@@ -1,0 +1,124 @@
+# yaml-language-server: $schema=../../../../src/mission_control/contracts/schemas/mc.mission_manifest.v2.json
+# Provider fixture F3 (ITER-3-2026-11-06 F2-G2): the E2 Stage Graph shape on the OpenAI Agents API
+# (`codex_agents`, pack deployments/hosted-packs/ai-engineer/codex_agents, model gpt-6.1-sol).
+#
+# Two parallel collectors (root concurrency 2), each reading ONE frozen source quote, an `all` join
+# (`synthesize` depends on both) and one human REVIEW gate that owns acceptance. Launch bindings:
+# `providers.codex_agents` of scripts/hosted_launch_bindings.py (registry keys hosted.default,
+# codex_agents.api, environment ai-engineer-knowledge on task queue mc-ai-engineer-lane-hosted).
+#
+# What the hosted lane cannot do, and how this fixture is shaped around it:
+# - No named output submission: `submit_output` exists only on the Deep Agents lane
+#   (adapters/deep_agents/knowledge_tools.py), hosted capability projection carries skills and
+#   streamable-HTTPS MCP servers only (adapters/remote_session/host_files.py), and the hosted
+#   harnesses register no `outputs/` files (end_session stages one session manifest). So each
+#   stage's text output is `enforcement: expected`: the run proceeds and inspection shows the
+#   promise as a visible shortfall instead of failing the stage.
+# - No stage-to-stage data: with no accepted output revision there is nothing to bind with
+#   `from:`, so the join is `depends_on` (ordering) and the synthesizer gets both frozen quotes
+#   inline. Each stage's answer is its final assistant text (settlement output_text, transcript).
+# - Repository-less knowledge work (ProviderExecutionBinding allows it on the hosted agent APIs).
+# - No `mc_upload_artifact`: the shipped pack declares no `mc_prepare` function, and the production
+#   tools gate every Mission Control function except mc_signal/mc_request_approval/mc_record_intent
+#   on a recorded env.prepared that needs an mc_prepare call (adapters/openai_agents/tools.py), so
+#   an upload returns environment_not_prepared. The stages answer in text and report one mc_signal.
+# Frozen sources (captured 2026-10-28, scripts/sprint_oc_w1_pack.mjs FIXTURES["ai-engineer"]).
+manifest: mission/v2
+mission:
+  key: f3-agents-stagegraph
+  title: F3 Agents API parallel collectors joined into one synthesis (frozen evidence)
+  application: ai-engineer
+  data_class: internal
+  description: >
+    Provider fixture F3. Two parallel collectors, an all-join and a synthesizer on the OpenAI
+    Agents API, then one human review gate.
+  goals:
+    - key: collected
+      description: Extract the parameter count each frozen source quote states for the model it names
+      objectives:
+        - { key: collect_mistral, description: Extract the size stated by the Mistral 7B abstract quote }
+        - { key: collect_llama, description: Extract the sizes stated by the Llama 3.1 model card quote }
+      criteria:
+        - key: notes_reported
+          description: Each collector answered one note naming its source id, model and quoted size
+          evidence: [notes_a, notes_b]
+          acceptance: { human: review_accept }
+    - key: synthesized
+      description: Combine both quotes into one short synthesis
+      objectives:
+        - { key: synthesize_notes, description: Synthesize the two quoted sizes }
+      criteria:
+        - key: synthesis_reported
+          description: The synthesis names both models with their quoted sizes
+          evidence: [synthesis]
+          acceptance: { human: review_accept }
+  environment:
+    lane: codex_agents
+    model: { profile: hosted.default }
+    auth: { profile: codex_agents.api }
+    execution_environment: { kind: provider_hosted, provider: openai, environment_ref: ai-engineer-knowledge }
+    workspace:
+      policy: { mode: provider_workspace, reuse: none }
+    budget: { usd: 0.5, tokens: 300000, wall_clock: 40m, tool_calls: 24 }
+    governors: { depth: 1, fan_out: 2, iterations: 1, patience: 1 }
+    side_effects: [read_only, workspace_write]
+  program:
+    key: root
+    behavior: stage_graph
+    objectives: [collected, synthesized]
+    concurrency: 2
+    nodes:
+      - key: collect_a
+        behavior: agent_executor
+        objectives: [collect_mistral]
+        environment:
+          budget: { usd: 0.1, tokens: 60000, wall_clock: 10m, tool_calls: 6 }
+        instruction: |
+          Frozen source arxiv-2310.06825-abstract ("Mistral 7B (arXiv:2310.06825), abstract"), verbatim quote:
+          "We introduce Mistral 7B, a 7-billion-parameter language model engineered for superior performance and efficiency."
+          Use only this quote; do not browse, write files or upload artifacts. Call mc_signal once with name
+          findings.ready before answering. Your final answer must be exactly two lines and nothing else:
+          "source: arxiv-2310.06825-abstract" and "mistral-7b: <parameter count exactly as quoted>".
+        outputs:
+          - { name: notes_a, form: text, enforcement: expected, media_type: text/plain }
+      - key: collect_b
+        behavior: agent_executor
+        objectives: [collect_llama]
+        environment:
+          budget: { usd: 0.1, tokens: 60000, wall_clock: 10m, tool_calls: 6 }
+        instruction: |
+          Frozen source hf-meta-llama-llama-3.1-model-card ("Meta Llama 3.1 model card, Model Information"), verbatim quote:
+          "a collection of pretrained and instruction tuned generative models in 8B, 70B and 405B sizes"
+          Use only this quote; do not browse, write files or upload artifacts. Call mc_signal once with name
+          findings.ready before answering. Your final answer must be exactly two lines and nothing else:
+          "source: hf-meta-llama-llama-3.1-model-card" and "llama-3-1: <sizes exactly as quoted>".
+        outputs:
+          - { name: notes_b, form: text, enforcement: expected, media_type: text/plain }
+      - key: synthesize
+        behavior: agent_executor
+        objectives: [synthesize_notes]
+        # The join: released when both collectors finished (ordering only; see the header).
+        depends_on: [collect_a, collect_b]
+        environment:
+          budget: { usd: 0.15, tokens: 100000, wall_clock: 15m, tool_calls: 6 }
+        instruction: |
+          Two collectors each read one frozen quote; their answers do not reach you on this lane. The quotes are:
+          arxiv-2310.06825-abstract: "We introduce Mistral 7B, a 7-billion-parameter language model engineered for superior performance and efficiency."
+          hf-meta-llama-llama-3.1-model-card: "a collection of pretrained and instruction tuned generative models in 8B, 70B and 405B sizes"
+          Use only these quotes; do not browse, write files or upload artifacts. Call mc_signal once with name
+          findings.ready before answering. Your final answer must be at most three lines and nothing else: one line per
+          model with the size its quote states, then "delivery: inline quotes (no upstream output on codex_agents)".
+        outputs:
+          - { name: synthesis, form: text, enforcement: expected, media_type: text/plain }
+      - key: review
+        behavior: human_gate
+        objectives: [collected, synthesized]
+        depends_on: [synthesize]
+        task:
+          kind: REVIEW
+          prompt: Review the two collector answers and the synthesis in the run transcript (the hosted lane submits no named outputs).
+          reviewers: [owner]
+          packet: [collect_a.notes_a, collect_b.notes_b, synthesize.synthesis]
+          on_timeout: keep_waiting
+  controls:
+    commands_allowed: [resume, cancel, queue_instruction, interrupt_and_inject]

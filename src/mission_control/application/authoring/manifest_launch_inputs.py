@@ -1265,12 +1265,15 @@ class ManifestLaunchResolver:
         except WorkspaceError as error:
             raise ManifestLaunchBindingError(source("workspace.policy"), error.message) from error
         repo = environment.workspace.repo if environment.workspace is not None else None
-        if repo is None:
+        # The hosted agent APIs also run knowledge work without a repository (ADR-0050;
+        # `ProviderExecutionBinding` admits it there); a named repository still needs its
+        # reviewed commit. Every worker lane works in a repository.
+        if repo is None and profile not in HOSTED_API_PROFILES:
             raise ManifestLaunchBindingError(
                 source("workspace.repo"), f"lane {profile} requires workspace.repo"
             )
         repo_commit = None
-        if profile in HOSTED_API_PROFILES:
+        if repo is not None and profile in HOSTED_API_PROFILES:
             repo_commit = lane.repository_commits.get(f"{repo.url or repo.path}#{repo.ref}")
             if not repo_commit:
                 raise ManifestLaunchBindingError(
@@ -1347,8 +1350,11 @@ class ManifestLaunchResolver:
                 "auth": auth,
                 "environment": bound_environment,
                 "workspace_policy": policy,
-                "repo_url": repo.url or repo.path,
-                "repo_ref": repo.ref,
+                **(
+                    {"repo_url": repo.url or repo.path, "repo_ref": repo.ref}
+                    if repo is not None
+                    else {}
+                ),
                 **({"repo_commit": repo_commit} if repo_commit else {}),
                 "requirements": requirements,
                 "policy_digest": policy_digest,
