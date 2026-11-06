@@ -1,5 +1,61 @@
 # Mission Control
 
+**A durable control plane for multi-agent "missions": it schedules work across frontier agent frameworks and keeps every agent
+session inspectable, forkable and steerable.**
+
+Mission Control takes a declarative *mission* (a goal, a workflow shape, the agents and capabilities it may use, and the outputs it
+promises) and runs it to an evidence-backed result. [Temporal](https://temporal.io) owns scheduling and recovery, PostgreSQL owns
+state, and each agent runtime plugs in as a *provider lane* behind one provider-neutral contract.
+[Deep Agents](https://github.com/langchain-ai/deepagents) (LangGraph) is the primary lane. Claude Agent SDK, Codex, Cursor,
+Claude Managed Agents and the OpenAI Agents API use the same adapter boundary.
+
+Built and maintained by [John Overton Bell](https://github.com/jbell-rusty-vantage).
+
+```mermaid
+flowchart LR
+  M[Mission manifest] --> A[Admission<br/>HTTP API · missionctl · MCP]
+  A --> T[Temporal workflows<br/>Stage Graph · Goal Loop]
+  T --> L{Provider lanes}
+  L --> DA[Deep Agents]
+  L --> O[Claude SDK · Codex · Cursor<br/>Managed Agents · Agents API]
+  T <--> DB[(PostgreSQL<br/>common contract)]
+  DA --> K[Knowledge Services<br/>evidence, judgment, review]
+```
+
+### What it does
+
+- **Workflow systems as data.** A mission manifest compiles to a Stage Graph (stages that release, route and revisit) or a
+  goal-directed run with produce, verify and repair rounds. Parallel Swarm is built as a Stage Graph profile, and the full Goal
+  Loop and evaluator-optimizer scoring are being built on the same machinery. Pure interpreters propose transitions, and reducers
+  own lifecycle and settlement.
+- **Control over live agent sessions.** Every lane records step-level *cognition points*, so an operator or coordinator agent can
+  read state as of any step, fork from it, queue work, interrupt and steer. This is proven locally on Deep Agents and is implemented
+  but not yet live-proven on the other lanes.
+- **Output contracts.** Named deliverables are submitted, independently judged and audited, then sealed with source attribution
+  before a mission counts as fulfilled.
+- **One governed database contract.** A versioned common schema with releases, attested installs, restricted runtime roles and
+  row-level security, shared by the applications built on it (AI Engineer and Biotech).
+- **Hexagonal architecture.** Domain code imports no database, Temporal, web framework or provider SDK. Adapters implement
+  application ports, and architecture tests enforce the boundaries.
+
+### Status
+
+Active development, in startup mode. The scheduling, control and output machinery for Deep Agents is implemented, tested and
+integrated against disposable PostgreSQL/Temporal targets. The first release gate (W0) has passed, and later gates are in progress.
+This repository separates *implemented*, *tested*, *integrated* and *qualified* claims
+([qualification](docs/knowledge/qualification.md)). The design record is 68 ADRs in [`docs/adr`](docs/adr), with concepts in
+[`docs/knowledge`](docs/knowledge/index.md).
+
+**Stack:** Python 3.12 · Temporal · LangGraph / Deep Agents · FastAPI · PostgreSQL 17 + pgvector · psycopg 3 · MCP ·
+uv, ruff, mypy, ty and pytest. The repository has about 1,000 source modules and 1,200 test files.
+
+### License
+
+No open-source license is granted yet. The code is public to read and review, and all rights are reserved. To use or build on
+it, open an issue or contact the author through GitHub.
+
+## Operating it
+
 General mission execution with governed admission, StageGraph and GoalDirected
 programs, durable lifecycle controls, and bounded Deep Agents cognition. Temporal
 owns execution; PostgreSQL owns application state.
