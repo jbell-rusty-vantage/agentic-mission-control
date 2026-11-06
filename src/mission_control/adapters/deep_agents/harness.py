@@ -29,6 +29,7 @@ from mission_control.domain.execution.checkpoint_lineage import CheckpointLineag
 from mission_control.domain.execution.contracts import (
     DeepAgentExecutionBinding,
     OperationExecutionRequest,
+    PromptSegment,
     RuntimeInvocation,
     RuntimeResult,
 )
@@ -97,6 +98,7 @@ class DeepAgentsHarness:
         self._runtime = runtime
         self._secrets = secrets
         self._sessions: dict[str, _Session] = {}
+        self._unsteered: dict[str, list[PromptSegment]] = {}
 
     @property
     def runtime(self) -> DeepAgentRuntime:
@@ -126,6 +128,25 @@ class DeepAgentsHarness:
         self, invocation: RuntimeInvocation, resolved_secrets: Mapping[str, str]
     ) -> RuntimeResult:
         return await self._runtime.execute(invocation, resolved_secrets)
+
+    # --- steer with context (`cooperative_inject`, owner 2026-11-06) -------------------------
+
+    async def inject(self, invocation: RuntimeInvocation, content: PromptSegment) -> None:
+        """Hand a steer to the running turn (`CooperativeInjectLane`). A runtime that cannot
+        steer in-turn keeps it for `undelivered`, so it runs as the next turn, never lost."""
+
+        steer = getattr(self._runtime, "inject", None)
+        if steer is None:
+            self._unsteered.setdefault(invocation.binding.binding_id, []).append(content)
+            return
+        await steer(invocation, content)
+
+    def undelivered(self, invocation: RuntimeInvocation) -> tuple[PromptSegment, ...]:
+        """`SteerFollowUpLane`: the steers the finished turn never applied, oldest first."""
+
+        own = tuple(self._unsteered.pop(invocation.binding.binding_id, []))
+        left = getattr(self._runtime, "undelivered", None)
+        return own + (tuple(left(invocation)) if left is not None else ())
 
     async def settle_invocation(
         self, invocation: RuntimeInvocation, *, fenced: bool = False

@@ -816,8 +816,10 @@ class ContextPackService:
     ) -> tuple[PackCandidate, ...]:
         """Mailbox entries a boundary delivers, as mandatory ``queued_instruction`` items.
 
-        Operator content is admitted input: data with provenance, never authority
-        (ADR-0027). A ``queue_instruction`` is inline; an ``add_context`` follows its
+        Inline ``queue_instruction`` and ``interrupt_and_inject`` text is an operator
+        instruction (owner 2026-11-06, amending ADR-0027 for authorized operators): it renders
+        in the packet's final Operator instructions section. Added context stays admitted
+        data with provenance. A ``queue_instruction`` is inline; an ``add_context`` follows its
         ``expand`` hint (``materialize`` degrades to a reference where the lane cannot write
         files, so it is not mandatory). An artifact reference that cannot be captured, or
         whose bytes differ from the commanded digest, stays a non-mandatory reference.
@@ -913,6 +915,7 @@ class ContextPackService:
                     content=entry.content_inline.encode("utf-8"),
                     media_type=entry.media_type,
                 )
+                operator_text = entry.kind != "add_context" and hint == ExpandMode.INLINE
                 candidates.append(
                     PackCandidate(
                         source_kind=ContextSourceKind.QUEUED_INSTRUCTION,
@@ -920,7 +923,13 @@ class ContextPackService:
                         content_digest=entry.content_digest,
                         bytes=entry.content_bytes,
                         media_type=entry.media_type,
-                        trust=ContextTrust.ADMITTED_INPUT,
+                        # L2-02 (owner 2026-11-06): queued and injected operator text is an
+                        # instruction; added context stays admitted data.
+                        trust=(
+                            ContextTrust.OPERATOR_INSTRUCTION
+                            if operator_text
+                            else ContextTrust.ADMITTED_INPUT
+                        ),
                         mandatory=hint != ExpandMode.MATERIALIZE,
                         expand=hint,
                         text=entry.content_inline,

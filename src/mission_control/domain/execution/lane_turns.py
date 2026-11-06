@@ -213,7 +213,9 @@ LANE_COMMAND_SEMANTICS: Final[dict[str, dict[str, str]]] = {
         "codex_agents": "turn_boundary_guaranteed",
     },
     "interrupt_and_inject": {
-        "deep_agents": "cancel_and_replace",
+        # Owner 2026-11-06 (steer with context): Deep Agents steers its running turn
+        # in-process before the next model call (adapters/deep_agents/steering.py).
+        "deep_agents": "cooperative_inject",
         "cursor_local": "cancel_and_replace",
         "cursor_cloud": "cancel_and_replace",
         "claude_agent_sdk": "cancel_and_replace",

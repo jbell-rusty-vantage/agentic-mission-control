@@ -25,7 +25,7 @@ from mission_control.application.recovery.run_forks import (
     SemanticForkService,
 )
 from mission_control.contracts.canonical import canonical_digest
-from mission_control.contracts.contracts import InlineText, MissionControlRejected
+from mission_control.contracts.contracts import MissionControlRejected
 from mission_control.contracts.runtime_contracts import (
     ClosedWorkflowRecoveryRequest,
     ForkSeedView,
@@ -97,22 +97,20 @@ class MissionControlRuntimeService:
             raise MissionControlRejected("unauthorized", "sponsorship was not granted")
         if not set(request.approval_refs) <= approval_refs:
             raise MissionControlRejected("unauthorized", "approval was not granted")
-        # 1.4.4 (P5.1): an inline message with a cognitive seed is delivered to the seed head
-        # by the fork itself; every other message is a mailbox instruction as before.
-        seed_head = request.cognitive_seed is not None and isinstance(request.message, InlineText)
+        # Loop iter-3 F1-G3 (owner 2026-11-06): every fork message, seeded or not, is the
+        # derived run's queued operator instruction for the fork's stage.
         if request.message is not None:
             self._authorize(actor, "workflow_run.control")
-            if not seed_head:
-                if self._seeds is None:
-                    raise MissionControlRejected(
-                        "unsupported_control", "a fork instruction requires a command mailbox"
-                    )
-                try:  # Refuse oversized or mismatched content before anything is admitted.
-                    mailbox_command_action(
-                        "queue_instruction", request.message, boundary="next_turn", generation=1
-                    )
-                except MailboxContentRejected as error:
-                    raise MissionControlRejected(error.code, str(error)) from None
+            if self._seeds is None:
+                raise MissionControlRejected(
+                    "unsupported_control", "a fork instruction requires a command mailbox"
+                )
+            try:  # Refuse oversized or mismatched content before anything is admitted.
+                mailbox_command_action(
+                    "queue_instruction", request.message, boundary="next_turn", generation=1
+                )
+            except MailboxContentRejected as error:
+                raise MissionControlRejected(error.code, str(error)) from None
         # Existing fork storage keys on scope/request_id. Include actor and action so
         # distinct authenticated principals cannot collide on a caller-chosen UUID.
         scoped_id = str(

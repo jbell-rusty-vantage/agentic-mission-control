@@ -37,7 +37,8 @@
       "enum": [
         "authoritative",
         "admitted_input",
-        "untrusted_content"
+        "untrusted_content",
+        "operator_instruction"
       ],
       "title": "ContextTrust",
       "type": "string"

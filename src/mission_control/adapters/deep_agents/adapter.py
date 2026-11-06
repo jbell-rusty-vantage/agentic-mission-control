@@ -79,6 +79,11 @@ from mission_control.adapters.deep_agents.model_retry import (
     GovernedModelRetryMiddleware,
     unsent_transport_failure,
 )
+from mission_control.adapters.deep_agents.steering import (
+    OperatorSteerMiddleware,
+    SteerInbox,
+    SteerItem,
+)
 from mission_control.adapters.deep_agents.transfer import (
     DeepAgentReceiverBackend,
     materialize_transfer,
@@ -133,6 +138,7 @@ from mission_control.domain.execution.contracts import (
     CapturedWorkspaceCandidate,
     DeepAgentExecutionBinding,
     OperationExecutionBinding,
+    PromptSegment,
     RuntimeInvocation,
     RuntimeResult,
     RuntimeUsage,
@@ -252,6 +258,30 @@ class DeepAgentRuntimeAdapter:
         # fixtures that still consume model-emitted refs. Either way the Context Packer only
         # materializes registered refs.
         self._drop_unregistered_output_refs = drop_unregistered_output_refs
+        # Owner 2026-11-06 (steer with context): `cooperative_inject` into the running turn.
+        self._steer = SteerInbox()
+        self._steer_leftover: dict[str, list[SteerItem]] = {}
+
+    # -- steer with context (cooperative_inject) -------------------------------------------
+
+    async def inject(self, invocation: RuntimeInvocation, content: PromptSegment) -> None:
+        """Hand a steer to the running turn of this binding (`CooperativeInjectLane`).
+
+        The turn's `OperatorSteerMiddleware` appends it before the next model call. With no
+        turn running (it just ended), the steer waits for `undelivered` to run it as a
+        follow-up turn; it is never dropped.
+        """
+
+        key = invocation.binding.binding_id
+        item = SteerItem(delivery_key=content.source_ref, segment=content)
+        if not self._steer.put(key, item):
+            self._steer_leftover.setdefault(key, []).append(item)
+
+    def undelivered(self, invocation: RuntimeInvocation) -> tuple[PromptSegment, ...]:
+        """Steers the binding's finished turn never drained, oldest first (removed)."""
+
+        items = self._steer_leftover.pop(invocation.binding.binding_id, [])
+        return tuple(item.segment for item in items)
 
     async def build_hosted_async_subagent_graph(
         self,
@@ -302,6 +332,20 @@ class DeepAgentRuntimeAdapter:
 
     @trace_deep_agent_execute
     async def execute(
+        self,
+        invocation: RuntimeInvocation,
+        resolved_secrets: Mapping[str, str],
+    ) -> RuntimeResult:
+        try:
+            return await self._execute_turn(invocation, resolved_secrets)
+        finally:
+            # Steers the turn never drained (it ended after its last model call) wait for
+            # the inject service's follow-up turn (`undelivered`).
+            left = self._steer.close(invocation.binding.binding_id)
+            if left:
+                self._steer_leftover.setdefault(invocation.binding.binding_id, []).extend(left)
+
+    async def _execute_turn(
         self,
         invocation: RuntimeInvocation,
         resolved_secrets: Mapping[str, str],
@@ -405,11 +449,17 @@ class DeepAgentRuntimeAdapter:
                 if turn_limits
                 else []
             )
+            steer_key = invocation.binding.binding_id
+            self._steer.open(steer_key)
             agent = _compile(
                 materialized,
                 binding,
                 system_prompt=system_prompt,
-                extra_middleware=[*governed_async, *budget_stop],
+                extra_middleware=[
+                    *governed_async,
+                    *budget_stop,
+                    OperatorSteerMiddleware(self._steer, steer_key),
+                ],
                 name=f"belllabs-{binding.operation_id}",
             )
             state = {

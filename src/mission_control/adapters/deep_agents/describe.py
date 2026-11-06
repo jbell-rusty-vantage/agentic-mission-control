@@ -73,7 +73,7 @@ DEEP_AGENTS_DESCRIBE: Final = LaneDescribe(
     },
     delivery_semantics={
         "queue_instruction": "turn_boundary_guaranteed",
-        "interrupt_and_inject": "cancel_and_replace",
+        "interrupt_and_inject": "cooperative_inject",
         "pause": "pause_at_tool_gate",
         "hard_pause": "unsupported",
         "resume": "turn_boundary_guaranteed",

@@ -102,6 +102,9 @@ class ForkSeedService:
                 )
             instruction_id = seed_command_id(scope, receipt.request_id, "instruction")
             content = instruction
+            # Loop iter-3 F1-G3: a fork at a Stage Graph stage delivers its message to that
+            # stage's first turn, never to another stage the derived run admits first.
+            target_node = receipt.at.stage if receipt.at is not None else None
             await self._admit(
                 scope,
                 run_id,
@@ -109,7 +112,11 @@ class ForkSeedService:
                 issuer=json.dumps(["mc.fork_seed.v1", actor.actor_id], separators=(",", ":")),
                 actor=actor,
                 build=lambda generation: mailbox_command_action(
-                    "queue_instruction", content, boundary="next_turn", generation=generation
+                    "queue_instruction",
+                    content,
+                    boundary="next_turn",
+                    generation=generation,
+                    node_key=target_node,
                 ),
                 reason=reason,
                 fork_request_id=receipt.request_id,

@@ -1443,15 +1443,17 @@ def _check_goal_position(snapshot: RunSnapshotManifest, at: ForkAt, head_revisio
 
 
 def _message_delivery(command: ForkCommand) -> tuple[str | None, MessageDelivery]:
-    """P5.1 (owner, 2026-10-21): with a cognitive seed an inline message becomes the seed
-    head's last human message; otherwise (no seed, or a content reference) it is queued to
-    the derived mailbox as before."""
+    """Every fork message is queued to the derived run's mailbox as an operator instruction.
 
-    message = command.message
-    if message is None:
+    Loop iter-3 F1-G3 (owner, 2026-11-06), superseding P5.1's seed-head delivery: as the seed
+    head's last human message it was followed by the derived stage's re-sent prompt and
+    rendered as data, so the model declined it. As a queued instruction for the fork's stage
+    it renders last, in the start packet's Operator instructions section; the seed head stays
+    the exact state at the point. `seed_head` remains a readable value for older receipts.
+    """
+
+    if command.message is None:
         return None, "none"
-    if command.cognitive_seed is not None and isinstance(message, InlineText):
-        return message.text, "seed_head"
     return None, "mailbox"
 
 

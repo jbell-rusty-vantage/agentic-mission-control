@@ -82,7 +82,8 @@ ARCHITECTURE_MATRIX: dict[str, dict[str, str]] = {
 ARCHITECTURE_DELIVERY: dict[str, dict[str, str]] = {
     "deep_agents": {
         "queue_instruction": "turn_boundary_guaranteed",
-        "interrupt_and_inject": "cancel_and_replace",
+        # Owner 2026-11-06 (steer with context): the running turn is steered in-process.
+        "interrupt_and_inject": "cooperative_inject",
         "pause": "pause_at_tool_gate",
     },
     "cursor_local": {
@@ -441,9 +442,11 @@ def test_usage_report_never_counts_unknown_as_tokens() -> None:
 
 
 _DB_CONTRACT = Path(__file__).resolve().parents[3] / "packages/mission-control-db-contract"
-_MIGRATIONS = _DB_CONTRACT / "releases/1.14.0/component/migrations"
+_MIGRATIONS = _DB_CONTRACT / "releases/1.15.0/component/migrations"
 # Cross-provider control (OVE-224, ADR-0069): the 1.14.0 describe refresh of every session lane.
 _CROSS_PROVIDER_MIGRATION = "0073_cross_provider_lane_describes.sql"
+# Owner 2026-11-06 (steer with context): 1.15.0 revises the Deep Agents row only.
+_STEER_MIGRATION = "0074_deep_agents_cooperative_inject_describe.sql"
 _SUBAGENT_FIELDS_MIGRATION = "0046_lane_describe_subagent_fields.sql"
 _LANE_DESCRIBE_MIGRATION = "0033_approvals_coordinator_inbox_lane_describes.sql"
 _HOSTED_AGENT_API_MIGRATION = "0036_hosted_agent_api_lane_profiles.sql"
@@ -502,6 +505,7 @@ def test_lane_profile_migrations_end_at_exactly_the_declared_describes() -> None
     revised_0042 = _revised_describes("0042_codex_01621_lane_describe.sql")
     revised_0046 = _revised_describes(_SUBAGENT_FIELDS_MIGRATION)
     revised_0073 = _revised_describes(_CROSS_PROVIDER_MIGRATION)
+    revised_0074 = _revised_describes(_STEER_MIGRATION)
     assert set(revised_0042) == {"codex"}
     assert set(seeded_0030) == {"deep_agents", "cursor_local", "cursor_cloud"}
     assert set(seeded_0031) == {"claude_agent_sdk", "codex", "claude_cloud", "codex_cloud"}
@@ -531,7 +535,13 @@ def test_lane_profile_migrations_end_at_exactly_the_declared_describes() -> None
     for document in revised_0073.values():
         assert document["qualified"] is False
         assert document["time_travel"]["read"] in {"R1", "R2", "R3"}
-    assert {**before_0046, **revised_0046, **revised_0073} == {
+    # 1.15.0: only the Deep Agents row moves (cooperative_inject); it stays qualified.
+    assert set(revised_0074) == {"deep_agents"}
+    assert revised_0074["deep_agents"]["qualified"] is True
+    assert revised_0074["deep_agents"]["delivery_semantics"]["interrupt_and_inject"] == (
+        "cooperative_inject"
+    )
+    assert {**before_0046, **revised_0046, **revised_0073, **revised_0074} == {
         profile: describe.model_dump(mode="json")
         for profile, describe in DECLARED_LANE_MATRICES.items()
     }
@@ -591,16 +601,31 @@ def test_frozen_0040_and_additive_0042_are_exact_generated_text() -> None:
     prior_1130 = generator.persisted_documents(
         _DB_CONTRACT / "releases/1.13.0/component/migrations"
     )
-    declared = generator.declared_documents()
-    moved = tuple(p for p in declared if declared[p] != prior_1130.get(p))
+    # 1.15.0: 0073's end state is what 1.14.0 persisted (0074 moved the declared matrices on).
+    persisted_1140 = generator.persisted_documents(
+        _DB_CONTRACT / "releases/1.14.0/component/migrations"
+    )
+    moved = tuple(p for p in persisted_1140 if persisted_1140[p] != prior_1130.get(p))
     expected_0073 = generator.render_successor_section(
         label="release 1.14.0: cross-provider control time-travel and intervention cells (OVE-224)",
-        documents=declared,
+        documents=persisted_1140,
         prior=prior_1130,
         profiles=moved,
         qualified_profiles=tuple(p for p in ("deep_agents",) if p in moved),
     )
     assert (_MIGRATIONS / _CROSS_PROVIDER_MIGRATION).read_bytes().decode("utf-8") == expected_0073
+    # 1.15.0: 0074 is exactly the successor from the persisted 1.14.0 documents to the declared
+    # matrices for the profiles that moved (`scripts/prepare_release_1150.py`).
+    declared = generator.declared_documents()
+    moved_1150 = tuple(p for p in declared if declared[p] != persisted_1140.get(p))
+    expected_0074 = generator.render_successor_section(
+        label="release 1.15.0: Deep Agents steer with context (cooperative_inject)",
+        documents=declared,
+        prior=persisted_1140,
+        profiles=moved_1150,
+        qualified_profiles=tuple(p for p in ("deep_agents",) if p in moved_1150),
+    )
+    assert (_MIGRATIONS / _STEER_MIGRATION).read_bytes().decode("utf-8") == expected_0074
     successor_spec = importlib.util.spec_from_file_location(
         "codex_describe_successor",
         _DB_CONTRACT.parents[1] / "scripts/prepare_codex_describe_successor.py",

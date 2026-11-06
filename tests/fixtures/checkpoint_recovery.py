@@ -50,6 +50,7 @@ from mission_control.adapters.deep_agents import (
 from mission_control.adapters.deep_agents.checkpoint_verifier import (
     LangGraphCheckpointDescendantVerifier,
 )
+from mission_control.adapters.deep_agents.describe import DEEP_AGENTS_DESCRIBE
 from mission_control.adapters.deep_agents.harness import DeepAgentsHarness
 from mission_control.adapters.operations.conformance import (
     ConformanceAssetVerifier,
@@ -279,6 +280,26 @@ class CrashingSaver(InMemorySaver):
         await super().aput_writes(config, writes, task_id, task_path)
 
 
+class DeclaredInterruptHarness(DeepAgentsHarness):
+    """The Deep Agents harness declaring another `interrupt_and_inject` semantics, so the
+    kernel's cancel-and-replace path stays tested on a real lane after Deep Agents moved to
+    `cooperative_inject` (owner 2026-11-06)."""
+
+    def __init__(self, runtime: Any, semantics: str) -> None:
+        super().__init__(runtime)
+        self._declared = DEEP_AGENTS_DESCRIBE.model_copy(
+            update={
+                "delivery_semantics": {
+                    **DEEP_AGENTS_DESCRIBE.delivery_semantics,
+                    "interrupt_and_inject": semantics,
+                }
+            }
+        )
+
+    def describe(self) -> Any:
+        return self._declared
+
+
 class InjectingRuntime:
     """The runtime port with crash points around the real adapter."""
 
@@ -298,6 +319,16 @@ class InjectingRuntime:
             self.crash_after_invocation = False
             raise SimulatedWorkerCrash("worker lost after the terminal checkpoint")
         return result
+
+    async def inject(self, invocation: RuntimeInvocation, content: Any) -> None:
+        """Steer with context: the real adapter's in-turn steer (owner 2026-11-06)."""
+
+        adapter: Any = self._adapter
+        await adapter.inject(invocation, content)
+
+    def undelivered(self, invocation: RuntimeInvocation) -> Any:
+        adapter: Any = self._adapter
+        return adapter.undelivered(invocation)
 
     async def settle_invocation(
         self, invocation: RuntimeInvocation, *, fenced: bool = False
@@ -632,6 +663,7 @@ async def recovery_harness(
     saved_results: Any = None,
     settlers: Sequence[Any] = (),
     service_options: dict[str, Any] | None = None,
+    interrupt_semantics: str | None = None,
 ) -> RecoveryHarness:
     """`run_control` (RRM-016) lets a family's admissions be registered on the harness; its
     repository is then not exposed (`RecoveryHarness.repository` stays `None`)."""
@@ -691,7 +723,13 @@ async def recovery_harness(
     service = OperationExecutionService(
         authority=(run_control_authority(run_control) if real_authority else AcceptingAuthority()),
         bindings=bindings,
-        lanes=LaneRegistry([DeepAgentsHarness(runtime)]),
+        lanes=LaneRegistry(
+            [
+                DeepAgentsHarness(runtime)
+                if interrupt_semantics is None
+                else DeclaredInterruptHarness(runtime, interrupt_semantics)
+            ]
+        ),
         sandbox=ConformanceSandbox(),
         assets=assets,
         mcp=assets,

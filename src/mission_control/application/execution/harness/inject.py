@@ -84,6 +84,29 @@ class CooperativeInjectLane(Protocol):
     async def inject(self, invocation: RuntimeInvocation, content: PromptSegment) -> None: ...
 
 
+@runtime_checkable
+class SteerFollowUpLane(Protocol):
+    """A cooperative lane that returns the steers a finished turn never applied (owner
+    2026-11-06: a steer is never dropped; it runs as the next turn of the same lineage)."""
+
+    def undelivered(self, invocation: RuntimeInvocation) -> tuple[PromptSegment, ...]: ...
+
+
+def merged_steer(segments: tuple[PromptSegment, ...]) -> PromptSegment:
+    """One follow-up segment carrying every undelivered steer, oldest first."""
+
+    if len(segments) == 1:
+        return segments[0]
+    content = "\n\n".join(segment.content for segment in segments)
+    return PromptSegment(
+        source_ref="steer-follow-up:" + sha256_digest([s.source_ref for s in segments])[7:],
+        source_revision=1,
+        trust_class=segments[0].trust_class,
+        content=content,
+        rendered_digest=sha256_digest(content),
+    )
+
+
 @dataclass
 class TurnRecord:
     """What the turns of one operation attempt did with injected Commands."""
@@ -201,6 +224,22 @@ class InterruptAndInjectService:
                         )
                         if current.follow_up_key in record.delivery_keys:
                             record.delivery_keys.remove(current.follow_up_key)
+                    leftover = (
+                        lane.undelivered(current) if isinstance(lane, SteerFollowUpLane) else ()
+                    )
+                    if leftover:
+                        # A steer the turn ended before draining (its last model call had
+                        # already run) continues the same lineage as one more turn.
+                        record.turns += 1
+                        current = current.model_copy(
+                            update={
+                                "follow_up": merged_steer(leftover),
+                                "follow_up_kind": None,
+                                "follow_up_key": None,
+                            }
+                        )
+                        task = asyncio.create_task(lane.execute(current, secrets))
+                        continue
                     queued = await self._queued_follow_up(
                         request,
                         invocation,

@@ -95,6 +95,10 @@ class ContextTrust(StrEnum):
     AUTHORITATIVE = "authoritative"
     ADMITTED_INPUT = "admitted_input"
     UNTRUSTED_CONTENT = "untrusted_content"
+    # Owner 2026-11-06 (L2-02): text an authorized operator queued or injected for this run is
+    # an instruction the attempt follows, rendered in its own final section (render.py), never
+    # inside the data blocks. Attached files, images and tool or web content stay data.
+    OPERATOR_INSTRUCTION = "operator_instruction"
 
 
 class ExpansionTier(StrEnum):
@@ -833,7 +837,12 @@ class _Packer:
             elif entry.item_id in seen:
                 reason = OmissionReason.DUPLICATE
             # 4. trust and expiry
-            elif candidate.trust not in self.policy.allowed_trust:
+            elif (
+                candidate.trust not in self.policy.allowed_trust
+                and candidate.trust != ContextTrust.OPERATOR_INSTRUCTION
+            ):
+                # Operator instructions pass every policy: the default tuple (and so every
+                # existing packet policy digest) is unchanged.
                 reason = OmissionReason.TRUST_FILTERED
             elif (
                 candidate.expires_at is not None and candidate.expires_at <= self.request.sealed_at

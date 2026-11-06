@@ -724,7 +724,10 @@ def test_message_delivery_is_decided_by_the_seed() -> None:
     assert _message_delivery(base) == (None, "none")
     assert _message_delivery(base.model_copy(update={"message": inline})) == (None, "mailbox")
     seeded = base.model_copy(update={"cognitive_seed": seed, "message": inline})
-    assert _message_delivery(seeded) == (inline.text, "seed_head")
+    # Loop iter-3 F1-G3 (owner 2026-11-06): a seeded fork's message is an operator
+    # instruction in the derived stage's start packet, not a seed-head human message the
+    # re-sent stage prompt buries; the seed stays the state at the point.
+    assert _message_delivery(seeded) == (None, "mailbox")
     assert _message_delivery(base.model_copy(update={"cognitive_seed": seed, "message": ref})) == (
         None,
         "mailbox",

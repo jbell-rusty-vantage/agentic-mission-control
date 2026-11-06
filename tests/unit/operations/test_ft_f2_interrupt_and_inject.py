@@ -92,6 +92,15 @@ async def harness_with_injections() -> RecoveryHarness:
     return await recovery_harness(model=RecordingModel(), injection_settings=FAST)
 
 
+async def cancel_and_replace_harness() -> RecoveryHarness:
+    """The kernel's cancel-and-replace path (Cursor, Claude, Codex and the hosted lanes
+    declare it) on the real Deep Agents lane, which itself now steers cooperatively."""
+
+    return await recovery_harness(
+        model=RecordingModel(), injection_settings=FAST, interrupt_semantics="cancel_and_replace"
+    )
+
+
 def facade(harness: RecoveryHarness) -> MissionControlService:
     return MissionControlService(
         harness.run_control,
@@ -134,35 +143,41 @@ def states(status: Any) -> list[str]:
 
 
 @pytest.mark.asyncio
-async def test_inject_with_no_running_tool_cancels_and_replaces_at_once() -> None:
+async def test_inject_steers_the_running_turn_without_cancelling_it() -> None:
+    """Owner 2026-11-06 (steer with context): Deep Agents declares `cooperative_inject`. A
+    steer arriving during a model call is never a cancel: it is handed to the running turn,
+    and since this turn ends after that call, it runs as the next turn of the same lineage."""
+
     harness = await harness_with_injections()
     unit = stage_recovery_unit(harness.run_id)
     request = await harness.request(unit)
-    entered, _gate = harness.model.gate_on(1)  # the first model call never returns
+    entered, gate = harness.model.gate_on(1)  # hold the first model call
     running = asyncio.create_task(harness.run(request))
     await asyncio.wait_for(entered.wait(), timeout=30)
 
     receipt = await inject(harness)
     assert receipt.admission.status == CommandStatus.ACCEPTED
-    assert states(receipt.delivery) == ["accepted", "queued"]
+    for _ in range(400):  # the watch packs the steer and hands it to the running turn
+        status = await status_of(harness, receipt)
+        if "applied" in states(status):
+            break
+        await asyncio.sleep(0.05)
+    gate.set()
     result = await asyncio.wait_for(running, timeout=60)
 
     assert result.status == "completed"
-    # The replacement turn saw the injected item after the original objective, once.
-    replacement = harness.model.humans[1]
-    assert len(replacement) == 2 and INJECTED in replacement[-1]
-    assert sum(INJECTED in text for call in harness.model.humans for text in call) == 2
+    # The first call ran to its end (nothing cancelled); the steer reached the turn's next
+    # model call, after the tool result, once.
+    assert harness.model.calls == [(1, 0), (2, 1)]
+    assert all(INJECTED not in text for text in harness.model.humans[0])
+    follow = harness.model.humans[1]
+    assert INJECTED in follow[-1]
+    assert sum(INJECTED in text for call in harness.model.humans for text in call) == 1
     status = await status_of(harness, receipt)
-    assert states(status) == ["accepted", "queued", "delivered", "observed", "applied"]
-    delivered = status.receipts[2].delivery_report
-    observed = status.receipts[3].delivery_report
-    assert delivered.requested_semantics == "cancel_and_replace"
-    assert delivered.native_refs.cancelled_turn_ref == "turn:1"
-    assert observed.delivered_semantics == "cancel_and_replace"
-    assert observed.native_refs.replacement_turn_ref == "turn:2"
-    assert observed.settled_effect_ids == () and observed.pending_effect_ids == ()
-    (entry,) = await harness.mailbox.list_entries("tenant-1", harness.run_id)
-    assert entry.state == MailboxState.CONSUMED
+    assert "delivered" in states(status) and "applied" in states(status)
+    delivered = next(r for r in status.receipts if r.state == "delivered").delivery_report
+    assert delivered.requested_semantics == "cooperative_inject"
+    assert delivered.native_refs.cancelled_turn_ref is None
 
 
 class SettlesDuringCancel:
@@ -204,7 +219,7 @@ async def _claim_tool_effect(harness: RecoveryHarness, request: Any) -> None:
 
 @pytest.mark.asyncio
 async def test_inject_with_a_running_tool_that_completes_during_cancel_settles_first() -> None:
-    harness = await harness_with_injections()
+    harness = await cancel_and_replace_harness()
     unit = stage_recovery_unit(harness.run_id)
     request = await harness.request(unit)
     harness.service._journal = SettlesDuringCancel(harness.service._journal)  # type: ignore[assignment]
@@ -230,7 +245,7 @@ async def test_inject_with_a_running_tool_that_completes_during_cancel_settles_f
 
 @pytest.mark.asyncio
 async def test_inject_with_a_tool_that_never_closes_parks_the_unit_in_doubt() -> None:
-    harness = await harness_with_injections()
+    harness = await cancel_and_replace_harness()
     unit = stage_recovery_unit(harness.run_id)
     request = await harness.request(unit)
 
@@ -266,7 +281,7 @@ async def test_inject_with_a_tool_that_never_closes_parks_the_unit_in_doubt() ->
 
 @pytest.mark.asyncio
 async def test_a_duplicate_command_id_interrupts_once() -> None:
-    harness = await harness_with_injections()
+    harness = await cancel_and_replace_harness()
     unit = stage_recovery_unit(harness.run_id)
     request = await harness.request(unit)
     entered, _gate = harness.model.gate_on(1)
