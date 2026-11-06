@@ -10,6 +10,8 @@ WI-19's `output.fulfilled` / `output.fulfillment_unmet` events come from the rea
 
 from __future__ import annotations
 
+from typing import Any
+
 import asyncpg
 
 from mission_control.adapters.postgres.context.transfer_plans import PostgresTransferPlanStore
@@ -19,11 +21,13 @@ from mission_control.adapters.postgres.knowledge.output_contracts import (
 )
 from mission_control.adapters.postgres.knowledge.use_decisions import PostgresMemberDecisions
 from mission_control.application.knowledge.effect_receipts import JournalEffectReceipts
+from mission_control.application.outputs.adoption import OutputAdoptionService
 from mission_control.application.outputs.fulfillment import (
     OutputFulfillmentService,
     TrustedReferenceUses,
 )
 from mission_control.application.outputs.submission_service import SubmissionService
+from mission_control.application.recovery.fork_outputs import ForkOutputCarry
 from mission_control.domain.knowledge.judgment import TRUSTED_BRIDGE_ACTOR
 
 
@@ -48,4 +52,25 @@ def compose_output_fulfillment(
     )
 
 
-__all__ = ["compose_output_fulfillment"]
+def compose_fork_output_carry(
+    pool: asyncpg.Pool, toolset: Any, *, trusted_validators: frozenset[str] | None
+) -> ForkOutputCarry:
+    """F1-G4: the carry of a reused unit's accepted named outputs into a fork-derived run,
+    over the worker's knowledge toolset (invocation origin, pins, lineage) and this store."""
+
+    from mission_control.application.knowledge.toolset import LiveInvocation
+
+    store = PostgresOutputContractStore(pool)
+    return ForkOutputCarry(
+        invocations=toolset,
+        finalization=toolset.submissions,
+        adoption=OutputAdoptionService(
+            outputs=store, submissions=toolset.submissions, lineage=toolset.lineage
+        ),
+        fulfillment=compose_output_fulfillment(pool, trusted_validators=trusted_validators),
+        outputs=store,
+        live_factory=LiveInvocation,
+    )
+
+
+__all__ = ["compose_fork_output_carry", "compose_output_fulfillment"]

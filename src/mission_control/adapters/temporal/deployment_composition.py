@@ -152,6 +152,7 @@ from mission_control.adapters.postgres.environments import (
 from mission_control.adapters.postgres.frames.repository import PostgresFrameRepository
 from mission_control.adapters.postgres.human_tasks.repository import PostgresHumanTaskRepository
 from mission_control.adapters.postgres.knowledge.output_fulfillment import (
+    compose_fork_output_carry,
     compose_output_fulfillment,
 )
 from mission_control.adapters.postgres.lanes.execution_state import (
@@ -1703,6 +1704,14 @@ class ProductionWorkerActivityCompositionFactory:
             review_alarm_interval=timedelta(seconds=settings.settlement_review_alarm_seconds),
             fork_reuse=ForkReuseResolver(
                 PostgresForkMaterializationStore(postgres_pool), results=payloads, bindings=bindings
+            ),
+            # F1-G4: a reused unit's accepted named outputs are carried into the derived run.
+            reused_outputs=(
+                None
+                if knowledge is None
+                else compose_fork_output_carry(
+                    postgres_pool, knowledge.toolset, trusted_validators=trusted_validators
+                )
             ),
             # RRM-008 step 4: the cancellation saga cancels the unit's active async children
             # with the operation's own scope-bound credential.

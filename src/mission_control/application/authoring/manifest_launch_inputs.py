@@ -3306,6 +3306,81 @@ class ManifestLaunchInputAuthor:
                 stage_inputs = stagegraph_authored_inputs(
                     MissionDefinition.model_validate(info["definition"])
                 )
+        await self._admit_inputs(request_scope, run_id, stage_inputs)
+        prepared = await self._dispatcher.prepare(
+            request_scope,
+            run_id,
+            initial_goal=initial_goal if family == "GoalDirected" else None,
+            task_timeout_seconds=self._timeout,
+            semantic_input_binding_ref=binding_ref(run_id),
+            human_gates=gates,
+            human_review=review,
+            stage_inputs=stage_inputs,
+        )
+        return asdict(prepared)
+
+    async def fork_family_input(
+        self,
+        *,
+        request_scope: str,
+        run_id: str,
+        source_run_id: str,
+        fork_request_id: str,
+        family: Literal["StageGraph", "GoalDirected"],
+    ) -> tuple[dict[str, Any], str]:
+        """F1-G2: a fork-derived Stage Graph run's family input, derived from its source run's
+        manifest submission exactly as the source's own was (human gates, authored inputs), but
+        bound to the derived run's admission and the fork's semantic input binding. The launch
+        derives the run's templates from the source's frozen ones (``_apply_stage_graph_fork``),
+        so nothing is frozen here. Returns the input and the source's binding ref."""
+
+        if family != "StageGraph":
+            raise ManifestStartUnavailable(
+                f"run {run_id}: only a Stage Graph fork derives its input from its source"
+            )
+        info = await self._definitions.run_subscriptions(request_scope, source_run_id)
+        if info is None:
+            raise ManifestStartUnavailable(
+                f"source run {source_run_id} was not submitted from a manifest"
+            )
+        source_ref = binding_ref(source_run_id)
+        if not await self._stages.list_templates(
+            request_scope=request_scope, semantic_input_binding_ref=source_ref
+        ):
+            raise ManifestStartUnavailable(
+                f"source run {source_run_id} has no frozen launch templates (it never launched)"
+            )
+        definition = MissionDefinition.model_validate(info["definition"])
+        stage_inputs = stagegraph_authored_inputs(definition)
+        await self._admit_inputs(request_scope, run_id, stage_inputs)
+        from mission_control.application.execution.run_launch import (
+            fork_semantic_input_binding_ref,
+        )
+
+        prepared = await self._dispatcher.prepare(
+            request_scope,
+            run_id,
+            task_timeout_seconds=self._timeout,
+            semantic_input_binding_ref=fork_semantic_input_binding_ref(fork_request_id),
+            human_gates=stagegraph_human_gates(definition),
+            stage_inputs=stage_inputs,
+        )
+        return asdict(prepared), source_ref
+
+    async def frozen_templates(
+        self, request_scope: str, semantic_input_binding_ref: str
+    ) -> dict[str, OperationExecutionRequest]:
+        """The Stage Graph templates frozen under a semantic input binding (read only)."""
+
+        return await self._stages.list_templates(
+            request_scope=request_scope, semantic_input_binding_ref=semantic_input_binding_ref
+        )
+
+    async def _admit_inputs(
+        self, request_scope: str, run_id: str, stage_inputs: tuple[StageAuthoredInput, ...]
+    ) -> None:
+        """Dependent inputs and trusted requirements need a composed trusted settlement."""
+
         if (
             stage_inputs
             and not self._dependent_inputs_admitted
@@ -3328,17 +3403,6 @@ class ManifestLaunchInputAuthor:
                     "settlement can judge; none is composed (set MC_JUDGE_OPENAI_API_KEY and "
                     "MC_AUDITOR_ANTHROPIC_API_KEY)",
                 )
-        prepared = await self._dispatcher.prepare(
-            request_scope,
-            run_id,
-            initial_goal=initial_goal if family == "GoalDirected" else None,
-            task_timeout_seconds=self._timeout,
-            semantic_input_binding_ref=binding_ref(run_id),
-            human_gates=gates,
-            human_review=review,
-            stage_inputs=stage_inputs,
-        )
-        return asdict(prepared)
 
     async def _schema_only_dependent_inputs(
         self, request_scope: str, run_id: str, inputs: tuple[StageAuthoredInput, ...]

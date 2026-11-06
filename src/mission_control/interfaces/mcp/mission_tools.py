@@ -30,6 +30,7 @@ from mission_control.application.authoring.manifest_service import (
 from mission_control.application.authoring.manifest_submit import (
     ManifestBlocked,
     ManifestIdempotencyConflict,
+    ManifestStartRefused,
     ManifestStartUnavailable,
     SubmitRequest,
     TenantNotProvisioned,
@@ -291,7 +292,7 @@ class ScopedManifests:
                 "ok": False,
                 "error": {"code": error.code, "report": error.report.model_dump(mode="json")},
             }
-        except (ManifestStartUnavailable, RunLaunchRejected) as error:
+        except (ManifestStartRefused, ManifestStartUnavailable, RunLaunchRejected) as error:
             raise CoordinatorDomainError(
                 code=CoordinatorErrorCode.CONFLICT, message=str(error)
             ) from None

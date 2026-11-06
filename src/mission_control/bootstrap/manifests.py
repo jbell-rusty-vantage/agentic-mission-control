@@ -28,6 +28,10 @@ from mission_control.adapters.postgres.orchestration.stagegraph_repository impor
 from mission_control.adapters.postgres.run_control.cluster_bindings import (
     PostgresRunClusterBindings,
 )
+from mission_control.adapters.postgres.runtime.run_forks import PostgresForkMaterializationStore
+from mission_control.adapters.postgres.runtime.stage3_kernel_repository import (
+    PostgresForkRepository,
+)
 from mission_control.adapters.remote_session.projection import digest as hosted_digest
 from mission_control.application.authoring.manifest_launch_inputs import (
     TRUSTED_ASSESSMENT_PIN,
@@ -47,6 +51,7 @@ from mission_control.application.authoring.manifest_service import (
 from mission_control.application.authoring.manifest_submit import (
     LaunchInputPort,
     ManifestSubmitService,
+    StoredForkSources,
     SubscriptionPort,
     register_manifest_admission_policies,
 )
@@ -253,6 +258,10 @@ def compose_manifest_service(
             subscriptions=subscriptions,
             watchers=watchers,
             prerequisites=prerequisites,
+            # F1-G2: a fork-derived run of a manifest run starts from its source's submission.
+            fork_sources=StoredForkSources(
+                PostgresForkMaterializationStore(pool), PostgresForkRepository(pool)
+            ),
         )
     service = MissionManifestService(
         compiler=compiler,

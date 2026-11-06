@@ -138,6 +138,18 @@ class ForkRejected(ValueError):
         self.reasons: tuple[str, ...] = tuple(reasons)
 
 
+class ForkOutputsNotCarried(RuntimeError):
+    """F1-G4: a reused unit's accepted named outputs cannot be carried into the derived run
+    (terminal: the unit settles ``failed`` with ``fork_outputs_not_carried``)."""
+
+    code = "fork_outputs_not_carried"
+
+    def __init__(self, reason: str, detail: str) -> None:
+        super().__init__(f"{reason}: {detail}")
+        self.reason = reason
+        self.message = f"{reason}: {detail}"
+
+
 Digest = Annotated[str, Field(pattern=DIGEST_PATTERN)]
 
 
