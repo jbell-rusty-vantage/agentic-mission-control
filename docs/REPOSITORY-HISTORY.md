@@ -14,7 +14,8 @@ only, no rollbacks to earlier commits.
 
 - The root commit, *Mission Control: fresh start on jbell-rusty-vantage*, has no parent. Its file tree is byte-identical to the
   last pre-move `main`, `ee34bb55` (2026-11-06). Nothing in the source changed at the move; only history was dropped.
-- Only `main` is published. There are no other branches, tags, recovery refs or stashes on the new remote.
+- The repository is [`jbell-rusty-vantage/agentic-mission-control`](https://github.com/jbell-rusty-vantage/agentic-mission-control), which is public.
+  Only `main` is published. There are no other branches, tags, recovery refs or stashes on the new remote.
 - The old `Overton77/mission-control` repository is legacy and no longer the source of truth. Do not push to it or open PRs
   there.
 
