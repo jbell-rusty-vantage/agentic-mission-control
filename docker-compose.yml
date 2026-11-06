@@ -1,0 +1,143 @@
+# Retain the existing local volume namespace after the source-directory rename.
+# Change only with an explicit volume migration; this is not the product/package name.
+name: biotech-research-ingestion-evaluation-system
+
+# Temporal persistence and application authority are intentionally separate PostgreSQL services.
+services:
+  application-postgres:
+    # Application authority and the local disposable capability-search projection
+    # share one development server but remain in separate schemas.
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: belllabs
+      POSTGRES_USER: belllabs
+      POSTGRES_PASSWORD: belllabs-local
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U belllabs -d belllabs"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    ports:
+      - "127.0.0.1:${APPLICATION_POSTGRES_PORT:-55432}:5432"
+    volumes:
+      - application-postgres-data:/var/lib/postgresql/data
+      - ./infra/application-postgres/init:/docker-entrypoint-initdb.d:ro
+    restart: unless-stopped
+
+  redis:
+    image: redis:7.4-alpine
+    command: ["redis-server", "--appendonly", "yes", "--appendfsync", "everysec"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+    ports:
+      # Default avoids Windows Hyper-V/WSL excluded ranges (e.g. 56xxx) and host/WSL Redis on 6379.
+      - "127.0.0.1:${REDIS_PORT:-16379}:6379"
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+
+  temporal-postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: temporal
+      POSTGRES_PASSWORD: temporal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U temporal"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    expose:
+      - "5432"
+    volumes:
+      - temporal-postgres-data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  temporal-schema:
+    image: temporalio/admin-tools:1.31.0
+    depends_on:
+      temporal-postgres:
+        condition: service_healthy
+    environment:
+      DB: postgres12
+      DB_PORT: 5432
+      POSTGRES_USER: temporal
+      POSTGRES_PWD: temporal
+      POSTGRES_SEEDS: temporal-postgres
+      SQL_PASSWORD: temporal
+    volumes:
+      - ./infra/temporal/scripts:/scripts:ro
+    entrypoint: ["/bin/sh"]
+    command: /scripts/setup-postgres.sh
+    restart: "no"
+
+  temporal:
+    # Temporal 1.31 uses the server image plus an explicit schema job; auto-setup is gone.
+    image: temporalio/server:1.31.0
+    depends_on:
+      temporal-schema:
+        condition: service_completed_successfully
+    environment:
+      DB: postgres12
+      DB_PORT: 5432
+      POSTGRES_USER: temporal
+      POSTGRES_PWD: temporal
+      POSTGRES_SEEDS: temporal-postgres
+      BIND_ON_IP: 0.0.0.0
+      DYNAMIC_CONFIG_FILE_PATH: config/dynamicconfig/development-sql.yaml
+    healthcheck:
+      test: ["CMD", "nc", "-z", "127.0.0.1", "7233"]
+      interval: 5s
+      timeout: 3s
+      retries: 60
+      start_period: 20s
+    ports:
+      - "127.0.0.1:7233:7233"
+    volumes:
+      - ./infra/temporal/dynamicconfig:/etc/temporal/config/dynamicconfig:ro
+    restart: unless-stopped
+
+  temporal-create-namespace:
+    image: temporalio/admin-tools:1.31.0
+    depends_on:
+      temporal:
+        condition: service_healthy
+    environment:
+      TEMPORAL_ADDRESS: temporal:7233
+      DEFAULT_NAMESPACE: default
+    volumes:
+      - ./infra/temporal/scripts:/scripts:ro
+    entrypoint: ["/bin/sh"]
+    command: /scripts/create-namespace.sh
+    restart: "no"
+
+  temporal-ui:
+    image: temporalio/ui:2.49.1
+    depends_on:
+      temporal:
+        condition: service_healthy
+    environment:
+      TEMPORAL_ADDRESS: temporal:7233
+      TEMPORAL_CORS_ORIGINS: http://localhost:3000,http://127.0.0.1:3000
+    ports:
+      - "127.0.0.1:8080:8080"
+    restart: unless-stopped
+
+  temporal-admin-tools:
+    image: temporalio/admin-tools:1.31.0
+    depends_on:
+      temporal:
+        condition: service_healthy
+    environment:
+      TEMPORAL_ADDRESS: temporal:7233
+      TEMPORAL_CLI_ADDRESS: temporal:7233
+    stdin_open: true
+    tty: true
+    profiles: ["tools"]
+
+volumes:
+  application-postgres-data:
+  redis-data:
+  temporal-postgres-data:

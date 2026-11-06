@@ -1,0 +1,1140 @@
+{
+  "actor_ref": "seed:mission-control-catalog",
+  "component_compatibility": ">=1.0.0 <2.0.0",
+  "depends_on": [],
+  "description": "Starter Environment Kits admitted in 'ai-engineer' (MO-12, ADR-0042): envkit.python-uv@1, envkit.node@1, envkit.python-uv-node@1, envkit.mission-control-dev@1, envkit.knowledge-research@1. Each row inlines its mc.environment_kit.v1 manifest; bytes live in the capability-bundles bucket under the manifest's digest path (upload with scripts/seeds_publish_bundles.py). Rows use the existing 'profile' asset category and the 0031 host-support profiles; no migration is required.",
+  "format": "mission-control-seed/v1",
+  "records": [
+    {
+      "fields": {
+        "asset_id": "definition:environment_kit:envkit.python-uv",
+        "contract": "mission-control.published-definition/1",
+        "host_support": {
+          "profiles": {
+            "claude_agent_sdk": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "claude_cloud": {
+              "evidence_ref": null,
+              "overlay": {
+                "base_layer": "owner"
+              },
+              "status": "unqualified"
+            },
+            "codex": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "codex_cloud": {
+              "evidence_ref": null,
+              "overlay": {
+                "base_layer": "owner"
+              },
+              "status": "unqualified"
+            },
+            "cursor_cloud": {
+              "evidence_ref": null,
+              "overlay": {
+                "base_layer": "mission_control"
+              },
+              "status": "unqualified"
+            },
+            "cursor_local": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            }
+          },
+          "schema_version": "mc.capability_host_support.v1"
+        },
+        "kind": "profile",
+        "manifest": {
+          "definition": {
+            "bundle_ref": {
+              "digest": "sha256:2430bdd46b256aa0a9b5617e9b06d1b9e8e34f66564bc20d7abe83d3f4220fe5",
+              "media_type": "application/vnd.mc.capability-bundle+json",
+              "size_bytes": 1273,
+              "uri": "capability-bundles://ai-engineer/environment_kit/envkit.python-uv/1/2430bdd46b256aa0a9b5617e9b06d1b9e8e34f66564bc20d7abe83d3f4220fe5"
+            },
+            "description": "Python 3.12 projects managed by uv: the base layer installs uv and Python 3.12; the mission layer syncs the locked environment and checks the interpreter runs.",
+            "file_manifest": [
+              {
+                "digest": "sha256:82c7923c31e77889befb7dbafd67f89b8fbb1fda2c78c8368059135849da98b5",
+                "executable": true,
+                "path": "base/install.sh",
+                "size_bytes": 384
+              },
+              {
+                "digest": "sha256:773d1e5131693356aca9e1694578f6b6dc275efe15cec6c4d8de04abdfd0c752",
+                "executable": false,
+                "path": "kit.json",
+                "size_bytes": 889
+              }
+            ],
+            "host_support": {
+              "profiles": {
+                "claude_agent_sdk": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "claude_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {
+                    "base_layer": "owner"
+                  },
+                  "status": "unqualified"
+                },
+                "codex": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "codex_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {
+                    "base_layer": "owner"
+                  },
+                  "status": "unqualified"
+                },
+                "cursor_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {
+                    "base_layer": "mission_control"
+                  },
+                  "status": "unqualified"
+                },
+                "cursor_local": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                }
+              },
+              "schema_version": "mc.capability_host_support.v1"
+            },
+            "kind": "environment_kit",
+            "kit": {
+              "base": {
+                "install": "base/install.sh",
+                "services": []
+              },
+              "description": "Python 3.12 projects managed by uv: the base layer installs uv and Python 3.12; the mission layer syncs the locked environment and checks the interpreter runs.",
+              "host_support": {
+                "claude_cloud": "base_via_owner",
+                "codex_cloud": "base_via_owner",
+                "cursor_cloud": "full",
+                "local": "full"
+              },
+              "id": "envkit.python-uv",
+              "mission": {
+                "health": [
+                  {
+                    "name": "python",
+                    "run": "uv run --no-sync python --version"
+                  }
+                ],
+                "steps": [
+                  {
+                    "name": "deps",
+                    "run": "uv sync --frozen",
+                    "when": "exists('uv.lock')"
+                  }
+                ],
+                "timeout_s": 480
+              },
+              "requires": {
+                "egress": [
+                  "pypi.org",
+                  "files.pythonhosted.org"
+                ],
+                "git_dependencies": [],
+                "secrets": [],
+                "variables": []
+              },
+              "schema_version": "mc.environment_kit.v1",
+              "system_packages": [
+                "git",
+                "curl"
+              ],
+              "title": "Python with uv",
+              "toolchains": {
+                "python": "3.12",
+                "uv": "0.12"
+              },
+              "version": "1"
+            },
+            "logical_id": "envkit.python-uv",
+            "manifest_digest": "sha256:2430bdd46b256aa0a9b5617e9b06d1b9e8e34f66564bc20d7abe83d3f4220fe5",
+            "schema_version": "1",
+            "secret_refs": [],
+            "source_provenance": {
+              "commit_digest": null,
+              "license": "proprietary",
+              "locator": "repo://envkits/python-uv",
+              "source": "local",
+              "upstream_identity": "envkit.python-uv",
+              "upstream_version": "1"
+            },
+            "title": "Python with uv"
+          },
+          "published_at": "2026-10-13T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:4a32d5680b475e95064bbf3e2d27b4a5783ed1e01c4e924476d1b61d6b49a83a",
+            "kind": "environment_kit",
+            "lifecycle_status": "published",
+            "logical_id": "envkit.python-uv",
+            "payload_ref": null,
+            "revision": 1,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:d74802e014d38bf16009b94d64630ceea0a8c9860d5f8a8998dd5b9141939a13",
+        "manifest_ref": "mc-catalog://definition/environment_kit/envkit.python-uv/1",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "1"
+      },
+      "kind": "asset_version",
+      "logical_key": "environment-kit:environment-kit:envkit.python-uv/1"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "environment-kit:environment-kit:envkit.python-uv/1",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/environment_kits.py",
+          "envkits/python-uv",
+          "docs/specs/materialization-observation-2026-10/SPEC-01-environments.md"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "environment-kit:environment-kit:envkit.python-uv/1:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:environment_kit:envkit.node",
+        "contract": "mission-control.published-definition/1",
+        "host_support": {
+          "profiles": {
+            "claude_agent_sdk": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "claude_cloud": {
+              "evidence_ref": null,
+              "overlay": {
+                "base_layer": "owner"
+              },
+              "status": "unqualified"
+            },
+            "codex": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "codex_cloud": {
+              "evidence_ref": null,
+              "overlay": {
+                "base_layer": "owner"
+              },
+              "status": "unqualified"
+            },
+            "cursor_cloud": {
+              "evidence_ref": null,
+              "overlay": {
+                "base_layer": "mission_control"
+              },
+              "status": "unqualified"
+            },
+            "cursor_local": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            }
+          },
+          "schema_version": "mc.capability_host_support.v1"
+        },
+        "kind": "profile",
+        "manifest": {
+          "definition": {
+            "bundle_ref": {
+              "digest": "sha256:0dddb8c68140c422b2ee553c433fa1bb19b6be4535dc38fc532eef79c4567ab9",
+              "media_type": "application/vnd.mc.capability-bundle+json",
+              "size_bytes": 974,
+              "uri": "capability-bundles://ai-engineer/environment_kit/envkit.node/1/0dddb8c68140c422b2ee553c433fa1bb19b6be4535dc38fc532eef79c4567ab9"
+            },
+            "description": "Node.js 22 projects managed by npm: the base layer checks Node and npm are installed; the mission layer installs the locked dependencies.",
+            "file_manifest": [
+              {
+                "digest": "sha256:c99901f680cd55e5ee3a2bb7828e617c92c0dab3d7b3080c29217b1164d3de8c",
+                "executable": true,
+                "path": "base/install.sh",
+                "size_bytes": 160
+              },
+              {
+                "digest": "sha256:dff9bebc653f9959c37193b35de38bd013c887113f2db9948832813431e8e9cf",
+                "executable": false,
+                "path": "kit.json",
+                "size_bytes": 814
+              }
+            ],
+            "host_support": {
+              "profiles": {
+                "claude_agent_sdk": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "claude_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {
+                    "base_layer": "owner"
+                  },
+                  "status": "unqualified"
+                },
+                "codex": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "codex_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {
+                    "base_layer": "owner"
+                  },
+                  "status": "unqualified"
+                },
+                "cursor_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {
+                    "base_layer": "mission_control"
+                  },
+                  "status": "unqualified"
+                },
+                "cursor_local": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                }
+              },
+              "schema_version": "mc.capability_host_support.v1"
+            },
+            "kind": "environment_kit",
+            "kit": {
+              "base": {
+                "install": "base/install.sh",
+                "services": []
+              },
+              "description": "Node.js 22 projects managed by npm: the base layer checks Node and npm are installed; the mission layer installs the locked dependencies.",
+              "host_support": {
+                "claude_cloud": "base_via_owner",
+                "codex_cloud": "base_via_owner",
+                "cursor_cloud": "full",
+                "local": "full"
+              },
+              "id": "envkit.node",
+              "mission": {
+                "health": [
+                  {
+                    "name": "node",
+                    "run": "node --version"
+                  }
+                ],
+                "steps": [
+                  {
+                    "name": "deps",
+                    "run": "npm ci",
+                    "when": "exists('package-lock.json')"
+                  }
+                ],
+                "timeout_s": 480
+              },
+              "requires": {
+                "egress": [
+                  "registry.npmjs.org"
+                ],
+                "git_dependencies": [],
+                "secrets": [],
+                "variables": []
+              },
+              "schema_version": "mc.environment_kit.v1",
+              "system_packages": [
+                "git"
+              ],
+              "title": "Node.js with npm",
+              "toolchains": {
+                "node": "22",
+                "npm": "10"
+              },
+              "version": "1"
+            },
+            "logical_id": "envkit.node",
+            "manifest_digest": "sha256:0dddb8c68140c422b2ee553c433fa1bb19b6be4535dc38fc532eef79c4567ab9",
+            "schema_version": "1",
+            "secret_refs": [],
+            "source_provenance": {
+              "commit_digest": null,
+              "license": "proprietary",
+              "locator": "repo://envkits/node",
+              "source": "local",
+              "upstream_identity": "envkit.node",
+              "upstream_version": "1"
+            },
+            "title": "Node.js with npm"
+          },
+          "published_at": "2026-10-13T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:02b9e2e0da99264d14b4208042e95060de1efbc9c1a6a8051ed9de5c0ed1a0e7",
+            "kind": "environment_kit",
+            "lifecycle_status": "published",
+            "logical_id": "envkit.node",
+            "payload_ref": null,
+            "revision": 1,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:e725abeb6e179d80452e5b7446e56b7f7a877a088f1c88a1877bcaf6015a6be6",
+        "manifest_ref": "mc-catalog://definition/environment_kit/envkit.node/1",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "1"
+      },
+      "kind": "asset_version",
+      "logical_key": "environment-kit:environment-kit:envkit.node/1"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "environment-kit:environment-kit:envkit.node/1",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/environment_kits.py",
+          "envkits/node",
+          "docs/specs/materialization-observation-2026-10/SPEC-01-environments.md"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "environment-kit:environment-kit:envkit.node/1:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:environment_kit:envkit.python-uv-node",
+        "contract": "mission-control.published-definition/1",
+        "host_support": {
+          "profiles": {
+            "claude_agent_sdk": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "claude_cloud": {
+              "evidence_ref": null,
+              "overlay": {
+                "base_layer": "owner"
+              },
+              "status": "unqualified"
+            },
+            "codex": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "codex_cloud": {
+              "evidence_ref": null,
+              "overlay": {
+                "base_layer": "owner"
+              },
+              "status": "unqualified"
+            },
+            "cursor_cloud": {
+              "evidence_ref": null,
+              "overlay": {
+                "base_layer": "mission_control"
+              },
+              "status": "unqualified"
+            },
+            "cursor_local": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            }
+          },
+          "schema_version": "mc.capability_host_support.v1"
+        },
+        "kind": "profile",
+        "manifest": {
+          "definition": {
+            "bundle_ref": {
+              "digest": "sha256:0706ffa8c52bb2c4456e3a4702af61e77eb5a9c9effd248beb29edd5f26cfd83",
+              "media_type": "application/vnd.mc.capability-bundle+json",
+              "size_bytes": 1526,
+              "uri": "capability-bundles://ai-engineer/environment_kit/envkit.python-uv-node/1/0706ffa8c52bb2c4456e3a4702af61e77eb5a9c9effd248beb29edd5f26cfd83"
+            },
+            "description": "Repositories with a uv-managed Python 3.12 environment and an npm-managed Node.js 22 package: the mission layer syncs both locked dependency sets.",
+            "file_manifest": [
+              {
+                "digest": "sha256:5d566cb13bd2f15c45eba259c5336378a8e106d8289d512a8f0bcc528d51ad11",
+                "executable": true,
+                "path": "base/install.sh",
+                "size_bytes": 417
+              },
+              {
+                "digest": "sha256:8d053554b6456164e011f8e55f29e73a1c5a64e79c23f36de627180a8cc6c9da",
+                "executable": false,
+                "path": "kit.json",
+                "size_bytes": 1109
+              }
+            ],
+            "host_support": {
+              "profiles": {
+                "claude_agent_sdk": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "claude_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {
+                    "base_layer": "owner"
+                  },
+                  "status": "unqualified"
+                },
+                "codex": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "codex_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {
+                    "base_layer": "owner"
+                  },
+                  "status": "unqualified"
+                },
+                "cursor_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {
+                    "base_layer": "mission_control"
+                  },
+                  "status": "unqualified"
+                },
+                "cursor_local": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                }
+              },
+              "schema_version": "mc.capability_host_support.v1"
+            },
+            "kind": "environment_kit",
+            "kit": {
+              "base": {
+                "install": "base/install.sh",
+                "services": []
+              },
+              "description": "Repositories with a uv-managed Python 3.12 environment and an npm-managed Node.js 22 package: the mission layer syncs both locked dependency sets.",
+              "host_support": {
+                "claude_cloud": "base_via_owner",
+                "codex_cloud": "base_via_owner",
+                "cursor_cloud": "full",
+                "local": "full"
+              },
+              "id": "envkit.python-uv-node",
+              "mission": {
+                "health": [
+                  {
+                    "name": "python",
+                    "run": "uv run --no-sync python --version"
+                  },
+                  {
+                    "name": "node",
+                    "run": "node --version"
+                  }
+                ],
+                "steps": [
+                  {
+                    "name": "python-deps",
+                    "run": "uv sync --frozen",
+                    "when": "exists('uv.lock')"
+                  },
+                  {
+                    "name": "node-deps",
+                    "run": "npm ci",
+                    "when": "exists('package-lock.json')"
+                  }
+                ],
+                "timeout_s": 600
+              },
+              "requires": {
+                "egress": [
+                  "pypi.org",
+                  "files.pythonhosted.org",
+                  "registry.npmjs.org"
+                ],
+                "git_dependencies": [],
+                "secrets": [],
+                "variables": []
+              },
+              "schema_version": "mc.environment_kit.v1",
+              "system_packages": [
+                "git",
+                "curl",
+                "ripgrep",
+                "jq"
+              ],
+              "title": "Python with uv and Node.js with npm",
+              "toolchains": {
+                "node": "22",
+                "npm": "10",
+                "python": "3.12",
+                "uv": "0.12"
+              },
+              "version": "1"
+            },
+            "logical_id": "envkit.python-uv-node",
+            "manifest_digest": "sha256:0706ffa8c52bb2c4456e3a4702af61e77eb5a9c9effd248beb29edd5f26cfd83",
+            "schema_version": "1",
+            "secret_refs": [],
+            "source_provenance": {
+              "commit_digest": null,
+              "license": "proprietary",
+              "locator": "repo://envkits/python-uv-node",
+              "source": "local",
+              "upstream_identity": "envkit.python-uv-node",
+              "upstream_version": "1"
+            },
+            "title": "Python with uv and Node.js with npm"
+          },
+          "published_at": "2026-10-13T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:981dc6c737628eaee40a9fe39d78c636a1b37f5ede3879edb01195b6ae24f3f6",
+            "kind": "environment_kit",
+            "lifecycle_status": "published",
+            "logical_id": "envkit.python-uv-node",
+            "payload_ref": null,
+            "revision": 1,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:9e5ee21fae03e4c6b62fd46b210ca07229fa6696e21daab4b2bd891bffa896ef",
+        "manifest_ref": "mc-catalog://definition/environment_kit/envkit.python-uv-node/1",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "1"
+      },
+      "kind": "asset_version",
+      "logical_key": "environment-kit:environment-kit:envkit.python-uv-node/1"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "environment-kit:environment-kit:envkit.python-uv-node/1",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/environment_kits.py",
+          "envkits/python-uv-node",
+          "docs/specs/materialization-observation-2026-10/SPEC-01-environments.md"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "environment-kit:environment-kit:envkit.python-uv-node/1:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:environment_kit:envkit.mission-control-dev",
+        "contract": "mission-control.published-definition/1",
+        "host_support": {
+          "profiles": {
+            "claude_agent_sdk": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "codex": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "cursor_cloud": {
+              "evidence_ref": null,
+              "overlay": {
+                "base_layer": "mission_control"
+              },
+              "status": "unqualified"
+            },
+            "cursor_local": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            }
+          },
+          "schema_version": "mc.capability_host_support.v1"
+        },
+        "kind": "profile",
+        "manifest": {
+          "definition": {
+            "bundle_ref": {
+              "digest": "sha256:5cbac07970f807cac7533c24c1f61ea108c29c9d2d4862cac208b1629c35ee6f",
+              "media_type": "application/vnd.mc.capability-bundle+json",
+              "size_bytes": 8245,
+              "uri": "capability-bundles://ai-engineer/environment_kit/envkit.mission-control-dev/1/5cbac07970f807cac7533c24c1f61ea108c29c9d2d4862cac208b1629c35ee6f"
+            },
+            "description": "This repository: uv with the biotech and dbcontract groups, make, and Docker Compose for the services (application PostgreSQL 16 with pgvector, Redis, Temporal 1.31 with its admin-tools CLI image); PostgreSQL and Temporal run as those pinned images, not as host toolchains. Its base layer is the Mission Control-owned .cursor/environment.json, Dockerfile and scripts (DECISIONS R24).",
+            "file_manifest": [
+              {
+                "digest": "sha256:08a05c8f05e54e590e9759e007479466c767b790439ef5f1e95e4aef6f88c488",
+                "executable": false,
+                "path": ".cursor/Dockerfile",
+                "size_bytes": 2260
+              },
+              {
+                "digest": "sha256:b2621f68e44c71f6d8b8266bc6f5ea725295372865b0bbf011512cd45a310cbb",
+                "executable": false,
+                "path": ".cursor/environment.json",
+                "size_bytes": 703
+              },
+              {
+                "digest": "sha256:57356b43e929a5ee7eb5286902b11eccab97edadbbccfc455b449cc7085dc8bb",
+                "executable": true,
+                "path": ".cursor/scripts/cloud-infra.sh",
+                "size_bytes": 2374
+              },
+              {
+                "digest": "sha256:ea9a4e071bb0aaaa8f478eda90dfb54f76b752424181719b057dfc47ef2c1e16",
+                "executable": true,
+                "path": ".cursor/scripts/cloud-install.sh",
+                "size_bytes": 539
+              },
+              {
+                "digest": "sha256:0c14aa2c1e749eb19680ceab55ae5fb2cc7b11415b253044761054b6ca0b8ae5",
+                "executable": true,
+                "path": ".cursor/scripts/cloud-start.sh",
+                "size_bytes": 1143
+              },
+              {
+                "digest": "sha256:d6c375d987fe65dd88e878ac11e50770973bd599c1a9d63c1db912816a995366",
+                "executable": false,
+                "path": "kit.json",
+                "size_bytes": 1226
+              }
+            ],
+            "host_support": {
+              "profiles": {
+                "claude_agent_sdk": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "codex": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "cursor_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {
+                    "base_layer": "mission_control"
+                  },
+                  "status": "unqualified"
+                },
+                "cursor_local": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                }
+              },
+              "schema_version": "mc.capability_host_support.v1"
+            },
+            "kind": "environment_kit",
+            "kit": {
+              "base": {
+                "install": ".cursor/scripts/cloud-install.sh",
+                "services": []
+              },
+              "description": "This repository: uv with the biotech and dbcontract groups, make, and Docker Compose for the services (application PostgreSQL 16 with pgvector, Redis, Temporal 1.31 with its admin-tools CLI image); PostgreSQL and Temporal run as those pinned images, not as host toolchains. Its base layer is the Mission Control-owned .cursor/environment.json, Dockerfile and scripts (DECISIONS R24).",
+              "host_support": {
+                "cursor_cloud": "full",
+                "local": "full"
+              },
+              "id": "envkit.mission-control-dev",
+              "mission": {
+                "health": [
+                  {
+                    "name": "import",
+                    "run": "uv run --no-sync python -c 'import mission_control'"
+                  }
+                ],
+                "steps": [
+                  {
+                    "name": "deps",
+                    "run": "uv sync --frozen --group biotech --group dbcontract",
+                    "when": "exists('uv.lock')"
+                  }
+                ],
+                "timeout_s": 600
+              },
+              "requires": {
+                "egress": [
+                  "pypi.org",
+                  "files.pythonhosted.org"
+                ],
+                "git_dependencies": [],
+                "secrets": [],
+                "variables": []
+              },
+              "schema_version": "mc.environment_kit.v1",
+              "system_packages": [
+                "git",
+                "curl",
+                "jq",
+                "make",
+                "ripgrep",
+                "docker-ce",
+                "docker-compose-plugin"
+              ],
+              "title": "Mission Control development",
+              "toolchains": {
+                "python": "3.12",
+                "uv": "0.12"
+              },
+              "version": "1"
+            },
+            "logical_id": "envkit.mission-control-dev",
+            "manifest_digest": "sha256:5cbac07970f807cac7533c24c1f61ea108c29c9d2d4862cac208b1629c35ee6f",
+            "schema_version": "1",
+            "secret_refs": [],
+            "source_provenance": {
+              "commit_digest": null,
+              "license": "proprietary",
+              "locator": "repo://envkits/mission-control-dev",
+              "source": "local",
+              "upstream_identity": "envkit.mission-control-dev",
+              "upstream_version": "1"
+            },
+            "title": "Mission Control development"
+          },
+          "published_at": "2026-10-13T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:6103c4fe9770ac32edd7941ee7cdbe64d87822333733d2296eef3231afee1810",
+            "kind": "environment_kit",
+            "lifecycle_status": "published",
+            "logical_id": "envkit.mission-control-dev",
+            "payload_ref": null,
+            "revision": 1,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:aa4e275f8717b4b04a1a47c9c62108df821263472303b432dd74fc2325c8fe7f",
+        "manifest_ref": "mc-catalog://definition/environment_kit/envkit.mission-control-dev/1",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "1"
+      },
+      "kind": "asset_version",
+      "logical_key": "environment-kit:environment-kit:envkit.mission-control-dev/1"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "environment-kit:environment-kit:envkit.mission-control-dev/1",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/environment_kits.py",
+          "envkits/mission-control-dev",
+          ".cursor/environment.json",
+          ".cursor/Dockerfile",
+          ".cursor/scripts/cloud-install.sh",
+          ".cursor/scripts/cloud-start.sh",
+          ".cursor/scripts/cloud-infra.sh",
+          "docs/specs/materialization-observation-2026-10/SPEC-01-environments.md"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "environment-kit:environment-kit:envkit.mission-control-dev/1:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:environment_kit:envkit.knowledge-research",
+        "contract": "mission-control.published-definition/1",
+        "host_support": {
+          "profiles": {
+            "claude_agent_sdk": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "claude_cloud": {
+              "evidence_ref": null,
+              "overlay": {
+                "base_layer": "owner"
+              },
+              "status": "unqualified"
+            },
+            "codex": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "codex_cloud": {
+              "evidence_ref": null,
+              "overlay": {
+                "base_layer": "owner"
+              },
+              "status": "unqualified"
+            },
+            "cursor_cloud": {
+              "evidence_ref": null,
+              "overlay": {
+                "base_layer": "mission_control"
+              },
+              "status": "unqualified"
+            },
+            "cursor_local": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            }
+          },
+          "schema_version": "mc.capability_host_support.v1"
+        },
+        "kind": "profile",
+        "manifest": {
+          "definition": {
+            "bundle_ref": {
+              "digest": "sha256:f93207fec3cdff8d29711e97067dd3d3f2860f2dcf3b2a713b5fd2ad35e4e500",
+              "media_type": "application/vnd.mc.capability-bundle+json",
+              "size_bytes": 2007,
+              "uri": "capability-bundles://ai-engineer/environment_kit/envkit.knowledge-research/1/f93207fec3cdff8d29711e97067dd3d3f2860f2dcf3b2a713b5fd2ad35e4e500"
+            },
+            "description": "Research and knowledge missions: uv-managed Python 3.12, Node.js for the stdio MCP servers, PDF and OCR tools, egress to the package registries and the hosted Tavily and Firecrawl MCP endpoints, and the installation's Knowledge Services API as KS_API_URL (an installation host, so the pinning manifest supplies it, typically from config:knowledge_services.public_url, and allows its egress).",
+            "file_manifest": [
+              {
+                "digest": "sha256:af97b77c20db6b6a224c4afc95c451873946b5c86e653d371616bb5286ca467a",
+                "executable": true,
+                "path": "base/install.sh",
+                "size_bytes": 542
+              },
+              {
+                "digest": "sha256:56a6f2761a73456714b65f3f80679ab68fa1e113dc4a4310e42897db54dd5040",
+                "executable": false,
+                "path": "kit.json",
+                "size_bytes": 1465
+              }
+            ],
+            "host_support": {
+              "profiles": {
+                "claude_agent_sdk": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "claude_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {
+                    "base_layer": "owner"
+                  },
+                  "status": "unqualified"
+                },
+                "codex": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "codex_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {
+                    "base_layer": "owner"
+                  },
+                  "status": "unqualified"
+                },
+                "cursor_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {
+                    "base_layer": "mission_control"
+                  },
+                  "status": "unqualified"
+                },
+                "cursor_local": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                }
+              },
+              "schema_version": "mc.capability_host_support.v1"
+            },
+            "kind": "environment_kit",
+            "kit": {
+              "base": {
+                "install": "base/install.sh",
+                "services": []
+              },
+              "description": "Research and knowledge missions: uv-managed Python 3.12, Node.js for the stdio MCP servers, PDF and OCR tools, egress to the package registries and the hosted Tavily and Firecrawl MCP endpoints, and the installation's Knowledge Services API as KS_API_URL (an installation host, so the pinning manifest supplies it, typically from config:knowledge_services.public_url, and allows its egress).",
+              "host_support": {
+                "claude_cloud": "base_via_owner",
+                "codex_cloud": "base_via_owner",
+                "cursor_cloud": "full",
+                "local": "full"
+              },
+              "id": "envkit.knowledge-research",
+              "mission": {
+                "health": [
+                  {
+                    "name": "pdftotext",
+                    "run": "pdftotext -v"
+                  },
+                  {
+                    "name": "tesseract",
+                    "run": "tesseract --version"
+                  }
+                ],
+                "steps": [
+                  {
+                    "name": "deps",
+                    "run": "uv sync --frozen",
+                    "when": "exists('uv.lock')"
+                  },
+                  {
+                    "name": "outputs",
+                    "run": "mkdir -p outputs",
+                    "when": null
+                  }
+                ],
+                "timeout_s": 480
+              },
+              "requires": {
+                "egress": [
+                  "pypi.org",
+                  "files.pythonhosted.org",
+                  "registry.npmjs.org",
+                  "mcp.tavily.com",
+                  "mcp.firecrawl.dev"
+                ],
+                "git_dependencies": [],
+                "secrets": [
+                  {
+                    "name": "TAVILY_API_KEY",
+                    "optional": true
+                  },
+                  {
+                    "name": "FIRECRAWL_API_KEY",
+                    "optional": true
+                  }
+                ],
+                "variables": [
+                  "KS_API_URL"
+                ]
+              },
+              "schema_version": "mc.environment_kit.v1",
+              "system_packages": [
+                "git",
+                "curl",
+                "poppler-utils",
+                "tesseract-ocr"
+              ],
+              "title": "Knowledge research",
+              "toolchains": {
+                "node": "22",
+                "python": "3.12",
+                "uv": "0.12"
+              },
+              "version": "1"
+            },
+            "logical_id": "envkit.knowledge-research",
+            "manifest_digest": "sha256:f93207fec3cdff8d29711e97067dd3d3f2860f2dcf3b2a713b5fd2ad35e4e500",
+            "schema_version": "1",
+            "secret_refs": [
+              "FIRECRAWL_API_KEY",
+              "TAVILY_API_KEY"
+            ],
+            "source_provenance": {
+              "commit_digest": null,
+              "license": "proprietary",
+              "locator": "repo://envkits/knowledge-research",
+              "source": "local",
+              "upstream_identity": "envkit.knowledge-research",
+              "upstream_version": "1"
+            },
+            "title": "Knowledge research"
+          },
+          "published_at": "2026-10-13T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:4a565d0c12c0299536ec466d84070225bfe87a1ac0634af4d1395d4120e45285",
+            "kind": "environment_kit",
+            "lifecycle_status": "published",
+            "logical_id": "envkit.knowledge-research",
+            "payload_ref": null,
+            "revision": 1,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:1cfe5dd6e981638baaaae9c179fedf541100f3d1048cc1b7172e2c2eb56ac460",
+        "manifest_ref": "mc-catalog://definition/environment_kit/envkit.knowledge-research/1",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "secret_refs": [
+          "FIRECRAWL_API_KEY",
+          "TAVILY_API_KEY"
+        ],
+        "status": "admitted",
+        "version": "1"
+      },
+      "kind": "asset_version",
+      "logical_key": "environment-kit:environment-kit:envkit.knowledge-research/1"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "environment-kit:environment-kit:envkit.knowledge-research/1",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/environment_kits.py",
+          "envkits/knowledge-research",
+          "docs/specs/materialization-observation-2026-10/SPEC-01-environments.md"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "environment-kit:environment-kit:envkit.knowledge-research/1:admit"
+    }
+  ],
+  "seed_key": "mc.app.ai-engineer.environment-kits",
+  "seed_version": "1.0.0"
+}

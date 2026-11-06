@@ -1,0 +1,241 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "cli": {
+      "enum": [
+        "claude",
+        "codex",
+        "cursor"
+      ]
+    },
+    "status": {
+      "enum": [
+        "done",
+        "blocked",
+        "budget_exhausted",
+        "failed",
+        "cancelled"
+      ]
+    },
+    "reason": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "session_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "iterations": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "verify": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "cmd": {
+            "type": "string"
+          },
+          "exit": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "cmd",
+          "exit"
+        ]
+      }
+    },
+    "worktree": {
+      "type": "string"
+    },
+    "branch": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "worktree_retained": {
+      "type": "boolean"
+    },
+    "diffstat": {
+      "type": "string"
+    },
+    "report": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "status": {
+          "enum": [
+            "done",
+            "continue",
+            "blocked"
+          ]
+        },
+        "summary": {
+          "type": "string"
+        },
+        "handoff": {
+          "type": "string"
+        },
+        "blockers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "status",
+        "summary",
+        "handoff",
+        "blockers"
+      ]
+    },
+    "usage": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "cost_usd": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "tokens": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        }
+      },
+      "required": [
+        "cost_usd",
+        "tokens"
+      ]
+    },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "cli": {
+          "enum": [
+            "claude",
+            "codex",
+            "cursor"
+          ]
+        },
+        "version": {
+          "type": "string"
+        },
+        "binary": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "host": {
+          "enum": [
+            "native",
+            "wsl"
+          ]
+        },
+        "requested_model": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "requested_effort": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "observed_model": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "model_selection": {
+          "enum": [
+            "explicit",
+            "native_default"
+          ]
+        },
+        "auth": {
+          "enum": [
+            "subscription",
+            "api"
+          ]
+        },
+        "permissions": {
+          "enum": [
+            "read-only",
+            "edit",
+            "full"
+          ]
+        },
+        "configuration_sources": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "cli",
+        "version",
+        "binary",
+        "host",
+        "requested_model",
+        "requested_effort",
+        "observed_model",
+        "model_selection",
+        "auth",
+        "permissions",
+        "configuration_sources"
+      ]
+    },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "id",
+    "cli",
+    "status",
+    "reason",
+    "session_id",
+    "iterations",
+    "verify",
+    "worktree",
+    "branch",
+    "worktree_retained",
+    "diffstat",
+    "report",
+    "usage",
+    "identity",
+    "artifacts"
+  ]
+}

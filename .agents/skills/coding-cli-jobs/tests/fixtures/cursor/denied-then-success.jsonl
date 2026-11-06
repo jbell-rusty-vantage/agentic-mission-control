@@ -1,0 +1,6 @@
+{"type":"system","subtype":"init","apiKeySource":"login","cwd":"C:\\w\\.worktrees\\fix-y","session_id":"d0000000-0000-4000-8000-000000000001","model":"Auto","permissionMode":"default"}
+{"type":"tool_call","subtype":"started","call_id":"c1","tool_call":{"shellToolCall":{"args":{"command":"git push"}}},"model_call_id":"m1","session_id":"d0000000-0000-4000-8000-000000000001","timestamp_ms":1791820000000}
+{"type":"tool_call","subtype":"completed","call_id":"c1","tool_call":{"shellToolCall":{"args":{"command":"git push"},"result":{"rejected":{"reason":"denied by permissions.deny (synthetic)"}}}},"model_call_id":"m1","session_id":"d0000000-0000-4000-8000-000000000001","timestamp_ms":1791820000100}
+{"type":"assistant","message":{"role":"assistant","content":[{"type":"text","text":"```json\n{\"status\":\"blocked\",\"summary\":\"push denied\",\"handoff\":\"push manually\",\"blockers\":[\"git push denied\"]}\n```"}]},"session_id":"d0000000-0000-4000-8000-000000000001"}
+{"type":"result","subtype":"success","duration_ms":3000,"duration_api_ms":3000,"is_error":false,"result":"```json\n{\"status\":\"blocked\",\"summary\":\"push denied\",\"handoff\":\"push manually\",\"blockers\":[\"git push denied\"]}\n```","session_id":"d0000000-0000-4000-8000-000000000001"}
+{"__fake__":{"exit":0}}

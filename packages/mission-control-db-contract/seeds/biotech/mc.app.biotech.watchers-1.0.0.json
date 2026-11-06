@@ -1,0 +1,657 @@
+{
+  "actor_ref": "seed:mission-control-catalog",
+  "component_compatibility": ">=1.0.0 <2.0.0",
+  "depends_on": [],
+  "description": "Seven bounded standard watcher templates; no direct effects or lifecycle settlement.",
+  "format": "mission-control-seed/v1",
+  "records": [
+    {
+      "fields": {
+        "asset_id": "definition:watcher:watcher.stall-detector",
+        "contract": "mission-control.published-definition/1",
+        "kind": "policy",
+        "manifest": {
+          "definition": {
+            "description": "Bounded standard watcher; reactions use admitted command paths.",
+            "kind": "watcher",
+            "logical_id": "watcher.stall-detector",
+            "schema_version": "1",
+            "spec": {
+              "limits": {
+                "budget": null,
+                "max_depth": null,
+                "max_fires": 2,
+                "min_interval": 1200,
+                "min_trust": null,
+                "rate": null
+              },
+              "on": {
+                "absence": {
+                  "for_": 1200,
+                  "of": [
+                    "frame",
+                    "signal"
+                  ]
+                },
+                "event": null,
+                "schedule": null,
+                "signal": null,
+                "where": null,
+                "while_": "run.phase == 'active'"
+              },
+              "then": [
+                {
+                  "command": null,
+                  "instruct": null,
+                  "notify": {
+                    "kind": "blocked",
+                    "text": "No progress for 20 minutes"
+                  },
+                  "probe": null,
+                  "satisfy_wait": null
+                },
+                {
+                  "command": null,
+                  "instruct": null,
+                  "notify": null,
+                  "probe": {
+                    "target": "self"
+                  },
+                  "satisfy_wait": null
+                }
+              ],
+              "until": null
+            },
+            "title": "Stall Detector"
+          },
+          "published_at": "2026-10-14T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:a10aec3ebd44301db23b786aa8ec135b31ab5e2f7234bef041ff9b38196088b3",
+            "kind": "watcher",
+            "lifecycle_status": "published",
+            "logical_id": "watcher.stall-detector",
+            "payload_ref": null,
+            "revision": 1,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:5c97401444561fba76031a734c30d3859ca072525f0c368e15b192209c2e43eb",
+        "manifest_ref": "mc-catalog://definition/watcher/watcher.stall-detector/1",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "1"
+      },
+      "kind": "asset_version",
+      "logical_key": "standard-watcher:watcher:watcher.stall-detector/1"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "standard-watcher:watcher:watcher.stall-detector/1",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/watcher_library.py",
+          "tests/fixtures/manifests/watchers/"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "standard-watcher:watcher:watcher.stall-detector/1:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:watcher:watcher.result-marker-stop",
+        "contract": "mission-control.published-definition/1",
+        "kind": "policy",
+        "manifest": {
+          "definition": {
+            "description": "Bounded standard watcher; reactions use admitted command paths.",
+            "kind": "watcher",
+            "logical_id": "watcher.result-marker-stop",
+            "schema_version": "1",
+            "spec": {
+              "limits": {
+                "budget": null,
+                "max_depth": null,
+                "max_fires": 1,
+                "min_interval": null,
+                "min_trust": "provider_signed",
+                "rate": null
+              },
+              "on": {
+                "absence": null,
+                "event": null,
+                "schedule": null,
+                "signal": "worker.log",
+                "where": "event.matched == true",
+                "while_": null
+              },
+              "then": [
+                {
+                  "command": null,
+                  "instruct": null,
+                  "notify": {
+                    "kind": "progress",
+                    "text": "Result marker observed"
+                  },
+                  "probe": null,
+                  "satisfy_wait": null
+                },
+                {
+                  "command": {
+                    "kind": "cancel",
+                    "urgency": null
+                  },
+                  "instruct": null,
+                  "notify": null,
+                  "probe": null,
+                  "satisfy_wait": null
+                }
+              ],
+              "until": null
+            },
+            "title": "Result Marker Stop"
+          },
+          "published_at": "2026-10-14T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:6b221c06df29b1ab556fef78d9cf45def32cda2491cf9c4caff8b5387c0109b3",
+            "kind": "watcher",
+            "lifecycle_status": "published",
+            "logical_id": "watcher.result-marker-stop",
+            "payload_ref": null,
+            "revision": 1,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:38354fdba09ed80eb768714d2806bb25fcaade486ed10b8ff43d28178ddf0cd1",
+        "manifest_ref": "mc-catalog://definition/watcher/watcher.result-marker-stop/1",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "1"
+      },
+      "kind": "asset_version",
+      "logical_key": "standard-watcher:watcher:watcher.result-marker-stop/1"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "standard-watcher:watcher:watcher.result-marker-stop/1",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/watcher_library.py",
+          "tests/fixtures/manifests/watchers/"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "standard-watcher:watcher:watcher.result-marker-stop/1:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:watcher:watcher.ci-watch",
+        "contract": "mission-control.published-definition/1",
+        "kind": "policy",
+        "manifest": {
+          "definition": {
+            "description": "Bounded standard watcher; reactions use admitted command paths.",
+            "kind": "watcher",
+            "logical_id": "watcher.ci-watch",
+            "schema_version": "1",
+            "spec": {
+              "limits": {
+                "budget": {
+                  "tokens": 50000,
+                  "usd": null
+                },
+                "max_depth": null,
+                "max_fires": 3,
+                "min_interval": 600,
+                "min_trust": null,
+                "rate": null
+              },
+              "on": {
+                "absence": null,
+                "event": null,
+                "schedule": null,
+                "signal": "github.check_suite.completed",
+                "where": "event.conclusion == 'failure'",
+                "while_": null
+              },
+              "then": [
+                {
+                  "command": null,
+                  "instruct": {
+                    "boundary": "next_turn",
+                    "delivery": "queue_instruction",
+                    "include": [],
+                    "target": "self",
+                    "text": "Inspect the failing checks and repair within the admitted scope."
+                  },
+                  "notify": null,
+                  "probe": null,
+                  "satisfy_wait": null
+                }
+              ],
+              "until": null
+            },
+            "title": "Ci Watch"
+          },
+          "published_at": "2026-10-14T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:7e454945d508506e38e26f5a6d18d4347583cbbe23a87ba172fda07f0c922554",
+            "kind": "watcher",
+            "lifecycle_status": "published",
+            "logical_id": "watcher.ci-watch",
+            "payload_ref": null,
+            "revision": 1,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:f440a2fd1841a63c6d7814dbad312d1abc625e36e0c6c92b188f797f9ada3c6f",
+        "manifest_ref": "mc-catalog://definition/watcher/watcher.ci-watch/1",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "1"
+      },
+      "kind": "asset_version",
+      "logical_key": "standard-watcher:watcher:watcher.ci-watch/1"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "standard-watcher:watcher:watcher.ci-watch/1",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/watcher_library.py",
+          "tests/fixtures/manifests/watchers/"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "standard-watcher:watcher:watcher.ci-watch/1:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:watcher:watcher.pr-merged-release-wait",
+        "contract": "mission-control.published-definition/1",
+        "kind": "policy",
+        "manifest": {
+          "definition": {
+            "description": "Bounded standard watcher; reactions use admitted command paths.",
+            "kind": "watcher",
+            "logical_id": "watcher.pr-merged-release-wait",
+            "schema_version": "1",
+            "spec": {
+              "limits": {
+                "budget": null,
+                "max_depth": null,
+                "max_fires": 1,
+                "min_interval": null,
+                "min_trust": "provider_signed",
+                "rate": null
+              },
+              "on": {
+                "absence": null,
+                "event": null,
+                "schedule": null,
+                "signal": "github.pull_request.merged",
+                "where": "event.merged == true",
+                "while_": null
+              },
+              "then": [
+                {
+                  "command": null,
+                  "instruct": null,
+                  "notify": null,
+                  "probe": null,
+                  "satisfy_wait": {
+                    "node": "await-merge"
+                  }
+                }
+              ],
+              "until": null
+            },
+            "title": "Pr Merged Release Wait"
+          },
+          "published_at": "2026-10-14T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:ede922afd07ab2ea754e7c36e82baf3bb2e6b79682b52a0fef33ca5153d62da1",
+            "kind": "watcher",
+            "lifecycle_status": "published",
+            "logical_id": "watcher.pr-merged-release-wait",
+            "payload_ref": null,
+            "revision": 1,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:1ac5e957da1aeb9d82341205efeaa123dad2ea49d94ff81cffd262e85ac1c892",
+        "manifest_ref": "mc-catalog://definition/watcher/watcher.pr-merged-release-wait/1",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "1"
+      },
+      "kind": "asset_version",
+      "logical_key": "standard-watcher:watcher:watcher.pr-merged-release-wait/1"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "standard-watcher:watcher:watcher.pr-merged-release-wait/1",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/watcher_library.py",
+          "tests/fixtures/manifests/watchers/"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "standard-watcher:watcher:watcher.pr-merged-release-wait/1:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:watcher:watcher.artifact-pipeline",
+        "contract": "mission-control.published-definition/1",
+        "kind": "policy",
+        "manifest": {
+          "definition": {
+            "description": "Bounded standard watcher; reactions use admitted command paths.",
+            "kind": "watcher",
+            "logical_id": "watcher.artifact-pipeline",
+            "schema_version": "1",
+            "spec": {
+              "limits": {
+                "budget": {
+                  "tokens": 100000,
+                  "usd": null
+                },
+                "max_depth": null,
+                "max_fires": 10,
+                "min_interval": null,
+                "min_trust": null,
+                "rate": "10/h"
+              },
+              "on": {
+                "absence": null,
+                "event": null,
+                "schedule": null,
+                "signal": "artifact.ready",
+                "where": "event.media_type == 'application/pdf'",
+                "while_": null
+              },
+              "then": [
+                {
+                  "command": null,
+                  "instruct": null,
+                  "notify": {
+                    "kind": "progress",
+                    "text": "Artifact ready for governed ingestion"
+                  },
+                  "probe": null,
+                  "satisfy_wait": null
+                },
+                {
+                  "command": null,
+                  "instruct": {
+                    "boundary": "next_turn",
+                    "delivery": "queue_instruction",
+                    "include": [
+                      "event.artifact_ref"
+                    ],
+                    "target": "self",
+                    "text": "Inspect the declared artifact; continue the admitted ingestion stage."
+                  },
+                  "notify": null,
+                  "probe": null,
+                  "satisfy_wait": null
+                }
+              ],
+              "until": null
+            },
+            "title": "Artifact Pipeline"
+          },
+          "published_at": "2026-10-14T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:1bdd5d0afbe3a692a316a420f52ae93fa2a2c081358c30f34fcf6d2c941039d2",
+            "kind": "watcher",
+            "lifecycle_status": "published",
+            "logical_id": "watcher.artifact-pipeline",
+            "payload_ref": null,
+            "revision": 1,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:60268a937e25f2f046f0e69e3f91d1a899a8e84d79d43f03279fd406ff5a62c9",
+        "manifest_ref": "mc-catalog://definition/watcher/watcher.artifact-pipeline/1",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "1"
+      },
+      "kind": "asset_version",
+      "logical_key": "standard-watcher:watcher:watcher.artifact-pipeline/1"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "standard-watcher:watcher:watcher.artifact-pipeline/1",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/watcher_library.py",
+          "tests/fixtures/manifests/watchers/"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "standard-watcher:watcher:watcher.artifact-pipeline/1:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:watcher:watcher.budget-guard",
+        "contract": "mission-control.published-definition/1",
+        "kind": "policy",
+        "manifest": {
+          "definition": {
+            "description": "Bounded standard watcher; reactions use admitted command paths.",
+            "kind": "watcher",
+            "logical_id": "watcher.budget-guard",
+            "schema_version": "1",
+            "spec": {
+              "limits": {
+                "budget": null,
+                "max_depth": null,
+                "max_fires": 1,
+                "min_interval": null,
+                "min_trust": "provider_signed",
+                "rate": null
+              },
+              "on": {
+                "absence": null,
+                "event": null,
+                "schedule": null,
+                "signal": "budget.threshold",
+                "where": "event.exhausted == true",
+                "while_": null
+              },
+              "then": [
+                {
+                  "command": null,
+                  "instruct": null,
+                  "notify": {
+                    "kind": "blocked",
+                    "text": "Reported budget threshold reached"
+                  },
+                  "probe": null,
+                  "satisfy_wait": null
+                },
+                {
+                  "command": {
+                    "kind": "pause",
+                    "urgency": null
+                  },
+                  "instruct": null,
+                  "notify": null,
+                  "probe": null,
+                  "satisfy_wait": null
+                }
+              ],
+              "until": null
+            },
+            "title": "Budget Guard"
+          },
+          "published_at": "2026-10-14T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:b1c675f85678ca098bddd9df3e10888c37bd3b87da3d487b0eff1f109ae415d0",
+            "kind": "watcher",
+            "lifecycle_status": "published",
+            "logical_id": "watcher.budget-guard",
+            "payload_ref": null,
+            "revision": 1,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:ce8a00a4770646e2b0b8f52db0390fa12ea0468779dd4cb820572dc958ab41c1",
+        "manifest_ref": "mc-catalog://definition/watcher/watcher.budget-guard/1",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "1"
+      },
+      "kind": "asset_version",
+      "logical_key": "standard-watcher:watcher:watcher.budget-guard/1"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "standard-watcher:watcher:watcher.budget-guard/1",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/watcher_library.py",
+          "tests/fixtures/manifests/watchers/"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "standard-watcher:watcher:watcher.budget-guard/1:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:watcher:watcher.heartbeat-progress",
+        "contract": "mission-control.published-definition/1",
+        "kind": "policy",
+        "manifest": {
+          "definition": {
+            "description": "Bounded standard watcher; reactions use admitted command paths.",
+            "kind": "watcher",
+            "logical_id": "watcher.heartbeat-progress",
+            "schema_version": "1",
+            "spec": {
+              "limits": {
+                "budget": null,
+                "max_depth": null,
+                "max_fires": 24,
+                "min_interval": 300,
+                "min_trust": null,
+                "rate": null
+              },
+              "on": {
+                "absence": null,
+                "event": null,
+                "schedule": null,
+                "signal": "progress",
+                "where": null,
+                "while_": null
+              },
+              "then": [
+                {
+                  "command": null,
+                  "instruct": null,
+                  "notify": {
+                    "kind": "progress",
+                    "text": "Progress evidence received"
+                  },
+                  "probe": null,
+                  "satisfy_wait": null
+                }
+              ],
+              "until": null
+            },
+            "title": "Heartbeat Progress"
+          },
+          "published_at": "2026-10-14T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:6ea29d4022eaa38015725820eef9a21560fc2a7cd998261532b8fdcb54fba740",
+            "kind": "watcher",
+            "lifecycle_status": "published",
+            "logical_id": "watcher.heartbeat-progress",
+            "payload_ref": null,
+            "revision": 1,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:18a1d4cdf0a6f4eaca87584c2470ae5836dd124155b8eacc5d73343349214f99",
+        "manifest_ref": "mc-catalog://definition/watcher/watcher.heartbeat-progress/1",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "1"
+      },
+      "kind": "asset_version",
+      "logical_key": "standard-watcher:watcher:watcher.heartbeat-progress/1"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "standard-watcher:watcher:watcher.heartbeat-progress/1",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/watcher_library.py",
+          "tests/fixtures/manifests/watchers/"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "standard-watcher:watcher:watcher.heartbeat-progress/1:admit"
+    }
+  ],
+  "seed_key": "mc.app.biotech.watchers",
+  "seed_version": "1.0.0"
+}

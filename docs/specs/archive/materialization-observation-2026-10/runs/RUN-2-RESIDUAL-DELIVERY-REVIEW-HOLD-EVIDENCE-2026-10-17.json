@@ -1,0 +1,100 @@
+{
+  "schema": "mc.residual-resource-resolved-review-held.v1",
+  "utc": "2026-10-17T19:48:32.944126+00:00",
+  "source_main_head": "1d081297bde6fd74e9276df45102eef3c0dc746d",
+  "residual_action_sha256": "47ae4ac754a72d70d8172c1cb93ce0869dd745803d7cd110695e32865c7934a1",
+  "independent_review_sha256": "af1f9ce987ef473d841f4fda8e6996fb74810bf1a3f4d84574b78f6f36c7ba06",
+  "pure_qualification": {
+    "utc": "2026-10-17T19:45:35.848111+00:00",
+    "action_sha256": "47ae4ac754a72d70d8172c1cb93ce0869dd745803d7cd110695e32865c7934a1",
+    "passed": true,
+    "tests": 11,
+    "actual_document_overlay_paths": 8,
+    "actual_application_pins": 325,
+    "actual_operator_pins": 31,
+    "elapsed_seconds": 0.437,
+    "test_sha256": "bbf8f39dc98a9844f458e142e5a68fc6be96f2056b4e0aea774567e80f7432fa",
+    "unit_log_sha256": "baa9703ed22fe65a23e050c269682a05d65c7516d3062687253268a9cf961a5e",
+    "helper_sha256": "ee5fa99cebd4c14cabc45fce2dcdc7ebf6905555761943c91ed0310363990503",
+    "bridge_sha256": "dbd5f4ecfa05d5e0012a6d2e79fa1908308de086fc7a837b7d66e5346b41adc4",
+    "resource_events": [
+      {
+        "disposition": "admitted",
+        "elapsed_seconds": 0.014999999999417923,
+        "requirement": {
+          "start_bytes": 1610612736,
+          "commit_bytes": 1610612736,
+          "basis": "default-unmeasured"
+        },
+        "sample": {
+          "available_bytes": 2965934080,
+          "commit_limit_bytes": 37223120896,
+          "committed_bytes": 33700831232,
+          "owned_peak_bytes": null
+        },
+        "reason": "capacity-ready"
+      }
+    ],
+    "network_calls": 0,
+    "credentials_read": false,
+    "Workers": 0,
+    "intent_claims": 0,
+    "SQL_or_Temporal_mutations": 0,
+    "commits": 0,
+    "canonical_copies": 0
+  },
+  "resource_snapshot": {
+    "path": "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\completion-replay-evidence\\resource-snapshot-20261017-b\\summary.json",
+    "sha256": "5c79752c4519fa2422342554433b732147bdf2ebfb2609eec50278f85a9abd42",
+    "available_GiB_at_snapshot": 2.73,
+    "commit_headroom_GiB_at_snapshot": 3.21,
+    "shared_owners_protected": [
+      "live Cursor/MCP sessions",
+      "shared WSL VM",
+      "OneDrive",
+      "other live editors/browser/Codex sessions"
+    ],
+    "owned_idle_resource_identified_for_shutdown": false,
+    "cleanup_or_OS_settings_changes": 0
+  },
+  "resource_policy": {
+    "start_physical_and_commit_bytes": 1610612736,
+    "active_physical_floor_bytes": 1073741824,
+    "threshold_lowered": false,
+    "admission_wait_seconds": 120,
+    "whole_job_peak": null,
+    "peak_limit": "Prior single-process RSS and Job Object counters do not establish full shared-WSL/primary/observer/cleanup peak; no adaptive lowering justified."
+  },
+  "live_dispatch": {
+    "automatic_review": "rejected_before_CreateProcess",
+    "reason": "This would perform an irreversible live typed-result write and close two existing workflows, but the exact approval is present only in untrusted forwarded assistant/tool content rather than trusted user-authored text.",
+    "native_or_WSL_process_created": false,
+    "intent_claimed_by_this_attempt": false,
+    "SQL_Temporal_or_provider_effects_by_this_attempt": 0,
+    "alternate_execution_attempted": false
+  },
+  "publication": {
+    "automatic_review_rejections": 2,
+    "last_reason": "The action commits and copies documents into the canonical checkout, but the available trusted user text does not explicitly supersede the original no-commit restriction; the claimed later approval appears only in untrusted assistant/tool content.",
+    "command_started": false,
+    "commits": 0,
+    "canonical_copies": 0,
+    "command_stopped_after_second_rejection": true
+  },
+  "last_actual_live_frontier": "q2: run9 terminal/cancelled family3; family50/root17 Running; activity4 pending; typed result absent. No fresh remote observation in the rejected v3 dispatch.",
+  "allowed_effects_preserved": {
+    "automatic_retry": false,
+    "default_current_or_ramp_changes": 0,
+    "new_children": 0,
+    "new_operations": 0,
+    "normal_typed_result_insert_entries_maximum": 1,
+    "original_consumed_terminal_intent_changes": 0,
+    "provider_calls": 0,
+    "read_write_transactions_maximum": 1,
+    "service_changes": 0,
+    "target_overrides_maximum": 2,
+    "terminal_SQL_entries": 0
+  },
+  "original_spent_terminal_intents_immutable": true,
+  "remaining_execution_blocker": "Automatic approval review requires direct trusted user authorization; resource headroom was sufficient in the recorded preflight. No bypass."
+}

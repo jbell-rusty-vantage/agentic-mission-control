@@ -1,0 +1,41 @@
+# The Managed Agents agent (SPEC-06 section 4.1). Synced once per materialization digest.
+name: mc-ai-engineer-knowledge
+model: claude-sonnet-5-5
+system: system.md
+# Managed Agents does not read AGENTS.md: prepare renders the target repository's into `system`.
+repository_instructions: AGENTS.md
+# Agent toolset: only these tools are enabled. bash, write and edit ask until the mission layer
+# reports readiness (SPEC-06 section 4.4); the lane switches the steady-state policy later.
+tools:
+  read: always_allow
+  glob: always_allow
+  grep: always_allow
+  bash: always_ask
+  write: always_ask
+  edit: always_ask
+custom_tools:
+  - name: mc_prepare
+    description: >-
+      Ask Mission Control for the mission layer setup commands. Call this first, before any
+      other tool, and run exactly the commands it returns.
+    input_schema:
+      type: object
+      properties: {}
+      additionalProperties: false
+  - name: mc_signal
+    description: >-
+      Report a Mission Control lifecycle signal, for example env.prepared after the setup
+      commands finished. Returns 'ok'.
+    input_schema:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Signal name, e.g. env.prepared
+      required: [name]
+      additionalProperties: false
+mcp_servers: []
+skills:
+  - skills/mission-control-signals
+metadata:
+  application: ai-engineer

@@ -1,0 +1,16 @@
+---
+name: codex-exec
+description: Run Codex exec for bounded local coding or review; consult for stdin EOF, JSON events, sandbox settings, ChatGPT auth guards and resume option order.
+---
+
+Start with `coding-cli-jobs` and its safety reference. Check `codex --version` through doctor; research baseline is 0.162.1. Install/update/login are separate actions. This skill drives local exec, separate from Mission Control's app-server lane, hosted OpenAI Agents API, Agents SDK and subscription cloud product.
+
+Use `codex exec --ignore-user-config --json <explicit-options> -` and pipe the prompt file to stdin, then close it. Open stdin can hang. `--output-schema` takes a schema file. Parse thread.started.thread_id, item.completed agent_message and turn.completed usage; a missing terminal or turn.failed is failure. Unknown serving model/cost remains unknown. Cumulative token usage replaces the prior snapshot rather than being summed on resume.
+
+Resume order is `codex exec <all-options> resume <id> -`; options after resume are rejected. Reapply model, effort, sandbox and auth each time. `--ephemeral` cannot resume and is omitted by the runner. Fork is separate from retry. Model uses --model, effort uses `-c model_reasoning_effort="<value>"`; omitted values retain disclosed defaults. Native compaction remains provider-owned. There is no native max-turn/cost budget; runner wall clock bounds execution, and supplied max_usd refuses.
+
+Scrub OPENAI_API_KEY/CODEX_API_KEY before `codex login status`; subscription guard requires ChatGPT, then passes `-c forced_login_method="chatgpt"`. Applying that guard with API credentials present may log the user out. API mode requires explicitly selected OPENAI_API_KEY. Never copy auth.json. Read-only uses -s read-only; edit uses -s workspace-write; full requires explicit acknowledgement and dangerously-bypass-approvals-and-sandbox. exec approval is never; -a is invalid, and --full-auto is removed.
+
+Ignore-user-config prevents inheriting broad sandbox/MCP settings. On Windows the adapter sets features.prefer_mxc=true with windows.sandbox="elevated" as the permitted legacy fallback, following the [official Windows sandbox guidance](https://learn.chatgpt.com/docs/windows/windows-sandbox#enable-mxc). It resolves native codex.exe in the npm distribution, avoiding codex.cmd. The child allowlist preserves existing Windows platform-directory variables needed by MXC; it neither fabricates directories nor copies the full environment. A non-inference read-only command/write-denial probe qualifies that setup boundary only; actual exec, model, edit enforcement and descendant custody remain LS-07 checks. Do not stop another session to release a legacy sandbox DLL lock. Worktrees are uniform Git worktrees; native worktree flags are feature-gated and incompatible with resume. WSL requires an explicit distro, Linux repository/ext4 worktree root, binary, home and PATH, with setsid process custody. Its actual placement remains unqualified. Do not route to a Windows npm shim in WSL.
+
+Project AGENTS/skills/hooks remain local context; doctor does not prove tool loading or enforcement. Exact Windows sandbox behavior, exits and descendant kill reach remain LS-07 live checks. Agent self-report is a claim; use runner-owned verification and review the retained diff.

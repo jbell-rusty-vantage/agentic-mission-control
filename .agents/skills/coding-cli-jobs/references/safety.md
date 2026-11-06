@@ -1,0 +1,9 @@
+# Safety and qualification boundaries
+
+Use trusted repositories: headless CLIs load repository instructions and potentially hooks. Claude receives project-only settings and strict empty MCP configuration; Codex receives ignore-user-config and explicit sandbox flags on every turn. Cursor edit jobs get a worktree-local allow/deny file; an existing file refuses instead of being overwritten. These local settings need live qualification before relying on specific tool enforcement. Prompt instructions alone do not constrain arbitrary shell effects.
+
+Child environment is allowlisted, retaining platform bootstrap paths plus the selected provider's explicit auth route. Subscription Claude/Codex omit API keys before status probes and launch; Codex receives forced ChatGPT login only after scrubbing. Claude OAuth token may be delivered, never copied. Cursor subscription uses login status; API mode requires CURSOR_API_KEY. CLAUDECODE, CLAUDE_CODE_ENTRYPOINT, database URLs and unrelated secrets are omitted. Native auth homes remain references, never artifacts. Raw environments are never printed.
+
+Resolved environment secrets and common token patterns are redacted from JSONL, stderr, verification logs, results and console errors. Redaction is defense in depth, not permission to include PHI/private notes or arbitrary credentials in goals. Keep artifacts ignored and private. No runner action copies auth.json or .credentials.json.
+
+Windows uses direct executables (Cursor's versioned node/index.js) and a kill-on-close Job Object with taskkill tree fallback; POSIX uses a new process group. Assignment failure refuses continued execution. Exact sandbox-user descendant kill reach remains LS-07 live evidence. Full profile requires isolated Git workspace and explicit acknowledgement. No automatic installation, login, global configuration edit, push, merge, PR or cloud resource action is performed.

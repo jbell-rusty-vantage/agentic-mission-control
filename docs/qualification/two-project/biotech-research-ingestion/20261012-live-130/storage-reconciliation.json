@@ -1,0 +1,7 @@
+{
+  "status": "performed",
+  "seed": "mc.storage.capability-bundles@1.0.0",
+  "approved": "project owner, 2026-10-12 (follow-up to DECISIONS R18)",
+  "result": "private capability-bundles bucket and four storage.objects policies verified; qualify-after pass with the storage-only allowed differences",
+  "other_buckets_untouched": true
+}

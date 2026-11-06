@@ -1,0 +1,175 @@
+{
+  "actor_ref": "seed:mission-control-catalog",
+  "component_compatibility": ">=1.0.0 <2.0.0",
+  "depends_on": [],
+  "description": "Reviewed mc-signals skill; provider qualification remains separate.",
+  "format": "mission-control-seed/v1",
+  "records": [
+    {
+      "fields": {
+        "asset_id": "definition:skill:skill.mc-signals",
+        "contract": "mission-control.published-definition/1",
+        "host_support": {
+          "profiles": {
+            "claude_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "codex_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "cursor_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "cursor_local": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            }
+          },
+          "schema_version": "mc.capability_host_support.v1"
+        },
+        "kind": "skill_bundle",
+        "manifest": {
+          "definition": {
+            "attachment_targets": [
+              "agent.main"
+            ],
+            "body_summary": "Report milestones, blockers, requests for input, ready artifacts and progress back to Mission Control from inside a mission workspace with mc-signal. Use whenever you finish a meaningful step, get stuck, need a human or another agent to act, or produce an artifact someone is waiting for; signals are the only channel back, so never write status, ledger or stop files instead.",
+            "bundle_ref": {
+              "digest": "sha256:893740e5591a184f529b10b3ba39df34d93aa112cba325ddc2b06ffe239bc018",
+              "media_type": "application/vnd.mc.capability-bundle+json",
+              "size_bytes": 2867,
+              "uri": "capability-bundles://biotech/skill_bundle/skill.mc-signals/0.1.0/893740e5591a184f529b10b3ba39df34d93aa112cba325ddc2b06ffe239bc018"
+            },
+            "compatibility": {
+              "executables": [],
+              "network_capabilities": [],
+              "runtimes": [],
+              "workspace_capabilities": []
+            },
+            "compatible_compiler_versions": [
+              "control-plane-definitions/1"
+            ],
+            "conflicts_with": [],
+            "description": "Report milestones, blockers, requests for input, ready artifacts and progress back to Mission Control from inside a mission workspace with mc-signal. Use whenever you finish a meaningful step, get stuck, need a human or another agent to act, or produce an artifact someone is waiting for; signals are the only channel back, so never write status, ledger or stop files instead.",
+            "file_manifest": [
+              {
+                "digest": "sha256:2a85e1e290bd1ad196589a8f333c6fffb54a75d31d1b55f140abe088bc40507b",
+                "executable": false,
+                "path": "SKILL.md",
+                "size_bytes": 2622
+              },
+              {
+                "digest": "sha256:25c00fbf3ead9e28c3b69f4e00059d671f06d678decd7b10af57c274d8d9ae41",
+                "executable": false,
+                "path": "manifest.json",
+                "size_bytes": 245
+              }
+            ],
+            "frontmatter": {
+              "description": "Report milestones, blockers, requests for input, ready artifacts and progress back to Mission Control from inside a mission workspace with mc-signal. Use whenever you finish a meaningful step, get stuck, need a human or another agent to act, or produce an artifact someone is waiting for; signals are the only channel back, so never write status, ledger or stop files instead.",
+              "name": "mc-signals"
+            },
+            "host_support": {
+              "profiles": {
+                "claude_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "codex_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "cursor_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "cursor_local": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                }
+              },
+              "schema_version": "mc.capability_host_support.v1"
+            },
+            "kind": "skill",
+            "logical_id": "skill.mc-signals",
+            "manifest_digest": "sha256:893740e5591a184f529b10b3ba39df34d93aa112cba325ddc2b06ffe239bc018",
+            "maturity": "experimental",
+            "required_capabilities": [],
+            "review_status": "approved",
+            "schema_version": "1",
+            "skill_name": "mc-signals",
+            "source_provenance": {
+              "commit_digest": null,
+              "license": "proprietary",
+              "locator": "repo://skills/mc-signals",
+              "source": "local",
+              "upstream_identity": "skill.mc-signals",
+              "upstream_version": "0.1.0"
+            },
+            "title": "mc-signals"
+          },
+          "published_at": "2026-10-14T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:e2c2be33c99e5603751ed65e673dcdba805da542ec995e9dbde1a7e23f5b0663",
+            "kind": "skill",
+            "lifecycle_status": "published",
+            "logical_id": "skill.mc-signals",
+            "payload_ref": null,
+            "revision": 1,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:ae6f72bf6b2d5ec65949f1246fb629270b8f4c858356c386da12ea21f94e9dc9",
+        "manifest_ref": "mc-catalog://definition/skill/skill.mc-signals/1",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "1"
+      },
+      "kind": "asset_version",
+      "logical_key": "agent-skill:skill:skill.mc-signals/1"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "agent-skill:skill:skill.mc-signals/1",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "skills/mc-signals",
+          "packages/mission-control-db-contract/seeds/signal_skills.py"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "agent-skill:skill:skill.mc-signals/1:admit"
+    }
+  ],
+  "seed_key": "mc.app.biotech.signal-skills",
+  "seed_version": "1.0.0"
+}

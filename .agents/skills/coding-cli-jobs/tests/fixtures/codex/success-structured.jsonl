@@ -1,0 +1,10 @@
+{"__fake__":{"expect_stdin_contains":"end with a JSON report"}}
+{"type":"thread.started","thread_id":"0199a213-81c0-7800-8aa1-bbab2a035a53"}
+{"type":"turn.started"}
+{"type":"item.started","item":{"id":"item_0","type":"command_execution","command":"\"C:\\\\WINDOWS\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe\" -Command \"uv run pytest tests/unit/outbox/test_relay.py -q\"","aggregated_output":"","exit_code":null,"status":"in_progress"}}
+{"type":"item.completed","item":{"id":"item_0","type":"command_execution","command":"\"C:\\\\WINDOWS\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe\" -Command \"uv run pytest tests/unit/outbox/test_relay.py -q\"","aggregated_output":"1 failed, 3 passed\n","exit_code":1,"status":"failed"}}
+{"type":"item.completed","item":{"id":"item_1","type":"file_change","changes":[{"path":"src/outbox/relay.py","kind":"update"}],"status":"completed"}}
+{"type":"item.completed","item":{"id":"item_2","type":"command_execution","command":"\"C:\\\\WINDOWS\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe\" -Command \"uv run pytest tests/unit/outbox/test_relay.py -q\"","aggregated_output":"4 passed\n","exit_code":0,"status":"completed"}}
+{"type":"item.completed","item":{"id":"item_3","type":"agent_message","text":"{\"status\":\"done\",\"summary\":\"Retry counter now uses attempt index.\",\"handoff\":\"\",\"blockers\":[]}"}}
+{"type":"turn.completed","usage":{"input_tokens":24763,"cached_input_tokens":24448,"cache_write_input_tokens":0,"output_tokens":622,"reasoning_output_tokens":210}}
+{"__fake__":{"exit":0}}

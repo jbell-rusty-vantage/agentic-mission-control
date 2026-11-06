@@ -1,0 +1,219 @@
+{
+  "files": {
+    ".claude/agents/summarizer.md": "0o644",
+    ".claude/agents/verifier.md": "0o644",
+    ".claude/settings.json": "0o644",
+    ".claude/skills/agent-browser/SKILL.md": "0o644",
+    ".claude/skills/agent-browser/scripts/open.sh": "0o755",
+    ".mcp.json": "0o644",
+    ".mission/hooks/hook.mc-policy-template/hook.json": "0o644",
+    ".mission/hooks/hook.mc-policy-template/policy.py": "0o755",
+    ".mission/hooks/native_output.py": "0o644",
+    ".mission/hooks/run.py": "0o755"
+  },
+  "in_process": null,
+  "report": {
+    "degraded": [
+      "hook.mc-policy-template: SessionStart cannot hold session_start fail-closed on claude_agent_sdk (observe)",
+      "mc.stop_fence: SubagentStart cannot hold subagent_start fail-closed on claude_agent_sdk (observe)",
+      "mc.operation_intent: SubagentStart cannot hold subagent_start fail-closed on claude_agent_sdk (observe)",
+      "mc.frame_capture: no Python SDK callback on claude_agent_sdk for session_start, session_end, before_model, after_model, after_compaction",
+      "mc.usage: no Python SDK callback on claude_agent_sdk for after_model"
+    ],
+    "overflow": [],
+    "plugin_expansions": [
+      [
+        "plugin.web-research@1.0.0#sha256:5e689e2b01672bf33996e75d5e372ff60c536ce1599a1458e867cd8f4bef5160",
+        [
+          "mcp.tavily@0.2.22#sha256:5e2d82cbc971f731d22f59e8993f63865f0dd4b85c27a052a0709bc07e8ac009",
+          "skill.agent-browser@0.38.2#sha256:9c53c074d7ac6a2728b638ac1f376c5fa9eb8f71603017c3ea638c2fd40548df",
+          "mcp.agent-browser@0.38.2#sha256:c01113dab94c0ed749a6086d3de01b1baf49f0f6c926e43ae642af798deac473"
+        ]
+      ]
+    ],
+    "requires_trust": [],
+    "skipped_members": [],
+    "unqualified": [],
+    "unsupported_on_lane": [
+      {
+        "event": "before_model",
+        "hook_id": "hook.mc-policy-template",
+        "required": false
+      }
+    ]
+  },
+  "send_options": {
+    "hook_callbacks": [
+      {
+        "fail_closed": true,
+        "hook_id": "mc.stop_fence",
+        "mc_event": "before_tool",
+        "native_event": "PreToolUse",
+        "timeout": 30
+      },
+      {
+        "fail_closed": true,
+        "hook_id": "mc.stop_fence",
+        "matcher": "Bash",
+        "mc_event": "before_shell",
+        "native_event": "PreToolUse",
+        "timeout": 30
+      },
+      {
+        "fail_closed": true,
+        "hook_id": "mc.stop_fence",
+        "matcher": "mcp__.*",
+        "mc_event": "before_mcp",
+        "native_event": "PreToolUse",
+        "timeout": 30
+      },
+      {
+        "fail_closed": true,
+        "hook_id": "mc.stop_fence",
+        "mc_event": "subagent_start",
+        "native_event": "SubagentStart",
+        "timeout": 30
+      },
+      {
+        "fail_closed": true,
+        "hook_id": "mc.operation_intent",
+        "mc_event": "before_tool",
+        "native_event": "PreToolUse",
+        "timeout": 30
+      },
+      {
+        "fail_closed": true,
+        "hook_id": "mc.operation_intent",
+        "matcher": "Bash",
+        "mc_event": "before_shell",
+        "native_event": "PreToolUse",
+        "timeout": 30
+      },
+      {
+        "fail_closed": true,
+        "hook_id": "mc.operation_intent",
+        "matcher": "mcp__.*",
+        "mc_event": "before_mcp",
+        "native_event": "PreToolUse",
+        "timeout": 30
+      },
+      {
+        "fail_closed": true,
+        "hook_id": "mc.operation_intent",
+        "mc_event": "subagent_start",
+        "native_event": "SubagentStart",
+        "timeout": 30
+      },
+      {
+        "fail_closed": true,
+        "hook_id": "mc.frame_capture",
+        "mc_event": "before_prompt",
+        "native_event": "UserPromptSubmit",
+        "timeout": 30
+      },
+      {
+        "fail_closed": true,
+        "hook_id": "mc.frame_capture",
+        "mc_event": "before_tool",
+        "native_event": "PreToolUse",
+        "timeout": 30
+      },
+      {
+        "fail_closed": true,
+        "hook_id": "mc.frame_capture",
+        "mc_event": "after_tool",
+        "native_event": "PostToolUse",
+        "timeout": 30
+      },
+      {
+        "fail_closed": true,
+        "hook_id": "mc.frame_capture",
+        "mc_event": "after_tool_failure",
+        "native_event": "PostToolUseFailure",
+        "timeout": 30
+      },
+      {
+        "fail_closed": true,
+        "hook_id": "mc.frame_capture",
+        "matcher": "Bash",
+        "mc_event": "before_shell",
+        "native_event": "PreToolUse",
+        "timeout": 30
+      },
+      {
+        "fail_closed": true,
+        "hook_id": "mc.frame_capture",
+        "matcher": "Bash",
+        "mc_event": "after_shell",
+        "native_event": "PostToolUse",
+        "timeout": 30
+      },
+      {
+        "fail_closed": true,
+        "hook_id": "mc.frame_capture",
+        "matcher": "mcp__.*",
+        "mc_event": "before_mcp",
+        "native_event": "PreToolUse",
+        "timeout": 30
+      },
+      {
+        "fail_closed": true,
+        "hook_id": "mc.frame_capture",
+        "matcher": "Edit|Write",
+        "mc_event": "after_file_edit",
+        "native_event": "PostToolUse",
+        "timeout": 30
+      },
+      {
+        "fail_closed": true,
+        "hook_id": "mc.frame_capture",
+        "mc_event": "before_compaction",
+        "native_event": "PreCompact",
+        "timeout": 30
+      },
+      {
+        "fail_closed": true,
+        "hook_id": "mc.frame_capture",
+        "mc_event": "subagent_start",
+        "native_event": "SubagentStart",
+        "timeout": 30
+      },
+      {
+        "fail_closed": true,
+        "hook_id": "mc.frame_capture",
+        "mc_event": "subagent_stop",
+        "native_event": "SubagentStop",
+        "timeout": 30
+      },
+      {
+        "fail_closed": true,
+        "hook_id": "mc.frame_capture",
+        "mc_event": "stop",
+        "native_event": "Stop",
+        "timeout": 30
+      },
+      {
+        "fail_closed": true,
+        "hook_id": "mc.usage",
+        "mc_event": "after_tool",
+        "native_event": "PostToolUse",
+        "timeout": 30
+      },
+      {
+        "fail_closed": true,
+        "hook_id": "mc.usage",
+        "mc_event": "stop",
+        "native_event": "Stop",
+        "timeout": 30
+      }
+    ],
+    "setting_sources": [
+      "project"
+    ],
+    "system_prompt": {
+      "append": "Collect peer-reviewed evidence on rapamycin and lifespan.\nCite every claim.\n\n## Mission context\n\n- inputs/sources/source_manifest.json (materialized)\n- journal digest (reference)\n",
+      "preset": "claude_code",
+      "type": "preset"
+    }
+  }
+}

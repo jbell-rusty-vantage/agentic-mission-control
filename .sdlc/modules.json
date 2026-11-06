@@ -1,0 +1,622 @@
+{
+  "version": 1,
+  "_comment": "Hand-maintained sidecar of docs/tools/agents_docs_index.py (DOC-02 section 3, SPEC-01 section 3.2). One entry per major directory, depth at most 2 below src/mission_control. The generator renders the root Code map from `purpose` (first sentence) and writes a generated block into <path>/AGENTS.md. Fields: id, title, path, purpose, pin_first (root map rank), pin_files (entrypoints listed first), tests, verify, program, invariants (0-3 lines). Explained by, Decided by, Depends on and Used by are derived, never written here.",
+  "modules": [
+    {
+      "id": "adapters.deep_agents",
+      "title": "Deep Agents lane adapter",
+      "path": "src/mission_control/adapters/deep_agents",
+      "purpose": "Deep Agents lane (ADR-0005): bounded cognition over LangGraph, never forked. It runs on deepagents extended through public interfaces, executes what the binding pins and schedules nothing.",
+      "pin_first": 1,
+      "pin_files": [
+        "compile.py",
+        "lane.py",
+        "binding.py",
+        "describe.py",
+        "harness.py",
+        "adapter.py",
+        "materializer.py",
+        "docker_sandbox.py"
+      ],
+      "tests": [
+        "tests/unit/deep_agents",
+        "tests/integration/deep_agents",
+        "tests/conformance/lanes"
+      ],
+      "verify": [
+        "uv run pytest tests/unit/deep_agents tests/conformance/lanes",
+        "uv run pytest tests/integration/deep_agents (real local stack; paid calls need authorization)"
+      ],
+      "program": "docs/specs/provider-consolidation-2026-10/providers/deep_agents/CHANGES.md",
+      "invariants": [
+        "Never choose a model, tool or skill the binding did not name; refuse mismatches.",
+        "Model clients and credentials stay server-side, never in prompts, files, checkpoints or artifacts.",
+        "An uncertain provider state is reconciled, never relaunched; checkpoints are recovery state, not mission truth."
+      ]
+    },
+    {
+      "id": "domain.execution",
+      "title": "Operation execution contracts",
+      "path": "src/mission_control/domain/execution",
+      "purpose": "Provider-neutral operation execution contracts, no I/O. Covers execution and environment bindings, lane describe and turn payloads, the journal, checkpoint lineage, cognition points, materialization receipts, saved-result settlement and usage admission.",
+      "pin_first": 2,
+      "tests": [
+        "tests/unit/operations",
+        "tests/unit/harness",
+        "tests/conformance/lanes"
+      ],
+      "verify": [
+        "uv run pytest tests/unit/operations tests/architecture"
+      ],
+      "invariants": [
+        "Provider-neutral: the contracts here name no provider SDK type.",
+        "Settlement is by saved result and reducer; execution completion is not mission acceptance."
+      ]
+    },
+    {
+      "id": "application.authoring",
+      "title": "Authoring use cases",
+      "path": "src/mission_control/application/authoring",
+      "purpose": "Mission Manifest compile, submit and start use cases. Also the production launch inputs of a manifest run, per-lane launch bindings (local providers and Cursor), the subagent discriminator and the control-plane repository port.",
+      "pin_first": 3,
+      "tests": [
+        "tests/unit/authoring",
+        "tests/unit/control_plane",
+        "tests/unit/deep_agents"
+      ],
+      "verify": [
+        "uv run pytest tests/unit/authoring tests/unit/control_plane"
+      ],
+      "invariants": [
+        "Fail closed at fresh launch when authored acceptance has no runtime evaluator."
+      ]
+    },
+    {
+      "id": "application.environments",
+      "title": "Execution environments",
+      "path": "src/mission_control/application/environments",
+      "purpose": "Environment resolution, preparation gate and network projection. Resolves an environment request into mc.environment_binding.v1 and attests it; also owns preparation records, Environment Kits and hosted provider environments.",
+      "pin_first": 4,
+      "tests": [
+        "tests/unit/agentic_components/test_environments.py",
+        "tests/unit/agentic_components/test_environment_preparation.py",
+        "tests/unit/agentic_components/test_network_policy.py",
+        "tests/unit/capability/test_environment_kits.py",
+        "tests/integration/postgres/test_environment_preparation.py"
+      ],
+      "verify": [
+        "uv run pytest tests/unit/agentic_components tests/unit/capability/test_environment_kits.py"
+      ],
+      "program": "docs/specs/provider-consolidation-2026-10/LEDGER.md",
+      "invariants": []
+    },
+    {
+      "id": "adapters.temporal",
+      "title": "Temporal execution mechanics",
+      "path": "src/mission_control/adapters/temporal",
+      "purpose": "Workflows and activities: mission_run, stagegraph, goal_directed, operation. Also the Temporal client, search attributes, visibility, worker versioning and the production lane composition factories.",
+      "pin_first": 5,
+      "tests": [
+        "tests/unit/temporal",
+        "tests/unit/runtime",
+        "tests/integration/temporal",
+        "tests/acceptance/mission_control"
+      ],
+      "verify": [
+        "uv run pytest tests/unit/temporal tests/unit/runtime",
+        "uv run pytest tests/integration/temporal (needs real Temporal and PostgreSQL)"
+      ],
+      "invariants": [
+        "Workflow code is deterministic; activities call application services.",
+        "Scoped child IDs cannot collide across installations, applications or tenants.",
+        "Submission replay verifies the actual first-history input before issuing a receipt."
+      ]
+    },
+    {
+      "id": "application.recovery",
+      "title": "Recovery, forks and reconciliation",
+      "path": "src/mission_control/application/recovery",
+      "purpose": "Macro snapshots, semantic forks, reconciliation and terminal-evidence adoption. Also cognitive seeds, interventions and repairs, and closed-workflow cancellation recovery.",
+      "pin_first": 6,
+      "tests": [
+        "tests/unit/recovery",
+        "tests/unit/continuation",
+        "tests/unit/runtime",
+        "tests/integration/postgres"
+      ],
+      "verify": [
+        "uv run pytest tests/unit/recovery tests/unit/continuation"
+      ],
+      "invariants": []
+    },
+    {
+      "id": "domain.programs",
+      "title": "Workflow family interpretation",
+      "path": "src/mission_control/domain/programs",
+      "purpose": "Pure Stage Graph and GoalDirected interpretation; interpreters propose only. Covers routes, dependencies, payload bounds, completion evidence, watchers, Human Gates and recursive composition rules; they never terminalize a run.",
+      "pin_first": 7,
+      "tests": [
+        "tests/unit/orchestration",
+        "tests/unit/watchers",
+        "tests/unit/run_control"
+      ],
+      "verify": [
+        "uv run pytest tests/unit/orchestration tests/unit/watchers tests/architecture"
+      ],
+      "invariants": [
+        "Do not turn an interpreter proposal into an authoritative lifecycle change.",
+        "Deterministic and free of I/O imports."
+      ]
+    },
+    {
+      "id": "application.programs",
+      "title": "Family orchestration use cases",
+      "path": "src/mission_control/application/programs",
+      "purpose": "Stage Graph and GoalDirected orchestration use cases over persisted authority. Covers the orchestration service, named-output settlement, completion validation, linked runs, nested bodies, Human Gate wiring and fork templates.",
+      "pin_first": 8,
+      "tests": [
+        "tests/unit/orchestration",
+        "tests/unit/run_control",
+        "tests/unit/outputs",
+        "tests/integration/postgres"
+      ],
+      "verify": [
+        "uv run pytest tests/unit/orchestration tests/unit/run_control"
+      ],
+      "invariants": []
+    },
+    {
+      "id": "mission_control",
+      "title": "General runtime navigation",
+      "path": "src/mission_control",
+      "purpose": "Runtime layers: contracts, domain, application, adapters, interfaces, bootstrap. A request becomes an admitted immutable binding, then a scoped Temporal root, family decisions, bounded operations and durable settlements.",
+      "tests": [
+        "tests/unit",
+        "tests/integration",
+        "tests/acceptance/mission_control",
+        "tests/architecture"
+      ],
+      "verify": [
+        "make check",
+        "make typecheck"
+      ],
+      "invariants": [
+        "Interpreters propose; reducers authorize and terminalize.",
+        "Provider objects stay outside the domain; application-specific integrations stay outside this package."
+      ]
+    },
+    {
+      "id": "contracts",
+      "title": "Public contracts",
+      "path": "src/mission_control/contracts",
+      "purpose": "Public envelopes: commands, inspection, admission, canonical digests. Also scoped identities and the hook, realtime, Context Packet and Knowledge Operation Protocol wire contracts.",
+      "tests": [
+        "tests/unit/run_control/test_mission_control_canonical.py",
+        "tests/unit/run_control/test_mission_control_facade.py",
+        "tests/unit/mission_control/test_temporal_identities.py",
+        "tests/conformance"
+      ],
+      "verify": [
+        "uv run pytest tests/unit/run_control tests/conformance"
+      ],
+      "invariants": [
+        "Changing canonical bytes changes idempotency and immutable pins.",
+        "A contract request cannot inject trusted actor, pool or installation authority."
+      ]
+    },
+    {
+      "id": "domain",
+      "title": "Pure rules and decisions",
+      "path": "src/mission_control/domain",
+      "purpose": "Pure rules and decisions with no I/O. Covers programs, execution, authoring, composition, context, resolution, capabilities, outputs and reactions; policies are explicit admitted inputs.",
+      "tests": [
+        "tests/unit/orchestration",
+        "tests/unit/run_control",
+        "tests/unit/operations",
+        "tests/unit/control_plane",
+        "tests/architecture/test_package_boundaries.py"
+      ],
+      "verify": [
+        "make test-arch",
+        "uv run pytest tests/unit/orchestration tests/unit/operations"
+      ],
+      "invariants": [
+        "Imports no Temporal, database client, FastAPI or provider SDK.",
+        "Determinism and immutable content identity hold across retries and forks."
+      ]
+    },
+    {
+      "id": "domain.authoring",
+      "title": "Authoring domain",
+      "path": "src/mission_control/domain/authoring",
+      "purpose": "Mission Manifest, MissionDefinition@1, Environment Kits and the compiler. Covers manifest v1 and v2 (YAML) lowered to immutable definitions; the package root re-exports lazily so a leaf module does not load the compiler.",
+      "tests": [
+        "tests/unit/authoring",
+        "tests/unit/chains",
+        "tests/unit/control_plane"
+      ],
+      "verify": [
+        "uv run pytest tests/unit/authoring tests/unit/chains"
+      ],
+      "invariants": [
+        "Definitions are immutable once compiled; identifiers derive from the parts that identify a record."
+      ]
+    },
+    {
+      "id": "domain.frames",
+      "title": "Provider frames and transcript rules",
+      "path": "src/mission_control/domain/frames",
+      "purpose": "Provider Frames, closing facts, usage and Transcript renderers. A Provider Frame is the lane-neutral record of what a provider said; the renderers emit JSONL for agents and Markdown for humans.",
+      "tests": [
+        "tests/unit/frames"
+      ],
+      "verify": [
+        "uv run pytest tests/unit/frames"
+      ],
+      "invariants": [
+        "Frame bodies are canonical JSON with secrets redacted and a bounded excerpt."
+      ]
+    },
+    {
+      "id": "application",
+      "title": "Application logic",
+      "path": "src/mission_control/application",
+      "purpose": "Use cases that map public controls to domain rules behind ports. Covers missions, execution, programs, recovery, subordinates and capabilities; concrete SDK clients and SQL belong in adapters, composition in bootstrap.",
+      "tests": [
+        "tests/unit/run_control",
+        "tests/integration/postgres/test_mission_control_lifecycle_postgres.py",
+        "tests/integration/postgres/test_mission_control_composition_postgres.py"
+      ],
+      "verify": [
+        "uv run pytest tests/unit/run_control"
+      ],
+      "invariants": [
+        "Never choose a provider fallback or install a permissive policy because a binding is missing."
+      ]
+    },
+    {
+      "id": "application.selection",
+      "title": "Selection Workspace",
+      "path": "src/mission_control/application/selection",
+      "purpose": "The Selection Workspace: faceted search and read-only draft check. One search and one read-only check of a draft lane, model and capability selection.",
+      "tests": [
+        "tests/unit/selection"
+      ],
+      "verify": [
+        "uv run pytest tests/unit/selection"
+      ],
+      "program": "docs/specs/provider-consolidation-2026-10/LEDGER.md",
+      "invariants": [
+        "The check is read-only; it never writes selection state."
+      ]
+    },
+    {
+      "id": "application.missions",
+      "title": "Mission application handlers",
+      "path": "src/mission_control/application/missions",
+      "purpose": "Mission admission, lifecycle facade, inspection and run retrieval. Handlers over the durable runtime authority: scoped admission and governed launch, the facade over the reducer and boundary relay, and runtime saga adapters.",
+      "tests": [
+        "tests/unit/mission_control",
+        "tests/unit/run_control",
+        "tests/integration/postgres/test_mission_control_lifecycle_postgres.py"
+      ],
+      "verify": [
+        "uv run pytest tests/unit/mission_control tests/unit/run_control"
+      ],
+      "invariants": []
+    },
+    {
+      "id": "adapters",
+      "title": "Concrete adapters",
+      "path": "src/mission_control/adapters",
+      "purpose": "Concrete I/O behind the application ports. Covers postgres, temporal, deep_agents, agent_server and the other lanes, storage, auth, realtime and operations; there is no general infrastructure catchall for new implementations.",
+      "tests": [
+        "tests/unit",
+        "tests/integration",
+        "tests/conformance/lanes"
+      ],
+      "verify": [
+        "make check",
+        "make test-integration (needs compose services)"
+      ],
+      "invariants": [
+        "Adapters implement application ports; they cannot invent completion semantics, privileged grants or cross-application routing.",
+        "No paid provider experiment without finite authorization."
+      ]
+    },
+    {
+      "id": "adapters.postgres",
+      "title": "PostgreSQL authority",
+      "path": "src/mission_control/adapters/postgres",
+      "purpose": "Scoped repositories, immutable content and transaction boundaries. Runtime and family-writer roles stay distinct; every statement is schema-qualified and runs in an explicit transaction after scope is applied.",
+      "tests": [
+        "tests/integration/postgres",
+        "tests/qualification/two_project"
+      ],
+      "verify": [
+        "uv run pytest tests/integration/postgres (needs real PostgreSQL)"
+      ],
+      "invariants": [
+        "Apply scope on every acquired connection; never use schema-owner credentials as a fallback.",
+        "Schema changes belong to the db-contract package; migrations/ here is historical and never applied live."
+      ]
+    },
+    {
+      "id": "adapters.agent_server",
+      "title": "Agent Server hosting",
+      "path": "src/mission_control/adapters/agent_server",
+      "purpose": "Hosts the bounded LangGraph graphs of the Agent Server (ADR-0006). Covers the graph registry, entrypoints for subordinate and async child graphs, deployment-selected topology, authentication, health and tracing.",
+      "tests": [
+        "tests/unit/agent_server",
+        "tests/integration/agent_server"
+      ],
+      "verify": [
+        "uv run pytest tests/unit/agent_server",
+        "uv run pytest tests/integration/agent_server (needs the local Agent Server)"
+      ],
+      "invariants": [
+        "Entrypoints are bounded graphs; Temporal alone schedules missions.",
+        "Topology is selected by the server deployment, never by a request."
+      ]
+    },
+    {
+      "id": "adapters.capabilities",
+      "title": "Capability custody adapters",
+      "path": "src/mission_control/adapters/capabilities",
+      "purpose": "Capability bundle custody, MCP registry, browser and skill discovery. Covers immutable skill bundles and their object store, browser subprocess transport, npx skills discovery, quarantine inspection and capability pins.",
+      "tests": [
+        "tests/unit/capability"
+      ],
+      "verify": [
+        "uv run pytest tests/unit/capability"
+      ],
+      "invariants": [
+        "Bundles are complete immutable directories; no archive extraction or install hooks."
+      ]
+    },
+    {
+      "id": "adapters.cursor",
+      "title": "Cursor lane family",
+      "path": "src/mission_control/adapters/cursor",
+      "purpose": "Cursor lane family (ADR-0030): cursor_local and cursor_cloud. Local uses the pinned SDK bridge, git worktree leases and fail-closed Kernel Hooks; cloud uses Cloud Agents API v1 with SCM branches; both map frames and reconcile billed cost.",
+      "tests": [
+        "tests/unit/cursor",
+        "tests/integration/cursor",
+        "tests/unit/harness"
+      ],
+      "verify": [
+        "uv run pytest tests/unit/cursor tests/unit/harness",
+        "uv run pytest tests/integration/cursor (paid provider calls need authorization)"
+      ],
+      "program": "docs/specs/provider-consolidation-2026-10/LEDGER.md",
+      "invariants": [
+        "Importing this package imports no SDK; the SDK loads lazily inside the bridge adapter."
+      ]
+    },
+    {
+      "id": "adapters.claude",
+      "title": "Claude Agent SDK lane",
+      "path": "src/mission_control/adapters/claude",
+      "purpose": "The local claude_agent_sdk lane. Covers the single session stream owner, the SDK client factory, message-to-frame mapping, Kernel Hooks as in-process callbacks, permission bindings to the approval broker, workspace and continuation.",
+      "tests": [
+        "tests/unit/claude",
+        "tests/integration/claude",
+        "tests/unit/harness"
+      ],
+      "verify": [
+        "uv run pytest tests/unit/claude tests/unit/harness",
+        "uv run pytest tests/integration/claude (paid provider calls need authorization)"
+      ],
+      "program": "docs/specs/provider-consolidation-2026-10/LEDGER.md",
+      "invariants": [
+        "Exports load lazily so the describe aggregator can read describe without importing the harness."
+      ]
+    },
+    {
+      "id": "adapters.codex",
+      "title": "Codex lane",
+      "path": "src/mission_control/adapters/codex",
+      "purpose": "The codex lane: Codex app-server over stdio on a worker. Covers the typed JSON-RPC protocol subset, transport, subprocess launcher, approvals over the broker, frame mapping, hook trust and continuation.",
+      "tests": [
+        "tests/unit/codex",
+        "tests/integration/codex",
+        "tests/unit/harness"
+      ],
+      "verify": [
+        "uv run pytest tests/unit/codex tests/unit/harness",
+        "uv run pytest tests/integration/codex (paid provider calls need authorization)"
+      ],
+      "program": "docs/specs/provider-consolidation-2026-10/LEDGER.md",
+      "invariants": [
+        "Nothing here logs in, starts a model turn on its own or reads a credential value."
+      ]
+    },
+    {
+      "id": "interfaces",
+      "title": "Public transport",
+      "path": "src/mission_control/interfaces",
+      "purpose": "Transport only: http, cli, mcp and socketio. They call application handlers and never implement a second lifecycle reducer or scheduler.",
+      "tests": [
+        "tests/unit/mission_control/test_public_interfaces.py",
+        "tests/unit/mission_control/test_authentication.py",
+        "tests/acceptance/mission_control/test_authenticated_scoped_runtime.py"
+      ],
+      "verify": [
+        "uv run pytest tests/unit/mission_control"
+      ],
+      "invariants": [
+        "Authenticate before resolving scoped services; verify scope against the trusted installation, application and tenant.",
+        "Request fields and token metadata cannot select pools, grants, bootstrap factories or provider credentials."
+      ]
+    },
+    {
+      "id": "interfaces.http",
+      "title": "HTTP routes",
+      "path": "src/mission_control/interfaces/http",
+      "purpose": "Typed application-scoped HTTP operations. Covers mission manifest verbs, run control and forks, runtime inspection, transcript and artifacts, catalog, subscriptions, signal ingress, human tasks, selection and model profiles.",
+      "tests": [
+        "tests/unit/mission_control/test_public_interfaces.py",
+        "tests/unit/mission_control/test_runtime_interfaces.py",
+        "tests/unit/frames",
+        "tests/unit/run_control"
+      ],
+      "verify": [
+        "uv run pytest tests/unit/mission_control"
+      ],
+      "invariants": [
+        "Keep replay response semantics and structured rejection codes explicit."
+      ]
+    },
+    {
+      "id": "interfaces.cli",
+      "title": "missionctl CLI",
+      "path": "src/mission_control/interfaces/cli",
+      "purpose": "missionctl: a thin authenticated client, never a second lifecycle authority. Works over the public HTTP surface; includes wait and inbox, outputs, selection, knowledge review, setup and token helpers.",
+      "tests": [
+        "tests/unit/run_control/test_cli_command_cancel.py",
+        "tests/unit/capability/test_catalog_cli.py",
+        "tests/unit/prerequisites/test_bootstrap_cli.py"
+      ],
+      "verify": [
+        "uv run pytest tests/unit/run_control/test_cli_command_cancel.py tests/unit/capability/test_catalog_cli.py"
+      ],
+      "invariants": [
+        "Credentials are written to a new file, never to standard output."
+      ]
+    },
+    {
+      "id": "interfaces.mcp",
+      "title": "MCP servers",
+      "path": "src/mission_control/interfaces/mcp",
+      "purpose": "Coordinator and operator MCP servers and the governed gateway. Tools cover mission, run-control, transcript, selection, human-task, cognition-point and signal operations, inbox and subscriptions; the gateway fronts Mission-Control-owned effect tools.",
+      "tests": [
+        "tests/unit/coordinator",
+        "tests/unit/subscriptions"
+      ],
+      "verify": [
+        "uv run pytest tests/unit/coordinator tests/unit/subscriptions"
+      ],
+      "program": "docs/specs/coordinator-surface-2026-10/LEDGER.md",
+      "invariants": []
+    },
+    {
+      "id": "bootstrap",
+      "title": "Trusted composition and startup",
+      "path": "src/mission_control/bootstrap",
+      "purpose": "Trusted startup and composition. Covers the API and worker factories, read-only preflight, the common-release check and the wiring of repositories and services; bootstrap passes the application id explicitly and never discovers profiles.",
+      "tests": [
+        "tests/unit/mission_control",
+        "tests/unit/prerequisites",
+        "tests/integration/postgres/test_mission_control_composition_postgres.py"
+      ],
+      "verify": [
+        "uv run pytest tests/unit/mission_control",
+        "make preflight (read-only installation check)"
+      ],
+      "invariants": [
+        "storage_mode is production_common only; missing or mismatched evidence fails closed with no transitional fallback.",
+        "Startup never migrates schema, invents catalog definitions or policy grants, or fetches token-supplied keys."
+      ]
+    },
+    {
+      "id": "db_contract",
+      "title": "Common database component",
+      "path": "packages/mission-control-db-contract",
+      "purpose": "Common SQL, releases and the mission-db admin tool (ADR-0003). Holds immutable releases and seeds; mission-db installs, verifies and seeds a release into one application database. The runtime never imports it.",
+      "tests": [
+        "packages/mission-control-db-contract/tests"
+      ],
+      "verify": [
+        "make test-db-contract (disposable PostgreSQL 17 + pgvector, MISSION_CONTROL_TEST_ADMIN_DSN set)",
+        "mission-db qualify (two-target proof)"
+      ],
+      "invariants": [
+        "A release is immutable once applied: add a new component version and seed version, never edit bytes.",
+        "Every apply, runtime-apply and seed-apply writes a receipt; verify compares fingerprint and contract digest."
+      ]
+    },
+    {
+      "id": "integrations.biotech",
+      "title": "Optional Biotech integration",
+      "path": "integrations/biotech",
+      "purpose": "Optional Biotech adapters; the kernel never imports them. Application-specific schema grounding, research and Neo4j adapters (namespace biotech_mission_adapters); deployment composition supplies their policies explicitly.",
+      "tests": [
+        "tests/integration/biotech",
+        "tests/unit/reference_research",
+        "tests/unit/web_research"
+      ],
+      "verify": [
+        "uv run --group biotech pytest tests/unit/reference_research tests/unit/web_research"
+      ],
+      "invariants": [
+        "The kernel never imports this package.",
+        "No entity writer here; Biotech domain writes arrive through the Knowledge Services intent and receipt contract."
+      ]
+    },
+    {
+      "id": "tests",
+      "title": "Verification navigation",
+      "path": "tests",
+      "purpose": "Where each kind of proof lives. unit covers pure contracts and reducers, integration real PostgreSQL and Temporal boundaries, acceptance/mission_control authenticated scoped execution, conformance every lane against its fake, qualification/two_project the common release.",
+      "tests": [
+        "tests/architecture/test_package_boundaries.py"
+      ],
+      "verify": [
+        "make check",
+        "make test-integration",
+        "make test-qualification (needs MISSION_CONTROL_TEST_ADMIN_DSN)"
+      ],
+      "invariants": [
+        "Never hide a missing service behind a new default skip.",
+        "Destructive fixture setup never targets live or unknown databases."
+      ]
+    },
+    {
+      "id": "skills",
+      "title": "Shipped skill bundles",
+      "path": "skills",
+      "purpose": "Shipped agent skill bundles with digest manifests. Includes the mission-control router skill, the author, catalog, compose, intervene and observe skills, mc-signals, the mc-cognition-* skills and the knowledge charters.",
+      "tests": [
+        "tests/unit/skills"
+      ],
+      "verify": [
+        "make skills-check",
+        "make skills-manifest (rewrites digests after editing a bundle)"
+      ],
+      "invariants": [
+        "A bundle's manifest.json digests must match the files on disk."
+      ]
+    },
+    {
+      "id": "deployments",
+      "title": "Deployment inputs",
+      "path": "deployments",
+      "purpose": "Per-application and per-environment deployment inputs, not code. Holds application.toml, models.toml, target.toml and release.lock.json per application, plus the cloud runtime plan, hosted packs, cognition profiles, Vercel ingress and examples.",
+      "tests": [
+        "deployments/cloud_runtime/test_plan.py"
+      ],
+      "verify": [
+        "uv run pytest deployments/cloud_runtime/test_plan.py",
+        "make preflight (read-only installation check)"
+      ],
+      "invariants": [
+        "release.lock.json and hosted-pack files are LF-pinned; their digests hash LF bytes.",
+        "No secrets or private runtime receipts."
+      ]
+    },
+    {
+      "id": "agent_server_deployment",
+      "title": "Agent Server deployment config",
+      "path": "agent_server",
+      "purpose": "LangGraph Agent Server deployment config. langgraph.json maps graph ids to mission_control.adapters.agent_server entrypoints and names the auth and http app; runtime.env carries the server environment. The code lives in src/mission_control/adapters/agent_server.",
+      "tests": [
+        "tests/unit/agent_server/test_canonical_deployment.py",
+        "tests/integration/agent_server"
+      ],
+      "verify": [
+        "uv run pytest tests/unit/agent_server/test_canonical_deployment.py"
+      ],
+      "invariants": []
+    }
+  ]
+}

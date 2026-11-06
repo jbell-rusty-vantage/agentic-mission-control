@@ -1,0 +1,988 @@
+{
+  "schema": "sprint-oc.work-items.v1",
+  "date": "2026-10-26",
+  "spec_issue": {
+    "id": "85a9154c-b2bd-46c3-ac71-c8a1759bb6c1",
+    "identifier": "OVE-162",
+    "url": "https://linear.app/overtonbell/issue/OVE-162/oc-final-output-contracts-exact-context-and-knowledge-service"
+  },
+  "items": [
+    {
+      "key": "WI-01",
+      "title": "Compile and fulfill explicit named output promises",
+      "phase": "sprint",
+      "status": "ready-for-agent",
+      "owner": "MC authoring/contracts/output application + common SQL",
+      "blocks_on": [],
+      "spec_sections": [
+        2,
+        3,
+        4
+      ],
+      "result": "Author and compile exact named output promises, enforcement, coverage and explicit completion; inspect pinned effective configuration. MC authoring/compiler/contracts.",
+      "cutover": "Replace implicit submitted-row promises, required-only projection and last-stage-goal acceptance. Extend EffectiveRunConfiguration and existing submission service; add exact obligations/revisions/heads/sets/assessments/fulfillment in the MC component. Governed output/transfer successors include expected prior revision, actor/reason/delegation, explicit weakening authority and safe-boundary CAS activation.",
+      "acceptance": "Prove all eight forms through ordinary handlers, closed completion expressions, index-only nested guarantees, changed-key refusal, omitted obligations, concurrent promotion and newly submitted drafts not replacing accepted heads. One reminder, unambiguous candidate/named-receipt association, one ambiguity repair then block; bare ID only under one exact admitted binding.",
+      "provenance": "OC-D114/115/118/123/162/163; new runtime contract slice, related to OVE-151/152/158.",
+      "linear": {
+        "id": "3b0c100f-d6af-4686-a8a9-9ac8661b4ad2",
+        "identifier": "OVE-163",
+        "url": "https://linear.app/overtonbell/issue/OVE-163/oc-compile-and-fulfill-explicit-named-output-promises"
+      },
+      "sequence": 1,
+      "definition_of_done": "At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.",
+      "description": "Parent specification: [OVE-162](https://linear.app/overtonbell/issue/OVE-162/oc-final-output-contracts-exact-context-and-knowledge-service)\n\n## Problem and observable result\n\nAuthor and compile exact named output promises, enforcement, coverage and explicit completion; inspect pinned effective configuration. MC authoring/compiler/contracts.\n\n## Owning interfaces and cutover\n\nMC authoring/contracts/output application + common SQL.\n\nReplace implicit submitted-row promises, required-only projection and last-stage-goal acceptance. Extend EffectiveRunConfiguration and existing submission service; add exact obligations/revisions/heads/sets/assessments/fulfillment in the MC component. Governed output/transfer successors include expected prior revision, actor/reason/delegation, explicit weakening authority and safe-boundary CAS activation.\n\n## Acceptance and recovery proof\n\n- [ ] Prove all eight forms through ordinary handlers, closed completion expressions, index-only nested guarantees, changed-key refusal, omitted obligations, concurrent promotion and newly submitted drafts not replacing accepted heads. One reminder, unambiguous candidate/named-receipt association, one ambiguity repair then block; bare ID only under one exact admitted binding.\n- [ ] At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.\n\n## Dependencies and execution\n\nBlocked by: None; ready frontier. Native blocker relations are authoritative. Phase: sprint.\n\nClaim repository/base and bounded writable scope before work; coordinate shared protocol/bootstrap/migration files with integrator. Necessary code/schema/import changes and disposable-target rebuilds are within the accepted assignment. Escalate missing credentials/authority or contradictory goals, not routine engineering.\n\n## Provenance\n\n* Owner final synthesis request, 2026-10-26; final handoff through OC-D181.\n* Decisions: OC-D114/115/118/123/162/163; new runtime contract slice, related to OVE-151/152/158.\n* Canonical: `mission-control-general/general-mission-control/OUTPUT-CONTRACTS.md` §§2, 3, 4; ADR-0058–0062.\n* Execution: `docs/specs/provider-consolidation-2026-10/sprint-oc/IMPLEMENTATION.md`, `PROOFS.md`, `DECISIONS.md`; planning key WI-01.\n* Source audit: MC 1863017c, KS b45adf5, AIDB 306efd7, BKS c398177. New specification files are uncommitted synthesis outputs, not runtime proof.\n* Terms: Output Obligation, Obligation Fulfillment, Sealed Transfer Plan, Delivery Receipt, Current Accepted Set.",
+      "draft_path": ".scratch/final-synthesis/issues/01-wi-01.md",
+      "linear_blockers": []
+    },
+    {
+      "key": "WI-02",
+      "title": "Deliver exact admitted inputs with one sealed plan",
+      "phase": "sprint",
+      "status": "ready-for-agent",
+      "owner": "MC context/lane materialization + KS exact-read port",
+      "blocks_on": [
+        "WI-01"
+      ],
+      "spec_sections": [
+        3,
+        6
+      ],
+      "result": "Deliver exact selected initial/dependent/reviewer inputs through one plan to prompt, files and handles, with attempt receipts and aggregate budgets. MC context/materializer plus KS exact-read port.",
+      "cutover": "Replace run-wide KS loading, first-slot selection and overlapping context selection/M04 plan authorities. Extend common SQL plan and per-attempt receipt keys; update KS readSelected for assertion/evidence handles and purpose. Materialize first/later/reviewer/nested/link/continuation inputs, including agents without knowledge tools.",
+      "acceptance": "Prove evaluator isolation before W1 and prompt/files/handles from identical exact selection. Count host/tool/skill/index/inline plus generation/tool-result reserves and all files. Required actual-backend read fails closed. Redelivery appends receipt, never resolves today's revision. Literal/artifact/application sources resolve exactly.",
+      "provenance": "OC-D116/119/122–124; RV-03/05. New expansion beyond OVE-161's bounded byte guard.",
+      "linear": {
+        "id": "1ca988e6-2175-42e8-bde7-f35912278650",
+        "identifier": "OVE-164",
+        "url": "https://linear.app/overtonbell/issue/OVE-164/oc-deliver-exact-admitted-inputs-with-one-sealed-plan"
+      },
+      "sequence": 2,
+      "definition_of_done": "At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.",
+      "description": "Parent specification: [OVE-162](https://linear.app/overtonbell/issue/OVE-162/oc-final-output-contracts-exact-context-and-knowledge-service)\n\n## Problem and observable result\n\nDeliver exact selected initial/dependent/reviewer inputs through one plan to prompt, files and handles, with attempt receipts and aggregate budgets. MC context/materializer plus KS exact-read port.\n\n## Owning interfaces and cutover\n\nMC context/lane materialization + KS exact-read port.\n\nReplace run-wide KS loading, first-slot selection and overlapping context selection/M04 plan authorities. Extend common SQL plan and per-attempt receipt keys; update KS readSelected for assertion/evidence handles and purpose. Materialize first/later/reviewer/nested/link/continuation inputs, including agents without knowledge tools.\n\n## Acceptance and recovery proof\n\n- [ ] Prove evaluator isolation before W1 and prompt/files/handles from identical exact selection. Count host/tool/skill/index/inline plus generation/tool-result reserves and all files. Required actual-backend read fails closed. Redelivery appends receipt, never resolves today's revision. Literal/artifact/application sources resolve exactly.\n- [ ] At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.\n\n## Dependencies and execution\n\nBlocked by: [OVE-163](https://linear.app/overtonbell/issue/OVE-163/oc-compile-and-fulfill-explicit-named-output-promises) (WI-01). Native blocker relations are authoritative. Phase: sprint.\n\nClaim repository/base and bounded writable scope before work; coordinate shared protocol/bootstrap/migration files with integrator. Necessary code/schema/import changes and disposable-target rebuilds are within the accepted assignment. Escalate missing credentials/authority or contradictory goals, not routine engineering.\n\n## Provenance\n\n* Owner final synthesis request, 2026-10-26; final handoff through OC-D181.\n* Decisions: OC-D116/119/122–124; RV-03/05. New expansion beyond OVE-161's bounded byte guard.\n* Canonical: `mission-control-general/general-mission-control/OUTPUT-CONTRACTS.md` §§3, 6; ADR-0058–0062.\n* Execution: `docs/specs/provider-consolidation-2026-10/sprint-oc/IMPLEMENTATION.md`, `PROOFS.md`, `DECISIONS.md`; planning key WI-02.\n* Source audit: MC 1863017c, KS b45adf5, AIDB 306efd7, BKS c398177. New specification files are uncommitted synthesis outputs, not runtime proof.\n* Terms: Output Obligation, Obligation Fulfillment, Sealed Transfer Plan, Delivery Receipt, Current Accepted Set.",
+      "draft_path": ".scratch/final-synthesis/issues/02-wi-02.md",
+      "linear_blockers": [
+        "OVE-163"
+      ]
+    },
+    {
+      "key": "WI-03",
+      "title": "Compose trusted report assessment and use review",
+      "phase": "sprint",
+      "status": "ready-for-agent",
+      "owner": "MC knowledge/review bridge + KS host/research/core + AIDB/BKS projections",
+      "blocks_on": [
+        "WI-02"
+      ],
+      "spec_sections": [
+        4,
+        5
+      ],
+      "result": "Ordinary independent Deep Agents judgments reach trusted KS sealing/use/review decisions and resumable MC waits. MC knowledge bridge + shared KS research/host, both native bindings.",
+      "cutover": "Compose existing KS observation/seal/decision/review services behind authenticated transport; remove test-only/memory authority from ordinary launch. Add judgment policy/premises/uncertainty and required review without fact entailment. Migrate KS constraints/types and native projections wherever the new invariant requires it.",
+      "acceptance": "Actual separate Deep Agents judge/auditor credentials; exact VerificationRun/seal; independent material-claim/question coverage versus producer assertion verification. Unavailable evaluator waits; ungrounded disagreement holds; stale/unauthorized review refuses; exact successor survives restart; official use vs allowed held repair in both apps.",
+      "provenance": "OC-D108–113/121; RV-04/08. Reuse Sprint V services; new missing composition/qualification only.",
+      "linear": {
+        "id": "681a123c-3a9c-4779-81b6-d223a9914b5c",
+        "identifier": "OVE-165",
+        "url": "https://linear.app/overtonbell/issue/OVE-165/oc-compose-trusted-report-assessment-and-use-review"
+      },
+      "sequence": 3,
+      "definition_of_done": "At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.",
+      "description": "Parent specification: [OVE-162](https://linear.app/overtonbell/issue/OVE-162/oc-final-output-contracts-exact-context-and-knowledge-service)\n\n## Problem and observable result\n\nOrdinary independent Deep Agents judgments reach trusted KS sealing/use/review decisions and resumable MC waits. MC knowledge bridge + shared KS research/host, both native bindings.\n\n## Owning interfaces and cutover\n\nMC knowledge/review bridge + KS host/research/core + AIDB/BKS projections.\n\nCompose existing KS observation/seal/decision/review services behind authenticated transport; remove test-only/memory authority from ordinary launch. Add judgment policy/premises/uncertainty and required review without fact entailment. Migrate KS constraints/types and native projections wherever the new invariant requires it.\n\n## Acceptance and recovery proof\n\n- [ ] Actual separate Deep Agents judge/auditor credentials; exact VerificationRun/seal; independent material-claim/question coverage versus producer assertion verification. Unavailable evaluator waits; ungrounded disagreement holds; stale/unauthorized review refuses; exact successor survives restart; official use vs allowed held repair in both apps.\n- [ ] At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.\n\n## Dependencies and execution\n\nBlocked by: [OVE-164](https://linear.app/overtonbell/issue/OVE-164/oc-deliver-exact-admitted-inputs-with-one-sealed-plan) (WI-02). Native blocker relations are authoritative. Phase: sprint.\n\nClaim repository/base and bounded writable scope before work; coordinate shared protocol/bootstrap/migration files with integrator. Necessary code/schema/import changes and disposable-target rebuilds are within the accepted assignment. Escalate missing credentials/authority or contradictory goals, not routine engineering.\n\n## Provenance\n\n* Owner final synthesis request, 2026-10-26; final handoff through OC-D181.\n* Decisions: OC-D108–113/121; RV-04/08. Reuse Sprint V services; new missing composition/qualification only.\n* Canonical: `mission-control-general/general-mission-control/OUTPUT-CONTRACTS.md` §§4, 5; ADR-0058–0062.\n* Execution: `docs/specs/provider-consolidation-2026-10/sprint-oc/IMPLEMENTATION.md`, `PROOFS.md`, `DECISIONS.md`; planning key WI-03.\n* Source audit: MC 1863017c, KS b45adf5, AIDB 306efd7, BKS c398177. New specification files are uncommitted synthesis outputs, not runtime proof.\n* Terms: Output Obligation, Obligation Fulfillment, Sealed Transfer Plan, Delivery Receipt, Current Accepted Set.",
+      "draft_path": ".scratch/final-synthesis/issues/03-wi-03.md",
+      "linear_blockers": [
+        "OVE-164"
+      ]
+    },
+    {
+      "key": "WI-04",
+      "title": "Settle saved provider results without repeated cognition",
+      "phase": "sprint",
+      "status": "ready-for-agent",
+      "owner": "MC outputs/Deep Agents/Temporal + common SQL",
+      "blocks_on": [
+        "WI-01"
+      ],
+      "spec_sections": [
+        4
+      ],
+      "result": "Retain completed provider result through assessment/effect waits and settle without repeated cognition. MC output/Deep Agents/Temporal/reducer path.",
+      "cutover": "Persist provider result before settlement and consume finalization outcome in adapter/reducer. Add durable reconciliation ownership and pending review/effect records; remove blind successful-cognition redispatch. Keep lifecycle, execution outcome, fulfillment and settlement separate.",
+      "acceptance": "Crash after provider completion, review wait, effect wait, late acknowledgment and cancellation; a fresh worker resumes one logical result without a second model turn or native write. Generic durable waits prove this slice; real KS/native paths are WI-03/05.",
+      "provenance": "OC-D109/114/127; RV-01. New repair slice.",
+      "linear": {
+        "id": "fc710912-45da-4199-91c4-68d226d7bb78",
+        "identifier": "OVE-166",
+        "url": "https://linear.app/overtonbell/issue/OVE-166/oc-settle-saved-provider-results-without-repeated-cognition"
+      },
+      "sequence": 4,
+      "definition_of_done": "At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.",
+      "description": "Parent specification: [OVE-162](https://linear.app/overtonbell/issue/OVE-162/oc-final-output-contracts-exact-context-and-knowledge-service)\n\n## Problem and observable result\n\nRetain completed provider result through assessment/effect waits and settle without repeated cognition. MC output/Deep Agents/Temporal/reducer path.\n\n## Owning interfaces and cutover\n\nMC outputs/Deep Agents/Temporal + common SQL.\n\nPersist provider result before settlement and consume finalization outcome in adapter/reducer. Add durable reconciliation ownership and pending review/effect records; remove blind successful-cognition redispatch. Keep lifecycle, execution outcome, fulfillment and settlement separate.\n\n## Acceptance and recovery proof\n\n- [ ] Crash after provider completion, review wait, effect wait, late acknowledgment and cancellation; a fresh worker resumes one logical result without a second model turn or native write. Generic durable waits prove this slice; real KS/native paths are WI-03/05.\n- [ ] At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.\n\n## Dependencies and execution\n\nBlocked by: [OVE-163](https://linear.app/overtonbell/issue/OVE-163/oc-compile-and-fulfill-explicit-named-output-promises) (WI-01). Native blocker relations are authoritative. Phase: sprint.\n\nClaim repository/base and bounded writable scope before work; coordinate shared protocol/bootstrap/migration files with integrator. Necessary code/schema/import changes and disposable-target rebuilds are within the accepted assignment. Escalate missing credentials/authority or contradictory goals, not routine engineering.\n\n## Provenance\n\n* Owner final synthesis request, 2026-10-26; final handoff through OC-D181.\n* Decisions: OC-D109/114/127; RV-01. New repair slice.\n* Canonical: `mission-control-general/general-mission-control/OUTPUT-CONTRACTS.md` §§4; ADR-0058–0062.\n* Execution: `docs/specs/provider-consolidation-2026-10/sprint-oc/IMPLEMENTATION.md`, `PROOFS.md`, `DECISIONS.md`; planning key WI-04.\n* Source audit: MC 1863017c, KS b45adf5, AIDB 306efd7, BKS c398177. New specification files are uncommitted synthesis outputs, not runtime proof.\n* Terms: Output Obligation, Obligation Fulfillment, Sealed Transfer Plan, Delivery Receipt, Current Accepted Set.",
+      "draft_path": ".scratch/final-synthesis/issues/04-wi-04.md",
+      "linear_blockers": [
+        "OVE-163"
+      ]
+    },
+    {
+      "key": "WI-05",
+      "title": "Recover native commits across missing protocol receipts",
+      "phase": "sprint",
+      "status": "ready-for-agent",
+      "owner": "KS operation journal/native ports + AIDB transaction + BKS dispatch/readback + MC wait bridge",
+      "blocks_on": [
+        "WI-03",
+        "WI-04"
+      ],
+      "spec_sections": [
+        5
+      ],
+      "result": "Recover committed native effects whose protocol receipt was not acknowledged. Shared KS protocol + AIDB/BKS native binding, MC wait bridge.",
+      "cutover": "Reuse/extend KS immutable original request/origin/digest/effect journal before native dispatch. Implement exact native receipt lookup/reconstruction; resolve native_only without applying again. AIDB commit and BKS effect+marker are native owners; acknowledgment remains separate.",
+      "acceptance": "Real fresh-process crash after SQL commit, graph commit and before protocol acknowledgment; same original caller/effect receipt, changed-byte conflict, duplicate/reordered ack, revocation before dispatch/during ack, rollback and separate readback. No duplicated native writes in either application.",
+      "provenance": "OC-D79/85/89/99/101/117; RV-06. Extend existing port evidence; do not rebuild Sprint V wholesale.",
+      "linear": {
+        "id": "9f3d9d7c-fcb1-47b1-b57e-0c6b81d22e73",
+        "identifier": "OVE-167",
+        "url": "https://linear.app/overtonbell/issue/OVE-167/oc-recover-native-commits-across-missing-protocol-receipts"
+      },
+      "sequence": 5,
+      "definition_of_done": "At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.",
+      "description": "Parent specification: [OVE-162](https://linear.app/overtonbell/issue/OVE-162/oc-final-output-contracts-exact-context-and-knowledge-service)\n\n## Problem and observable result\n\nRecover committed native effects whose protocol receipt was not acknowledged. Shared KS protocol + AIDB/BKS native binding, MC wait bridge.\n\n## Owning interfaces and cutover\n\nKS operation journal/native ports + AIDB transaction + BKS dispatch/readback + MC wait bridge.\n\nReuse/extend KS immutable original request/origin/digest/effect journal before native dispatch. Implement exact native receipt lookup/reconstruction; resolve native_only without applying again. AIDB commit and BKS effect+marker are native owners; acknowledgment remains separate.\n\n## Acceptance and recovery proof\n\n- [ ] Real fresh-process crash after SQL commit, graph commit and before protocol acknowledgment; same original caller/effect receipt, changed-byte conflict, duplicate/reordered ack, revocation before dispatch/during ack, rollback and separate readback. No duplicated native writes in either application.\n- [ ] At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.\n\n## Dependencies and execution\n\nBlocked by: [OVE-165](https://linear.app/overtonbell/issue/OVE-165/oc-compose-trusted-report-assessment-and-use-review) (WI-03), [OVE-166](https://linear.app/overtonbell/issue/OVE-166/oc-settle-saved-provider-results-without-repeated-cognition) (WI-04). Native blocker relations are authoritative. Phase: sprint.\n\nClaim repository/base and bounded writable scope before work; coordinate shared protocol/bootstrap/migration files with integrator. Necessary code/schema/import changes and disposable-target rebuilds are within the accepted assignment. Escalate missing credentials/authority or contradictory goals, not routine engineering.\n\n## Provenance\n\n* Owner final synthesis request, 2026-10-26; final handoff through OC-D181.\n* Decisions: OC-D79/85/89/99/101/117; RV-06. Extend existing port evidence; do not rebuild Sprint V wholesale.\n* Canonical: `mission-control-general/general-mission-control/OUTPUT-CONTRACTS.md` §§5; ADR-0058–0062.\n* Execution: `docs/specs/provider-consolidation-2026-10/sprint-oc/IMPLEMENTATION.md`, `PROOFS.md`, `DECISIONS.md`; planning key WI-05.\n* Source audit: MC 1863017c, KS b45adf5, AIDB 306efd7, BKS c398177. New specification files are uncommitted synthesis outputs, not runtime proof.\n* Terms: Output Obligation, Obligation Fulfillment, Sealed Transfer Plan, Delivery Receipt, Current Accepted Set.",
+      "draft_path": ".scratch/final-synthesis/issues/05-wi-05.md",
+      "linear_blockers": [
+        "OVE-165",
+        "OVE-166"
+      ]
+    },
+    {
+      "key": "WI-24",
+      "title": "Release W0 four-owner schema and trusted-runtime foundations",
+      "phase": "sprint",
+      "status": "ready-for-agent",
+      "owner": "Integrator across MC, KS, AIDB, BKS",
+      "blocks_on": [
+        "WI-03",
+        "WI-05"
+      ],
+      "spec_sections": [
+        1,
+        4,
+        5,
+        12
+      ],
+      "result": "Integrate current four-owner schema fit and disposable release/install proof before W1. Review reused Sprint V source/cards without reimplementing them; install the new delivering-slice migrations/types/roles/pins. Remove obsolete historical-biotech-meta fixture assumptions, not recreate the repo.",
+      "cutover": "Integrate current four-owner schema fit and disposable release/install proof before W1. Review reused Sprint V source/cards without reimplementing them; install the new delivering-slice migrations/types/roles/pins. Remove obsolete historical-biotech-meta fixture assumptions, not recreate the repo.",
+      "acceptance": "W0 fresh/repeat/interrupted install on two app-local targets; wrong installation/checksum/grants refusal; real evaluator-isolation/trusted-ingress/settlement/native-recovery service tests; no test-populated authority. Separate source, historical, installed and doubled evidence; independent reviewer signs W0.",
+      "provenance": "OC-D106/108–130/177/180; SV-D1–14; RV-01/03–08",
+      "linear": {
+        "id": "19d49592-aed8-428f-ae97-e37dea7c6c62",
+        "identifier": "OVE-168",
+        "url": "https://linear.app/overtonbell/issue/OVE-168/oc-release-w0-four-owner-schema-and-trusted-runtime-foundations"
+      },
+      "sequence": 6,
+      "definition_of_done": "At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.",
+      "description": "Parent specification: [OVE-162](https://linear.app/overtonbell/issue/OVE-162/oc-final-output-contracts-exact-context-and-knowledge-service)\n\n## Problem and observable result\n\nIntegrate current four-owner schema fit and disposable release/install proof before W1. Review reused Sprint V source/cards without reimplementing them; install the new delivering-slice migrations/types/roles/pins. Remove obsolete historical-biotech-meta fixture assumptions, not recreate the repo.\n\n## Owning interfaces and cutover\n\nIntegrator across MC, KS, AIDB, BKS.\n\nIntegrate current four-owner schema fit and disposable release/install proof before W1. Review reused Sprint V source/cards without reimplementing them; install the new delivering-slice migrations/types/roles/pins. Remove obsolete historical-biotech-meta fixture assumptions, not recreate the repo.\n\n## Acceptance and recovery proof\n\n- [ ] W0 fresh/repeat/interrupted install on two app-local targets; wrong installation/checksum/grants refusal; real evaluator-isolation/trusted-ingress/settlement/native-recovery service tests; no test-populated authority. Separate source, historical, installed and doubled evidence; independent reviewer signs W0.\n- [ ] At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.\n\n## Dependencies and execution\n\nBlocked by: [OVE-165](https://linear.app/overtonbell/issue/OVE-165/oc-compose-trusted-report-assessment-and-use-review) (WI-03), [OVE-167](https://linear.app/overtonbell/issue/OVE-167/oc-recover-native-commits-across-missing-protocol-receipts) (WI-05). Native blocker relations are authoritative. Phase: sprint.\n\nClaim repository/base and bounded writable scope before work; coordinate shared protocol/bootstrap/migration files with integrator. Necessary code/schema/import changes and disposable-target rebuilds are within the accepted assignment. Escalate missing credentials/authority or contradictory goals, not routine engineering.\n\n## Provenance\n\n* Owner final synthesis request, 2026-10-26; final handoff through OC-D181.\n* Decisions: OC-D106/108–130/177/180; SV-D1–14; RV-01/03–08\n* Canonical: `mission-control-general/general-mission-control/OUTPUT-CONTRACTS.md` §§1, 4, 5, 12; ADR-0058–0062.\n* Execution: `docs/specs/provider-consolidation-2026-10/sprint-oc/IMPLEMENTATION.md`, `PROOFS.md`, `DECISIONS.md`; planning key WI-24.\n* Source audit: MC 1863017c, KS b45adf5, AIDB 306efd7, BKS c398177. New specification files are uncommitted synthesis outputs, not runtime proof.\n* Terms: Output Obligation, Obligation Fulfillment, Sealed Transfer Plan, Delivery Receipt, Current Accepted Set.",
+      "draft_path": ".scratch/final-synthesis/issues/06-wi-24.md",
+      "linear_blockers": [
+        "OVE-165",
+        "OVE-167"
+      ]
+    },
+    {
+      "key": "WI-06",
+      "title": "Prove the first ordinary GoalDirected report",
+      "phase": "sprint",
+      "status": "ready-for-agent",
+      "owner": "MC GoalDirected/Deep Agents + KS report path, both native bindings",
+      "blocks_on": [
+        "WI-24"
+      ],
+      "spec_sections": [
+        7,
+        12
+      ],
+      "result": "First ordinary real GoalDirected report, independent assessment/use and durable fulfillment in both applications; W1 checkpoint.",
+      "cutover": "Deliver the W1 real GoalDirected report checkpoint using ordinary coordinator launch, explicit promises and continuing progress note. Apply necessary service/schema fixes; remove tests/docs that accept report prose or provider stop as mission success.",
+      "acceptance": "Run AI Engineer then Biotech with real independent semantic operations, report/use/fulfillment and native-write variant after WI-05. Transcript demonstrates report content/usefulness, missing/held output, evaluator wait and recovery. Independent reviewer releases W1 only on every criterion.",
+      "provenance": "OC-D106–130/133/137; first W1 functional checkpoint. New scoped integration/qualification slice.",
+      "linear": {
+        "id": "e5398375-904a-449a-aaf1-039614d3e9e1",
+        "identifier": "OVE-169",
+        "url": "https://linear.app/overtonbell/issue/OVE-169/oc-prove-the-first-ordinary-goaldirected-report"
+      },
+      "sequence": 7,
+      "definition_of_done": "At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.",
+      "description": "Parent specification: [OVE-162](https://linear.app/overtonbell/issue/OVE-162/oc-final-output-contracts-exact-context-and-knowledge-service)\n\n## Problem and observable result\n\nFirst ordinary real GoalDirected report, independent assessment/use and durable fulfillment in both applications; W1 checkpoint.\n\n## Owning interfaces and cutover\n\nMC GoalDirected/Deep Agents + KS report path, both native bindings.\n\nDeliver the W1 real GoalDirected report checkpoint using ordinary coordinator launch, explicit promises and continuing progress note. Apply necessary service/schema fixes; remove tests/docs that accept report prose or provider stop as mission success.\n\n## Acceptance and recovery proof\n\n- [ ] Run AI Engineer then Biotech with real independent semantic operations, report/use/fulfillment and native-write variant after WI-05. Transcript demonstrates report content/usefulness, missing/held output, evaluator wait and recovery. Independent reviewer releases W1 only on every criterion.\n- [ ] At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.\n\n## Dependencies and execution\n\nBlocked by: [OVE-168](https://linear.app/overtonbell/issue/OVE-168/oc-release-w0-four-owner-schema-and-trusted-runtime-foundations) (WI-24). Native blocker relations are authoritative. Phase: sprint.\n\nClaim repository/base and bounded writable scope before work; coordinate shared protocol/bootstrap/migration files with integrator. Necessary code/schema/import changes and disposable-target rebuilds are within the accepted assignment. Escalate missing credentials/authority or contradictory goals, not routine engineering.\n\n## Provenance\n\n* Owner final synthesis request, 2026-10-26; final handoff through OC-D181.\n* Decisions: OC-D106–130/133/137; first W1 functional checkpoint. New scoped integration/qualification slice.\n* Canonical: `mission-control-general/general-mission-control/OUTPUT-CONTRACTS.md` §§7, 12; ADR-0058–0062.\n* Execution: `docs/specs/provider-consolidation-2026-10/sprint-oc/IMPLEMENTATION.md`, `PROOFS.md`, `DECISIONS.md`; planning key WI-06.\n* Source audit: MC 1863017c, KS b45adf5, AIDB 306efd7, BKS c398177. New specification files are uncommitted synthesis outputs, not runtime proof.\n* Terms: Output Obligation, Obligation Fulfillment, Sealed Transfer Plan, Delivery Receipt, Current Accepted Set.",
+      "draft_path": ".scratch/final-synthesis/issues/07-wi-06.md",
+      "linear_blockers": [
+        "OVE-168"
+      ]
+    },
+    {
+      "key": "WI-07",
+      "title": "Assess report collections and accumulate current accepted sets",
+      "phase": "sprint",
+      "status": "ready-for-agent",
+      "owner": "MC output sets/GoalDirected + KS member assessment",
+      "blocks_on": [
+        "WI-06"
+      ],
+      "spec_sections": [
+        4,
+        7,
+        8
+      ],
+      "result": "Assess report collections per member and maintain exact current accepted heads/coverage across Goal Loop iterations. MC outputs/sets/GoalDirected + KS assessment bindings.",
+      "cutover": "Replace temporary OVE-160 report-collection refusal with per-member revision/assessment and explicit aggregate policy. Persist exact current accepted heads/frontier and complete goal-wide set index; verifier no longer reads only the latest executor result.",
+      "acceptance": "Mixed held/accepted/rejected members, distinct identity vs revisions, missing coverage, duplicate/reordered inputs, concurrent head promotion and restart. Independent work progresses during a goal-scoped wait while final acceptance remains blocked; successes are retained.",
+      "provenance": "OC-D114/133/134/152; RV-02. New collection support; OVE-160 stays the historical temporary guard.",
+      "linear": {
+        "id": "ecdfc24b-ebab-4cd5-8548-aa4f8e3bde46",
+        "identifier": "OVE-170",
+        "url": "https://linear.app/overtonbell/issue/OVE-170/oc-assess-report-collections-and-accumulate-current-accepted-sets"
+      },
+      "sequence": 8,
+      "definition_of_done": "At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.",
+      "description": "Parent specification: [OVE-162](https://linear.app/overtonbell/issue/OVE-162/oc-final-output-contracts-exact-context-and-knowledge-service)\n\n## Problem and observable result\n\nAssess report collections per member and maintain exact current accepted heads/coverage across Goal Loop iterations. MC outputs/sets/GoalDirected + KS assessment bindings.\n\n## Owning interfaces and cutover\n\nMC output sets/GoalDirected + KS member assessment.\n\nReplace temporary OVE-160 report-collection refusal with per-member revision/assessment and explicit aggregate policy. Persist exact current accepted heads/frontier and complete goal-wide set index; verifier no longer reads only the latest executor result.\n\n## Acceptance and recovery proof\n\n- [ ] Mixed held/accepted/rejected members, distinct identity vs revisions, missing coverage, duplicate/reordered inputs, concurrent head promotion and restart. Independent work progresses during a goal-scoped wait while final acceptance remains blocked; successes are retained.\n- [ ] At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.\n\n## Dependencies and execution\n\nBlocked by: [OVE-169](https://linear.app/overtonbell/issue/OVE-169/oc-prove-the-first-ordinary-goaldirected-report) (WI-06). Native blocker relations are authoritative. Phase: sprint.\n\nClaim repository/base and bounded writable scope before work; coordinate shared protocol/bootstrap/migration files with integrator. Necessary code/schema/import changes and disposable-target rebuilds are within the accepted assignment. Escalate missing credentials/authority or contradictory goals, not routine engineering.\n\n## Provenance\n\n* Owner final synthesis request, 2026-10-26; final handoff through OC-D181.\n* Decisions: OC-D114/133/134/152; RV-02. New collection support; OVE-160 stays the historical temporary guard.\n* Canonical: `mission-control-general/general-mission-control/OUTPUT-CONTRACTS.md` §§4, 7, 8; ADR-0058–0062.\n* Execution: `docs/specs/provider-consolidation-2026-10/sprint-oc/IMPLEMENTATION.md`, `PROOFS.md`, `DECISIONS.md`; planning key WI-07.\n* Source audit: MC 1863017c, KS b45adf5, AIDB 306efd7, BKS c398177. New specification files are uncommitted synthesis outputs, not runtime proof.\n* Terms: Output Obligation, Obligation Fulfillment, Sealed Transfer Plan, Delivery Receipt, Current Accepted Set.",
+      "draft_path": ".scratch/final-synthesis/issues/08-wi-07.md",
+      "linear_blockers": [
+        "OVE-169"
+      ]
+    },
+    {
+      "key": "WI-08",
+      "title": "Execute explicit graph routes and alternative input release",
+      "phase": "sprint",
+      "status": "ready-for-agent",
+      "owner": "MC compiler/interpreter/Temporal + context",
+      "blocks_on": [
+        "WI-06"
+      ],
+      "spec_sections": [
+        6,
+        7
+      ],
+      "result": "Execute explicit conditional modes, unknown waits, any/quorum exact selection and optional omissions. MC compiler/interpreter/Temporal.",
+      "cutover": "Replace positional/required-all lowering and side-path compatibility inputs. Compile explicit all-matching/ordered-first-match, typed unknown evidence, named release groups, optional omission and frozen expansion. Implement governed bounded Revisit Regions/cyclic stage behavior.",
+      "acceptance": "W2 real exact transfer after W1; all-matching true releases with unknown waits, first-match never skips earlier unknown, else requires false, quorum cannot waive all-subject coverage. Graph surplus continues by default, optional omissions visible, late arrivals cannot alter sealed plan. Public inspection evidence need not wait for full external-host wake.",
+      "provenance": "OC-D139–148/162; new routing/selection slice.",
+      "linear": {
+        "id": "6506130a-f3f9-467e-ad3b-00d9353c009e",
+        "identifier": "OVE-171",
+        "url": "https://linear.app/overtonbell/issue/OVE-171/oc-execute-explicit-graph-routes-and-alternative-input-release"
+      },
+      "sequence": 9,
+      "definition_of_done": "At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.",
+      "description": "Parent specification: [OVE-162](https://linear.app/overtonbell/issue/OVE-162/oc-final-output-contracts-exact-context-and-knowledge-service)\n\n## Problem and observable result\n\nExecute explicit conditional modes, unknown waits, any/quorum exact selection and optional omissions. MC compiler/interpreter/Temporal.\n\n## Owning interfaces and cutover\n\nMC compiler/interpreter/Temporal + context.\n\nReplace positional/required-all lowering and side-path compatibility inputs. Compile explicit all-matching/ordered-first-match, typed unknown evidence, named release groups, optional omission and frozen expansion. Implement governed bounded Revisit Regions/cyclic stage behavior.\n\n## Acceptance and recovery proof\n\n- [ ] W2 real exact transfer after W1; all-matching true releases with unknown waits, first-match never skips earlier unknown, else requires false, quorum cannot waive all-subject coverage. Graph surplus continues by default, optional omissions visible, late arrivals cannot alter sealed plan. Public inspection evidence need not wait for full external-host wake.\n- [ ] At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.\n\n## Dependencies and execution\n\nBlocked by: [OVE-169](https://linear.app/overtonbell/issue/OVE-169/oc-prove-the-first-ordinary-goaldirected-report) (WI-06). Native blocker relations are authoritative. Phase: sprint.\n\nClaim repository/base and bounded writable scope before work; coordinate shared protocol/bootstrap/migration files with integrator. Necessary code/schema/import changes and disposable-target rebuilds are within the accepted assignment. Escalate missing credentials/authority or contradictory goals, not routine engineering.\n\n## Provenance\n\n* Owner final synthesis request, 2026-10-26; final handoff through OC-D181.\n* Decisions: OC-D139–148/162; new routing/selection slice.\n* Canonical: `mission-control-general/general-mission-control/OUTPUT-CONTRACTS.md` §§6, 7; ADR-0058–0062.\n* Execution: `docs/specs/provider-consolidation-2026-10/sprint-oc/IMPLEMENTATION.md`, `PROOFS.md`, `DECISIONS.md`; planning key WI-08.\n* Source audit: MC 1863017c, KS b45adf5, AIDB 306efd7, BKS c398177. New specification files are uncommitted synthesis outputs, not runtime proof.\n* Terms: Output Obligation, Obligation Fulfillment, Sealed Transfer Plan, Delivery Receipt, Current Accepted Set.",
+      "draft_path": ".scratch/final-synthesis/issues/09-wi-08.md",
+      "linear_blockers": [
+        "OVE-169"
+      ]
+    },
+    {
+      "key": "WI-09",
+      "title": "Execute typed transforms with explicit join populations",
+      "phase": "sprint",
+      "status": "ready-for-agent",
+      "owner": "MC deterministic catalog/dispatch; reusable knowledge algorithms in KS",
+      "blocks_on": [
+        "WI-07"
+      ],
+      "spec_sections": [
+        8
+      ],
+      "result": "Run standard and admitted custom typed deterministic transformations, including explicit data-join populations. MC executor catalog/dispatch; KS when a reusable knowledge capability owns the algorithm.",
+      "cutover": "Implement standard and admitted custom deterministic executor contracts for union/dedup/filter/sort/group/join/project/partition/validate. Pin schemas/implementation/effect/order/duplicate rules; reusable domain-neutral knowledge algorithms stay in KS when suitable.",
+      "acceptance": "End-to-end transforms over exact collections. Explicit primary/both/matched population, match cardinality/unmatched rules, duplicate conflicts, schema/version drift refusal and lineage. No automatic computation cache or hidden semantic summarizer.",
+      "provenance": "OC-D151/154/163/170; new dispatcher/library integration.",
+      "linear": {
+        "id": "0d900588-aa2b-4614-a9c9-1ad078095bf6",
+        "identifier": "OVE-172",
+        "url": "https://linear.app/overtonbell/issue/OVE-172/oc-execute-typed-transforms-with-explicit-join-populations"
+      },
+      "sequence": 10,
+      "definition_of_done": "At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.",
+      "description": "Parent specification: [OVE-162](https://linear.app/overtonbell/issue/OVE-162/oc-final-output-contracts-exact-context-and-knowledge-service)\n\n## Problem and observable result\n\nRun standard and admitted custom typed deterministic transformations, including explicit data-join populations. MC executor catalog/dispatch; KS when a reusable knowledge capability owns the algorithm.\n\n## Owning interfaces and cutover\n\nMC deterministic catalog/dispatch; reusable knowledge algorithms in KS.\n\nImplement standard and admitted custom deterministic executor contracts for union/dedup/filter/sort/group/join/project/partition/validate. Pin schemas/implementation/effect/order/duplicate rules; reusable domain-neutral knowledge algorithms stay in KS when suitable.\n\n## Acceptance and recovery proof\n\n- [ ] End-to-end transforms over exact collections. Explicit primary/both/matched population, match cardinality/unmatched rules, duplicate conflicts, schema/version drift refusal and lineage. No automatic computation cache or hidden semantic summarizer.\n- [ ] At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.\n\n## Dependencies and execution\n\nBlocked by: [OVE-170](https://linear.app/overtonbell/issue/OVE-170/oc-assess-report-collections-and-accumulate-current-accepted-sets) (WI-07). Native blocker relations are authoritative. Phase: sprint.\n\nClaim repository/base and bounded writable scope before work; coordinate shared protocol/bootstrap/migration files with integrator. Necessary code/schema/import changes and disposable-target rebuilds are within the accepted assignment. Escalate missing credentials/authority or contradictory goals, not routine engineering.\n\n## Provenance\n\n* Owner final synthesis request, 2026-10-26; final handoff through OC-D181.\n* Decisions: OC-D151/154/163/170; new dispatcher/library integration.\n* Canonical: `mission-control-general/general-mission-control/OUTPUT-CONTRACTS.md` §§8; ADR-0058–0062.\n* Execution: `docs/specs/provider-consolidation-2026-10/sprint-oc/IMPLEMENTATION.md`, `PROOFS.md`, `DECISIONS.md`; planning key WI-09.\n* Source audit: MC 1863017c, KS b45adf5, AIDB 306efd7, BKS c398177. New specification files are uncommitted synthesis outputs, not runtime proof.\n* Terms: Output Obligation, Obligation Fulfillment, Sealed Transfer Plan, Delivery Receipt, Current Accepted Set.",
+      "draft_path": ".scratch/final-synthesis/issues/10-wi-09.md",
+      "linear_blockers": [
+        "OVE-170"
+      ]
+    },
+    {
+      "key": "WI-10",
+      "title": "Schedule bounded inventory and governed partition successors",
+      "phase": "sprint",
+      "status": "ready-for-agent",
+      "owner": "MC inventory/admission/revision/inspection + common SQL",
+      "blocks_on": [
+        "WI-09"
+      ],
+      "spec_sections": [
+        8
+      ],
+      "result": "Schedule exact durable inventory in bounded windows; inspect and replace poor partitions through coordinator or admitted agentic planning. MC inventory/admission/revision/inspection.",
+      "cutover": "Persist full exact inventory, partition membership/overlap/atomic groups, leased activation windows and successor lineage. Add coordinator inspection and admitted agentic planning proposal path; no automatic deterministic semantic repartitioner.",
+      "acceptance": "Restart mid-window has no lost/duplicate members; capacity/provider/budget/fairness ceilings; retain successes; retry preserves original slice; successor preserves coverage/delegation. Record dedicated local worker pressure evidence without adopting undecided priority policy.",
+      "provenance": "OC-D148/152/153/168. Worker-evidence review for OC-D169 belongs here; pressure policy is not adopted.",
+      "linear": {
+        "id": "662514f3-ee5d-46e1-ad29-035e4b6def8b",
+        "identifier": "OVE-173",
+        "url": "https://linear.app/overtonbell/issue/OVE-173/oc-schedule-bounded-inventory-and-governed-partition-successors"
+      },
+      "sequence": 11,
+      "definition_of_done": "At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.",
+      "description": "Parent specification: [OVE-162](https://linear.app/overtonbell/issue/OVE-162/oc-final-output-contracts-exact-context-and-knowledge-service)\n\n## Problem and observable result\n\nSchedule exact durable inventory in bounded windows; inspect and replace poor partitions through coordinator or admitted agentic planning. MC inventory/admission/revision/inspection.\n\n## Owning interfaces and cutover\n\nMC inventory/admission/revision/inspection + common SQL.\n\nPersist full exact inventory, partition membership/overlap/atomic groups, leased activation windows and successor lineage. Add coordinator inspection and admitted agentic planning proposal path; no automatic deterministic semantic repartitioner.\n\n## Acceptance and recovery proof\n\n- [ ] Restart mid-window has no lost/duplicate members; capacity/provider/budget/fairness ceilings; retain successes; retry preserves original slice; successor preserves coverage/delegation. Record dedicated local worker pressure evidence without adopting undecided priority policy.\n- [ ] At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.\n\n## Dependencies and execution\n\nBlocked by: [OVE-172](https://linear.app/overtonbell/issue/OVE-172/oc-execute-typed-transforms-with-explicit-join-populations) (WI-09). Native blocker relations are authoritative. Phase: sprint.\n\nClaim repository/base and bounded writable scope before work; coordinate shared protocol/bootstrap/migration files with integrator. Necessary code/schema/import changes and disposable-target rebuilds are within the accepted assignment. Escalate missing credentials/authority or contradictory goals, not routine engineering.\n\n## Provenance\n\n* Owner final synthesis request, 2026-10-26; final handoff through OC-D181.\n* Decisions: OC-D148/152/153/168. Worker-evidence review for OC-D169 belongs here; pressure policy is not adopted.\n* Canonical: `mission-control-general/general-mission-control/OUTPUT-CONTRACTS.md` §§8; ADR-0058–0062.\n* Execution: `docs/specs/provider-consolidation-2026-10/sprint-oc/IMPLEMENTATION.md`, `PROOFS.md`, `DECISIONS.md`; planning key WI-10.\n* Source audit: MC 1863017c, KS b45adf5, AIDB 306efd7, BKS c398177. New specification files are uncommitted synthesis outputs, not runtime proof.\n* Terms: Output Obligation, Obligation Fulfillment, Sealed Transfer Plan, Delivery Receipt, Current Accepted Set.",
+      "draft_path": ".scratch/final-synthesis/issues/11-wi-10.md",
+      "linear_blockers": [
+        "OVE-172"
+      ]
+    },
+    {
+      "key": "WI-11",
+      "title": "Close groups and qualify reductions with coverage",
+      "phase": "sprint",
+      "status": "ready-for-agent",
+      "owner": "MC closure/reduction/coverage + KS/domain assessments",
+      "blocks_on": [
+        "WI-10",
+        "WI-08"
+      ],
+      "spec_sections": [
+        8
+      ],
+      "result": "Release independently closed groups, retain uncontested results/conflicts, and qualify deterministic trees and semantic decomposition. MC closure/coverage/reduction plus KS/domain assessment.",
+      "cutover": "Persist contributor-closure witnesses and exact grouped frontiers, typed conflicts and preservation/coverage terms. Qualify deterministic regrouping separately from reordering; semantic hierarchy remains authored. Deliver W3 checkpoint.",
+      "acceptance": "Actual multi-report accumulation/synthesis, independent ready groups, missing/late contributor and unknown discovery barrier. Uncontested results survive conflicts. Cross-partition challenge exposes semantic loss; oversized indivisible item refuses. Independent reviewer assesses W3 evidence.",
+      "provenance": "OC-D154–156/164; new bounded reduction slice.",
+      "linear": {
+        "id": "768de17b-df69-477f-ad64-8bd45d57a711",
+        "identifier": "OVE-174",
+        "url": "https://linear.app/overtonbell/issue/OVE-174/oc-close-groups-and-qualify-reductions-with-coverage"
+      },
+      "sequence": 12,
+      "definition_of_done": "At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.",
+      "description": "Parent specification: [OVE-162](https://linear.app/overtonbell/issue/OVE-162/oc-final-output-contracts-exact-context-and-knowledge-service)\n\n## Problem and observable result\n\nRelease independently closed groups, retain uncontested results/conflicts, and qualify deterministic trees and semantic decomposition. MC closure/coverage/reduction plus KS/domain assessment.\n\n## Owning interfaces and cutover\n\nMC closure/reduction/coverage + KS/domain assessments.\n\nPersist contributor-closure witnesses and exact grouped frontiers, typed conflicts and preservation/coverage terms. Qualify deterministic regrouping separately from reordering; semantic hierarchy remains authored. Deliver W3 checkpoint.\n\n## Acceptance and recovery proof\n\n- [ ] Actual multi-report accumulation/synthesis, independent ready groups, missing/late contributor and unknown discovery barrier. Uncontested results survive conflicts. Cross-partition challenge exposes semantic loss; oversized indivisible item refuses. Independent reviewer assesses W3 evidence.\n- [ ] At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.\n\n## Dependencies and execution\n\nBlocked by: [OVE-173](https://linear.app/overtonbell/issue/OVE-173/oc-schedule-bounded-inventory-and-governed-partition-successors) (WI-10), [OVE-171](https://linear.app/overtonbell/issue/OVE-171/oc-execute-explicit-graph-routes-and-alternative-input-release) (WI-08). Native blocker relations are authoritative. Phase: sprint.\n\nClaim repository/base and bounded writable scope before work; coordinate shared protocol/bootstrap/migration files with integrator. Necessary code/schema/import changes and disposable-target rebuilds are within the accepted assignment. Escalate missing credentials/authority or contradictory goals, not routine engineering.\n\n## Provenance\n\n* Owner final synthesis request, 2026-10-26; final handoff through OC-D181.\n* Decisions: OC-D154–156/164; new bounded reduction slice.\n* Canonical: `mission-control-general/general-mission-control/OUTPUT-CONTRACTS.md` §§8; ADR-0058–0062.\n* Execution: `docs/specs/provider-consolidation-2026-10/sprint-oc/IMPLEMENTATION.md`, `PROOFS.md`, `DECISIONS.md`; planning key WI-11.\n* Source audit: MC 1863017c, KS b45adf5, AIDB 306efd7, BKS c398177. New specification files are uncommitted synthesis outputs, not runtime proof.\n* Terms: Output Obligation, Obligation Fulfillment, Sealed Transfer Plan, Delivery Receipt, Current Accepted Set.",
+      "draft_path": ".scratch/final-synthesis/issues/12-wi-11.md",
+      "linear_blockers": [
+        "OVE-173",
+        "OVE-171"
+      ]
+    },
+    {
+      "key": "WI-12",
+      "title": "Reassess synthesis for the selected source changes",
+      "phase": "sprint",
+      "status": "ready-for-agent",
+      "owner": "MC revision/readiness + KS assessment/use",
+      "blocks_on": [
+        "WI-07",
+        "WI-08"
+      ],
+      "spec_sections": [
+        10
+      ],
+      "result": "Reassess synthesis after tracked report revision or exact unchanged held-source acceptance under the selected bounded policies. MC revision/readiness + KS assessments/use.",
+      "cutover": "Implement only selected automatic cases: tracked report revision revalidation and authored reassessment after exact unchanged held-source acceptance. Retain one active/one coalesced pending incremental activation. General authorized contract revisions remain WI-01, generic freshness is excluded.",
+      "acceptance": "Running synthesis retains valid sealed input then revalidates; revoked input stops independently. Reuse exact matching checks only, unavailable checks wait, no source-acceptance auto-approval, bounds/rerun identity survive restart. W4 integrated checkpoint is WI-32.",
+      "provenance": "OC-D142–146; new scoped evolution slice, not general freshness engine.",
+      "linear": {
+        "id": "af506265-f0c8-4d60-b4e4-7405a6732846",
+        "identifier": "OVE-175",
+        "url": "https://linear.app/overtonbell/issue/OVE-175/oc-reassess-synthesis-for-the-selected-source-changes"
+      },
+      "sequence": 13,
+      "definition_of_done": "At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.",
+      "description": "Parent specification: [OVE-162](https://linear.app/overtonbell/issue/OVE-162/oc-final-output-contracts-exact-context-and-knowledge-service)\n\n## Problem and observable result\n\nReassess synthesis after tracked report revision or exact unchanged held-source acceptance under the selected bounded policies. MC revision/readiness + KS assessments/use.\n\n## Owning interfaces and cutover\n\nMC revision/readiness + KS assessment/use.\n\nImplement only selected automatic cases: tracked report revision revalidation and authored reassessment after exact unchanged held-source acceptance. Retain one active/one coalesced pending incremental activation. General authorized contract revisions remain WI-01, generic freshness is excluded.\n\n## Acceptance and recovery proof\n\n- [ ] Running synthesis retains valid sealed input then revalidates; revoked input stops independently. Reuse exact matching checks only, unavailable checks wait, no source-acceptance auto-approval, bounds/rerun identity survive restart. W4 integrated checkpoint is WI-32.\n- [ ] At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.\n\n## Dependencies and execution\n\nBlocked by: [OVE-170](https://linear.app/overtonbell/issue/OVE-170/oc-assess-report-collections-and-accumulate-current-accepted-sets) (WI-07), [OVE-171](https://linear.app/overtonbell/issue/OVE-171/oc-execute-explicit-graph-routes-and-alternative-input-release) (WI-08). Native blocker relations are authoritative. Phase: sprint.\n\nClaim repository/base and bounded writable scope before work; coordinate shared protocol/bootstrap/migration files with integrator. Necessary code/schema/import changes and disposable-target rebuilds are within the accepted assignment. Escalate missing credentials/authority or contradictory goals, not routine engineering.\n\n## Provenance\n\n* Owner final synthesis request, 2026-10-26; final handoff through OC-D181.\n* Decisions: OC-D142–146; new scoped evolution slice, not general freshness engine.\n* Canonical: `mission-control-general/general-mission-control/OUTPUT-CONTRACTS.md` §§10; ADR-0058–0062.\n* Execution: `docs/specs/provider-consolidation-2026-10/sprint-oc/IMPLEMENTATION.md`, `PROOFS.md`, `DECISIONS.md`; planning key WI-12.\n* Source audit: MC 1863017c, KS b45adf5, AIDB 306efd7, BKS c398177. New specification files are uncommitted synthesis outputs, not runtime proof.\n* Terms: Output Obligation, Obligation Fulfillment, Sealed Transfer Plan, Delivery Receipt, Current Accepted Set.",
+      "draft_path": ".scratch/final-synthesis/issues/13-wi-12.md",
+      "linear_blockers": [
+        "OVE-170",
+        "OVE-171"
+      ]
+    },
+    {
+      "key": "WI-13",
+      "title": "Execute recursive Goal Loops and subgraphs",
+      "phase": "sprint",
+      "status": "ready-for-agent",
+      "owner": "MC authoring/programs/Temporal recursive dispatch",
+      "blocks_on": [
+        "WI-07",
+        "WI-08"
+      ],
+      "spec_sections": [
+        7,
+        9
+      ],
+      "result": "Execute a Goal Loop/subgraph recursively with unchanged external promises and explicit exports. MC hierarchical compiler/runtime/control scopes.",
+      "cutover": "Replace nested Goal Loop flattening with recursive ProgramNode execution and scoped activations/governors. Shared dispatch supports child family implementations; explicit early/final exports preserve external promises.",
+      "acceptance": "Real nested Goal Loop in Graph and subgraph replacement, isolated state/budget/control, restart and early export from incomplete composite. Internal drafts are not parent outputs and early eligibility never accepts the composite.",
+      "provenance": "OC-D34/47/119/133/135; new recursive execution slice.",
+      "linear": {
+        "id": "c8ba732c-03c1-4605-9f04-ca994438658e",
+        "identifier": "OVE-176",
+        "url": "https://linear.app/overtonbell/issue/OVE-176/oc-execute-recursive-goal-loops-and-subgraphs"
+      },
+      "sequence": 14,
+      "definition_of_done": "At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.",
+      "description": "Parent specification: [OVE-162](https://linear.app/overtonbell/issue/OVE-162/oc-final-output-contracts-exact-context-and-knowledge-service)\n\n## Problem and observable result\n\nExecute a Goal Loop/subgraph recursively with unchanged external promises and explicit exports. MC hierarchical compiler/runtime/control scopes.\n\n## Owning interfaces and cutover\n\nMC authoring/programs/Temporal recursive dispatch.\n\nReplace nested Goal Loop flattening with recursive ProgramNode execution and scoped activations/governors. Shared dispatch supports child family implementations; explicit early/final exports preserve external promises.\n\n## Acceptance and recovery proof\n\n- [ ] Real nested Goal Loop in Graph and subgraph replacement, isolated state/budget/control, restart and early export from incomplete composite. Internal drafts are not parent outputs and early eligibility never accepts the composite.\n- [ ] At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.\n\n## Dependencies and execution\n\nBlocked by: [OVE-170](https://linear.app/overtonbell/issue/OVE-170/oc-assess-report-collections-and-accumulate-current-accepted-sets) (WI-07), [OVE-171](https://linear.app/overtonbell/issue/OVE-171/oc-execute-explicit-graph-routes-and-alternative-input-release) (WI-08). Native blocker relations are authoritative. Phase: sprint.\n\nClaim repository/base and bounded writable scope before work; coordinate shared protocol/bootstrap/migration files with integrator. Necessary code/schema/import changes and disposable-target rebuilds are within the accepted assignment. Escalate missing credentials/authority or contradictory goals, not routine engineering.\n\n## Provenance\n\n* Owner final synthesis request, 2026-10-26; final handoff through OC-D181.\n* Decisions: OC-D34/47/119/133/135; new recursive execution slice.\n* Canonical: `mission-control-general/general-mission-control/OUTPUT-CONTRACTS.md` §§7, 9; ADR-0058–0062.\n* Execution: `docs/specs/provider-consolidation-2026-10/sprint-oc/IMPLEMENTATION.md`, `PROOFS.md`, `DECISIONS.md`; planning key WI-13.\n* Source audit: MC 1863017c, KS b45adf5, AIDB 306efd7, BKS c398177. New specification files are uncommitted synthesis outputs, not runtime proof.\n* Terms: Output Obligation, Obligation Fulfillment, Sealed Transfer Plan, Delivery Receipt, Current Accepted Set.",
+      "draft_path": ".scratch/final-synthesis/issues/14-wi-13.md",
+      "linear_blockers": [
+        "OVE-170",
+        "OVE-171"
+      ]
+    },
+    {
+      "key": "WI-14",
+      "title": "Execute Swarm members and exact convergence",
+      "phase": "sprint",
+      "status": "ready-for-agent",
+      "owner": "MC Swarm runtime/convergence",
+      "blocks_on": [
+        "WI-13"
+      ],
+      "spec_sections": [
+        9
+      ],
+      "result": "Execute Swarm members and convergence with distinct all/quorum/best-effort and surplus-cancellation semantics. MC Swarm runtime plus admitted convergence operations.",
+      "cutover": "Implement actual Swarm member/convergence reducers over recursive dispatch, shared transfer and fulfillment. Persist member selection/convergence/governor lineage; keep all/quorum/best-effort and default surplus cancellation distinct.",
+      "acceptance": "Real isolated unequal members, quorum immediate vs best-effort all-terminal, selected convergence set, independent coverage, convergence failure, late results, cancellation/usage/effect settlement and restart. Parser examples cannot pass.",
+      "provenance": "Existing canonical Swarm + accepted common protocol; new runtime family/qualification.",
+      "linear": {
+        "id": "f6ea83db-6d11-4f20-9460-ca88321e45ce",
+        "identifier": "OVE-177",
+        "url": "https://linear.app/overtonbell/issue/OVE-177/oc-execute-swarm-members-and-exact-convergence"
+      },
+      "sequence": 15,
+      "definition_of_done": "At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.",
+      "description": "Parent specification: [OVE-162](https://linear.app/overtonbell/issue/OVE-162/oc-final-output-contracts-exact-context-and-knowledge-service)\n\n## Problem and observable result\n\nExecute Swarm members and convergence with distinct all/quorum/best-effort and surplus-cancellation semantics. MC Swarm runtime plus admitted convergence operations.\n\n## Owning interfaces and cutover\n\nMC Swarm runtime/convergence.\n\nImplement actual Swarm member/convergence reducers over recursive dispatch, shared transfer and fulfillment. Persist member selection/convergence/governor lineage; keep all/quorum/best-effort and default surplus cancellation distinct.\n\n## Acceptance and recovery proof\n\n- [ ] Real isolated unequal members, quorum immediate vs best-effort all-terminal, selected convergence set, independent coverage, convergence failure, late results, cancellation/usage/effect settlement and restart. Parser examples cannot pass.\n- [ ] At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.\n\n## Dependencies and execution\n\nBlocked by: [OVE-176](https://linear.app/overtonbell/issue/OVE-176/oc-execute-recursive-goal-loops-and-subgraphs) (WI-13). Native blocker relations are authoritative. Phase: sprint.\n\nClaim repository/base and bounded writable scope before work; coordinate shared protocol/bootstrap/migration files with integrator. Necessary code/schema/import changes and disposable-target rebuilds are within the accepted assignment. Escalate missing credentials/authority or contradictory goals, not routine engineering.\n\n## Provenance\n\n* Owner final synthesis request, 2026-10-26; final handoff through OC-D181.\n* Decisions: Existing canonical Swarm + accepted common protocol; new runtime family/qualification.\n* Canonical: `mission-control-general/general-mission-control/OUTPUT-CONTRACTS.md` §§9; ADR-0058–0062.\n* Execution: `docs/specs/provider-consolidation-2026-10/sprint-oc/IMPLEMENTATION.md`, `PROOFS.md`, `DECISIONS.md`; planning key WI-14.\n* Source audit: MC 1863017c, KS b45adf5, AIDB 306efd7, BKS c398177. New specification files are uncommitted synthesis outputs, not runtime proof.\n* Terms: Output Obligation, Obligation Fulfillment, Sealed Transfer Plan, Delivery Receipt, Current Accepted Set.",
+      "draft_path": ".scratch/final-synthesis/issues/15-wi-14.md",
+      "linear_blockers": [
+        "OVE-176"
+      ]
+    },
+    {
+      "key": "WI-15",
+      "title": "Execute independent Evaluator Optimizer repair rounds",
+      "phase": "sprint",
+      "status": "ready-for-agent",
+      "owner": "MC EO runtime + KS evaluation bridge",
+      "blocks_on": [
+        "WI-13",
+        "WI-03"
+      ],
+      "spec_sections": [
+        9
+      ],
+      "result": "Execute independent Evaluator Optimizer production, findings-directed repair and bounded reassessment. MC optimizer runtime + KS judge/use semantics.",
+      "cutover": "Implement actual EO rounds with distinct producer/evaluator identity, exact candidate/findings and bounded repair. Persist round and assessment lineage; use KS judgment/use authority where promised.",
+      "acceptance": "Real candidate→grounded findings→repair→reassessment, stale findings never accept successor, unavailable evaluator waits, no-progress/round/budget limits and hard gates despite accept-best. Preserve candidate outputs through restart.",
+      "provenance": "Canonical EO + OC-D108–113; new runtime family/qualification.",
+      "linear": {
+        "id": "107f9a16-6eb6-46fe-a0c2-521500e9fb89",
+        "identifier": "OVE-178",
+        "url": "https://linear.app/overtonbell/issue/OVE-178/oc-execute-independent-evaluator-optimizer-repair-rounds"
+      },
+      "sequence": 16,
+      "definition_of_done": "At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.",
+      "description": "Parent specification: [OVE-162](https://linear.app/overtonbell/issue/OVE-162/oc-final-output-contracts-exact-context-and-knowledge-service)\n\n## Problem and observable result\n\nExecute independent Evaluator Optimizer production, findings-directed repair and bounded reassessment. MC optimizer runtime + KS judge/use semantics.\n\n## Owning interfaces and cutover\n\nMC EO runtime + KS evaluation bridge.\n\nImplement actual EO rounds with distinct producer/evaluator identity, exact candidate/findings and bounded repair. Persist round and assessment lineage; use KS judgment/use authority where promised.\n\n## Acceptance and recovery proof\n\n- [ ] Real candidate→grounded findings→repair→reassessment, stale findings never accept successor, unavailable evaluator waits, no-progress/round/budget limits and hard gates despite accept-best. Preserve candidate outputs through restart.\n- [ ] At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.\n\n## Dependencies and execution\n\nBlocked by: [OVE-176](https://linear.app/overtonbell/issue/OVE-176/oc-execute-recursive-goal-loops-and-subgraphs) (WI-13), [OVE-165](https://linear.app/overtonbell/issue/OVE-165/oc-compose-trusted-report-assessment-and-use-review) (WI-03). Native blocker relations are authoritative. Phase: sprint.\n\nClaim repository/base and bounded writable scope before work; coordinate shared protocol/bootstrap/migration files with integrator. Necessary code/schema/import changes and disposable-target rebuilds are within the accepted assignment. Escalate missing credentials/authority or contradictory goals, not routine engineering.\n\n## Provenance\n\n* Owner final synthesis request, 2026-10-26; final handoff through OC-D181.\n* Decisions: Canonical EO + OC-D108–113; new runtime family/qualification.\n* Canonical: `mission-control-general/general-mission-control/OUTPUT-CONTRACTS.md` §§9; ADR-0058–0062.\n* Execution: `docs/specs/provider-consolidation-2026-10/sprint-oc/IMPLEMENTATION.md`, `PROOFS.md`, `DECISIONS.md`; planning key WI-15.\n* Source audit: MC 1863017c, KS b45adf5, AIDB 306efd7, BKS c398177. New specification files are uncommitted synthesis outputs, not runtime proof.\n* Terms: Output Obligation, Obligation Fulfillment, Sealed Transfer Plan, Delivery Receipt, Current Accepted Set.",
+      "draft_path": ".scratch/final-synthesis/issues/16-wi-15.md",
+      "linear_blockers": [
+        "OVE-176",
+        "OVE-165"
+      ]
+    },
+    {
+      "key": "WI-16",
+      "title": "Transfer exact linked exports within each application",
+      "phase": "sprint",
+      "status": "ready-for-agent",
+      "owner": "MC chains/links/adoption + KS read/use",
+      "blocks_on": [
+        "WI-07",
+        "WI-08"
+      ],
+      "spec_sections": [
+        10
+      ],
+      "result": "Transfer exact exports between missions within an application, including held repair and changed running-consumer cancellation default. MC chains/linked runs + KS receiving use/read.",
+      "cutover": "Extend existing chains/child invocation with exact exported bindings and explicit adoption, purpose-scoped held review and running-chain continue default. Native projections/migrations follow exact lineage needs; no cross-application API.",
+      "acceptance": "Both apps independently: source goal/mission acceptance gate, required held repair bytes, own receiver grant/budget, source/caller/adopter identity, pre/post-start cancellation, spawned cancel vs attached detach, revocation, restart and no duplicate effects. Helpers may have no obligation; explicit adoption of a contracted child exact output preserves parent accountability and remaining checks. Mere availability/admission never fulfills the parent.",
+      "provenance": "OC-D165–167; new extension to existing chain code. No cross-application feature.",
+      "linear": {
+        "id": "84dede99-b28c-45a9-a2b1-ec0b36762de2",
+        "identifier": "OVE-179",
+        "url": "https://linear.app/overtonbell/issue/OVE-179/oc-transfer-exact-linked-exports-within-each-application"
+      },
+      "sequence": 17,
+      "definition_of_done": "At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.",
+      "description": "Parent specification: [OVE-162](https://linear.app/overtonbell/issue/OVE-162/oc-final-output-contracts-exact-context-and-knowledge-service)\n\n## Problem and observable result\n\nTransfer exact exports between missions within an application, including held repair and changed running-consumer cancellation default. MC chains/linked runs + KS receiving use/read.\n\n## Owning interfaces and cutover\n\nMC chains/links/adoption + KS read/use.\n\nExtend existing chains/child invocation with exact exported bindings and explicit adoption, purpose-scoped held review and running-chain continue default. Native projections/migrations follow exact lineage needs; no cross-application API.\n\n## Acceptance and recovery proof\n\n- [ ] Both apps independently: source goal/mission acceptance gate, required held repair bytes, own receiver grant/budget, source/caller/adopter identity, pre/post-start cancellation, spawned cancel vs attached detach, revocation, restart and no duplicate effects. Helpers may have no obligation; explicit adoption of a contracted child exact output preserves parent accountability and remaining checks. Mere availability/admission never fulfills the parent.\n- [ ] At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.\n\n## Dependencies and execution\n\nBlocked by: [OVE-170](https://linear.app/overtonbell/issue/OVE-170/oc-assess-report-collections-and-accumulate-current-accepted-sets) (WI-07), [OVE-171](https://linear.app/overtonbell/issue/OVE-171/oc-execute-explicit-graph-routes-and-alternative-input-release) (WI-08). Native blocker relations are authoritative. Phase: sprint.\n\nClaim repository/base and bounded writable scope before work; coordinate shared protocol/bootstrap/migration files with integrator. Necessary code/schema/import changes and disposable-target rebuilds are within the accepted assignment. Escalate missing credentials/authority or contradictory goals, not routine engineering.\n\n## Provenance\n\n* Owner final synthesis request, 2026-10-26; final handoff through OC-D181.\n* Decisions: OC-D165–167; new extension to existing chain code. No cross-application feature.\n* Canonical: `mission-control-general/general-mission-control/OUTPUT-CONTRACTS.md` §§10; ADR-0058–0062.\n* Execution: `docs/specs/provider-consolidation-2026-10/sprint-oc/IMPLEMENTATION.md`, `PROOFS.md`, `DECISIONS.md`; planning key WI-16.\n* Source audit: MC 1863017c, KS b45adf5, AIDB 306efd7, BKS c398177. New specification files are uncommitted synthesis outputs, not runtime proof.\n* Terms: Output Obligation, Obligation Fulfillment, Sealed Transfer Plan, Delivery Receipt, Current Accepted Set.",
+      "draft_path": ".scratch/final-synthesis/issues/17-wi-16.md",
+      "linear_blockers": [
+        "OVE-170",
+        "OVE-171"
+      ]
+    },
+    {
+      "key": "WI-17",
+      "title": "Prepare hook context through scoped reads and staged files",
+      "phase": "sprint",
+      "status": "ready-for-agent",
+      "owner": "MC hook/context/operation boundaries",
+      "blocks_on": [
+        "WI-02"
+      ],
+      "spec_sections": [
+        11
+      ],
+      "result": "Give admitted operation hooks scoped reads, staged preparation files and requests for separate ordinary operations. MC hooks/context/effects; KS when requested operations use it.",
+      "cutover": "Extend hook contracts with scoped host-read capabilities and attributed staged candidates. Host validates safe-boundary install/path collisions/current grants; model/external work is a separate ordinary admitted operation. No live workspace mutation.",
+      "acceptance": "Denied read/state overwrite/used-plan rewrite refuse; same-path race and crash after install recover once. Candidate file cannot self-fulfill. Before-effect deny works; after-effect callback cannot undo commit. Protected effects additionally gate on WI-03/05.",
+      "provenance": "OC-D173–175; new hook boundary extension; historical OVE-26 baseline. F20-15 is a consequence.",
+      "linear": {
+        "id": "d431a473-2563-4b0a-b217-407d899a2567",
+        "identifier": "OVE-180",
+        "url": "https://linear.app/overtonbell/issue/OVE-180/oc-prepare-hook-context-through-scoped-reads-and-staged-files"
+      },
+      "sequence": 18,
+      "definition_of_done": "At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.",
+      "description": "Parent specification: [OVE-162](https://linear.app/overtonbell/issue/OVE-162/oc-final-output-contracts-exact-context-and-knowledge-service)\n\n## Problem and observable result\n\nGive admitted operation hooks scoped reads, staged preparation files and requests for separate ordinary operations. MC hooks/context/effects; KS when requested operations use it.\n\n## Owning interfaces and cutover\n\nMC hook/context/operation boundaries.\n\nExtend hook contracts with scoped host-read capabilities and attributed staged candidates. Host validates safe-boundary install/path collisions/current grants; model/external work is a separate ordinary admitted operation. No live workspace mutation.\n\n## Acceptance and recovery proof\n\n- [ ] Denied read/state overwrite/used-plan rewrite refuse; same-path race and crash after install recover once. Candidate file cannot self-fulfill. Before-effect deny works; after-effect callback cannot undo commit. Protected effects additionally gate on WI-03/05.\n- [ ] At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.\n\n## Dependencies and execution\n\nBlocked by: [OVE-164](https://linear.app/overtonbell/issue/OVE-164/oc-deliver-exact-admitted-inputs-with-one-sealed-plan) (WI-02). Native blocker relations are authoritative. Phase: sprint.\n\nClaim repository/base and bounded writable scope before work; coordinate shared protocol/bootstrap/migration files with integrator. Necessary code/schema/import changes and disposable-target rebuilds are within the accepted assignment. Escalate missing credentials/authority or contradictory goals, not routine engineering.\n\n## Provenance\n\n* Owner final synthesis request, 2026-10-26; final handoff through OC-D181.\n* Decisions: OC-D173–175; new hook boundary extension; historical OVE-26 baseline. F20-15 is a consequence.\n* Canonical: `mission-control-general/general-mission-control/OUTPUT-CONTRACTS.md` §§11; ADR-0058–0062.\n* Execution: `docs/specs/provider-consolidation-2026-10/sprint-oc/IMPLEMENTATION.md`, `PROOFS.md`, `DECISIONS.md`; planning key WI-17.\n* Source audit: MC 1863017c, KS b45adf5, AIDB 306efd7, BKS c398177. New specification files are uncommitted synthesis outputs, not runtime proof.\n* Terms: Output Obligation, Obligation Fulfillment, Sealed Transfer Plan, Delivery Receipt, Current Accepted Set.",
+      "draft_path": ".scratch/final-synthesis/issues/18-wi-17.md",
+      "linear_blockers": [
+        "OVE-164"
+      ]
+    },
+    {
+      "key": "WI-18",
+      "title": "Preserve validated context and historical repair-fork inputs",
+      "phase": "sprint",
+      "status": "ready-for-agent",
+      "owner": "MC Deep Agents/context/recovery/Temporal",
+      "blocks_on": [
+        "WI-17",
+        "WI-07",
+        "OVE-75"
+      ],
+      "spec_sections": [
+        6,
+        11
+      ],
+      "result": "Consume validated preservation proposals and deliver exact notes/references after compaction or continuation; restore selected historical repair-fork drafts. MC Deep Agents/context/recovery.",
+      "cutover": "Reuse OVE-75 continuation phase machine, register real Deep Agents continuation/hydration in production composition, and consume bounded preservation proposals currently ignored by hooks. Add exact historical repair-fork default; no second continuation engine.",
+      "acceptance": "Actual post-compaction context contains accepted notes/refs; rejected proposals never displace host state. Separate new session generation on continuation, ≥3 iterations and mid-stage threshold. Historical bytes differ from today; required missing snapshot blocks and pending effects remain visible.",
+      "provenance": "OC-D137/138/172; preservation/fork delta beyond OVE-75, not duplicate full continuation implementation.",
+      "linear": {
+        "id": "91eac450-79ff-45ed-ae6c-15efeabd11da",
+        "identifier": "OVE-181",
+        "url": "https://linear.app/overtonbell/issue/OVE-181/oc-preserve-validated-context-and-historical-repair-fork-inputs"
+      },
+      "sequence": 19,
+      "definition_of_done": "At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.",
+      "description": "Parent specification: [OVE-162](https://linear.app/overtonbell/issue/OVE-162/oc-final-output-contracts-exact-context-and-knowledge-service)\n\n## Problem and observable result\n\nConsume validated preservation proposals and deliver exact notes/references after compaction or continuation; restore selected historical repair-fork drafts. MC Deep Agents/context/recovery.\n\n## Owning interfaces and cutover\n\nMC Deep Agents/context/recovery/Temporal.\n\nReuse OVE-75 continuation phase machine, register real Deep Agents continuation/hydration in production composition, and consume bounded preservation proposals currently ignored by hooks. Add exact historical repair-fork default; no second continuation engine.\n\n## Acceptance and recovery proof\n\n- [ ] Actual post-compaction context contains accepted notes/refs; rejected proposals never displace host state. Separate new session generation on continuation, ≥3 iterations and mid-stage threshold. Historical bytes differ from today; required missing snapshot blocks and pending effects remain visible.\n- [ ] At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.\n\n## Dependencies and execution\n\nBlocked by: [OVE-180](https://linear.app/overtonbell/issue/OVE-180/oc-prepare-hook-context-through-scoped-reads-and-staged-files) (WI-17), [OVE-170](https://linear.app/overtonbell/issue/OVE-170/oc-assess-report-collections-and-accumulate-current-accepted-sets) (WI-07), OVE-75. Native blocker relations are authoritative. Phase: sprint.\n\nClaim repository/base and bounded writable scope before work; coordinate shared protocol/bootstrap/migration files with integrator. Necessary code/schema/import changes and disposable-target rebuilds are within the accepted assignment. Escalate missing credentials/authority or contradictory goals, not routine engineering.\n\n## Provenance\n\n* Owner final synthesis request, 2026-10-26; final handoff through OC-D181.\n* Decisions: OC-D137/138/172; preservation/fork delta beyond OVE-75, not duplicate full continuation implementation.\n* Canonical: `mission-control-general/general-mission-control/OUTPUT-CONTRACTS.md` §§6, 11; ADR-0058–0062.\n* Execution: `docs/specs/provider-consolidation-2026-10/sprint-oc/IMPLEMENTATION.md`, `PROOFS.md`, `DECISIONS.md`; planning key WI-18.\n* Source audit: MC 1863017c, KS b45adf5, AIDB 306efd7, BKS c398177. New specification files are uncommitted synthesis outputs, not runtime proof.\n* Terms: Output Obligation, Obligation Fulfillment, Sealed Transfer Plan, Delivery Receipt, Current Accepted Set.",
+      "draft_path": ".scratch/final-synthesis/issues/19-wi-18.md",
+      "linear_blockers": [
+        "OVE-180",
+        "OVE-170",
+        "OVE-75"
+      ]
+    },
+    {
+      "key": "WI-19",
+      "title": "Deliver exact coordinator inspection and bounded selected content",
+      "phase": "sprint",
+      "status": "ready-for-agent",
+      "owner": "MC inspection/subscriptions + actual coordinator host + KS retrieval",
+      "blocks_on": [
+        "WI-02",
+        "OVE-78"
+      ],
+      "spec_sections": [
+        3,
+        12
+      ],
+      "result": "Add exact output/fulfillment/transfer inspection, qualify actual selected coordinator-host delivery and support configured bounded content. MC inspection/subscriptions + admitted KS retrieval.",
+      "cutover": "Reuse OVE-78 inbox/callback engine. Separate transport delivery from model-visible delivery/explicit ack; webhook 2xx must not advance coordinator acknowledgment. Add exact inspection/events, default actionable notices and opted-in bounded content.",
+      "acceptance": "Select actual Codex/Claude Code/admitted coordinator host and prove notice, transport, idle wake, model-visible payload, ack and retrieval separately; disconnect/replay/duplicate/dead-letter/cancel. Grants/purpose/revision/budgets constrain excerpts. Unavailable host wake blocks its claim.",
+      "provenance": "OC-D125/126/176. New focused delta plus additive OVE-78 scope note; preserve its baseline machinery, parent and status.",
+      "linear": {
+        "id": "4f7988be-857e-4e36-8a6b-a6687fa7c0af",
+        "identifier": "OVE-182",
+        "url": "https://linear.app/overtonbell/issue/OVE-182/oc-deliver-exact-coordinator-inspection-and-bounded-selected-content"
+      },
+      "sequence": 20,
+      "definition_of_done": "At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.",
+      "description": "Parent specification: [OVE-162](https://linear.app/overtonbell/issue/OVE-162/oc-final-output-contracts-exact-context-and-knowledge-service)\n\n## Problem and observable result\n\nAdd exact output/fulfillment/transfer inspection, qualify actual selected coordinator-host delivery and support configured bounded content. MC inspection/subscriptions + admitted KS retrieval.\n\n## Owning interfaces and cutover\n\nMC inspection/subscriptions + actual coordinator host + KS retrieval.\n\nReuse OVE-78 inbox/callback engine. Separate transport delivery from model-visible delivery/explicit ack; webhook 2xx must not advance coordinator acknowledgment. Add exact inspection/events, default actionable notices and opted-in bounded content.\n\n## Acceptance and recovery proof\n\n- [ ] Select actual Codex/Claude Code/admitted coordinator host and prove notice, transport, idle wake, model-visible payload, ack and retrieval separately; disconnect/replay/duplicate/dead-letter/cancel. Grants/purpose/revision/budgets constrain excerpts. Unavailable host wake blocks its claim.\n- [ ] At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.\n\n## Dependencies and execution\n\nBlocked by: [OVE-164](https://linear.app/overtonbell/issue/OVE-164/oc-deliver-exact-admitted-inputs-with-one-sealed-plan) (WI-02), OVE-78. Native blocker relations are authoritative. Phase: sprint.\n\nClaim repository/base and bounded writable scope before work; coordinate shared protocol/bootstrap/migration files with integrator. Necessary code/schema/import changes and disposable-target rebuilds are within the accepted assignment. Escalate missing credentials/authority or contradictory goals, not routine engineering.\n\n## Provenance\n\n* Owner final synthesis request, 2026-10-26; final handoff through OC-D181.\n* Decisions: OC-D125/126/176. New focused delta plus additive OVE-78 scope note; preserve its baseline machinery, parent and status.\n* Canonical: `mission-control-general/general-mission-control/OUTPUT-CONTRACTS.md` §§3, 12; ADR-0058–0062.\n* Execution: `docs/specs/provider-consolidation-2026-10/sprint-oc/IMPLEMENTATION.md`, `PROOFS.md`, `DECISIONS.md`; planning key WI-19.\n* Source audit: MC 1863017c, KS b45adf5, AIDB 306efd7, BKS c398177. New specification files are uncommitted synthesis outputs, not runtime proof.\n* Terms: Output Obligation, Obligation Fulfillment, Sealed Transfer Plan, Delivery Receipt, Current Accepted Set.",
+      "draft_path": ".scratch/final-synthesis/issues/20-wi-19.md",
+      "linear_blockers": [
+        "OVE-164",
+        "OVE-78"
+      ]
+    },
+    {
+      "key": "WI-22",
+      "title": "Execute bounded durable-transition reactions",
+      "phase": "sprint",
+      "status": "ready-for-agent",
+      "owner": "MC authoring/Temporal/admission/outbox",
+      "blocks_on": [
+        "WI-01",
+        "WI-04"
+      ],
+      "spec_sections": [
+        11
+      ],
+      "result": "Attach bounded durable-transition reactions and execute them through ordinary admitted operations. MC authoring/Temporal/operation dispatch.",
+      "cutover": "Compile durable transition reactions into ordinary admitted executions and Temporal dispatch. Add event/binding/generation/causal activation keys and outbox state; no parallel hook scheduler.",
+      "acceptance": "Duplicate event yields one logical reaction; crash after admission before dispatch recovers; stale generation cancels; self-trigger chain hits admitted recursion/rate/activation/time/spend limits. Output/assessment/fulfillment/delivery/settlement events stay distinct.",
+      "provenance": "OC-D171; separate durable-dispatch slice keeps local preparation and preservation independent of transition-reaction delivery.",
+      "linear": {
+        "id": "de2500c7-3ecf-4033-8f48-b39f0f92a48b",
+        "identifier": "OVE-183",
+        "url": "https://linear.app/overtonbell/issue/OVE-183/oc-execute-bounded-durable-transition-reactions"
+      },
+      "sequence": 21,
+      "definition_of_done": "At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.",
+      "description": "Parent specification: [OVE-162](https://linear.app/overtonbell/issue/OVE-162/oc-final-output-contracts-exact-context-and-knowledge-service)\n\n## Problem and observable result\n\nAttach bounded durable-transition reactions and execute them through ordinary admitted operations. MC authoring/Temporal/operation dispatch.\n\n## Owning interfaces and cutover\n\nMC authoring/Temporal/admission/outbox.\n\nCompile durable transition reactions into ordinary admitted executions and Temporal dispatch. Add event/binding/generation/causal activation keys and outbox state; no parallel hook scheduler.\n\n## Acceptance and recovery proof\n\n- [ ] Duplicate event yields one logical reaction; crash after admission before dispatch recovers; stale generation cancels; self-trigger chain hits admitted recursion/rate/activation/time/spend limits. Output/assessment/fulfillment/delivery/settlement events stay distinct.\n- [ ] At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.\n\n## Dependencies and execution\n\nBlocked by: [OVE-163](https://linear.app/overtonbell/issue/OVE-163/oc-compile-and-fulfill-explicit-named-output-promises) (WI-01), [OVE-166](https://linear.app/overtonbell/issue/OVE-166/oc-settle-saved-provider-results-without-repeated-cognition) (WI-04). Native blocker relations are authoritative. Phase: sprint.\n\nClaim repository/base and bounded writable scope before work; coordinate shared protocol/bootstrap/migration files with integrator. Necessary code/schema/import changes and disposable-target rebuilds are within the accepted assignment. Escalate missing credentials/authority or contradictory goals, not routine engineering.\n\n## Provenance\n\n* Owner final synthesis request, 2026-10-26; final handoff through OC-D181.\n* Decisions: OC-D171; separate durable-dispatch slice keeps local preparation and preservation independent of transition-reaction delivery.\n* Canonical: `mission-control-general/general-mission-control/OUTPUT-CONTRACTS.md` §§11; ADR-0058–0062.\n* Execution: `docs/specs/provider-consolidation-2026-10/sprint-oc/IMPLEMENTATION.md`, `PROOFS.md`, `DECISIONS.md`; planning key WI-22.\n* Source audit: MC 1863017c, KS b45adf5, AIDB 306efd7, BKS c398177. New specification files are uncommitted synthesis outputs, not runtime proof.\n* Terms: Output Obligation, Obligation Fulfillment, Sealed Transfer Plan, Delivery Receipt, Current Accepted Set.",
+      "draft_path": ".scratch/final-synthesis/issues/21-wi-22.md",
+      "linear_blockers": [
+        "OVE-163",
+        "OVE-166"
+      ]
+    },
+    {
+      "key": "WI-23",
+      "title": "Deliver dynamic async child bindings and check-time result admission",
+      "phase": "sprint",
+      "status": "ready-for-agent",
+      "owner": "MC Deep Agents/Agent Server/capability custody",
+      "blocks_on": [
+        "WI-02",
+        "WI-04"
+      ],
+      "spec_sections": [
+        9,
+        11,
+        12
+      ],
+      "result": "Replace fixed technical async child with sealed binding custody, assistant-per-binding and exact server materialization. Implement check-time governed result admission so outputs can be used during parent cognition. Reuse existing OVE-148 configuration registry without duplicating its baseline.",
+      "cutover": "Replace fixed technical async child with sealed binding custody, assistant-per-binding and exact server materialization. Implement check-time governed result admission so outputs can be used during parent cognition. Reuse existing OVE-148 configuration registry without duplicating its baseline.",
+      "acceptance": "Real inherited/general and seeded sync/dynamic async configurations with per-child model/tools/skills/MCP, exact digest/audience checks, result use, blocking/nonblocking, status/update/list/cancel, no duplicate child/admission and lineage/effect/usage reconciliation. Optional helper obligations and explicit exact child-output adoption preserve parent checks; technical result admission alone never fulfills parent obligations. Required unsupported feature refuses; actual backend provisioning/permissions and selected C01/C10–13 cells are observed.",
+      "provenance": "OC-D71/76/99/178; accepted SUBAGENTS Q1–Q8, WP-S3/WP-S4",
+      "linear": {
+        "id": "426c3ee9-064a-47d5-8a5d-b9c31d9aa4af",
+        "identifier": "OVE-184",
+        "url": "https://linear.app/overtonbell/issue/OVE-184/oc-deliver-dynamic-async-child-bindings-and-check-time-result"
+      },
+      "sequence": 22,
+      "definition_of_done": "At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.",
+      "description": "Parent specification: [OVE-162](https://linear.app/overtonbell/issue/OVE-162/oc-final-output-contracts-exact-context-and-knowledge-service)\n\n## Problem and observable result\n\nReplace fixed technical async child with sealed binding custody, assistant-per-binding and exact server materialization. Implement check-time governed result admission so outputs can be used during parent cognition. Reuse existing OVE-148 configuration registry without duplicating its baseline.\n\n## Owning interfaces and cutover\n\nMC Deep Agents/Agent Server/capability custody.\n\nReplace fixed technical async child with sealed binding custody, assistant-per-binding and exact server materialization. Implement check-time governed result admission so outputs can be used during parent cognition. Reuse existing OVE-148 configuration registry without duplicating its baseline.\n\n## Acceptance and recovery proof\n\n- [ ] Real inherited/general and seeded sync/dynamic async configurations with per-child model/tools/skills/MCP, exact digest/audience checks, result use, blocking/nonblocking, status/update/list/cancel, no duplicate child/admission and lineage/effect/usage reconciliation. Optional helper obligations and explicit exact child-output adoption preserve parent checks; technical result admission alone never fulfills parent obligations. Required unsupported feature refuses; actual backend provisioning/permissions and selected C01/C10–13 cells are observed.\n- [ ] At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.\n\n## Dependencies and execution\n\nBlocked by: [OVE-164](https://linear.app/overtonbell/issue/OVE-164/oc-deliver-exact-admitted-inputs-with-one-sealed-plan) (WI-02), [OVE-166](https://linear.app/overtonbell/issue/OVE-166/oc-settle-saved-provider-results-without-repeated-cognition) (WI-04). Native blocker relations are authoritative. Phase: sprint.\n\nClaim repository/base and bounded writable scope before work; coordinate shared protocol/bootstrap/migration files with integrator. Necessary code/schema/import changes and disposable-target rebuilds are within the accepted assignment. Escalate missing credentials/authority or contradictory goals, not routine engineering.\n\n## Provenance\n\n* Owner final synthesis request, 2026-10-26; final handoff through OC-D181.\n* Decisions: OC-D71/76/99/178; accepted SUBAGENTS Q1–Q8, WP-S3/WP-S4\n* Canonical: `mission-control-general/general-mission-control/OUTPUT-CONTRACTS.md` §§9, 11, 12; ADR-0058–0062.\n* Execution: `docs/specs/provider-consolidation-2026-10/sprint-oc/IMPLEMENTATION.md`, `PROOFS.md`, `DECISIONS.md`; planning key WI-23.\n* Source audit: MC 1863017c, KS b45adf5, AIDB 306efd7, BKS c398177. New specification files are uncommitted synthesis outputs, not runtime proof.\n* Terms: Output Obligation, Obligation Fulfillment, Sealed Transfer Plan, Delivery Receipt, Current Accepted Set.",
+      "draft_path": ".scratch/final-synthesis/issues/22-wi-23.md",
+      "linear_blockers": [
+        "OVE-164",
+        "OVE-166"
+      ]
+    },
+    {
+      "key": "WI-32",
+      "title": "Release W4 integrated revision composition and recovery checkpoint",
+      "phase": "sprint",
+      "status": "ready-for-agent",
+      "owner": "Independent recovery/composition reviewer + integrator",
+      "blocks_on": [
+        "WI-11",
+        "WI-12",
+        "WI-16",
+        "WI-18",
+        "WI-22"
+      ],
+      "spec_sections": [
+        10,
+        11,
+        12
+      ],
+      "result": "Independently release W4 integrated advanced recovery after the delivering revisions/links/hooks/continuation pieces land. This is a real functional checkpoint, not another runtime engine.",
+      "cutover": "Independently release W4 integrated advanced recovery after the delivering revisions/links/hooks/continuation pieces land. This is a real functional checkpoint, not another runtime engine.",
+      "acceptance": "Both applicable domains: exact tracked/held reassessment, review successor, adoption, chain cancel before/after start, historical fork, preservation/install crash and durable reaction replay. Record source/schema/run pins, every criterion, fixes/reruns and real/double split. Basic first-use durability was already required at W0/W1.",
+      "provenance": "OC-D106/129/130/138/142–146/165/166/171–175",
+      "linear": {
+        "id": "26f7dab1-1ef7-46ab-bca2-2ecc55dce704",
+        "identifier": "OVE-185",
+        "url": "https://linear.app/overtonbell/issue/OVE-185/oc-release-w4-integrated-revision-composition-and-recovery-checkpoint"
+      },
+      "sequence": 23,
+      "definition_of_done": "At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.",
+      "description": "Parent specification: [OVE-162](https://linear.app/overtonbell/issue/OVE-162/oc-final-output-contracts-exact-context-and-knowledge-service)\n\n## Problem and observable result\n\nIndependently release W4 integrated advanced recovery after the delivering revisions/links/hooks/continuation pieces land. This is a real functional checkpoint, not another runtime engine.\n\n## Owning interfaces and cutover\n\nIndependent recovery/composition reviewer + integrator.\n\nIndependently release W4 integrated advanced recovery after the delivering revisions/links/hooks/continuation pieces land. This is a real functional checkpoint, not another runtime engine.\n\n## Acceptance and recovery proof\n\n- [ ] Both applicable domains: exact tracked/held reassessment, review successor, adoption, chain cancel before/after start, historical fork, preservation/install crash and durable reaction replay. Record source/schema/run pins, every criterion, fixes/reruns and real/double split. Basic first-use durability was already required at W0/W1.\n- [ ] At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.\n\n## Dependencies and execution\n\nBlocked by: [OVE-174](https://linear.app/overtonbell/issue/OVE-174/oc-close-groups-and-qualify-reductions-with-coverage) (WI-11), [OVE-175](https://linear.app/overtonbell/issue/OVE-175/oc-reassess-synthesis-for-the-selected-source-changes) (WI-12), [OVE-179](https://linear.app/overtonbell/issue/OVE-179/oc-transfer-exact-linked-exports-within-each-application) (WI-16), [OVE-181](https://linear.app/overtonbell/issue/OVE-181/oc-preserve-validated-context-and-historical-repair-fork-inputs) (WI-18), [OVE-183](https://linear.app/overtonbell/issue/OVE-183/oc-execute-bounded-durable-transition-reactions) (WI-22). Native blocker relations are authoritative. Phase: sprint.\n\nClaim repository/base and bounded writable scope before work; coordinate shared protocol/bootstrap/migration files with integrator. Necessary code/schema/import changes and disposable-target rebuilds are within the accepted assignment. Escalate missing credentials/authority or contradictory goals, not routine engineering.\n\n## Provenance\n\n* Owner final synthesis request, 2026-10-26; final handoff through OC-D181.\n* Decisions: OC-D106/129/130/138/142–146/165/166/171–175\n* Canonical: `mission-control-general/general-mission-control/OUTPUT-CONTRACTS.md` §§10, 11, 12; ADR-0058–0062.\n* Execution: `docs/specs/provider-consolidation-2026-10/sprint-oc/IMPLEMENTATION.md`, `PROOFS.md`, `DECISIONS.md`; planning key WI-32.\n* Source audit: MC 1863017c, KS b45adf5, AIDB 306efd7, BKS c398177. New specification files are uncommitted synthesis outputs, not runtime proof.\n* Terms: Output Obligation, Obligation Fulfillment, Sealed Transfer Plan, Delivery Receipt, Current Accepted Set.",
+      "draft_path": ".scratch/final-synthesis/issues/23-wi-32.md",
+      "linear_blockers": [
+        "OVE-174",
+        "OVE-175",
+        "OVE-179",
+        "OVE-181",
+        "OVE-183"
+      ]
+    },
+    {
+      "key": "WI-21",
+      "title": "Qualify the full workflow version and both applications",
+      "phase": "sprint",
+      "status": "ready-for-agent",
+      "owner": "Independent release reviewer + integrator across all four repos",
+      "blocks_on": [
+        "WI-32",
+        "WI-14",
+        "WI-15",
+        "WI-19",
+        "WI-23",
+        "OVE-73"
+      ],
+      "spec_sections": [
+        12,
+        13
+      ],
+      "result": "W5 full accepted runtime qualification; routine use remains closed until independent review passes. F1/F2/F3 follow separately.",
+      "cutover": "Integrate all mandatory slices and close the W5 full-version/general-use gate plus downstream SV-18. Produce actual C01–C16 adopted P1, eight-form, four-family, both-app and composition/control/recovery coverage; do not block on whole OVE-150.",
+      "acceptance": "Real agents/backends/native paths and selected coordinator host, exact transcripts/outputs/receipts, first-use RV repairs, all required criteria independently reviewed with fixes/reruns. Missing/ambiguous evidence blocks. Mark other providers/cross-app/unselected options honestly; F1–F3 have not run merely because W5 passes.",
+      "provenance": "OC-D106/107/128–131; downstream SV-18 gate. New release-evidence slice; no invented fixture or proof.",
+      "linear": {
+        "id": "b6c29675-9e96-40d0-853e-49c7c7d5432b",
+        "identifier": "OVE-186",
+        "url": "https://linear.app/overtonbell/issue/OVE-186/oc-qualify-the-full-workflow-version-and-both-applications"
+      },
+      "sequence": 24,
+      "definition_of_done": "At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.",
+      "description": "Parent specification: [OVE-162](https://linear.app/overtonbell/issue/OVE-162/oc-final-output-contracts-exact-context-and-knowledge-service)\n\n## Problem and observable result\n\nW5 full accepted runtime qualification; routine use remains closed until independent review passes. F1/F2/F3 follow separately.\n\n## Owning interfaces and cutover\n\nIndependent release reviewer + integrator across all four repos.\n\nIntegrate all mandatory slices and close the W5 full-version/general-use gate plus downstream SV-18. Produce actual C01–C16 adopted P1, eight-form, four-family, both-app and composition/control/recovery coverage; do not block on whole OVE-150.\n\n## Acceptance and recovery proof\n\n- [ ] Real agents/backends/native paths and selected coordinator host, exact transcripts/outputs/receipts, first-use RV repairs, all required criteria independently reviewed with fixes/reruns. Missing/ambiguous evidence blocks. Mark other providers/cross-app/unselected options honestly; F1–F3 have not run merely because W5 passes.\n- [ ] At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.\n\n## Dependencies and execution\n\nBlocked by: [OVE-185](https://linear.app/overtonbell/issue/OVE-185/oc-release-w4-integrated-revision-composition-and-recovery-checkpoint) (WI-32), [OVE-177](https://linear.app/overtonbell/issue/OVE-177/oc-execute-swarm-members-and-exact-convergence) (WI-14), [OVE-178](https://linear.app/overtonbell/issue/OVE-178/oc-execute-independent-evaluator-optimizer-repair-rounds) (WI-15), [OVE-182](https://linear.app/overtonbell/issue/OVE-182/oc-deliver-exact-coordinator-inspection-and-bounded-selected-content) (WI-19), [OVE-184](https://linear.app/overtonbell/issue/OVE-184/oc-deliver-dynamic-async-child-bindings-and-check-time-result) (WI-23), OVE-73. Native blocker relations are authoritative. Phase: sprint.\n\nClaim repository/base and bounded writable scope before work; coordinate shared protocol/bootstrap/migration files with integrator. Necessary code/schema/import changes and disposable-target rebuilds are within the accepted assignment. Escalate missing credentials/authority or contradictory goals, not routine engineering.\n\n## Provenance\n\n* Owner final synthesis request, 2026-10-26; final handoff through OC-D181.\n* Decisions: OC-D106/107/128–131; downstream SV-18 gate. New release-evidence slice; no invented fixture or proof.\n* Canonical: `mission-control-general/general-mission-control/OUTPUT-CONTRACTS.md` §§12, 13; ADR-0058–0062.\n* Execution: `docs/specs/provider-consolidation-2026-10/sprint-oc/IMPLEMENTATION.md`, `PROOFS.md`, `DECISIONS.md`; planning key WI-21.\n* Source audit: MC 1863017c, KS b45adf5, AIDB 306efd7, BKS c398177. New specification files are uncommitted synthesis outputs, not runtime proof.\n* Terms: Output Obligation, Obligation Fulfillment, Sealed Transfer Plan, Delivery Receipt, Current Accepted Set.",
+      "draft_path": ".scratch/final-synthesis/issues/24-wi-21.md",
+      "linear_blockers": [
+        "OVE-185",
+        "OVE-177",
+        "OVE-178",
+        "OVE-182",
+        "OVE-184",
+        "OVE-73"
+      ]
+    },
+    {
+      "key": "WI-25",
+      "title": "Qualify the complete stress-fixture skills and interactive browser profiles",
+      "phase": "post-sprint",
+      "status": "ready-for-agent",
+      "owner": "MC catalog/skills/Deep Agents/Agent Server + KS skills",
+      "blocks_on": [
+        "WI-21"
+      ],
+      "spec_sections": [
+        11,
+        12
+      ],
+      "result": "After W5, inventory/pin all Tavily and Firecrawl skills, real Vercel interactive browser, general helper and dedicated async browser profile. Wire PubMed and requested ClinicalTrials MCP plus selected KS evidence/ingest/Biotech/retrieval skills per stage.",
+      "cutover": "After W5, inventory/pin all Tavily and Firecrawl skills, real Vercel interactive browser, general helper and dedicated async browser profile. Wire PubMed and requested ClinicalTrials MCP plus selected KS evidence/ingest/Biotech/retrieval skills per stage.",
+      "acceptance": "Actual installed skill collections and MCP allowlists, interactive browser task/status/join/cancel/admitted output use; no page-text/stub or BioMCP-only substitution. File/implement owner-layer capability gaps without shrinking fixtures. Pins and receiving grants are inspectable.",
+      "provenance": "OC-D178/179; owner F1/F2/F3 capabilities",
+      "linear": {
+        "id": "11ea5565-3f42-4d10-87a2-5e4a7274534b",
+        "identifier": "OVE-187",
+        "url": "https://linear.app/overtonbell/issue/OVE-187/oc-qualify-the-complete-stress-fixture-skills-and-interactive-browser"
+      },
+      "sequence": 25,
+      "definition_of_done": "At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.",
+      "description": "Parent specification: [OVE-162](https://linear.app/overtonbell/issue/OVE-162/oc-final-output-contracts-exact-context-and-knowledge-service)\n\n## Problem and observable result\n\nAfter W5, inventory/pin all Tavily and Firecrawl skills, real Vercel interactive browser, general helper and dedicated async browser profile. Wire PubMed and requested ClinicalTrials MCP plus selected KS evidence/ingest/Biotech/retrieval skills per stage.\n\n## Owning interfaces and cutover\n\nMC catalog/skills/Deep Agents/Agent Server + KS skills.\n\nAfter W5, inventory/pin all Tavily and Firecrawl skills, real Vercel interactive browser, general helper and dedicated async browser profile. Wire PubMed and requested ClinicalTrials MCP plus selected KS evidence/ingest/Biotech/retrieval skills per stage.\n\n## Acceptance and recovery proof\n\n- [ ] Actual installed skill collections and MCP allowlists, interactive browser task/status/join/cancel/admitted output use; no page-text/stub or BioMCP-only substitution. File/implement owner-layer capability gaps without shrinking fixtures. Pins and receiving grants are inspectable.\n- [ ] At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.\n\n## Dependencies and execution\n\nBlocked by: [OVE-186](https://linear.app/overtonbell/issue/OVE-186/oc-qualify-the-full-workflow-version-and-both-applications) (WI-21). Native blocker relations are authoritative. Phase: post-sprint.\n\nClaim repository/base and bounded writable scope before work; coordinate shared protocol/bootstrap/migration files with integrator. Necessary code/schema/import changes and disposable-target rebuilds are within the accepted assignment. Escalate missing credentials/authority or contradictory goals, not routine engineering.\n\n## Provenance\n\n* Owner final synthesis request, 2026-10-26; final handoff through OC-D181.\n* Decisions: OC-D178/179; owner F1/F2/F3 capabilities\n* Canonical: `mission-control-general/general-mission-control/OUTPUT-CONTRACTS.md` §§11, 12; ADR-0058–0062.\n* Execution: `docs/specs/provider-consolidation-2026-10/sprint-oc/IMPLEMENTATION.md`, `PROOFS.md`, `DECISIONS.md`; planning key WI-25.\n* Source audit: MC 1863017c, KS b45adf5, AIDB 306efd7, BKS c398177. New specification files are uncommitted synthesis outputs, not runtime proof.\n* Terms: Output Obligation, Obligation Fulfillment, Sealed Transfer Plan, Delivery Receipt, Current Accepted Set.",
+      "draft_path": ".scratch/final-synthesis/issues/25-wi-25.md",
+      "linear_blockers": [
+        "OVE-186"
+      ]
+    },
+    {
+      "key": "WI-26",
+      "title": "Establish independent mission-work evaluation and versioned evidence",
+      "phase": "post-sprint",
+      "status": "ready-for-agent",
+      "owner": "KS evaluation contracts/application + MC evidence exports",
+      "blocks_on": [
+        "WI-21"
+      ],
+      "spec_sections": [
+        12
+      ],
+      "result": "After W5, extend/reuse KS evaluation dataset/experiment/run surfaces for mission outcomes and MC trace/resource exports. Freeze independent rubrics, criteria, version lineage and failure classes for F1/F2/F3 before execution.",
+      "cutover": "After W5, extend/reuse KS evaluation dataset/experiment/run surfaces for mission outcomes and MC trace/resource exports. Freeze independent rubrics, criteria, version lineage and failure classes for F1/F2/F3 before execution.",
+      "acceptance": "Independent assessment of coverage/evidence/useful outputs/agent-subagent-context behavior/cost-latency/recovery; F3 recall/rank/routing separated. Known bad fixtures fail, doubles labelled, rubric changes versioned, evaluation does not grant official/scientific use. Wire repair issue and rerun evidence references.",
+      "provenance": "OC-D178–180; owner mission-work evaluation",
+      "linear": {
+        "id": "09bee2d4-6375-427c-a32b-93a58d77a35f",
+        "identifier": "OVE-188",
+        "url": "https://linear.app/overtonbell/issue/OVE-188/oc-establish-independent-mission-work-evaluation-and-versioned"
+      },
+      "sequence": 26,
+      "definition_of_done": "At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.",
+      "description": "Parent specification: [OVE-162](https://linear.app/overtonbell/issue/OVE-162/oc-final-output-contracts-exact-context-and-knowledge-service)\n\n## Problem and observable result\n\nAfter W5, extend/reuse KS evaluation dataset/experiment/run surfaces for mission outcomes and MC trace/resource exports. Freeze independent rubrics, criteria, version lineage and failure classes for F1/F2/F3 before execution.\n\n## Owning interfaces and cutover\n\nKS evaluation contracts/application + MC evidence exports.\n\nAfter W5, extend/reuse KS evaluation dataset/experiment/run surfaces for mission outcomes and MC trace/resource exports. Freeze independent rubrics, criteria, version lineage and failure classes for F1/F2/F3 before execution.\n\n## Acceptance and recovery proof\n\n- [ ] Independent assessment of coverage/evidence/useful outputs/agent-subagent-context behavior/cost-latency/recovery; F3 recall/rank/routing separated. Known bad fixtures fail, doubles labelled, rubric changes versioned, evaluation does not grant official/scientific use. Wire repair issue and rerun evidence references.\n- [ ] At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.\n\n## Dependencies and execution\n\nBlocked by: [OVE-186](https://linear.app/overtonbell/issue/OVE-186/oc-qualify-the-full-workflow-version-and-both-applications) (WI-21). Native blocker relations are authoritative. Phase: post-sprint.\n\nClaim repository/base and bounded writable scope before work; coordinate shared protocol/bootstrap/migration files with integrator. Necessary code/schema/import changes and disposable-target rebuilds are within the accepted assignment. Escalate missing credentials/authority or contradictory goals, not routine engineering.\n\n## Provenance\n\n* Owner final synthesis request, 2026-10-26; final handoff through OC-D181.\n* Decisions: OC-D178–180; owner mission-work evaluation\n* Canonical: `mission-control-general/general-mission-control/OUTPUT-CONTRACTS.md` §§12; ADR-0058–0062.\n* Execution: `docs/specs/provider-consolidation-2026-10/sprint-oc/IMPLEMENTATION.md`, `PROOFS.md`, `DECISIONS.md`; planning key WI-26.\n* Source audit: MC 1863017c, KS b45adf5, AIDB 306efd7, BKS c398177. New specification files are uncommitted synthesis outputs, not runtime proof.\n* Terms: Output Obligation, Obligation Fulfillment, Sealed Transfer Plan, Delivery Receipt, Current Accepted Set.",
+      "draft_path": ".scratch/final-synthesis/issues/26-wi-26.md",
+      "linear_blockers": [
+        "OVE-186"
+      ]
+    },
+    {
+      "key": "WI-27",
+      "title": "Run Generation Lab exhaustive discovery and report-intent stress mission",
+      "phase": "post-sprint",
+      "status": "ready-for-agent",
+      "owner": "Fixture author/research executor + independent evaluator",
+      "blocks_on": [
+        "WI-25",
+        "WI-26"
+      ],
+      "spec_sections": [
+        7,
+        12
+      ],
+      "result": "Run F1 Generation Lab exhaustive GoalDirected tests/biomarkers discovery with all selected external skills and general/async interactive browser helpers. Store retrievable reports and ingestion intents; native Biotech apply is not required.",
+      "cutover": "Run F1 Generation Lab exhaustive GoalDirected tests/biomarkers discovery with all selected external skills and general/async interactive browser helpers. Store retrievable reports and ingestion intents; native Biotech apply is not required.",
+      "acceptance": "Dated exhaustive source/inventory closure, exact aliases and test↔biomarker coverage, independent outcomes review, actual browser async use and continuation/current-set retention. Inaccessible population/resource exhaustion remains resumable with gaps; no convenient partial success. Observe PROOFS §6 spend/segment limits.",
+      "provenance": "OC-D178/179; F1 exact owner contract",
+      "linear": {
+        "id": "21ee7144-de73-4e1f-bc4a-27e276973692",
+        "identifier": "OVE-189",
+        "url": "https://linear.app/overtonbell/issue/OVE-189/oc-run-generation-lab-exhaustive-discovery-and-report-intent-stress"
+      },
+      "sequence": 27,
+      "definition_of_done": "At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.",
+      "description": "Parent specification: [OVE-162](https://linear.app/overtonbell/issue/OVE-162/oc-final-output-contracts-exact-context-and-knowledge-service)\n\n## Problem and observable result\n\nRun F1 Generation Lab exhaustive GoalDirected tests/biomarkers discovery with all selected external skills and general/async interactive browser helpers. Store retrievable reports and ingestion intents; native Biotech apply is not required.\n\n## Owning interfaces and cutover\n\nFixture author/research executor + independent evaluator.\n\nRun F1 Generation Lab exhaustive GoalDirected tests/biomarkers discovery with all selected external skills and general/async interactive browser helpers. Store retrievable reports and ingestion intents; native Biotech apply is not required.\n\n## Acceptance and recovery proof\n\n- [ ] Dated exhaustive source/inventory closure, exact aliases and test↔biomarker coverage, independent outcomes review, actual browser async use and continuation/current-set retention. Inaccessible population/resource exhaustion remains resumable with gaps; no convenient partial success. Observe PROOFS §6 spend/segment limits.\n- [ ] At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.\n\n## Dependencies and execution\n\nBlocked by: [OVE-187](https://linear.app/overtonbell/issue/OVE-187/oc-qualify-the-complete-stress-fixture-skills-and-interactive-browser) (WI-25), [OVE-188](https://linear.app/overtonbell/issue/OVE-188/oc-establish-independent-mission-work-evaluation-and-versioned) (WI-26). Native blocker relations are authoritative. Phase: post-sprint.\n\nClaim repository/base and bounded writable scope before work; coordinate shared protocol/bootstrap/migration files with integrator. Necessary code/schema/import changes and disposable-target rebuilds are within the accepted assignment. Escalate missing credentials/authority or contradictory goals, not routine engineering.\n\n## Provenance\n\n* Owner final synthesis request, 2026-10-26; final handoff through OC-D181.\n* Decisions: OC-D178/179; F1 exact owner contract\n* Canonical: `mission-control-general/general-mission-control/OUTPUT-CONTRACTS.md` §§7, 12; ADR-0058–0062.\n* Execution: `docs/specs/provider-consolidation-2026-10/sprint-oc/IMPLEMENTATION.md`, `PROOFS.md`, `DECISIONS.md`; planning key WI-27.\n* Source audit: MC 1863017c, KS b45adf5, AIDB 306efd7, BKS c398177. New specification files are uncommitted synthesis outputs, not runtime proof.\n* Terms: Output Obligation, Obligation Fulfillment, Sealed Transfer Plan, Delivery Receipt, Current Accepted Set.",
+      "draft_path": ".scratch/final-synthesis/issues/27-wi-27.md",
+      "linear_blockers": [
+        "OVE-187",
+        "OVE-188"
+      ]
+    },
+    {
+      "key": "WI-28",
+      "title": "Run Qualia Life product-ingredient-study verification stress graph",
+      "phase": "post-sprint",
+      "status": "ready-for-agent",
+      "owner": "Biotech fixture team + MC/KS/BKS owning repairs",
+      "blocks_on": [
+        "WI-25",
+        "WI-26"
+      ],
+      "spec_sections": [
+        7,
+        8,
+        12
+      ],
+      "result": "Run F2 complex Biotech Graph for every current Qualia Life product and all ingredients, per-product foundational reports and three most important qualifying connected studies/trials. Distribute capabilities/contracts per stage; actual KS verification provenance reaches final reports.",
+      "cutover": "Run F2 complex Biotech Graph for every current Qualia Life product and all ingredients, per-product foundational reports and three most important qualifying connected studies/trials. Distribute capabilities/contracts per stage; actual KS verification provenance reaches final reports.",
+      "acceptance": "Dated product/formula/label inventory, exact joins/shared-ingredient coverage, frozen connection/importance rubric, independent review of three studies and every coverage cell; unavailable trial/duplicate ingredient/failing product/correction cases. Stage-explicit intent/apply; required SDL/projection gaps fixed with native proof. Bounded segments preserve exhaustive objective.",
+      "provenance": "OC-D178/179; F2 exact owner contract",
+      "linear": {
+        "id": "585b553d-0070-45d3-80bb-2e5bc5e8faee",
+        "identifier": "OVE-190",
+        "url": "https://linear.app/overtonbell/issue/OVE-190/oc-run-qualia-life-product-ingredient-study-verification-stress-graph"
+      },
+      "sequence": 28,
+      "definition_of_done": "At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.",
+      "description": "Parent specification: [OVE-162](https://linear.app/overtonbell/issue/OVE-162/oc-final-output-contracts-exact-context-and-knowledge-service)\n\n## Problem and observable result\n\nRun F2 complex Biotech Graph for every current Qualia Life product and all ingredients, per-product foundational reports and three most important qualifying connected studies/trials. Distribute capabilities/contracts per stage; actual KS verification provenance reaches final reports.\n\n## Owning interfaces and cutover\n\nBiotech fixture team + MC/KS/BKS owning repairs.\n\nRun F2 complex Biotech Graph for every current Qualia Life product and all ingredients, per-product foundational reports and three most important qualifying connected studies/trials. Distribute capabilities/contracts per stage; actual KS verification provenance reaches final reports.\n\n## Acceptance and recovery proof\n\n- [ ] Dated product/formula/label inventory, exact joins/shared-ingredient coverage, frozen connection/importance rubric, independent review of three studies and every coverage cell; unavailable trial/duplicate ingredient/failing product/correction cases. Stage-explicit intent/apply; required SDL/projection gaps fixed with native proof. Bounded segments preserve exhaustive objective.\n- [ ] At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.\n\n## Dependencies and execution\n\nBlocked by: [OVE-187](https://linear.app/overtonbell/issue/OVE-187/oc-qualify-the-complete-stress-fixture-skills-and-interactive-browser) (WI-25), [OVE-188](https://linear.app/overtonbell/issue/OVE-188/oc-establish-independent-mission-work-evaluation-and-versioned) (WI-26). Native blocker relations are authoritative. Phase: post-sprint.\n\nClaim repository/base and bounded writable scope before work; coordinate shared protocol/bootstrap/migration files with integrator. Necessary code/schema/import changes and disposable-target rebuilds are within the accepted assignment. Escalate missing credentials/authority or contradictory goals, not routine engineering.\n\n## Provenance\n\n* Owner final synthesis request, 2026-10-26; final handoff through OC-D181.\n* Decisions: OC-D178/179; F2 exact owner contract\n* Canonical: `mission-control-general/general-mission-control/OUTPUT-CONTRACTS.md` §§7, 8, 12; ADR-0058–0062.\n* Execution: `docs/specs/provider-consolidation-2026-10/sprint-oc/IMPLEMENTATION.md`, `PROOFS.md`, `DECISIONS.md`; planning key WI-28.\n* Source audit: MC 1863017c, KS b45adf5, AIDB 306efd7, BKS c398177. New specification files are uncommitted synthesis outputs, not runtime proof.\n* Terms: Output Obligation, Obligation Fulfillment, Sealed Transfer Plan, Delivery Receipt, Current Accepted Set.",
+      "draft_path": ".scratch/final-synthesis/issues/28-wi-28.md",
+      "linear_blockers": [
+        "OVE-187",
+        "OVE-188"
+      ]
+    },
+    {
+      "key": "WI-29",
+      "title": "Ingest the model and benchmark dataset with exact native provenance",
+      "phase": "post-sprint",
+      "status": "ready-for-agent",
+      "owner": "AI Engineer fixture team + KS/AIDB native ingestion",
+      "blocks_on": [
+        "WI-25",
+        "WI-26"
+      ],
+      "spec_sections": [
+        5,
+        12
+      ],
+      "result": "Run F3 acquisition and actual AIDB model/version/benchmark/entity-relationship ingestion for up to 50 open/closed models, preferably 2025–2026. Use existing native schema and amend missing needed invariants/types in owner migrations.",
+      "cutover": "Run F3 acquisition and actual AIDB model/version/benchmark/entity-relationship ingestion for up to 50 open/closed models, preferably 2025–2026. Use existing native schema and amend missing needed invariants/types in owner migrations.",
+      "acceptance": "Exact versions/license/openness/benchmark protocol/settings/units/dates/provenance; missing/incomparable scores explicit. Real commit/receipt/readback and normalized identity joins. Up to 50 is not exactly 50; date preference is not absolute; Epoch AI not mandated. Retain native dataset/version for WI-30.",
+      "provenance": "OC-D178/179; F3 native ingestion",
+      "linear": {
+        "id": "4e3befdf-9bf8-4b02-98da-672094daba57",
+        "identifier": "OVE-191",
+        "url": "https://linear.app/overtonbell/issue/OVE-191/oc-ingest-the-model-and-benchmark-dataset-with-exact-native-provenance"
+      },
+      "sequence": 29,
+      "definition_of_done": "At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.",
+      "description": "Parent specification: [OVE-162](https://linear.app/overtonbell/issue/OVE-162/oc-final-output-contracts-exact-context-and-knowledge-service)\n\n## Problem and observable result\n\nRun F3 acquisition and actual AIDB model/version/benchmark/entity-relationship ingestion for up to 50 open/closed models, preferably 2025–2026. Use existing native schema and amend missing needed invariants/types in owner migrations.\n\n## Owning interfaces and cutover\n\nAI Engineer fixture team + KS/AIDB native ingestion.\n\nRun F3 acquisition and actual AIDB model/version/benchmark/entity-relationship ingestion for up to 50 open/closed models, preferably 2025–2026. Use existing native schema and amend missing needed invariants/types in owner migrations.\n\n## Acceptance and recovery proof\n\n- [ ] Exact versions/license/openness/benchmark protocol/settings/units/dates/provenance; missing/incomparable scores explicit. Real commit/receipt/readback and normalized identity joins. Up to 50 is not exactly 50; date preference is not absolute; Epoch AI not mandated. Retain native dataset/version for WI-30.\n- [ ] At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.\n\n## Dependencies and execution\n\nBlocked by: [OVE-187](https://linear.app/overtonbell/issue/OVE-187/oc-qualify-the-complete-stress-fixture-skills-and-interactive-browser) (WI-25), [OVE-188](https://linear.app/overtonbell/issue/OVE-188/oc-establish-independent-mission-work-evaluation-and-versioned) (WI-26). Native blocker relations are authoritative. Phase: post-sprint.\n\nClaim repository/base and bounded writable scope before work; coordinate shared protocol/bootstrap/migration files with integrator. Necessary code/schema/import changes and disposable-target rebuilds are within the accepted assignment. Escalate missing credentials/authority or contradictory goals, not routine engineering.\n\n## Provenance\n\n* Owner final synthesis request, 2026-10-26; final handoff through OC-D181.\n* Decisions: OC-D178/179; F3 native ingestion\n* Canonical: `mission-control-general/general-mission-control/OUTPUT-CONTRACTS.md` §§5, 12; ADR-0058–0062.\n* Execution: `docs/specs/provider-consolidation-2026-10/sprint-oc/IMPLEMENTATION.md`, `PROOFS.md`, `DECISIONS.md`; planning key WI-29.\n* Source audit: MC 1863017c, KS b45adf5, AIDB 306efd7, BKS c398177. New specification files are uncommitted synthesis outputs, not runtime proof.\n* Terms: Output Obligation, Obligation Fulfillment, Sealed Transfer Plan, Delivery Receipt, Current Accepted Set.",
+      "draft_path": ".scratch/final-synthesis/issues/29-wi-29.md",
+      "linear_blockers": [
+        "OVE-187",
+        "OVE-188"
+      ]
+    },
+    {
+      "key": "WI-30",
+      "title": "Evaluate database-grounded model retrieval ranking and routing",
+      "phase": "post-sprint",
+      "status": "ready-for-agent",
+      "owner": "AI Engineer retrieval/ranking experiment + KS/AIDB query/evaluation",
+      "blocks_on": [
+        "WI-29"
+      ],
+      "spec_sections": [
+        5,
+        12
+      ],
+      "result": "Run F3 use-case retrieval/ranking/routing against WI-29 ingested AIDB. Reuse qualified entity/KS retrieval and evaluation; configure embeddings/reranker or explicit degraded policy. Retain ranking as typed artifacts initially rather than assume read-only ranking tables are writable.",
+      "cutover": "Run F3 use-case retrieval/ranking/routing against WI-29 ingested AIDB. Reuse qualified entity/KS retrieval and evaluation; configure embeddings/reranker or explicit degraded policy. Retain ranking as typed artifacts initially rather than assume read-only ranking tables are writable.",
+      "acceptance": "Agent starts with use case/policy and truly retrieves, no full answer injection. Engineering acceptance choices frozen before run: ≥6 use cases +2 held-out; recall@k≥0.90 with k=min(dataset size,max(10,independent relevant-set size)), zero-relevant cases require abstention; all hard routing constraints, traceable factual support and median usefulness≥4/5. Never shrink gold labels to pass. Record candidate/evidence/dimension/uncertainty/routing lineage and incomparable/missing cases; version rubric.",
+      "provenance": "OC-D178/179; F3 retrieval/ranking/routing",
+      "linear": {
+        "id": "839835ab-36df-4ee0-8a6a-847751ea4da9",
+        "identifier": "OVE-192",
+        "url": "https://linear.app/overtonbell/issue/OVE-192/oc-evaluate-database-grounded-model-retrieval-ranking-and-routing"
+      },
+      "sequence": 30,
+      "definition_of_done": "At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.",
+      "description": "Parent specification: [OVE-162](https://linear.app/overtonbell/issue/OVE-162/oc-final-output-contracts-exact-context-and-knowledge-service)\n\n## Problem and observable result\n\nRun F3 use-case retrieval/ranking/routing against [OVE-191](https://linear.app/overtonbell/issue/OVE-191/oc-ingest-the-model-and-benchmark-dataset-with-exact-native-provenance) (WI-29) ingested AIDB. Reuse qualified entity/KS retrieval and evaluation; configure embeddings/reranker or explicit degraded policy. Retain ranking as typed artifacts initially rather than assume read-only ranking tables are writable.\n\n## Owning interfaces and cutover\n\nAI Engineer retrieval/ranking experiment + KS/AIDB query/evaluation.\n\nRun F3 use-case retrieval/ranking/routing against [OVE-191](https://linear.app/overtonbell/issue/OVE-191/oc-ingest-the-model-and-benchmark-dataset-with-exact-native-provenance) (WI-29) ingested AIDB. Reuse qualified entity/KS retrieval and evaluation; configure embeddings/reranker or explicit degraded policy. Retain ranking as typed artifacts initially rather than assume read-only ranking tables are writable.\n\n## Acceptance and recovery proof\n\n- [ ] Agent starts with use case/policy and truly retrieves, no full answer injection. Engineering acceptance choices frozen before run: ≥6 use cases +2 held-out; recall@k≥0.90 with k=min(dataset size,max(10,independent relevant-set size)), zero-relevant cases require abstention; all hard routing constraints, traceable factual support and median usefulness≥4/5. Never shrink gold labels to pass. Record candidate/evidence/dimension/uncertainty/routing lineage and incomparable/missing cases; version rubric.\n- [ ] At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.\n\n## Dependencies and execution\n\nBlocked by: [OVE-191](https://linear.app/overtonbell/issue/OVE-191/oc-ingest-the-model-and-benchmark-dataset-with-exact-native-provenance) (WI-29). Native blocker relations are authoritative. Phase: post-sprint.\n\nClaim repository/base and bounded writable scope before work; coordinate shared protocol/bootstrap/migration files with integrator. Necessary code/schema/import changes and disposable-target rebuilds are within the accepted assignment. Escalate missing credentials/authority or contradictory goals, not routine engineering.\n\n## Provenance\n\n* Owner final synthesis request, 2026-10-26; final handoff through OC-D181.\n* Decisions: OC-D178/179; F3 retrieval/ranking/routing\n* Canonical: `mission-control-general/general-mission-control/OUTPUT-CONTRACTS.md` §§5, 12; ADR-0058–0062.\n* Execution: `docs/specs/provider-consolidation-2026-10/sprint-oc/IMPLEMENTATION.md`, `PROOFS.md`, `DECISIONS.md`; planning key WI-30.\n* Source audit: MC 1863017c, KS b45adf5, AIDB 306efd7, BKS c398177. New specification files are uncommitted synthesis outputs, not runtime proof.\n* Terms: Output Obligation, Obligation Fulfillment, Sealed Transfer Plan, Delivery Receipt, Current Accepted Set.",
+      "draft_path": ".scratch/final-synthesis/issues/30-wi-30.md",
+      "linear_blockers": [
+        "OVE-191"
+      ]
+    },
+    {
+      "key": "WI-31",
+      "title": "Close stress feedback loops and hand off product-architecture evidence",
+      "phase": "post-sprint",
+      "status": "ready-for-agent",
+      "owner": "Integrator + independent evaluator + owning repair agents",
+      "blocks_on": [
+        "WI-27",
+        "WI-28",
+        "WI-30"
+      ],
+      "spec_sections": [
+        12
+      ],
+      "result": "Aggregate final independent stress outcomes and verify closure of owning-layer fixes, versioned reruns and retained regressions. Active fixture issues and WI-26 own immediate repair loops; they never wait for this downstream card. Produce evidence handoff for subsequent full education and Biotech product architecture.",
+      "cutover": "Aggregate final independent stress outcomes and verify closure of owning-layer fixes, versioned reruns and retained regressions. Active fixture issues and WI-26 own immediate repair loops; they never wait for this downstream card. Produce evidence handoff for subsequent full education and Biotech product architecture.",
+      "acceptance": "Each required criterion passes or explicit owner scope disposition; unresolved source/tool/authority is truthful blocker. Versioned before/after results, held-out regressions, cost/latency and independent reviewer. Full product design follows; experimental records need not survive. No unlimited looping or silent objective reduction.",
+      "provenance": "OC-D178–181; feedback/sequence",
+      "linear": {
+        "id": "532b9336-d3eb-468c-9747-c86d61646c77",
+        "identifier": "OVE-193",
+        "url": "https://linear.app/overtonbell/issue/OVE-193/oc-close-stress-feedback-loops-and-hand-off-product-architecture"
+      },
+      "sequence": 31,
+      "definition_of_done": "At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.",
+      "description": "Parent specification: [OVE-162](https://linear.app/overtonbell/issue/OVE-162/oc-final-output-contracts-exact-context-and-knowledge-service)\n\n## Problem and observable result\n\nAggregate final independent stress outcomes and verify closure of owning-layer fixes, versioned reruns and retained regressions. Active fixture issues and WI-26 own immediate repair loops; they never wait for this downstream card. Produce evidence handoff for subsequent full education and Biotech product architecture.\n\n## Owning interfaces and cutover\n\nIntegrator + independent evaluator + owning repair agents.\n\nAggregate final independent stress outcomes and verify closure of owning-layer fixes, versioned reruns and retained regressions. Active fixture issues and WI-26 own immediate repair loops; they never wait for this downstream card. Produce evidence handoff for subsequent full education and Biotech product architecture.\n\n## Acceptance and recovery proof\n\n- [ ] Each required criterion passes or explicit owner scope disposition; unresolved source/tool/authority is truthful blocker. Versioned before/after results, held-out regressions, cost/latency and independent reviewer. Full product design follows; experimental records need not survive. No unlimited looping or silent objective reduction.\n- [ ] At each major commit/integration milestone, run independent clean-code/spec review, update affected AGENTS/OKF/schema/API/operator docs with the owning generators, run affected lint/type/native/functional checks, fix findings and rerun. Record four-owner schema fit, source/install pins, real vs doubled evidence and passed/failed/blocked/unrun results. Use IMPLEMENTATION §§4/6/7 and PROOFS; necessary migrations/cutovers belong in this slice.\n\n## Dependencies and execution\n\nBlocked by: [OVE-189](https://linear.app/overtonbell/issue/OVE-189/oc-run-generation-lab-exhaustive-discovery-and-report-intent-stress) (WI-27), [OVE-190](https://linear.app/overtonbell/issue/OVE-190/oc-run-qualia-life-product-ingredient-study-verification-stress-graph) (WI-28), [OVE-192](https://linear.app/overtonbell/issue/OVE-192/oc-evaluate-database-grounded-model-retrieval-ranking-and-routing) (WI-30). Native blocker relations are authoritative. Phase: post-sprint.\n\nClaim repository/base and bounded writable scope before work; coordinate shared protocol/bootstrap/migration files with integrator. Necessary code/schema/import changes and disposable-target rebuilds are within the accepted assignment. Escalate missing credentials/authority or contradictory goals, not routine engineering.\n\n## Provenance\n\n* Owner final synthesis request, 2026-10-26; final handoff through OC-D181.\n* Decisions: OC-D178–181; feedback/sequence\n* Canonical: `mission-control-general/general-mission-control/OUTPUT-CONTRACTS.md` §§12; ADR-0058–0062.\n* Execution: `docs/specs/provider-consolidation-2026-10/sprint-oc/IMPLEMENTATION.md`, `PROOFS.md`, `DECISIONS.md`; planning key WI-31.\n* Source audit: MC 1863017c, KS b45adf5, AIDB 306efd7, BKS c398177. New specification files are uncommitted synthesis outputs, not runtime proof.\n* Terms: Output Obligation, Obligation Fulfillment, Sealed Transfer Plan, Delivery Receipt, Current Accepted Set.",
+      "draft_path": ".scratch/final-synthesis/issues/31-wi-31.md",
+      "linear_blockers": [
+        "OVE-189",
+        "OVE-190",
+        "OVE-192"
+      ]
+    }
+  ],
+  "unselected": [
+    "WI-20: integrated preflight/impact-preview; F20-19 unanswered",
+    "F20-18: specialized code integration; unanswered"
+  ],
+  "publication_verified_at": "2026-10-27T01:36:56.931253+00:00"
+}

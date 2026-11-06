@@ -1,0 +1,617 @@
+{
+  "record_format": "run2-partial-closure-diagnosis/1",
+  "prepared_utc": "2026-10-17T18:52:59.177804+00:00",
+  "inspected_main_head": "bbb70c2059b191ebe07b181a293da40d796000c4",
+  "application_service_commit": "d106d0c7191d25cda618ebd25fcebfff25aa1120",
+  "application_source_pins_unchanged": true,
+  "frozen_original_operator_source_pins_unchanged": true,
+  "actual_closure_action_sha256": "7a5a084df2ed1ba629ede82fee9c053b11d02d818e8843f1b88f8314d45171f4",
+  "original_consumed_intent_must_not_be_reused": true,
+  "actual_closure_receipt": {
+    "path": "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\run2-completion-offline\\.scratch\\run2-completion-20261017\\continuation-v8\\recovery\\closure-host-r11\\owned-host-coordinated1.json",
+    "sha256": "3a2bbcba97e1a612571d76821f749efdeff0c8226a430fa499a9b73baaf519e8",
+    "outer_seconds": 306.546,
+    "guardian_seconds": 306.219,
+    "primary_seconds": 250.683,
+    "independent_observer_seconds": 55.532,
+    "owned_processes_reaped": true,
+    "forced_kill": false
+  },
+  "read_only_diagnosis": {
+    "utc_started": "2026-10-17T18:37:41.792397+00:00",
+    "provider_calls": 0,
+    "SQL_writes": 0,
+    "workers": 0,
+    "routing_mutations": 0,
+    "intent_claims": 0,
+    "credentials_saved": false,
+    "steps": {
+      "family_description": {
+        "seconds": 0.048,
+        "passed": true
+      },
+      "family_history": {
+        "seconds": 0.078,
+        "passed": true
+      },
+      "root_description": {
+        "seconds": 0.035,
+        "passed": true
+      },
+      "root_history": {
+        "seconds": 0.042,
+        "passed": true
+      },
+      "default_routing": {
+        "seconds": 0.048,
+        "passed": true
+      },
+      "receipt": {
+        "seconds": 0.531,
+        "passed": true
+      },
+      "family_head": {
+        "seconds": 0.522,
+        "passed": true
+      },
+      "family_journal": {
+        "seconds": 0.523,
+        "passed": true
+      },
+      "run": {
+        "seconds": 0.463,
+        "passed": true
+      },
+      "budget": {
+        "seconds": 0.464,
+        "passed": true
+      },
+      "effects": {
+        "seconds": 0.464,
+        "passed": true
+      },
+      "cancel_statuses": {
+        "seconds": 0.656,
+        "passed": true
+      },
+      "typed_result": {
+        "seconds": 0.477,
+        "passed": true
+      },
+      "protected_snapshot": {
+        "seconds": 3.194,
+        "passed": true
+      },
+      "canonical_read_only_exact_completion_replay": {
+        "seconds": 1.704,
+        "passed": true
+      }
+    },
+    "private_audit_root": "/home/overton/.local/state/mission-control/qualification/run2/recovery/remaining-closure-l3brnpgi",
+    "expected": {
+      "commit_digest": "sha256:fdc1c0e65b6fb47ac25a6af2d92d4beba5fea5967092724a260e48ea88088bd0",
+      "command_id": "stagegraph:complete-fa027a19efbd1ebadffcb17509b953248305ce50cf5413fe6880376967f4f468",
+      "mutation_id": "complete-fa027a19efbd1ebadffcb17509b953248305ce50cf5413fe6880376967f4f468",
+      "run_version": 9,
+      "family_version": 3
+    },
+    "read_only_pool_principals": [
+      {
+        "session_user": "mc_ai_engineer_runtime_login",
+        "current_user": "mc_ai_engineer_runtime_login",
+        "readonly": "on"
+      },
+      {
+        "session_user": "mc_ai_engineer_family_login",
+        "current_user": "mc_ai_engineer_family_login",
+        "readonly": "on"
+      },
+      {
+        "session_user": "mc_ai_engineer_runtime_login",
+        "current_user": "mc_ai_engineer_runtime_login",
+        "readonly": "on"
+      }
+    ],
+    "family": {
+      "status": 1,
+      "events": 50,
+      "digest": "b31d61bc9ac1b3683034a0aad104429f0a1058a52f37b8b23bf5eece8c441ccd",
+      "target_build": "run2-remaining-closure-d106d0c7-v11",
+      "pending_activities": [
+        {
+          "activity_id": "4",
+          "type": "stagegraph.complete",
+          "attempt": 2,
+          "state": 1,
+          "last_failure": [
+            {
+              "message": "bounded_remaining_family_refused_or_uncertain",
+              "type": "",
+              "non_retryable": false
+            }
+          ]
+        }
+      ],
+      "suffix": [
+        {
+          "id": 43,
+          "type": "EVENT_TYPE_WORKFLOW_EXECUTION_OPTIONS_UPDATED"
+        },
+        {
+          "id": 44,
+          "type": "EVENT_TYPE_WORKFLOW_TASK_STARTED"
+        },
+        {
+          "id": 45,
+          "type": "EVENT_TYPE_WORKFLOW_TASK_COMPLETED"
+        },
+        {
+          "id": 46,
+          "type": "EVENT_TYPE_MARKER_RECORDED"
+        },
+        {
+          "id": 47,
+          "type": "EVENT_TYPE_UPSERT_WORKFLOW_SEARCH_ATTRIBUTES"
+        },
+        {
+          "id": 48,
+          "type": "EVENT_TYPE_MARKER_RECORDED"
+        },
+        {
+          "id": 49,
+          "type": "EVENT_TYPE_UPSERT_WORKFLOW_SEARCH_ATTRIBUTES"
+        },
+        {
+          "id": 50,
+          "type": "EVENT_TYPE_ACTIVITY_TASK_SCHEDULED"
+        }
+      ]
+    },
+    "root": {
+      "status": 1,
+      "events": 17,
+      "digest": "1074e4f76a917510582e113f643a7dab371a1dc2b264ca923f9e15ccbfb4d8a2",
+      "target_build": "run2-remaining-closure-d106d0c7-v11",
+      "pending_activities": [],
+      "suffix": [
+        {
+          "id": 17,
+          "type": "EVENT_TYPE_WORKFLOW_EXECUTION_OPTIONS_UPDATED"
+        }
+      ]
+    },
+    "default_routing": {
+      "current_version": "mission-control.0.1.0-a8d69c5b4850",
+      "current_version_changed_time": "2026-10-16T06:25:36.277805333Z",
+      "current_deployment_version": {
+        "build_id": "0.1.0-a8d69c5b4850",
+        "deployment_name": "mission-control"
+      },
+      "revision_number": "10"
+    },
+    "exact_commit_comparisons": {
+      "receipt_equal": true,
+      "head_canonical_equal": true,
+      "journal_canonical_equal": true,
+      "run_equal": true,
+      "budget_equal": true,
+      "effects_equal": true
+    },
+    "run": {
+      "version": 9,
+      "phase": "terminal",
+      "terminal_outcome": "cancelled"
+    },
+    "receipt": {
+      "digest": "sha256:4a5d9842f64f96abbe7a8cbcbcf9efa1840449f43265f6f8ee4e85b2da895dfc",
+      "status": "accepted",
+      "version": 9,
+      "family_version": 3,
+      "family_fingerprint": "sha256:efdab9b36ce55ef38a49bb422a83d98cd59c72b1558b99e80a152cb5c5a3cc7a"
+    },
+    "reservations": {},
+    "typed_result_present": false,
+    "original_cancellation": [
+      {
+        "command_id": "6a5398e3-2a73-4351-a354-a24a9a4ddc4b",
+        "state": "applied",
+        "receipt_count": 3,
+        "last_run_version": null
+      }
+    ],
+    "protected_snapshot": {
+      "digest": "sha256:a103263185922b1da2994ac167a8f3d4a692b5dbe4dff9c81cf10f8565050534",
+      "changed_domains": [
+        "budgets",
+        "cancel",
+        "cancel_delivery",
+        "commands",
+        "effects",
+        "family_head",
+        "family_journal",
+        "family_results",
+        "ledger_commits",
+        "mission",
+        "mission_events",
+        "outbox",
+        "request_receipts",
+        "run",
+        "transitions"
+      ],
+      "exact_expected_domains": true,
+      "row_deltas": {
+        "agent_sessions": 0,
+        "binding": 0,
+        "budget_entries": 0,
+        "budgets": 0,
+        "cancel": 0,
+        "cancel_delivery": 1,
+        "claim": 0,
+        "commands": 0,
+        "effect_entries": 0,
+        "effects": 0,
+        "family_head": 0,
+        "family_journal": 1,
+        "family_results": 1,
+        "frames": 0,
+        "harness": 0,
+        "intent": 0,
+        "journal": 0,
+        "ledger_commits": 1,
+        "mission": 0,
+        "mission_events": 2,
+        "outbox": 2,
+        "receipts": 0,
+        "request_receipts": 1,
+        "run": 0,
+        "session_turns": 0,
+        "settlements": 0,
+        "technical_attempts": 0,
+        "transitions": 1
+      },
+      "usage_and_settlement_facts_unchanged": true
+    },
+    "canonical_completion_replay": {
+      "accepted": true,
+      "outcome": "cancelled",
+      "run_version": 9,
+      "reason_code": "accepted",
+      "SQL_write_capability": false
+    },
+    "owned_pools_closed": true,
+    "utc_finished": "2026-10-17T18:37:56.053940+00:00"
+  },
+  "exact_history_capture": {
+    "provider_calls": 0,
+    "SQL_writes": 0,
+    "workflow_mutations": 0,
+    "intent_claims": 0,
+    "utc": "2026-10-17T18:50:24.088705+00:00",
+    "private_root": "/home/overton/.local/state/mission-control/qualification/run2/recovery/residual-proof-bgq_2q_w",
+    "family": {
+      "events": 50,
+      "event_digest": "b31d61bc9ac1b3683034a0aad104429f0a1058a52f37b8b23bf5eece8c441ccd",
+      "proto_sha256": "87ad374ffbae2f98bae06a1dee63a94f502c5eb28c34859375b4337832b8b30c",
+      "patches_and_search_attributes": [
+        {
+          "event": 5,
+          "marker": "core_patch",
+          "details": {
+            "patch-data": [
+              {
+                "id": "run2-stagegraph-noncognitive-human-gate",
+                "deprecated": false
+              }
+            ]
+          }
+        },
+        {
+          "event": 6,
+          "search_attributes": {
+            "TemporalChangeVersion": {
+              "metadata": {
+                "encoding": "json/plain",
+                "type": "KeywordList"
+              },
+              "value": [
+                "run2-stagegraph-noncognitive-human-gate"
+              ]
+            }
+          }
+        },
+        {
+          "event": 7,
+          "marker": "core_patch",
+          "details": {
+            "patch-data": [
+              {
+                "id": "ft-c4-family-phase",
+                "deprecated": false
+              }
+            ]
+          }
+        },
+        {
+          "event": 8,
+          "search_attributes": {
+            "TemporalChangeVersion": {
+              "metadata": {
+                "encoding": "json/plain",
+                "type": "KeywordList"
+              },
+              "value": [
+                "ft-c4-family-phase",
+                "run2-stagegraph-noncognitive-human-gate"
+              ]
+            }
+          }
+        },
+        {
+          "event": 9,
+          "search_attributes": {
+            "mc_phase": {
+              "metadata": {
+                "encoding": "json/plain",
+                "type": "Keyword"
+              },
+              "value": "executing"
+            }
+          }
+        },
+        {
+          "event": 16,
+          "marker": "core_patch",
+          "details": {
+            "patch-data": [
+              {
+                "id": "run2-stagegraph-durable-budget-admission-rejection",
+                "deprecated": false
+              }
+            ]
+          }
+        },
+        {
+          "event": 17,
+          "search_attributes": {
+            "TemporalChangeVersion": {
+              "metadata": {
+                "encoding": "json/plain",
+                "type": "KeywordList"
+              },
+              "value": [
+                "ft-c4-family-phase",
+                "run2-stagegraph-durable-budget-admission-rejection",
+                "run2-stagegraph-noncognitive-human-gate"
+              ]
+            }
+          }
+        },
+        {
+          "event": 46,
+          "marker": "core_patch",
+          "details": {
+            "patch-data": [
+              {
+                "id": "mp12-stagegraph-drain-before-continue-as-new",
+                "deprecated": false
+              }
+            ]
+          }
+        },
+        {
+          "event": 47,
+          "search_attributes": {
+            "TemporalChangeVersion": {
+              "metadata": {
+                "encoding": "json/plain",
+                "type": "KeywordList"
+              },
+              "value": [
+                "ft-c4-family-phase",
+                "mp12-stagegraph-drain-before-continue-as-new",
+                "run2-stagegraph-durable-budget-admission-rejection",
+                "run2-stagegraph-noncognitive-human-gate"
+              ]
+            }
+          }
+        },
+        {
+          "event": 48,
+          "marker": "core_patch",
+          "details": {
+            "patch-data": [
+              {
+                "id": "rrm-008-stagegraph-cancellation-saga",
+                "deprecated": false
+              }
+            ]
+          }
+        },
+        {
+          "event": 49,
+          "search_attributes": {
+            "TemporalChangeVersion": {
+              "metadata": {
+                "type": "KeywordList",
+                "encoding": "json/plain"
+              },
+              "value": [
+                "ft-c4-family-phase",
+                "mp12-stagegraph-drain-before-continue-as-new",
+                "rrm-008-stagegraph-cancellation-saga",
+                "run2-stagegraph-durable-budget-admission-rejection",
+                "run2-stagegraph-noncognitive-human-gate"
+              ]
+            }
+          }
+        }
+      ],
+      "activity_payload_sha256": "8b9fb66c5fcbfbdbaca8044f7a9df2d84e938f9a4a316c6bd92ca1f55a26c9cb",
+      "canonical_request_digest": "sha256:1b19f87a0677c0e4d8be857d602f7a9d9bf37472916876905b6690746cb3923b",
+      "activity_type": "stagegraph.complete",
+      "activity_id": "4",
+      "scheduled_event_id": 50
+    },
+    "root": {
+      "events": 17,
+      "event_digest": "1074e4f76a917510582e113f643a7dab371a1dc2b264ca923f9e15ccbfb4d8a2",
+      "proto_sha256": "f62186c318b5af1f05152aca4c39b3410549a84e712cc707b87302b697ddce83",
+      "patches_and_search_attributes": [
+        {
+          "event": 5,
+          "marker": "core_patch",
+          "details": {
+            "patch-data": [
+              {
+                "id": "ft-g7-mc-visibility",
+                "deprecated": false
+              }
+            ]
+          }
+        },
+        {
+          "event": 6,
+          "search_attributes": {
+            "TemporalChangeVersion": {
+              "metadata": {
+                "type": "KeywordList",
+                "encoding": "json/plain"
+              },
+              "value": [
+                "ft-g7-mc-visibility"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "expected-commit.json": {
+      "sha256": "ae65eb29f8efd038c1604e1c7d0c8fc194a1306b5f91b105bd3075e18743b9c1",
+      "source_root": "/home/overton/.local/state/mission-control/qualification/run2/recovery/remaining-closure-l3brnpgi"
+    },
+    "seal-stagegraph.complete.json": {
+      "sha256": "14ce0f3c6d0e5483ff89b854938e032961f6a80de0e486db52fb8d6773bba15d",
+      "source_root": "/home/overton/.local/state/mission-control/qualification/run2/recovery/remaining-closure-l3brnpgi"
+    },
+    "before.json": {
+      "sha256": "805c1cab41e3fc116e40fb3b0299bae0109e82b27f580ce77e656e0175e46d7c",
+      "source_root": "/home/overton/.local/state/mission-control/qualification/run2/recovery/remaining-closure-l3brnpgi"
+    },
+    "consumed_closure_intent": {
+      "sha256": "068d1d4057e5a5cfed01f65a820df9db7a98dacf24d607f88d6c1979b85a5e98",
+      "filename": "r2b-6f2c83986950208017b91aff193ee9f036b78ecf0ea29f5bc9ec8882fec7794b.once.json"
+    },
+    "owned_pools_closed": true
+  },
+  "native_resource_checks": {
+    "source_pins": {
+      ".agents\\skills\\coding-cli-jobs\\scripts\\resource_admission.py": "1edadb7a0d75e3c8e2ab786ccb3130b367ea8866436d496f24fbb68a8d0880c7",
+      ".agents\\skills\\coding-cli-jobs\\tests\\test_resource_admission.py": "2e711ac551b343fc3f80ca6c3541cfb63a273187b4461f2277cc55d9c355c58a"
+    },
+    "external_calls": 0,
+    "provider_calls": 0,
+    "tests": [
+      {
+        "tag": "ruff",
+        "exit_code": 0,
+        "reason": null,
+        "seconds": 0.11,
+        "admission": {
+          "disposition": "admitted",
+          "elapsed_seconds": 0.0,
+          "requirement": {
+            "start_bytes": 1610612736,
+            "commit_bytes": 1610612736,
+            "basis": "default-unmeasured"
+          },
+          "sample": {
+            "available_bytes": 3082321920,
+            "commit_limit_bytes": 32883335168,
+            "committed_bytes": 28287156224,
+            "owned_peak_bytes": null
+          },
+          "reason": "capacity-ready"
+        },
+        "log": "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\completion-replay-evidence\\resource-admission-v2-ruff.txt",
+        "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+      },
+      {
+        "tag": "mypy",
+        "exit_code": 0,
+        "reason": null,
+        "seconds": 0.515,
+        "admission": {
+          "disposition": "admitted",
+          "elapsed_seconds": 0.0,
+          "requirement": {
+            "start_bytes": 1610612736,
+            "commit_bytes": 1610612736,
+            "basis": "default-unmeasured"
+          },
+          "sample": {
+            "available_bytes": 3081146368,
+            "commit_limit_bytes": 32883335168,
+            "committed_bytes": 28290461696,
+            "owned_peak_bytes": null
+          },
+          "reason": "capacity-ready"
+        },
+        "log": "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\completion-replay-evidence\\resource-admission-v2-mypy.txt",
+        "log_sha256": "c57dcdaf6ea259ecd683e1d7177a36a2d19cb37a485c53ac886564c9c4b8fe3a"
+      },
+      {
+        "tag": "unittest",
+        "exit_code": 0,
+        "reason": null,
+        "seconds": 0.219,
+        "admission": {
+          "disposition": "admitted",
+          "elapsed_seconds": 0.0,
+          "requirement": {
+            "start_bytes": 1610612736,
+            "commit_bytes": 1610612736,
+            "basis": "default-unmeasured"
+          },
+          "sample": {
+            "available_bytes": 3052769280,
+            "commit_limit_bytes": 32883335168,
+            "committed_bytes": 28294627328,
+            "owned_peak_bytes": null
+          },
+          "reason": "capacity-ready"
+        },
+        "log": "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\completion-replay-evidence\\resource-admission-v2-unittest.txt",
+        "log_sha256": "9c22784ba0873281517131ca76cd963bea6038d3fb7e75975162d154895f1cde"
+      }
+    ],
+    "native_memory_sample": {
+      "available_bytes": 3082346496,
+      "commit_limit_bytes": 32883335168,
+      "committed_bytes": 28287156224,
+      "owned_peak_bytes": null
+    }
+  },
+  "source_verification_profile": {
+    "loaded_product_modules": 264,
+    "contract_files": 61,
+    "module_warm_seconds": 10.258,
+    "wall_seconds": [
+      6.048,
+      5.895
+    ],
+    "cpu_seconds": [
+      0.77,
+      0.746
+    ],
+    "process_peak_rss_kib": 169684,
+    "whole_host_peak_measurement": false,
+    "original_inner_failure_cause_proven": false
+  },
+  "no_new_canonical_product_defect_established": true,
+  "new_residual_delivery_activated": false,
+  "source_receipts": {
+    "partial-closure-diagnosis2.json": "57feb6d18b812cae915e6bf2487505e5988285181aedc46e264f064b6d739066",
+    "partial-closure-diagnosiscapture2.json": "a297375e083a5a05e42a36448089ff67684b638209dffb5268bae1cdbbf6fcb0",
+    "resource-admission-native-checks-v2.json": "eb8583ae9cbaa2e4cfabd555cd612802689cece6ef3e12b5cd0c29d0ce3c8ad0"
+  }
+}

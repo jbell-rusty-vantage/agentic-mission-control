@@ -1,0 +1,9 @@
+{
+  "schema_version": "mc.skill_bundle.v1",
+  "name": "mc-signals",
+  "version": "0.1.0",
+  "service_contract_range": ">=0.1.0,<0.2.0",
+  "files": {
+    "SKILL.md": "sha256:2a85e1e290bd1ad196589a8f333c6fffb54a75d31d1b55f140abe088bc40507b"
+  }
+}

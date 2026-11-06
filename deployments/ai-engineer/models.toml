@@ -1,0 +1,220 @@
+# Model Profiles for the `ai-engineer` installation (mc.model_catalog.v1, ADR-0063, Sprint OC R6 / OVE-200).
+# One `[[models]]` row per Model Profile (`domain/resolution/profiles.py::ModelProfile`): the name a
+# manifest writes in `model.profile`, the vendor and exact model id it resolves to, the context window,
+# list prices and the most sensitive Data Class the row may receive. A row names no lane: the lane's
+# describe declares which vendors it routes (`model_routes`), and the resolver refuses an unrouted
+# pairing with MODEL_ROUTE_UNSUPPORTED. Bootstrap loads this file into the Model Catalog
+# (`bootstrap/model_profiles.py`); `GET /v1/applications/ai-engineer/models` and `missionctl model list`
+# show it with each lane's route verdict.
+#
+# The `*.default` rows are the PROOFS §6 runtime pins (OC-D185); the `*.fallback` rows are the PROOFS §6
+# fallbacks, so the W0 availability probe can substitute by data (select the fallback profile, or edit
+# the default row) without a code change. Distinct from the AI Engineer knowledge schema's model
+# entities (OC-D201): these rows seed workflows; they are not knowledge.
+#
+# Facts and sources (all retrieved 2026-10-27 from the vendors' public pages):
+# - [A-models]  https://platform.claude.com/docs/en/about-claude/models/overview (IDs, 1M context
+#               window, 128K max output, text and image input, tool use for every current model)
+# - [A-pricing] https://platform.claude.com/docs/en/about-claude/pricing (base input/output per MTok;
+#               Claude Haiku 5.5 is priced by prompt length: the rows carry the <=100,000-token tier
+#               $0.10/$0.50; prompts over 100,000 tokens pay $0.50/$2.50)
+# - [A-struct]  https://platform.claude.com/docs/en/build-with-claude/structured-outputs (supportedModels
+#               lists claude-sonnet-5-5 and claude-haiku-5-5)
+# - [O-terra]   https://developers.openai.com/api/docs/models/gpt-5.6-terra (1,050,000 context window,
+#               922,000 max input, 128,000 max output, $2/$12; prompts over 272K input tokens cost 2x
+#               input and 1.5x output; structured outputs, function calling, image input)
+# - [O-luna]    https://developers.openai.com/api/docs/models/gpt-5.6-luna (1,050,000 context window,
+#               922,000 max input, 128,000 max output, $0.20/$1.20; structured outputs, function
+#               calling, image input)
+# - [O-mini]    https://developers.openai.com/api/docs/models/gpt-5.4-mini (400,000 context window,
+#               272,000 max input, 128,000 max output, $0.75/$4.50; snapshot gpt-5.4-mini-2026-03-17;
+#               structured outputs, function calling, image input)
+# `context_window_tokens` is the vendor's stated context window; `max_input_tokens` is the largest
+# prompt the vendor accepts and is what sizes a context: the OpenAI pages state 922,000 (272,000 for
+# gpt-5.4-mini); the Anthropic pages state no input limit apart from the 1M window, so it is the window.
+# `[[models.price_tiers]]` are long-prompt list prices for the whole request above `above_input_tokens`:
+# Claude Haiku 5.5 above 100,000 ([A-pricing]) and gpt-5.6-terra above 272,000 ([O-terra]). No tier is
+# stated for gpt-5.6-luna; gpt-5.4-mini accepts no prompt above 272,000. Re-checked 2026-10-27: the
+# Sonnet 5.5 ($2 / $10) and Haiku 5.5 ($0.10 / $0.50) base prices are verbatim from [A-pricing].
+#
+# Data Class ceiling, engineering default (R6): `internal` on every row. Both vendors' commercial API
+# terms retain inputs and outputs for up to 30 days by default (Anthropic: "we automatically delete
+# inputs and outputs on our backend within 30 days", https://privacy.claude.com/en/articles/
+# 7996866-how-long-do-you-store-my-organization-s-data; OpenAI: "abuse monitoring logs ... retained for
+# up to 30 days", https://developers.openai.com/api/docs/guides/your-data); zero data retention and a
+# BAA exist only by separate agreement, and none is recorded for this installation. That matches the
+# hosted agent API default (`domain/execution/data_class.py`, public and internal) and this
+# application's own ceiling. A row may be raised only with a recorded ZDR or BAA.
+# Structured-output strategy (W1 D16, `structured_output`, required with `supports` structured_output):
+# - `tool_auto` (the schema as an ordinary tool, tool_choice auto, the host requiring exactly one valid
+#   call) for Claude Sonnet 5.5. It rejects forced tool use with 400 `tool_choice: type "tool" and "any"
+#   are not supported for this model` (W1 run 0da30ad0, D16), and `provider_native` compiled the executor
+#   observation as 400 "Schema is too complex." on every request (W1 run 457bd952, D18): the schema is
+#   inside the published limits (24 optional, 16 union-typed parameters, [A-struct]) but over the
+#   unpublished compiled-grammar limit; `tool_auto` compiles no grammar.
+# - `tool_forced` (the schema as a tool the model must call) for Claude Haiku 5.5, which accepts forced
+#   tool_choice (W1 runs 361d04a8 / 3081b3e4 returned the observation this way), and for gpt-5.6-terra
+#   and gpt-5.6-luna, the strategy LangChain auto-detection gave them in the earlier proofs.
+# - `provider_native` for gpt-5.4-mini, again the strategy the earlier auto-detection gave it.
+# API surface (W1 D24, `api_surface`, required on an OpenAI row with tool use): `responses`.
+# OpenAI answered every judge call on /v1/chat/completions with 400 "Function tools with
+# reasoning_effort are not supported for gpt-5.6-terra in /v1/chat/completions. To use function
+# tools, use /v1/responses or set reasoning_effort to 'none'" (W1 session 7). Every OpenAI row
+# here calls tools (agents, the forced response tool, or provider_native beside agent tools), so
+# each uses the Responses API (langchain-openai `use_responses_api`) and keeps its reasoning.
+schema_version = "mc.model_catalog.v1"
+
+# Producer / executor cognition (Deep Agents lane). [A-models] [A-pricing] [A-struct]
+[[models]]
+profile = "producer.default"
+vendor = "anthropic"
+model_id = "claude-sonnet-5-5"
+context_window_tokens = 1_000_000
+max_input_tokens = 1_000_000
+cost_per_million_input = 2.0
+cost_per_million_output = 10.0
+supports = ["structured_output", "tool_use", "images"]
+structured_output = "tool_auto"
+data_class_ceiling = "internal"
+
+# Producer fallback (same vendor, next tier; Haiku for W-fixture dry runs). [A-models] [A-pricing] [A-struct]
+[[models]]
+profile = "producer.fallback"
+vendor = "anthropic"
+model_id = "claude-haiku-5-5"
+context_window_tokens = 1_000_000
+max_input_tokens = 1_000_000
+cost_per_million_input = 0.10
+cost_per_million_output = 0.50
+supports = ["structured_output", "tool_use", "images"]
+structured_output = "tool_forced"
+data_class_ceiling = "internal"
+# [A-pricing]: prompts over 100,000 tokens pay $0.50 / $2.50 for the whole request.
+[[models.price_tiers]]
+above_input_tokens = 100_000
+cost_per_million_input = 0.50
+cost_per_million_output = 2.50
+
+# Independent judge: a different vendor from the producer by design. [O-terra]
+[[models]]
+profile = "judge.default"
+vendor = "openai"
+model_id = "gpt-5.6-terra"
+context_window_tokens = 1_050_000
+max_input_tokens = 922_000
+cost_per_million_input = 2.0
+cost_per_million_output = 12.0
+supports = ["structured_output", "tool_use", "images"]
+structured_output = "tool_forced"
+api_surface = "responses"
+data_class_ceiling = "internal"
+# [O-terra]: prompts over 272K input tokens cost 2x input and 1.5x output for the full request.
+[[models.price_tiers]]
+above_input_tokens = 272_000
+cost_per_million_input = 4.0
+cost_per_million_output = 18.0
+
+# Judge fallback. [O-luna]
+[[models]]
+profile = "judge.fallback"
+vendor = "openai"
+model_id = "gpt-5.6-luna"
+context_window_tokens = 1_050_000
+max_input_tokens = 922_000
+cost_per_million_input = 0.20
+cost_per_million_output = 1.20
+supports = ["structured_output", "tool_use", "images"]
+structured_output = "tool_forced"
+api_surface = "responses"
+data_class_ceiling = "internal"
+
+# Independent auditor: separate credential and origin from the producer. [A-models] [A-pricing] [A-struct]
+[[models]]
+profile = "auditor.default"
+vendor = "anthropic"
+model_id = "claude-haiku-5-5"
+context_window_tokens = 1_000_000
+max_input_tokens = 1_000_000
+cost_per_million_input = 0.10
+cost_per_million_output = 0.50
+supports = ["structured_output", "tool_use", "images"]
+structured_output = "tool_forced"
+data_class_ceiling = "internal"
+# [A-pricing]: prompts over 100,000 tokens pay $0.50 / $2.50 for the whole request.
+[[models.price_tiers]]
+above_input_tokens = 100_000
+cost_per_million_input = 0.50
+cost_per_million_output = 2.50
+
+# Auditor fallback. [A-models] [A-pricing] [A-struct]
+[[models]]
+profile = "auditor.fallback"
+vendor = "anthropic"
+model_id = "claude-sonnet-5-5"
+context_window_tokens = 1_000_000
+max_input_tokens = 1_000_000
+cost_per_million_input = 2.0
+cost_per_million_output = 10.0
+supports = ["structured_output", "tool_use", "images"]
+structured_output = "tool_auto"
+data_class_ceiling = "internal"
+
+# Sync/async child default; the hosted async technical child runs on this row. [A-models] [A-pricing] [A-struct]
+[[models]]
+profile = "child.default"
+vendor = "anthropic"
+model_id = "claude-haiku-5-5"
+context_window_tokens = 1_000_000
+max_input_tokens = 1_000_000
+cost_per_million_input = 0.10
+cost_per_million_output = 0.50
+supports = ["structured_output", "tool_use", "images"]
+structured_output = "tool_forced"
+data_class_ceiling = "internal"
+# [A-pricing]: prompts over 100,000 tokens pay $0.50 / $2.50 for the whole request.
+[[models.price_tiers]]
+above_input_tokens = 100_000
+cost_per_million_input = 0.50
+cost_per_million_output = 2.50
+
+# Child fallback (PROOFS §6 names the other vendor here). [O-luna]
+[[models]]
+profile = "child.fallback"
+vendor = "openai"
+model_id = "gpt-5.6-luna"
+context_window_tokens = 1_050_000
+max_input_tokens = 922_000
+cost_per_million_input = 0.20
+cost_per_million_output = 1.20
+supports = ["structured_output", "tool_use", "images"]
+structured_output = "tool_forced"
+api_surface = "responses"
+data_class_ceiling = "internal"
+
+# Cheap classification and availability probes. [O-luna]
+[[models]]
+profile = "probe.default"
+vendor = "openai"
+model_id = "gpt-5.6-luna"
+context_window_tokens = 1_050_000
+max_input_tokens = 922_000
+cost_per_million_input = 0.20
+cost_per_million_output = 1.20
+supports = ["structured_output", "tool_use", "images"]
+structured_output = "tool_forced"
+api_surface = "responses"
+data_class_ceiling = "internal"
+
+# Probe fallback. [O-mini]
+[[models]]
+profile = "probe.fallback"
+vendor = "openai"
+model_id = "gpt-5.4-mini"
+context_window_tokens = 400_000
+max_input_tokens = 272_000
+cost_per_million_input = 0.75
+cost_per_million_output = 4.50
+supports = ["structured_output", "tool_use", "images"]
+structured_output = "provider_native"
+api_surface = "responses"
+data_class_ceiling = "internal"

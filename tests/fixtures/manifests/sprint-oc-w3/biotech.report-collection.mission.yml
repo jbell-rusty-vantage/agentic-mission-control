@@ -1,0 +1,92 @@
+# yaml-language-server: $schema=../../../../src/mission_control/contracts/schemas/mc.mission_manifest.v1.json
+# Sprint OC W3 slice A (OVE-170 / WI-07), Biotech: a label-report collection accumulated over
+# Goal Loop iterations into the exact current accepted set.
+#
+# Frozen inputs (OC-D192): `__PACK__` is replaced by the driver before compile with
+# {"reports":[<pack A>,<pack B>,<pack C>]}: three W1-style Biotech packs
+# (scripts/sprint_oc_w1_pack.mjs, one per Qualia Life product: its own reportId, task contract and
+# ONE captured "Other Ingredients" label quote with URL and capture sha256). The packs author NO
+# claim. Each iteration registers exactly ONE label report and submits it under the goal-scoped
+# collection promise with its own deliverable id; the verifier reads the whole current set and the
+# exact current-set index file.
+#
+#   reports        reference  required  goal scope, exactly 3 distinct reports (revisions count once),
+#                                        each judged per exact revision through KS; a held report waits
+#                                        at goal scope without holding the next iteration
+#   progress_note  text       required  iteration scope
+#
+# Objective criteria: each report lists exactly the other ingredients its quote prints, in label
+# order, for the named product; each claim cites only its own label fragment; nothing about actives,
+# doses or effects; three distinct accepted reports after at least three iterations.
+manifest: mission/v1
+mission:
+  key: w3-qualia-label-report-collection
+  title: W3 label report collection for three Qualia Life products (frozen label excerpts)
+  application: biotech
+  description: >
+    Sprint OC W3 slice A. Goal Loop accumulation of three distinct per-product label reports into
+    the exact current accepted set, judged per member. Small real knowledge task with frozen inputs.
+  goals:
+    - key: label_ingredients_collection
+      description: |
+        Build the collection of three label reports, ONE report per iteration, one per pack in
+        PACK.reports (product order A, B, C). Use only each pack's quote; nothing about actives,
+        doses or effects; you author the claim; never write digest/tenant/binding/schemaVersion/producer;
+        record ids MUST start with that pack's reportId.
+        0 First read the current-set index file the host placed under /inputs/current-set/ (if
+        present): promise "root.reports" lists accepted heads and labelled candidates (held,
+        rejected, pending). Pick the FIRST pack whose deliverable "report-<product slug>" has no
+        accepted head and no held candidate; repair a rejected one; if all three are accepted or
+        held, submit only the progress note and stop.
+        1 For that ONE pack: one assertion, one support set and a four-section body exactly as the
+        W1 Biotech label report fixture prescribes.
+        2 report_register ONCE with the five keys "task", "fragments", "assertions", "supportSets"
+        and "report" = {"reportId":<pack.reportId>,"revision":1,"kind":"evidence_report",
+        "structuredBody":<body>}. On a refusal, fix the named fields AND append "-r2" to every
+        assertion and support-set id, then call once more; never invent a handle or digest.
+        3 submit_output obligation "root.reports", deliverable "report-<product slug>":
+        [{"kind":"handle","ref":<report handle>,"digest":<digest>}]. One report per act.
+        4 submit_output obligation "root.progress_note": inline text naming the product done this
+        iteration, what the index showed and which products remain.
+        Stop; never repeat a call that returned a receipt.
+
+        FROZEN PACK (three per-product packs, JSON): __PACK__
+      objectives:
+        - key: accumulate_label_reports
+          description: Accumulate three independently assessed per-product label reports in the current set
+      criteria:
+        - key: collection_accepted
+          description: Three distinct label report revisions are accepted heads of the collection promise, each independently assessed
+          evidence: [reports, progress_note]
+          acceptance: { human: review_accept }
+  environment:
+    lane: deep_agents
+    model: { profile: __PRODUCER__ }
+    sandbox: { profile: research.standard }
+    capabilities:
+      # Exact pins (seed mc.catalog.knowledge-tools@1.0.0), as in W1 (finding D7).
+      - { pin: "tool.knowledge-report-register@1#sha256:69e840eb7606d45285d5ebeb3ffe8a759353d4a3b7e495dfb2eb9c994b0474d2", kind: tool, as: report_register }
+      - { pin: "tool.knowledge-submit-output@2#sha256:f1fa75f1e3fa49e9061746cbe89f53a828e502fb93e142d3b34d8a854a2a64dd", kind: tool, as: submit_output }
+    budget: { usd: 1, tokens: 900000, wall_clock: 60m, tool_calls: 40 }
+    governors: { depth: 1, fan_out: 1, iterations: 4, patience: 2 }
+    side_effects: [read_only, workspace_write, external_write_reversible]
+  program:
+    key: root
+    behavior: goal_loop
+    objective: label_ingredients_collection
+    action_space: [root]
+    verifier:
+      independent: true
+      environment:
+        model: { profile: producer.fallback }
+    outputs:
+      - name: reports
+        form: reference
+        enforcement: required
+        scope: goal
+        cardinality: { min: 3, max: 3 }
+        requirements:
+          - { key: assessed, validator: "knowledge.report.assess@1" }
+      - { name: progress_note, form: text, enforcement: required, media_type: text/plain, scope: iteration }
+  controls:
+    commands_allowed: [pause, resume, cancel]

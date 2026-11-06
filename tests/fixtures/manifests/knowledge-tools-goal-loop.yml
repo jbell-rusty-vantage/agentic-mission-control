@@ -1,0 +1,49 @@
+# yaml-language-server: $schema=../../../src/mission_control/contracts/schemas/mc.mission_manifest.v1.json
+# W1 D27: the six knowledge tools bound at mission level into a GoalDirected (goal loop) program,
+# so the executor and the independent verifier templates both inherit them; the verifier must
+# not receive the producer's tools (report_register, knowledge_apply, submit_output).
+manifest: mission/v1
+mission:
+  key: knowledge-goal-report
+  title: Register and submit a research report
+  application: ai-engineer
+  goals:
+    - key: report
+      description: Produce one registered, independently assessed report
+      objectives:
+        - { key: draft_report, description: Draft and register the report }
+      criteria:
+        - key: assessed
+          description: The registered report is submitted for the report obligation
+          evidence: [report]
+          acceptance:
+            all:
+              - { human: review_accept }
+  environment:
+    lane: deep_agents
+    model: { profile: frontier.default }
+    sandbox: { profile: research.standard }
+    capabilities:
+      - { search: "exact knowledge read report revision", kind: tool, as: knowledge_read }
+      - { search: "governed knowledge apply native intent", kind: tool, as: knowledge_apply }
+      - { search: "research report registration", kind: tool, as: report_register }
+      - { search: "report derivation domain proposals", kind: tool, as: report_derive }
+      - { search: "claim verification evidence", kind: tool, as: verify_claims }
+      - { search: "output submission obligation handles", kind: tool, as: submit_output }
+      - { pin: "tool.knowledge-read-intent@1#sha256:2c591f2d5919e921a2b6cd3a71e8bc440f43c407174fb71995a70c4e03d9c639", kind: tool, as: knowledge_read_intent }
+    budget: { usd: 5, tokens: 200000, wall_clock: 1h, tool_calls: 40 }
+    governors: { depth: 1, fan_out: 1, iterations: 2, patience: 1 }
+    side_effects: [read_only, workspace_write, external_write_reversible]
+  program:
+    key: root
+    behavior: goal_loop
+    objective: report
+    action_space: [root]
+    verifier:
+      independent: true
+    outputs:
+      - name: report
+        form: reference
+        enforcement: required
+  controls:
+    commands_allowed: [pause, resume, cancel]

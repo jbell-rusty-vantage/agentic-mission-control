@@ -1,0 +1,3323 @@
+{
+  "actor_ref": "seed:mission-control-catalog",
+  "component_compatibility": ">=1.0.0 <2.0.0",
+  "depends_on": [
+    {
+      "seed_key": "mc.storage.capability-bundles",
+      "seed_version": "1.0.0"
+    }
+  ],
+  "description": "Portable cognition/sdlc, cognition/knowledge and cognition/mixed defaults. Exact constituent pins; hosted support remains unqualified. Application Knowledge Services binding is required separately.",
+  "format": "mission-control-seed/v1",
+  "records": [
+    {
+      "fields": {
+        "asset_id": "definition:skill:skill.mc-cognition-tdd",
+        "contract": "mission-control.published-definition/1",
+        "host_support": {
+          "profiles": {
+            "claude_agent_sdk": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "claude_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "claude_managed": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "codex_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "cursor_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "cursor_local": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "deep_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            }
+          },
+          "schema_version": "mc.capability_host_support.v1"
+        },
+        "kind": "skill_bundle",
+        "manifest": {
+          "definition": {
+            "attachment_targets": [
+              "agent.main"
+            ],
+            "body_summary": "Mission Control cognition guidance for tdd.",
+            "bundle_ref": {
+              "digest": "sha256:fe5806ccef8e27836c051675c0ddf730dea591552e3e75fb78dcfb47ecd185a8",
+              "media_type": "application/vnd.mc.capability-bundle+json",
+              "size_bytes": 614,
+              "uri": "capability-bundles://biotech/skill_bundle/skill.mc-cognition-tdd/0.1.0/fe5806ccef8e27836c051675c0ddf730dea591552e3e75fb78dcfb47ecd185a8"
+            },
+            "compatibility": {
+              "executables": [],
+              "network_capabilities": [],
+              "runtimes": [],
+              "workspace_capabilities": []
+            },
+            "compatible_compiler_versions": [
+              "control-plane-definitions/1"
+            ],
+            "conflicts_with": [],
+            "description": "Mission Control cognition guidance for tdd.",
+            "file_manifest": [
+              {
+                "digest": "sha256:1ad2fa004f9c3465d4de23149284c24ce118c4c4cf5f22b27211fd1f1cdd1b5d",
+                "executable": false,
+                "path": "SKILL.md",
+                "size_bytes": 363
+              },
+              {
+                "digest": "sha256:78cecf83f179827518725ef5165b17b4d10fbe15bec7f1a64b8f56be79763f4e",
+                "executable": false,
+                "path": "manifest.json",
+                "size_bytes": 251
+              }
+            ],
+            "frontmatter": {
+              "description": "Mission Control cognition guidance for tdd.",
+              "name": "mc-cognition-tdd"
+            },
+            "host_support": {
+              "profiles": {
+                "claude_agent_sdk": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "claude_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "claude_managed": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "codex_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "cursor_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "cursor_local": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "deep_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                }
+              },
+              "schema_version": "mc.capability_host_support.v1"
+            },
+            "kind": "skill",
+            "logical_id": "skill.mc-cognition-tdd",
+            "manifest_digest": "sha256:fe5806ccef8e27836c051675c0ddf730dea591552e3e75fb78dcfb47ecd185a8",
+            "maturity": "experimental",
+            "required_capabilities": [],
+            "review_status": "approved",
+            "schema_version": "1",
+            "skill_name": "mc-cognition-tdd",
+            "source_provenance": {
+              "commit_digest": null,
+              "license": null,
+              "locator": "capability-bundles://biotech/skill_bundle/skill.mc-cognition-tdd/0.1.0/fe5806ccef8e27836c051675c0ddf730dea591552e3e75fb78dcfb47ecd185a8",
+              "source": "local",
+              "upstream_identity": "skill.mc-cognition-tdd",
+              "upstream_version": "0.1.0"
+            },
+            "title": "mc-cognition-tdd"
+          },
+          "published_at": "2026-10-14T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:939d0b6b608de37144c7369189f5a12b06a13aea2e9ffc325c8d20450c41932e",
+            "kind": "skill",
+            "lifecycle_status": "published",
+            "logical_id": "skill.mc-cognition-tdd",
+            "payload_ref": null,
+            "revision": 1,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:95fe527756d70bafa0b6c07333bcbfbcb2d2722ae248ec3aab8d899d564e705a",
+        "manifest_ref": "mc-catalog://definition/skill/skill.mc-cognition-tdd/1",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "1"
+      },
+      "kind": "asset_version",
+      "logical_key": "cognition-profile:skill:skill.mc-cognition-tdd/1"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "cognition-profile:skill:skill.mc-cognition-tdd/1",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "docs/specs/materialization-observation-2026-10/SPEC-02-cognition.md",
+          "packages/mission-control-db-contract/seeds/cognition_profiles.py",
+          "skills/mc-cognition-tdd"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "cognition-profile:skill:skill.mc-cognition-tdd/1:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:skill:skill.mc-cognition-code-review",
+        "contract": "mission-control.published-definition/1",
+        "host_support": {
+          "profiles": {
+            "claude_agent_sdk": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "claude_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "claude_managed": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "codex_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "cursor_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "cursor_local": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "deep_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            }
+          },
+          "schema_version": "mc.capability_host_support.v1"
+        },
+        "kind": "skill_bundle",
+        "manifest": {
+          "definition": {
+            "attachment_targets": [
+              "agent.main"
+            ],
+            "body_summary": "Mission Control cognition guidance for code-review.",
+            "bundle_ref": {
+              "digest": "sha256:a2cdd7db20ac69ae7407903cf069509f62f556bb330eb99d3159769c2bff9b57",
+              "media_type": "application/vnd.mc.capability-bundle+json",
+              "size_bytes": 635,
+              "uri": "capability-bundles://biotech/skill_bundle/skill.mc-cognition-code-review/0.1.0/a2cdd7db20ac69ae7407903cf069509f62f556bb330eb99d3159769c2bff9b57"
+            },
+            "compatibility": {
+              "executables": [],
+              "network_capabilities": [],
+              "runtimes": [],
+              "workspace_capabilities": []
+            },
+            "compatible_compiler_versions": [
+              "control-plane-definitions/1"
+            ],
+            "conflicts_with": [],
+            "description": "Mission Control cognition guidance for code-review.",
+            "file_manifest": [
+              {
+                "digest": "sha256:a1de146e27a1f5cc6d96abc0720217381254c30a5ffc0fe1f653a695daa5edc5",
+                "executable": false,
+                "path": "SKILL.md",
+                "size_bytes": 376
+              },
+              {
+                "digest": "sha256:bf18ee92a3ca05a7760713b1e6609f4f8c3735d3abe557ca83002d7f863d934c",
+                "executable": false,
+                "path": "manifest.json",
+                "size_bytes": 259
+              }
+            ],
+            "frontmatter": {
+              "description": "Mission Control cognition guidance for code-review.",
+              "name": "mc-cognition-code-review"
+            },
+            "host_support": {
+              "profiles": {
+                "claude_agent_sdk": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "claude_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "claude_managed": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "codex_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "cursor_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "cursor_local": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "deep_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                }
+              },
+              "schema_version": "mc.capability_host_support.v1"
+            },
+            "kind": "skill",
+            "logical_id": "skill.mc-cognition-code-review",
+            "manifest_digest": "sha256:a2cdd7db20ac69ae7407903cf069509f62f556bb330eb99d3159769c2bff9b57",
+            "maturity": "experimental",
+            "required_capabilities": [],
+            "review_status": "approved",
+            "schema_version": "1",
+            "skill_name": "mc-cognition-code-review",
+            "source_provenance": {
+              "commit_digest": null,
+              "license": null,
+              "locator": "capability-bundles://biotech/skill_bundle/skill.mc-cognition-code-review/0.1.0/a2cdd7db20ac69ae7407903cf069509f62f556bb330eb99d3159769c2bff9b57",
+              "source": "local",
+              "upstream_identity": "skill.mc-cognition-code-review",
+              "upstream_version": "0.1.0"
+            },
+            "title": "mc-cognition-code-review"
+          },
+          "published_at": "2026-10-14T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:b9b87ac245618f76fb3268b17492e9c0ae75e0d2f405a4aca2db923fc764ad50",
+            "kind": "skill",
+            "lifecycle_status": "published",
+            "logical_id": "skill.mc-cognition-code-review",
+            "payload_ref": null,
+            "revision": 1,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:bccce514d29c2150d2088a5b7b8b002d185bbc34499dfbdaad2c48b0c962fe93",
+        "manifest_ref": "mc-catalog://definition/skill/skill.mc-cognition-code-review/1",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "1"
+      },
+      "kind": "asset_version",
+      "logical_key": "cognition-profile:skill:skill.mc-cognition-code-review/1"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "cognition-profile:skill:skill.mc-cognition-code-review/1",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "docs/specs/materialization-observation-2026-10/SPEC-02-cognition.md",
+          "packages/mission-control-db-contract/seeds/cognition_profiles.py",
+          "skills/mc-cognition-code-review"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "cognition-profile:skill:skill.mc-cognition-code-review/1:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:skill:skill.mc-cognition-pr",
+        "contract": "mission-control.published-definition/1",
+        "host_support": {
+          "profiles": {
+            "claude_agent_sdk": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "claude_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "claude_managed": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "codex_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "cursor_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "cursor_local": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "deep_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            }
+          },
+          "schema_version": "mc.capability_host_support.v1"
+        },
+        "kind": "skill_bundle",
+        "manifest": {
+          "definition": {
+            "attachment_targets": [
+              "agent.main"
+            ],
+            "body_summary": "Mission Control cognition guidance for pr.",
+            "bundle_ref": {
+              "digest": "sha256:0379441509b95405b9d9744aec034fbc5fc864e9aded514b4d44611f8e21c048",
+              "media_type": "application/vnd.mc.capability-bundle+json",
+              "size_bytes": 620,
+              "uri": "capability-bundles://biotech/skill_bundle/skill.mc-cognition-pr/0.1.0/0379441509b95405b9d9744aec034fbc5fc864e9aded514b4d44611f8e21c048"
+            },
+            "compatibility": {
+              "executables": [],
+              "network_capabilities": [],
+              "runtimes": [],
+              "workspace_capabilities": []
+            },
+            "compatible_compiler_versions": [
+              "control-plane-definitions/1"
+            ],
+            "conflicts_with": [],
+            "description": "Mission Control cognition guidance for pr.",
+            "file_manifest": [
+              {
+                "digest": "sha256:4696e2026c275bdd42da36b2e749601c32496d084afeea45fa320143e846d410",
+                "executable": false,
+                "path": "SKILL.md",
+                "size_bytes": 370
+              },
+              {
+                "digest": "sha256:aff43d58e262c12185c6154255e765d275230cbe6bd326169a82b6dc82f83f34",
+                "executable": false,
+                "path": "manifest.json",
+                "size_bytes": 250
+              }
+            ],
+            "frontmatter": {
+              "description": "Mission Control cognition guidance for pr.",
+              "name": "mc-cognition-pr"
+            },
+            "host_support": {
+              "profiles": {
+                "claude_agent_sdk": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "claude_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "claude_managed": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "codex_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "cursor_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "cursor_local": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "deep_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                }
+              },
+              "schema_version": "mc.capability_host_support.v1"
+            },
+            "kind": "skill",
+            "logical_id": "skill.mc-cognition-pr",
+            "manifest_digest": "sha256:0379441509b95405b9d9744aec034fbc5fc864e9aded514b4d44611f8e21c048",
+            "maturity": "experimental",
+            "required_capabilities": [],
+            "review_status": "approved",
+            "schema_version": "1",
+            "skill_name": "mc-cognition-pr",
+            "source_provenance": {
+              "commit_digest": null,
+              "license": null,
+              "locator": "capability-bundles://biotech/skill_bundle/skill.mc-cognition-pr/0.1.0/0379441509b95405b9d9744aec034fbc5fc864e9aded514b4d44611f8e21c048",
+              "source": "local",
+              "upstream_identity": "skill.mc-cognition-pr",
+              "upstream_version": "0.1.0"
+            },
+            "title": "mc-cognition-pr"
+          },
+          "published_at": "2026-10-14T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:6184599431570314382c5edab7f133a9736a38b901d0f98b9b555c5d155eee77",
+            "kind": "skill",
+            "lifecycle_status": "published",
+            "logical_id": "skill.mc-cognition-pr",
+            "payload_ref": null,
+            "revision": 1,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:dcda0a29ef764908cbca87348e43b763d76588cdc1b659f792f36c4c7acd6e13",
+        "manifest_ref": "mc-catalog://definition/skill/skill.mc-cognition-pr/1",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "1"
+      },
+      "kind": "asset_version",
+      "logical_key": "cognition-profile:skill:skill.mc-cognition-pr/1"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "cognition-profile:skill:skill.mc-cognition-pr/1",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "docs/specs/materialization-observation-2026-10/SPEC-02-cognition.md",
+          "packages/mission-control-db-contract/seeds/cognition_profiles.py",
+          "skills/mc-cognition-pr"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "cognition-profile:skill:skill.mc-cognition-pr/1:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:skill:skill.mc-cognition-diagnosing-bugs",
+        "contract": "mission-control.published-definition/1",
+        "host_support": {
+          "profiles": {
+            "claude_agent_sdk": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "claude_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "claude_managed": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "codex_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "cursor_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "cursor_local": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "deep_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            }
+          },
+          "schema_version": "mc.capability_host_support.v1"
+        },
+        "kind": "skill_bundle",
+        "manifest": {
+          "definition": {
+            "attachment_targets": [
+              "agent.main"
+            ],
+            "body_summary": "Mission Control cognition guidance for diagnosing-bugs.",
+            "bundle_ref": {
+              "digest": "sha256:1a286c5247ff4cf29df007a92685e66d2e359f8878118ceffc2f619c7d0d70fc",
+              "media_type": "application/vnd.mc.capability-bundle+json",
+              "size_bytes": 671,
+              "uri": "capability-bundles://biotech/skill_bundle/skill.mc-cognition-diagnosing-bugs/0.1.0/1a286c5247ff4cf29df007a92685e66d2e359f8878118ceffc2f619c7d0d70fc"
+            },
+            "compatibility": {
+              "executables": [],
+              "network_capabilities": [],
+              "runtimes": [],
+              "workspace_capabilities": []
+            },
+            "compatible_compiler_versions": [
+              "control-plane-definitions/1"
+            ],
+            "conflicts_with": [],
+            "description": "Mission Control cognition guidance for diagnosing-bugs.",
+            "file_manifest": [
+              {
+                "digest": "sha256:2913e7d4999056a32514146b83f68c113b38fbb159f90719e0d8f50659f5b1e1",
+                "executable": false,
+                "path": "SKILL.md",
+                "size_bytes": 408
+              },
+              {
+                "digest": "sha256:84be6084a55cc85a46bd49629b442bfb9408881498509a477a1045ee40da0890",
+                "executable": false,
+                "path": "manifest.json",
+                "size_bytes": 263
+              }
+            ],
+            "frontmatter": {
+              "description": "Mission Control cognition guidance for diagnosing-bugs.",
+              "name": "mc-cognition-diagnosing-bugs"
+            },
+            "host_support": {
+              "profiles": {
+                "claude_agent_sdk": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "claude_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "claude_managed": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "codex_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "cursor_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "cursor_local": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "deep_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                }
+              },
+              "schema_version": "mc.capability_host_support.v1"
+            },
+            "kind": "skill",
+            "logical_id": "skill.mc-cognition-diagnosing-bugs",
+            "manifest_digest": "sha256:1a286c5247ff4cf29df007a92685e66d2e359f8878118ceffc2f619c7d0d70fc",
+            "maturity": "experimental",
+            "required_capabilities": [],
+            "review_status": "approved",
+            "schema_version": "1",
+            "skill_name": "mc-cognition-diagnosing-bugs",
+            "source_provenance": {
+              "commit_digest": null,
+              "license": null,
+              "locator": "capability-bundles://biotech/skill_bundle/skill.mc-cognition-diagnosing-bugs/0.1.0/1a286c5247ff4cf29df007a92685e66d2e359f8878118ceffc2f619c7d0d70fc",
+              "source": "local",
+              "upstream_identity": "skill.mc-cognition-diagnosing-bugs",
+              "upstream_version": "0.1.0"
+            },
+            "title": "mc-cognition-diagnosing-bugs"
+          },
+          "published_at": "2026-10-14T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:fb6817c03177ea4d9134758a8bf98fb7013743327808316f44742222478949c1",
+            "kind": "skill",
+            "lifecycle_status": "published",
+            "logical_id": "skill.mc-cognition-diagnosing-bugs",
+            "payload_ref": null,
+            "revision": 1,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:062c304fc52c53ee9dd9f5e5e89415e52bcafb4bdd87ef03cc9b6d20603ec71e",
+        "manifest_ref": "mc-catalog://definition/skill/skill.mc-cognition-diagnosing-bugs/1",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "1"
+      },
+      "kind": "asset_version",
+      "logical_key": "cognition-profile:skill:skill.mc-cognition-diagnosing-bugs/1"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "cognition-profile:skill:skill.mc-cognition-diagnosing-bugs/1",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "docs/specs/materialization-observation-2026-10/SPEC-02-cognition.md",
+          "packages/mission-control-db-contract/seeds/cognition_profiles.py",
+          "skills/mc-cognition-diagnosing-bugs"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "cognition-profile:skill:skill.mc-cognition-diagnosing-bugs/1:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:skill:skill.mc-cognition-research",
+        "contract": "mission-control.published-definition/1",
+        "host_support": {
+          "profiles": {
+            "claude_agent_sdk": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "claude_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "claude_managed": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "codex_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "cursor_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "cursor_local": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "deep_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            }
+          },
+          "schema_version": "mc.capability_host_support.v1"
+        },
+        "kind": "skill_bundle",
+        "manifest": {
+          "definition": {
+            "attachment_targets": [
+              "agent.main"
+            ],
+            "body_summary": "Mission Control cognition guidance for research.",
+            "bundle_ref": {
+              "digest": "sha256:fc7af9b790b35a5805f25c1a766c5fbd995f1e95818c78077ffda30b473b5bdb",
+              "media_type": "application/vnd.mc.capability-bundle+json",
+              "size_bytes": 639,
+              "uri": "capability-bundles://biotech/skill_bundle/skill.mc-cognition-research/0.1.0/fc7af9b790b35a5805f25c1a766c5fbd995f1e95818c78077ffda30b473b5bdb"
+            },
+            "compatibility": {
+              "executables": [],
+              "network_capabilities": [],
+              "runtimes": [],
+              "workspace_capabilities": []
+            },
+            "compatible_compiler_versions": [
+              "control-plane-definitions/1"
+            ],
+            "conflicts_with": [],
+            "description": "Mission Control cognition guidance for research.",
+            "file_manifest": [
+              {
+                "digest": "sha256:2f3ef95ea82f3d421ecef40c63df7bdaccb1e48a400832d6c783563ba9b5f044",
+                "executable": false,
+                "path": "SKILL.md",
+                "size_bytes": 383
+              },
+              {
+                "digest": "sha256:a4ec9b1185deaa67d1526037becf6fae5a830ba164b111f40e6c8945fc941f45",
+                "executable": false,
+                "path": "manifest.json",
+                "size_bytes": 256
+              }
+            ],
+            "frontmatter": {
+              "description": "Mission Control cognition guidance for research.",
+              "name": "mc-cognition-research"
+            },
+            "host_support": {
+              "profiles": {
+                "claude_agent_sdk": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "claude_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "claude_managed": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "codex_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "cursor_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "cursor_local": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "deep_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                }
+              },
+              "schema_version": "mc.capability_host_support.v1"
+            },
+            "kind": "skill",
+            "logical_id": "skill.mc-cognition-research",
+            "manifest_digest": "sha256:fc7af9b790b35a5805f25c1a766c5fbd995f1e95818c78077ffda30b473b5bdb",
+            "maturity": "experimental",
+            "required_capabilities": [],
+            "review_status": "approved",
+            "schema_version": "1",
+            "skill_name": "mc-cognition-research",
+            "source_provenance": {
+              "commit_digest": null,
+              "license": null,
+              "locator": "capability-bundles://biotech/skill_bundle/skill.mc-cognition-research/0.1.0/fc7af9b790b35a5805f25c1a766c5fbd995f1e95818c78077ffda30b473b5bdb",
+              "source": "local",
+              "upstream_identity": "skill.mc-cognition-research",
+              "upstream_version": "0.1.0"
+            },
+            "title": "mc-cognition-research"
+          },
+          "published_at": "2026-10-14T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:37d03be7039281358d1470032ad202aa1f332e5df2379849bf9658ae44cba676",
+            "kind": "skill",
+            "lifecycle_status": "published",
+            "logical_id": "skill.mc-cognition-research",
+            "payload_ref": null,
+            "revision": 1,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:db2fdeb60eec306144db030e186a8ddd08cf8db5a47129a4dd7d06a97d8b2542",
+        "manifest_ref": "mc-catalog://definition/skill/skill.mc-cognition-research/1",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "1"
+      },
+      "kind": "asset_version",
+      "logical_key": "cognition-profile:skill:skill.mc-cognition-research/1"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "cognition-profile:skill:skill.mc-cognition-research/1",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "docs/specs/materialization-observation-2026-10/SPEC-02-cognition.md",
+          "packages/mission-control-db-contract/seeds/cognition_profiles.py",
+          "skills/mc-cognition-research"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "cognition-profile:skill:skill.mc-cognition-research/1:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:skill:skill.mc-cognition-cite-and-verify",
+        "contract": "mission-control.published-definition/1",
+        "host_support": {
+          "profiles": {
+            "claude_agent_sdk": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "claude_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "claude_managed": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "codex_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "cursor_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "cursor_local": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "deep_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            }
+          },
+          "schema_version": "mc.capability_host_support.v1"
+        },
+        "kind": "skill_bundle",
+        "manifest": {
+          "definition": {
+            "attachment_targets": [
+              "agent.main"
+            ],
+            "body_summary": "Mission Control cognition guidance for cite-and-verify.",
+            "bundle_ref": {
+              "digest": "sha256:fb1b90774620d4f974f5311df846d7fe755942ed02de3e9d0dc66ab694866b33",
+              "media_type": "application/vnd.mc.capability-bundle+json",
+              "size_bytes": 641,
+              "uri": "capability-bundles://biotech/skill_bundle/skill.mc-cognition-cite-and-verify/0.1.0/fb1b90774620d4f974f5311df846d7fe755942ed02de3e9d0dc66ab694866b33"
+            },
+            "compatibility": {
+              "executables": [],
+              "network_capabilities": [],
+              "runtimes": [],
+              "workspace_capabilities": []
+            },
+            "compatible_compiler_versions": [
+              "control-plane-definitions/1"
+            ],
+            "conflicts_with": [],
+            "description": "Mission Control cognition guidance for cite-and-verify.",
+            "file_manifest": [
+              {
+                "digest": "sha256:1ca73f7f5a2ea001ab9e9bc6c1c95a176d1236195d6222584507235e70cddc74",
+                "executable": false,
+                "path": "SKILL.md",
+                "size_bytes": 378
+              },
+              {
+                "digest": "sha256:34a1b06133737a049f7a66e53fd571d0cebe8b43a7addaeadeef3d48099d0202",
+                "executable": false,
+                "path": "manifest.json",
+                "size_bytes": 263
+              }
+            ],
+            "frontmatter": {
+              "description": "Mission Control cognition guidance for cite-and-verify.",
+              "name": "mc-cognition-cite-and-verify"
+            },
+            "host_support": {
+              "profiles": {
+                "claude_agent_sdk": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "claude_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "claude_managed": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "codex_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "cursor_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "cursor_local": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "deep_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                }
+              },
+              "schema_version": "mc.capability_host_support.v1"
+            },
+            "kind": "skill",
+            "logical_id": "skill.mc-cognition-cite-and-verify",
+            "manifest_digest": "sha256:fb1b90774620d4f974f5311df846d7fe755942ed02de3e9d0dc66ab694866b33",
+            "maturity": "experimental",
+            "required_capabilities": [],
+            "review_status": "approved",
+            "schema_version": "1",
+            "skill_name": "mc-cognition-cite-and-verify",
+            "source_provenance": {
+              "commit_digest": null,
+              "license": null,
+              "locator": "capability-bundles://biotech/skill_bundle/skill.mc-cognition-cite-and-verify/0.1.0/fb1b90774620d4f974f5311df846d7fe755942ed02de3e9d0dc66ab694866b33",
+              "source": "local",
+              "upstream_identity": "skill.mc-cognition-cite-and-verify",
+              "upstream_version": "0.1.0"
+            },
+            "title": "mc-cognition-cite-and-verify"
+          },
+          "published_at": "2026-10-14T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:0954da42ed43eb9726fd50fff3fc2221f67bbeae750f034fbac786aa44ab326d",
+            "kind": "skill",
+            "lifecycle_status": "published",
+            "logical_id": "skill.mc-cognition-cite-and-verify",
+            "payload_ref": null,
+            "revision": 1,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:4fedf3691ac21b3cc8cb2d0b3291518618f359b7194d91a19e709473d2642735",
+        "manifest_ref": "mc-catalog://definition/skill/skill.mc-cognition-cite-and-verify/1",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "1"
+      },
+      "kind": "asset_version",
+      "logical_key": "cognition-profile:skill:skill.mc-cognition-cite-and-verify/1"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "cognition-profile:skill:skill.mc-cognition-cite-and-verify/1",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "docs/specs/materialization-observation-2026-10/SPEC-02-cognition.md",
+          "packages/mission-control-db-contract/seeds/cognition_profiles.py",
+          "skills/mc-cognition-cite-and-verify"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "cognition-profile:skill:skill.mc-cognition-cite-and-verify/1:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:skill:skill.mc-cognition-ingest",
+        "contract": "mission-control.published-definition/1",
+        "host_support": {
+          "profiles": {
+            "claude_agent_sdk": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "claude_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "claude_managed": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "codex_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "cursor_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "cursor_local": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "deep_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            }
+          },
+          "schema_version": "mc.capability_host_support.v1"
+        },
+        "kind": "skill_bundle",
+        "manifest": {
+          "definition": {
+            "attachment_targets": [
+              "agent.main"
+            ],
+            "body_summary": "Mission Control cognition guidance for ingest.",
+            "bundle_ref": {
+              "digest": "sha256:72bc1b50230da485686a75873bbc97b6b3a50d41064be68519bc91dccf203cd9",
+              "media_type": "application/vnd.mc.capability-bundle+json",
+              "size_bytes": 628,
+              "uri": "capability-bundles://biotech/skill_bundle/skill.mc-cognition-ingest/0.1.0/72bc1b50230da485686a75873bbc97b6b3a50d41064be68519bc91dccf203cd9"
+            },
+            "compatibility": {
+              "executables": [],
+              "network_capabilities": [],
+              "runtimes": [],
+              "workspace_capabilities": []
+            },
+            "compatible_compiler_versions": [
+              "control-plane-definitions/1"
+            ],
+            "conflicts_with": [],
+            "description": "Mission Control cognition guidance for ingest.",
+            "file_manifest": [
+              {
+                "digest": "sha256:7754eb5a68c79eafe94a3cd597b5b4cb478ce98a80fce3703c932c59955cdd44",
+                "executable": false,
+                "path": "SKILL.md",
+                "size_bytes": 374
+              },
+              {
+                "digest": "sha256:c4a73ad1ff20eadc5ddaad899e73ad63de4c240cc7659e214d0eeb82cd0b84f2",
+                "executable": false,
+                "path": "manifest.json",
+                "size_bytes": 254
+              }
+            ],
+            "frontmatter": {
+              "description": "Mission Control cognition guidance for ingest.",
+              "name": "mc-cognition-ingest"
+            },
+            "host_support": {
+              "profiles": {
+                "claude_agent_sdk": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "claude_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "claude_managed": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "codex_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "cursor_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "cursor_local": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "deep_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                }
+              },
+              "schema_version": "mc.capability_host_support.v1"
+            },
+            "kind": "skill",
+            "logical_id": "skill.mc-cognition-ingest",
+            "manifest_digest": "sha256:72bc1b50230da485686a75873bbc97b6b3a50d41064be68519bc91dccf203cd9",
+            "maturity": "experimental",
+            "required_capabilities": [],
+            "review_status": "approved",
+            "schema_version": "1",
+            "skill_name": "mc-cognition-ingest",
+            "source_provenance": {
+              "commit_digest": null,
+              "license": null,
+              "locator": "capability-bundles://biotech/skill_bundle/skill.mc-cognition-ingest/0.1.0/72bc1b50230da485686a75873bbc97b6b3a50d41064be68519bc91dccf203cd9",
+              "source": "local",
+              "upstream_identity": "skill.mc-cognition-ingest",
+              "upstream_version": "0.1.0"
+            },
+            "title": "mc-cognition-ingest"
+          },
+          "published_at": "2026-10-14T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:3296e6897cdc7da2275f147c17cda80231269ed96d7e8f37a994a6fd7bed2ac2",
+            "kind": "skill",
+            "lifecycle_status": "published",
+            "logical_id": "skill.mc-cognition-ingest",
+            "payload_ref": null,
+            "revision": 1,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:968d7dd0bc3d36158f14052c3d9d509dcec6916d0d272e2801e6fc176232f4da",
+        "manifest_ref": "mc-catalog://definition/skill/skill.mc-cognition-ingest/1",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "1"
+      },
+      "kind": "asset_version",
+      "logical_key": "cognition-profile:skill:skill.mc-cognition-ingest/1"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "cognition-profile:skill:skill.mc-cognition-ingest/1",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "docs/specs/materialization-observation-2026-10/SPEC-02-cognition.md",
+          "packages/mission-control-db-contract/seeds/cognition_profiles.py",
+          "skills/mc-cognition-ingest"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "cognition-profile:skill:skill.mc-cognition-ingest/1:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:skill:skill.mc-cognition-knowledge-services",
+        "contract": "mission-control.published-definition/1",
+        "host_support": {
+          "profiles": {
+            "claude_agent_sdk": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "claude_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "claude_managed": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "codex_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "cursor_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "cursor_local": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "deep_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            }
+          },
+          "schema_version": "mc.capability_host_support.v1"
+        },
+        "kind": "skill_bundle",
+        "manifest": {
+          "definition": {
+            "attachment_targets": [
+              "agent.main"
+            ],
+            "body_summary": "Mission Control cognition guidance for knowledge-services.",
+            "bundle_ref": {
+              "digest": "sha256:846e038344e43d257f3a114da4b166ca2e00ffde708735ca7b232b55cc62ea80",
+              "media_type": "application/vnd.mc.capability-bundle+json",
+              "size_bytes": 867,
+              "uri": "capability-bundles://biotech/skill_bundle/skill.mc-cognition-knowledge-services/0.1.0/846e038344e43d257f3a114da4b166ca2e00ffde708735ca7b232b55cc62ea80"
+            },
+            "compatibility": {
+              "executables": [],
+              "network_capabilities": [],
+              "runtimes": [],
+              "workspace_capabilities": []
+            },
+            "compatible_compiler_versions": [
+              "control-plane-definitions/1"
+            ],
+            "conflicts_with": [],
+            "description": "Mission Control cognition guidance for knowledge-services.",
+            "file_manifest": [
+              {
+                "digest": "sha256:a89f10539806283aa669416580e5cdc11b460e9648b0c3249448d7bf5d09c8b9",
+                "executable": false,
+                "path": "SKILL.md",
+                "size_bytes": 601
+              },
+              {
+                "digest": "sha256:dd2b82af06c397e12c7c2601017d218043d5fae732c1c3250f364933bcef823d",
+                "executable": false,
+                "path": "manifest.json",
+                "size_bytes": 266
+              }
+            ],
+            "frontmatter": {
+              "description": "Mission Control cognition guidance for knowledge-services.",
+              "name": "mc-cognition-knowledge-services"
+            },
+            "host_support": {
+              "profiles": {
+                "claude_agent_sdk": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "claude_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "claude_managed": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "codex_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "cursor_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "cursor_local": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "deep_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                }
+              },
+              "schema_version": "mc.capability_host_support.v1"
+            },
+            "kind": "skill",
+            "logical_id": "skill.mc-cognition-knowledge-services",
+            "manifest_digest": "sha256:846e038344e43d257f3a114da4b166ca2e00ffde708735ca7b232b55cc62ea80",
+            "maturity": "experimental",
+            "required_capabilities": [],
+            "review_status": "approved",
+            "schema_version": "1",
+            "skill_name": "mc-cognition-knowledge-services",
+            "source_provenance": {
+              "commit_digest": null,
+              "license": null,
+              "locator": "capability-bundles://biotech/skill_bundle/skill.mc-cognition-knowledge-services/0.1.0/846e038344e43d257f3a114da4b166ca2e00ffde708735ca7b232b55cc62ea80",
+              "source": "local",
+              "upstream_identity": "skill.mc-cognition-knowledge-services",
+              "upstream_version": "0.1.0"
+            },
+            "title": "mc-cognition-knowledge-services"
+          },
+          "published_at": "2026-10-14T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:68b91a0315d2dfadad9b25efa80138d4cb2b69a4d10c93cf1bb680cd2835273b",
+            "kind": "skill",
+            "lifecycle_status": "published",
+            "logical_id": "skill.mc-cognition-knowledge-services",
+            "payload_ref": null,
+            "revision": 1,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:bc2aa9afc76d7cadc68baaf895bf588fd97a9fd54d1f5f36a9f1b8f14495aeec",
+        "manifest_ref": "mc-catalog://definition/skill/skill.mc-cognition-knowledge-services/1",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "1"
+      },
+      "kind": "asset_version",
+      "logical_key": "cognition-profile:skill:skill.mc-cognition-knowledge-services/1"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "cognition-profile:skill:skill.mc-cognition-knowledge-services/1",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "docs/specs/materialization-observation-2026-10/SPEC-02-cognition.md",
+          "packages/mission-control-db-contract/seeds/cognition_profiles.py",
+          "skills/mc-cognition-knowledge-services"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "cognition-profile:skill:skill.mc-cognition-knowledge-services/1:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:subagent_profile:subagent.mc-cognition-reviewer",
+        "contract": "mission-control.published-definition/1",
+        "host_support": {
+          "profiles": {
+            "claude_agent_sdk": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "claude_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "claude_managed": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "codex_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "cursor_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "cursor_local": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "deep_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            }
+          },
+          "schema_version": "mc.capability_host_support.v1"
+        },
+        "kind": "subagent_profile",
+        "manifest": {
+          "definition": {
+            "description": "Review the diff against the objective. Identify regressions and missing evidence. Do not edit or publish.",
+            "host_support": {
+              "profiles": {
+                "claude_agent_sdk": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "claude_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "claude_managed": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "codex_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "cursor_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "cursor_local": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "deep_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                }
+              },
+              "schema_version": "mc.capability_host_support.v1"
+            },
+            "kind": "subagent_profile",
+            "logical_id": "subagent.mc-cognition-reviewer",
+            "profile": {
+              "background": false,
+              "context_mode": "isolated",
+              "description": "Review the diff against the objective. Identify regressions and missing evidence. Do not edit or publish.",
+              "interrupt_on": [],
+              "max_turns": null,
+              "mcp_servers": [],
+              "model": "inherit",
+              "name": "mc-reviewer",
+              "prompt": "Review the diff against the objective. Identify regressions and missing evidence. Do not edit or publish.",
+              "prompt_bundle_ref": null,
+              "readonly": true,
+              "schema_version": "mc.subagent_profile.v1",
+              "skills": [],
+              "tools": []
+            },
+            "schema_version": "1",
+            "secret_refs": [],
+            "title": "Cognition reviewer"
+          },
+          "published_at": "2026-10-14T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:873b0a03f8ef9961a470a470d16501df088cba9d344f2b7445cfb76c56682320",
+            "kind": "subagent_profile",
+            "lifecycle_status": "published",
+            "logical_id": "subagent.mc-cognition-reviewer",
+            "payload_ref": null,
+            "revision": 1,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:fbfc52e29c456653d308a6993c039e4771f0f88affe5c9a49fcbce4b23584f6a",
+        "manifest_ref": "mc-catalog://definition/subagent_profile/subagent.mc-cognition-reviewer/1",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "1"
+      },
+      "kind": "asset_version",
+      "logical_key": "cognition-profile:subagent-profile:subagent.mc-cognition-reviewer/1"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "cognition-profile:subagent-profile:subagent.mc-cognition-reviewer/1",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "docs/specs/materialization-observation-2026-10/SPEC-02-cognition.md",
+          "packages/mission-control-db-contract/seeds/cognition_profiles.py"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "cognition-profile:subagent-profile:subagent.mc-cognition-reviewer/1:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:subagent_profile:subagent.mc-cognition-test-runner",
+        "contract": "mission-control.published-definition/1",
+        "host_support": {
+          "profiles": {
+            "claude_agent_sdk": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "claude_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "claude_managed": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "codex_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "cursor_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "cursor_local": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "deep_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            }
+          },
+          "schema_version": "mc.capability_host_support.v1"
+        },
+        "kind": "subagent_profile",
+        "manifest": {
+          "definition": {
+            "description": "Run the declared verification commands and report exact results. Do not replace failed checks with weaker checks.",
+            "host_support": {
+              "profiles": {
+                "claude_agent_sdk": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "claude_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "claude_managed": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "codex_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "cursor_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "cursor_local": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "deep_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                }
+              },
+              "schema_version": "mc.capability_host_support.v1"
+            },
+            "kind": "subagent_profile",
+            "logical_id": "subagent.mc-cognition-test-runner",
+            "profile": {
+              "background": false,
+              "context_mode": "isolated",
+              "description": "Run the declared verification commands and report exact results. Do not replace failed checks with weaker checks.",
+              "interrupt_on": [],
+              "max_turns": null,
+              "mcp_servers": [],
+              "model": "inherit",
+              "name": "mc-test-runner",
+              "prompt": "Run the declared verification commands and report exact results. Do not replace failed checks with weaker checks.",
+              "prompt_bundle_ref": null,
+              "readonly": true,
+              "schema_version": "mc.subagent_profile.v1",
+              "skills": [],
+              "tools": []
+            },
+            "schema_version": "1",
+            "secret_refs": [],
+            "title": "Cognition test-runner"
+          },
+          "published_at": "2026-10-14T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:9dde3cfd6bb70181334b732c0baeafacb20a674f9331f6c20219ac44f093de26",
+            "kind": "subagent_profile",
+            "lifecycle_status": "published",
+            "logical_id": "subagent.mc-cognition-test-runner",
+            "payload_ref": null,
+            "revision": 1,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:fb0f9a18b83a1bd8326bf57fa84061bafc795c4e87a5fea7f365e00a163e18bb",
+        "manifest_ref": "mc-catalog://definition/subagent_profile/subagent.mc-cognition-test-runner/1",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "1"
+      },
+      "kind": "asset_version",
+      "logical_key": "cognition-profile:subagent-profile:subagent.mc-cognition-test-runner/1"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "cognition-profile:subagent-profile:subagent.mc-cognition-test-runner/1",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "docs/specs/materialization-observation-2026-10/SPEC-02-cognition.md",
+          "packages/mission-control-db-contract/seeds/cognition_profiles.py"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "cognition-profile:subagent-profile:subagent.mc-cognition-test-runner/1:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:subagent_profile:subagent.mc-cognition-source-verifier",
+        "contract": "mission-control.published-definition/1",
+        "host_support": {
+          "profiles": {
+            "claude_agent_sdk": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "claude_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "claude_managed": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "codex_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "cursor_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "cursor_local": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "deep_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            }
+          },
+          "schema_version": "mc.capability_host_support.v1"
+        },
+        "kind": "subagent_profile",
+        "manifest": {
+          "definition": {
+            "description": "Check each material claim against its cited source. Report unsupported claims and source limitations without inventing evidence.",
+            "host_support": {
+              "profiles": {
+                "claude_agent_sdk": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "claude_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "claude_managed": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "codex_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "cursor_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "cursor_local": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "deep_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                }
+              },
+              "schema_version": "mc.capability_host_support.v1"
+            },
+            "kind": "subagent_profile",
+            "logical_id": "subagent.mc-cognition-source-verifier",
+            "profile": {
+              "background": false,
+              "context_mode": "isolated",
+              "description": "Check each material claim against its cited source. Report unsupported claims and source limitations without inventing evidence.",
+              "interrupt_on": [],
+              "max_turns": null,
+              "mcp_servers": [],
+              "model": "inherit",
+              "name": "mc-source-verifier",
+              "prompt": "Check each material claim against its cited source. Report unsupported claims and source limitations without inventing evidence.",
+              "prompt_bundle_ref": null,
+              "readonly": true,
+              "schema_version": "mc.subagent_profile.v1",
+              "skills": [],
+              "tools": []
+            },
+            "schema_version": "1",
+            "secret_refs": [],
+            "title": "Cognition source-verifier"
+          },
+          "published_at": "2026-10-14T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:effd164e64dc7d6d4a7ce5112b04f496555ee9149b83b209307d63d30896eed7",
+            "kind": "subagent_profile",
+            "lifecycle_status": "published",
+            "logical_id": "subagent.mc-cognition-source-verifier",
+            "payload_ref": null,
+            "revision": 1,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:822911fe5617a5a94ad25664ae199bc5e7febd1355902ef4056a921d8ebfffe8",
+        "manifest_ref": "mc-catalog://definition/subagent_profile/subagent.mc-cognition-source-verifier/1",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "1"
+      },
+      "kind": "asset_version",
+      "logical_key": "cognition-profile:subagent-profile:subagent.mc-cognition-source-verifier/1"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "cognition-profile:subagent-profile:subagent.mc-cognition-source-verifier/1",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "docs/specs/materialization-observation-2026-10/SPEC-02-cognition.md",
+          "packages/mission-control-db-contract/seeds/cognition_profiles.py"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "cognition-profile:subagent-profile:subagent.mc-cognition-source-verifier/1:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:subagent_profile:subagent.mc-cognition-summarizer",
+        "contract": "mission-control.published-definition/1",
+        "host_support": {
+          "profiles": {
+            "claude_agent_sdk": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "claude_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "claude_managed": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "codex_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "cursor_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "cursor_local": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "deep_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            }
+          },
+          "schema_version": "mc.capability_host_support.v1"
+        },
+        "kind": "subagent_profile",
+        "manifest": {
+          "definition": {
+            "description": "Summarize the verified sources, preserve citations and uncertainty, and identify contradictory evidence.",
+            "host_support": {
+              "profiles": {
+                "claude_agent_sdk": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "claude_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "claude_managed": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "codex_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "cursor_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "cursor_local": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "deep_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                }
+              },
+              "schema_version": "mc.capability_host_support.v1"
+            },
+            "kind": "subagent_profile",
+            "logical_id": "subagent.mc-cognition-summarizer",
+            "profile": {
+              "background": false,
+              "context_mode": "isolated",
+              "description": "Summarize the verified sources, preserve citations and uncertainty, and identify contradictory evidence.",
+              "interrupt_on": [],
+              "max_turns": null,
+              "mcp_servers": [],
+              "model": "inherit",
+              "name": "mc-summarizer",
+              "prompt": "Summarize the verified sources, preserve citations and uncertainty, and identify contradictory evidence.",
+              "prompt_bundle_ref": null,
+              "readonly": true,
+              "schema_version": "mc.subagent_profile.v1",
+              "skills": [],
+              "tools": []
+            },
+            "schema_version": "1",
+            "secret_refs": [],
+            "title": "Cognition summarizer"
+          },
+          "published_at": "2026-10-14T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:a60911610b8379412db4c001b29e41f6aa935b90f353d891a1080a01e85eac93",
+            "kind": "subagent_profile",
+            "lifecycle_status": "published",
+            "logical_id": "subagent.mc-cognition-summarizer",
+            "payload_ref": null,
+            "revision": 1,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:c2cb56acb41fc7281907ad9a99ea8dde8aebc096e27931d32a09164a04e9a5bb",
+        "manifest_ref": "mc-catalog://definition/subagent_profile/subagent.mc-cognition-summarizer/1",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "1"
+      },
+      "kind": "asset_version",
+      "logical_key": "cognition-profile:subagent-profile:subagent.mc-cognition-summarizer/1"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "cognition-profile:subagent-profile:subagent.mc-cognition-summarizer/1",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "docs/specs/materialization-observation-2026-10/SPEC-02-cognition.md",
+          "packages/mission-control-db-contract/seeds/cognition_profiles.py"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "cognition-profile:subagent-profile:subagent.mc-cognition-summarizer/1:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:plugin:plugin.cognition-sdlc",
+        "contract": "mission-control.published-definition/1",
+        "host_support": {
+          "profiles": {
+            "claude_agent_sdk": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "claude_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "claude_managed": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "codex_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "cursor_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "cursor_local": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "deep_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            }
+          },
+          "schema_version": "mc.capability_host_support.v1"
+        },
+        "kind": "plugin",
+        "manifest": {
+          "definition": {
+            "description": "Cognition Profile cognition/sdlc: portable sdlc skills and bounded reviewer subagents. Kernel hooks and telemetry are composed by Mission Control; repository instructions stay additive. Knowledge work requires the application's admitted Knowledge Services MCP pin as an explicit manifest extension.",
+            "host_support": {
+              "profiles": {
+                "claude_agent_sdk": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "claude_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "claude_managed": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "codex_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "cursor_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "cursor_local": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "deep_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                }
+              },
+              "schema_version": "mc.capability_host_support.v1"
+            },
+            "kind": "plugin",
+            "logical_id": "plugin.cognition-sdlc",
+            "manifest": {
+              "members": [
+                {
+                  "optional": false,
+                  "overlay": {},
+                  "pin": {
+                    "capability_id": "skill.mc-cognition-tdd",
+                    "digest": "sha256:939d0b6b608de37144c7369189f5a12b06a13aea2e9ffc325c8d20450c41932e",
+                    "version": "0.1.0"
+                  },
+                  "role": "skill"
+                },
+                {
+                  "optional": false,
+                  "overlay": {},
+                  "pin": {
+                    "capability_id": "skill.mc-cognition-code-review",
+                    "digest": "sha256:b9b87ac245618f76fb3268b17492e9c0ae75e0d2f405a4aca2db923fc764ad50",
+                    "version": "0.1.0"
+                  },
+                  "role": "skill"
+                },
+                {
+                  "optional": false,
+                  "overlay": {},
+                  "pin": {
+                    "capability_id": "skill.mc-cognition-pr",
+                    "digest": "sha256:6184599431570314382c5edab7f133a9736a38b901d0f98b9b555c5d155eee77",
+                    "version": "0.1.0"
+                  },
+                  "role": "skill"
+                },
+                {
+                  "optional": false,
+                  "overlay": {},
+                  "pin": {
+                    "capability_id": "skill.mc-cognition-diagnosing-bugs",
+                    "digest": "sha256:fb6817c03177ea4d9134758a8bf98fb7013743327808316f44742222478949c1",
+                    "version": "0.1.0"
+                  },
+                  "role": "skill"
+                },
+                {
+                  "optional": false,
+                  "overlay": {},
+                  "pin": {
+                    "capability_id": "subagent.mc-cognition-reviewer",
+                    "digest": "sha256:873b0a03f8ef9961a470a470d16501df088cba9d344f2b7445cfb76c56682320",
+                    "version": "1"
+                  },
+                  "role": "subagent"
+                },
+                {
+                  "optional": false,
+                  "overlay": {},
+                  "pin": {
+                    "capability_id": "subagent.mc-cognition-test-runner",
+                    "digest": "sha256:9dde3cfd6bb70181334b732c0baeafacb20a674f9331f6c20219ac44f093de26",
+                    "version": "1"
+                  },
+                  "role": "subagent"
+                }
+              ],
+              "prompts": [],
+              "resources": [],
+              "schema_version": "mc.plugin_manifest.v1"
+            },
+            "schema_version": "1",
+            "secret_refs": [],
+            "title": "cognition/sdlc"
+          },
+          "published_at": "2026-10-14T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:d222f15a0e6ff4cf345b8de8cfaeab5c07be524456ed64e57e89e713c700a3ce",
+            "kind": "plugin",
+            "lifecycle_status": "published",
+            "logical_id": "plugin.cognition-sdlc",
+            "payload_ref": null,
+            "revision": 1,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:8c3dfb93f22e64ea11c4120b4a0baf89a6bb6c84e2406538af55e8edaf13e058",
+        "manifest_ref": "mc-catalog://definition/plugin/plugin.cognition-sdlc/1",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "1"
+      },
+      "kind": "asset_version",
+      "logical_key": "cognition-profile:plugin:plugin.cognition-sdlc/1"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "cognition-profile:plugin:plugin.cognition-sdlc/1",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "docs/specs/materialization-observation-2026-10/SPEC-02-cognition.md",
+          "packages/mission-control-db-contract/seeds/cognition_profiles.py"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "cognition-profile:plugin:plugin.cognition-sdlc/1:admit"
+    },
+    {
+      "fields": {
+        "member": "cognition-profile:skill:skill.mc-cognition-tdd/1",
+        "optional": false,
+        "plugin": "cognition-profile:plugin:plugin.cognition-sdlc/1",
+        "position": 0,
+        "role": "skill"
+      },
+      "kind": "capability_plugin_member",
+      "logical_key": "cognition-profile:plugin:plugin.cognition-sdlc/1:member:0"
+    },
+    {
+      "fields": {
+        "member": "cognition-profile:skill:skill.mc-cognition-code-review/1",
+        "optional": false,
+        "plugin": "cognition-profile:plugin:plugin.cognition-sdlc/1",
+        "position": 1,
+        "role": "skill"
+      },
+      "kind": "capability_plugin_member",
+      "logical_key": "cognition-profile:plugin:plugin.cognition-sdlc/1:member:1"
+    },
+    {
+      "fields": {
+        "member": "cognition-profile:skill:skill.mc-cognition-pr/1",
+        "optional": false,
+        "plugin": "cognition-profile:plugin:plugin.cognition-sdlc/1",
+        "position": 2,
+        "role": "skill"
+      },
+      "kind": "capability_plugin_member",
+      "logical_key": "cognition-profile:plugin:plugin.cognition-sdlc/1:member:2"
+    },
+    {
+      "fields": {
+        "member": "cognition-profile:skill:skill.mc-cognition-diagnosing-bugs/1",
+        "optional": false,
+        "plugin": "cognition-profile:plugin:plugin.cognition-sdlc/1",
+        "position": 3,
+        "role": "skill"
+      },
+      "kind": "capability_plugin_member",
+      "logical_key": "cognition-profile:plugin:plugin.cognition-sdlc/1:member:3"
+    },
+    {
+      "fields": {
+        "member": "cognition-profile:subagent-profile:subagent.mc-cognition-reviewer/1",
+        "optional": false,
+        "plugin": "cognition-profile:plugin:plugin.cognition-sdlc/1",
+        "position": 4,
+        "role": "subagent"
+      },
+      "kind": "capability_plugin_member",
+      "logical_key": "cognition-profile:plugin:plugin.cognition-sdlc/1:member:4"
+    },
+    {
+      "fields": {
+        "member": "cognition-profile:subagent-profile:subagent.mc-cognition-test-runner/1",
+        "optional": false,
+        "plugin": "cognition-profile:plugin:plugin.cognition-sdlc/1",
+        "position": 5,
+        "role": "subagent"
+      },
+      "kind": "capability_plugin_member",
+      "logical_key": "cognition-profile:plugin:plugin.cognition-sdlc/1:member:5"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:plugin:plugin.cognition-knowledge",
+        "contract": "mission-control.published-definition/1",
+        "host_support": {
+          "profiles": {
+            "claude_agent_sdk": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "claude_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "claude_managed": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "codex_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "cursor_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "cursor_local": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "deep_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            }
+          },
+          "schema_version": "mc.capability_host_support.v1"
+        },
+        "kind": "plugin",
+        "manifest": {
+          "definition": {
+            "description": "Cognition Profile cognition/knowledge: portable knowledge skills and bounded reviewer subagents. Kernel hooks and telemetry are composed by Mission Control; repository instructions stay additive. Knowledge work requires the application's admitted Knowledge Services MCP pin as an explicit manifest extension.",
+            "host_support": {
+              "profiles": {
+                "claude_agent_sdk": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "claude_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "claude_managed": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "codex_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "cursor_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "cursor_local": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "deep_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                }
+              },
+              "schema_version": "mc.capability_host_support.v1"
+            },
+            "kind": "plugin",
+            "logical_id": "plugin.cognition-knowledge",
+            "manifest": {
+              "members": [
+                {
+                  "optional": false,
+                  "overlay": {},
+                  "pin": {
+                    "capability_id": "skill.mc-cognition-research",
+                    "digest": "sha256:37d03be7039281358d1470032ad202aa1f332e5df2379849bf9658ae44cba676",
+                    "version": "0.1.0"
+                  },
+                  "role": "skill"
+                },
+                {
+                  "optional": false,
+                  "overlay": {},
+                  "pin": {
+                    "capability_id": "skill.mc-cognition-cite-and-verify",
+                    "digest": "sha256:0954da42ed43eb9726fd50fff3fc2221f67bbeae750f034fbac786aa44ab326d",
+                    "version": "0.1.0"
+                  },
+                  "role": "skill"
+                },
+                {
+                  "optional": false,
+                  "overlay": {},
+                  "pin": {
+                    "capability_id": "skill.mc-cognition-ingest",
+                    "digest": "sha256:3296e6897cdc7da2275f147c17cda80231269ed96d7e8f37a994a6fd7bed2ac2",
+                    "version": "0.1.0"
+                  },
+                  "role": "skill"
+                },
+                {
+                  "optional": false,
+                  "overlay": {},
+                  "pin": {
+                    "capability_id": "skill.mc-cognition-knowledge-services",
+                    "digest": "sha256:68b91a0315d2dfadad9b25efa80138d4cb2b69a4d10c93cf1bb680cd2835273b",
+                    "version": "0.1.0"
+                  },
+                  "role": "skill"
+                },
+                {
+                  "optional": false,
+                  "overlay": {},
+                  "pin": {
+                    "capability_id": "subagent.mc-cognition-source-verifier",
+                    "digest": "sha256:effd164e64dc7d6d4a7ce5112b04f496555ee9149b83b209307d63d30896eed7",
+                    "version": "1"
+                  },
+                  "role": "subagent"
+                },
+                {
+                  "optional": false,
+                  "overlay": {},
+                  "pin": {
+                    "capability_id": "subagent.mc-cognition-summarizer",
+                    "digest": "sha256:a60911610b8379412db4c001b29e41f6aa935b90f353d891a1080a01e85eac93",
+                    "version": "1"
+                  },
+                  "role": "subagent"
+                }
+              ],
+              "prompts": [],
+              "resources": [],
+              "schema_version": "mc.plugin_manifest.v1"
+            },
+            "schema_version": "1",
+            "secret_refs": [],
+            "title": "cognition/knowledge"
+          },
+          "published_at": "2026-10-14T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:3ca0cf408f42b2813494d0630b0e5802230f3f034b57af2de7f9ed140ed761e0",
+            "kind": "plugin",
+            "lifecycle_status": "published",
+            "logical_id": "plugin.cognition-knowledge",
+            "payload_ref": null,
+            "revision": 1,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:5a7a3976c0f0589f27a34e443573b9165d604caacd227446dba1d672899a2f31",
+        "manifest_ref": "mc-catalog://definition/plugin/plugin.cognition-knowledge/1",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "1"
+      },
+      "kind": "asset_version",
+      "logical_key": "cognition-profile:plugin:plugin.cognition-knowledge/1"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "cognition-profile:plugin:plugin.cognition-knowledge/1",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "docs/specs/materialization-observation-2026-10/SPEC-02-cognition.md",
+          "packages/mission-control-db-contract/seeds/cognition_profiles.py"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "cognition-profile:plugin:plugin.cognition-knowledge/1:admit"
+    },
+    {
+      "fields": {
+        "member": "cognition-profile:skill:skill.mc-cognition-research/1",
+        "optional": false,
+        "plugin": "cognition-profile:plugin:plugin.cognition-knowledge/1",
+        "position": 0,
+        "role": "skill"
+      },
+      "kind": "capability_plugin_member",
+      "logical_key": "cognition-profile:plugin:plugin.cognition-knowledge/1:member:0"
+    },
+    {
+      "fields": {
+        "member": "cognition-profile:skill:skill.mc-cognition-cite-and-verify/1",
+        "optional": false,
+        "plugin": "cognition-profile:plugin:plugin.cognition-knowledge/1",
+        "position": 1,
+        "role": "skill"
+      },
+      "kind": "capability_plugin_member",
+      "logical_key": "cognition-profile:plugin:plugin.cognition-knowledge/1:member:1"
+    },
+    {
+      "fields": {
+        "member": "cognition-profile:skill:skill.mc-cognition-ingest/1",
+        "optional": false,
+        "plugin": "cognition-profile:plugin:plugin.cognition-knowledge/1",
+        "position": 2,
+        "role": "skill"
+      },
+      "kind": "capability_plugin_member",
+      "logical_key": "cognition-profile:plugin:plugin.cognition-knowledge/1:member:2"
+    },
+    {
+      "fields": {
+        "member": "cognition-profile:skill:skill.mc-cognition-knowledge-services/1",
+        "optional": false,
+        "plugin": "cognition-profile:plugin:plugin.cognition-knowledge/1",
+        "position": 3,
+        "role": "skill"
+      },
+      "kind": "capability_plugin_member",
+      "logical_key": "cognition-profile:plugin:plugin.cognition-knowledge/1:member:3"
+    },
+    {
+      "fields": {
+        "member": "cognition-profile:subagent-profile:subagent.mc-cognition-source-verifier/1",
+        "optional": false,
+        "plugin": "cognition-profile:plugin:plugin.cognition-knowledge/1",
+        "position": 4,
+        "role": "subagent"
+      },
+      "kind": "capability_plugin_member",
+      "logical_key": "cognition-profile:plugin:plugin.cognition-knowledge/1:member:4"
+    },
+    {
+      "fields": {
+        "member": "cognition-profile:subagent-profile:subagent.mc-cognition-summarizer/1",
+        "optional": false,
+        "plugin": "cognition-profile:plugin:plugin.cognition-knowledge/1",
+        "position": 5,
+        "role": "subagent"
+      },
+      "kind": "capability_plugin_member",
+      "logical_key": "cognition-profile:plugin:plugin.cognition-knowledge/1:member:5"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:plugin:plugin.cognition-mixed",
+        "contract": "mission-control.published-definition/1",
+        "host_support": {
+          "profiles": {
+            "claude_agent_sdk": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "claude_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "claude_managed": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "codex_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "cursor_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "cursor_local": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "deep_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            }
+          },
+          "schema_version": "mc.capability_host_support.v1"
+        },
+        "kind": "plugin",
+        "manifest": {
+          "definition": {
+            "description": "Cognition Profile cognition/mixed: portable mixed skills and bounded reviewer subagents. Kernel hooks and telemetry are composed by Mission Control; repository instructions stay additive. Knowledge work requires the application's admitted Knowledge Services MCP pin as an explicit manifest extension.",
+            "host_support": {
+              "profiles": {
+                "claude_agent_sdk": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "claude_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "claude_managed": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "codex_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "cursor_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "cursor_local": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "deep_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                }
+              },
+              "schema_version": "mc.capability_host_support.v1"
+            },
+            "kind": "plugin",
+            "logical_id": "plugin.cognition-mixed",
+            "manifest": {
+              "members": [
+                {
+                  "optional": false,
+                  "overlay": {},
+                  "pin": {
+                    "capability_id": "skill.mc-cognition-tdd",
+                    "digest": "sha256:939d0b6b608de37144c7369189f5a12b06a13aea2e9ffc325c8d20450c41932e",
+                    "version": "0.1.0"
+                  },
+                  "role": "skill"
+                },
+                {
+                  "optional": false,
+                  "overlay": {},
+                  "pin": {
+                    "capability_id": "skill.mc-cognition-code-review",
+                    "digest": "sha256:b9b87ac245618f76fb3268b17492e9c0ae75e0d2f405a4aca2db923fc764ad50",
+                    "version": "0.1.0"
+                  },
+                  "role": "skill"
+                },
+                {
+                  "optional": false,
+                  "overlay": {},
+                  "pin": {
+                    "capability_id": "skill.mc-cognition-pr",
+                    "digest": "sha256:6184599431570314382c5edab7f133a9736a38b901d0f98b9b555c5d155eee77",
+                    "version": "0.1.0"
+                  },
+                  "role": "skill"
+                },
+                {
+                  "optional": false,
+                  "overlay": {},
+                  "pin": {
+                    "capability_id": "skill.mc-cognition-diagnosing-bugs",
+                    "digest": "sha256:fb6817c03177ea4d9134758a8bf98fb7013743327808316f44742222478949c1",
+                    "version": "0.1.0"
+                  },
+                  "role": "skill"
+                },
+                {
+                  "optional": false,
+                  "overlay": {},
+                  "pin": {
+                    "capability_id": "skill.mc-cognition-research",
+                    "digest": "sha256:37d03be7039281358d1470032ad202aa1f332e5df2379849bf9658ae44cba676",
+                    "version": "0.1.0"
+                  },
+                  "role": "skill"
+                },
+                {
+                  "optional": false,
+                  "overlay": {},
+                  "pin": {
+                    "capability_id": "skill.mc-cognition-cite-and-verify",
+                    "digest": "sha256:0954da42ed43eb9726fd50fff3fc2221f67bbeae750f034fbac786aa44ab326d",
+                    "version": "0.1.0"
+                  },
+                  "role": "skill"
+                },
+                {
+                  "optional": false,
+                  "overlay": {},
+                  "pin": {
+                    "capability_id": "skill.mc-cognition-ingest",
+                    "digest": "sha256:3296e6897cdc7da2275f147c17cda80231269ed96d7e8f37a994a6fd7bed2ac2",
+                    "version": "0.1.0"
+                  },
+                  "role": "skill"
+                },
+                {
+                  "optional": false,
+                  "overlay": {},
+                  "pin": {
+                    "capability_id": "skill.mc-cognition-knowledge-services",
+                    "digest": "sha256:68b91a0315d2dfadad9b25efa80138d4cb2b69a4d10c93cf1bb680cd2835273b",
+                    "version": "0.1.0"
+                  },
+                  "role": "skill"
+                },
+                {
+                  "optional": false,
+                  "overlay": {},
+                  "pin": {
+                    "capability_id": "subagent.mc-cognition-reviewer",
+                    "digest": "sha256:873b0a03f8ef9961a470a470d16501df088cba9d344f2b7445cfb76c56682320",
+                    "version": "1"
+                  },
+                  "role": "subagent"
+                },
+                {
+                  "optional": false,
+                  "overlay": {},
+                  "pin": {
+                    "capability_id": "subagent.mc-cognition-test-runner",
+                    "digest": "sha256:9dde3cfd6bb70181334b732c0baeafacb20a674f9331f6c20219ac44f093de26",
+                    "version": "1"
+                  },
+                  "role": "subagent"
+                },
+                {
+                  "optional": false,
+                  "overlay": {},
+                  "pin": {
+                    "capability_id": "subagent.mc-cognition-source-verifier",
+                    "digest": "sha256:effd164e64dc7d6d4a7ce5112b04f496555ee9149b83b209307d63d30896eed7",
+                    "version": "1"
+                  },
+                  "role": "subagent"
+                },
+                {
+                  "optional": false,
+                  "overlay": {},
+                  "pin": {
+                    "capability_id": "subagent.mc-cognition-summarizer",
+                    "digest": "sha256:a60911610b8379412db4c001b29e41f6aa935b90f353d891a1080a01e85eac93",
+                    "version": "1"
+                  },
+                  "role": "subagent"
+                }
+              ],
+              "prompts": [],
+              "resources": [],
+              "schema_version": "mc.plugin_manifest.v1"
+            },
+            "schema_version": "1",
+            "secret_refs": [],
+            "title": "cognition/mixed"
+          },
+          "published_at": "2026-10-14T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:64ac3978f88fea533db1244b5f4d8f832020c93e0b84afc6f833be30a0d45f1b",
+            "kind": "plugin",
+            "lifecycle_status": "published",
+            "logical_id": "plugin.cognition-mixed",
+            "payload_ref": null,
+            "revision": 1,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:9d2e03299173a15106958767d98a4e16f6e11025cccba65d6fdc73f0ef0338ca",
+        "manifest_ref": "mc-catalog://definition/plugin/plugin.cognition-mixed/1",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "1"
+      },
+      "kind": "asset_version",
+      "logical_key": "cognition-profile:plugin:plugin.cognition-mixed/1"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "cognition-profile:plugin:plugin.cognition-mixed/1",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "docs/specs/materialization-observation-2026-10/SPEC-02-cognition.md",
+          "packages/mission-control-db-contract/seeds/cognition_profiles.py"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "cognition-profile:plugin:plugin.cognition-mixed/1:admit"
+    },
+    {
+      "fields": {
+        "member": "cognition-profile:skill:skill.mc-cognition-tdd/1",
+        "optional": false,
+        "plugin": "cognition-profile:plugin:plugin.cognition-mixed/1",
+        "position": 0,
+        "role": "skill"
+      },
+      "kind": "capability_plugin_member",
+      "logical_key": "cognition-profile:plugin:plugin.cognition-mixed/1:member:0"
+    },
+    {
+      "fields": {
+        "member": "cognition-profile:skill:skill.mc-cognition-code-review/1",
+        "optional": false,
+        "plugin": "cognition-profile:plugin:plugin.cognition-mixed/1",
+        "position": 1,
+        "role": "skill"
+      },
+      "kind": "capability_plugin_member",
+      "logical_key": "cognition-profile:plugin:plugin.cognition-mixed/1:member:1"
+    },
+    {
+      "fields": {
+        "member": "cognition-profile:skill:skill.mc-cognition-pr/1",
+        "optional": false,
+        "plugin": "cognition-profile:plugin:plugin.cognition-mixed/1",
+        "position": 2,
+        "role": "skill"
+      },
+      "kind": "capability_plugin_member",
+      "logical_key": "cognition-profile:plugin:plugin.cognition-mixed/1:member:2"
+    },
+    {
+      "fields": {
+        "member": "cognition-profile:skill:skill.mc-cognition-diagnosing-bugs/1",
+        "optional": false,
+        "plugin": "cognition-profile:plugin:plugin.cognition-mixed/1",
+        "position": 3,
+        "role": "skill"
+      },
+      "kind": "capability_plugin_member",
+      "logical_key": "cognition-profile:plugin:plugin.cognition-mixed/1:member:3"
+    },
+    {
+      "fields": {
+        "member": "cognition-profile:skill:skill.mc-cognition-research/1",
+        "optional": false,
+        "plugin": "cognition-profile:plugin:plugin.cognition-mixed/1",
+        "position": 4,
+        "role": "skill"
+      },
+      "kind": "capability_plugin_member",
+      "logical_key": "cognition-profile:plugin:plugin.cognition-mixed/1:member:4"
+    },
+    {
+      "fields": {
+        "member": "cognition-profile:skill:skill.mc-cognition-cite-and-verify/1",
+        "optional": false,
+        "plugin": "cognition-profile:plugin:plugin.cognition-mixed/1",
+        "position": 5,
+        "role": "skill"
+      },
+      "kind": "capability_plugin_member",
+      "logical_key": "cognition-profile:plugin:plugin.cognition-mixed/1:member:5"
+    },
+    {
+      "fields": {
+        "member": "cognition-profile:skill:skill.mc-cognition-ingest/1",
+        "optional": false,
+        "plugin": "cognition-profile:plugin:plugin.cognition-mixed/1",
+        "position": 6,
+        "role": "skill"
+      },
+      "kind": "capability_plugin_member",
+      "logical_key": "cognition-profile:plugin:plugin.cognition-mixed/1:member:6"
+    },
+    {
+      "fields": {
+        "member": "cognition-profile:skill:skill.mc-cognition-knowledge-services/1",
+        "optional": false,
+        "plugin": "cognition-profile:plugin:plugin.cognition-mixed/1",
+        "position": 7,
+        "role": "skill"
+      },
+      "kind": "capability_plugin_member",
+      "logical_key": "cognition-profile:plugin:plugin.cognition-mixed/1:member:7"
+    },
+    {
+      "fields": {
+        "member": "cognition-profile:subagent-profile:subagent.mc-cognition-reviewer/1",
+        "optional": false,
+        "plugin": "cognition-profile:plugin:plugin.cognition-mixed/1",
+        "position": 8,
+        "role": "subagent"
+      },
+      "kind": "capability_plugin_member",
+      "logical_key": "cognition-profile:plugin:plugin.cognition-mixed/1:member:8"
+    },
+    {
+      "fields": {
+        "member": "cognition-profile:subagent-profile:subagent.mc-cognition-test-runner/1",
+        "optional": false,
+        "plugin": "cognition-profile:plugin:plugin.cognition-mixed/1",
+        "position": 9,
+        "role": "subagent"
+      },
+      "kind": "capability_plugin_member",
+      "logical_key": "cognition-profile:plugin:plugin.cognition-mixed/1:member:9"
+    },
+    {
+      "fields": {
+        "member": "cognition-profile:subagent-profile:subagent.mc-cognition-source-verifier/1",
+        "optional": false,
+        "plugin": "cognition-profile:plugin:plugin.cognition-mixed/1",
+        "position": 10,
+        "role": "subagent"
+      },
+      "kind": "capability_plugin_member",
+      "logical_key": "cognition-profile:plugin:plugin.cognition-mixed/1:member:10"
+    },
+    {
+      "fields": {
+        "member": "cognition-profile:subagent-profile:subagent.mc-cognition-summarizer/1",
+        "optional": false,
+        "plugin": "cognition-profile:plugin:plugin.cognition-mixed/1",
+        "position": 11,
+        "role": "subagent"
+      },
+      "kind": "capability_plugin_member",
+      "logical_key": "cognition-profile:plugin:plugin.cognition-mixed/1:member:11"
+    }
+  ],
+  "seed_key": "mc.app.biotech.cognition-profiles",
+  "seed_version": "1.0.0"
+}

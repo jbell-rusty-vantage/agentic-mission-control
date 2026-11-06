@@ -1,0 +1,28 @@
+{
+  "schema_version": "mc.environment_kit.v1",
+  "id": "envkit.node",
+  "version": "1",
+  "title": "Node.js with npm",
+  "description": "Node.js 22 projects managed by npm: the base layer checks Node and npm are installed; the mission layer installs the locked dependencies.",
+  "toolchains": {"node": "22", "npm": "10"},
+  "system_packages": ["git"],
+  "base": {"install": "base/install.sh"},
+  "mission": {
+    "steps": [
+      {"name": "deps", "run": "npm ci", "when": "exists('package-lock.json')"}
+    ],
+    "health": [
+      {"name": "node", "run": "node --version"}
+    ],
+    "timeout_s": 480
+  },
+  "requires": {
+    "egress": ["registry.npmjs.org"]
+  },
+  "host_support": {
+    "local": "full",
+    "cursor_cloud": "full",
+    "claude_cloud": "base_via_owner",
+    "codex_cloud": "base_via_owner"
+  }
+}

@@ -1,0 +1,371 @@
+{
+  "schema": "run2.resumed_execution.v3",
+  "utc": "2026-10-16T16:11:57.499375+00:00",
+  "model": "gpt-6.1-sol",
+  "base": "a8d69c5b48506c6babcd7f3f74f0b92716423091",
+  "canonical": "C:\\Users\\Pinda\\Proyectos\\BellLabs\\platform\\mission-control",
+  "branch": "mo/run2-integration",
+  "canonical_applied_files": {
+    "src/mission_control/application/execution/harness/cursor_usage.py": "6b02127c653bd9728db64ecd361336195cc90f9d0e3e026ea1266bc3dfe0872a",
+    "src/mission_control/adapters/cursor/frames.py": "1e0444fb52d76486cb4dee1848de4fbf8a7ee9f5f1bafca5f69457483f610ded",
+    "src/mission_control/adapters/cursor/cloud.py": "ae3298440bd90e17230dc1876500ed8a86c82abd8b66d64b3c0565199c100b6d",
+    "src/mission_control/application/execution/harness/lane_turns.py": "8cd91773b4cfd9b1e16bbc81a0dbaff774df3cb59071b04e90178419aa8b5f30",
+    "src/mission_control/application/execution/harness/describe.py": "3232e359f2fec8da885dbec5cc9b37f96ebb1c341b57db017cda6310741d3125",
+    "tests/unit/runtime/test_run2_cursor_usage.py": "2dfa6f4138a3af890f60c277c7d7a98cfee7462a35d776cfd3e824758c3408fa",
+    "tests/unit/cursor/test_cloud_usage_unknown.py": "8071f1f81be1fa4e28ff3549114d3cdfd8da0e098fb048a64da00eac5139430f",
+    "tests/unit/temporal/test_run2_managed_budget_composition.py": "bdcfe996b41f8563ded08a6e4faeef08cc7e052b41fa1ce538350b1755b8413a",
+    "tests/unit/subscriptions/test_run2_caller_identity.py": "978a7da7647292d5d4c04d6a91adc5986d2a1f3326b1d62d998d52afd186fc66",
+    "src/mission_control/application/recovery/terminal_lane_adoption.py": "c5535f30597a70a70783edcd718c6be3e685a8cab57dea84724020fc157a2029",
+    "tests/unit/recovery/test_terminal_lane_adoption.py": "9ac2527adb718967ad6bda7ecb9d70dbbf6cbf1ee2f961139c4ced5c95ee3836"
+  },
+  "candidate_bytes_equal": true,
+  "original_canonical_tracked_checked": 3980,
+  "expected_owned_tracked_drift": [
+    "src/mission_control/adapters/cursor/frames.py",
+    "tests/unit/runtime/test_run2_cursor_usage.py",
+    "src/mission_control/application/execution/harness/describe.py",
+    "src/mission_control/application/execution/harness/lane_turns.py",
+    "src/mission_control/adapters/cursor/cloud.py",
+    "tests/unit/cursor/test_cloud_usage_unknown.py",
+    "src/mission_control/application/execution/harness/cursor_usage.py"
+  ],
+  "unexpected_tracked_drift": [],
+  "other_retained_worktrees_unchanged": [
+    "C:\\Users\\Pinda\\Proyectos\\BellLabs\\platform\\.worktrees\\run2-admission-failure",
+    "C:\\Users\\Pinda\\Proyectos\\BellLabs\\platform\\.worktrees\\run2-claude-host-proof",
+    "C:\\Users\\Pinda\\Proyectos\\BellLabs\\platform\\.worktrees\\run2-cli",
+    "C:\\Users\\Pinda\\Proyectos\\BellLabs\\platform\\.worktrees\\run2-closed-workflow-recovery",
+    "C:\\Users\\Pinda\\Proyectos\\BellLabs\\platform\\.worktrees\\run2-cursor",
+    "C:\\Users\\Pinda\\Proyectos\\BellLabs\\platform\\.worktrees\\run2-cursor-c9",
+    "C:\\Users\\Pinda\\Proyectos\\BellLabs\\platform\\.worktrees\\run2-events",
+    "C:\\Users\\Pinda\\Proyectos\\BellLabs\\platform\\.worktrees\\run2-human-control-budget"
+  ],
+  "excluded_dirty_document_sha256": {
+    "docs/knowledge/index.md": "89cf1e3d520539109f9ec9b1b29e9f389c55ea8849c89bec6b21380f046c126d",
+    "docs/specs/materialization-observation-2026-10/runs/RUN-2-REPORT.md": "320627c1b5d4aec9ba74e33565a8fb9ccbe7d3218f847ccc32dad3e093adca35"
+  },
+  "documentation": {
+    "RUN-2-EXECUTION-LEDGER-2026-10-16.md": "881818803ee1b6098c18e7573a8c3db1aadd78d390d7d5f0bfa125ab89c6ae60",
+    "RUN-2-REMAINING-GATES-2026-10-16.md": "1065334b843c24dbf7e17a7964023bc9f1bbeda72802fb745f8d31ba7bf53b0f",
+    "RUN-2-G1-ACCEPTANCE-2026-10-16.md": "6a6fb9c36f33fba56837a6fd7ce986b7708cd781b8e61d4603fea4e93bd9fc31",
+    "RUN-2-CURRENT-RECONCILIATION-2026-10-16.md": "1e53c054bba513a7ac03f1de9ea103b4ca899d448c12e5500f96402820baf9ef",
+    "RUN-2-QUALIFICATION-ENVELOPES-2026-10-16.md": "a44d4bed6dfc25a353af99a1f66c82f629d25fbfaf667fe29aa2b45529cf32d5",
+    "RUN-2-INTEGRATION-2026-10-16.md": "dbc182a5e729183546eab0078eb97ac7b4c83c8bc52452c51946d57393fed342",
+    "RUN-2-RESUMPTION-AND-APPROVALS-2026-10-16.md": "774ad78956643143e74908308ddb7c89ea27a0ed815352f6f842b28b939eb573",
+    "RUN-2-EXECUTION-EVIDENCE-2026-10-16.json": "3864840f8dda8018196e7d6a401858d9aa322c636f043dba6f91fb5ab23b175c",
+    "RUN-2-EXECUTION-CONTINUATION-EVIDENCE-2026-10-16.json": "f8e0f837b396c72ba8679734f4010709e3eae980be30387017de81fa34f9f208"
+  },
+  "canonical_status": " M docs/knowledge/index.md\n M docs/specs/materialization-observation-2026-10/runs/RUN-2-REPORT.md\n M src/mission_control/adapters/cursor/cloud.py\n M src/mission_control/adapters/cursor/frames.py\n M src/mission_control/application/execution/harness/cursor_usage.py\n M src/mission_control/application/execution/harness/describe.py\n M src/mission_control/application/execution/harness/lane_turns.py\n M tests/unit/cursor/test_cloud_usage_unknown.py\n M tests/unit/runtime/test_run2_cursor_usage.py\n?? docs/specs/materialization-observation-2026-10/issues/bash.exe.stackdump\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-ASSESSMENT-EVIDENCE-2026-10-16.json\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-COMPLETION-ASSESSMENT-2026-10-16.md\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-COMPLETION-FINDINGS-2026-10-16.md\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-COMPLETION-PLAN-2026-10-16.md\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-CURRENT-RECONCILIATION-2026-10-16.md\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-EXECUTION-CONTINUATION-EVIDENCE-2026-10-16.json\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-EXECUTION-EVIDENCE-2026-10-16.json\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-EXECUTION-LEDGER-2026-10-16.md\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-G1-ACCEPTANCE-2026-10-16.md\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-INTEGRATION-2026-10-16.md\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-QUALIFICATION-ENVELOPES-2026-10-16.md\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-REMAINING-GATES-2026-10-16.md\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-RESUMPTION-AND-APPROVALS-2026-10-16.md\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-SOL-EXECUTION-2026-10-16.md\n?? src/mission_control/application/recovery/terminal_lane_adoption.py\n?? tests/unit/recovery/test_terminal_lane_adoption.py\n?? tests/unit/subscriptions/test_run2_caller_identity.py\n?? tests/unit/temporal/test_run2_managed_budget_composition.py\n",
+  "source_patch_sha256": "eee1d570b3c159b78188d1d5b71a735ee87f0c8f638ede86ad7d6a099e1dec0c",
+  "preimages": "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\run2-completion-offline\\.scratch\\run2-completion-20261016\\resumption\\canonical-integration\\preimages",
+  "old_v2_manifest_sha256": "f8e0f837b396c72ba8679734f4010709e3eae980be30387017de81fa34f9f208",
+  "old_v2_archive_sha256": "151e9630e5e7380454062e03c004a12a37ad8ecae56c8d28d3dd630dd0c55d22",
+  "post_outage_reread": {
+    "utc": "2026-10-16T15:47:57.065761+00:00",
+    "frozen_manifest_sha256": "f8e0f837b396c72ba8679734f4010709e3eae980be30387017de81fa34f9f208",
+    "archive_sha256": "151e9630e5e7380454062e03c004a12a37ad8ecae56c8d28d3dd630dd0c55d22",
+    "zip_integrity_error": null,
+    "audit_files": 135,
+    "audit_hash_drift": [],
+    "archive_member_hash_drift": [],
+    "owned_application_drift": [],
+    "manifest_copies_equal": true,
+    "canonical_tracked_checked": 3980,
+    "canonical_drift": [],
+    "retained_worktrees": [
+      {
+        "path": "C:/Users/Pinda/Proyectos/BellLabs/platform/mission-control",
+        "head": "a8d69c5b48506c6babcd7f3f74f0b92716423091",
+        "status_unchanged": true
+      },
+      {
+        "path": "C:/Users/Pinda/Proyectos/BellLabs/platform/.worktrees/run2-admission-failure",
+        "head": "1c018ff010fcec2c04f64d007eb0d9a2a4b8fd2c",
+        "status_unchanged": true
+      },
+      {
+        "path": "C:/Users/Pinda/Proyectos/BellLabs/platform/.worktrees/run2-claude-host-proof",
+        "head": "ee3e1953a47c51ac19d8c06179f7951419ce80fb",
+        "status_unchanged": true
+      },
+      {
+        "path": "C:/Users/Pinda/Proyectos/BellLabs/platform/.worktrees/run2-cli",
+        "head": "5b03afc4f214d335b5ef5dc96ba33100f1fb4d67",
+        "status_unchanged": true
+      },
+      {
+        "path": "C:/Users/Pinda/Proyectos/BellLabs/platform/.worktrees/run2-closed-workflow-recovery",
+        "head": "7a96c511252c643a0fdea12e5ab11fec26eae1f9",
+        "status_unchanged": true
+      },
+      {
+        "path": "C:/Users/Pinda/Proyectos/BellLabs/platform/.worktrees/run2-cursor",
+        "head": "5b03afc4f214d335b5ef5dc96ba33100f1fb4d67",
+        "status_unchanged": true
+      },
+      {
+        "path": "C:/Users/Pinda/Proyectos/BellLabs/platform/.worktrees/run2-cursor-c9",
+        "head": "9f62c18645536888754f60c1dfed9ee55d79d131",
+        "status_unchanged": true
+      },
+      {
+        "path": "C:/Users/Pinda/Proyectos/BellLabs/platform/.worktrees/run2-events",
+        "head": "5b03afc4f214d335b5ef5dc96ba33100f1fb4d67",
+        "status_unchanged": true
+      },
+      {
+        "path": "C:/Users/Pinda/Proyectos/BellLabs/platform/.worktrees/run2-human-control-budget",
+        "head": "94eb433e165615baa4296b3e1cad4e705e2776b3",
+        "status_unchanged": true
+      }
+    ],
+    "original_reference_pins_unchanged": true,
+    "patch_checks": {
+      "application.patch": "check_passed_no_apply",
+      "documentation.patch": "check_passed_no_apply"
+    },
+    "tests_repeated": 0,
+    "native_actions": 0,
+    "shared_data_mutations": 0
+  },
+  "protected_authority_receipt_sha256": "8758f66f42bb3978e2a57528438ebf00fc82bd92c2f4e3a6dd169ca271b4ce4c",
+  "adoption_plan": {
+    "utc": "2026-10-16T15:56:33.382148+00:00",
+    "mode": "retained_snapshot_inspection_only",
+    "authority_receipt_sha256": "8758f66f42bb3978e2a57528438ebf00fc82bd92c2f4e3a6dd169ca271b4ce4c",
+    "native_receipt_sha256": "2d8f12c93bd8f01456f96b420faec6f070da8a441dcaa430ed20ee54637bd83f",
+    "fresh_native_byte_custody": false,
+    "live_writer_approval": false,
+    "plan": {
+      "authority": {
+        "identity": {
+          "request_scope": "mc/01a103c0-9a9e-70f3-9398-eb1573a98324/ai-engineer/00000000-0000-7000-8000-000000000001",
+          "public_run_key": "60f44a50-c0e4-5edb-ac13-0fb0436aaedb",
+          "internal_run_id": "01a14386-3bb2-7dd0-ba2b-f33d0eaa2053",
+          "harness_execution_id": "4eb7354d-980a-52f1-93b3-83b6b8863a2b",
+          "generation": 1,
+          "native_session_ref": "agent-73162e55-750b-4f76-8762-ebee7c6dcead",
+          "native_turn_ref": "run-2df4a451-c80c-4814-843c-3cc542048c2f"
+        },
+        "run_version": 5,
+        "phase": "cancelling",
+        "harness_lifecycle": "live",
+        "claim_status": "claimed",
+        "binding_id": "7669041e-bf40-58a2-9878-82a85b975b92",
+        "binding_digest": "sha256:fe8d72dbc4983c780dc31a4c0b432fa69528a21b0c2c24954a754400468e30be",
+        "claim_id": "c0d3b676-9738-59c7-9b47-01566d1a9420",
+        "harness_revision": 140,
+        "owner_epoch": 1,
+        "dispatch_revision": 140,
+        "dispatch_digest": "sha256:dfe96c9069c9df1775c946c3fbd490ecaeadf882fca85dd013d84ca70da5d453",
+        "dispatches_resolved": true,
+        "family_head_digest": "sha256:fe2905b2abaace9136235108132ede15f887259a00d9c86013e9005764815785",
+        "cancel_command_id": "6a5398e3-2a73-4351-a354-a24a9a4ddc4b",
+        "cancel_receipt_revision": 2,
+        "cancel_state": "delivered",
+        "currency_liability_retained": false
+      },
+      "evidence": {
+        "identity": {
+          "request_scope": "mc/01a103c0-9a9e-70f3-9398-eb1573a98324/ai-engineer/00000000-0000-7000-8000-000000000001",
+          "public_run_key": "60f44a50-c0e4-5edb-ac13-0fb0436aaedb",
+          "internal_run_id": "01a14386-3bb2-7dd0-ba2b-f33d0eaa2053",
+          "harness_execution_id": "4eb7354d-980a-52f1-93b3-83b6b8863a2b",
+          "generation": 1,
+          "native_session_ref": "agent-73162e55-750b-4f76-8762-ebee7c6dcead",
+          "native_turn_ref": "run-2df4a451-c80c-4814-843c-3cc542048c2f"
+        },
+        "native_status": "FINISHED",
+        "evidence_digest": "sha256:2d8f12c93bd8f01456f96b420faec6f070da8a441dcaa430ed20ee54637bd83f",
+        "result_digest": "sha256:2e4aac0d29aae546e783667baef26ec7850b3f34586d62908f1f66171e194a7c",
+        "result_size": 2946,
+        "total_tokens": 926070,
+        "cost_micros_usd": null,
+        "custody_ref": null,
+        "custody_digest": null,
+        "custody_size": null,
+        "custody_immutable": false
+      },
+      "blockers": [
+        "cancel_command_unresolved",
+        "immutable_result_custody_missing",
+        "cost_unknown",
+        "unknown_cost_liability_unproven"
+      ],
+      "digest": "sha256:b966b1d8f2af5336636a7bfe06f3163d35f3feb9f2a25f56876fc27ca427db51",
+      "provider_acknowledged": false,
+      "writer_available": false
+    }
+  },
+  "validation": {
+    "prior_combined": "505 passed in87.86s; unchanged original9 candidate files, not repeated",
+    "prior_disposable_pg_temporal": "13PG/4Temporal passed; targets removed; not repeated",
+    "new_inspection_planner": "17passed0.33s; Ruff/format/source mypy pass",
+    "private_capture_preparation": "17passed0.68s; Ruff/format/Linux-target mypy; one realWSL synthetic fixture0400/0700, duplicate replay and exact temp cleanup",
+    "docs": "seven documents links/C0/whitespace pass; indexcurrent; OKF45pass",
+    "counts_non_additive": true
+  },
+  "r1_request": {
+    "request_id": "R1-private-local-60f44a50-20261016",
+    "status": "pending_explicit_human_approval",
+    "helper": "/mnt/c/Users/Pinda/Documents/Codex/2026-10-16/task/run2-completion-offline/.scratch/run2-completion-20261016/resumption/private_custody.py",
+    "helper_sha256": "44b5d1a8c2cdd0ad85abfb18ecd2204713636e4143908e91d46a05e0d257cff9",
+    "wsl_distribution": "Ubuntu",
+    "user": "overton",
+    "command_prefix": [
+      "/usr/bin/timeout",
+      "-k5s",
+      "60s",
+      "/usr/bin/python3",
+      "-B"
+    ],
+    "helper_arguments": [
+      "--execute",
+      "--approval-token",
+      "R1_PRIVATE_LOCAL_ONLY:60f44a50-c0e4-5edb-ac13-0fb0436aaedb:01a14386-3bb2-7dd0-ba2b-f33d0eaa2053:2e4aac0d29aae546e783667baef26ec7850b3f34586d62908f1f66171e194a7c"
+    ],
+    "retained_destination": "/home/overton/.local/state/mission-control/evidence/run2/60f44a50-c0e4-5edb-ac13-0fb0436aaedb/2e4aac0d29aae546e783667baef26ec7850b3f34586d62908f1f66171e194a7c/",
+    "retained_files": [
+      "result.utf8",
+      "manifest.json"
+    ],
+    "directory_mode": "0700",
+    "file_mode": "0400",
+    "source_max_files": 3,
+    "source_max_bytes_per_file": 33554432,
+    "expected_result_bytes": 2946,
+    "expected_result_sha256": "2e4aac0d29aae546e783667baef26ec7850b3f34586d62908f1f66171e194a7c",
+    "max_new_native_runs": 0,
+    "max_native_spend_usd": 0,
+    "shared_database_mutations": 0,
+    "provider_or_native_control_calls": 0,
+    "s3_or_runtime_artifact_registration": false,
+    "settlement": false,
+    "no_new_run_guarantee": "helper has no provider/network/dispatch/start/send/control or data-writer port; fixed existing IDs only",
+    "recovery": "verify exact existing destination on retry; retain partial failures as incidents; preserve originals and canonical fence; no overwrite or destructive rollback",
+    "approval_token_is_authority": false
+  },
+  "funding": {
+    "current_authorized_new_native_usd": 0,
+    "nominal_proposed_new_usd_ceiling": 38,
+    "deduct_prior_slice_spend": true,
+    "no_original_slice_ceiling_increase": true,
+    "proposal_only_no_dispatch": true,
+    "details": "C:\\Users\\Pinda\\Proyectos\\BellLabs\\platform\\mission-control\\docs\\specs\\materialization-observation-2026-10\\runs\\RUN-2-RESUMPTION-AND-APPROVALS-2026-10-16.md"
+  },
+  "resource_cleanup": {
+    "Utc": "2026-10-16T16:10:48.1093521Z",
+    "FreeKiB": 2168640,
+    "OwnedTests": [],
+    "OwnedFixtureContainers": [],
+    "OwnedFixtureNetworks": [],
+    "ExistingContainers": [
+      "d26599cd119a biotech-research-ingestion-evaluation-system-temporal-ui-1 Up 19 hours",
+      "5aa69fac2075 biotech-research-ingestion-evaluation-system-temporal-1 Up 19 hours (healthy)",
+      "8335da5c6d36 biotech-research-ingestion-evaluation-system-temporal-postgres-1 Up 19 hours (healthy)",
+      "05ae089ad0f5 biotech-research-ingestion-evaluation-system-redis-1 Up 19 hours (healthy)",
+      "3c16ca6537e8 biotech-research-ingestion-evaluation-system-application-postgres-1 Up 19 hours (healthy)"
+    ]
+  },
+  "source_fence_pins_unchanged": true,
+  "audit_member_sha256": {
+    ".scratch/run2-completion-20261016/integration/audit-files.zip": "151e9630e5e7380454062e03c004a12a37ad8ecae56c8d28d3dd630dd0c55d22",
+    ".scratch/run2-completion-20261016/integration/manifest.json": "f8e0f837b396c72ba8679734f4010709e3eae980be30387017de81fa34f9f208",
+    ".scratch/run2-completion-20261016/resumption/apply_canonical.py": "7c54328e8731ae5eb0235793e26a734ff6129a091f1dd9292415f6f1237f7d7d",
+    ".scratch/run2-completion-20261016/resumption/authority_read.py": "a82b679c61a289eb463312c7d67b7b77fc496ae349863837f88f67b4cf93cf9b",
+    ".scratch/run2-completion-20261016/resumption/build_adoption_plan.py": "73463bbf9a4f0bbf2685b2574a0e334c6bc673622704ccbf049495a617743f4f",
+    ".scratch/run2-completion-20261016/resumption/canonical-integration/application-11-files.patch": "eee1d570b3c159b78188d1d5b71a735ee87f0c8f638ede86ad7d6a099e1dec0c",
+    ".scratch/run2-completion-20261016/resumption/canonical-integration/applied.json": "89d60dca106ac47893fb02e5d576a031075dc953b323229cb20c7fdb2c4db843",
+    ".scratch/run2-completion-20261016/resumption/canonical-integration/documents-applied.json": "730cee7fa8da8ca2adf68188d2d6365636ac425ac177a71b10e8898fa64c29e5",
+    ".scratch/run2-completion-20261016/resumption/canonical-integration/preimages/src/mission_control/adapters/cursor/cloud.py": "15ed6132c1739d17d97e0e7bfb2855f727d62ea44d4554f1c375762fb2279864",
+    ".scratch/run2-completion-20261016/resumption/canonical-integration/preimages/src/mission_control/adapters/cursor/frames.py": "ff9a56e0a9a84c497ff17424776e42d3d4ec08ca4a79d78147be3b9c0d6895fb",
+    ".scratch/run2-completion-20261016/resumption/canonical-integration/preimages/src/mission_control/application/execution/harness/cursor_usage.py": "29cde660d55d5b26b4f6cbe2480ed044fc0a5f06467e7fcaaacc70136f24d501",
+    ".scratch/run2-completion-20261016/resumption/canonical-integration/preimages/src/mission_control/application/execution/harness/describe.py": "66c3a65facf44c5577fbee5b940e54feb6a73950b83bc823e713fca5db83032f",
+    ".scratch/run2-completion-20261016/resumption/canonical-integration/preimages/src/mission_control/application/execution/harness/lane_turns.py": "ce20cae335cf88ac3d384af015fc35d3cb247bf45452991a84267a623b7f889b",
+    ".scratch/run2-completion-20261016/resumption/canonical-integration/preimages/tests/unit/cursor/test_cloud_usage_unknown.py": "3d111c4a9c6745aa9e44080cb4db78c96315ef7827ee47dd7845b6d7c5dbeb0c",
+    ".scratch/run2-completion-20261016/resumption/canonical-integration/preimages/tests/unit/runtime/test_run2_cursor_usage.py": "fa809325436bc3a71f8ffcc0d6378c1795de55411d543e2b0afe6b22eb13ca0e",
+    ".scratch/run2-completion-20261016/resumption/canonical-integration/prepared.json": "a0581d1b1afc2506dbaa7559426331c4e00045a9ce5990951b870b9eeb7085cf",
+    ".scratch/run2-completion-20261016/resumption/canonical-process-check.json": "eaf7b89bdafa5195698c3d6d077eb24b82ce9d144c35dec2aff402efe5b13177",
+    ".scratch/run2-completion-20261016/resumption/docs-index.txt": "24bebe6e3584a82fbc0280ea4cfbca87a5f30727034feaf97d45f48a52aef6de",
+    ".scratch/run2-completion-20261016/resumption/docs-links.txt": "8fec6bd50fdf577b85946ca4f6d8b16b5a58e90df420c9ce27218a2a200e87e9",
+    ".scratch/run2-completion-20261016/resumption/docs-okf.txt": "3ad1284662870ef7810661af009f2d4b72f85daf7d611a5189863dcbe5be7786",
+    ".scratch/run2-completion-20261016/resumption/final-resource.json": "7c6077252cae910727130ae53593c3270aebf901f529be2f50bfb085c3543114",
+    ".scratch/run2-completion-20261016/resumption/freeze_resumed.py": "5176fb83abe9ba43becfec9df054d95ab5c2ed2506ba1665ff9d8878ecae0b66",
+    ".scratch/run2-completion-20261016/resumption/frozen-reread.json": "58966e91d1b5e88b87179f2e22a5fe55e7bc7bad13c6b9a470c8c8814c7f13e7",
+    ".scratch/run2-completion-20261016/resumption/integrate_documents.py": "45fd620fb87c4092e46bb817d91cc8eb12fe1d4ebff22e3396cf71ddc7165abf",
+    ".scratch/run2-completion-20261016/resumption/prepare_integration.py": "404d0aa4b19a6977322e5c02a6452d695dcdb55001c8e4cc72a76288fd320c88",
+    ".scratch/run2-completion-20261016/resumption/private-custody/check.py": "410b8d2228471fa6d35cc8b7d2a871b8b37e04bc1e2966b7bc18f85af40254c3",
+    ".scratch/run2-completion-20261016/resumption/private-custody/edit.py": "8807550c53039fca6dfd02722d01a913dfc5daa20eafd14305acfcea8a053dfc",
+    ".scratch/run2-completion-20261016/resumption/private-custody/format.txt": "3a71d0bfdb365ed6d873ae6ce90bdc87fe8450ca688fa4b73e6f13915042c6b2",
+    ".scratch/run2-completion-20261016/resumption/private-custody/initial-pytest.txt": "e9e891d9863dc19a2703b11e2ad60a0c20bbfea5e9d57798ce84560f424cc79a",
+    ".scratch/run2-completion-20261016/resumption/private-custody/mypy.txt": "fe21cd5504dd71c1b9fe07fa87289781721026b1af85ec91546d7cef57ed1947",
+    ".scratch/run2-completion-20261016/resumption/private-custody/posix-result.txt": "b150ca7c7998542d8d53b3af24f195106aea7f509119d0b6d335035ba1dd8c84",
+    ".scratch/run2-completion-20261016/resumption/private-custody/posix_fixture.py": "4ae3e54f29b5188aab10ed440bce7af004fbafbe34e8dff293b3ec2072ad9bee",
+    ".scratch/run2-completion-20261016/resumption/private-custody/pytest.ini": "578fc1cd12d8d642df8eff41d71d5119626e9f88f21fafadba6b1092ac840a93",
+    ".scratch/run2-completion-20261016/resumption/private-custody/pytest.txt": "6cf51ea970a3c5d99b26ace4af834050a2ad6fc0094bcb9ebc3d7a49a9dd3cee",
+    ".scratch/run2-completion-20261016/resumption/private-custody/receipt.json": "01bc2f27082e6d6445ccceb4bea3bf71fd980efcd79a1aba6105fad54a2e5fd8",
+    ".scratch/run2-completion-20261016/resumption/private-custody/ruff-fix.txt": "dc3caa5943bdd27fde969930cb055bb0aac43a0099693dcd8f4a375b47b4e712",
+    ".scratch/run2-completion-20261016/resumption/private-custody/ruff.txt": "dc3caa5943bdd27fde969930cb055bb0aac43a0099693dcd8f4a375b47b4e712",
+    ".scratch/run2-completion-20261016/resumption/private-custody/run_posix.py": "c6f7c2521019f84dd88d1743e100b8dbf5ddfb53eee501a1ebb112d797acbf95",
+    ".scratch/run2-completion-20261016/resumption/private_custody.py": "44b5d1a8c2cdd0ad85abfb18ecd2204713636e4143908e91d46a05e0d257cff9",
+    ".scratch/run2-completion-20261016/resumption/protected-adoption-plan.json": "ebbe60093fa0de640bcba0f05149c8e473b58a8f6ce4706753113c5b8f645278",
+    ".scratch/run2-completion-20261016/resumption/protected-authority-read-2.json": "38446308018d87ecdb594760b2ddd3b41e7ee515245f7cd84fd47963e5712b3c",
+    ".scratch/run2-completion-20261016/resumption/protected-authority-read-3.json": "8758f66f42bb3978e2a57528438ebf00fc82bd92c2f4e3a6dd169ca271b4ce4c",
+    ".scratch/run2-completion-20261016/resumption/protected-authority-read.json": "98de59d2df58e14e9c8b855f7cab0ecaa96fbebeac6fb55a333655695cddd434",
+    ".scratch/run2-completion-20261016/resumption/r1-request.json": "872639378992b6ef0c82a90c098622af837f439c7955a4b5df58cda34271e5e0",
+    ".scratch/run2-completion-20261016/resumption/resource-cleanup.json": "b9c89fd2ff939131ba9784f8adc94f85011f1c517896e3f256af1496f7ffeaf9",
+    ".scratch/run2-completion-20261016/resumption/test_private_custody.py": "354fc3ec3a21125204de0f80fafdb57fbc25cf453f890458a9dc7de9fc6e875c",
+    ".scratch/run2-completion-20261016/resumption/verify_frozen.py": "91a4a76f1142c4a5d4d9bea7cdfcdb208168e7f5974e204e25deb35bc5c2370c",
+    ".scratch/run2-completion-20261016/terminal-adoption/check.py": "65bd810176f92c24f6a3cfcb43eebb606d687629f4695103fce47ef4af7bd8f8",
+    ".scratch/run2-completion-20261016/terminal-adoption/escalated-focused.txt": "abf7f016c821459a3b8f378d2c4ccb627c1a808a8e79a073cff1854c8c04d2e2",
+    ".scratch/run2-completion-20261016/terminal-adoption/final-format.txt": "65533e15617d37aed20dd63c85c09a02ace1baee26d59b7d6543c195dd7906dd",
+    ".scratch/run2-completion-20261016/terminal-adoption/final-mypy.txt": "898817170cea17adacaf53245cb4de7dd8c77c30bbff6b929eddb69a7248d25f",
+    ".scratch/run2-completion-20261016/terminal-adoption/final-ruff.txt": "44b3a0b223b5d90aa85613cea37113de7672ea1aa43c2e605ca6ce3d2a6b44f7",
+    ".scratch/run2-completion-20261016/terminal-adoption/format.txt": "bfc73b46a17cae64f3e807320194a5212c7bd9c7a85b70c42ce2992a77094ab8",
+    ".scratch/run2-completion-20261016/terminal-adoption/receipt.json": "3d5e212bfe6a044049dad361b256746f4c9400e9dca4a46e7d0b7da3ee23d9b8",
+    ".scratch/run2-completion-20261016/terminal-adoption/ruff.txt": "44b3a0b223b5d90aa85613cea37113de7672ea1aa43c2e605ca6ce3d2a6b44f7",
+    ".scratch/run2-completion-20261016/terminal-adoption/tests.txt": "1479c55b018d319c18ac5592e7feb497e4d03d450075f44bb03a5404c1b310e9",
+    ".scratch/run2-completion-20261016/terminal-adoption/timeout.txt": "d82da735df5aba74c707a9dd2b8430f02d48dfaa5c081cdf8f020e5e70b5aed0",
+    "docs/specs/materialization-observation-2026-10/runs/RUN-2-CURRENT-RECONCILIATION-2026-10-16.md": "1e53c054bba513a7ac03f1de9ea103b4ca899d448c12e5500f96402820baf9ef",
+    "docs/specs/materialization-observation-2026-10/runs/RUN-2-EXECUTION-CONTINUATION-EVIDENCE-2026-10-16.json": "f8e0f837b396c72ba8679734f4010709e3eae980be30387017de81fa34f9f208",
+    "docs/specs/materialization-observation-2026-10/runs/RUN-2-EXECUTION-EVIDENCE-2026-10-16.json": "3864840f8dda8018196e7d6a401858d9aa322c636f043dba6f91fb5ab23b175c",
+    "docs/specs/materialization-observation-2026-10/runs/RUN-2-EXECUTION-LEDGER-2026-10-16.md": "881818803ee1b6098c18e7573a8c3db1aadd78d390d7d5f0bfa125ab89c6ae60",
+    "docs/specs/materialization-observation-2026-10/runs/RUN-2-G1-ACCEPTANCE-2026-10-16.md": "6a6fb9c36f33fba56837a6fd7ce986b7708cd781b8e61d4603fea4e93bd9fc31",
+    "docs/specs/materialization-observation-2026-10/runs/RUN-2-INTEGRATION-2026-10-16.md": "dbc182a5e729183546eab0078eb97ac7b4c83c8bc52452c51946d57393fed342",
+    "docs/specs/materialization-observation-2026-10/runs/RUN-2-QUALIFICATION-ENVELOPES-2026-10-16.md": "a44d4bed6dfc25a353af99a1f66c82f629d25fbfaf667fe29aa2b45529cf32d5",
+    "docs/specs/materialization-observation-2026-10/runs/RUN-2-REMAINING-GATES-2026-10-16.md": "1065334b843c24dbf7e17a7964023bc9f1bbeda72802fb745f8d31ba7bf53b0f",
+    "docs/specs/materialization-observation-2026-10/runs/RUN-2-RESUMPTION-AND-APPROVALS-2026-10-16.md": "774ad78956643143e74908308ddb7c89ea27a0ed815352f6f842b28b939eb573",
+    "src/mission_control/adapters/cursor/cloud.py": "ae3298440bd90e17230dc1876500ed8a86c82abd8b66d64b3c0565199c100b6d",
+    "src/mission_control/adapters/cursor/frames.py": "1e0444fb52d76486cb4dee1848de4fbf8a7ee9f5f1bafca5f69457483f610ded",
+    "src/mission_control/application/execution/harness/cursor_usage.py": "6b02127c653bd9728db64ecd361336195cc90f9d0e3e026ea1266bc3dfe0872a",
+    "src/mission_control/application/execution/harness/describe.py": "3232e359f2fec8da885dbec5cc9b37f96ebb1c341b57db017cda6310741d3125",
+    "src/mission_control/application/execution/harness/lane_turns.py": "8cd91773b4cfd9b1e16bbc81a0dbaff774df3cb59071b04e90178419aa8b5f30",
+    "src/mission_control/application/recovery/terminal_lane_adoption.py": "c5535f30597a70a70783edcd718c6be3e685a8cab57dea84724020fc157a2029",
+    "tests/unit/cursor/test_cloud_usage_unknown.py": "8071f1f81be1fa4e28ff3549114d3cdfd8da0e098fb048a64da00eac5139430f",
+    "tests/unit/recovery/test_terminal_lane_adoption.py": "9ac2527adb718967ad6bda7ecb9d70dbbf6cbf1ee2f961139c4ced5c95ee3836",
+    "tests/unit/runtime/test_run2_cursor_usage.py": "2dfa6f4138a3af890f60c277c7d7a98cfee7462a35d776cfd3e824758c3408fa",
+    "tests/unit/subscriptions/test_run2_caller_identity.py": "978a7da7647292d5d4c04d6a91adc5986d2a1f3326b1d62d998d52afd186fc66",
+    "tests/unit/temporal/test_run2_managed_budget_composition.py": "bdcfe996b41f8563ded08a6e4faeef08cc7e052b41fa1ce538350b1755b8413a"
+  },
+  "audit_archive": {
+    "path": "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\run2-completion-offline\\.scratch\\run2-completion-20261016\\resumption\\frozen-v3\\resumed-audit.zip",
+    "sha256": "f7e34e9dd0449c8a90b63254b887f626e72f5e6dff257ed3d17fb531a8d834c0",
+    "bytes": 544505,
+    "zip_integrity": "verified"
+  },
+  "runtime_actions": {
+    "new_native_runs": 0,
+    "native_controls": 0,
+    "shared_data_writes": 0,
+    "service_restarts": 0,
+    "credentials_configured": 0,
+    "commit_merge_push_publication": 0
+  },
+  "remaining": [
+    "R1 explicit private-byte retention approval pending",
+    "R2 unknown-cost/command/application adoption writer remains held",
+    "fullG1 live transport/actual registry/native-supervisor and host-wrapper cleanup unqualified",
+    "native LS07-08/all18S0/R/S1/S2thenS3/current-readiness/fullrelease acceptance not waived",
+    "AF-FOLLOWON-01 excluded/manual"
+  ]
+}

@@ -1,0 +1,129 @@
+{
+  "format": "ks.live-describe-capture.v1",
+  "capturedAt": "2026-10-28T06:05:42.771Z",
+  "purpose": "Sprint OC W0 (WI-24): the live K01 knowledge.describe of each configured binding, composed exactly as the KS executor composes it; read-only, no secret",
+  "composition": "startExecutorServer (verification-executor serve) -> KnowledgeOperationService.descriptorFor per backend",
+  "executor": {
+    "dist": "index.js",
+    "distSha256": "sha256:b2ac663e0240ac44c7c0d48f8de2eb9f6b9eae2453dad28dfe43073d3ec7965e",
+    "commit": "740df8c1720b7eae9988581884de88f26157ec11",
+    "trackedChanges": 0,
+    "node": "v24.18.0"
+  },
+  "envFile": {
+    "name": "ks-executor.bio.env",
+    "variables": [
+      "KS_BIOTECH_COMPONENT_DSN",
+      "KS_BIOTECH_EXECUTOR_READ_TOKEN",
+      "KS_BIOTECH_EXECUTOR_TOKEN",
+      "KS_BIOTECH_EXECUTOR_URL",
+      "KS_KNOWLEDGE_AUDIENCE",
+      "KS_KNOWLEDGE_BINDINGS_JSON",
+      "KS_KNOWLEDGE_ISSUER",
+      "KS_KNOWLEDGE_JWKS_FILE",
+      "KS_KNOWLEDGE_SEAL_KEY_FILE",
+      "KS_KNOWLEDGE_SEAL_KEY_ID",
+      "VERIFY_HOST",
+      "VERIFY_PORT"
+    ]
+  },
+  "registeredBackends": [
+    "aiengineer-postgres",
+    "biotech-graph",
+    "in-memory"
+  ],
+  "bindings": [
+    {
+      "application": "biotech",
+      "binding": "biotech-graph",
+      "installationId": "3e8e892e-17ed-4729-b870-828ce55837ed",
+      "tenantsConfigured": 1,
+      "served": true,
+      "unsupportedReason": null,
+      "capabilities": [
+        "apply",
+        "delivery",
+        "native_receipt_lookup",
+        "research",
+        "revocation"
+      ],
+      "registration": {
+        "id": "biotech-graph",
+        "capabilities": [
+          "research",
+          "apply",
+          "delivery",
+          "native_receipt_lookup",
+          "revocation"
+        ],
+        "storageClass": "graph",
+        "writeAtomicity": "marker_plus_outbox",
+        "nativeCancellation": "stop_dispatch_and_reconcile",
+        "nativeContract": {
+          "name": "biotech-knowledge-apply",
+          "version": "v1"
+        },
+        "researchStore": "aiengineer-postgres/PostgresResearchBinding",
+        "conditionalCapabilities": []
+      },
+      "describe": {
+        "protocolVersions": [
+          "ks.knowledge_operation.v2"
+        ],
+        "binding": "biotech-graph",
+        "application": "biotech",
+        "coreSchemas": [
+          "research-core.task.v2",
+          "research-core.assertion.v2",
+          "research-core.support_set.v2",
+          "research-core.observation.v2",
+          "research-core.mapping.v2",
+          "research-report.v2",
+          "research-report-kind.v1",
+          "research-core.report_assessment.v1"
+        ],
+        "operations": [
+          "knowledge.describe",
+          "knowledge.read",
+          "knowledge.apply",
+          "report.register",
+          "report.derive",
+          "report.observe",
+          "report.seal",
+          "report.decide",
+          "report.review",
+          "decision.resolve",
+          "operation.get",
+          "operation.cancel",
+          "receipt.get"
+        ],
+        "auditorKind": "none",
+        "reportKinds": [
+          "evidence_report",
+          "study_appraisal"
+        ],
+        "media": [
+          "text.markdown",
+          "application.json"
+        ],
+        "guarantees": {
+          "exactRead": "exact_revision",
+          "receiptLookup": "by_effect_key",
+          "nativeCancellation": "stop_dispatch_and_reconcile",
+          "admission": "exact_use_decision",
+          "revocation": "epoch_checked",
+          "writeAtomicity": "marker_plus_outbox"
+        },
+        "signingIssuer": "knowledge-services",
+        "pinnedSchema": {
+          "name": "knowledge-verification-2.5.0",
+          "version": "knowledge-verification.v2",
+          "digest": "sha256:728e4d8aa64a857185be19181886da22ad8952dcec6e4f8a3bf9bf0578d2fd18"
+        },
+        "qualification": [],
+        "describedAt": "2026-10-28T06:05:42.76Z"
+      },
+      "describeDigest": "sha256:1b254873ac39d065fd3d0a2de17c895d5d28e774bc05c2b49208dc1b5bc2d9d4"
+    }
+  ]
+}

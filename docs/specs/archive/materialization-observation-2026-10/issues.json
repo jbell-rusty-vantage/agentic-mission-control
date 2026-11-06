@@ -1,0 +1,4225 @@
+{
+ "parent": "Materialization, observation and hosted-lane maturity (2026-10-12)",
+ "issues": [
+  {
+   "id": "MO-01",
+   "title": "Compose bundle custody into every production capability rows resolver",
+   "owner": "Integrator",
+   "wave": "A",
+   "size": "S",
+   "spec": "SPEC-02-cognition.md",
+   "deps": [],
+   "paths": [
+    "bootstrap/manifests.py",
+    "adapters/temporal/provider_lane_composition.py",
+    "adapters/temporal/deployment_composition.py",
+    "application/capabilities/bundle_custody.py",
+    "tests/integration/"
+   ],
+   "problem": "CatalogProjectionRows/CatalogRows are built without custody, so every skill bundle and hook script raises 'custody is not configured' on every lane in production (gap G1, handoff C5).",
+   "work": [
+    "Pass the configured BundleCustody (local FS or Supabase bucket) into all rows resolvers at bootstrap/manifests.py:213, provider_lane_composition.py:103,163, deployment_composition.py:628,672.",
+    "Workers fetch bundles through signed URLs per ADR-0024; cache by digest.",
+    "Fail launch with a typed error when custody is unavailable instead of at materialization time."
+   ],
+   "acceptance": [
+    "Integration test: one skill bundle and one hook-script pin materialize with matching digests on cursor_local, claude_agent_sdk and codex through production composition.",
+    "Missing custody is a launch-time typed refusal, not a worker crash."
+   ],
+   "sprint": "in",
+   "slice": "F",
+   "file": "MO-01-compose-bundle-custody-into-every-production-capability-rows-resolver.md"
+  },
+  {
+   "id": "MO-02",
+   "title": "Additive instruction layering and structural config merge",
+   "owner": "Environment",
+   "wave": "A",
+   "size": "M",
+   "spec": "SPEC-02-cognition.md",
+   "deps": [
+    "MO-01"
+   ],
+   "paths": [
+    "application/agentic_components/materialization.py",
+    "application/agentic_components/projections.py",
+    "adapters/cursor/projection.py",
+    "adapters/claude/harness.py",
+    "adapters/codex/harness.py"
+   ],
+   "problem": "Cursor overwrites the repo AGENTS.md; Claude/Codex refuse repos that already have AGENTS.md, CLAUDE.md, .mcp.json or settings (gap G8).",
+   "work": [
+    "Cursor: mission overlay as .cursor/rules/mc-mission.mdc (alwaysApply); never touch AGENTS.md.",
+    "Claude: never create CLAUDE.md; local overlay through system_prompt preset append; cloud overlay .claude/rules/mc-mission.md.",
+    "Codex: developerInstructions on thread/start locally; merged AGENTS.override.md (repo AGENTS.md + delimited mission section, <=32 KiB) for cloud.",
+    "Structural merge for .claude/settings.json, .cursor/hooks.json, .codex/hooks.json, .mcp.json, .codex/config.toml with provenance markers and materialization.conflicts policy; receipt lists merged keys."
+   ],
+   "acceptance": [
+    "A fixture repo with its own AGENTS.md, .claude/skills and .cursor/hooks.json launches on all three local lanes; repo files are byte-identical after the run.",
+    "Discovery reports both repo and mission items; conflicts follow the declared policy."
+   ],
+   "sprint": "in",
+   "slice": "F",
+   "file": "MO-02-additive-instruction-layering-and-structural-config-merge.md"
+  },
+  {
+   "id": "MO-03",
+   "title": "Back Codex kernel hooks and handle Codex hook trust",
+   "owner": "Runtime",
+   "wave": "A",
+   "size": "M",
+   "spec": "SPEC-02-cognition.md",
+   "deps": [
+    "MO-01"
+   ],
+   "paths": [
+    "adapters/codex/harness.py",
+    "adapters/codex/compose.py",
+    "adapters/cursor/kernel_hook_script.py",
+    "interfaces/http/hook_callback.py",
+    "docs/qualification/release/multi-provider-2026-10.md"
+   ],
+   "problem": ".codex/hooks.json calls .mission/hooks/kernel.py which the Codex lane never writes; no hook callback service or token is composed; non-managed hooks need hash trust (gap G11).",
+   "work": [
+    "Write kernel.py, context.json and the per-execution token in the Codex lane exactly as cursor_local does; compose HookCallbackService for codex.",
+    "Record hook trust for exact digests in the isolated CODEX_HOME or install kernel hooks as managed requirements (resolve Q-X2).",
+    "Correct the release statement until a live drill proves fail-closed hooks."
+   ],
+   "acceptance": [
+    "Live Codex CLI drill: kernel before_tool deny enforced end to end.",
+    "Release statement matches evidence."
+   ],
+   "sprint": "in",
+   "slice": "F",
+   "file": "MO-03-back-codex-kernel-hooks-and-handle-codex-hook-trust.md"
+  },
+  {
+   "id": "MO-04",
+   "title": "Allowlisted child environments for local provider processes",
+   "owner": "Runtime",
+   "wave": "A",
+   "size": "S",
+   "spec": "SPEC-01-environments.md",
+   "deps": [],
+   "paths": [
+    "bootstrap/provider_auth.py",
+    "adapters/claude/transport.py",
+    "adapters/codex/launcher.py",
+    "adapters/cursor/bridge.py"
+   ],
+   "problem": "The Claude CLI inherits the whole worker environment (DB DSNs, other provider keys); Codex strips secrets its MCP servers need (gap G12).",
+   "work": [
+    "Start every provider child from an empty env plus an explicit allowlist (auth route, kit-declared variables, per-MCP env).",
+    "Pass declared MCP secret env to Codex servers.",
+    "Correct HANDOFF-2026-10-10 'credential-free' statement."
+   ],
+   "acceptance": [
+    "Sentinel test proves only allowlisted names reach each child process on all local lanes."
+   ],
+   "sprint": "in",
+   "slice": "F",
+   "file": "MO-04-allowlisted-child-environments-for-local-provider-processes.md"
+  },
+  {
+   "id": "MO-05",
+   "title": "All local lanes use WorkspaceAllocator with manifest policy and cleanup",
+   "owner": "Runtime",
+   "wave": "A",
+   "size": "M",
+   "spec": "SPEC-03-workspaces-and-placement.md",
+   "deps": [],
+   "paths": [
+    "adapters/codex/harness.py",
+    "adapters/cursor/local.py",
+    "adapters/temporal/provider_lane_composition.py",
+    "application/workspaces/service.py",
+    "adapters/temporal/workflows/"
+   ],
+   "problem": "Codex and Cursor local ignore the manifest workspace policy; WorkspaceAllocator.cleanup and join_shared have no production callers (gap G10).",
+   "work": [
+    "Route Codex and Cursor local through WorkspaceAllocator.allocate with the manifest policy.",
+    "Invoke cleanup from the operation workflow after Artifact registration and liability settlement; never force-delete unsnapshotted dirty work.",
+    "Make shared_checkout reachable through join_shared."
+   ],
+   "acceptance": [
+    "within_run reuse and cleanup verified on all local lanes; snapshots retained; dirty work preserved."
+   ],
+   "sprint": "in",
+   "slice": "F",
+   "file": "MO-05-all-local-lanes-use-workspaceallocator-with-manifest-policy-and-cleanup.md"
+  },
+  {
+   "id": "MO-06",
+   "title": "Compose cursor_cloud with env resolver and workspace lease in production",
+   "owner": "Runtime",
+   "wave": "A",
+   "size": "S",
+   "spec": "SPEC-01-environments.md",
+   "deps": [],
+   "paths": [
+    "adapters/temporal/deployment_composition.py",
+    "adapters/cursor/cloud.py"
+   ],
+   "problem": "cursor_cloud is composed without env_resolver and workspaces, so env_vars_ref is UNSUPPORTED_BEHAVIOR and no provider-workspace lease is recorded.",
+   "work": [
+    "Compose env_resolver (Secret Broker adapter once MO-11 lands; worker env meanwhile) and the WorkspaceAllocator into compose_cursor_cloud."
+   ],
+   "acceptance": [
+    "Production-composition test records a provider-workspace lease and resolves env_vars_ref."
+   ],
+   "sprint": "in",
+   "slice": "S1",
+   "file": "MO-06-compose-cursor-cloud-with-env-resolver-and-workspace-lease-in-production.md"
+  },
+  {
+   "id": "MO-07",
+   "title": "Reconcile stale documentation and status statements",
+   "owner": "Integrator",
+   "wave": "A",
+   "size": "S",
+   "spec": "GAP-REPORT.md",
+   "deps": [],
+   "paths": [
+    "docs/knowledge/capabilities.md",
+    "docs/knowledge/cursor-lane.md",
+    "docs/knowledge/lanes-and-harness.md",
+    "docs/qualification/release/multi-provider-2026-10.md",
+    "skills/mission-control-author/references/manifest-cheatsheet.md",
+    "skills/mission-control-observe/SKILL.md"
+   ],
+   "problem": "Several docs claim behaviour the code does not have (gap G17).",
+   "work": [
+    "Fix each statement listed in research/codebase-materialization.md §4 and codebase-observation.md §7.",
+    "Remove or flag controls.notifications and mission_subscribe guidance until wired."
+   ],
+   "acceptance": [
+    "python docs/tools/validate_okf.py passes; every corrected statement cites code."
+   ],
+   "sprint": "in",
+   "slice": "F",
+   "file": "MO-07-reconcile-stale-documentation-and-status-statements.md",
+   "run2_plan": {
+    "approved_at": "2026-10-14",
+    "inspection_base": "a2527f6f3c385a7f55272c41d90e6860b44781d0",
+    "baseline": "Historical packet kickoff, migration allocation and describe/module prose conflict with Run 1 delivered code; original records remain provenance.",
+    "outcome": "Reconcile active navigation and qualification claims from current code without rewriting immutable historical evidence or reopening completed scope.",
+    "non_goals": "No changes to historical receipt facts, completed Specs 1-6 contracts, provider wire IDs or live readiness.",
+    "sequencing": "Use the existing deps/wave. Shared contracts/composition belong to the integrator; satisfy dependencies with integrated source evidence, not assumed live readiness.",
+    "interfaces": [
+     "docs/",
+     "AGENTS.md (generated index only)"
+    ],
+    "acceptance": [
+     "Document hosted Agents API vs SDK/Responses and standard openai dependency vs historical wire pin; no wire lane rename.",
+     "CM-10 closure reflects existing cloud unit branches and separately verifies local isolation; no duplicated allocator.",
+     "Managed budget-pause unsupported/wiring blocker, release 1.4.0 live disposition and unknown S3 spend remain visible.",
+     "Active kickoff uses fresh remaining issues and migration authority; preserved historical smoke endpoint discrepancy is labelled, not silently altered."
+    ],
+    "offline_validation": [
+     "python docs/tools/agents_docs_index.py --check",
+     "python docs/tools/validate_okf.py",
+     "Read-only issue/spec/links/scope consistency audit; do not regenerate historical baseline over approved Run 2 plans."
+    ],
+    "live_validation": "Unrun until exact prerequisite/configuration/placement and action-specific authorization are established. Use the assigned spec/drill; fixture success never sets qualified. Retain default-off paid runners.",
+    "compatibility": "Preserve old canonical bytes, admitted model/options, approval configuration seals and scoped grants across retry, reattach, continuation and fork. See RUN-2 shared acceptance rules.",
+    "evidence": "Map every criterion to exact source revision, test/receipt, evidence level and disposition; record requested versus observed identity, usage uncertainty, resource custody and cleanup. Apply RUN-2 shared escalation rules.",
+    "effort": "Small acceptance refinement; existing implementation scope remains."
+   }
+  },
+  {
+   "id": "MO-08",
+   "title": "WSL2 worker runbook and host preflight for local Claude and Codex lanes",
+   "owner": "Environment",
+   "wave": "A",
+   "size": "S",
+   "spec": "SPEC-03-workspaces-and-placement.md",
+   "deps": [],
+   "paths": [
+    "docs/MISSION_CONTROL_LOCAL_API.md",
+    "bootstrap/preflight",
+    "scripts/"
+   ],
+   "problem": "Local Claude and Codex lanes refuse Windows hosts; the owner's machine is Windows (gap G16, decision D5).",
+   "work": [
+    "Document and script a WSL2 worker with the workspace root on the WSL filesystem and pinned CLIs.",
+    "Preflight checks host OS, CLI versions and auth per lane.",
+    "Install in WSL: uv (lock-compatible), Python 3.12, Node LTS, pinned Codex, Claude Code CLI; detect Windows shims leaking via /mnt/c on PATH; lease roots on Linux FS; same-tree rule (run from /mnt/c with a separate venv or checkpointed clone)."
+   ],
+   "acceptance": [
+    "Preflight passes on the owner's WSL2 worker for claude_agent_sdk and codex."
+   ],
+   "sprint": "in",
+   "slice": "S0",
+   "file": "MO-08-wsl2-worker-runbook-and-host-preflight-for-local-claude-and-codex-lanes.md"
+  },
+  {
+   "id": "MO-10",
+   "title": "mission/v2 environment additions with validation and binding population",
+   "owner": "Integrator",
+   "wave": "B",
+   "size": "M",
+   "spec": "SPEC-01-environments.md",
+   "deps": [
+    "MO-01"
+   ],
+   "paths": [
+    "domain/authoring/manifest_v2.py",
+    "domain/execution/bindings.py",
+    "application/authoring/manifest_launch_inputs.py",
+    "contracts/schemas/"
+   ],
+   "problem": "The manifest cannot express variables, secrets, kits, network, git write or provider environment strategy (gap G2).",
+   "work": [
+    "Add kit, variables, secrets, network, git, provider_environment to EnvironmentV2 with inheritance rules (no widening).",
+    "Compile-time check of kit requires vs declared variables/secrets/egress; secret names only in bindings.",
+    "Populate EnvironmentBinding.setup_pin, secret_refs, network_policy_ref, observed_config_digest, readiness.",
+    "Relax repo requirement per profile (SPEC-03 §4 correction)."
+   ],
+   "acceptance": [
+    "One manifest compiles offline for all profiles; mismatches are validation errors with JSON pointers; regenerated schemas reproducible."
+   ],
+   "sprint": "in",
+   "slice": "S1",
+   "file": "MO-10-mission-v2-environment-additions-with-validation-and-binding-population.md"
+  },
+  {
+   "id": "MO-11",
+   "title": "Secret Broker port, sources, minting, per-lane delivery and redaction",
+   "owner": "Environment",
+   "wave": "B",
+   "size": "L",
+   "spec": "SPEC-01-environments.md",
+   "deps": [
+    "MO-04"
+   ],
+   "paths": [
+    "application/secrets/",
+    "adapters/secrets/",
+    "bootstrap/",
+    "adapters/cursor/",
+    "adapters/claude/",
+    "adapters/codex/"
+   ],
+   "problem": "Secrets resolve only from the worker env; keyring/secret refs are accepted but never resolved; no minted per-run credentials.",
+   "work": [
+    "Port with keyring/file source and Supabase Vault adapter; provider_held verification.",
+    "mint:signal_token bound to scope/run/unit/generation, digest stored, expiry.",
+    "Delivery adapters: process env allowlist, Cursor env/team secrets API and launch envVars, provider vaults (Anthropic, OpenAI).",
+    "Exact-match redaction for frames/logs/receipts; pre-commit scan of every Mission Control commit to mission branches."
+   ],
+   "acceptance": [
+    "Sentinel secret appears in no commit, frame, log or binding.",
+    "Minted token expires and is bound; wrong-run use rejected."
+   ],
+   "sprint": "in",
+   "slice": "S1",
+   "file": "MO-11-secret-broker-port-sources-minting-per-lane-delivery-and-redaction.md"
+  },
+  {
+   "id": "MO-12",
+   "title": "Environment Kit capability kind, mission layer and bootstrap entrypoint",
+   "owner": "Environment",
+   "wave": "B",
+   "size": "L",
+   "spec": "SPEC-01-environments.md",
+   "deps": [
+    "MO-01",
+    "MO-10"
+   ],
+   "paths": [
+    "domain/capabilities/",
+    "application/capabilities/",
+    "application/environments/",
+    "skills/ or catalog seeds",
+    "packages/mission-control-db-contract"
+   ],
+   "problem": "Nothing provisions packages/runtimes or runs setup; no readiness receipt (gap G2/G3).",
+   "work": [
+    "Add Capability Kind environment_kit with mc.environment_kit.v1 manifest.",
+    "Render .mission/setup/run from kit mission steps; receipt.json contract; bootstrap entrypoint per lane.",
+    "Publish starter kits: python-uv, node, python-uv-node, mission-control-dev, knowledge-research, biotech-backend."
+   ],
+   "acceptance": [
+    "Local lanes reach readiness 'prepared' with a receipt; kits searchable in the catalog with host_support."
+   ],
+   "sprint": "in",
+   "slice": "S1",
+   "file": "MO-12-environment-kit-capability-kind-mission-layer-and-bootstrap-entrypoint.md"
+  },
+  {
+   "id": "MO-13",
+   "title": "Cursor environments and secrets REST adapter (bind/sync) with environment.json ownership check",
+   "owner": "Runtime",
+   "wave": "B",
+   "size": "M",
+   "spec": "SPEC-01-environments.md",
+   "deps": [
+    "MO-11",
+    "MO-12"
+   ],
+   "paths": [
+    "adapters/cursor/cloud_api.py",
+    "adapters/cursor/environments.py",
+    "application/environments/"
+   ],
+   "problem": "Cursor launch sends only env.type; deployment environment_ref is never transmitted; a committed environment.json silently overrides API environments.",
+   "work": [
+    "Implement /v1/environments CRUD and secrets PUT/DELETE; naming mc-<kit>-<digest8>; version history read-back digest.",
+    "Preflight check: committed .cursor/environment.json mc-owned / foreign / absent.",
+    "Resolve Q-C1 (start on startingRef) and Q-C2 (envVars) by drill before relying on them."
+   ],
+   "acceptance": [
+    "Drill: environment created once, reused by a second mission; foreign committed file refused; secret names synced."
+   ],
+   "sprint": "in",
+   "slice": "S1",
+   "file": "MO-13-cursor-environments-and-secrets-rest-adapter-bind-sync-with-environment-json-own.md"
+  },
+  {
+   "id": "MO-14",
+   "title": "Git write path: scoped credentials, pre-push guard, repo_pr effect and head SHA artifacts",
+   "owner": "Environment",
+   "wave": "B",
+   "size": "M",
+   "spec": "SPEC-01-environments.md",
+   "deps": [
+    "MO-05"
+   ],
+   "paths": [
+    "adapters/workspaces/git_workspaces.py",
+    "application/effects/",
+    "adapters/github/",
+    "adapters/cursor/scm.py"
+   ],
+   "problem": "No push/PR path for local lanes; repo_commit never pinned; cloud push uses ambient worker credentials.",
+   "work": [
+    "Worktree-scoped credential helper using a Mission Control GitHub App installation token (owner gh fallback).",
+    "Mission Control-owned pre-push guard allowing only mc/{run}/*.",
+    "repo_pr Governed Effect; head SHA artifacts for every lane (Claude-Session trailer, Cursor branch lookup)."
+   ],
+   "acceptance": [
+    "Push to a non-mc ref rejected; draft PR created through the effect and recorded with SHA."
+   ],
+   "sprint": "in",
+   "slice": "S1",
+   "file": "MO-14-git-write-path-scoped-credentials-pre-push-guard-repo-pr-effect-and-head-sha-art.md"
+  },
+  {
+   "id": "MO-15",
+   "title": "Network policy resolution and per-lane projection",
+   "owner": "Environment",
+   "wave": "B",
+   "size": "S",
+   "spec": "SPEC-01-environments.md",
+   "deps": [
+    "MO-10"
+   ],
+   "paths": [
+    "application/environments/",
+    "adapters/cursor/",
+    "adapters/codex/",
+    "adapters/claude/"
+   ],
+   "problem": "sandbox.egress only enters a policy digest; nothing is enforced (gap G2).",
+   "work": [
+    "Resolve network policy; project to Cursor egress fields, Codex sandbox network, Claude sandbox settings, Managed Agents limited networking, OpenAI environment allowlists, SandboxHost egress.",
+    "Record enforced/advisory/unsupported per lane in the receipt."
+   ],
+   "acceptance": [
+    "Receipt honest per lane; Signal Ingress and Model Gateway hosts always included when required."
+   ],
+   "sprint": "in",
+   "slice": "S1",
+   "file": "MO-15-network-policy-resolution-and-per-lane-projection.md"
+  },
+  {
+   "id": "MO-16",
+   "title": "Persist environment preparation records and readiness levels",
+   "owner": "Integrator",
+   "wave": "B",
+   "size": "M",
+   "spec": "SPEC-01-environments.md",
+   "deps": [
+    "MO-10"
+   ],
+   "paths": [
+    "packages/mission-control-db-contract",
+    "adapters/postgres/",
+    "application/environments/"
+   ],
+   "problem": "mc.environment_preparation.v1 is deferred (C15); readiness is copied from deployment declarations.",
+   "work": [
+    "Common SQL migration plus seeds in the db-contract package; repository adapter; readiness ladder declared→exercised.",
+    "Validation Report and Launch Ticket cite the record."
+   ],
+   "acceptance": [
+    "Real local PostgreSQL test; launch policy enforces the minimum readiness level."
+   ],
+   "sprint": "in",
+   "slice": "S1",
+   "file": "MO-16-persist-environment-preparation-records-and-readiness-levels.md"
+  },
+  {
+   "id": "MO-20",
+   "title": "Owner prerequisite store and generated paste-ready content",
+   "owner": "Environment",
+   "wave": "C",
+   "size": "M",
+   "spec": "SPEC-05-owner-prerequisites.md",
+   "deps": [
+    "MO-12"
+   ],
+   "paths": [
+    "domain/prerequisites/",
+    "application/prerequisites/",
+    "adapters/postgres/"
+   ],
+   "problem": "Human-only steps are not surfaced before spawn (gap G4).",
+   "work": [
+    "mc.owner_prerequisite.v1 with steps, generated content refs, verification method and freshness.",
+    "Generators for Cursor, Claude, Codex, Managed Agents and OpenAI Agents items from kit/policy digests.",
+    "Expiry tracking (Claude 30-day login, tokens)."
+   ],
+   "acceptance": [
+    "Generated content digests match the binding; expiring credentials flagged before launch."
+   ],
+   "sprint": "in",
+   "slice": "S1",
+   "file": "MO-20-owner-prerequisite-store-and-generated-paste-ready-content.md"
+  },
+  {
+   "id": "MO-21",
+   "title": "missionctl preflight and PREREQUISITES_UNMET launch refusal",
+   "owner": "Integrator",
+   "wave": "C",
+   "size": "M",
+   "spec": "SPEC-05-owner-prerequisites.md",
+   "deps": [
+    "MO-20"
+   ],
+   "paths": [
+    "interfaces/cli/main.py",
+    "interfaces/http/",
+    "interfaces/mcp/",
+    "skills/mission-control/SKILL.md"
+   ],
+   "problem": "Launch fails late or silently degrades when human setup is missing.",
+   "work": [
+    "Preflight CLI, HTTP endpoint and MCP tool listing unmet/stale prerequisites, degradations and reachable readiness per lane.",
+    "Launch API refuses with typed PREREQUISITES_UNMET carrying the same list.",
+    "Router skill rule: relay steps to the human, never work around."
+   ],
+   "acceptance": [
+    "Fresh installation plus a claude_managed manifest yields the full list and non-zero exit."
+   ],
+   "sprint": "in",
+   "slice": "S1",
+   "file": "MO-21-missionctl-preflight-and-prerequisites-unmet-launch-refusal.md"
+  },
+  {
+   "id": "MO-22",
+   "title": "missionctl setup wizard, probe missions and attestations",
+   "owner": "Environment",
+   "wave": "C",
+   "size": "M",
+   "spec": "SPEC-05-owner-prerequisites.md",
+   "deps": [
+    "MO-21"
+   ],
+   "paths": [
+    "interfaces/cli/",
+    "scripts/",
+    "missions/probes/"
+   ],
+   "problem": "Owner needs a guided path to complete and verify setup.",
+   "work": [
+    "Wizard per provider (open URL, paste block, attest, verify) following the repo wizard skill pattern.",
+    "Probe missions per cloud/API lane emitting readiness signals; prereq attest command."
+   ],
+   "acceptance": [
+    "Owner completes Cursor and Anthropic setup through the wizard; probes flip items to verified."
+   ],
+   "sprint": "in",
+   "slice": "S1",
+   "file": "MO-22-missionctl-setup-wizard-probe-missions-and-attestations.md"
+  },
+  {
+   "id": "MO-30",
+   "title": "Per-lane layout table and full cognition projection",
+   "owner": "Environment",
+   "wave": "C",
+   "size": "M",
+   "spec": "SPEC-02-cognition.md",
+   "deps": [
+    "MO-01",
+    "MO-02"
+   ],
+   "paths": [
+    "domain/capabilities/layouts.py",
+    "application/agentic_components/projections.py",
+    "adapters/cursor/projection.py",
+    "tests/fixtures/projections/"
+   ],
+   "problem": "Native layouts are hard-coded and partially wrong per provider; API lanes need non-file projection.",
+   "work": [
+    "Data-driven layout table per profile (paths, frontmatter fields, limits).",
+    "Full subagent field mapping per provider with degradation reports; skills placement; Cursor cloud inline customSubagents/mcpServers re-sent every run.",
+    "API projection targets for claude_managed (agent/skills/MCP) and codex_agents (saved agent/skills/tools).",
+    "Move C14 lane-neutral helpers out of adapters/cursor."
+   ],
+   "acceptance": [
+    "Golden fixtures for all nine profiles re-recorded from the fact sheets with degradation reports."
+   ],
+   "sprint": "in",
+   "slice": "S1",
+   "file": "MO-30-per-lane-layout-table-and-full-cognition-projection.md"
+  },
+  {
+   "id": "MO-31",
+   "title": "Evidence-based hook event mapping and Cursor binding v2",
+   "owner": "Runtime",
+   "wave": "C",
+   "size": "M",
+   "spec": "SPEC-02-cognition.md",
+   "deps": [
+    "MO-03"
+   ],
+   "paths": [
+    "domain/capabilities/hooks.py",
+    "domain/execution/lanes.py",
+    "application/authoring/cursor_launch.py"
+   ],
+   "problem": "_CODEX mapping was copied from _CLAUDE; Cursor binding cannot carry hook scripts or plugins (parity gap 15).",
+   "work": [
+    "Rebuild HOOK_EVENT_MAPPING per profile with enforce/observe, cloud support, timeouts, fail-closed form.",
+    "mc.cursor_binding.v2 with hook_script_pins and plugin_expansion_digest."
+   ],
+   "acceptance": [
+    "Missions 2 and 3 launch on Cursor as authored; validation rejects unsupported enforced events per lane."
+   ],
+   "sprint": "in",
+   "slice": "S1",
+   "file": "MO-31-evidence-based-hook-event-mapping-and-cursor-binding-v2.md"
+  },
+  {
+   "id": "MO-32",
+   "title": "Plugin expansion into constituent kinds for every lane",
+   "owner": "Environment",
+   "wave": "C",
+   "size": "S",
+   "spec": "SPEC-02-cognition.md",
+   "deps": [
+    "MO-30"
+   ],
+   "paths": [
+    "application/capabilities/plugins.py",
+    "application/agentic_components/projections.py"
+   ],
+   "problem": "Provider plugin formats differ and Claude cloud ignores repo plugins.",
+   "work": [
+    "Expand catalog plugins into skills/agents/hooks/MCP; reject cycles and collisions; native plugin loading only behind qualification."
+   ],
+   "acceptance": [
+    "One plugin yields equivalent parts on all lanes."
+   ],
+   "sprint": "in",
+   "slice": "S1",
+   "file": "MO-32-plugin-expansion-into-constituent-kinds-for-every-lane.md"
+  },
+  {
+   "id": "MO-33",
+   "title": "Ambient cognition inventory and policy",
+   "owner": "Environment",
+   "wave": "C",
+   "size": "M",
+   "spec": "SPEC-02-cognition.md",
+   "deps": [
+    "MO-30"
+   ],
+   "paths": [
+    "application/agentic_components/materialization.py",
+    "domain/capabilities/"
+   ],
+   "problem": "Providers load cognition Mission Control did not place (Cursor reads .claude/* and .codex/agents) (gap G13).",
+   "work": [
+    "Scan every root each lane loads; record ambient inventory in the receipt.",
+    "Policy allow | inventory | refuse_conflicts; local suppression where providers allow."
+   ],
+   "acceptance": [
+    "Receipt lists ambient items on each local lane; conflicts refused under policy."
+   ],
+   "sprint": "in",
+   "slice": "S1",
+   "file": "MO-33-ambient-cognition-inventory-and-policy.md"
+  },
+  {
+   "id": "MO-34",
+   "title": "Discovery proof per lane",
+   "owner": "Runtime",
+   "wave": "C",
+   "size": "M",
+   "spec": "SPEC-02-cognition.md",
+   "deps": [
+    "MO-30"
+   ],
+   "paths": [
+    "adapters/claude/",
+    "adapters/codex/",
+    "adapters/cursor/",
+    "application/environments/"
+   ],
+   "problem": "A generated file does not prove the provider loaded it (gap G14).",
+   "work": [
+    "Claude init/InstructionsLoaded; Codex skills/list, hooks/list, config/read; Cursor setting read-back; materialization.observed signal for cloud; API read-back for claude_managed/codex_agents."
+   ],
+   "acceptance": [
+    "Readiness reaches 'discovered' on local lanes, cursor_cloud and both API lanes."
+   ],
+   "sprint": "in",
+   "slice": "S1",
+   "file": "MO-34-discovery-proof-per-lane.md"
+  },
+  {
+   "id": "MO-35",
+   "title": "Publish Cognition Profiles for SDLC, knowledge and mixed work",
+   "owner": "Environment",
+   "wave": "C",
+   "size": "S",
+   "spec": "SPEC-02-cognition.md",
+   "deps": [
+    "MO-30"
+   ],
+   "paths": [
+    "skills/",
+    "catalog seeds"
+   ],
+   "problem": "Task families need default cognition packs.",
+   "work": [
+    "Publish cognition/sdlc, cognition/knowledge, cognition/mixed as plugins/workflow templates sized to lane limits."
+   ],
+   "acceptance": [
+    "Manifests reference them; capability search finds them."
+   ],
+   "sprint": "in",
+   "slice": "S1",
+   "file": "MO-35-publish-cognition-profiles-for-sdlc-knowledge-and-mixed-work.md"
+  },
+  {
+   "id": "MO-40",
+   "title": "Signal Ingress service, SQL functions and migration 0035",
+   "owner": "Events",
+   "wave": "B",
+   "size": "L",
+   "spec": "SPEC-10-ingress-on-vercel.md",
+   "deps": [
+    "MO-11"
+   ],
+   "paths": [
+    "application/signals/",
+    "adapters/postgres/ingress.py",
+    "interfaces/http/ingress.py",
+    "packages/mission-control-db-contract/component/migrations/0035_signal_ingress.sql",
+    "interfaces/http/hook_callback.py"
+   ],
+   "problem": "No authenticated public ingress; cloud lanes are blind beyond provider APIs (gap G6).",
+   "work": [
+    "Migration 0035 (component 1.4.0): ingress_credential, ingress_session_binding, ingress_inbox (+ pg_notify trigger), ingress_artifact_upload; NOLOGIN role with EXECUTE-only SECURITY DEFINER functions ingress_accept, ingress_gate (intent before allow), ingress_webhook, ingress_artifact_prepare/commit.",
+    "Application ingress service and HTTP router for /v1/ingress/{app}/… with tiers run_token, Cursor OIDC (JWKS), standard-webhooks/HMAC, environment-key HMAC with session binding; derived secrets.",
+    "Unify the loopback hook callback onto the same handlers."
+   ],
+   "acceptance": [
+    "Per-tier accept/reject, dedupe, size and rate tests; real PostgreSQL tests for every SQL function including gate ordering and token revocation."
+   ],
+   "sprint": "in",
+   "slice": "S1",
+   "file": "MO-40-signal-ingress-service-sql-functions-and-migration-0035.md"
+  },
+  {
+   "id": "MO-41",
+   "title": "Telemetry Hook Pack, mc-signal CLI and signal_emit tool",
+   "owner": "Events",
+   "wave": "C",
+   "size": "M",
+   "spec": "SPEC-04-watchers-and-callbacks.md",
+   "deps": [
+    "MO-40",
+    "MO-30"
+   ],
+   "paths": [
+    "skills/mc-signals/",
+    "application/agentic_components/",
+    "interfaces/mcp/"
+   ],
+   "problem": "Agents and hooks have no formal channel back to Mission Control (replaces ad hoc watcher/status files).",
+   "work": [
+    "Dependency-free signal script with spool, seq and batching; mc-signal CLI; signal_emit MCP tool; mc-signals skill.",
+    "Native projection per lane per SPEC-04 §4.2."
+   ],
+   "acceptance": [
+    "cursor_cloud drill: session.started, materialization.observed and stop arrive ordered with no gaps."
+   ],
+   "sprint": "in",
+   "slice": "S1",
+   "file": "MO-41-telemetry-hook-pack-mc-signal-cli-and-signal-emit-tool.md"
+  },
+  {
+   "id": "MO-42",
+   "title": "Gate hooks and remote stop fence",
+   "owner": "Events",
+   "wave": "C",
+   "size": "M",
+   "spec": "SPEC-04-watchers-and-callbacks.md",
+   "deps": [
+    "MO-41"
+   ],
+   "paths": [
+    "application/signals/gates.py",
+    "skills/mc-signals/"
+   ],
+   "problem": "Lanes without a cancel API cannot be stopped mid-turn; remote VMs lack Stop Fence parity.",
+   "work": [
+    "Synchronous gate endpoint returning allow/deny/stop mapped to native hook outputs; trust-tier rules; fail-closed when declared."
+   ],
+   "acceptance": [
+    "cursor_cloud drill stops within one tool call after cancel; fail-closed gate denies when ingress is down."
+   ],
+   "sprint": "in",
+   "slice": "S1",
+   "file": "MO-42-gate-hooks-and-remote-stop-fence.md"
+  },
+  {
+   "id": "MO-43",
+   "title": "Wake channels: missionctl wait, inbox long-poll, MCP inbox_wait, auto-subscribe",
+   "owner": "Events",
+   "wave": "B",
+   "size": "M",
+   "spec": "SPEC-04-watchers-and-callbacks.md",
+   "deps": [],
+   "paths": [
+    "interfaces/cli/main.py",
+    "interfaces/http/coordinator_inbox.py",
+    "interfaces/mcp/",
+    "bootstrap/api.py",
+    "application/subscriptions/"
+   ],
+   "problem": "Nothing wakes the orchestrating agent; MCP surfaces are split; auto-subscribe missing (gap G5).",
+   "work": [
+    "missionctl wait (--follow); GET inbox?wait=; MCP inbox_wait on the authenticated server; unify inbox/transcripts/signal_emit onto it.",
+    "Auto-subscribe the launcher on every coordinator launch; relay on by default; webhook payload: summary; deprecate mission_subscribe (ADR-0049).",
+    "Authenticated MCP gains submit, start and intervene (dev MCP compiles only)."
+   ],
+   "acceptance": [
+    "A Claude Code coordinator is woken by background missionctl wait on run.completed (recorded transcript)."
+   ],
+   "sprint": "in",
+   "slice": "S0",
+   "file": "MO-43-wake-channels-missionctl-wait-inbox-long-poll-mcp-inbox-wait-auto-subscribe.md"
+  },
+  {
+   "id": "MO-44",
+   "title": "Watchers: schema, compiled descriptors, evaluator, actions and boundaries",
+   "owner": "Events",
+   "wave": "C",
+   "size": "L",
+   "spec": "SPEC-04-watchers-and-callbacks.md",
+   "deps": [
+    "MO-43"
+   ],
+   "paths": [
+    "domain/authoring/manifest_v2.py",
+    "domain/programs/",
+    "application/watchers/",
+    "adapters/temporal/"
+   ],
+   "problem": "Manifests cannot declare watchers/callbacks/limits; controls.notifications is dead; event_wait only releases manually (gap G7).",
+   "work": [
+    "controls.watchers with closed ADR-0010 conditions, typed actions and mandatory boundaries; Capability Kind watcher.",
+    "Deterministic Watcher Evaluator over outbox/frames/timers; watcher.fired/failed events; dedupe key (watcher_id, trigger_event_id).",
+    "controls.notifications consumed as sugar; event_wait satisfiable by watcher."
+   ],
+   "acceptance": [
+    "Temporal test env: sample watchers fire deterministically; replay causes no duplicate actions; limits enforced."
+   ],
+   "sprint": "in",
+   "slice": "S1",
+   "file": "MO-44-watchers-schema-compiled-descriptors-evaluator-actions-and-boundaries.md"
+  },
+  {
+   "id": "MO-45",
+   "title": "External signal sources: GitHub, Cursor v0 webhook, schedules, worker watches",
+   "owner": "Events",
+   "wave": "D",
+   "size": "M",
+   "spec": "SPEC-04-watchers-and-callbacks.md",
+   "deps": [
+    "MO-40",
+    "MO-44"
+   ],
+   "paths": [
+    "interfaces/http/ingress.py",
+    "adapters/github/",
+    "adapters/temporal/activities/"
+   ],
+   "problem": "Watchers need PR/CI, provider status, timers and process/log/file watches.",
+   "work": [
+    "GitHub webhook + poll fallback; Cursor v0 statusChange; Temporal schedules; S6 worker watches with heartbeats."
+   ],
+   "acceptance": [
+    "Each source produces typed signals consumed by a watcher in tests."
+   ],
+   "sprint": "in",
+   "slice": "S1",
+   "file": "MO-45-external-signal-sources-github-cursor-v0-webhook-schedules-worker-watches.md"
+  },
+  {
+   "id": "MO-46",
+   "title": "Standard watcher library",
+   "owner": "Events",
+   "wave": "D",
+   "size": "S",
+   "spec": "SPEC-04-watchers-and-callbacks.md",
+   "deps": [
+    "MO-44"
+   ],
+   "paths": [
+    "skills/ or catalog seeds"
+   ],
+   "problem": "Replace the owner's ad hoc supervisor/poll/stop scripts with reusable templates.",
+   "work": [
+    "stall-detector, result-marker-stop, ci-watch, pr-merged-release-wait, artifact-pipeline, budget-guard, heartbeat-progress."
+   ],
+   "acceptance": [
+    "Each template has an example manifest and a test."
+   ],
+   "sprint": "in",
+   "slice": "S1",
+   "file": "MO-46-standard-watcher-library.md"
+  },
+  {
+   "id": "MO-47",
+   "title": "Observe skill v2 and router/author skill updates",
+   "owner": "Events",
+   "wave": "D",
+   "size": "S",
+   "spec": "SPEC-04-watchers-and-callbacks.md",
+   "deps": [
+    "MO-43",
+    "MO-44"
+   ],
+   "paths": [
+    "skills/mission-control-observe/",
+    "skills/mission-control/",
+    "skills/mission-control-author/"
+   ],
+   "problem": "Observe skill advertises a broken push and lacks wait recipes.",
+   "work": [
+    "Rewrite around launch-then-wait, supervise-many, inspect-on-wake, declare-watchers; follow writing-for-agents; update manifest digests."
+   ],
+   "acceptance": [
+    "Recipes executed in a recorded session; make skills-check passes."
+   ],
+   "sprint": "in",
+   "slice": "S1",
+   "file": "MO-47-observe-skill-v2-and-router-author-skill-updates.md"
+  },
+  {
+   "id": "MO-50",
+   "title": "Generalised cloud branch preparation with large-input references",
+   "owner": "Environment",
+   "wave": "D",
+   "size": "M",
+   "spec": "SPEC-03-workspaces-and-placement.md",
+   "deps": [
+    "MO-11",
+    "MO-12",
+    "MO-30"
+   ],
+   "paths": [
+    "adapters/cursor/scm.py",
+    "application/workspaces/",
+    "adapters/github/"
+   ],
+   "problem": "Only Cursor prepares branches; inputs are committed regardless of size or sensitivity.",
+   "work": [
+    "Shared mc/{run}/{unit} preparation for all branch-based cloud lanes with secret scan.",
+    "Inputs over 256 KiB or sensitive become Artifact references fetched at runtime."
+   ],
+   "acceptance": [
+    "Large inputs never committed; branch carries pack, mission layer and packet."
+   ],
+   "sprint": "in",
+   "slice": "S1",
+   "file": "MO-50-generalised-cloud-branch-preparation-with-large-input-references.md"
+  },
+  {
+   "id": "MO-51",
+   "title": "Knowledge workspaces and output channels",
+   "owner": "Environment",
+   "wave": "D",
+   "size": "M",
+   "spec": "SPEC-03-workspaces-and-placement.md",
+   "deps": [
+    "MO-40",
+    "MO-50"
+   ],
+   "paths": [
+    "domain/authoring/manifest_v2.py",
+    "adapters/cursor/workspace.py",
+    "application/workspaces/",
+    "interfaces/http/ingress.py"
+   ],
+   "problem": "Knowledge/research/content missions cannot launch without a target code repo (gap G9).",
+   "work": [
+    "workspace.kind code|knowledge|mixed; Application knowledge repo binding; research lease reachable; repo-optional for API lanes and Cursor no-repo agents.",
+    "Output channels: ingress artifact upload, branch commit, provider artifacts; Completion Contract names the evidence channel."
+   ],
+   "acceptance": [
+    "A knowledge mission with no code repo completes on cursor_cloud, claude_managed and a local lane with an accepted output Artifact."
+   ],
+   "sprint": "in",
+   "slice": "S1",
+   "file": "MO-51-knowledge-workspaces-and-output-channels.md"
+  },
+  {
+   "id": "MO-52",
+   "title": "Placement limits, fan-out admission and lane preference",
+   "owner": "Runtime",
+   "wave": "D",
+   "size": "M",
+   "spec": "SPEC-03-workspaces-and-placement.md",
+   "deps": [
+    "MO-21"
+   ],
+   "paths": [
+    "application/missions/admission.py",
+    "adapters/temporal/",
+    "bootstrap/settings.py"
+   ],
+   "problem": "Parallel cloud work needs per-provider concurrency budgets and lane fallback.",
+   "work": [
+    "placement_limits per profile; durable waits when exceeded; placement prefer_cloud|cloud_only|local_only; first-qualified lane resolution."
+   ],
+   "acceptance": [
+    "Five-member fan-out throttled at three active without busy loops."
+   ],
+   "sprint": "in",
+   "slice": "S1",
+   "file": "MO-52-placement-limits-fan-out-admission-and-lane-preference.md"
+  },
+  {
+   "id": "MO-53",
+   "title": "Cross-lane forks between cloud and local",
+   "owner": "Runtime",
+   "wave": "D",
+   "size": "M",
+   "spec": "SPEC-03-workspaces-and-placement.md",
+   "deps": [
+    "MO-50"
+   ],
+   "paths": [
+    "application/recovery/",
+    "application/workspaces/snapshots.py"
+   ],
+   "problem": "Forks must move between placements without copying provider transcripts.",
+   "work": [
+    "Cloud→local fetch of mission branch into a lease; local→cloud snapshot push and launch; continuation per ADR-0039."
+   ],
+   "acceptance": [
+    "Cloud head SHA reproduced in a local lease and vice versa."
+   ],
+   "sprint": "deferred",
+   "slice": "-",
+   "file": "MO-53-cross-lane-forks-between-cloud-and-local.md"
+  },
+  {
+   "id": "HL-01",
+   "title": "Daytona qualification on the current tier",
+   "owner": "Environment",
+   "wave": "D",
+   "size": "S",
+   "spec": "SPEC-06-hosted-api-lanes.md",
+   "deps": [],
+   "paths": [
+    "docs/specs/materialization-observation-2026-10/research/"
+   ],
+   "problem": "Daytona is chosen (R9) and runs on the current tier (R16); stdin, log streaming, preview-URL headers and the essential-services egress must be confirmed before adapters depend on them.",
+   "work": [
+    "Record the observed tier (dashboard limits page); the design must work on Tier 1/2 (R16). Confirm a sandbox reaches the Vercel project's *.vercel.app host, api.anthropic.com, api.openai.com, *.chatgpt.com, GitHub, PyPI and npm, and that an arbitrary host is blocked.",
+    "One authorized low-cost smoke (inside the S4 budget and the $200 free credit): create from image, session exec with suppress_input_echo and text-line stdin, log WebSocket streaming, signed preview URL with bearer header pass-through, snapshot/restore, terminate.",
+    "Record results in research/daytona.md."
+   ],
+   "acceptance": [
+    "Each SandboxHost method's Daytona behaviour confirmed or its gap recorded with a workaround."
+   ],
+   "funding_gated": true,
+   "sprint": "in",
+   "slice": "S4",
+   "file": "HL-01-daytona-qualification-on-the-current-tier.md"
+  },
+  {
+   "id": "HL-02",
+   "title": "SandboxHost port with Docker (WSL2) and Daytona adapters",
+   "owner": "Hosted",
+   "wave": "D",
+   "size": "M",
+   "spec": "SPEC-06-hosted-api-lanes.md",
+   "deps": [
+    "HL-01"
+   ],
+   "paths": [
+    "application/execution/ports.py",
+    "adapters/sandboxes/docker/",
+    "adapters/sandboxes/<provider>/"
+   ],
+   "problem": "Self-hosted executors and Sandbox Host placements need one provider-neutral port.",
+   "work": [
+    "Port per SPEC-06 §2 and §12.1; Daytona adapter (daytona SDK 0.224.0 async, explicit key/URL/target, kit snapshots per size, TTL reaper, session exec with echo suppressed and adapter-enforced timeouts, labels and orphan sweep).",
+    "Docker adapter on WSL2 with TTL reaper, egress-proxy sidecar, committed-image snapshots and the same text-line stdin contract."
+   ],
+   "acceptance": [
+    "Shared SandboxHost conformance tests pass on Docker and Daytona (Daytona run owner-authorized); orphan sweep removes labelled leftovers."
+   ],
+   "funding_gated": true,
+   "sprint": "in",
+   "slice": "S4",
+   "file": "HL-02-sandboxhost-port-with-docker-wsl2-and-daytona-adapters.md"
+  },
+  {
+   "id": "HL-03",
+   "title": "Model Gateway: keyless model access from sandboxes",
+   "owner": "Environment",
+   "wave": "D",
+   "size": "M",
+   "spec": "SPEC-06-hosted-api-lanes.md",
+   "deps": [
+    "MO-11",
+    "HL-02",
+    "MO-74"
+   ],
+   "paths": [
+    "interfaces/http/model_gateway.py",
+    "application/secrets/",
+    "deployments/ingress-vercel/ (gateway routes; leased from the integrator)"
+   ],
+   "problem": "Claude CLI or Codex inside a sandbox would otherwise need the organisation API key.",
+   "work": [
+    "Gateway per SPEC-06 §12.2: /v1/messages?beta=true (+count_tokens) only; byte-for-byte body and anthropic-* headers; unbuffered SSE with pings; retry-after/x-should-retry passthrough; per-run token → x-api-key; per-run usage and hard 429 on budget.",
+    "Sandbox env contract (ANTHROPIC_BASE_URL, ANTHROPIC_AUTH_TOKEN, CLAUDE_CODE_PROVIDER_MANAGED_BY_HOST=1, CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1, CLAUDE_CODE_SKIP_FAST_MODE_NETWORK_ERRORS=1, skipWebFetchPreflight).",
+    "Two placements sharing one module (R16, R17): the worker host for Docker on WSL2 (host.docker.internal), and gateway routes in the Vercel ingress project served from its *.vercel.app host for Daytona Tier 1/2. On Vercel: per-run token checked in Postgres (ingress_credential, purpose model_gateway); org keys only as Production sensitive env vars; maxDuration 800 s for streams; the 4.5 MB request cap returns a typed 413 with the size; data class internal or lower only."
+   ],
+   "acceptance": [
+    "Sentinel test: no org key in any sandbox env or file.",
+    "Claude CLI in Docker completes a turn through the worker-host gateway, and through the Vercel gateway from a Daytona sandbox on the current tier.",
+    "A request over budget gets the hard 429; usage per run is recorded."
+   ],
+   "funding_gated": true,
+   "sprint": "in",
+   "slice": "S4",
+   "file": "HL-03-model-gateway-keyless-model-access-from-sandboxes.md"
+  },
+  {
+   "id": "HL-04",
+   "title": "Extract the Remote Session Lane base from cursor_cloud",
+   "owner": "Hosted",
+   "wave": "A",
+   "size": "M",
+   "spec": "SPEC-06-hosted-api-lanes.md",
+   "deps": [],
+   "paths": [
+    "adapters/remote_session/",
+    "adapters/cursor/cloud.py",
+    "adapters/cursor/sse.py",
+    "adapters/cursor/cloud_api.py"
+   ],
+   "problem": "Two new hosted lanes would duplicate SSE, reconcile, idempotency, error and custody machinery.",
+   "work": [
+    "Move provider-neutral parts into adapters/remote_session (ADR-0052); cursor_cloud becomes the first client with no behaviour change."
+   ],
+   "acceptance": [
+    "All existing cursor_cloud tests pass unchanged; base has its own unit tests."
+   ],
+   "sprint": "in",
+   "slice": "F",
+   "file": "HL-04-extract-the-remote-session-lane-base-from-cursor-cloud.md"
+  },
+  {
+   "id": "HL-05",
+   "title": "Lane conformance suite for every lane",
+   "owner": "Integrator",
+   "wave": "A",
+   "size": "M",
+   "spec": "SPEC-06-hosted-api-lanes.md",
+   "deps": [],
+   "paths": [
+    "tests/conformance/lanes/",
+    "tests/unit/cursor/test_describe_honesty.py"
+   ],
+   "problem": "Describe honesty is tested for Cursor only; no shared lane scenarios exist.",
+   "work": [
+    "Shared scenarios per SPEC-06 §3 run against each lane fake; generalise describe-honesty."
+   ],
+   "acceptance": [
+    "All existing lanes pass or have documented, declared exceptions; new lanes must pass to merge."
+   ],
+   "sprint": "in",
+   "slice": "F",
+   "file": "HL-05-lane-conformance-suite-for-every-lane.md"
+  },
+  {
+   "id": "HL-06",
+   "title": "Profile vocabulary for claude_managed and codex_agents, data class and ADR-0050",
+   "owner": "Integrator",
+   "wave": "A",
+   "size": "M",
+   "spec": "SPEC-06-hosted-api-lanes.md",
+   "deps": [
+    "HL-05"
+   ],
+   "paths": [
+    "domain/capabilities/host_support.py",
+    "domain/execution/lanes.py",
+    "domain/execution/bindings.py",
+    "domain/authoring/manifest.py",
+    "domain/authoring/manifest_v2.py",
+    "application/execution/harness/describe.py",
+    "application/authoring/provider_launch.py",
+    "bootstrap/provider_auth.py",
+    "packages/mission-control-db-contract"
+   ],
+   "problem": "New profiles touch every vocabulary listed in research/codebase-new-lanes.md §2.",
+   "work": [
+    "Add both profiles on existing lanes (claude, codex) with placements; describe matrices per SPEC-06 §9; options classes; api_key auth routes with billing consent.",
+    "Add data_class to missions and enforce per-lane admission (SPEC-06 §8).",
+    "DB migration after 0034 widening profile checks; regenerate schemas; ADR-0050 proposed."
+   ],
+   "acceptance": [
+    "Import-time guards pass; describe-only registry lists both profiles unqualified; PHI-classed mission refused."
+   ],
+   "sprint": "in",
+   "slice": "F",
+   "file": "HL-06-profile-vocabulary-for-claude-managed-and-codex-agents-data-class-and-adr-0050.md"
+  },
+  {
+   "id": "HL-07",
+   "title": "claude_managed prepare: agents, skills, environments and vaults from pack files",
+   "owner": "Hosted",
+   "wave": "B",
+   "size": "M",
+   "spec": "SPEC-06-hosted-api-lanes.md",
+   "deps": [
+    "HL-06",
+    "HL-23"
+   ],
+   "paths": [
+    "adapters/anthropic_managed/prepare.py",
+    "adapters/anthropic_managed/client.py"
+   ],
+   "problem": "Cognition and environment must be projected through the Managed Agents API. To start S2 before the S1 foundations (R30), the first prepare reads checked-in pack files; HL-21 later swaps in the general projection.",
+   "work": [
+    "Pack files under deployments/hosted-packs/<app>/claude_managed/: agent (model, system overlay, tools with permission policies, MCP servers, skills directories, metadata), environment (packages, limited networking with explicit allowed_hosts including the ingress host), vault credential names (values from the worker env at sync time, never from files).",
+    "Sync keyed by digest: agent per materialization digest (optimistic version), skills uploaded by bundle digest, environment per kit digest (new digest means new environment), vault per secret-set digest.",
+    "Render repo AGENTS.md into system; record API read-back digests as discovery proof."
+   ],
+   "acceptance": [
+    "Fake-API tests; a live sync creates resources once and reuses them on the second run (owner-authorized, inside the S2 budget)."
+   ],
+   "sprint": "in",
+   "slice": "S2",
+   "file": "HL-07-claude-managed-prepare-agents-skills-environments-and-vaults-from-pack-files.md"
+  },
+  {
+   "id": "HL-08",
+   "title": "claude_managed session lifecycle and frame classifier",
+   "owner": "Hosted",
+   "wave": "B",
+   "size": "L",
+   "spec": "SPEC-06-hosted-api-lanes.md",
+   "deps": [
+    "HL-04",
+    "HL-07"
+   ],
+   "paths": [
+    "adapters/anthropic_managed/harness.py",
+    "adapters/anthropic_managed/frames.py",
+    "application/frames/kinds.py"
+   ],
+   "problem": "Full harness operations on Managed Agents sessions.",
+   "work": [
+    "start with budget and metadata reconcile; observe SSE + history with cursor (created_at,id,threads); reattach; send_turn queue; cancel via user.interrupt; interrupt_and_inject; pause via budget gate; usage from list_cost; end via interrupt→archive→delete.",
+    "KIND_TABLES/DEDUPE rows; closing facts from idle end_turn correlated with interrupts; multiagent off by default.",
+    "Read-only knowledge missions may enable multiagent (dynamic workflows and subagents) and user.define_outcome; outcome results are evidence for the Completion Contract, never acceptance (R33). Code missions keep multiagent off."
+   ],
+   "acceptance": [
+    "Conformance suite passes; reattach after worker kill yields no duplicate frames."
+   ],
+   "sprint": "in",
+   "slice": "S2",
+   "file": "HL-08-claude-managed-session-lifecycle-and-frame-classifier.md"
+  },
+  {
+   "id": "HL-09",
+   "title": "claude_managed approvals, Mission Control custom tools and publication",
+   "owner": "Hosted",
+   "wave": "B",
+   "size": "M",
+   "spec": "SPEC-06-hosted-api-lanes.md",
+   "deps": [
+    "HL-08",
+    "MO-14"
+   ],
+   "paths": [
+    "adapters/anthropic_managed/tools.py",
+    "application/approvals/"
+   ],
+   "problem": "Managed Agents has no hooks; gating and effects need custom tools and permission policies.",
+   "work": [
+    "always_ask → Human Task → user.tool_confirmation; mc_signal, mc_request_approval, mc_checkpoint, mc_record_intent, mc_prepare, mc_publish answered after Stop Fence.",
+    "Readiness gating via always_ask until env.prepared; bundle-based publication with verify→push→repo_pr."
+   ],
+   "acceptance": [
+    "Approval round trip and bundle publication drills pass; no push credential in cloud sandbox by default."
+   ],
+   "sprint": "in",
+   "slice": "S2",
+   "file": "HL-09-claude-managed-approvals-mission-control-custom-tools-and-publication.md"
+  },
+  {
+   "id": "HL-10",
+   "title": "claude_managed self_hosted placement on SandboxHost",
+   "owner": "Hosted",
+   "wave": "D",
+   "size": "L",
+   "spec": "SPEC-06-hosted-api-lanes.md",
+   "deps": [
+    "HL-08",
+    "HL-02"
+   ],
+   "paths": [
+    "adapters/anthropic_managed/worker.py",
+    "adapters/temporal/activities/"
+   ],
+   "problem": "Code work needs our worktrees, remotes, services and real tool interception.",
+   "work": [
+    "Environment worker with our wrapped tool implementations (Stop Fence, Operation Intent, kernel policy, frame capture) over SandboxHost exec in the lease.",
+    "Own runner without the 150 s cap; staged repos; environment key from Secret Broker.",
+    "Own poll/ack/heartbeat loop per SPEC-06 §4.3 (412 = lease lost, ttl_seconds, per-item sessions_token); idempotent tools keyed (session, tool_use_id); worker stays outside the sandbox."
+   ],
+   "acceptance": [
+    "Drill: code mission in a Docker lease with kernel deny and verified publication."
+   ],
+   "funding_gated": true,
+   "sprint": "in",
+   "slice": "S4",
+   "file": "HL-10-claude-managed-self-hosted-placement-on-sandboxhost.md"
+  },
+  {
+   "id": "HL-11",
+   "title": "codex_agents prepare: saved agents, environment templates, prewarm and vaults from pack files",
+   "owner": "Hosted",
+   "wave": "C",
+   "size": "M",
+   "spec": "SPEC-06-hosted-api-lanes.md",
+   "deps": [
+    "HL-06",
+    "HL-23"
+   ],
+   "paths": [
+    "adapters/openai_agents/prepare.py",
+    "adapters/openai_agents/client.py"
+   ],
+   "problem": "Project Cognition Pack and kits through the Agents API.",
+   "work": [
+    "Pack files under deployments/hosted-packs/<app>/codex_agents/: saved agent (instructions append plus inlined repo rules, function tools mc_*, MCP), environment template (setup commands, packages, network allowlist), skills and plugins, vault credential names.",
+    "Saved agent per pack digest; environment templates and prewarm with Idempotency-Key; vault credentials from the worker env at sync time."
+   ],
+   "acceptance": [
+    "Fake-API tests; drill reuse by digest."
+   ],
+   "sprint": "in",
+   "slice": "S3",
+   "file": "HL-11-codex-agents-prepare-saved-agents-environment-templates-prewarm-and-vaults-from.md"
+  },
+  {
+   "id": "HL-12",
+   "title": "codex_agents session lifecycle, recovery recipe and frame classifier",
+   "owner": "Hosted",
+   "wave": "C",
+   "size": "L",
+   "spec": "SPEC-06-hosted-api-lanes.md",
+   "deps": [
+    "HL-04",
+    "HL-11"
+   ],
+   "paths": [
+    "adapters/openai_agents/harness.py",
+    "adapters/openai_agents/frames.py",
+    "application/frames/kinds.py"
+   ],
+   "problem": "Full harness operations on Agents API sessions without replay cursors.",
+   "work": [
+    "start with metadata reconcile; observe SSE with documented buffer→retrieve→items?after→apply recovery; status-gated send vs steer; cancel; usage; DELETE end; environment state events (suspended/expired/reset) handled.",
+    "Closing facts only from item.done and turn terminal events."
+   ],
+   "acceptance": [
+    "Conformance suite passes; worker-kill recovery reconciles with no duplicates."
+   ],
+   "sprint": "in",
+   "slice": "S3",
+   "file": "HL-12-codex-agents-session-lifecycle-recovery-recipe-and-frame-classifier.md"
+  },
+  {
+   "id": "HL-13",
+   "title": "codex_agents function-tool effect gating and custody",
+   "owner": "Hosted",
+   "wave": "C",
+   "size": "M",
+   "spec": "SPEC-06-hosted-api-lanes.md",
+   "deps": [
+    "HL-12",
+    "MO-14"
+   ],
+   "paths": [
+    "adapters/openai_agents/tools.py",
+    "application/effects/"
+   ],
+   "problem": "Built-in shell/patch cannot be approved or hooked.",
+   "work": [
+    "Credential-free sandbox; mc_publish, mc_open_pr, mc_comment, mc_signal, mc_request_approval, mc_upload_artifact executed after fence + intent keyed (session,turn,call).",
+    "Diff custody via git bundle/format-patch artifacts; multi_agent off unless read-only."
+   ],
+   "acceptance": [
+    "Approval round trip via required_actions; verified bundle push drill."
+   ],
+   "sprint": "in",
+   "slice": "S3",
+   "file": "HL-13-codex-agents-function-tool-effect-gating-and-custody.md"
+  },
+  {
+   "id": "HL-14",
+   "title": "codex_agents self_hosted executor on SandboxHost",
+   "owner": "Hosted",
+   "wave": "D",
+   "size": "M",
+   "spec": "SPEC-06-hosted-api-lanes.md",
+   "deps": [
+    "HL-12",
+    "HL-02"
+   ],
+   "paths": [
+    "adapters/openai_agents/executor.py"
+   ],
+   "problem": "Code work needs image control, worktrees and snapshots.",
+   "work": [
+    "Run codex exec-server --remote with environment key in the lease; version pin and compatibility check; 5-minute connect deadline handling; snapshot via SandboxHost.",
+    "Environment key only (connect scope) in the sandbox; 30 s disconnect retention; 5-minute connect deadline; works on all Daytona tiers (openai/chatgpt egress is essential-listed)."
+   ],
+   "acceptance": [
+    "Drill: code mission in Docker executor; reconnect after executor restart."
+   ],
+   "funding_gated": true,
+   "sprint": "in",
+   "slice": "S4",
+   "file": "HL-14-codex-agents-self-hosted-executor-on-sandboxhost.md"
+  },
+  {
+   "id": "HL-15",
+   "title": "claude_agent_sdk on Sandbox Host (real Claude Code harness)",
+   "owner": "Hosted",
+   "wave": "D",
+   "size": "L",
+   "spec": "SPEC-06-hosted-api-lanes.md",
+   "deps": [
+    "HL-02",
+    "HL-03",
+    "MO-73"
+   ],
+   "paths": [
+    "adapters/claude/transport.py",
+    "adapters/claude/host.py",
+    "adapters/claude/session.py"
+   ],
+   "problem": "The owner wants the Claude Code harness off the local machine on API billing.",
+   "work": [
+    "Bridge SDK stdio to the CLI in the sandbox (custom transport or relay, resolve Q-S1); Model Gateway for model access; SessionStore mirroring for cross-host resume.",
+    "execution_environment.kind sandbox_host; keep in-process kernel hooks and can_use_tool.",
+    "Use the exported Transport via ExplicitEnvironmentCliTransport spawn injection with a SandboxProcess adapter; set CLAUDE_CONFIG_DIR; restore transcript for cross-host resume (see MO-73). The Daytona variant uses the Vercel-hosted gateway on *.vercel.app and works on Tier 1/2 (R16)."
+   ],
+   "acceptance": [
+    "Drill: CLI in Docker through the gateway, hooks fire in-process, resume on another worker."
+   ],
+   "funding_gated": true,
+   "sprint": "in",
+   "slice": "S4",
+   "file": "HL-15-claude-agent-sdk-on-sandbox-host-real-claude-code-harness.md"
+  },
+  {
+   "id": "HL-16",
+   "title": "codex app-server with remote exec-server executor",
+   "owner": "Hosted",
+   "wave": "D",
+   "size": "M",
+   "spec": "SPEC-06-hosted-api-lanes.md",
+   "deps": [
+    "HL-02"
+   ],
+   "paths": [
+    "adapters/codex/launcher.py",
+    "adapters/codex/protocol.py"
+   ],
+   "problem": "Full Codex control plane with isolated execution.",
+   "work": [
+    "environment/add to exec-server in SandboxHost; TurnEnvironmentParams per thread; resolve Q-S2 (where hooks/approvals run); fallback app-server-in-sandbox.",
+    "environment/add per SPEC-06 §7 (experimentalApi; wss or loopback; capability-token auth); approvals and hooks stay worker-side; reach Daytona via signed preview URL or a loopback stdio relay; pin identical Codex on both sides and check executorVersion."
+   ],
+   "acceptance": [
+    "Drill: per-command approval and turn/steer with remote execution."
+   ],
+   "funding_gated": true,
+   "sprint": "in",
+   "slice": "S4",
+   "file": "HL-16-codex-app-server-with-remote-exec-server-executor.md"
+  },
+  {
+   "id": "HL-17",
+   "title": "Provider webhooks into Signal Ingress as wake signals",
+   "owner": "Events",
+   "wave": "B",
+   "size": "S",
+   "spec": "SPEC-06-hosted-api-lanes.md",
+   "deps": [
+    "MO-40"
+   ],
+   "paths": [
+    "interfaces/http/ingress.py",
+    "application/signals/"
+   ],
+   "problem": "Managed Agents and OpenAI Agents webhooks should wake workflows.",
+   "work": [
+    "Standard-webhooks verification for both providers; dedupe on webhook-id; re-read resource state; never trust payload."
+   ],
+   "acceptance": [
+    "Signed fixture deliveries accepted; forged or replayed rejected."
+   ],
+   "sprint": "in",
+   "slice": "S2",
+   "file": "HL-17-provider-webhooks-into-signal-ingress-as-wake-signals.md"
+  },
+  {
+   "id": "HL-18",
+   "title": "Data-class policy enforcement and session retention",
+   "owner": "Integrator",
+   "wave": "B",
+   "size": "S",
+   "spec": "SPEC-06-hosted-api-lanes.md",
+   "deps": [
+    "HL-06"
+   ],
+   "paths": [
+    "application/missions/admission.py",
+    "adapters/anthropic_managed/",
+    "adapters/openai_agents/"
+   ],
+   "problem": "Neither hosted API is ZDR; BellLabs keeps PHI and secrets out.",
+   "work": [
+    "Admission by data_class per profile and Application Binding; session delete after custody plus retention."
+   ],
+   "acceptance": [
+    "PHI-classed mission refused on all API lanes; sessions deleted on schedule."
+   ],
+   "sprint": "in",
+   "slice": "S2",
+   "file": "HL-18-data-class-policy-enforcement-and-session-retention.md"
+  },
+  {
+   "id": "HL-19",
+   "title": "Owner prerequisites and probes for API lanes",
+   "owner": "Environment",
+   "wave": "C",
+   "size": "S",
+   "spec": "SPEC-06-hosted-api-lanes.md",
+   "deps": [
+    "MO-20"
+   ],
+   "paths": [
+    "application/prerequisites/"
+   ],
+   "problem": "MA1-MA5, OA1-OA4, SH1-SH2 must be surfaced and verified before spawn.",
+   "work": [
+    "Add catalog entries, generated instructions and api_probe/probe_mission verifications."
+   ],
+   "acceptance": [
+    "Preflight on a fresh installation lists them; probes verify."
+   ],
+   "sprint": "in",
+   "slice": "S2",
+   "file": "HL-19-owner-prerequisites-and-probes-for-api-lanes.md"
+  },
+  {
+   "id": "HL-20",
+   "title": "Self-hosted placement and Sandbox Host qualification drills (funding-gated)",
+   "owner": "Integrator",
+   "wave": "E",
+   "size": "M",
+   "spec": "SPEC-06-hosted-api-lanes.md",
+   "deps": [
+    "HL-10",
+    "HL-14",
+    "HL-15",
+    "HL-16"
+   ],
+   "paths": [
+    "docs/qualification/lanes/claude_managed/",
+    "docs/qualification/lanes/codex_agents/"
+   ],
+   "problem": "The cloud placements qualify in HL-24 and HL-25. The self-hosted placements and the self-run harnesses on Sandbox Host qualify only when the owner releases slice S4 (R31). Open questions Q-M2, Q-M3, Q-S1 and Q-S2 need these drills.",
+   "work": [
+    "Owner-authorized, finite-budget drills per SPEC-06 §11; record transcripts, frames, usage disposition."
+   ],
+   "acceptance": [
+    "Each profile/placement has a drill record; describe matrices updated from evidence."
+   ],
+   "sprint": "in",
+   "slice": "Q",
+   "file": "HL-20-self-hosted-placement-and-sandbox-host-qualification-drills-funding-gated.md"
+  },
+  {
+   "id": "SC-01",
+   "title": "Qualification probes for subscription cloud surfaces",
+   "owner": "Integrator",
+   "wave": "E",
+   "size": "S",
+   "spec": "DECISIONS.md",
+   "deps": [
+    "MO-40"
+   ],
+   "paths": [
+    "docs/qualification/lanes/claude_cloud/",
+    "docs/qualification/lanes/codex_cloud/"
+   ],
+   "problem": "Experimental lanes depend on unverified behaviours (Q-L1, Q-L2, Q-X1, Q-X3).",
+   "work": [
+    "Run owner-authorized probes and record results."
+   ],
+   "acceptance": [
+    "Each question answered with evidence."
+   ],
+   "sprint": "deferred",
+   "slice": "-",
+   "file": "SC-01-qualification-probes-for-subscription-cloud-surfaces.md"
+  },
+  {
+   "id": "SC-02",
+   "title": "claude_cloud experimental launch-and-observe lane",
+   "owner": "Runtime",
+   "wave": "E",
+   "size": "L",
+   "spec": "DECISIONS.md",
+   "deps": [
+    "SC-01",
+    "MO-41",
+    "MO-42",
+    "MO-50",
+    "MO-20"
+   ],
+   "paths": [
+    "adapters/claude_cloud/"
+   ],
+   "problem": "Owner decision R5: Claude Code cloud as an experimental lane after API lanes.",
+   "work": [
+    "Routine-trigger launch, nonce session binding, hook-pack observation (environment_key tier), gate stop, -p --cloud follow-up, branch/PR results, 30-day credential tracking; honest describe (no status/cancel API)."
+   ],
+   "acceptance": [
+    "Drill completes a bounded task; describe declares the gaps."
+   ],
+   "sprint": "deferred",
+   "slice": "-",
+   "file": "SC-02-claude-cloud-experimental-launch-and-observe-lane.md"
+  },
+  {
+   "id": "SC-03",
+   "title": "codex_cloud experimental launch-and-collect lane",
+   "owner": "Runtime",
+   "wave": "E",
+   "size": "M",
+   "spec": "DECISIONS.md",
+   "deps": [
+    "SC-01",
+    "MO-50",
+    "MO-20"
+   ],
+   "paths": [
+    "adapters/codex_cloud/"
+   ],
+   "problem": "Owner decision R5: Codex Cloud as an experimental lane after API lanes.",
+   "work": [
+    "codex cloud exec with env and branch; status/list --json poll; diff/apply collection; Start-skill entrypoint; strict max_active_tasks."
+   ],
+   "acceptance": [
+    "Bounded task completes and is collected; describe declares no cancel or observation."
+   ],
+   "sprint": "deferred",
+   "slice": "-",
+   "file": "SC-03-codex-cloud-experimental-launch-and-collect-lane.md"
+  },
+  {
+   "id": "LS-01",
+   "title": "Job and result schemas plus runner core",
+   "owner": "Skills",
+   "wave": "A",
+   "size": "M",
+   "spec": "SPEC-08-local-cli-skills.md",
+   "deps": [],
+   "paths": [
+    ".agents/skills/coding-cli-jobs/scripts/agentjob.py",
+    ".agents/skills/coding-cli-jobs/schemas/"
+   ],
+   "problem": "Agents need a config-in, goal-directed way to run other coding CLIs without Mission Control.",
+   "work": [
+    "PEP 723 uv script: run/status/cancel/doctor; git worktree per job; iteration loop with runner-owned verify; resume vs sealed hand-over; status.json heartbeat; result.json; wall-clock kill of process tree; asyncio parallelism.",
+    "Prompt always via stdin file; host auto = native on this machine; Job Object + taskkill /T /F on Windows."
+   ],
+   "acceptance": [
+    "Fake-CLI harness drives done, blocked, budget_exhausted, timeout and cancelled paths on Windows and POSIX."
+   ],
+   "sprint": "in",
+   "slice": "LS",
+   "file": "LS-01-job-and-result-schemas-plus-runner-core.md",
+   "run2_plan": {
+    "approved_at": "2026-10-14",
+    "inspection_base": "a2527f6f3c385a7f55272c41d90e6860b44781d0",
+    "baseline": "SPEC-08 is independent of Mission Control runtime; section 10 CLI corrections override earlier examples. No CLI default may silently weaken the requested job profile.",
+    "outcome": "Extend schemas and runner with exact local CLI configuration identity and unsupported-option refusal using schemas/job.schema.json, schemas/result.schema.json and scripts/agentjob.py.",
+    "non_goals": "No Mission Control import/catalog publication, SDK lane, hosted subscription adapter, installation or new auth setup.",
+    "sequencing": "Use the existing deps/wave. Shared contracts/composition belong to the integrator; satisfy dependencies with integrated source evidence, not assumed live readiness.",
+    "interfaces": [
+     ".agents/skills/coding-cli-jobs/",
+     ".agents/skills/claude-code-headless/",
+     ".agents/skills/codex-exec/",
+     ".agents/skills/cursor-agent-headless/"
+    ],
+    "acceptance": [
+     "Result records actual CLI/version/host, requested model/effort, observed model or unknown, auth route, permission profile and effective configuration sources.",
+     "Unsupported supplied option fails before CLI spawn; omitted model retains disclosed native default; resume preserves explicit settings and auth route.",
+     "Subscription jobs scrub API keys before auth guards; unknown usage/cost remains unknown; no mission_control import, secret copying, push/merge/PR or cloud-lane claim."
+    ],
+    "offline_validation": [
+     "Offline: use SPEC-08 fake-CLI/schema/argv/env/redaction suite under .agents/skills/coding-cli-jobs/tests/ after it is created; establish exact command in handoff.",
+     "Before tests exist, inspect SPEC-08 section 10 and research/cli-adapters.md; add option refusal, omitted model, resume/config and API-key sentinel cases. No smoke invoked by planning."
+    ],
+    "live_validation": "Unrun until exact prerequisite/configuration/placement and action-specific authorization are established. Use the assigned spec/drill; fixture success never sets qualified. Retain default-off paid runners.",
+    "compatibility": "Preserve old canonical bytes, admitted model/options, approval configuration seals and scoped grants across retry, reattach, continuation and fork. See RUN-2 shared acceptance rules.",
+    "evidence": "Map every criterion to exact source revision, test/receipt, evidence level and disposition; record requested versus observed identity, usage uncertainty, resource custody and cleanup. Apply RUN-2 shared escalation rules.",
+    "effort": "Small increment within original schema/adapter work."
+   }
+  },
+  {
+   "id": "LS-02",
+   "title": "Claude Code adapter",
+   "owner": "Skills",
+   "wave": "A",
+   "size": "S",
+   "spec": "SPEC-08-local-cli-skills.md",
+   "deps": [
+    "LS-01"
+   ],
+   "paths": [
+    ".agents/skills/coding-cli-jobs/scripts/adapters/claude.py"
+   ],
+   "problem": "Map the job contract to claude -p.",
+   "work": [
+    "stream-json --verbose parsing; --json-schema; --session-id/--resume; permission profiles; --max-turns/--max-budget-usd; subscription guard (no --bare, scrub ANTHROPIC_*).",
+    "Always pass --permission-mode; --session-id <uuid> up front; inline --json-schema; --allowedTools followed by another flag; parse result subtype/terminal_reason."
+   ],
+   "acceptance": [
+    "argv and event-parsing unit tests from recorded fixtures."
+   ],
+   "sprint": "in",
+   "slice": "LS",
+   "file": "LS-02-claude-code-adapter.md",
+   "run2_plan": {
+    "approved_at": "2026-10-14",
+    "inspection_base": "a2527f6f3c385a7f55272c41d90e6860b44781d0",
+    "baseline": "SPEC-08 is independent of Mission Control runtime; section 10 CLI corrections override earlier examples. No CLI default may silently weaken the requested job profile.",
+    "outcome": "Extend Claude adapter with exact local CLI configuration identity and unsupported-option refusal using scripts/adapters/claude.py.",
+    "non_goals": "No Mission Control import/catalog publication, SDK lane, hosted subscription adapter, installation or new auth setup.",
+    "sequencing": "Use the existing deps/wave. Shared contracts/composition belong to the integrator; satisfy dependencies with integrated source evidence, not assumed live readiness.",
+    "interfaces": [
+     ".agents/skills/coding-cli-jobs/",
+     ".agents/skills/claude-code-headless/",
+     ".agents/skills/codex-exec/",
+     ".agents/skills/cursor-agent-headless/"
+    ],
+    "acceptance": [
+     "Result records actual CLI/version/host, requested model/effort, observed model or unknown, auth route, permission profile and effective configuration sources.",
+     "Unsupported supplied option fails before CLI spawn; omitted model retains disclosed native default; resume preserves explicit settings and auth route.",
+     "Subscription jobs scrub API keys before auth guards; unknown usage/cost remains unknown; no mission_control import, secret copying, push/merge/PR or cloud-lane claim."
+    ],
+    "offline_validation": [
+     "Offline: use SPEC-08 fake-CLI/schema/argv/env/redaction suite under .agents/skills/coding-cli-jobs/tests/ after it is created; establish exact command in handoff.",
+     "Before tests exist, inspect SPEC-08 section 10 and research/cli-adapters.md; add option refusal, omitted model, resume/config and API-key sentinel cases. No smoke invoked by planning."
+    ],
+    "live_validation": "Unrun until exact prerequisite/configuration/placement and action-specific authorization are established. Use the assigned spec/drill; fixture success never sets qualified. Retain default-off paid runners.",
+    "compatibility": "Preserve old canonical bytes, admitted model/options, approval configuration seals and scoped grants across retry, reattach, continuation and fork. See RUN-2 shared acceptance rules.",
+    "evidence": "Map every criterion to exact source revision, test/receipt, evidence level and disposition; record requested versus observed identity, usage uncertainty, resource custody and cleanup. Apply RUN-2 shared escalation rules.",
+    "effort": "Small increment within original schema/adapter work."
+   }
+  },
+  {
+   "id": "LS-03",
+   "title": "Codex adapter with WSL host support",
+   "owner": "Skills",
+   "wave": "A",
+   "size": "S",
+   "spec": "SPEC-08-local-cli-skills.md",
+   "deps": [
+    "LS-01"
+   ],
+   "paths": [
+    ".agents/skills/coding-cli-jobs/scripts/adapters/codex.py"
+   ],
+   "problem": "Map the job contract to codex exec.",
+   "work": [
+    "--json events; --output-schema/-o; exec resume; sandbox/approval profiles; stdin closed; forced_login_method chatgpt; host auto→wsl on Windows with path translation.",
+    "--ignore-user-config and explicit -c overrides (owner config defaults to danger-full-access); no -a on exec; --full-auto removed; options before `resume <id> -`; scrub API keys before forced_login_method; launch codex.exe directly; --ephemeral only for single-iteration jobs."
+   ],
+   "acceptance": [
+    "argv and event-parsing unit tests; WSL path translation tests."
+   ],
+   "sprint": "in",
+   "slice": "LS",
+   "file": "LS-03-codex-adapter-with-wsl-host-support.md",
+   "run2_plan": {
+    "approved_at": "2026-10-14",
+    "inspection_base": "a2527f6f3c385a7f55272c41d90e6860b44781d0",
+    "baseline": "SPEC-08 is independent of Mission Control runtime; section 10 CLI corrections override earlier examples. No CLI default may silently weaken the requested job profile.",
+    "outcome": "Extend Codex adapter with exact local CLI configuration identity and unsupported-option refusal using scripts/adapters/codex.py.",
+    "non_goals": "No Mission Control import/catalog publication, SDK lane, hosted subscription adapter, installation or new auth setup.",
+    "sequencing": "Use the existing deps/wave. Shared contracts/composition belong to the integrator; satisfy dependencies with integrated source evidence, not assumed live readiness.",
+    "interfaces": [
+     ".agents/skills/coding-cli-jobs/",
+     ".agents/skills/claude-code-headless/",
+     ".agents/skills/codex-exec/",
+     ".agents/skills/cursor-agent-headless/"
+    ],
+    "acceptance": [
+     "Result records actual CLI/version/host, requested model/effort, observed model or unknown, auth route, permission profile and effective configuration sources.",
+     "Unsupported supplied option fails before CLI spawn; omitted model retains disclosed native default; resume preserves explicit settings and auth route.",
+     "Subscription jobs scrub API keys before auth guards; unknown usage/cost remains unknown; no mission_control import, secret copying, push/merge/PR or cloud-lane claim."
+    ],
+    "offline_validation": [
+     "Offline: use SPEC-08 fake-CLI/schema/argv/env/redaction suite under .agents/skills/coding-cli-jobs/tests/ after it is created; establish exact command in handoff.",
+     "Before tests exist, inspect SPEC-08 section 10 and research/cli-adapters.md; add option refusal, omitted model, resume/config and API-key sentinel cases. No smoke invoked by planning."
+    ],
+    "live_validation": "Unrun until exact prerequisite/configuration/placement and action-specific authorization are established. Use the assigned spec/drill; fixture success never sets qualified. Retain default-off paid runners.",
+    "compatibility": "Preserve old canonical bytes, admitted model/options, approval configuration seals and scoped grants across retry, reattach, continuation and fork. See RUN-2 shared acceptance rules.",
+    "evidence": "Map every criterion to exact source revision, test/receipt, evidence level and disposition; record requested versus observed identity, usage uncertainty, resource custody and cleanup. Apply RUN-2 shared escalation rules.",
+    "effort": "Small increment within original schema/adapter work."
+   }
+  },
+  {
+   "id": "LS-04",
+   "title": "Cursor agent adapter with direct Windows launch",
+   "owner": "Skills",
+   "wave": "A",
+   "size": "S",
+   "spec": "SPEC-08-local-cli-skills.md",
+   "deps": [
+    "LS-01"
+   ],
+   "paths": [
+    ".agents/skills/coding-cli-jobs/scripts/adapters/cursor.py"
+   ],
+   "problem": "Map the job contract to Cursor agent -p.",
+   "work": [
+    "stream-json parsing; --force/--trust/--sandbox/--mode; --resume; generated .cursor/cli.json allow/deny in the worktree; Windows launch via versions/<ver>/node.exe index.js; schema extract-and-validate.",
+    "Final report from the last assistant event (result concatenates text); exit codes 0/1/130/143; never --printenv; stdin prompt when no prompt argument."
+   ],
+   "acceptance": [
+    "argv and parsing unit tests; Windows launcher resolution test."
+   ],
+   "sprint": "in",
+   "slice": "LS",
+   "file": "LS-04-cursor-agent-adapter-with-direct-windows-launch.md",
+   "run2_plan": {
+    "approved_at": "2026-10-14",
+    "inspection_base": "a2527f6f3c385a7f55272c41d90e6860b44781d0",
+    "baseline": "SPEC-08 is independent of Mission Control runtime; section 10 CLI corrections override earlier examples. No CLI default may silently weaken the requested job profile.",
+    "outcome": "Extend Cursor adapter with exact local CLI configuration identity and unsupported-option refusal using scripts/adapters/cursor.py.",
+    "non_goals": "No Mission Control import/catalog publication, SDK lane, hosted subscription adapter, installation or new auth setup.",
+    "sequencing": "Use the existing deps/wave. Shared contracts/composition belong to the integrator; satisfy dependencies with integrated source evidence, not assumed live readiness.",
+    "interfaces": [
+     ".agents/skills/coding-cli-jobs/",
+     ".agents/skills/claude-code-headless/",
+     ".agents/skills/codex-exec/",
+     ".agents/skills/cursor-agent-headless/"
+    ],
+    "acceptance": [
+     "Result records actual CLI/version/host, requested model/effort, observed model or unknown, auth route, permission profile and effective configuration sources.",
+     "Unsupported supplied option fails before CLI spawn; omitted model retains disclosed native default; resume preserves explicit settings and auth route.",
+     "Subscription jobs scrub API keys before auth guards; unknown usage/cost remains unknown; no mission_control import, secret copying, push/merge/PR or cloud-lane claim."
+    ],
+    "offline_validation": [
+     "Offline: use SPEC-08 fake-CLI/schema/argv/env/redaction suite under .agents/skills/coding-cli-jobs/tests/ after it is created; establish exact command in handoff.",
+     "Before tests exist, inspect SPEC-08 section 10 and research/cli-adapters.md; add option refusal, omitted model, resume/config and API-key sentinel cases. No smoke invoked by planning."
+    ],
+    "live_validation": "Unrun until exact prerequisite/configuration/placement and action-specific authorization are established. Use the assigned spec/drill; fixture success never sets qualified. Retain default-off paid runners.",
+    "compatibility": "Preserve old canonical bytes, admitted model/options, approval configuration seals and scoped grants across retry, reattach, continuation and fork. See RUN-2 shared acceptance rules.",
+    "evidence": "Map every criterion to exact source revision, test/receipt, evidence level and disposition; record requested versus observed identity, usage uncertainty, resource custody and cleanup. Apply RUN-2 shared escalation rules.",
+    "effort": "Small increment within original schema/adapter work."
+   }
+  },
+  {
+   "id": "LS-05",
+   "title": "Router skill, per-CLI skills, recipes and attributions",
+   "owner": "Skills",
+   "wave": "A",
+   "size": "S",
+   "spec": "SPEC-08-local-cli-skills.md",
+   "deps": [
+    "LS-01"
+   ],
+   "paths": [
+    ".agents/skills/coding-cli-jobs/SKILL.md",
+    ".agents/skills/claude-code-headless/SKILL.md",
+    ".agents/skills/codex-exec/SKILL.md",
+    ".agents/skills/cursor-agent-headless/SKILL.md"
+   ],
+   "problem": "Teach any agent when and how to delegate, and how to wait.",
+   "work": [
+    "Write with the writing-for-agents skill: delegation heuristics, job contract, permission profiles, background waiting recipes, gotchas, subscription notes; NOTICE.md for MIT attributions; link trailofbits second-opinion; document codex-plugin-cc adoption."
+   ],
+   "acceptance": [
+    "Skills load in Claude Code, Codex and Cursor sessions (discovery check)."
+   ],
+   "sprint": "in",
+   "slice": "LS",
+   "file": "LS-05-router-skill-per-cli-skills-recipes-and-attributions.md",
+   "run2_plan": {
+    "approved_at": "2026-10-14",
+    "inspection_base": "a2527f6f3c385a7f55272c41d90e6860b44781d0",
+    "baseline": "SPEC-08 is independent of Mission Control runtime; section 10 CLI corrections override earlier examples. No CLI default may silently weaken the requested job profile.",
+    "outcome": "Extend router and CLI guidance with exact local CLI configuration identity and unsupported-option refusal using SKILL.md and per-CLI SKILL.md files.",
+    "non_goals": "No Mission Control import/catalog publication, SDK lane, hosted subscription adapter, installation or new auth setup.",
+    "sequencing": "Use the existing deps/wave. Shared contracts/composition belong to the integrator; satisfy dependencies with integrated source evidence, not assumed live readiness.",
+    "interfaces": [
+     ".agents/skills/coding-cli-jobs/",
+     ".agents/skills/claude-code-headless/",
+     ".agents/skills/codex-exec/",
+     ".agents/skills/cursor-agent-headless/"
+    ],
+    "acceptance": [
+     "Result records actual CLI/version/host, requested model/effort, observed model or unknown, auth route, permission profile and effective configuration sources.",
+     "Unsupported supplied option fails before CLI spawn; omitted model retains disclosed native default; resume preserves explicit settings and auth route.",
+     "Subscription jobs scrub API keys before auth guards; unknown usage/cost remains unknown; no mission_control import, secret copying, push/merge/PR or cloud-lane claim."
+    ],
+    "offline_validation": [
+     "Offline: use SPEC-08 fake-CLI/schema/argv/env/redaction suite under .agents/skills/coding-cli-jobs/tests/ after it is created; establish exact command in handoff.",
+     "Before tests exist, inspect SPEC-08 section 10 and research/cli-adapters.md; add option refusal, omitted model, resume/config and API-key sentinel cases. No smoke invoked by planning."
+    ],
+    "live_validation": "Unrun until exact prerequisite/configuration/placement and action-specific authorization are established. Use the assigned spec/drill; fixture success never sets qualified. Retain default-off paid runners.",
+    "compatibility": "Preserve old canonical bytes, admitted model/options, approval configuration seals and scoped grants across retry, reattach, continuation and fork. See RUN-2 shared acceptance rules.",
+    "evidence": "Map every criterion to exact source revision, test/receipt, evidence level and disposition; record requested versus observed identity, usage uncertainty, resource custody and cleanup. Apply RUN-2 shared escalation rules.",
+    "effort": "Small increment within original schema/adapter work."
+   }
+  },
+  {
+   "id": "LS-06",
+   "title": "Safety: env allowlist, redaction, auth guards and doctor",
+   "owner": "Skills",
+   "wave": "A",
+   "size": "S",
+   "spec": "SPEC-08-local-cli-skills.md",
+   "deps": [
+    "LS-01"
+   ],
+   "paths": [
+    ".agents/skills/coding-cli-jobs/scripts/"
+   ],
+   "problem": "Jobs must not leak keys or silently switch billing.",
+   "work": [
+    "Child env allowlist; token redaction; auth guard per CLI and auth mode; never copy credential files; never push or merge; refuse full profile without explicit acknowledgement.",
+    "Windows env allowlist additions (APPDATA, LOCALAPPDATA, SYSTEMROOT, COMSPEC, PATHEXT, WINDIR, PROGRAMDATA, TEMP/TMP, …); scrub CLAUDECODE and CLAUDE_CODE_ENTRYPOINT."
+   ],
+   "acceptance": [
+    "Sentinel key never appears in run.jsonl/result.json; subscription job refuses when only API keys are available."
+   ],
+   "sprint": "in",
+   "slice": "LS",
+   "file": "LS-06-safety-env-allowlist-redaction-auth-guards-and-doctor.md",
+   "run2_plan": {
+    "approved_at": "2026-10-14",
+    "inspection_base": "a2527f6f3c385a7f55272c41d90e6860b44781d0",
+    "baseline": "SPEC-08 is independent of Mission Control runtime; section 10 CLI corrections override earlier examples. No CLI default may silently weaken the requested job profile.",
+    "outcome": "Extend doctor and auth/config guards with exact local CLI configuration identity and unsupported-option refusal using doctor, environment allowlist and redaction.",
+    "non_goals": "No Mission Control import/catalog publication, SDK lane, hosted subscription adapter, installation or new auth setup.",
+    "sequencing": "Use the existing deps/wave. Shared contracts/composition belong to the integrator; satisfy dependencies with integrated source evidence, not assumed live readiness.",
+    "interfaces": [
+     ".agents/skills/coding-cli-jobs/",
+     ".agents/skills/claude-code-headless/",
+     ".agents/skills/codex-exec/",
+     ".agents/skills/cursor-agent-headless/"
+    ],
+    "acceptance": [
+     "Result records actual CLI/version/host, requested model/effort, observed model or unknown, auth route, permission profile and effective configuration sources.",
+     "Unsupported supplied option fails before CLI spawn; omitted model retains disclosed native default; resume preserves explicit settings and auth route.",
+     "Subscription jobs scrub API keys before auth guards; unknown usage/cost remains unknown; no mission_control import, secret copying, push/merge/PR or cloud-lane claim."
+    ],
+    "offline_validation": [
+     "Offline: use SPEC-08 fake-CLI/schema/argv/env/redaction suite under .agents/skills/coding-cli-jobs/tests/ after it is created; establish exact command in handoff.",
+     "Before tests exist, inspect SPEC-08 section 10 and research/cli-adapters.md; add option refusal, omitted model, resume/config and API-key sentinel cases. No smoke invoked by planning."
+    ],
+    "live_validation": "Unrun until exact prerequisite/configuration/placement and action-specific authorization are established. Use the assigned spec/drill; fixture success never sets qualified. Retain default-off paid runners.",
+    "compatibility": "Preserve old canonical bytes, admitted model/options, approval configuration seals and scoped grants across retry, reattach, continuation and fork. See RUN-2 shared acceptance rules.",
+    "evidence": "Map every criterion to exact source revision, test/receipt, evidence level and disposition; record requested versus observed identity, usage uncertainty, resource custody and cleanup. Apply RUN-2 shared escalation rules.",
+    "effort": "Small increment within original schema/adapter work."
+   }
+  },
+  {
+   "id": "LS-07",
+   "title": "Live smoke checklist for the CLI open items",
+   "owner": "Skills",
+   "wave": "B",
+   "size": "S",
+   "spec": "SPEC-08-local-cli-skills.md",
+   "deps": [
+    "LS-02",
+    "LS-03",
+    "LS-04"
+   ],
+   "paths": [
+    ".agents/skills/coding-cli-jobs/references/"
+   ],
+   "problem": "Remaining live unknowns: Claude exit codes on max-turns/auth failure, Codex Windows sandbox under --ignore-user-config and kill reach, Cursor stdin prompt and read-only shell behaviour, claude -p usage pool after 2026-10-07.",
+   "work": [
+    "Owner-authorized cheap prompts; record results in references; adjust adapters."
+   ],
+   "acceptance": [
+    "Every open item in SPEC-08 §9 answered."
+   ],
+   "sprint": "in",
+   "slice": "LS",
+   "file": "LS-07-live-smoke-checklist-for-the-cli-open-items.md"
+  },
+  {
+   "id": "LS-08",
+   "title": "End-to-end delegation demo from a Claude Code session",
+   "owner": "Skills",
+   "wave": "B",
+   "size": "S",
+   "spec": "SPEC-08-local-cli-skills.md",
+   "deps": [
+    "LS-05",
+    "LS-06",
+    "LS-07"
+   ],
+   "paths": [
+    ".agents/skills/coding-cli-jobs/examples/"
+   ],
+   "problem": "Prove the owner workflow.",
+   "work": [
+    "Claude Code launches a Codex fix job and a Cursor review job in parallel in the background, is woken on completion and reads both results."
+   ],
+   "acceptance": [
+    "Recorded session transcript and result files."
+   ],
+   "sprint": "in",
+   "slice": "LS",
+   "file": "LS-08-end-to-end-delegation-demo-from-a-claude-code-session.md"
+  },
+  {
+   "id": "CM-10",
+   "title": "Parallel Cursor units in one run get distinct workspaces",
+   "owner": "Runtime",
+   "wave": "A",
+   "size": "M",
+   "spec": "SPEC-07-cursor-maturity.md",
+   "deps": [],
+   "paths": [
+    "adapters/cursor/workspace.py",
+    "adapters/cursor/cloud.py",
+    "adapters/cursor/scm.py",
+    "application/workspaces/policy.py"
+   ],
+   "problem": "Historical defect: units shared workspace identity. Run 1 cloud prepare now uses operation_id in per-unit branch construction; verify local isolation and remaining production/qualification evidence before changing allocation.",
+   "work": [
+    "Per-unit lease key and branch mc/{run}/{unit}; retries reuse their own lease; reattach finds per-unit branch."
+   ],
+   "acceptance": [
+    "Stage Graph with two parallel local and two parallel cloud stages gets four distinct leases and branches."
+   ],
+   "sprint": "in",
+   "slice": "F",
+   "file": "CM-10-parallel-cursor-units-in-one-run-get-distinct-workspaces.md",
+   "run2_plan": {
+    "approved_at": "2026-10-14",
+    "inspection_base": "a2527f6f3c385a7f55272c41d90e6860b44781d0",
+    "baseline": "Cloud prepare already calls run_branch(binding, run_id, operation_id), backed by mission_branch. Original cloud-only defect statement is stale; inspect local lease identity separately.",
+    "outcome": "Verify existing per-unit isolation, fixing only demonstrated gaps without replacing the common allocator.",
+    "non_goals": "No new lane, model catalog, generic configuration schema or deferred feature.",
+    "sequencing": "Use the existing deps/wave. Shared contracts/composition belong to the integrator; satisfy dependencies with integrated source evidence, not assumed live readiness.",
+    "interfaces": [
+     "adapters/cursor/cloud.py",
+     "adapters/cursor/workspace.py",
+     "application/workspaces/cloud_branches.py",
+     "application/workspaces/service.py (reuse)"
+    ],
+    "acceptance": [
+     "Parallel local/cloud units in one run have distinct writable leases/branches; retries reuse only the same unit.",
+     "Reattach locates the sealed unit branch; cleanup of one unit cannot affect another.",
+     "Cite already integrated source/tests when sufficient; preserve original acceptance without redundant branch/allocator design."
+    ],
+    "offline_validation": [
+     "uv run pytest tests/unit/cursor/test_cloud_workspace_and_resume.py tests/unit/cursor/test_local_reconcile_and_rehydration.py tests/unit/workspaces -q",
+     "Add production-composition parallel-unit/retry/cleanup fixture only where current tests do not establish the criterion."
+    ],
+    "live_validation": "Unrun until exact prerequisite/configuration/placement and action-specific authorization are established. Use the assigned spec/drill; fixture success never sets qualified. Retain default-off paid runners.",
+    "compatibility": "Preserve old canonical bytes, admitted model/options, approval configuration seals and scoped grants across retry, reattach, continuation and fork. See RUN-2 shared acceptance rules.",
+    "evidence": "Map every criterion to exact source revision, test/receipt, evidence level and disposition; record requested versus observed identity, usage uncertainty, resource custody and cleanup. Apply RUN-2 shared escalation rules.",
+    "effort": "Small acceptance refinement; existing implementation scope remains."
+   }
+  },
+  {
+   "id": "CM-09",
+   "title": "Cloud declared-output custody and missing outputs",
+   "owner": "Runtime",
+   "wave": "A",
+   "size": "M",
+   "spec": "SPEC-07-cursor-maturity.md",
+   "deps": [],
+   "paths": [
+    "adapters/cursor/cloud.py",
+    "adapters/cursor/scm.py"
+   ],
+   "problem": "Cloud registers only artifacts/, never outputs/ from the branch.",
+   "work": [
+    "Register outputs/* at branch head as candidate refs with digests; missing_outputs closing fact; optional single follow-up; persist prUrl before archive."
+   ],
+   "acceptance": [
+    "Outputs registered; missing-output follow-up fires once; prUrl persisted."
+   ],
+   "sprint": "in",
+   "slice": "F",
+   "file": "CM-09-cloud-declared-output-custody-and-missing-outputs.md",
+   "run2_plan": {
+    "approved_at": "2026-10-14",
+    "inspection_base": "a2527f6f3c385a7f55272c41d90e6860b44781d0",
+    "baseline": "Artifact API staging and branch-head recording exist; declared outputs/ registration and missing-output semantics must be checked at current code.",
+    "outcome": "Collect declared output bytes through the admitted channel and prove immutable custody before cleanup/archive.",
+    "non_goals": "No new lane, model catalog, generic configuration schema or deferred feature.",
+    "sequencing": "Use the existing deps/wave. Shared contracts/composition belong to the integrator; satisfy dependencies with integrated source evidence, not assumed live readiness.",
+    "interfaces": [
+     "adapters/cursor/cloud.py",
+     "application/artifacts/artifact_promotion.py (reuse)",
+     "domain/programs/human_gate.py (reuse)"
+    ],
+    "acceptance": [
+     "Branch outputs cite exact head; API outputs cite session/run/turn and digest; missing declared outputs produce an explicit fact.",
+     "Follow-up is at most the authored bounded allowance; provider done/path/prUrl alone cannot satisfy acceptance.",
+     "Registered output/version is what review binds; review acceptance does not grant repo publication; cleanup only follows verified custody."
+    ],
+    "offline_validation": [
+     "uv run pytest tests/unit/cursor/test_knowledge_output_channels.py tests/unit/workspaces/test_artifact_promotion.py tests/unit/human_tasks/test_human_gate_rules.py -q",
+     "Add missing-output, changed branch head, digest mismatch, duplicate registration and stale-review packet cases."
+    ],
+    "live_validation": "Unrun until exact prerequisite/configuration/placement and action-specific authorization are established. Use the assigned spec/drill; fixture success never sets qualified. Retain default-off paid runners.",
+    "compatibility": "Preserve old canonical bytes, admitted model/options, approval configuration seals and scoped grants across retry, reattach, continuation and fork. See RUN-2 shared acceptance rules.",
+    "evidence": "Map every criterion to exact source revision, test/receipt, evidence level and disposition; record requested versus observed identity, usage uncertainty, resource custody and cleanup. Apply RUN-2 shared escalation rules.",
+    "effort": "Small-medium custody/evidence join; no new viewer."
+   }
+  },
+  {
+   "id": "CM-08",
+   "title": "Continuation and fork agent parity on cloud",
+   "owner": "Runtime",
+   "wave": "A",
+   "size": "S",
+   "spec": "SPEC-07-cursor-maturity.md",
+   "deps": [],
+   "paths": [
+    "adapters/cursor/cloud.py",
+    "adapters/cursor/controls.py"
+   ],
+   "problem": "Continuation agent drops subagents, env and metadata; source never archived.",
+   "work": [
+    "Verify start/hydrate body parity; factor a shared builder only where needed. Preserve admitted options and idempotent env delivery; archive source after successful handover/custody."
+   ],
+   "acceptance": [
+    "Body parity test; source archived idempotently."
+   ],
+   "sprint": "in",
+   "slice": "F",
+   "file": "CM-08-continuation-and-fork-agent-parity-on-cloud.md",
+   "run2_plan": {
+    "approved_at": "2026-10-14",
+    "inspection_base": "a2527f6f3c385a7f55272c41d90e6860b44781d0",
+    "baseline": "Cloud start already projects MCP/customSubagents and per-unit branch; inspect start versus hydrate/continuation for remaining env/metadata differences.",
+    "outcome": "Preserve the entire admitted supported create configuration through continuation without treating code factoring as proof.",
+    "non_goals": "No new lane, model catalog, generic configuration schema or deferred feature.",
+    "sequencing": "Use the existing deps/wave. Shared contracts/composition belong to the integrator; satisfy dependencies with integrated source evidence, not assumed live readiness.",
+    "interfaces": [
+     "adapters/cursor/cloud.py",
+     "adapters/cursor/controls.py"
+    ],
+    "acceptance": [
+     "Golden start/hydrate bodies preserve model, mode, environment, inline MCP/subagents, metadata and secret-reference delivery semantics.",
+     "Worker-loss reattach uses sealed configuration; drift or unsupported transfer refuses rather than dropping options.",
+     "Source archive happens idempotently only after successful handover/custody; no duplicate session/turn or budget reset."
+    ],
+    "offline_validation": [
+     "uv run pytest tests/unit/cursor/test_cloud_workspace_and_resume.py tests/unit/cursor/test_local_reconcile_and_rehydration.py tests/unit/cursor/test_cloud_inline_options.py -q",
+     "Add body-parity negative cases for missing required option and source archive retry."
+    ],
+    "live_validation": "Unrun until exact prerequisite/configuration/placement and action-specific authorization are established. Use the assigned spec/drill; fixture success never sets qualified. Retain default-off paid runners.",
+    "compatibility": "Preserve old canonical bytes, admitted model/options, approval configuration seals and scoped grants across retry, reattach, continuation and fork. See RUN-2 shared acceptance rules.",
+    "evidence": "Map every criterion to exact source revision, test/receipt, evidence level and disposition; record requested versus observed identity, usage uncertainty, resource custody and cleanup. Apply RUN-2 shared escalation rules.",
+    "effort": "Small acceptance refinement; existing implementation scope remains."
+   }
+  },
+  {
+   "id": "CM-18",
+   "title": "Refuse unknown staged turn text",
+   "owner": "Runtime",
+   "wave": "A",
+   "size": "S",
+   "spec": "SPEC-07-cursor-maturity.md",
+   "deps": [],
+   "paths": [
+    "adapters/cursor/local.py",
+    "adapters/cursor/cloud.py"
+   ],
+   "problem": "A missing staged instruction silently resends the original prompt.",
+   "work": [
+    "Raise NativeTurnLost when instruction_ref has no staged text."
+   ],
+   "acceptance": [
+    "Unit tests for both lanes."
+   ],
+   "sprint": "in",
+   "slice": "F",
+   "file": "CM-18-refuse-unknown-staged-turn-text.md"
+  },
+  {
+   "id": "CM-13",
+   "title": "One SSE vocabulary per run",
+   "owner": "Runtime",
+   "wave": "A",
+   "size": "S",
+   "spec": "SPEC-07-cursor-maturity.md",
+   "deps": [],
+   "paths": [
+    "application/frames/kinds.py",
+    "adapters/cursor/cloud.py"
+   ],
+   "problem": "Both simplified and interaction_update events are persisted, risking double counting.",
+   "work": [
+    "Prove double counting with a test; keep one transcript-bearing family; other raw-only."
+   ],
+   "acceptance": [
+    "Transcript and usage counted once."
+   ],
+   "sprint": "in",
+   "slice": "F",
+   "file": "CM-13-one-sse-vocabulary-per-run.md",
+   "run2_plan": {
+    "approved_at": "2026-10-14",
+    "inspection_base": "a2527f6f3c385a7f55272c41d90e6860b44781d0",
+    "baseline": "Both provider event families may be retained as raw evidence; duplicate transcript-bearing facts require measured proof.",
+    "outcome": "Select one attributable normalized transcript/accounting vocabulary without discarding necessary raw events.",
+    "non_goals": "No new lane, model catalog, generic configuration schema or deferred feature.",
+    "sequencing": "Use the existing deps/wave. Shared contracts/composition belong to the integrator; satisfy dependencies with integrated source evidence, not assumed live readiness.",
+    "interfaces": [
+     "adapters/cursor/frames.py",
+     "adapters/cursor/cloud.py",
+     "application/frames/ (integrator leases any shared changes)"
+    ],
+    "acceptance": [
+     "Fixture with both SSE vocabularies yields one assistant/tool/usage fact per native identity.",
+     "Reconnect/replay and stream-gap recovery retain ordered attributable facts; raw evidence disposition is documented.",
+     "CM-02 totals and CM-01 settlement remain unchanged under duplicate family delivery."
+    ],
+    "offline_validation": [
+     "uv run pytest tests/unit/cursor/test_cloud_stream_expiry.py tests/unit/cursor/test_cloud_reconcile.py tests/conformance/lanes -q",
+     "Add dual-vocabulary golden normalization/usage fixture, shared with CM-02."
+    ],
+    "live_validation": "Unrun until exact prerequisite/configuration/placement and action-specific authorization are established. Use the assigned spec/drill; fixture success never sets qualified. Retain default-off paid runners.",
+    "compatibility": "Preserve old canonical bytes, admitted model/options, approval configuration seals and scoped grants across retry, reattach, continuation and fork. See RUN-2 shared acceptance rules.",
+    "evidence": "Map every criterion to exact source revision, test/receipt, evidence level and disposition; record requested versus observed identity, usage uncertainty, resource custody and cleanup. Apply RUN-2 shared escalation rules.",
+    "effort": "Small acceptance refinement; existing implementation scope remains."
+   }
+  },
+  {
+   "id": "CM-02",
+   "title": "Per-run token attribution across all turns",
+   "owner": "Runtime",
+   "wave": "B",
+   "size": "M",
+   "spec": "SPEC-07-cursor-maturity.md",
+   "deps": [],
+   "paths": [
+    "adapters/cursor/bridge.py",
+    "adapters/cursor/local.py",
+    "adapters/cursor/cloud.py",
+    "application/execution/harness/lane_turns.py",
+    "domain/execution/lanes.py"
+   ],
+   "problem": "Local charges agent totals; cloud counts only the final run; cache tokens dropped.",
+   "work": [
+    "Per-run usage summed across replaced and continuation turns; additive cache_read/cache_write tokens; unknown stays unknown."
+   ],
+   "acceptance": [
+    "Cancel-and-replace plus continuation fixture charges each run once."
+   ],
+   "sprint": "in",
+   "slice": "F",
+   "file": "CM-02-per-run-token-attribution-across-all-turns.md",
+   "run2_plan": {
+    "approved_at": "2026-10-14",
+    "inspection_base": "a2527f6f3c385a7f55272c41d90e6860b44781d0",
+    "baseline": "Per-run totals must include every replaced and continuation turn; session aggregates alone do not prove turn attribution.",
+    "outcome": "Use attributable native run/turn identities for token/cache accounting and preserve unavailable counters.",
+    "non_goals": "No new lane, model catalog, generic configuration schema or deferred feature.",
+    "sequencing": "Use the existing deps/wave. Shared contracts/composition belong to the integrator; satisfy dependencies with integrated source evidence, not assumed live readiness.",
+    "interfaces": [
+     "adapters/cursor/bridge.py",
+     "adapters/cursor/local.py",
+     "adapters/cursor/cloud.py",
+     "application/execution/harness/lane_turns.py"
+    ],
+    "acceptance": [
+     "Two turns, cancel-and-replace, continuation and reconnect fixture count each native run once.",
+     "Absent input/output/cache fields remain unknown; partial totals are disclosed.",
+     "Native usage and model evidence identify source/version; duplicate SSE families cannot inflate totals."
+    ],
+    "offline_validation": [
+     "uv run pytest tests/unit/cursor tests/conformance/lanes -q",
+     "Add replaced/continuation-turn, missing-counter and replay cases; coordinate frame fixtures with CM-13."
+    ],
+    "live_validation": "Unrun until exact prerequisite/configuration/placement and action-specific authorization are established. Use the assigned spec/drill; fixture success never sets qualified. Retain default-off paid runners.",
+    "compatibility": "Preserve old canonical bytes, admitted model/options, approval configuration seals and scoped grants across retry, reattach, continuation and fork. See RUN-2 shared acceptance rules.",
+    "evidence": "Map every criterion to exact source revision, test/receipt, evidence level and disposition; record requested versus observed identity, usage uncertainty, resource custody and cleanup. Apply RUN-2 shared escalation rules.",
+    "effort": "Small acceptance refinement; existing implementation scope remains."
+   }
+  },
+  {
+   "id": "CM-01",
+   "title": "Cloud and local cost settlement",
+   "owner": "Runtime",
+   "wave": "B",
+   "size": "M",
+   "spec": "SPEC-07-cursor-maturity.md",
+   "deps": [
+    "CM-02",
+    "CM-04"
+   ],
+   "paths": [
+    "adapters/cursor/cost.py",
+    "adapters/temporal/deployment_composition.py"
+   ],
+   "problem": "Cloud cost reader is never composed; local cost read once though it settles late.",
+   "work": [
+    "Settle from charged_cents; estimated until reported; bounded delayed re-read; budget charged once; compose cost_reader."
+   ],
+   "acceptance": [
+    "Describe cost estimated_then_settled true in production; no zero-fill."
+   ],
+   "sprint": "in",
+   "slice": "F",
+   "file": "CM-01-cloud-and-local-cost-settlement.md",
+   "run2_plan": {
+    "approved_at": "2026-10-14",
+    "inspection_base": "a2527f6f3c385a7f55272c41d90e6860b44781d0",
+    "baseline": "Existing cost_reader/usage paths and Run 1 composition must be inspected; charged_cents settlement may arrive later than completion.",
+    "outcome": "Settle each attributable provider run once and expose unknown/estimated/settled evidence honestly.",
+    "non_goals": "No new lane, model catalog, generic configuration schema or deferred feature.",
+    "sequencing": "Use the existing deps/wave. Shared contracts/composition belong to the integrator; satisfy dependencies with integrated source evidence, not assumed live readiness.",
+    "interfaces": [
+     "adapters/cursor/cost.py",
+     "adapters/temporal/deployment_composition.py (integrator-only)"
+    ],
+    "acceptance": [
+     "Missing charged_cents is unknown/estimated with source, never zero; delayed settlement uses bounded rereads.",
+     "Replay, duplicate settlement and replaced/continued turns do not double debit budget.",
+     "Receipt preserves requested and observed model when available; cost cannot imply model identity or free execution."
+    ],
+    "offline_validation": [
+     "uv run pytest tests/unit/cursor/test_cloud_usage_unknown.py tests/unit/cursor -q",
+     "Add delayed-settlement, multi-turn replay and single-budget-debit fixtures beside cost tests."
+    ],
+    "live_validation": "Unrun until exact prerequisite/configuration/placement and action-specific authorization are established. Use the assigned spec/drill; fixture success never sets qualified. Retain default-off paid runners.",
+    "compatibility": "Preserve old canonical bytes, admitted model/options, approval configuration seals and scoped grants across retry, reattach, continuation and fork. See RUN-2 shared acceptance rules.",
+    "evidence": "Map every criterion to exact source revision, test/receipt, evidence level and disposition; record requested versus observed identity, usage uncertainty, resource custody and cleanup. Apply RUN-2 shared escalation rules.",
+    "effort": "Small acceptance refinement; existing implementation scope remains."
+   }
+  },
+  {
+   "id": "CM-03",
+   "title": "Typed provider error taxonomy",
+   "owner": "Runtime",
+   "wave": "B",
+   "size": "S",
+   "spec": "SPEC-07-cursor-maturity.md",
+   "deps": [],
+   "paths": [
+    "adapters/cursor/bridge.py",
+    "adapters/cursor/cloud_api.py"
+   ],
+   "problem": "Local maps no rate-limit/auth/network errors; cloud maps only 429.",
+   "work": [
+    "Map SDK and HTTP errors to typed retryable/non-retryable errors with retry_after and request_id; wire ADR-0011 classifier."
+   ],
+   "acceptance": [
+    "Each class routes to the correct retry counter; no secrets in messages."
+   ],
+   "sprint": "in",
+   "slice": "F",
+   "file": "CM-03-typed-provider-error-taxonomy.md",
+   "run2_plan": {
+    "approved_at": "2026-10-14",
+    "inspection_base": "a2527f6f3c385a7f55272c41d90e6860b44781d0",
+    "baseline": "Remote-session typed errors already exist; Cursor adapter-specific mappings and exact retry owner still need validation.",
+    "outcome": "Classify native auth/quota/rate/network/archived/configuration failures without leaking prose/secrets or unsafe create replay.",
+    "non_goals": "No new lane, model catalog, generic configuration schema or deferred feature.",
+    "sequencing": "Use the existing deps/wave. Shared contracts/composition belong to the integrator; satisfy dependencies with integrated source evidence, not assumed live readiness.",
+    "interfaces": [
+     "adapters/cursor/bridge.py",
+     "adapters/cursor/cloud.py",
+     "adapters/remote_session/errors.py (reuse)"
+    ],
+    "acceptance": [
+     "Recorded 429/auth/network/archived/unsupported-option errors map to ADR-0011 decisions with bounded retries.",
+     "Ambiguous create reconciles native identity before retry; auth/configuration refusal is not hidden by fallback.",
+     "Receipt preserves unknown usage/cost on failed/cancelled requests; diagnostics identify product/profile/version."
+    ],
+    "offline_validation": [
+     "uv run pytest tests/unit/cursor tests/unit/remote_session -q",
+     "Add parameter/auth refusal before-create and ambiguous-create fixtures; no live retries required."
+    ],
+    "live_validation": "Unrun until exact prerequisite/configuration/placement and action-specific authorization are established. Use the assigned spec/drill; fixture success never sets qualified. Retain default-off paid runners.",
+    "compatibility": "Preserve old canonical bytes, admitted model/options, approval configuration seals and scoped grants across retry, reattach, continuation and fork. See RUN-2 shared acceptance rules.",
+    "evidence": "Map every criterion to exact source revision, test/receipt, evidence level and disposition; record requested versus observed identity, usage uncertainty, resource custody and cleanup. Apply RUN-2 shared escalation rules.",
+    "effort": "Small acceptance refinement; existing implementation scope remains."
+   }
+  },
+  {
+   "id": "CM-04",
+   "title": "cursor_local on Windows workers",
+   "owner": "Runtime",
+   "wave": "B",
+   "size": "M",
+   "spec": "SPEC-07-cursor-maturity.md",
+   "deps": [],
+   "paths": [
+    "adapters/cursor/bridge.py",
+    "bootstrap/preflight",
+    "adapters/cursor/kernel_hook_script.py"
+   ],
+   "problem": "cursor_local is refused on Windows.",
+   "work": [
+    "Launch bridge via asyncio.to_thread(Bridge.launch) plus AsyncClient.connect; resolved interpreter for hook commands; gate behind a setting until CD-15."
+   ],
+   "acceptance": [
+    "Fixture bridge launches, sends, observes and closes on a Windows SelectorEventLoop worker."
+   ],
+   "sprint": "in",
+   "slice": "S0",
+   "file": "CM-04-cursor-local-on-windows-workers.md"
+  },
+  {
+   "id": "CM-05",
+   "title": "Detached bridge and live reattach",
+   "owner": "Runtime",
+   "wave": "B",
+   "size": "L",
+   "spec": "SPEC-07-cursor-maturity.md",
+   "deps": [
+    "CM-04"
+   ],
+   "paths": [
+    "adapters/cursor/bridge.py",
+    "adapters/cursor/local.py"
+   ],
+   "problem": "The local bridge dies with the worker, leaving in-flight runs in_doubt.",
+   "work": [
+    "Sidecar bridge per lease with 0600 discovery file; connect on reattach; list_runs reconciliation; orphan sweep at worker start."
+   ],
+   "acceptance": [
+    "Killing the worker mid-run and restarting resumes the same live run with no duplicate frames."
+   ],
+   "sprint": "in",
+   "slice": "F",
+   "file": "CM-05-detached-bridge-and-live-reattach.md"
+  },
+  {
+   "id": "CM-06",
+   "title": "Local store and conversation fork, drill-gated",
+   "owner": "Runtime",
+   "wave": "D",
+   "size": "M",
+   "spec": "SPEC-07-cursor-maturity.md",
+   "deps": [
+    "CM-05"
+   ],
+   "paths": [
+    "adapters/cursor/snapshot.py",
+    "adapters/cursor/local.py"
+   ],
+   "problem": "Local conversation fork may be possible by copying the bridge store.",
+   "work": [
+    "Include store in snapshot; fork restores and resumes source agent id; close as unsupported if CD-09 fails."
+   ],
+   "acceptance": [
+    "CD-09 recorded either way."
+   ],
+   "sprint": "deferred",
+   "slice": "-",
+   "file": "CM-06-local-store-and-conversation-fork-drill-gated.md"
+  },
+  {
+   "id": "CM-07",
+   "title": "Conversation export for forks and continuations",
+   "owner": "Runtime",
+   "wave": "B",
+   "size": "S",
+   "spec": "SPEC-07-cursor-maturity.md",
+   "deps": [
+    "CM-04"
+   ],
+   "paths": [
+    "adapters/cursor/controls.py"
+   ],
+   "problem": "Forks and continuations carry no conversation excerpt.",
+   "work": [
+    "Bounded scrubbed transcript excerpt via run.conversation() or v0 /conversation with digest and source; report absence, never invent."
+   ],
+   "acceptance": [
+    "Fork packet carries the excerpt or an explicit absence."
+   ],
+   "sprint": "in",
+   "slice": "F",
+   "file": "CM-07-conversation-export-for-forks-and-continuations.md"
+  },
+  {
+   "id": "CM-11",
+   "title": "Model selection with params and validation",
+   "owner": "Runtime",
+   "wave": "D",
+   "size": "S",
+   "spec": "SPEC-07-cursor-maturity.md",
+   "deps": [],
+   "paths": [
+    "application/authoring/cursor_launch.py",
+    "adapters/cursor/bridge.py",
+    "adapters/cursor/cloud.py"
+   ],
+   "problem": "Only a model id is passed; no params or validation.",
+   "work": [
+    "Additive model_params; validate against models.list() or /v1/models with MODEL_UNAVAILABLE; resolved model in closing facts."
+   ],
+   "acceptance": [
+    "Invalid params refused before launch."
+   ],
+   "sprint": "deferred",
+   "slice": "-",
+   "file": "CM-11-model-selection-with-params-and-validation.md"
+  },
+  {
+   "id": "CM-12",
+   "title": "Subagent honesty",
+   "owner": "Runtime",
+   "wave": "D",
+   "size": "S",
+   "spec": "SPEC-07-cursor-maturity.md",
+   "deps": [
+    "MO-30"
+   ],
+   "paths": [
+    "adapters/cursor/cloud.py"
+   ],
+   "problem": "Cloud silently truncates inline subagents to 20.",
+   "work": [
+    "Refuse >20 and built-in name collisions at launch."
+   ],
+   "acceptance": [
+    "Launch refusal tests."
+   ],
+   "sprint": "deferred",
+   "slice": "-",
+   "file": "CM-12-subagent-honesty.md"
+  },
+  {
+   "id": "CM-15",
+   "title": "Plan-then-approve gate",
+   "owner": "Runtime",
+   "wave": "D",
+   "size": "M",
+   "spec": "SPEC-07-cursor-maturity.md",
+   "deps": [],
+   "paths": [
+    "adapters/cursor/cloud.py",
+    "adapters/cursor/bridge.py",
+    "application/programs/human_gates"
+   ],
+   "problem": "Cursor's plan mode is unused as a native pre-execution approval lever.",
+   "work": [
+    "Turn 1 in plan mode; workflow_gate Human Task shows the plan; approve sends turn 2 in agent mode; deny ends not_accepted."
+   ],
+   "acceptance": [
+    "CD-17 passes on both profiles."
+   ],
+   "sprint": "deferred",
+   "slice": "-",
+   "file": "CM-15-plan-then-approve-gate.md"
+  },
+  {
+   "id": "CM-16",
+   "title": "Local approval and question channel through custom tools",
+   "owner": "Runtime",
+   "wave": "D",
+   "size": "M",
+   "spec": "SPEC-07-cursor-maturity.md",
+   "deps": [
+    "CM-05"
+   ],
+   "paths": [
+    "adapters/cursor/custom_tools.py",
+    "adapters/cursor/bridge.py",
+    "adapters/cursor/qualification.py"
+   ],
+   "problem": "cursor_local has no per-action approval or provider question channel.",
+   "work": [
+    "mc_request_approval and mc_ask custom tools opening Human Tasks with a 600 s cap; re-supplied on resume."
+   ],
+   "acceptance": [
+    "CD-18 passes; admission lists provider_question implemented for cursor_local."
+   ],
+   "sprint": "deferred",
+   "slice": "-",
+   "file": "CM-16-local-approval-and-question-channel-through-custom-tools.md"
+  },
+  {
+   "id": "CM-17",
+   "title": "Cloud agent hygiene sweep",
+   "owner": "Runtime",
+   "wave": "D",
+   "size": "S",
+   "spec": "SPEC-07-cursor-maturity.md",
+   "deps": [
+    "CM-08"
+   ],
+   "paths": [
+    "adapters/temporal/activities/",
+    "adapters/cursor/cloud_api.py"
+   ],
+   "problem": "Orphaned mc-* cloud agents accumulate.",
+   "work": [
+    "Archive agents with mc metadata and no open execution; never delete; report in inspection."
+   ],
+   "acceptance": [
+    "Sweep test with fake API."
+   ],
+   "sprint": "deferred",
+   "slice": "-",
+   "file": "CM-17-cloud-agent-hygiene-sweep.md"
+  },
+  {
+   "id": "CM-19",
+   "title": "Cancel robustness",
+   "owner": "Runtime",
+   "wave": "D",
+   "size": "S",
+   "spec": "SPEC-07-cursor-maturity.md",
+   "deps": [],
+   "paths": [
+    "adapters/cursor/cloud.py"
+   ],
+   "problem": "Cancel edge cases (agent not found, CREATING runs) are unhandled.",
+   "work": [
+    "Tolerate AgentNotFound after cancel; cover CREATING; set provider-acknowledged timestamp."
+   ],
+   "acceptance": [
+    "Unit tests for each edge."
+   ],
+   "sprint": "in",
+   "slice": "F",
+   "file": "CM-19-cancel-robustness.md"
+  },
+  {
+   "id": "CM-20",
+   "title": "Follow-up prompt images and per-turn mode passthrough",
+   "owner": "Runtime",
+   "wave": "D",
+   "size": "S",
+   "spec": "SPEC-07-cursor-maturity.md",
+   "deps": [
+    "MO-30"
+   ],
+   "paths": [
+    "adapters/cursor/cloud.py",
+    "adapters/cursor/bridge.py"
+   ],
+   "problem": "Packet images and per-turn mode never reach the provider.",
+   "work": [
+    "Pass up to 5 images (15 MB) and mode per turn."
+   ],
+   "acceptance": [
+    "Request-body tests."
+   ],
+   "sprint": "deferred",
+   "slice": "-",
+   "file": "CM-20-follow-up-prompt-images-and-per-turn-mode-passthrough.md"
+  },
+  {
+   "id": "CM-22",
+   "title": "No-repo cursor_cloud agents for knowledge work",
+   "owner": "Runtime",
+   "wave": "D",
+   "size": "M",
+   "spec": "SPEC-07-cursor-maturity.md",
+   "deps": [
+    "MO-40",
+    "MO-51"
+   ],
+   "paths": [
+    "domain/execution/lanes.py",
+    "adapters/cursor/cloud.py"
+   ],
+   "problem": "Cursor cloud agents can run without a repo, but the lane requires one.",
+   "work": [
+    "prepare skips the branch; packet via prompt plus ingress fetch; outputs via artifacts API or ingress."
+   ],
+   "acceptance": [
+    "A knowledge mission with no repo completes on cursor_cloud."
+   ],
+   "sprint": "deferred",
+   "slice": "-",
+   "file": "CM-22-no-repo-cursor-cloud-agents-for-knowledge-work.md"
+  },
+  {
+   "id": "CM-14",
+   "title": "Context occupancy for Cursor",
+   "owner": "Runtime",
+   "wave": "D",
+   "size": "S",
+   "spec": "SPEC-07-cursor-maturity.md",
+   "deps": [
+    "CM-02",
+    "CM-11"
+   ],
+   "paths": [
+    "adapters/cursor/local.py",
+    "adapters/cursor/cloud.py"
+   ],
+   "problem": "No occupancy reading, so context pressure never triggers continuation.",
+   "work": [
+    "Occupancy from last run input+cache-read tokens vs model window when known; else unknown with reason; record summary-completed as native compaction."
+   ],
+   "acceptance": [
+    "Continuation policy triggers on a fixture at the soft ratio."
+   ],
+   "sprint": "deferred",
+   "slice": "-",
+   "file": "CM-14-context-occupancy-for-cursor.md"
+  },
+  {
+   "id": "CM-21",
+   "title": "Cursor qualification drills CD-01..CD-20",
+   "owner": "Runtime",
+   "wave": "E",
+   "size": "M",
+   "spec": "SPEC-07-cursor-maturity.md",
+   "deps": [
+    "CM-01",
+    "CM-05",
+    "CM-09",
+    "CM-10"
+   ],
+   "paths": [
+    "docs/qualification/lanes/cursor_local/",
+    "docs/qualification/lanes/cursor_cloud/"
+   ],
+   "problem": "qualified flips only on recorded drill evidence.",
+   "work": [
+    "Run owner-authorized drills per research/cursor-maturity.md and carried-over README drills; record transcripts, frames, journal rows and usage disposition."
+   ],
+   "acceptance": [
+    "Every drill recorded; describe matrices updated from evidence."
+   ],
+   "sprint": "in",
+   "slice": "Q",
+   "file": "CM-21-cursor-qualification-drills-cd-01-cd-20.md",
+   "run2_plan": {
+    "approved_at": "2026-10-14",
+    "inspection_base": "a2527f6f3c385a7f55272c41d90e6860b44781d0",
+    "baseline": "CD-01..20 are exact-placement qualification, not every aspirational/deferred capability; Run 1 receipts are narrower than a blanket Cursor flag.",
+    "outcome": "Qualify only currently in-scope implemented cells with exact identity/configuration, accounting, recovery and custody evidence.",
+    "non_goals": "No new lane, model catalog, generic configuration schema or deferred feature.",
+    "sequencing": "Use the existing deps/wave. Shared contracts/composition belong to the integrator; satisfy dependencies with integrated source evidence, not assumed live readiness.",
+    "interfaces": [
+     "docs/qualification/lanes/cursor_local/",
+     "docs/qualification/lanes/cursor_cloud/",
+     "application/execution/harness/describe.py (integrator-only)"
+    ],
+    "acceptance": [
+     "Each applicable drill maps to exact profile/OS/build/configuration pins and requested/observed model; unavailable counters remain unknown.",
+     "No deferred CM-11/12/14/15/16/17/20/22/06 capability is promoted by the matrix or a fixture.",
+     "CM-01/05/09/10 joins and shared CM-02/08/13 regression evidence are complete before a qualified cell changes."
+    ],
+    "offline_validation": [
+     "uv run pytest tests/unit/cursor/test_qualification.py tests/conformance/lanes -q",
+     "Live: use existing research/cursor-maturity CD definitions only after per-drill authorization and current budget/prerequisite reconciliation."
+    ],
+    "live_validation": "Unrun until exact prerequisite/configuration/placement and action-specific authorization are established. Use the assigned spec/drill; fixture success never sets qualified. Retain default-off paid runners.",
+    "compatibility": "Preserve old canonical bytes, admitted model/options, approval configuration seals and scoped grants across retry, reattach, continuation and fork. See RUN-2 shared acceptance rules.",
+    "evidence": "Map every criterion to exact source revision, test/receipt, evidence level and disposition; record requested versus observed identity, usage uncertainty, resource custody and cleanup. Apply RUN-2 shared escalation rules.",
+    "effort": "Small acceptance refinement; existing implementation scope remains."
+   }
+  },
+  {
+   "id": "MO-63",
+   "title": "Lane-only worker role",
+   "owner": "Runtime",
+   "wave": "B",
+   "size": "M",
+   "spec": "SPEC-09-local-harness-path.md",
+   "deps": [],
+   "paths": [
+    "bootstrap/worker.py",
+    "adapters/temporal/worker.py",
+    "adapters/temporal/deployment_composition.py",
+    "bootstrap/settings.py"
+   ],
+   "problem": "Every worker is monolithic: it polls root and family queues and needs family-writer and checkpointer DB logins, which blocks safe workers on other hosts (Daytona).",
+   "work": [
+    "MISSION_CONTROL_WORKER_ROLE=lane serves only MISSION_CONTROL_LANE_TASK_QUEUES with the runtime DB role only.",
+    "Same build id enforcement; readiness reports the role.",
+    "This role is how the WSL2 worker coexists with the AWS base worker (SPEC-11 §3): it serves only mc-s0-<app>-lane-wsl."
+   ],
+   "acceptance": [
+    "A second worker serving only lane queues runs lane.turn without the family-writer DSN and starts no root or family pollers."
+   ],
+   "sprint": "in",
+   "slice": "S0",
+   "file": "MO-63-lane-only-worker-role.md"
+  },
+  {
+   "id": "MO-64",
+   "title": "Split-host payload custody preflight",
+   "owner": "Runtime",
+   "wave": "B",
+   "size": "S",
+   "spec": "SPEC-09-local-harness-path.md",
+   "deps": [],
+   "paths": [
+    "adapters/temporal/deployment_composition.py",
+    "bootstrap/preflight.py"
+   ],
+   "problem": "API and workers on different hosts silently use different filesystem payload roots.",
+   "work": [
+    "Preflight compares payload-root identity across API and worker (marker file) and requires S3 when not shared; document the S3 path for remote workers.",
+    "S3 is the payload store whenever the AWS worker is live: S3_BUCKET on the Windows API (profile mission-control) and on the AWS task (task role); AWS_PROFILE must be empty in ECS."
+   ],
+   "acceptance": [
+    "Preflight flags a non-shared ARTIFACT_PAYLOAD_ROOT; shared /mnt/c root passes."
+   ],
+   "sprint": "in",
+   "slice": "S0",
+   "file": "MO-64-split-host-payload-custody-preflight.md"
+  },
+  {
+   "id": "MO-65",
+   "title": "Refuse Codex ChatGPT login in an isolated CODEX_HOME",
+   "owner": "Runtime",
+   "wave": "A",
+   "size": "S",
+   "spec": "SPEC-09-local-harness-path.md",
+   "deps": [],
+   "paths": [
+    "adapters/codex/harness.py",
+    "adapters/codex/compose.py",
+    "bootstrap/preflight.py"
+   ],
+   "problem": "Isolated CODEX_HOME has no auth.json, yet admission passes and the lane launches signed out.",
+   "work": [
+    "Typed refusal at preflight and admission for owner_cli_login with isolated home; owner mode launches signed in; API-key route works in isolated mode."
+   ],
+   "acceptance": [
+    "Profile codex-owner-chatgpt + isolated is refused; owner mode passes readiness."
+   ],
+   "sprint": "in",
+   "slice": "S0",
+   "file": "MO-65-refuse-codex-chatgpt-login-in-an-isolated-codex-home.md"
+  },
+  {
+   "id": "MO-66",
+   "title": "Re-pin Codex to 0.162.1 and regenerate app-server fixtures",
+   "owner": "Runtime",
+   "wave": "A",
+   "size": "S",
+   "spec": "SPEC-09-local-harness-path.md",
+   "deps": [],
+   "paths": [
+    "application/execution/harness/describe.py",
+    "tests/fixtures/provider_frames/codex/schema",
+    "adapters/codex/protocol.py"
+   ],
+   "problem": "Mission Control pins Codex 0.162.0 while the owner machine has 0.162.1; the LS skills and lane should share one version.",
+   "work": [
+    "Re-pin to 0.162.1 (owner may override), regenerate the app-server schema fixture, re-run codex unit and conformance tests; readiness checks the WSL binary against the pin."
+   ],
+   "acceptance": [
+    "codex --version equals the pin on the worker; schema fixture regenerated reproducibly."
+   ],
+   "sprint": "in",
+   "slice": "S0",
+   "file": "MO-66-re-pin-codex-to-0-162-1-and-regenerate-app-server-fixtures.md"
+  },
+  {
+   "id": "MO-67",
+   "title": "Temporal Cloud qualification run",
+   "owner": "Integrator",
+   "wave": "B",
+   "size": "M",
+   "spec": "SPEC-09-local-harness-path.md",
+   "deps": [
+    "MO-72",
+    "MO-78"
+   ],
+   "paths": [
+    "adapters/temporal/client.py",
+    "scripts/register_belllabs_search_attributes.py",
+    "docs/MISSION_CONTROL_LOCAL_API.md"
+   ],
+   "problem": "Temporal Cloud is only unit-tested with a mocked connection.",
+   "work": [
+    "Run the S0 probe set on mission-control-dev.ih0e7 using the setup and versioning rule from MO-78 (TEMPORAL_TARGET=cloud, TEMPORAL_CLOUD_API_KEY, R20); mission-control-prod.ih0e7 is untouched this sprint.",
+    "If the AWS worker (MO-77) is already serving AI Engineer's base queues, run the S0 Cloud variant with the WSL2 worker in lane role only, so there is one base worker per (namespace, application)."
+   ],
+   "acceptance": [
+    "Three-lane S0 probe set completes on a Cloud namespace with a recorded run."
+   ],
+   "sprint": "in",
+   "slice": "S0",
+   "file": "MO-67-temporal-cloud-qualification-run.md"
+  },
+  {
+   "id": "MO-68",
+   "title": "Preflight accepts a local deployments root",
+   "owner": "Integrator",
+   "wave": "A",
+   "size": "S",
+   "spec": "SPEC-09-local-harness-path.md",
+   "deps": [],
+   "paths": [
+    "bootstrap/preflight.py"
+   ],
+   "problem": "db_release reads only the tracked 1.1.0 lock, so a local 1.3.0 install is always red.",
+   "work": [
+    "Profile-level deployment_dir for local/scratch installs; tracked locks untouched."
+   ],
+   "acceptance": [
+    "Readiness green for a local 1.3.0 install outside version control."
+   ],
+   "sprint": "in",
+   "slice": "S0",
+   "file": "MO-68-preflight-accepts-a-local-deployments-root.md"
+  },
+  {
+   "id": "MO-69",
+   "title": "Binding digest tool for compose-bindings",
+   "owner": "Integrator",
+   "wave": "A",
+   "size": "M",
+   "spec": "SPEC-09-local-harness-path.md",
+   "deps": [],
+   "paths": [
+    "bootstrap/preflight.py",
+    "application/authoring/provider_launch.py",
+    "scripts/"
+   ],
+   "problem": "The launch-bindings file needs 62 hand-resolved values (model ids, digests, policy refs) (owner action O7).",
+   "work": [
+    "Compute environment, image, package and runtime digests and reviewed agent_profile_ref digests from owner selections; emit a file with zero BINDING_UNRESOLVED."
+   ],
+   "acceptance": [
+    "compose-bindings produces a valid three-lane local file from owner selections only."
+   ],
+   "sprint": "in",
+   "slice": "S0",
+   "file": "MO-69-binding-digest-tool-for-compose-bindings.md",
+   "run2_plan": {
+    "approved_at": "2026-10-14",
+    "inspection_base": "a2527f6f3c385a7f55272c41d90e6860b44781d0",
+    "baseline": "ModelPin/AuthPin, typed ProviderLaneBinding, REQUIRED_PINS and Cursor bindings already exist; compose-bindings still needs reviewed owner selections and exact digests.",
+    "outcome": "Emit a secret-free derived identity/configuration summary alongside valid three-lane bindings, without altering canonical binding shape.",
+    "non_goals": "No new lane, model catalog, generic configuration schema or deferred feature.",
+    "sequencing": "Use the existing deps/wave. Shared contracts/composition belong to the integrator; satisfy dependencies with integrated source evidence, not assumed live readiness.",
+    "interfaces": [
+     "bootstrap/preflight.py",
+     "application/authoring/provider_launch.py",
+     "application/authoring/cursor_launch.py",
+     "domain/execution/bindings.py (integrator-only; reuse)"
+    ],
+    "acceptance": [
+     "Summary names runtime/lane, placement, requested model, auth/billing profile, SDK/CLI/schema pins, binding/materialization/describe digests and prerequisite freshness.",
+     "Provider-reported serving model is separately identified or unknown; no provider-name translation or implicit fallback.",
+     "Missing selection, pin mismatch or unsupported required control is refused before any provider create; no secret appears in output."
+    ],
+    "offline_validation": [
+     "uv run pytest tests/unit/authoring/test_hosted_launch_bindings.py tests/unit/prerequisites/test_preflight.py -q",
+     "Add deterministic compose-summary, omitted-field digest, drift and redaction cases beside existing preflight tests; command cannot claim tests exist before added."
+    ],
+    "live_validation": "Unrun until exact prerequisite/configuration/placement and action-specific authorization are established. Use the assigned spec/drill; fixture success never sets qualified. Retain default-off paid runners.",
+    "compatibility": "Preserve old canonical bytes, admitted model/options, approval configuration seals and scoped grants across retry, reattach, continuation and fork. See RUN-2 shared acceptance rules.",
+    "evidence": "Map every criterion to exact source revision, test/receipt, evidence level and disposition; record requested versus observed identity, usage uncertainty, resource custody and cleanup. Apply RUN-2 shared escalation rules.",
+    "effort": "Small-medium: derive existing heterogeneous pins, not a live model catalog."
+   }
+  },
+  {
+   "id": "MO-70",
+   "title": "missionctl token mint helper",
+   "owner": "Integrator",
+   "wave": "A",
+   "size": "S",
+   "spec": "SPEC-09-local-harness-path.md",
+   "deps": [],
+   "paths": [
+    "interfaces/cli/main.py",
+    "adapters/auth/"
+   ],
+   "problem": "Operators hand-write JWTs to use the API locally.",
+   "work": [
+    "missionctl token mint from an operator key with scopes and expiry; never prints the key."
+   ],
+   "acceptance": [
+    "S0 runbook needs no hand-written JWT code."
+   ],
+   "sprint": "in",
+   "slice": "S0",
+   "file": "MO-70-missionctl-token-mint-helper.md"
+  },
+  {
+   "id": "MO-71",
+   "title": "S0 probe manifests for all three local lanes",
+   "owner": "Integrator",
+   "wave": "A",
+   "size": "S",
+   "spec": "SPEC-09-local-harness-path.md",
+   "deps": [
+    "MO-69"
+   ],
+   "paths": [
+    "docs/specs/materialization-observation-2026-10/examples/",
+    "packages/mission-control-db-contract (seeds, if needed)"
+   ],
+   "problem": "Existing examples depend on test-only schemas.",
+   "work": [
+    "One probe manifest per lane (claude_agent_sdk, codex, cursor_local) against a fixture repo, compiling on production and qualification seeds; exercises inject and cancel."
+   ],
+   "acceptance": [
+    "compile reports 0 blockers on the local install for all three lanes."
+   ],
+   "sprint": "in",
+   "slice": "S0",
+   "file": "MO-71-s0-probe-manifests-for-all-three-local-lanes.md",
+   "run2_plan": {
+    "approved_at": "2026-10-14",
+    "inspection_base": "a2527f6f3c385a7f55272c41d90e6860b44781d0",
+    "baseline": "S0 requires owner-selected bindings and production/qualification seeds; delivery does not prove provider loading.",
+    "outcome": "Add exact local Anthropic identity/tool/configuration and evidence requirements to the three S0 probe manifests.",
+    "non_goals": "No new lane, model catalog, generic configuration schema or deferred feature.",
+    "sequencing": "Requires MO-69 output and integrated MO-04/05/08/21/34; retain issue deps and verify these evidence joins before S0.",
+    "interfaces": [
+     "deployments/ (S0 probe manifests; integrator selects exact path)",
+     "bootstrap/preflight.py",
+     "application/agentic_components/projections.py (reuse)"
+    ],
+    "acceptance": [
+     "Each manifest compiles from reviewed selections with zero unresolved bindings and names actual host/CLI/SDK/auth/model, required tool-family enforcement and output channel.",
+     "Claude probe preserves repo instructions and exercises one admitted skill and a governed permission decision; report delivered/read-back/exercised separately.",
+     "Unsupported required enforcement and optional-degradation cases are explicit; no probe substitutes an attestation for a required trusted method."
+    ],
+    "offline_validation": [
+     "uv run pytest tests/unit/authoring tests/unit/agentic_components/test_discovery_proof.py tests/unit/claude -q",
+     "Compile proposed manifests against deterministic registry fixtures; assert no provider create for negative cases."
+    ],
+    "live_validation": "Unrun until exact prerequisite/configuration/placement and action-specific authorization are established. Use the assigned spec/drill; fixture success never sets qualified. Retain default-off paid runners.",
+    "compatibility": "Preserve old canonical bytes, admitted model/options, approval configuration seals and scoped grants across retry, reattach, continuation and fork. See RUN-2 shared acceptance rules.",
+    "evidence": "Map every criterion to exact source revision, test/receipt, evidence level and disposition; record requested versus observed identity, usage uncertainty, resource custody and cleanup. Apply RUN-2 shared escalation rules.",
+    "effort": "Small-medium: select existing capabilities and add qualification cases."
+   }
+  },
+  {
+   "id": "MO-72",
+   "title": "Slice S0 end-to-end: local harness path from all three tools",
+   "owner": "Integrator",
+   "wave": "B",
+   "size": "M",
+   "spec": "SPEC-09-local-harness-path.md",
+   "deps": [
+    "MO-08",
+    "MO-43",
+    "MO-04",
+    "MO-05",
+    "MO-65",
+    "MO-66",
+    "MO-68",
+    "MO-69",
+    "MO-70",
+    "MO-71"
+   ],
+   "paths": [
+    "docs/qualification/lanes/claude_agent_sdk/",
+    "docs/qualification/lanes/codex/",
+    "docs/qualification/lanes/cursor_local/"
+   ],
+   "problem": "Prove the local programmatic harness path (owner decision R13).",
+   "work": [
+    "Run SPEC-09 §8 runbook: nine runs (three lanes x three launching tools) with wait, inject, cancel/complete and cleanup; record transcripts, frames and usage disposition (owner-authorized spend)."
+   ],
+   "acceptance": [
+    "SPEC-09 §9 acceptance met on local Temporal; records saved."
+   ],
+   "sprint": "in",
+   "slice": "S0",
+   "file": "MO-72-slice-s0-end-to-end-local-harness-path-from-all-three-tools.md",
+   "run2_plan": {
+    "approved_at": "2026-10-14",
+    "inspection_base": "a2527f6f3c385a7f55272c41d90e6860b44781d0",
+    "baseline": "Run 1 integrates local env, allocator, discovery and SessionStore seams; it does not qualify the exact WSL placement or the nine caller/lane runs.",
+    "outcome": "Execute S0 only after offline proofs and authorization; carry exact Anthropic configuration, enforcement and custody evidence through normal launch.",
+    "non_goals": "No new lane, model catalog, generic configuration schema or deferred feature.",
+    "sequencing": "Use the existing deps/wave. Shared contracts/composition belong to the integrator; satisfy dependencies with integrated source evidence, not assumed live readiness.",
+    "interfaces": [
+     "docs/qualification/lanes/",
+     "deployments/ (S0 probes)",
+     "adapters/claude/harness.py (existing seam)"
+    ],
+    "acceptance": [
+     "All originally required caller/lane runs and controls remain required; label partial progress without blanket qualification.",
+     "Claude SDK receipt includes actual SDK/bundled CLI/host/model/auth, repo-file digests, selected skill loading/invocation, tool deny/allow, inject/cancel and immutable output.",
+     "Resume/reattach retains admitted configuration; stale config/approval fails, child-env sentinels stay redacted and cleanup follows custody."
+    ],
+    "offline_validation": [
+     "uv run pytest tests/unit/claude tests/unit/agentic_components/test_discovery_proof.py tests/conformance/lanes -q",
+     "Future disposable-stack run: use SPEC-09 runbook and RUN-1 reproduction commands with isolated queues; record exact launch/wait/inject/cancel commands."
+    ],
+    "live_validation": "Unrun until exact prerequisite/configuration/placement and action-specific authorization are established. Use the assigned spec/drill; fixture success never sets qualified. Retain default-off paid runners.",
+    "compatibility": "Preserve old canonical bytes, admitted model/options, approval configuration seals and scoped grants across retry, reattach, continuation and fork. See RUN-2 shared acceptance rules.",
+    "evidence": "Map every criterion to exact source revision, test/receipt, evidence level and disposition; record requested versus observed identity, usage uncertainty, resource custody and cleanup. Apply RUN-2 shared escalation rules.",
+    "effort": "Small incremental evidence additions; original end-to-end qualification is still medium."
+   }
+  },
+  {
+   "id": "MO-73",
+   "title": "Verify Claude SessionStore restore with the custom transport",
+   "owner": "Runtime",
+   "wave": "A",
+   "size": "S",
+   "spec": "SPEC-06-hosted-api-lanes.md",
+   "deps": [],
+   "paths": [
+    "adapters/claude/transport.py",
+    "adapters/claude/session.py",
+    "tests/unit/claude/"
+   ],
+   "problem": "With a custom transport the SDK skips SessionStore resume; the existing local lane may never restore mirrored sessions.",
+   "work": [
+    "Test cross-process resume through the lane; if broken, restore the transcript into CLAUDE_CONFIG_DIR before resume=<id>."
+   ],
+   "acceptance": [
+    "Resume on a fresh worker process restores the session with no lost turns."
+   ],
+   "sprint": "in",
+   "slice": "F",
+   "file": "MO-73-verify-claude-sessionstore-restore-with-the-custom-transport.md"
+  },
+  {
+   "id": "MO-74",
+   "title": "Vercel ingress project, slim import closure and deployment",
+   "owner": "Integrator",
+   "wave": "B",
+   "size": "M",
+   "spec": "SPEC-10-ingress-on-vercel.md",
+   "deps": [
+    "MO-40"
+   ],
+   "paths": [
+    "deployments/ingress-vercel/",
+    "src/mission_control/interfaces/http/ingress.py",
+    "tests/unit/ingress/"
+   ],
+   "problem": "The ingress must run on Vercel without the heavy package.",
+   "work": [
+    "Project layout per SPEC-10 §6 (app.py, pyproject/uv.lock, vercel.json fluid/iad1/30s/no trailing slash); vendor_closure script and import-closure test; env var contract. Model Gateway/800s routes remain S4 funding-gated and are not enabled by this issue.",
+    "Deploy to team overtons-projects (Pro, R17), always with --scope overtons-projects because the CLI's current scope is another team; production host is the project's *.vercel.app domain; no custom domain this sprint.",
+    "Verify actual live identity first; use the immutable built component 1.4.0 (34 migrations, manifest/fingerprint in RUN-2-HANDOFF), with ingress role through LIVE_PLAN.md and integrator-only reviewed proofs. Do not reconstruct the obsolete 0035-0039 range or overwrite the artifact. Live apply requires exact current authority/prerequisites."
+   ],
+   "acceptance": [
+    "Import-closure test passes; preview build succeeds; production deploy answers health and rejects unauthenticated calls.",
+    "Live 1.4.0 qualify-before/apply/verify/qualify-after evidence recorded for both projects."
+   ],
+   "sprint": "in",
+   "slice": "S1",
+   "file": "MO-74-vercel-ingress-project-slim-import-closure-and-deployment.md",
+   "run2_plan": {
+    "approved_at": "2026-10-14",
+    "inspection_base": "a2527f6f3c385a7f55272c41d90e6860b44781d0",
+    "baseline": "MO-40 SQL/service already integrated. Edge must remain slim, without lane SDK/Temporal imports or a background worker.",
+    "outcome": "Package/deploy only the existing ingress closure and expose product/version/session-safe webhook handling.",
+    "non_goals": "No new lane, model catalog, generic configuration schema or deferred feature.",
+    "sequencing": "Use the existing deps/wave. Shared contracts/composition belong to the integrator; satisfy dependencies with integrated source evidence, not assumed live readiness.",
+    "interfaces": [
+     "deployments/ingress-vercel/",
+     "interfaces/http/ingress.py (Events lease)",
+     "application/signals/verification.py (reuse)"
+    ],
+    "acceptance": [
+     "Import closure excludes Temporal/provider adapters/LangGraph; no production DSN in preview and no Temporal credentials at edge.",
+     "Fixture webhook schema is tied to the qualified bound product/version/session; wrong scope/session and forged/replayed payloads refuse.",
+     "No queue replacement; account/version metadata is evidence, not trusted caller-supplied authority."
+    ],
+    "offline_validation": [
+     "uv run pytest tests/unit/signals/test_verification.py tests/unit/signals/test_provider_wake.py -q",
+     "Future ingress project import-closure/build checks: exact path created by MO-74; local restricted PostgreSQL route tests from SPEC-10."
+    ],
+    "live_validation": "Unrun until exact prerequisite/configuration/placement and action-specific authorization are established. Use the assigned spec/drill; fixture success never sets qualified. Retain default-off paid runners.",
+    "compatibility": "Preserve old canonical bytes, admitted model/options, approval configuration seals and scoped grants across retry, reattach, continuation and fork. See RUN-2 shared acceptance rules.",
+    "evidence": "Map every criterion to exact source revision, test/receipt, evidence level and disposition; record requested versus observed identity, usage uncertainty, resource custody and cleanup. Apply RUN-2 shared escalation rules.",
+    "effort": "Small acceptance refinement; existing implementation scope remains."
+   }
+  },
+  {
+   "id": "MO-75",
+   "title": "IngressDrainer worker role",
+   "owner": "Events",
+   "wave": "B",
+   "size": "M",
+   "spec": "SPEC-10-ingress-on-vercel.md",
+   "deps": [
+    "MO-40"
+   ],
+   "paths": [
+    "application/signals/drainer.py",
+    "adapters/postgres/ingress.py",
+    "bootstrap/worker.py"
+   ],
+   "problem": "Inbox rows must become frames, watcher input, reconciliations and Temporal wake-ups without the edge holding credentials.",
+   "work": [
+    "LISTEN mc_ingress + 5 s poll; SKIP LOCKED batches; FrameWriter with ingress provider_key; webhook reconcile; artifact custody trigger; ingress_wake signal; dead-lettering."
+   ],
+   "acceptance": [
+    "Real PostgreSQL test: replay is a no-op; latency under 200 ms with LISTEN; dead rows after N failures."
+   ],
+   "sprint": "in",
+   "slice": "S1",
+   "file": "MO-75-ingressdrainer-worker-role.md",
+   "run2_plan": {
+    "approved_at": "2026-10-14",
+    "inspection_base": "a2527f6f3c385a7f55272c41d90e6860b44781d0",
+    "baseline": "Existing PostgreSQL ingress_inbox, outbox and wake reducer are the durable foundation; LISTEN requires a session connection with polling fallback.",
+    "outcome": "Drain product/session-bound inbox rows idempotently across crashes, reorder and stale generations.",
+    "non_goals": "No new lane, model catalog, generic configuration schema or deferred feature.",
+    "sequencing": "Use the existing deps/wave. Shared contracts/composition belong to the integrator; satisfy dependencies with integrated source evidence, not assumed live readiness.",
+    "interfaces": [
+     "application/signals/",
+     "adapters/postgres/ (integrator leases store edits)",
+     "bootstrap/ (integrator-only)",
+     "adapters/temporal/ (lease wake activity)"
+    ],
+    "acceptance": [
+     "Crash after frame persistence before wake/drained acknowledgement replays without duplicate applied effect.",
+     "Duplicate/reordered webhook is only a reconcile wake; authoritative native history determines facts; stale generation cannot create a mission.",
+     "SKIP LOCKED and 5-second polling fallback retain scope isolation; dead rows carry sanitized actionable telemetry."
+    ],
+    "offline_validation": [
+     "uv run pytest tests/unit/signals/test_provider_wake.py tests/unit/remote_session -q",
+     "Future disposable PostgreSQL: uv run pytest tests/integration/postgres/test_signal_ingress_postgres.py -q; add drainer crash/claim/replay cases alongside it."
+    ],
+    "live_validation": "Unrun until exact prerequisite/configuration/placement and action-specific authorization are established. Use the assigned spec/drill; fixture success never sets qualified. Retain default-off paid runners.",
+    "compatibility": "Preserve old canonical bytes, admitted model/options, approval configuration seals and scoped grants across retry, reattach, continuation and fork. See RUN-2 shared acceptance rules.",
+    "evidence": "Map every criterion to exact source revision, test/receipt, evidence level and disposition; record requested versus observed identity, usage uncertainty, resource custody and cleanup. Apply RUN-2 shared escalation rules.",
+    "effort": "Small acceptance refinement; existing implementation scope remains."
+   }
+  },
+  {
+   "id": "MO-76",
+   "title": "Signed artifact uploads with quarantine and custody",
+   "owner": "Events",
+   "wave": "C",
+   "size": "M",
+   "spec": "SPEC-10-ingress-on-vercel.md",
+   "deps": [
+    "MO-40",
+    "MO-75"
+   ],
+   "paths": [
+    "application/signals/artifacts.py",
+    "adapters/supabase_storage/"
+   ],
+   "problem": "Vercel caps bodies at 4.5 MB; outputs must still reach custody verified.",
+   "work": [
+    "artifacts:prepare issues a signed upload to a quarantine bucket; commit records digest; drainer verifies and moves into custody (ADR-0024); quarantine cleanup."
+   ],
+   "acceptance": [
+    "A >4.5 MB artifact arrives, is digest-verified and lands in custody; tampered upload rejected."
+   ],
+   "sprint": "in",
+   "slice": "S1",
+   "file": "MO-76-signed-artifact-uploads-with-quarantine-and-custody.md",
+   "run2_plan": {
+    "approved_at": "2026-10-14",
+    "inspection_base": "a2527f6f3c385a7f55272c41d90e6860b44781d0",
+    "baseline": "Signed upload quarantine is distinct from durable artifact promotion; edge acknowledgement must not become acceptance.",
+    "outcome": "Verify uploaded bytes and promote immutable scoped evidence before registration/review/cleanup.",
+    "non_goals": "No new lane, model catalog, generic configuration schema or deferred feature.",
+    "sequencing": "Use the existing deps/wave. Shared contracts/composition belong to the integrator; satisfy dependencies with integrated source evidence, not assumed live readiness.",
+    "interfaces": [
+     "application/signals/artifacts.py",
+     "adapters/supabase_storage/",
+     "application/artifacts/artifact_promotion.py (reuse)"
+    ],
+    "acceptance": [
+     "Existing >4.5 MB requirement remains; actual size/digest and scoped credential are verified before custody.",
+     "Mismatch, cross-scope, expired/revoked token and duplicate/conflicting commit cannot create accepted artifacts.",
+     "Review references registered immutable output/version/digest; publication is separate; quarantine cleanup/retention is recorded and large bytes bypass edge."
+    ],
+    "offline_validation": [
+     "uv run pytest tests/unit/workspaces/test_artifact_promotion.py tests/unit/human_tasks/test_human_gate_rules.py tests/unit/signals -q",
+     "Future disposable PostgreSQL/store fixture covers signed upload->commit->drain->promotion, corrupted bytes and replay."
+    ],
+    "live_validation": "Unrun until exact prerequisite/configuration/placement and action-specific authorization are established. Use the assigned spec/drill; fixture success never sets qualified. Retain default-off paid runners.",
+    "compatibility": "Preserve old canonical bytes, admitted model/options, approval configuration seals and scoped grants across retry, reattach, continuation and fork. See RUN-2 shared acceptance rules.",
+    "evidence": "Map every criterion to exact source revision, test/receipt, evidence level and disposition; record requested versus observed identity, usage uncertainty, resource custody and cleanup. Apply RUN-2 shared escalation rules.",
+    "effort": "Small-medium evidence join within planned upload implementation."
+   }
+  },
+  {
+   "id": "MO-78",
+   "title": "Temporal Cloud namespace setup and connection probe",
+   "owner": "Integrator",
+   "wave": "A",
+   "size": "S",
+   "spec": "SPEC-11-remote-worker-on-aws.md",
+   "deps": [],
+   "paths": [
+    "docs/MISSION_CONTROL_LOCAL_API.md",
+    "bootstrap/settings.py",
+    "scripts/temporal_cloud/"
+   ],
+   "problem": "Temporal Cloud has never been exercised by this code (R20). Both the S0 Cloud run (MO-67) and the AWS worker (MO-77) need the namespace prepared first, and neither should own that setup.",
+   "work": [
+    "Register the custom search attributes the code uses on mission-control-dev.ih0e7 (Cloud UI or tcld; removal is unsupported, so list them first and get the integrator's sign-off).",
+    "Decide and document Worker Deployment versioning on Cloud: TEMPORAL_PROMOTE_ON_START behaviour, build id = package version plus git sha, and the rule of one base worker per (namespace, application).",
+    "A read-only connection probe script (no secrets printed): connect with TEMPORAL_TARGET=cloud and the API key, describe the namespace, list search attributes, start and complete one no-op workflow on a probe task queue with a throwaway in-process worker.",
+    "Document the exact env contract (TEMPORAL_TARGET, TEMPORAL_ADDRESS, TEMPORAL_NAMESPACE, TEMPORAL_CLOUD_API_KEY) in the operator guide."
+   ],
+   "acceptance": [
+    "The probe completes against mission-control-dev.ih0e7 and its output is recorded; mission-control-prod.ih0e7 is untouched.",
+    "Search attributes and the versioning rule are documented; MO-67 and MO-77 reference them instead of repeating setup."
+   ],
+   "sprint": "in",
+   "slice": "R",
+   "file": "MO-78-temporal-cloud-namespace-setup-and-connection-probe.md"
+  },
+  {
+   "id": "MO-77",
+   "title": "Thin Temporal worker on AWS ECS Fargate (us-east-1)",
+   "owner": "Integrator",
+   "wave": "B",
+   "size": "M",
+   "spec": "SPEC-11-remote-worker-on-aws.md",
+   "deps": [
+    "MO-63",
+    "MO-64",
+    "MO-78"
+   ],
+   "paths": [
+    "deployments/worker-aws/",
+    "deployments/cloud_runtime/plan.py",
+    "deployments/cloud_runtime/Dockerfile",
+    "bootstrap/worker.py",
+    "docs/MISSION_CONTROL_LOCAL_API.md"
+   ],
+   "problem": "Missions stop progressing when the owner's machine is off. Managed agents remove agent compute, but Temporal Cloud never runs workflow code; one small always-on worker must (R28).",
+   "work": [
+    "Operator image deployments/worker-aws/Dockerfile extending the reviewed cloud_runtime base with the AI Engineer deployment files (target.toml, release.lock), capability pins and launch bindings; CMD python -m mission_control.bootstrap.worker; linux/amd64; non-root.",
+    "One-time infrastructure in us-east-1 per SPEC-11 §4 (always pass --region us-east-1; the CLI default is us-east-2): ECR repo, S3 payload bucket, two IAM roles, egress-only security group, log group, ECS cluster and service (0.5 vCPU / 2 GiB, desiredCount 1, min 0 / max 100 percent), AWS Budgets alert.",
+    "deployments/worker-aws/put-secrets.ps1 for the owner to run: reads named keys from mission-control/.env and writes them to Secrets Manager under mission-control/ai-engineer/ without ever echoing values.",
+    "deployments/worker-aws/deploy.ps1: build, tag (version + git sha), push to ECR, render the task definition with plan.py (worker-only service, secrets by ARN, AWS_PROFILE empty), register, update the service, wait for stable, tail readiness from CloudWatch. No GitHub dependency.",
+    "Queue layout per SPEC-11 §3: the AWS worker serves the base queues and the hosted lane queue mc-ai-engineer-lane-hosted (cursor_cloud, claude_managed, codex_agents) plus the IngressDrainer; the WSL2 worker switches to MISSION_CONTROL_WORKER_ROLE=lane for mc-s0-ai-engineer-lane-wsl once this service is live.",
+    "Database connectivity through the Supabase session pooler (IPv4); confirm LISTEN works there, otherwise run the drainer on its 5 s poll."
+   ],
+   "acceptance": [
+    "The service runs one task in us-east-1 with no inbound rules; readiness passes against Temporal Cloud (mission-control-dev.ih0e7), the AI Engineer Supabase project and the S3 payload bucket.",
+    "With the owner's machine powered off, a probe mission admitted earlier runs a hosted lane turn to completion on the AWS worker; frames and payloads land in Postgres and S3.",
+    "No secret value appears in the image, task definition, logs, repo or handoff (sentinel check); deploy.ps1 redeploys a new build with no manual console steps.",
+    "Measured CPU and memory over a 24 h idle-plus-drill window are recorded, with the monthly cost estimate."
+   ],
+   "sprint": "in",
+   "slice": "R",
+   "file": "MO-77-thin-temporal-worker-on-aws-ecs-fargate-us-east-1.md",
+   "run2_plan": {
+    "approved_at": "2026-10-14",
+    "inspection_base": "a2527f6f3c385a7f55272c41d90e6860b44781d0",
+    "baseline": "Existing reviewed AWS renderer/image and sealed lane queues remain; current main integration does not prove remote readiness or installed live component.",
+    "outcome": "Bind laptop-off/restart evidence to exact build, queues, installation/release and hosted configuration without widening deployment.",
+    "non_goals": "No new lane, model catalog, generic configuration schema or deferred feature.",
+    "sequencing": "Use the existing deps/wave. Shared contracts/composition belong to the integrator; satisfy dependencies with integrated source evidence, not assumed live readiness.",
+    "interfaces": [
+     "deployments/worker-aws/",
+     "deployments/cloud_runtime/ (reuse)",
+     "bootstrap/worker.py (integrator-only)"
+    ],
+    "acceptance": [
+     "One base worker only; WSL is lane-only after activation, both hosts use matching builds when local lanes participate.",
+     "Laptop-off and restart receipts identify exact model/auth/config/binding/materialization/describe evidence, frames and S3 content digests with no duplicates.",
+     "No publication from provider done/review alone; secret sentinel, scoped IAM, retention/cleanup and actual/estimated/unknown cost remain required."
+    ],
+    "offline_validation": [
+     "Offline: inspect and use existing deployments/cloud_runtime renderer/image tests; MO-77 creates worker-aws tests, then records exact commands.",
+     "Future runtime proof uses SPEC-11 exact resources/account/us-east-1, verified roles/release/namespace/S3; no deployment is authorized by this amendment."
+    ],
+    "live_validation": "Unrun until exact prerequisite/configuration/placement and action-specific authorization are established. Use the assigned spec/drill; fixture success never sets qualified. Retain default-off paid runners.",
+    "compatibility": "Preserve old canonical bytes, admitted model/options, approval configuration seals and scoped grants across retry, reattach, continuation and fork. See RUN-2 shared acceptance rules.",
+    "evidence": "Map every criterion to exact source revision, test/receipt, evidence level and disposition; record requested versus observed identity, usage uncertainty, resource custody and cleanup. Apply RUN-2 shared escalation rules.",
+    "effort": "Small receipt refinement; original remote deployment/qualification remains medium."
+   }
+  },
+  {
+   "id": "MO-79",
+   "title": "Remote launch-request route on the Signal Ingress",
+   "owner": "Events",
+   "wave": "B",
+   "size": "M",
+   "spec": "SPEC-10-ingress-on-vercel.md",
+   "deps": [
+    "MO-40",
+    "MO-75",
+    "MO-70"
+   ],
+   "paths": [
+    "interfaces/http/ingress.py",
+    "application/signals/",
+    "application/missions/",
+    "adapters/postgres/ingress.py",
+    "deployments/ingress-vercel/ (route; leased from the integrator)",
+    "interfaces/cli/ (missionctl remote launch)"
+   ],
+   "problem": "The operator API is local-only and SPEC-10 keeps Temporal credentials off Vercel, so nothing outside the owner's machine can start a mission (gap G-R1, decision R29).",
+   "work": [
+    "POST /v1/ingress/{app}/missions:request authenticated by a minted operator launch credential (ingress_credential purpose mission_request, scoped to app and manifest set, expiring); writes an inbox row of kind mission_request carrying the manifest reference, inputs digest and idempotency key; replies 202 with the request id.",
+    "GET /v1/ingress/{app}/missions:request/{id} returns request state (queued, admitted, refused with typed reason) and, once admitted, the mission id and lifecycle state from a read-only SQL view.",
+    "The IngressDrainer admits the request by calling the same application admission handler the API uses (data_class, Spawn Grant and preflight checks included); a refusal is recorded, never retried silently.",
+    "missionctl remote launch --app <app> --manifest <ref> mints nothing itself: it uses an operator-minted credential (MO-70) and polls the status route.",
+    "Reuse the integrated 0035 mission_request kind and credential purpose; no SQL migration is needed for this route. Never edit applied 0035 or occupied 0040. A demonstrated new schema need requires integrator review and fresh additive release allocation."
+   ],
+   "acceptance": [
+    "Real PostgreSQL tests: forged, expired and wrong-app requests refuse; replay of an identical idempotent request admits once, while reuse with a conflicting body is refused.",
+    "A request sent from outside the owner's network is admitted by the AWS worker and its mission id is readable from the status route."
+   ],
+   "sprint": "in",
+   "slice": "R",
+   "file": "MO-79-remote-launch-request-route-on-the-signal-ingress.md",
+   "run2_plan": {
+    "approved_at": "2026-10-14",
+    "inspection_base": "a2527f6f3c385a7f55272c41d90e6860b44781d0",
+    "baseline": "MO-40 already owns mission_request credential purpose/inbox kind; normal admission includes fresh prerequisites and exact binding seals.",
+    "outcome": "Expose queued/admitted/refused and lifecycle states while admitting launch requests through existing handlers.",
+    "non_goals": "No new lane, model catalog, generic configuration schema or deferred feature.",
+    "sequencing": "Use the existing deps/wave. Shared contracts/composition belong to the integrator; satisfy dependencies with integrated source evidence, not assumed live readiness.",
+    "interfaces": [
+     "interfaces/http/ingress.py",
+     "application/signals/",
+     "application/missions/admission.py (reuse)",
+     "bootstrap/ (integrator-only)"
+    ],
+    "acceptance": [
+     "202 means queued only; status distinguishes typed admission/refusal and lifecycle; no fabricated accepted completion.",
+     "Same request replay yields one admission, including drainer crash; body conflict, wrong scope and revoked/expired credential refuse.",
+     "Admission rechecks current prerequisites/configuration; unsupported selection creates no provider session and no implicit lane/model fallback."
+    ],
+    "offline_validation": [
+     "uv run pytest tests/unit/prerequisites/test_preflight.py tests/unit/signals -q",
+     "Future disposable PostgreSQL/Temporal launch fixture: assert inbox-to-normal-handler idempotency and stale prerequisite refusal; record exact module after implementation."
+    ],
+    "live_validation": "Unrun until exact prerequisite/configuration/placement and action-specific authorization are established. Use the assigned spec/drill; fixture success never sets qualified. Retain default-off paid runners.",
+    "compatibility": "Preserve old canonical bytes, admitted model/options, approval configuration seals and scoped grants across retry, reattach, continuation and fork. See RUN-2 shared acceptance rules.",
+    "evidence": "Map every criterion to exact source revision, test/receipt, evidence level and disposition; record requested versus observed identity, usage uncertainty, resource custody and cleanup. Apply RUN-2 shared escalation rules.",
+    "effort": "Small acceptance refinement; existing implementation scope remains."
+   }
+  },
+  {
+   "id": "HL-23",
+   "title": "Provider smoke: Managed Agents and Agents API field confirmation",
+   "owner": "Hosted",
+   "wave": "A",
+   "size": "S",
+   "spec": "MANAGED-AGENTS-REMOTE-PATH.md",
+   "deps": [],
+   "paths": [
+    "scripts/provider_smoke/",
+    "docs/specs/materialization-observation-2026-10/research/provider-smoke-2026-10.md"
+   ],
+   "problem": "Lane code would otherwise be written against unconfirmed request shapes (MANAGED-AGENTS-REMOTE-PATH §3 sketches), open questions Q-M1 and Q-O2, and an unconfirmed model (gpt-6-luna on the Agents API).",
+   "work": [
+    "One script per provider (anthropic 1.13.0, openai 3.29.0 pinned), keys from the environment, nothing printed but ids and statuses: create a skill, a vault with one credential, an agent and an environment; start a session with a one-turn read-only prompt; stream; answer one custom/function tool; send a mid-turn user.message (Q-M1); interrupt; read usage; delete the session and archive test resources.",
+    "OpenAI: confirm gpt-6-luna is accepted for the Codex harness; if refused, stop and ask the owner (SPRINT drill table). Check whether an AGENTS.md placed in the hosted workspace is honoured (Q-O2).",
+    "Record exact working request shapes, ids returned, event names seen and usage in research/provider-smoke-2026-10.md."
+   ],
+   "acceptance": [
+    "Both smokes complete under $1 each (charged to the S2 and S3 budgets) with usage recorded; every created resource is deleted or archived.",
+    "MANAGED-AGENTS-REMOTE-PATH §3 and SPEC-06 are corrected wherever a field differs."
+   ],
+   "sprint": "in",
+   "slice": "S2",
+   "file": "HL-23-provider-smoke-managed-agents-and-agents-api-field-confirmation.md"
+  },
+  {
+   "id": "HL-24",
+   "title": "Slice S2: claude_managed cloud end to end, launched remotely",
+   "owner": "Integrator",
+   "wave": "C",
+   "size": "M",
+   "spec": "SPRINT.md",
+   "deps": [
+    "HL-09",
+    "HL-17",
+    "HL-18",
+    "HL-23",
+    "MO-74",
+    "MO-77",
+    "MO-79"
+   ],
+   "paths": [
+    "docs/qualification/hosted/claude-managed/",
+    "deployments/hosted-packs/ai-engineer/"
+   ],
+   "problem": "Prove claude_managed cloud as the first remote lane (R27) before any other hosted lane qualifies.",
+   "work": [
+    "Run the S2 definition of done in SPRINT.md: a knowledge mission and an SDLC mission, both requested through the launch route and orchestrated by the AWS worker.",
+    "Exercise: provider webhook wake through the ingress, one always_ask approval round trip, interrupt_and_inject, budget-gate pause and resume, mc_publish bundle → verified push → draft PR, usage settled from list_cost, session deleted after custody.",
+    "Record transcripts, frames, usage disposition and the describe matrix observed; flip claude_managed cloud to qualified only from this record."
+   ],
+   "acceptance": [
+    "Both missions accepted by their Completion Contracts within the $10 S2 budget, with the owner's machine not running the base worker.",
+    "SPEC-06 §9 matrix for claude_managed cloud updated from evidence."
+   ],
+   "sprint": "in",
+   "slice": "S2",
+   "file": "HL-24-slice-s2-claude-managed-cloud-end-to-end-launched-remotely.md",
+   "run2_plan": {
+    "approved_at": "2026-10-14",
+    "inspection_base": "a2527f6f3c385a7f55272c41d90e6860b44781d0",
+    "baseline": "Managed Agents adapter/config read-back and local HL-09 approval/publication exist; remote S2 and full owner-selected HL21 are not blanket-qualified. Budget hold/release has no production workflow caller; describe pause is unsupported.",
+    "outcome": "Qualify remote Anthropic knowledge and SDLC missions with exact selected tools/configuration, custody, approval and explicit pause blocker.",
+    "non_goals": "No new lane, model catalog, generic configuration schema or deferred feature.",
+    "sequencing": "Existing deps HL-09/17/18/23 + MO-74/77/79 remain. Carry HL21 owner-binding/config evidence; escalate pause wiring to integrator before qualification. No new implementation issue or permission is silently created.",
+    "interfaces": [
+     "docs/qualification/hosted/claude-managed/",
+     "deployments/hosted-packs/ai-engineer/",
+     "adapters/anthropic_managed/discovery.py (existing seam)",
+     "application/execution/harness/describe.py (integrator-only)"
+    ],
+    "acceptance": [
+     "Both original Completion Contracts, laptop-off remote path and budget/cleanup requirements remain; report each blocked cell separately.",
+     "Pin actual agent/version, skill/version, MCP/toolset/permission policy, instructions, network/env and configuration seals. Read-back is not invocation proof.",
+     "Required unsupported enforcement refuses before create; native approval deny/allow/timeout binds the exact effective config, never webhook authority.",
+     "Budget-gate pause/resume remains blocked until governed production wiring and actual budget-boundary receipt exist; demonstrated boundary hold is separate and cannot replace it. Do not mark native/hard pause.",
+     "Immutable output/version is reviewed; publication is a separately granted verified effect; settled list_cost and cleanup receipts are required."
+    ],
+    "offline_validation": [
+     "uv run pytest tests/unit/anthropic_managed tests/unit/agentic_components/test_discovery_proof.py tests/unit/human_tasks/test_human_gate_rules.py tests/conformance/lanes -q",
+     "Live runners remain default-off: tests/integration/anthropic_managed/test_approval_publication_live.py and test_session_lifecycle_live.py are historical local seams, not remote HL-24 proof. Remote proof uses normal ingress/AWS launch after exact authorization."
+    ],
+    "live_validation": "Unrun until exact prerequisite/configuration/placement and action-specific authorization are established. Use the assigned spec/drill; fixture success never sets qualified. Retain default-off paid runners.",
+    "compatibility": "Preserve old canonical bytes, admitted model/options, approval configuration seals and scoped grants across retry, reattach, continuation and fork. See RUN-2 shared acceptance rules.",
+    "evidence": "Map every criterion to exact source revision, test/receipt, evidence level and disposition; record requested versus observed identity, usage uncertainty, resource custody and cleanup. Apply RUN-2 shared escalation rules.",
+    "effort": "Small-medium offline refinement; pause wiring is an unresolved implementation boundary."
+   }
+  },
+  {
+   "id": "HL-25",
+   "title": "Slice S3: codex_agents hosted end to end, launched remotely",
+   "owner": "Integrator",
+   "wave": "C",
+   "size": "M",
+   "spec": "SPRINT.md",
+   "deps": [
+    "HL-13",
+    "HL-17",
+    "HL-24"
+   ],
+   "paths": [
+    "docs/qualification/hosted/codex-agents/",
+    "deployments/hosted-packs/ai-engineer/"
+   ],
+   "problem": "Prove codex_agents hosted after claude_managed (R27) on the same remote path.",
+   "work": [
+    "Run the S3 definition of done in SPRINT.md: the same two missions as S2 on codex_agents hosted.",
+    "Exercise: function-tool approval round trip via required_actions, steer and cancel, recovery after killing the AWS task mid-stream (reconcile from items with no duplicate frames), per-turn artifact custody, session DELETE.",
+    "Record transcripts, frames, usage disposition; flip codex_agents openai_hosted to qualified only from this record."
+   ],
+   "acceptance": [
+    "Both missions accepted within the $10 S3 budget; worker-kill recovery shows no duplicate frames.",
+    "SPEC-06 §9 matrix for codex_agents hosted updated from evidence."
+   ],
+   "sprint": "in",
+   "slice": "S3",
+   "file": "HL-25-slice-s3-codex-agents-hosted-end-to-end-launched-remotely.md",
+   "run2_plan": {
+    "approved_at": "2026-10-14",
+    "inspection_base": "a2527f6f3c385a7f55272c41d90e6860b44781d0",
+    "baseline": "codex_agents is the hosted Agents API HTTP lane, not Agents SDK. Run 1 S3 paid attempts did not prove accepted approval/recovery; spend/native usage remain unresolved.",
+    "outcome": "Qualify the existing hosted product only after HL-24 and exact OpenAI acceptance/cost prerequisites, with model/configuration and custody evidence.",
+    "non_goals": "No new lane, model catalog, generic configuration schema or deferred feature.",
+    "sequencing": "Use the existing deps/wave. Shared contracts/composition belong to the integrator; satisfy dependencies with integrated source evidence, not assumed live readiness.",
+    "interfaces": [
+     "docs/qualification/hosted/",
+     "deployments/hosted-packs/ai-engineer/",
+     "adapters/openai_agents/ (existing seams)"
+    ],
+    "acceptance": [
+     "Receipt identifies hosted Agents API agents=v1 wire pin, runtime HTTP client build, requested/observed model, exact saved agent/environment/skill/config seals and account scope.",
+     "Required native shell/file per-command approval refuses; only qualified function-tool approval may satisfy that declared mode.",
+     "One session/input, accepted durable review plus actual native allow, turn/index visibility and item-recovery dedupe are demonstrated; unknown usage/cost stays unknown.",
+     "Current-turn path-only artifacts refuse where download is unavailable; registered immutable bytes/version are reviewed and publication remains separate.",
+     "Prior unknown spend reconciled and cleanup proven before any authorized finite proof; no blind paid retry or inferred qualification from SDK docs."
+    ],
+    "offline_validation": [
+     "uv run pytest tests/unit/openai_agents tests/unit/authoring/test_hosted_launch_bindings.py tests/conformance/lanes -q",
+     "Use retained default-off S3 runner and RUN-1 receipt/reproduction index for later authorized finite proof; remote HL-25 additionally uses normal ingress/AWS path."
+    ],
+    "live_validation": "Unrun until exact prerequisite/configuration/placement and action-specific authorization are established. Use the assigned spec/drill; fixture success never sets qualified. Retain default-off paid runners.",
+    "compatibility": "Preserve old canonical bytes, admitted model/options, approval configuration seals and scoped grants across retry, reattach, continuation and fork. See RUN-2 shared acceptance rules.",
+    "evidence": "Map every criterion to exact source revision, test/receipt, evidence level and disposition; record requested versus observed identity, usage uncertainty, resource custody and cleanup. Apply RUN-2 shared escalation rules.",
+    "effort": "Small evidence refinement; unresolved native acceptance is a real blocker, not predictable effort."
+   }
+  },
+  {
+   "id": "HL-21",
+   "title": "Hosted lanes: full Cognition Pack and Secret Broker projection",
+   "owner": "Hosted",
+   "wave": "C",
+   "size": "M",
+   "spec": "SPEC-06-hosted-api-lanes.md",
+   "deps": [
+    "HL-07",
+    "HL-11",
+    "MO-30",
+    "MO-11"
+   ],
+   "paths": [
+    "adapters/anthropic_managed/prepare.py",
+    "adapters/openai_agents/prepare.py",
+    "deployments/hosted-packs/"
+   ],
+   "problem": "HL-07 and HL-11 start from checked-in pack files (R30) so S2 and S3 need not wait for the S1 foundations; the general projection must replace them once MO-30 and MO-11 land.",
+   "work": [
+    "Drive agent, skill, environment and vault sync from the MO-30 projection targets and the Secret Broker provider_vault delivery channel instead of pack files.",
+    "Keep digest keys identical so resources created from pack files are reused, not duplicated."
+   ],
+   "acceptance": [
+    "The S2 and S3 drill missions re-run through the projection with zero new provider resources created when nothing changed."
+   ],
+   "sprint": "in",
+   "slice": "S3",
+   "file": "HL-21-hosted-lanes-full-cognition-pack-and-secret-broker-projection.md"
+  }
+ ],
+ "waves": {
+  "A": "Start now: foundations and fixes, Cursor P0, local CLI skills, S0 setup, hosted-lane groundwork (remote-session base, conformance suite, profile vocabulary), provider smoke, Temporal Cloud namespace setup",
+  "B": "S0 end to end and Temporal Cloud; Secret Broker; Signal Ingress (SQL, Vercel, drainer) and the remote launch route; lane-only worker and the AWS thin worker; claude_managed prepare, lifecycle, approvals and publication; provider webhooks; data class; Cursor accounting and durability",
+  "C": "S2 claude_managed drill, then S3 codex_agents; S1 cursor_cloud end to end; full cognition projection; preflight; signals, gates and watchers",
+  "D": "Workspaces and fan-out, external signal sources; funding-gated S4 (Daytona, SandboxHost, Model Gateway, self-hosted placements, harnesses on Sandbox Host)",
+  "E": "Qualification drills"
+ },
+ "slices": {
+  "F": "Foundations and fixes",
+  "LS": "Local CLI job skills",
+  "S0": "Local harness path",
+  "S1": "cursor_cloud end-to-end with materialization and observation",
+  "R": "Remote operation: thin Temporal worker on AWS and remote launch",
+  "S2": "claude_managed cloud, launched remotely",
+  "S3": "codex_agents hosted, launched remotely",
+  "S4": "Funding-gated: self-hosted placements and real harnesses on Sandbox Host",
+  "Q": "Qualification drills"
+ },
+ "blocking_relations": [
+  [
+   "MO-01",
+   "MO-02"
+  ],
+  [
+   "MO-01",
+   "MO-03"
+  ],
+  [
+   "MO-01",
+   "MO-10"
+  ],
+  [
+   "MO-04",
+   "MO-11"
+  ],
+  [
+   "MO-01",
+   "MO-12"
+  ],
+  [
+   "MO-10",
+   "MO-12"
+  ],
+  [
+   "MO-11",
+   "MO-13"
+  ],
+  [
+   "MO-12",
+   "MO-13"
+  ],
+  [
+   "MO-05",
+   "MO-14"
+  ],
+  [
+   "MO-10",
+   "MO-15"
+  ],
+  [
+   "MO-10",
+   "MO-16"
+  ],
+  [
+   "MO-12",
+   "MO-20"
+  ],
+  [
+   "MO-20",
+   "MO-21"
+  ],
+  [
+   "MO-21",
+   "MO-22"
+  ],
+  [
+   "MO-01",
+   "MO-30"
+  ],
+  [
+   "MO-02",
+   "MO-30"
+  ],
+  [
+   "MO-03",
+   "MO-31"
+  ],
+  [
+   "MO-30",
+   "MO-32"
+  ],
+  [
+   "MO-30",
+   "MO-33"
+  ],
+  [
+   "MO-30",
+   "MO-34"
+  ],
+  [
+   "MO-30",
+   "MO-35"
+  ],
+  [
+   "MO-11",
+   "MO-40"
+  ],
+  [
+   "MO-40",
+   "MO-41"
+  ],
+  [
+   "MO-30",
+   "MO-41"
+  ],
+  [
+   "MO-41",
+   "MO-42"
+  ],
+  [
+   "MO-43",
+   "MO-44"
+  ],
+  [
+   "MO-40",
+   "MO-45"
+  ],
+  [
+   "MO-44",
+   "MO-45"
+  ],
+  [
+   "MO-44",
+   "MO-46"
+  ],
+  [
+   "MO-43",
+   "MO-47"
+  ],
+  [
+   "MO-44",
+   "MO-47"
+  ],
+  [
+   "MO-11",
+   "MO-50"
+  ],
+  [
+   "MO-12",
+   "MO-50"
+  ],
+  [
+   "MO-30",
+   "MO-50"
+  ],
+  [
+   "MO-40",
+   "MO-51"
+  ],
+  [
+   "MO-50",
+   "MO-51"
+  ],
+  [
+   "MO-21",
+   "MO-52"
+  ],
+  [
+   "MO-50",
+   "MO-53"
+  ],
+  [
+   "HL-01",
+   "HL-02"
+  ],
+  [
+   "MO-11",
+   "HL-03"
+  ],
+  [
+   "HL-02",
+   "HL-03"
+  ],
+  [
+   "MO-74",
+   "HL-03"
+  ],
+  [
+   "HL-05",
+   "HL-06"
+  ],
+  [
+   "HL-06",
+   "HL-07"
+  ],
+  [
+   "HL-23",
+   "HL-07"
+  ],
+  [
+   "HL-04",
+   "HL-08"
+  ],
+  [
+   "HL-07",
+   "HL-08"
+  ],
+  [
+   "HL-08",
+   "HL-09"
+  ],
+  [
+   "MO-14",
+   "HL-09"
+  ],
+  [
+   "HL-08",
+   "HL-10"
+  ],
+  [
+   "HL-02",
+   "HL-10"
+  ],
+  [
+   "HL-06",
+   "HL-11"
+  ],
+  [
+   "HL-23",
+   "HL-11"
+  ],
+  [
+   "HL-04",
+   "HL-12"
+  ],
+  [
+   "HL-11",
+   "HL-12"
+  ],
+  [
+   "HL-12",
+   "HL-13"
+  ],
+  [
+   "MO-14",
+   "HL-13"
+  ],
+  [
+   "HL-12",
+   "HL-14"
+  ],
+  [
+   "HL-02",
+   "HL-14"
+  ],
+  [
+   "HL-02",
+   "HL-15"
+  ],
+  [
+   "HL-03",
+   "HL-15"
+  ],
+  [
+   "MO-73",
+   "HL-15"
+  ],
+  [
+   "HL-02",
+   "HL-16"
+  ],
+  [
+   "MO-40",
+   "HL-17"
+  ],
+  [
+   "HL-06",
+   "HL-18"
+  ],
+  [
+   "MO-20",
+   "HL-19"
+  ],
+  [
+   "HL-10",
+   "HL-20"
+  ],
+  [
+   "HL-14",
+   "HL-20"
+  ],
+  [
+   "HL-15",
+   "HL-20"
+  ],
+  [
+   "HL-16",
+   "HL-20"
+  ],
+  [
+   "MO-40",
+   "SC-01"
+  ],
+  [
+   "SC-01",
+   "SC-02"
+  ],
+  [
+   "MO-41",
+   "SC-02"
+  ],
+  [
+   "MO-42",
+   "SC-02"
+  ],
+  [
+   "MO-50",
+   "SC-02"
+  ],
+  [
+   "MO-20",
+   "SC-02"
+  ],
+  [
+   "SC-01",
+   "SC-03"
+  ],
+  [
+   "MO-50",
+   "SC-03"
+  ],
+  [
+   "MO-20",
+   "SC-03"
+  ],
+  [
+   "LS-01",
+   "LS-02"
+  ],
+  [
+   "LS-01",
+   "LS-03"
+  ],
+  [
+   "LS-01",
+   "LS-04"
+  ],
+  [
+   "LS-01",
+   "LS-05"
+  ],
+  [
+   "LS-01",
+   "LS-06"
+  ],
+  [
+   "LS-02",
+   "LS-07"
+  ],
+  [
+   "LS-03",
+   "LS-07"
+  ],
+  [
+   "LS-04",
+   "LS-07"
+  ],
+  [
+   "LS-05",
+   "LS-08"
+  ],
+  [
+   "LS-06",
+   "LS-08"
+  ],
+  [
+   "LS-07",
+   "LS-08"
+  ],
+  [
+   "CM-02",
+   "CM-01"
+  ],
+  [
+   "CM-04",
+   "CM-01"
+  ],
+  [
+   "CM-04",
+   "CM-05"
+  ],
+  [
+   "CM-05",
+   "CM-06"
+  ],
+  [
+   "CM-04",
+   "CM-07"
+  ],
+  [
+   "MO-30",
+   "CM-12"
+  ],
+  [
+   "CM-05",
+   "CM-16"
+  ],
+  [
+   "CM-08",
+   "CM-17"
+  ],
+  [
+   "MO-30",
+   "CM-20"
+  ],
+  [
+   "MO-40",
+   "CM-22"
+  ],
+  [
+   "MO-51",
+   "CM-22"
+  ],
+  [
+   "CM-02",
+   "CM-14"
+  ],
+  [
+   "CM-11",
+   "CM-14"
+  ],
+  [
+   "CM-01",
+   "CM-21"
+  ],
+  [
+   "CM-05",
+   "CM-21"
+  ],
+  [
+   "CM-09",
+   "CM-21"
+  ],
+  [
+   "CM-10",
+   "CM-21"
+  ],
+  [
+   "MO-72",
+   "MO-67"
+  ],
+  [
+   "MO-78",
+   "MO-67"
+  ],
+  [
+   "MO-69",
+   "MO-71"
+  ],
+  [
+   "MO-08",
+   "MO-72"
+  ],
+  [
+   "MO-43",
+   "MO-72"
+  ],
+  [
+   "MO-04",
+   "MO-72"
+  ],
+  [
+   "MO-05",
+   "MO-72"
+  ],
+  [
+   "MO-65",
+   "MO-72"
+  ],
+  [
+   "MO-66",
+   "MO-72"
+  ],
+  [
+   "MO-68",
+   "MO-72"
+  ],
+  [
+   "MO-69",
+   "MO-72"
+  ],
+  [
+   "MO-70",
+   "MO-72"
+  ],
+  [
+   "MO-71",
+   "MO-72"
+  ],
+  [
+   "MO-40",
+   "MO-74"
+  ],
+  [
+   "MO-40",
+   "MO-75"
+  ],
+  [
+   "MO-40",
+   "MO-76"
+  ],
+  [
+   "MO-75",
+   "MO-76"
+  ],
+  [
+   "MO-63",
+   "MO-77"
+  ],
+  [
+   "MO-64",
+   "MO-77"
+  ],
+  [
+   "MO-78",
+   "MO-77"
+  ],
+  [
+   "MO-40",
+   "MO-79"
+  ],
+  [
+   "MO-75",
+   "MO-79"
+  ],
+  [
+   "MO-70",
+   "MO-79"
+  ],
+  [
+   "HL-09",
+   "HL-24"
+  ],
+  [
+   "HL-17",
+   "HL-24"
+  ],
+  [
+   "HL-18",
+   "HL-24"
+  ],
+  [
+   "HL-23",
+   "HL-24"
+  ],
+  [
+   "MO-74",
+   "HL-24"
+  ],
+  [
+   "MO-77",
+   "HL-24"
+  ],
+  [
+   "MO-79",
+   "HL-24"
+  ],
+  [
+   "HL-13",
+   "HL-25"
+  ],
+  [
+   "HL-17",
+   "HL-25"
+  ],
+  [
+   "HL-24",
+   "HL-25"
+  ],
+  [
+   "HL-07",
+   "HL-21"
+  ],
+  [
+   "HL-11",
+   "HL-21"
+  ],
+  [
+   "MO-30",
+   "HL-21"
+  ],
+  [
+   "MO-11",
+   "HL-21"
+  ]
+ ]
+}

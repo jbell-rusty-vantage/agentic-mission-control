@@ -1,0 +1,256 @@
+{
+  "schema": "mc.mo78.own-acceptance.review.v1",
+  "mode": "read-only retained-artifact/static source join",
+  "main_head": "1d081297bde6fd74e9276df45102eef3c0dc746d",
+  "issue_id": "MO-78",
+  "title": "Temporal Cloud namespace setup and connection probe",
+  "recommended_status": "fully done",
+  "boundary": "Exact dev namespace setup + documented rules + actual recorded bounded no-op; does not qualify MO67/MO77/SPEC11/lanes/releases",
+  "new_live_calls": 0,
+  "new_tests": 0,
+  "source_edits": 0,
+  "signature_claim": "SHA256 integrity join only; retained receipts are not cryptographically signed",
+  "criteria": [
+    {
+      "issue_line": 33,
+      "disposition": "satisfied",
+      "evidence": "temporal-approved-readback-1792031182884881700.json",
+      "workflow_id": "run2-probe-6c75bd7ea57d4f22987a32946b53e777",
+      "namespace": "mission-control-dev.ih0e7",
+      "noop": "completed",
+      "production_boundary": "exact dev constants/environment guard; action selects no production namespace"
+    },
+    {
+      "issue_line": 34,
+      "disposition": "satisfied by joined existing documentation",
+      "evidence": [
+        "docs/MISSION_CONTROL_LOCAL_API.md:537,538,899",
+        "deployments/worker-aws/README.md:67",
+        "deployments/worker-aws/plan.py:35,94",
+        "docs/specs/materialization-observation-2026-10/SPEC-11-remote-worker-on-aws.md:53,56",
+        "issues/MO-67-temporal-cloud-qualification-run.md:18",
+        "issues/MO-77-thin-temporal-worker-on-aws-ecs-fargate-us-east-1.md:9,22"
+      ]
+    }
+  ],
+  "retained_files": [
+    {
+      "name": "temporal-approved-execution-1792031027496207900.json",
+      "path": "C:\\Users\\Pinda\\Proyectos\\BellLabs\\platform\\mission-control\\.scratch\\materialization-observation-2026-10\\run2\\resumed\\temporal-approved-execution-1792031027496207900.json",
+      "sha256": "36214ca95914bedf48e795af5b7ed82e7d05410ba03f7b31cb3b3654719d242a",
+      "bytes": 536
+    },
+    {
+      "name": "temporal-approved-readback-1792031110938886100.json",
+      "path": "C:\\Users\\Pinda\\Proyectos\\BellLabs\\platform\\mission-control\\.scratch\\materialization-observation-2026-10\\run2\\resumed\\temporal-approved-readback-1792031110938886100.json",
+      "sha256": "21879e58f382f48a6185667f65dae446954b718f53a15ac4350f138e546697d2",
+      "bytes": 314
+    },
+    {
+      "name": "temporal-approved-readback-1792031182884881700.json",
+      "path": "C:\\Users\\Pinda\\Proyectos\\BellLabs\\platform\\mission-control\\.scratch\\materialization-observation-2026-10\\run2\\resumed\\temporal-approved-readback-1792031182884881700.json",
+      "sha256": "30fe112084dd1738f2aaae75ddea9e514758b616e4e359f18f70ac5ea26c7089",
+      "bytes": 1615
+    },
+    {
+      "name": "temporal-search-attributes-plan.json",
+      "path": "C:\\Users\\Pinda\\Proyectos\\BellLabs\\platform\\mission-control\\.scratch\\materialization-observation-2026-10\\run2\\resumed\\temporal-search-attributes-plan.json",
+      "sha256": "59b8d15f7f35c650a9095f153e60ce8d79e6ce91d142be043cee1ee6c6115f9f",
+      "bytes": 776
+    }
+  ],
+  "initial_failed_execution": {
+    "namespace": "mission-control-dev.ih0e7",
+    "region": "aws-us-east-1",
+    "noop": "unrun",
+    "reviewed_plan_file_sha256": "59b8d15f7f35c650a9095f153e60ce8d79e6ce91d142be043cee1ee6c6115f9f",
+    "before_resource_version": "3dd77d5f-52a5-4b06-b7c9-77a4773e65a1",
+    "phase": "readback_pending",
+    "apply": {
+      "namespace": "mission-control-dev.ih0e7",
+      "state": "submitted_readback_required",
+      "async_operation_id": "b86fdc54-5073-4b69-9214-2e06fa0fee28"
+    },
+    "error_type": "AssertionError",
+    "rpc_status": null
+  },
+  "failed_readback": {
+    "prior_receipt": "temporal-approved-execution-1792031027496207900.json",
+    "namespace": "mission-control-dev.ih0e7",
+    "noop": "unrun",
+    "operation_id": "b86fdc54-5073-4b69-9214-2e06fa0fee28",
+    "operation_state": 5,
+    "namespace_state": 3,
+    "attribute_count": 14,
+    "error_type": "AssertionError"
+  },
+  "successful_final_receipt": {
+    "prior_receipt": "temporal-approved-execution-1792031027496207900.json",
+    "namespace": "mission-control-dev.ih0e7",
+    "noop": "completed",
+    "operation_id": "b86fdc54-5073-4b69-9214-2e06fa0fee28",
+    "operation_state": 5,
+    "namespace_state": 3,
+    "attribute_count": 14,
+    "phase": "complete",
+    "resource_version": "7bb2e41e-a666-4027-9cfe-55ce050053f0",
+    "search_attributes": {
+      "BellLabsRunId": 2,
+      "BellLabsExecutionGeneration": 3,
+      "BellLabsFamily": 2,
+      "BellLabsWorkflowKind": 2,
+      "mc_phase": 2,
+      "ForkedFromRunId": 7,
+      "mc_lane": 2,
+      "BellLabsUnitKind": 2,
+      "BellLabsUnitKey": 2,
+      "BellLabsScopeHash": 2,
+      "mc_mission_id": 2,
+      "BellLabsParentRunId": 2,
+      "mc_run_id": 7,
+      "BellLabsExecutionEpoch": 3
+    },
+    "legacy_attribute_map_exact_mirror": true,
+    "other_namespace_settings_unchanged": true,
+    "probe": {
+      "namespace": "mission-control-dev.ih0e7",
+      "address": "us-east-1.aws.api.temporal.io:7233",
+      "search_attributes": {
+        "BellLabsExecutionEpoch": 3,
+        "BellLabsExecutionGeneration": 3,
+        "BellLabsFamily": 2,
+        "BellLabsParentRunId": 2,
+        "BellLabsRunId": 2,
+        "BellLabsScopeHash": 2,
+        "BellLabsUnitKey": 2,
+        "BellLabsUnitKind": 2,
+        "BellLabsWorkflowKind": 2,
+        "ForkedFromRunId": 7,
+        "mc_lane": 2,
+        "mc_mission_id": 2,
+        "mc_phase": 2,
+        "mc_run_id": 7
+      },
+      "missing_search_attributes": [],
+      "noop": "completed",
+      "qualification": "connection only",
+      "workflow_id": "run2-probe-6c75bd7ea57d4f22987a32946b53e777"
+    }
+  },
+  "reviewed_plan": {
+    "namespace": "mission-control-dev.ih0e7",
+    "region": "aws-us-east-1",
+    "api_version": "v0.23.0",
+    "resource_version": "3dd77d5f-52a5-4b06-b7c9-77a4773e65a1",
+    "spec_sha256": "6fdb60103d7946eb220f6461c24ae30cf0c543d8fbbbd93f414e059b91223260",
+    "additions": {
+      "BellLabsExecutionEpoch": "int",
+      "BellLabsExecutionGeneration": "int",
+      "BellLabsFamily": "keyword",
+      "BellLabsParentRunId": "keyword",
+      "BellLabsRunId": "keyword",
+      "BellLabsScopeHash": "keyword",
+      "BellLabsUnitKey": "keyword",
+      "BellLabsUnitKind": "keyword",
+      "BellLabsWorkflowKind": "keyword",
+      "ForkedFromRunId": "keyword_list",
+      "mc_lane": "keyword",
+      "mc_mission_id": "keyword",
+      "mc_phase": "keyword",
+      "mc_run_id": "keyword_list"
+    }
+  },
+  "receipt_checks": {
+    "plan_sha_matches_initial_record": true,
+    "same_operation_chain": true,
+    "earlier_noops_explicitly_unrun": true,
+    "final_actual_noop_completed": true,
+    "exact14_type_map_matches_plan_and_probe": true,
+    "legacy_mirror_exact": true,
+    "other_namespace_settings_unchanged": true,
+    "fresh_cloudops_inventory_performed_in_this_review": false
+  },
+  "q2": {
+    "path": "run2-completion-offline\\.scratch\\run2-completion-20261017\\continuation-v8\\recovery\\residual-host-v1\\owned-host-q2.json",
+    "sha256": "8e6304fc18fcf2006cff511c2f69196a898b09b041b0f136078c7591ee44a950",
+    "action_sha256": "d3e5265c1547491011c6fd9cb299d2cd6cccfe11474e9bc77091b469a97baf36",
+    "passed": true,
+    "owned_pools_closed": true,
+    "outer_seconds": 89.453,
+    "child_reaped": true,
+    "forced_kill": false,
+    "source_unchanged": true,
+    "proves": "Later functional Cloud connection/visibility/history/routing and current existing recovery frontier",
+    "does_not_prove": "Fresh CloudOps attribute inventory or a replacement no-op; no provider or sprint acceptance promotion"
+  },
+  "sources": [
+    {
+      "file": "run2-final-main\\scripts\\temporal_cloud\\probe.py",
+      "sha256": "003a0a4e07b79592ffe3825b5174f6e5b0285213fe14830d1d5ab4a09ed8c6bb"
+    },
+    {
+      "file": "run2-final-main\\scripts\\temporal_cloud\\configure_search_attributes.py",
+      "sha256": "9305165150e4ab3aa974de44473c4a92407ed69b173e2ae6b742ec54591fb5e5"
+    },
+    {
+      "file": "run2-final-main\\src\\mission_control\\adapters\\temporal\\cloud_namespace.py",
+      "sha256": "5e3f2f0737ea072b01fa9e9da93487047a254c81b5dec39e7a73f160d2508957"
+    },
+    {
+      "file": "run2-final-main\\src\\mission_control\\domain\\programs\\search_attributes.py",
+      "sha256": "b259a14a97651c75c335182cacba3a59080f4e1729bddcae08a0d056ce67d3a5"
+    },
+    {
+      "file": "run2-final-main\\docs\\MISSION_CONTROL_LOCAL_API.md",
+      "sha256": "271216d4864239ad61b4a4852c0f33d3df884e773c945725bbf5868e31c680aa"
+    },
+    {
+      "file": "run2-final-main\\deployments\\worker-aws\\README.md",
+      "sha256": "897d3b1e9d934ef685de5eded53f94b2fcfb32b01b1ab635f474c012b914a9c7"
+    },
+    {
+      "file": "run2-final-main\\deployments\\worker-aws\\plan.py",
+      "sha256": "d6389a35ad917339e445b108697429c766716bb853faeef3e8871790a91a1690"
+    },
+    {
+      "file": "run2-final-main\\docs\\specs\\materialization-observation-2026-10\\SPEC-11-remote-worker-on-aws.md",
+      "sha256": "e065b48eb78b665096fd053e0257e8d068994334db97e4b0cec2b74e51404220"
+    },
+    {
+      "file": "run2-final-main\\docs\\specs\\materialization-observation-2026-10\\issues\\MO-67-temporal-cloud-qualification-run.md",
+      "sha256": "f5737e28e77584cf6abf2ddba2cc3e74cec6973d8c9be9fcfc89ec185e2879f3"
+    },
+    {
+      "file": "run2-final-main\\docs\\specs\\materialization-observation-2026-10\\issues\\MO-77-thin-temporal-worker-on-aws-ecs-fargate-us-east-1.md",
+      "sha256": "9575bd8646e9184bae0670b4df61bdab40defab8774bd8bcf401f86c8042e9bc"
+    },
+    {
+      "file": "run2-final-main\\docs\\specs\\materialization-observation-2026-10\\issues\\MO-78-temporal-cloud-namespace-setup-and-connection-probe.md",
+      "sha256": "6f3388fb190a88802484f5bb65ef04b69674a055796adc5c027a4655c298f5f4"
+    },
+    {
+      "file": "run2-final-main\\docs\\specs\\materialization-observation-2026-10\\runs\\RUN-2-REPORT.md",
+      "sha256": "320627c1b5d4aec9ba74e33565a8fb9ccbe7d3218f847ccc32dad3e093adca35"
+    }
+  ],
+  "smallest_correction": "Append MO78 evidence/status closeout only; preserve historical audit and failure chronology. No code/test/remote run required.",
+  "current_count_delta": {
+    "fully_done": 38,
+    "implemented_but_unqualified": 41,
+    "blocked": 18,
+    "genuinely_not_started": 12,
+    "active_development": 1
+  },
+  "unclosed": [
+    "MO-67 original three-lane S0 Cloud probe set",
+    "MO-77 original remote/laptop-off/restart/sentinel/redeploy/24h resource and cost criteria",
+    "SPEC-11 full qualification",
+    "current residual delivery and resource admission"
+  ],
+  "independent_review": {
+    "model": "gpt-6.1-sol",
+    "sha256": "90eb5995e42944a748b7b0e1a1aae5fac983be7d90bf741978c9be214ae2360a",
+    "result": "passed; no blocking gap"
+  },
+  "recorded_utc": "2026-10-17T19:44:07.060378+00:00"
+}

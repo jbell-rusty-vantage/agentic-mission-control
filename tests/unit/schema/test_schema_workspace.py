@@ -1,0 +1,92 @@
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+import pytest
+
+from biotech_mission_adapters.application.schema.schema_catalog import parse_schema_catalog
+from biotech_mission_adapters.application.schema.schema_workspace import (
+    TIER0_MAX_BYTES,
+    build_tier0,
+    materialize_schema_workspace,
+    select_workspace_candidates,
+    workspace_profile_paths,
+)
+from biotech_mission_adapters.bootstrap.schema_source import (
+    locate_authoritative_schema,
+    read_authoritative_schema,
+)
+from tests.schema_context_helpers import SDL
+
+
+def test_profiles_mount_one_representation_per_candidate(tmp_path: Path) -> None:
+    catalog = parse_schema_catalog(SDL, "fixture.graphql")
+    root = tmp_path / "schema"
+    manifest = materialize_schema_workspace(
+        catalog,
+        SDL,
+        root,
+        report="Organization offers a Product using a TechnologyPlatform.",
+    )
+
+    paths = workspace_profile_paths(tmp_path, "selection-candidates")
+    assert "schema/overview/tier0.json" in paths
+    assert not any("drilldown" in path for path in paths)
+    assert not any(path.endswith(".md") and "/elements/" in path for path in paths)
+    detail_stems = [path.removesuffix("/detail.json") for path in paths if "/elements/" in path]
+    assert len(detail_stems) == len(set(detail_stems))
+    assert manifest["tier0_size_bytes"] < TIER0_MAX_BYTES
+    assert not (root / "source/neo4jbiotechschema.graphql").exists()
+
+
+def test_authoritative_schema_tier0_is_bounded_and_workload_candidates_are_present() -> None:
+    schema_path = locate_authoritative_schema()
+    # Tracked copy of the live-windows-bind-9 input report; see tests/fixtures/schema_context/.
+    report_path = (
+        Path(__file__).resolve().parents[2]
+        / "fixtures/schema_context/trudiagnostic_report_2026-03-30.md"
+    )
+    source = read_authoritative_schema(schema_path)
+    catalog = parse_schema_catalog(source, str(schema_path))
+
+    encoded = json.dumps(build_tier0(catalog), sort_keys=True, separators=(",", ":")).encode(
+        "utf-8"
+    )
+    nodes, relationships = select_workspace_candidates(catalog, report_path.read_bytes())
+
+    assert len(encoded) < TIER0_MAX_BYTES
+    assert {"LabTest", "Metric", "AssayVersion", "SourceSnapshot", "SourceLocator"} <= set(nodes)
+    assert {"INCLUDES_TEST", "MEASURES_METRIC", "PERFORMED_WITH_VERSION", "HAS_EVIDENCE"} <= set(
+        relationships
+    )
+    assert set(nodes) <= catalog.nodes.keys()
+    assert set(relationships) <= catalog.relationships.keys()
+
+
+def test_tier0_exposes_governed_ontological_categories() -> None:
+    from biotech_mission_adapters.application.schema.schema_catalog import DEFAULT_SEMANTIC_OVERLAY
+
+    schema_path = locate_authoritative_schema()
+    catalog = parse_schema_catalog(
+        read_authoritative_schema(schema_path),
+        str(schema_path),
+        semantic_overlay=DEFAULT_SEMANTIC_OVERLAY,
+    )
+
+    metadata = build_tier0(catalog)["node_metadata"]["LabTest"]
+    assert metadata["archetypes"] == ["entity"]
+    assert metadata["modules"] == ["diagnostics-and-biomarkers"]
+    assert metadata["description"].startswith("An orderable")
+
+
+def test_workspace_materialization_rejects_stale_destination(tmp_path: Path) -> None:
+    catalog = parse_schema_catalog(SDL, "fixture.graphql")
+    root = tmp_path / "schema"
+    root.mkdir()
+    (root / "stale.json").write_text("{}", encoding="utf-8")
+
+    with pytest.raises(FileExistsError, match="must be empty"):
+        materialize_schema_workspace(catalog, SDL, root, report="Organization")
+
+    assert (root / "stale.json").exists()

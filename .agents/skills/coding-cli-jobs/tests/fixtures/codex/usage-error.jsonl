@@ -1,0 +1,2 @@
+{"__fake__":{"stderr":"error: unexpected argument '-a' found\n\n  tip: to pass '-a' as a value, use '-- -a'\n"}}
+{"__fake__":{"exit":2}}

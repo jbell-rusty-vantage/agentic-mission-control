@@ -1,0 +1,48 @@
+"""Owner prerequisites (materialization-observation SPEC-05; ADR-0047): the human-only steps a
+lane needs before a mission spawns, their generated paste-ready content and their freshness."""
+
+from mission_control.domain.prerequisites.owner_prerequisites import (
+    BLOCKING_STANDINGS,
+    OWNER_PREREQUISITE_RECORD_SCHEMA,
+    OWNER_PREREQUISITE_SCHEMA,
+    EvidenceRefused,
+    Freshness,
+    GeneratedContent,
+    GeneratedFrom,
+    LaneBlock,
+    OwnerPrerequisite,
+    OwnerPrerequisiteRecord,
+    PasteStep,
+    PrerequisiteAssessment,
+    PrerequisiteEvidence,
+    PrerequisiteScope,
+    PrerequisiteStanding,
+    PrerequisiteState,
+    Verification,
+    VerificationMethod,
+    assess_prerequisite,
+    content_digest,
+)
+
+__all__ = [
+    "BLOCKING_STANDINGS",
+    "OWNER_PREREQUISITE_RECORD_SCHEMA",
+    "OWNER_PREREQUISITE_SCHEMA",
+    "EvidenceRefused",
+    "Freshness",
+    "GeneratedContent",
+    "GeneratedFrom",
+    "LaneBlock",
+    "OwnerPrerequisite",
+    "OwnerPrerequisiteRecord",
+    "PasteStep",
+    "PrerequisiteAssessment",
+    "PrerequisiteEvidence",
+    "PrerequisiteScope",
+    "PrerequisiteStanding",
+    "PrerequisiteState",
+    "Verification",
+    "VerificationMethod",
+    "assess_prerequisite",
+    "content_digest",
+]

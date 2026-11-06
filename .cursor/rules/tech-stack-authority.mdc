@@ -1,0 +1,21 @@
+---
+description: Runtime roles and persistence authority
+alwaysApply: false
+---
+
+# Runtime authority
+
+Temporal owns durable scheduling, retries, cancellation and replay. Domain and
+application own admission, lifecycle, budgets, effects and settlement. Deep Agents
+executes bounded operations through admitted bindings. Agent Server runs
+subordinate graphs, never a second mission scheduler.
+
+Application PostgreSQL owns control and immutable records. Temporal's database is
+private runtime persistence. Redis is optional wake/fanout. Object storage carries
+digest-bound payloads and directory bundles. External knowledge stays behind
+admitted capability interfaces.
+
+The common mission_control component (packages/mission-control-db-contract,
+installer mission-db) is the only storage mode; live installation stays blocked
+until the owner approves each target.
+Runtime connections cannot migrate. See docs/knowledge/persistence.md.

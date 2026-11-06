@@ -1,0 +1,26 @@
+---
+description: Mission Control architecture, source ownership and evidence rules
+alwaysApply: true
+---
+
+# Mission Control organization
+
+Current authority: the code, then `docs/adr/` (decisions), explained by `docs/knowledge/mission-control.md`,
+`lanes-and-harness.md`, `database-component.md` and the workflow concepts. The origin spec pack was deleted on 2026-11-01.
+
+Read root AGENTS.md, the closest source AGENTS.md, and docs/knowledge/index.md.
+Concepts explain implementation; they do not amend contracts or certify deployment.
+
+One distribution imports mission_control from src/mission_control. Interfaces
+call application; application uses domain and ports; adapters implement ports;
+bootstrap wires dependencies. Temporal alone schedules missions; Deep Agents
+performs bounded cognition. Checkpoints cannot decide semantic acceptance.
+
+PostgreSQL owns application persistence; Temporal persistence is separate. Common
+SQL lives only in packages/mission-control-db-contract (mission-db); app targets
+live in deployments/<app>. Legacy schemas are never a fallback.
+Application-specific knowledge services stay outside the general kernel.
+
+Historical BellLabs specs, WPs and old guides are provenance. They cannot restore
+obsolete app/, Mongo or endpoint authority. Preserve unrelated work and recovery
+checkpoints. Report local proof, external blockers and unimplemented scope separately.

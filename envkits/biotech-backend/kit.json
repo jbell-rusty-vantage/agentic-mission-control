@@ -1,0 +1,28 @@
+{
+  "schema_version": "mc.environment_kit.v1",
+  "id": "envkit.biotech-backend",
+  "version": "1",
+  "title": "Biotech backend",
+  "description": "The Biotech backend service: uv-managed Python 3.12, Docker Compose, and the biotech-meta repository as a read-only dependency cloned beside the target (what the retired hand-written Biotech backend .cursor/environment.json did).",
+  "toolchains": {"python": "3.12", "uv": "0.12"},
+  "system_packages": ["git", "curl", "make", "docker-ce", "docker-compose-plugin"],
+  "base": {"install": "base/install.sh"},
+  "mission": {
+    "steps": [
+      {"name": "deps", "run": "uv sync --frozen", "when": "exists('uv.lock')"},
+      {"name": "compose-config", "run": "docker compose config --quiet", "when": "exists('docker-compose.yml')"}
+    ],
+    "health": [
+      {"name": "python", "run": "uv run --no-sync python --version"}
+    ],
+    "timeout_s": 600
+  },
+  "requires": {
+    "egress": ["pypi.org", "files.pythonhosted.org", "github.com"],
+    "git_dependencies": ["https://github.com/Overton77/biotech-meta"]
+  },
+  "host_support": {
+    "local": "full",
+    "cursor_cloud": "full"
+  }
+}

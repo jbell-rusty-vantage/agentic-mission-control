@@ -1,0 +1,179 @@
+# yaml-language-server: $schema=../../../../src/mission_control/contracts/schemas/mc.mission_manifest.v1.json
+# Experiment loop E4 (EXPERIMENT-LOOP-2026-11 section 3, OVE-169): linked chain, one manifest.
+#
+#   e4-evidence  Stage Graph (collect -> map -> review gate). Stage `map` promises
+#                `map.evidence_map`; the program root exports it as the mission output
+#                `evidence_map` (`exports: [{output: evidence_map, from: map.evidence_map}]`).
+#   e4-brief     Goal Loop consumer. Its program input `evidence_map` is the chain supply
+#                (`from: e4-evidence.evidence_map`, materialized as a file in its first packet);
+#                independent verifier; held review at the end.
+#   link         supplies [evidence_map], released on goal_accepted{evidence} (the supplier's
+#                review gate approval accepts that goal), on_upstream_cancel: continue (an
+#                already-released consumer finishes on its sealed inputs).
+#
+# Fixed gap (OVE-169 iteration 0): a Stage Graph root output used to lower to a promise owned by
+# position `workflow`, which no stage invocation declares, so the submission was refused and the
+# link could never release. A Stage Graph root now owes no promise of its own: each root output
+# is an export of one stage's promise (domain/authoring/manifest.py `stage_graph_root_sources`),
+# and the chain binding reads `map.evidence_map` at position `map` (domain/composition/chain.py).
+# Iteration 1 (L1-05): `map` is told its contracted media type (it sent text/markdown and was refused
+# MEDIA_TYPE_MISMATCH), and a no-cost APPROVAL gate `hold` (goal `handoff`) after the release gate
+# keeps the supplier running when the link releases, so the cancel overlay can land.
+# Frozen sources inline; no placeholders. Overlays: cancel e4-evidence after the link releases;
+# transient transport fault (D40) during the consumer's first executor turn.
+manifest: mission/v1
+missions:
+  - key: e4-evidence
+    title: E4 supplier Stage Graph builds an evidence map (frozen evidence)
+    application: ai-engineer
+    description: >
+      Experiment loop E4 supplier. Two frozen quotes become one accepted evidence map.
+    goals:
+      - key: evidence
+        description: Build the evidence map of model sizes from the frozen sources
+        objectives:
+          - { key: collect_sources, description: Write one note line per frozen source }
+          - { key: build_map, description: Turn the notes into the evidence map }
+        criteria:
+          - key: map_submitted
+            description: The evidence map names each model, its quoted size and its source id
+            evidence: [notes, evidence_map]
+            acceptance: { human: review_accept }
+      - key: handoff
+        description: Hold the supplier open after the link releases (the cancel overlay lands here)
+        objectives:
+          - { key: hold_open, description: Wait for the owner after the evidence map is released }
+        criteria:
+          - key: handoff_approved
+            description: The owner approved closing the supplier after the release
+            evidence: [evidence_map]
+            acceptance: { human: approved }
+    environment:
+      lane: deep_agents
+      model: { profile: producer.fallback }
+      sandbox: { profile: research.standard }
+      capabilities:
+        - { pin: "tool.knowledge-submit-output@2#sha256:f1fa75f1e3fa49e9061746cbe89f53a828e502fb93e142d3b34d8a854a2a64dd", kind: tool, as: submit_output }
+      budget: { usd: 0.3, tokens: 200000, wall_clock: 30m, tool_calls: 16 }
+      governors: { depth: 1, fan_out: 1, iterations: 1, patience: 1 }
+      side_effects: [read_only, workspace_write]
+    program:
+      key: root
+      behavior: stage_graph
+      objectives: [evidence, handoff]
+      outputs:
+        - { name: evidence_map, form: text, enforcement: required, media_type: text/plain }
+      exports:
+        - { output: evidence_map, from: map.evidence_map }
+      nodes:
+        - key: collect
+          behavior: agent_executor
+          objectives: [collect_sources]
+          environment:
+            budget: { usd: 0.08, tokens: 60000, wall_clock: 10m, tool_calls: 4 }
+          instruction: |
+            Frozen sources (verbatim quotes; use nothing else):
+            - arxiv-2310.06825-abstract: "We introduce Mistral 7B, a 7-billion-parameter language model engineered for superior performance and efficiency."
+            - hf-meta-llama-llama-3.1-model-card: "a collection of pretrained and instruction tuned generative models in 8B, 70B and 405B sizes"
+            Call submit_output ONCE, obligation "collect.notes", one inline text item with exactly one line per
+            source: "<source id>: <model> - <size exactly as quoted>". Stop; never repeat a call that returned a receipt.
+          outputs:
+            - { name: notes, form: text, enforcement: required, media_type: text/plain }
+        - key: map
+          behavior: agent_executor
+          objectives: [build_map]
+          environment:
+            budget: { usd: 0.1, tokens: 80000, wall_clock: 10m, tool_calls: 6 }
+          inputs:
+            - { name: notes, from: collect.notes, expand: materialize }
+          outputs:
+            - { name: evidence_map, form: text, enforcement: required, media_type: text/plain }
+          instruction: |
+            Read /.mission/transfer.json and the file it lists for binding notes. Call submit_output ONCE,
+            obligation "map.evidence_map" (the mission exports it), one inline text item with media_type text/plain
+            (the contracted type; never text/markdown) whose text is a Markdown table with columns model | quoted size | source id, one row per note line. If the obligation is refused,
+            stop and report the exact refusal; never submit it under another key.
+            Stop; never repeat a call that returned a receipt.
+        - key: review
+          behavior: human_gate
+          objectives: [evidence]
+          depends_on: [map]
+          task:
+            kind: REVIEW
+            prompt: Review the notes and the evidence map before the brief mission receives it.
+            reviewers: [owner]
+            packet: [collect.notes, map.evidence_map]
+            on_timeout: keep_waiting
+        # Loop iter-1 L1-05: no-cost hold after the release gate, so the supplier is still
+        # running when the link releases and the cancel overlay can land (else HTTP 422).
+        - key: hold
+          behavior: human_gate
+          objectives: [handoff]
+          depends_on: [review]
+          task:
+            kind: APPROVAL
+            prompt: The evidence map is released to e4-brief; approve to close the supplier (the experiment cancels it here).
+            reviewers: [owner]
+            packet: [map.evidence_map]
+            on_timeout: keep_waiting
+    controls:
+      commands_allowed: [pause, resume, cancel, queue_instruction, add_context]
+
+  - key: e4-brief
+    title: E4 consumer Goal Loop writes a brief from the supplied evidence map
+    application: ai-engineer
+    description: >
+      Experiment loop E4 consumer. Reads exactly the supplied evidence map and writes a brief.
+    goals:
+      - key: brief
+        description: |
+          Your only evidence is the supplied evidence map (binding evidence_map). Read /.mission/transfer.json and
+          the file it lists for evidence_map; use nothing else and never guess its content.
+          1 submit_output obligation "root.brief": inline text, at most three sentences, one per model with the size
+          the map states and its source id, then "source map: <ref and digest from the index>".
+          2 submit_output obligation "root.progress_note": inline text, what you read and what remains.
+          If the map is missing from the index, submit only the progress note stating that. Stop; never repeat a
+          call that returned a receipt. On a second iteration, fix only what the verifier names.
+        objectives:
+          - { key: write_brief, description: Write the brief from the supplied evidence map }
+        criteria:
+          - key: brief_submitted
+            description: The brief restates only what the supplied map states and names the map it read
+            evidence: [brief, progress_note]
+            acceptance: { human: review_accept }
+    environment:
+      lane: deep_agents
+      model: { profile: producer.fallback }
+      sandbox: { profile: research.standard }
+      capabilities:
+        - { pin: "tool.knowledge-submit-output@2#sha256:f1fa75f1e3fa49e9061746cbe89f53a828e502fb93e142d3b34d8a854a2a64dd", kind: tool, as: submit_output }
+      budget: { usd: 0.3, tokens: 200000, wall_clock: 30m, tool_calls: 16 }
+      governors: { depth: 1, fan_out: 1, iterations: 2, patience: 1 }
+      side_effects: [read_only, workspace_write]
+    program:
+      key: root
+      behavior: goal_loop
+      objective: brief
+      action_space: [root]
+      inputs:
+        # Chain supply: the supplier's accepted root output, delivered in the first Context Packet.
+        - { name: evidence_map, from: e4-evidence.evidence_map, expand: materialize }
+      verifier:
+        independent: true
+        environment:
+          model: { profile: producer.fallback }
+      outputs:
+        - { name: brief, form: text, enforcement: required, media_type: text/plain, scope: iteration }
+        - { name: progress_note, form: text, enforcement: required, media_type: text/plain, scope: iteration }
+    controls:
+      commands_allowed: [pause, resume, cancel, queue_instruction, add_context]
+
+links:
+  - from: e4-evidence
+    to: e4-brief
+    kind: supplies
+    outputs: [evidence_map]
+    on: { goal_accepted: { goal_key: evidence } }
+    on_upstream_cancel: continue
+    selector: accepted_snapshot
+    placement: file

@@ -1,0 +1,207 @@
+{
+  "record_format": "run2-residual-qualified-held/1",
+  "utc": "2026-10-17T19:17:11.294527+00:00",
+  "main_head": "e5fd79929b8877b9ad949ee8f64a483c1f8ceacf",
+  "action_sha256": "d3e5265c1547491011c6fd9cb299d2cd6cccfe11474e9bc77091b469a97baf36",
+  "action_path": "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\run2-completion-offline\\.scratch\\run2-completion-20261017\\continuation-v8\\recovery\\residual-host-v1\\approved-action.json",
+  "allowed_effects": {
+    "automatic_retry": false,
+    "default_current_or_ramp_changes": 0,
+    "new_children": 0,
+    "new_operations": 0,
+    "normal_typed_result_insert_entries_maximum": 1,
+    "original_consumed_terminal_intent_changes": 0,
+    "provider_calls": 0,
+    "read_write_transactions_maximum": 1,
+    "service_changes": 0,
+    "target_overrides_maximum": 2,
+    "terminal_SQL_entries": 0
+  },
+  "execution_attempt": {
+    "result": "automatic_approval_review_rejected_before_process_creation",
+    "reason": "This executes a live Temporal/database workflow mutation, including a possible typed-result write and closure of existing workflows; the available user text provides only general infrastructure approval, not clear authorization for this exact irreversible side effect.",
+    "command_started": false,
+    "live_host_receipts_created": false,
+    "intent_claimed_by_this_attempt": false,
+    "SQL_or_Temporal_mutations_by_this_attempt": false,
+    "alternate_execution_or_workaround_attempted": false
+  },
+  "review": {
+    "path": "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\residual-guard-proposal\\ASSEMBLED-HOST-REVIEW-2026-10-17.md",
+    "sha256": "1f68ed8454515080f8b07ade7cb401ffaf99806abd1c9446a2b4c8d271d166cc",
+    "model": "gpt-6.1-sol",
+    "remaining_P1_P2": 0
+  },
+  "qualification": [
+    {
+      "tag": "q1",
+      "path": "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\run2-completion-offline\\.scratch\\run2-completion-20261017\\continuation-v8\\recovery\\residual-host-v1\\owned-host-q1.json",
+      "sha256": "2f9c8447576d76f1263d27db895df8ae0bd16f40992e568edacca4116c8a0428",
+      "action_sha256": "9d9eafef260a5d7ce7476660d5acd94e1995ac4d69f45d9d06ebfd5cc4d41376",
+      "outer_seconds": 79.594,
+      "guardian_seconds": 78.43,
+      "guardian_bound_seconds": 90,
+      "forced_kill": false,
+      "exact_child_reaped": true,
+      "sources_unchanged": true,
+      "passed": true,
+      "owned_pools_closed": true,
+      "full_source_verification_seconds": 0.2173,
+      "canonical_read_only_completion_replay": {
+        "accepted": true,
+        "terminal_outcome": "cancelled",
+        "resulting_run_version": 9,
+        "reason_code": "accepted"
+      },
+      "pool_principals": [
+        {
+          "session_user": "mc_ai_engineer_runtime_login",
+          "current_user": "mc_ai_engineer_runtime_login",
+          "readonly": "on"
+        },
+        {
+          "session_user": "mc_ai_engineer_family_login",
+          "current_user": "mc_ai_engineer_family_login",
+          "readonly": "on"
+        },
+        {
+          "session_user": "mc_ai_engineer_runtime_login",
+          "current_user": "mc_ai_engineer_runtime_login",
+          "readonly": "on"
+        }
+      ],
+      "result_insert_entries": 0,
+      "result_pool_entries": 0,
+      "stages": [
+        {
+          "stage": "sealed_source_and_actual_fixture_assembly",
+          "started_monotonic": 85894.205082375,
+          "passed": true,
+          "seconds": 0.53
+        },
+        {
+          "stage": "three_read_only_pools_and_contract",
+          "started_monotonic": 85894.737206162,
+          "passed": true,
+          "seconds": 20.155
+        },
+        {
+          "stage": "actual_read_only_normal_repository_join",
+          "started_monotonic": 85914.89564736,
+          "passed": true,
+          "seconds": 31.308
+        },
+        {
+          "stage": "canonical_committed_receipt_replay",
+          "started_monotonic": 85927.395137313,
+          "passed": true,
+          "seconds": 8.756
+        },
+        {
+          "stage": "actual_private_fixture_and_sdk_replay",
+          "started_monotonic": 85946.207087147,
+          "passed": true,
+          "seconds": 1.833
+        },
+        {
+          "stage": "one_result_transaction_boundary_fixture",
+          "started_monotonic": 85948.042153801,
+          "passed": true,
+          "seconds": 0.0
+        }
+      ],
+      "original_consumed_intent_preserved": true
+    },
+    {
+      "tag": "q2",
+      "path": "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\run2-completion-offline\\.scratch\\run2-completion-20261017\\continuation-v8\\recovery\\residual-host-v1\\owned-host-q2.json",
+      "sha256": "8e6304fc18fcf2006cff511c2f69196a898b09b041b0f136078c7591ee44a950",
+      "action_sha256": "d3e5265c1547491011c6fd9cb299d2cd6cccfe11474e9bc77091b469a97baf36",
+      "outer_seconds": 89.453,
+      "guardian_seconds": 88.595,
+      "guardian_bound_seconds": 90,
+      "forced_kill": false,
+      "exact_child_reaped": true,
+      "sources_unchanged": true,
+      "passed": true,
+      "owned_pools_closed": true,
+      "full_source_verification_seconds": 0.2176,
+      "canonical_read_only_completion_replay": {
+        "accepted": true,
+        "terminal_outcome": "cancelled",
+        "resulting_run_version": 9,
+        "reason_code": "accepted"
+      },
+      "pool_principals": [
+        {
+          "session_user": "mc_ai_engineer_runtime_login",
+          "current_user": "mc_ai_engineer_runtime_login",
+          "readonly": "on"
+        },
+        {
+          "session_user": "mc_ai_engineer_family_login",
+          "current_user": "mc_ai_engineer_family_login",
+          "readonly": "on"
+        },
+        {
+          "session_user": "mc_ai_engineer_runtime_login",
+          "current_user": "mc_ai_engineer_runtime_login",
+          "readonly": "on"
+        }
+      ],
+      "result_insert_entries": 0,
+      "result_pool_entries": 0,
+      "stages": [
+        {
+          "stage": "sealed_source_and_actual_fixture_assembly",
+          "started_monotonic": 86094.39318137,
+          "passed": true,
+          "seconds": 0.51
+        },
+        {
+          "stage": "three_read_only_pools_and_contract",
+          "started_monotonic": 86094.907980868,
+          "passed": true,
+          "seconds": 21.459
+        },
+        {
+          "stage": "actual_read_only_normal_repository_join",
+          "started_monotonic": 86116.3689436,
+          "passed": true,
+          "seconds": 40.01
+        },
+        {
+          "stage": "canonical_committed_receipt_replay",
+          "started_monotonic": 86137.221573642,
+          "passed": true,
+          "seconds": 9.064
+        },
+        {
+          "stage": "actual_private_fixture_and_sdk_replay",
+          "started_monotonic": 86156.384336016,
+          "passed": true,
+          "seconds": 2.197
+        },
+        {
+          "stage": "one_result_transaction_boundary_fixture",
+          "started_monotonic": 86158.583264405,
+          "passed": true,
+          "seconds": 0.0
+        }
+      ],
+      "original_consumed_intent_preserved": true
+    }
+  ],
+  "remaining_gap": "Human approval of the exact bounded irreversible live effects; then fresh gates, single dispatch and real persisted-result/final-history readback",
+  "normal_resource_commit": "e5fd79929b8877b9ad949ee8f64a483c1f8ceacf",
+  "resource_validation": {
+    "native_tests": 15,
+    "focused_mypy": "passed",
+    "ruff": "passed",
+    "normal_hooks": "passed"
+  },
+  "pure_guard_tests": 8,
+  "actual_family50_root17_replayer_join": "passed",
+  "original_consumed_terminal_intent_must_remain_unchanged": true,
+  "active_owned_processes": 0
+}

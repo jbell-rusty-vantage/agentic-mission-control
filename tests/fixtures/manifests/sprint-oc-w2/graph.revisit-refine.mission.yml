@@ -1,0 +1,92 @@
+# yaml-language-server: $schema=../../../../src/mission_control/contracts/schemas/mc.mission_manifest.v1.json
+# Sprint OC W2 (OVE-171 / WI-08 slice D) graph variant: a bounded Revisit Region.
+#
+# Region `refine` = draft (entry) -> critique (exit), at most 3 visits. The host stops it when the
+# critique's accepted verdict says `approved == true` (a pinned fact of validated bytes), ends it
+# as `no_progress` when `score` does not improve over 2 visits, or as `cap_exhausted` at the cap
+# (governed outcomes, never success). On each revisit the draft receives the PRIOR visit's
+# accepted verdict (`carry`), never a sibling or an older attempt; `publish` waits for the
+# region's final outcome and reads exactly the final visit's outputs.
+# Schema `schema.w2-critique-verdict@1` ships in seed mc.catalog.w2-graph-schemas@1.0.0.
+manifest: mission/v1
+mission:
+  key: w2-graph-revisit
+  title: W2 bounded revisit region (draft and critique)
+  application: ai-engineer
+  goals:
+    - key: drafted
+      description: Draft the answer, revising it from the prior critique on a revisit
+      criteria:
+        - { key: draft, description: The draft is submitted, evidence: [text], acceptance: { human: review_accept } }
+    - key: critiqued
+      description: Critique the draft and decide whether it is approved
+      criteria:
+        - { key: verdict, description: The verdict is submitted, evidence: [verdict], acceptance: { human: review_accept } }
+    - key: published
+      description: Publish the approved (or last) draft with its verdict
+      criteria:
+        - { key: publication, description: The publication is submitted, evidence: [publication], acceptance: { human: review_accept } }
+  environment:
+    lane: deep_agents
+    model: { profile: frontier.default }
+    sandbox: { profile: research.standard }
+    capabilities:
+      - { pin: "tool.knowledge-submit-output@2#sha256:f1fa75f1e3fa49e9061746cbe89f53a828e502fb93e142d3b34d8a854a2a64dd", kind: tool, as: submit_output }
+    budget: { usd: 1, tokens: 250000, wall_clock: 45m, tool_calls: 40 }
+    governors: { depth: 1, fan_out: 1, iterations: 3, patience: 2 }
+    side_effects: [read_only, workspace_write]
+  program:
+    key: root
+    behavior: stage_graph
+    objectives: [drafted, critiqued, published]
+    revisits:
+      - key: refine
+        stages: [draft, critique]
+        entry: draft
+        exit: critique
+        max_visits: 3
+        until: [ { fact: critique.approved, op: eq, value: true } ]
+        progress: critique.score
+        patience: 2
+        carry: [verdict]
+    nodes:
+      - key: draft
+        behavior: agent_executor
+        objectives: [drafted]
+        instruction: >
+          Submit obligation "draft.text" as inline text. On a revisit, /.mission/inputs.json lists
+          the prior verdict (binding carry-verdict): address every finding it names.
+        outputs: [ { name: text, form: text, media_type: text/plain } ]
+      - key: critique
+        behavior: agent_executor
+        objectives: [critiqued]
+        inputs: [ { name: text, from: draft.text } ]
+        instruction: >
+          Submit obligation "critique.verdict" as JSON
+          {"approved":true|false,"score":<0-100>,"findings":["..."]} for the draft you received.
+        outputs: [ { name: verdict, schema: schema.w2-critique-verdict@1 } ]
+        facts:
+          - { name: approved, output: verdict, pointer: /approved, type: boolean }
+          - { name: score, output: verdict, pointer: /score, type: integer }
+      - key: publish
+        behavior: agent_executor
+        objectives: [published]
+        inputs:
+          - { name: text, from: draft.text }
+          - { name: verdict, from: critique.verdict }
+        instruction: Submit obligation "publish.publication" as inline text from the final draft and verdict.
+        outputs: [ { name: publication, form: text, media_type: text/plain } ]
+      # Human criteria need a qualified human evaluator at launch (completion_support.py; compile
+      # reports them as start blockers since OVE-169): this final REVIEW gate owns every goal.
+      - key: review
+        behavior: human_gate
+        objectives: [drafted, critiqued, published]
+        depends_on: [publish]
+        task:
+          kind: REVIEW
+          prompt: Review the final draft, its verdict and the publication.
+          reviewers: [owner]
+          packet: [draft.text, critique.verdict, publish.publication]
+          on_timeout: keep_waiting
+  controls:
+    commands_allowed: [pause, resume, cancel]

@@ -1,0 +1,11 @@
+{
+  "$comment": "EXAMPLE ONLY (P1). The deployment's non-secret installation configuration in mc.installation_config.v1 shape, referenced by MISSION_CONTROL_INSTALLATION_CONFIG_PATH: one mapping per Application. A manifest variable's value_ref: config:<key> resolves in its Application's mapping at compile; an Application not listed has no values (its keys stay config_unresolved). Never a credential: a key containing key|token|secret|password|passwd|dsn|credential is refused at load and at compile; declare credentials under a manifest's secrets instead.",
+  "schema": "mc.installation_config.v1",
+  "applications": {
+    "ai-engineer": {
+      "knowledge_services.public_url": "https://knowledge.example.org",
+      "log.level": "info"
+    },
+    "biotech": {}
+  }
+}

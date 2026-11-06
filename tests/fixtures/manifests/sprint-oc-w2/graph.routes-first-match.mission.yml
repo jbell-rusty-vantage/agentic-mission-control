@@ -1,0 +1,104 @@
+# yaml-language-server: $schema=../../../../src/mission_control/contracts/schemas/mc.mission_manifest.v1.json
+# Sprint OC W2 (OVE-171 / WI-08) graph variant: an ordered first-match route over typed facts.
+#
+# `triage` submits a structured verdict; the host reads `severity` and `source_count` from its
+# accepted, schema-validated bytes (never prose). Route `triage_route` (first_match, declared
+# order): `urgent` (severity == high) -> deep_review; `broad` (source_count >= 3) ->
+# light_review; else -> archive. An unknown `urgent` waits and is never skipped for `broad`;
+# `else` needs both branches conclusively false. The three alternatives all serve `reviewed`, so
+# the selected branch owes it (applicability); the others are skipped visibly. `report` releases
+# on the `review` any-group over the three alternatives: the selected one is its exact input and
+# the skipped ones are visible release omissions (`RELEASE_MEMBER_UNAVAILABLE`).
+# The verdict schema `schema.w2-triage-verdict@1` is not seeded in the catalog (offline compile).
+manifest: mission/v1
+mission:
+  key: w2-graph-first-match
+  title: W2 first-match route over typed triage facts
+  application: ai-engineer
+  goals:
+    - key: triaged
+      description: Classify the request and submit the structured verdict
+      criteria:
+        - { key: verdict, description: The verdict is submitted, evidence: [verdict], acceptance: { human: review_accept } }
+    - key: reviewed
+      description: Review the request at the depth the route selected
+      criteria:
+        - { key: review, description: One review is submitted, evidence: [deep, light, archived], acceptance: { human: review_accept } }
+    - key: reported
+      description: Report what the selected review found
+      criteria:
+        - { key: report, description: The report is submitted, evidence: [report], acceptance: { human: review_accept } }
+  environment:
+    lane: deep_agents
+    model: { profile: frontier.default }
+    sandbox: { profile: research.standard }
+    capabilities:
+      - { pin: "tool.knowledge-submit-output@2#sha256:f1fa75f1e3fa49e9061746cbe89f53a828e502fb93e142d3b34d8a854a2a64dd", kind: tool, as: submit_output }
+    budget: { usd: 1, tokens: 200000, wall_clock: 30m, tool_calls: 20 }
+    governors: { depth: 1, fan_out: 1, iterations: 1, patience: 1 }
+    side_effects: [read_only, workspace_write]
+  program:
+    key: root
+    behavior: stage_graph
+    objectives: [triaged, reviewed, reported]
+    concurrency: 2
+    routes:
+      - key: triage_route
+        mode: first_match
+        branches:
+          - key: urgent
+            when: [ { fact: triage.severity, op: eq, value: high } ]
+            release: [deep_review]
+          - key: broad
+            when: [ { fact: triage.source_count, op: ge, value: 3 } ]
+            release: [light_review]
+        else: [archive]
+    nodes:
+      - key: triage
+        behavior: agent_executor
+        objectives: [triaged]
+        instruction: Submit obligation "triage.verdict" as JSON {"severity":"high|normal","source_count":<int>}.
+        outputs: [ { name: verdict, schema: schema.w2-triage-verdict@1 } ]
+        facts:
+          - { name: severity, output: verdict, pointer: /severity, type: string }
+          - { name: source_count, output: verdict, pointer: /source_count, type: integer }
+      - key: deep_review
+        behavior: agent_executor
+        objectives: [reviewed]
+        instruction: Submit obligation "deep_review.deep" as inline text, a thorough review.
+        outputs: [ { name: deep, form: text, media_type: text/plain } ]
+      - key: light_review
+        behavior: agent_executor
+        objectives: [reviewed]
+        instruction: Submit obligation "light_review.light" as inline text, a short review.
+        outputs: [ { name: light, form: text, media_type: text/plain } ]
+      - key: archive
+        behavior: agent_executor
+        objectives: [reviewed]
+        instruction: Submit obligation "archive.archived" as inline text, why no review is needed.
+        outputs: [ { name: archived, form: text, media_type: text/plain } ]
+      - key: report
+        behavior: agent_executor
+        objectives: [reported]
+        release_groups:
+          - { key: review, join: any, members: [deep_review, light_review, archive] }
+        inputs:
+          - { name: deep, from: deep_review.deep }
+          - { name: light, from: light_review.light }
+          - { name: archived, from: archive.archived }
+        instruction: Submit obligation "report.report" as inline text from whichever review you received.
+        outputs: [ { name: report, form: text, media_type: text/plain } ]
+      # Human criteria need a qualified human evaluator at launch (completion_support.py; compile
+      # reports them as start blockers since OVE-169): this final REVIEW gate owns every goal.
+      - key: review
+        behavior: human_gate
+        objectives: [triaged, reviewed, reported]
+        depends_on: [report]
+        task:
+          kind: REVIEW
+          prompt: Review the triage verdict and the report.
+          reviewers: [owner]
+          packet: [triage.verdict, report.report]
+          on_timeout: keep_waiting
+  controls:
+    commands_allowed: [pause, resume, cancel]

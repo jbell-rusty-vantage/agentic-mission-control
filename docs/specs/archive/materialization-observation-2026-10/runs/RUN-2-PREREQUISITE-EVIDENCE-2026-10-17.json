@@ -1,0 +1,858 @@
+{
+  "schema_version": 1,
+  "prepared_utc": "2026-10-17T05:01:49.294903+00:00",
+  "observation_main_head": "ffcd373f9e6d0533efff30af0d623b975d053cc4",
+  "setup_fix_head": "d8857f4ee0d5dcada79a2898193dc668863f2f26",
+  "source_sha256": {
+    ".agents/skills/coding-cli-jobs/scripts/agentjob.py": "53486cb78bdb9cbb498413e25fde04943334f7bf6c532c39a433244146e6f2c0",
+    ".agents/skills/coding-cli-jobs/scripts/adapters/codex.py": "dc9960287c2ca52cc25a37b2fe413a5bbf79beb7b2f2aefc7229740edc9f1570",
+    ".agents/skills/coding-cli-jobs/tests/test_agentjob.py": "c5f4848ec0900eda8be941685ddb6c7a59e1477a3199e045d4c480c100f58d2d",
+    ".agents/skills/codex-exec/SKILL.md": "04f6cbbbbc55602a7bb122236af235ca6c6cdf359e762986615e1792e9a7b6bf",
+    "packages/mission-control-db-contract/src/mission_control_db_contract/seeds.py": "84d42f8a08b4b13a7c81e09685441dcff029c6a0fc2f3a4b4d09e0373ed34ffa",
+    "packages/mission-control-db-contract/seeds/biotech/mc.app.biotech.agent-skills-1.0.1.json": "7c3cd13ca7a87a60478c6a10b09828dab5df040c8d78d5938a8ba5a8d4c64f85",
+    "packages/mission-control-db-contract/seeds/biotech/mc.app.biotech.agent-skills-1.0.2.json": "3471e24ef28e46035fe5ea655cc32068af31cd231583963901f9d4c0369c9d5d",
+    "packages/mission-control-db-contract/seeds/biotech/mc.app.biotech.cognition-profiles-1.0.0.json": "b7f80e32302b965c529809092e329559d2826e1dc5bad7882fc1a894f927723f",
+    "packages/mission-control-db-contract/seeds/biotech/mc.app.biotech.environment-kits-1.0.0.json": "5e8e4308e7415e5a1336b18852b317b6a212176a02d67ffc78e1e1a722525b29",
+    "packages/mission-control-db-contract/seeds/biotech/mc.app.biotech.signal-skills-1.0.0.json": "1f0429b86508152bbdcfdca7429daeeaf37eebd6681043b424a60a5448aea0b7",
+    "packages/mission-control-db-contract/seeds/biotech/mc.app.biotech.watchers-1.0.0.json": "ffecc6b6fd5c929538d4c5e2369023e095707c070ce8d182c14c157886845819",
+    "packages/mission-control-db-contract/seeds/common/mc.catalog.approved-assets-1.0.2.json": "071ddc496986738d2e493a7f0eddfb0fb31d9d6be4e07ad96d4e2984d9ec2987",
+    "packages/mission-control-db-contract/seeds/common/mc.catalog.workflow-parity-1.0.3.json": "9dccfa2c6abada4d920121f824f8a23368bf934e8b1572a27014d85819e890c0",
+    "packages/mission-control-db-contract/seeds/common/mc.catalog.artifact-schemas-1.0.0.json": "403f5c2128ace752bcdc0ba2f1e8a999d42a6b0315bff7e89d337768461d6838"
+  },
+  "model": "gpt-6.1-sol",
+  "maximum_active_worker_count": 1,
+  "private_evidence_root": "retained-offline/.scratch/run2-completion-20261017/prerequisite-closure",
+  "private_evidence_sha256": {
+    "codex-process-r2.json": "2ad483b23b0e3f797c5c3e5d4ae9b07faa098d4eb3530ff4247b4ef9d13f2638",
+    "codex-process-r2.txt": "297650a4fe8c07854faa3018e5ac42a7da09eb58426c0ea081ce40e4dbe641ba",
+    "sandbox.json": "7a3ee20487c1d1d8037e56feb55fbbabe81950d366cd7c299d2410953b5873a9",
+    "sandbox-probe-detail.json": "5b894717153417ec80569d3044f180f1376d6099bceccb1eef262243591d308c",
+    "dll.json": "08a3accefa4540c12fbb3302b18e10511b71798ff4d55e48c485f7a2b4f6d551",
+    "dll.txt": "0b25e6ea73951e25eb21ffb3984722042897456714c6e901999c94d5f8f4e1af",
+    "mxc.json": "911227486f451ef33e6f39a9b8bf512b833d6ed3db0c376d21aee8386ee3f072",
+    "mxc-probe-detail.json": "ec89ab629b8ec41023527b7ed6bb81749fb8cb4c8f626d17a2de30862476c36b",
+    "mxc-bootstrap.json": "478afe9e5b6e82b769aa739d50ab3afdb50f1abf721fe45eec0a9b4866b585de",
+    "mxc-bootstrap-detail.json": "cd65e48327ed67001cebfce433694ff2054d7c77b3e4758a91c2b966b6a157bc",
+    "tests-fixed.json": "56d98fca34294deae903f6480fa525849234b87d410a8730f6a6114608142b9f",
+    "tests-fixed.txt": "69ebe0c06a88bd9c246b1bc9022764f6947b4b83fedc1bf1037fe0383ba0c086",
+    "prefer-fixed.json": "70413db0b53342a0ba0ad76c088b830c49220e89d4b9ba399bd3fccff6587e90",
+    "prefer-fixed-detail.json": "0d75f09dc2066dce5fab2a3908935e2379604549b8e9922db0eed51f50062acd",
+    "prefer-host-fixed.json": "dad3231d838146aec44cf6c4e2843f3c5a6738242657978db6f9464b04e45880",
+    "prefer-host-fixed-detail.json": "18f80694eb20937a6354a867d7c7811c6c979bfb1a98117e7eaa0ccc968cdfca",
+    "accounts.json": "acda71e42778d040e42b8d2f455033c4534e88aa48baaf1c4328fd714ada977f",
+    "account-metadata-detail.json": "b1ca8a34ee78e1764a7037e045930401e384fa0061fce5d67a2702400e437c6a",
+    "codex-quota-metadata.json": "c398d5205b3aa44f97a1a1dc0a01cc21cc6e2d21cf7155136239179d0ead7072",
+    "seed-analysis.json": "10fee1b4ab0ee838320eb80ea13a8b95fc1983ec35dd60d0ff20a682dd0a1591",
+    "setup-fix-publication.json": "a4f5db2b178e3b8294fe31d87df1f4e1a6503f166631a9b3df41916892033601",
+    "setup-fix-commit.txt": "3e6fd3a123aac7c419eb726c0aacc3e601d615da08ac6ef6640b88de05cc744e"
+  },
+  "source_handoffs_sha256": {
+    "SESSION-END-2026-10-16-MISSION-HANDOFF.md": "a8ce3a8d6665b27309ea45191b1f2ff5f9bd8fc7debf032a7101567f3b8a7710",
+    "SESSION-END-2026-10-16-MULTI-PROVIDER-SURVEY.md": "29a81f849a9b552352576fecc8c8f8389924abae5a9c5f7f40300123d6bd8ff7"
+  },
+  "setup_boundary": {
+    "passed": true,
+    "inference_calls": 0,
+    "actual_exec_qualified": false,
+    "LS07_qualified": false,
+    "restricted_context_native_failure_retained": true,
+    "vendor_read_ACL_effects_disclosed": true,
+    "signals_to_preexisting_processes": 0,
+    "normal_commit_hooks": true,
+    "independent_review": "No P1/P2"
+  },
+  "inclusive_category_budget": {
+    "cursor_cli": {
+      "inclusive_ceiling_usd": 20,
+      "attributable_spent_usd": null,
+      "attributable_committed_usd": null,
+      "remaining_usd": null,
+      "disposition": "unknown; not a refill"
+    },
+    "cursor_cloud": {
+      "inclusive_ceiling_usd": 20,
+      "attributable_spent_usd": null,
+      "attributable_committed_usd": null,
+      "remaining_usd": null,
+      "disposition": "unknown; not a refill"
+    },
+    "anthropic_local_api_sdk": {
+      "inclusive_ceiling_usd": 25,
+      "attributable_spent_usd": null,
+      "attributable_committed_usd": null,
+      "remaining_usd": null,
+      "disposition": "unknown; not a refill"
+    },
+    "anthropic_managed": {
+      "inclusive_ceiling_usd": 25,
+      "attributable_spent_usd": null,
+      "attributable_committed_usd": null,
+      "remaining_usd": null,
+      "disposition": "unknown; not a refill"
+    },
+    "openai_hosted_agents": {
+      "inclusive_ceiling_usd": 20,
+      "attributable_spent_usd": null,
+      "attributable_committed_usd": null,
+      "remaining_usd": null,
+      "disposition": "unknown; not a refill"
+    },
+    "aws_test": {
+      "inclusive_ceiling_usd": 10,
+      "attributable_spent_usd": null,
+      "attributable_committed_usd": null,
+      "remaining_usd": null,
+      "disposition": "unknown; not a refill"
+    }
+  },
+  "authority_budget_source_sha256": "f5933fc33b1596a61628e7b08c8faf4fa9df4953e0946fffbe1d5d0219030df2",
+  "current_qualification_budget_sha256": "a03dfeb26683a5bdea7e85ca85e91b23494c066f84e54fbd3415fb5f9de42be7",
+  "retained_shared_reserve_snapshots": [
+    {
+      "relative_to_handoff": "base-worker-closure/b9-full3-cost-outcome.sanitized.json",
+      "sha256": "76d348cd50c900be78004639da348ea21f240f93cc2de19c3add18ff1d154499",
+      "conditional_reserve_snapshot_usd": "1.35"
+    },
+    {
+      "relative_to_handoff": "codex-controls-next/cost-and-separation-plan.json",
+      "sha256": "a2211df9a8e526002c2a24c4bdcf8716d08eefaa9b38727d2e3248ce14527efb",
+      "conditional_reserve_snapshot_usd": "1.85"
+    },
+    {
+      "relative_to_handoff": "claude-next-preparation/f70-runtime-config/controller-preparation/cost-plan.full1.json",
+      "sha256": "cf0b73c345260ad1d0c0791392ffd3f66bbfb4f64ab2750616090d791e541634",
+      "conditional_reserve_snapshot_usd": "2.85"
+    },
+    {
+      "relative_to_handoff": "claude-next-preparation/ee3-native-qualification/budget-after-window2-1.json",
+      "sha256": "8c68c805d1e1eff28f5ddb1aeed018108b6447cad5bc97e02ad3859d3d7055f3",
+      "conditional_reserve_snapshot_usd": "3.85"
+    },
+    {
+      "relative_to_handoff": "cursor-next-preparation/a8d69-successor-preparation/budget-and-service-read-sponsored-1.json",
+      "sha256": "ddb211f20229ff17a7db18b7906040e54eeadd76607038c5dd439a8cc5fafb3f",
+      "conditional_reserve_snapshot_usd": "4.85"
+    }
+  ],
+  "retained_reserves_are_successive_not_additive": true,
+  "old_shared_pool_usd": "10.00",
+  "current_reserve_allocation_consumption_release": "unknown",
+  "historical_missing_ledger_tokens": 221222,
+  "billing_metadata": {
+    "utc": "2026-10-17T04:48:02.321378+00:00",
+    "window_start": "2026-10-01T00:00:00Z",
+    "purpose": "Read-only account metadata and billing permissions; no task attribution inferred",
+    "calls": [
+      {
+        "surface": "cursor_configured_key_identity",
+        "method": "GET",
+        "url": "https://api.cursor.com/v1/me",
+        "credential_source_name": "CURSOR_API_KEY",
+        "semantic": "read-only metadata/report",
+        "timeout_seconds": 8,
+        "maximum_response_bytes": 262144,
+        "http_status": 200,
+        "response_sha256": "d559482a2e266d3d9e79092db92cdbd8e3b9d6868b91b17f4cbccc7f3ca78f99",
+        "response_bytes": 131,
+        "identity_fingerprint": "98e083dac09ccb55e847657a4a4e14c9b84496b75c01b78c1e5ef4809f1e0067",
+        "user_scoped": true
+      },
+      {
+        "surface": "cursor_owner_current_cycle_spending",
+        "method": "POST",
+        "url": "https://api.cursor.com/teams/spend",
+        "credential_source_name": "CURSOR_API_KEY",
+        "semantic": "read-only metadata/report",
+        "timeout_seconds": 8,
+        "maximum_response_bytes": 262144,
+        "http_status": 401,
+        "response_sha256": "4b6772c1c9a0a9a3383b0d763208fe2a36f619567760d8b7fbddbcbce5b29c73",
+        "response_bytes": 49
+      },
+      {
+        "surface": "anthropic_existing_key_organization_cost_report",
+        "method": "GET",
+        "url": "https://api.anthropic.com/v1/organizations/cost_report",
+        "credential_source_name": "ANTHROPIC_API_KEY",
+        "semantic": "read-only metadata/report",
+        "timeout_seconds": 8,
+        "maximum_response_bytes": 262144,
+        "http_status": 401,
+        "response_sha256": "ce324f262760bc7ed3691c5a5a4fd04e1d1e0eefdca77c05f2cb651d2756b039",
+        "response_bytes": 187,
+        "provider_error_type": "authentication_error"
+      },
+      {
+        "surface": "openai_existing_key_organization_costs",
+        "method": "GET",
+        "url": "https://api.openai.com/v1/organization/costs",
+        "credential_source_name": "OPENAI_API_KEY",
+        "semantic": "read-only metadata/report",
+        "timeout_seconds": 8,
+        "maximum_response_bytes": 262144,
+        "http_status": 403,
+        "response_sha256": "5f95c86ea9f119a8696e6991d1b542d11fb5e1254952a3ebafa9ec352c9801ca",
+        "response_bytes": 232
+      }
+    ],
+    "new_inference_calls": 0,
+    "new_provider_sessions": 0,
+    "credential_or_limit_changes": 0,
+    "raw_bodies_or_credentials_retained": false,
+    "maximum_HTTP_requests": 4,
+    "maximum_AWS_calls": 2,
+    "paid_Cost_Explorer_calls": 0,
+    "retries": 0,
+    "existing_key_name_presence": {
+      "CURSOR_ADMIN_API_KEY": false,
+      "CURSOR_API_KEY": true,
+      "ANTHROPIC_ADMIN_KEY": false,
+      "ANTHROPIC_API_KEY": true,
+      "OPENAI_ADMIN_KEY": false,
+      "OPENAI_API_KEY": true
+    },
+    "AWS_principal_matches_expected": true,
+    "AWS_budget": {
+      "account": "298199649527",
+      "budget_name": "mission-control-monthly",
+      "limit": {
+        "Amount": "40.0",
+        "Unit": "USD"
+      },
+      "calculated_spend": {
+        "ActualSpend": {
+          "Amount": "1.04",
+          "Unit": "USD"
+        },
+        "ForecastedSpend": {
+          "Amount": "1.658",
+          "Unit": "USD"
+        }
+      },
+      "cost_filters": null,
+      "last_updated": "2026-10-16 17:03:34.622000-04:00",
+      "time_unit": "MONTHLY",
+      "account_wide_context_only": true,
+      "task_remaining_proven": false
+    },
+    "elapsed_seconds": 2.453
+  },
+  "codex_app_quota_metadata": {
+    "source": "Codex app read-only usage-limits tool; account-wide host login, not API invoice",
+    "recorded_time": "2026-10-17 04:54:15 UTC",
+    "rateLimitsByLimitId": {
+      "codex": {
+        "limitId": "codex",
+        "limitName": null,
+        "normalModelSlug": null,
+        "primary": {
+          "usedPercent": 49,
+          "windowDurationMins": 10080,
+          "resetsAt": 1792757236
+        },
+        "secondary": null,
+        "credits": {
+          "hasCredits": false,
+          "unlimited": false,
+          "balance": "0"
+        },
+        "individualLimit": null,
+        "spendControlReached": null,
+        "planType": "prolite",
+        "rateLimitReachedType": null
+      }
+    },
+    "ordinaryUsageAllowed": null,
+    "account_identity_returned": false,
+    "financial_category_remaining_proven": false,
+    "credit_balance_is_OpenAI_API_wallet": false,
+    "inference_calls": 0
+  },
+  "quota_is_API_wallet_or_category_allowance": false,
+  "original_cursor_explicit_total_tokens": 926070,
+  "original_cursor_USD": null,
+  "original_cursor_SDK_allocation_to_CLI_or_cloud_category": "unproved",
+  "seed_classification": {
+    "scope": "Static only; no apply, DB, provider, tests or product edits",
+    "main_head": "ffcd373f",
+    "observation": "independent-v2/biotech-r3.txt",
+    "observation_sha256": "a32db03f62750ce375bffb9e018ea97daece0ba6e0df0e41322125c544f67f22",
+    "installed_version": "1.3.0",
+    "ownership": "common and biotech are source/data scopes, not named human approvers. Package db-contract owner plus Biotech application/catalog owner must select any intended change.",
+    "semantics": "seeds.py:761-770 applied set; 797-807 incompatible/pending/replay/conflict; 869-882 compatibility and dependency refusal; 889-907 atomic records plus receipt. All nine contain only asset_version/asset_decision, plus 24 plugin-member records in cognition; no provider start, worker registration, bundle upload or watcher execution.",
+    "dependency_note": "agent-skills1.0.2 depends on pending1.0.1; other declared dependencies are replay in observed receipt. Declaration/ordering does not prove referenced storage bytes, authoring compatibility or complete apply success.",
+    "decision": "No blanket seed apply or Biotech upgrade justified. Owner selection is needed only when proposing a specific acceptance-required Biotech capability; all eight pending need not be installed. Artifact schema can target an already compatible original AI Engineer environment after its own exact readiness/receipt check; no claim that it is absent there.",
+    "bundles": [
+      {
+        "seed": "mc.app.biotech.agent-skills@1.0.1",
+        "file": "packages/mission-control-db-contract/seeds/biotech/mc.app.biotech.agent-skills-1.0.1.json",
+        "sha256": "7c3cd13ca7a87a60478c6a10b09828dab5df040c8d78d5938a8ba5a8d4c64f85",
+        "owner_scope": "biotech",
+        "actor": "seed:mission-control-catalog",
+        "observed_status": "pending",
+        "reason": "No installation_seed_receipt for this exact key/version in observed applied set. Cause/history of absence unproved.",
+        "compatibility": ">=1.0.0 <2.0.0",
+        "dependencies": [
+          {
+            "seed_key": "mc.app.biotech.agent-skills",
+            "seed_version": "1.0.0"
+          }
+        ],
+        "record_total": 6,
+        "record_counts": [
+          {
+            "kind": "asset_decision",
+            "count": 3
+          },
+          {
+            "kind": "asset_version",
+            "count": 3
+          }
+        ],
+        "effect": "Materialization and observation skill successor in 'biotech': skill.mission-control, skill.mission-control-author, skill.mission-control-observe. New revision 2 definitions preserve all applied 1.0.0 records and custody bytes.",
+        "assets": [
+          {
+            "logical_key": "agent-skill:skill:skill.mission-control/2",
+            "asset_id": "definition:skill:skill.mission-control",
+            "kind": "skill_bundle",
+            "version": "2"
+          },
+          {
+            "logical_key": "agent-skill:skill:skill.mission-control-author/2",
+            "asset_id": "definition:skill:skill.mission-control-author",
+            "kind": "skill_bundle",
+            "version": "2"
+          },
+          {
+            "logical_key": "agent-skill:skill:skill.mission-control-observe/2",
+            "asset_id": "definition:skill:skill.mission-control-observe",
+            "kind": "skill_bundle",
+            "version": "2"
+          }
+        ],
+        "source_lines": [
+          3,
+          4,
+          10,
+          12,
+          542,
+          543
+        ],
+        "acceptance_relevance": "Materialization/observation capability relevance; exact current mission selection and need on Biotech not established."
+      },
+      {
+        "seed": "mc.app.biotech.agent-skills@1.0.2",
+        "file": "packages/mission-control-db-contract/seeds/biotech/mc.app.biotech.agent-skills-1.0.2.json",
+        "sha256": "3471e24ef28e46035fe5ea655cc32068af31cd231583963901f9d4c0369c9d5d",
+        "owner_scope": "biotech",
+        "actor": "seed:mission-control-catalog",
+        "observed_status": "pending",
+        "reason": "No installation_seed_receipt for this exact key/version in observed applied set. Cause/history of absence unproved.",
+        "compatibility": ">=1.0.0 <2.0.0",
+        "dependencies": [
+          {
+            "seed_key": "mc.app.biotech.agent-skills",
+            "seed_version": "1.0.1"
+          }
+        ],
+        "record_total": 4,
+        "record_counts": [
+          {
+            "kind": "asset_decision",
+            "count": 2
+          },
+          {
+            "kind": "asset_version",
+            "count": 2
+          }
+        ],
+        "effect": "Materialization and observation skill successor in 'biotech': skill.mission-control-author, skill.mission-control-observe. New definition revisions preserve all earlier 1.0.0 and 1.0.1 records and custody bytes.",
+        "assets": [
+          {
+            "logical_key": "agent-skill:skill:skill.mission-control-author/3",
+            "asset_id": "definition:skill:skill.mission-control-author",
+            "kind": "skill_bundle",
+            "version": "3"
+          },
+          {
+            "logical_key": "agent-skill:skill:skill.mission-control-observe/3",
+            "asset_id": "definition:skill:skill.mission-control-observe",
+            "kind": "skill_bundle",
+            "version": "3"
+          }
+        ],
+        "source_lines": [
+          3,
+          4,
+          10,
+          12,
+          366,
+          367
+        ],
+        "acceptance_relevance": "Materialization/observation capability relevance; exact current mission selection and need on Biotech not established."
+      },
+      {
+        "seed": "mc.app.biotech.cognition-profiles@1.0.0",
+        "file": "packages/mission-control-db-contract/seeds/biotech/mc.app.biotech.cognition-profiles-1.0.0.json",
+        "sha256": "b7f80e32302b965c529809092e329559d2826e1dc5bad7882fc1a894f927723f",
+        "owner_scope": "biotech",
+        "actor": "seed:mission-control-catalog",
+        "observed_status": "pending",
+        "reason": "No installation_seed_receipt for this exact key/version in observed applied set. Cause/history of absence unproved.",
+        "compatibility": ">=1.0.0 <2.0.0",
+        "dependencies": [
+          {
+            "seed_key": "mc.storage.capability-bundles",
+            "seed_version": "1.0.0"
+          }
+        ],
+        "record_total": 54,
+        "record_counts": [
+          {
+            "kind": "asset_decision",
+            "count": 15
+          },
+          {
+            "kind": "asset_version",
+            "count": 15
+          },
+          {
+            "kind": "capability_plugin_member",
+            "count": 24
+          }
+        ],
+        "effect": "Portable cognition/sdlc, cognition/knowledge and cognition/mixed defaults. Exact constituent pins; hosted support remains unqualified. Application Knowledge Services binding is required separately.",
+        "assets": [
+          {
+            "logical_key": "cognition-profile:skill:skill.mc-cognition-tdd/1",
+            "asset_id": "definition:skill:skill.mc-cognition-tdd",
+            "kind": "skill_bundle",
+            "version": "1"
+          },
+          {
+            "logical_key": "cognition-profile:skill:skill.mc-cognition-code-review/1",
+            "asset_id": "definition:skill:skill.mc-cognition-code-review",
+            "kind": "skill_bundle",
+            "version": "1"
+          },
+          {
+            "logical_key": "cognition-profile:skill:skill.mc-cognition-pr/1",
+            "asset_id": "definition:skill:skill.mc-cognition-pr",
+            "kind": "skill_bundle",
+            "version": "1"
+          },
+          {
+            "logical_key": "cognition-profile:skill:skill.mc-cognition-diagnosing-bugs/1",
+            "asset_id": "definition:skill:skill.mc-cognition-diagnosing-bugs",
+            "kind": "skill_bundle",
+            "version": "1"
+          },
+          {
+            "logical_key": "cognition-profile:skill:skill.mc-cognition-research/1",
+            "asset_id": "definition:skill:skill.mc-cognition-research",
+            "kind": "skill_bundle",
+            "version": "1"
+          },
+          {
+            "logical_key": "cognition-profile:skill:skill.mc-cognition-cite-and-verify/1",
+            "asset_id": "definition:skill:skill.mc-cognition-cite-and-verify",
+            "kind": "skill_bundle",
+            "version": "1"
+          },
+          {
+            "logical_key": "cognition-profile:skill:skill.mc-cognition-ingest/1",
+            "asset_id": "definition:skill:skill.mc-cognition-ingest",
+            "kind": "skill_bundle",
+            "version": "1"
+          },
+          {
+            "logical_key": "cognition-profile:skill:skill.mc-cognition-knowledge-services/1",
+            "asset_id": "definition:skill:skill.mc-cognition-knowledge-services",
+            "kind": "skill_bundle",
+            "version": "1"
+          },
+          {
+            "logical_key": "cognition-profile:subagent-profile:subagent.mc-cognition-reviewer/1",
+            "asset_id": "definition:subagent_profile:subagent.mc-cognition-reviewer",
+            "kind": "subagent_profile",
+            "version": "1"
+          },
+          {
+            "logical_key": "cognition-profile:subagent-profile:subagent.mc-cognition-test-runner/1",
+            "asset_id": "definition:subagent_profile:subagent.mc-cognition-test-runner",
+            "kind": "subagent_profile",
+            "version": "1"
+          },
+          {
+            "logical_key": "cognition-profile:subagent-profile:subagent.mc-cognition-source-verifier/1",
+            "asset_id": "definition:subagent_profile:subagent.mc-cognition-source-verifier",
+            "kind": "subagent_profile",
+            "version": "1"
+          },
+          {
+            "logical_key": "cognition-profile:subagent-profile:subagent.mc-cognition-summarizer/1",
+            "asset_id": "definition:subagent_profile:subagent.mc-cognition-summarizer",
+            "kind": "subagent_profile",
+            "version": "1"
+          },
+          {
+            "logical_key": "cognition-profile:plugin:plugin.cognition-sdlc/1",
+            "asset_id": "definition:plugin:plugin.cognition-sdlc",
+            "kind": "plugin",
+            "version": "1"
+          },
+          {
+            "logical_key": "cognition-profile:plugin:plugin.cognition-knowledge/1",
+            "asset_id": "definition:plugin:plugin.cognition-knowledge",
+            "kind": "plugin",
+            "version": "1"
+          },
+          {
+            "logical_key": "cognition-profile:plugin:plugin.cognition-mixed/1",
+            "asset_id": "definition:plugin:plugin.cognition-mixed",
+            "kind": "plugin",
+            "version": "1"
+          }
+        ],
+        "source_lines": [
+          3,
+          4,
+          10,
+          12,
+          3321,
+          3322
+        ],
+        "acceptance_relevance": "Potential capability/catalog relevance; current acceptance-required selection on Biotech not established."
+      },
+      {
+        "seed": "mc.app.biotech.environment-kits@1.0.0",
+        "file": "packages/mission-control-db-contract/seeds/biotech/mc.app.biotech.environment-kits-1.0.0.json",
+        "sha256": "5e8e4308e7415e5a1336b18852b317b6a212176a02d67ffc78e1e1a722525b29",
+        "owner_scope": "biotech",
+        "actor": "seed:mission-control-catalog",
+        "observed_status": "pending",
+        "reason": "No installation_seed_receipt for this exact key/version in observed applied set. Cause/history of absence unproved.",
+        "compatibility": ">=1.0.0 <2.0.0",
+        "dependencies": [],
+        "record_total": 12,
+        "record_counts": [
+          {
+            "kind": "asset_decision",
+            "count": 6
+          },
+          {
+            "kind": "asset_version",
+            "count": 6
+          }
+        ],
+        "effect": "Starter Environment Kits admitted in 'biotech' (MO-12, ADR-0042): envkit.python-uv@1, envkit.node@1, envkit.python-uv-node@1, envkit.mission-control-dev@1, envkit.knowledge-research@1, envkit.biotech-backend@1. Each row inlines its mc.environment_kit.v1 manifest; bytes live in the capability-bundles bucket under the manifest's digest path (upload with scripts/seeds_publish_bundles.py). Rows use the existing 'profile' asset category and the 0031 host-support profiles; no migration is required.",
+        "assets": [
+          {
+            "logical_key": "environment-kit:environment-kit:envkit.python-uv/1",
+            "asset_id": "definition:environment_kit:envkit.python-uv",
+            "kind": "profile",
+            "version": "1"
+          },
+          {
+            "logical_key": "environment-kit:environment-kit:envkit.node/1",
+            "asset_id": "definition:environment_kit:envkit.node",
+            "kind": "profile",
+            "version": "1"
+          },
+          {
+            "logical_key": "environment-kit:environment-kit:envkit.python-uv-node/1",
+            "asset_id": "definition:environment_kit:envkit.python-uv-node",
+            "kind": "profile",
+            "version": "1"
+          },
+          {
+            "logical_key": "environment-kit:environment-kit:envkit.mission-control-dev/1",
+            "asset_id": "definition:environment_kit:envkit.mission-control-dev",
+            "kind": "profile",
+            "version": "1"
+          },
+          {
+            "logical_key": "environment-kit:environment-kit:envkit.knowledge-research/1",
+            "asset_id": "definition:environment_kit:envkit.knowledge-research",
+            "kind": "profile",
+            "version": "1"
+          },
+          {
+            "logical_key": "environment-kit:environment-kit:envkit.biotech-backend/1",
+            "asset_id": "definition:environment_kit:envkit.biotech-backend",
+            "kind": "profile",
+            "version": "1"
+          }
+        ],
+        "source_lines": [
+          3,
+          4,
+          5,
+          7,
+          1335,
+          1336
+        ],
+        "acceptance_relevance": "MO-12 environment preparation relevance; catalog admission does not provision an environment."
+      },
+      {
+        "seed": "mc.app.biotech.signal-skills@1.0.0",
+        "file": "packages/mission-control-db-contract/seeds/biotech/mc.app.biotech.signal-skills-1.0.0.json",
+        "sha256": "1f0429b86508152bbdcfdca7429daeeaf37eebd6681043b424a60a5448aea0b7",
+        "owner_scope": "biotech",
+        "actor": "seed:mission-control-catalog",
+        "observed_status": "pending",
+        "reason": "No installation_seed_receipt for this exact key/version in observed applied set. Cause/history of absence unproved.",
+        "compatibility": ">=1.0.0 <2.0.0",
+        "dependencies": [],
+        "record_total": 2,
+        "record_counts": [
+          {
+            "kind": "asset_decision",
+            "count": 1
+          },
+          {
+            "kind": "asset_version",
+            "count": 1
+          }
+        ],
+        "effect": "Reviewed mc-signals skill; provider qualification remains separate.",
+        "assets": [
+          {
+            "logical_key": "agent-skill:skill:skill.mc-signals/1",
+            "asset_id": "definition:skill:skill.mc-signals",
+            "kind": "skill_bundle",
+            "version": "1"
+          }
+        ],
+        "source_lines": [
+          3,
+          4,
+          5,
+          7,
+          173,
+          174
+        ],
+        "acceptance_relevance": "Materialization/observation capability relevance; exact current mission selection and need on Biotech not established."
+      },
+      {
+        "seed": "mc.app.biotech.watchers@1.0.0",
+        "file": "packages/mission-control-db-contract/seeds/biotech/mc.app.biotech.watchers-1.0.0.json",
+        "sha256": "ffecc6b6fd5c929538d4c5e2369023e095707c070ce8d182c14c157886845819",
+        "owner_scope": "biotech",
+        "actor": "seed:mission-control-catalog",
+        "observed_status": "pending",
+        "reason": "No installation_seed_receipt for this exact key/version in observed applied set. Cause/history of absence unproved.",
+        "compatibility": ">=1.0.0 <2.0.0",
+        "dependencies": [],
+        "record_total": 14,
+        "record_counts": [
+          {
+            "kind": "asset_decision",
+            "count": 7
+          },
+          {
+            "kind": "asset_version",
+            "count": 7
+          }
+        ],
+        "effect": "Seven bounded standard watcher templates; no direct effects or lifecycle settlement.",
+        "assets": [
+          {
+            "logical_key": "standard-watcher:watcher:watcher.stall-detector/1",
+            "asset_id": "definition:watcher:watcher.stall-detector",
+            "kind": "policy",
+            "version": "1"
+          },
+          {
+            "logical_key": "standard-watcher:watcher:watcher.result-marker-stop/1",
+            "asset_id": "definition:watcher:watcher.result-marker-stop",
+            "kind": "policy",
+            "version": "1"
+          },
+          {
+            "logical_key": "standard-watcher:watcher:watcher.ci-watch/1",
+            "asset_id": "definition:watcher:watcher.ci-watch",
+            "kind": "policy",
+            "version": "1"
+          },
+          {
+            "logical_key": "standard-watcher:watcher:watcher.pr-merged-release-wait/1",
+            "asset_id": "definition:watcher:watcher.pr-merged-release-wait",
+            "kind": "policy",
+            "version": "1"
+          },
+          {
+            "logical_key": "standard-watcher:watcher:watcher.artifact-pipeline/1",
+            "asset_id": "definition:watcher:watcher.artifact-pipeline",
+            "kind": "policy",
+            "version": "1"
+          },
+          {
+            "logical_key": "standard-watcher:watcher:watcher.budget-guard/1",
+            "asset_id": "definition:watcher:watcher.budget-guard",
+            "kind": "policy",
+            "version": "1"
+          },
+          {
+            "logical_key": "standard-watcher:watcher:watcher.heartbeat-progress/1",
+            "asset_id": "definition:watcher:watcher.heartbeat-progress",
+            "kind": "policy",
+            "version": "1"
+          }
+        ],
+        "source_lines": [
+          3,
+          4,
+          5,
+          7,
+          655,
+          656
+        ],
+        "acceptance_relevance": "Materialization/observation capability relevance; exact current mission selection and need on Biotech not established."
+      },
+      {
+        "seed": "mc.catalog.approved-assets@1.0.2",
+        "file": "packages/mission-control-db-contract/seeds/common/mc.catalog.approved-assets-1.0.2.json",
+        "sha256": "071ddc496986738d2e493a7f0eddfb0fb31d9d6be4e07ad96d4e2984d9ec2987",
+        "owner_scope": "common",
+        "actor": "seed:mission-control-catalog",
+        "observed_status": "pending",
+        "reason": "No installation_seed_receipt for this exact key/version in observed applied set. Cause/history of absence unproved.",
+        "compatibility": ">=1.0.0 <2.0.0",
+        "dependencies": [
+          {
+            "seed_key": "mc.catalog.approved-assets",
+            "seed_version": "1.0.1"
+          }
+        ],
+        "record_total": 2,
+        "record_counts": [
+          {
+            "kind": "asset_decision",
+            "count": 1
+          },
+          {
+            "kind": "asset_version",
+            "count": 1
+          }
+        ],
+        "effect": "Successor of mc.catalog.approved-assets@1.0.1 (applied, frozen): the reviewed approved assets whose logical keys neither applied version holds, including the canonical skills/mission-control bundle manifest at its present version. The coordinator skill and prompt definitions stay at the applied revision 1.",
+        "assets": [
+          {
+            "logical_key": "skill-bundle-manifest:mission-control/0.5.0",
+            "asset_id": "skill-bundle-manifest:mission-control",
+            "kind": "skill",
+            "version": "0.5.0"
+          }
+        ],
+        "source_lines": [
+          3,
+          4,
+          10,
+          12,
+          57,
+          58
+        ],
+        "acceptance_relevance": "Potential capability/catalog relevance; current acceptance-required selection on Biotech not established."
+      },
+      {
+        "seed": "mc.catalog.workflow-parity@1.0.3",
+        "file": "packages/mission-control-db-contract/seeds/common/mc.catalog.workflow-parity-1.0.3.json",
+        "sha256": "9dccfa2c6abada4d920121f824f8a23368bf934e8b1572a27014d85819e890c0",
+        "owner_scope": "common",
+        "actor": "seed:mission-control-catalog",
+        "observed_status": "pending",
+        "reason": "No installation_seed_receipt for this exact key/version in observed applied set. Cause/history of absence unproved.",
+        "compatibility": ">=1.0.0 <2.0.0",
+        "dependencies": [
+          {
+            "seed_key": "mc.catalog.workflow-parity",
+            "seed_version": "1.0.2"
+          }
+        ],
+        "record_total": 4,
+        "record_counts": [
+          {
+            "kind": "asset_decision",
+            "count": 2
+          },
+          {
+            "kind": "asset_version",
+            "count": 2
+          }
+        ],
+        "effect": "Successor of mc.catalog.workflow-parity@1.0.2 (frozen): StageGraph and GoalDirected registration including bounded Cursor billing reconciliation, as asset version 4. No product Workflow Types, missions or runs.",
+        "assets": [
+          {
+            "logical_key": "workflow-family:stagegraph/4",
+            "asset_id": "workflow-family:stagegraph",
+            "kind": "policy",
+            "version": "4"
+          },
+          {
+            "logical_key": "workflow-family:goal-directed/4",
+            "asset_id": "workflow-family:goal-directed",
+            "kind": "policy",
+            "version": "4"
+          }
+        ],
+        "source_lines": [
+          3,
+          4,
+          10,
+          12,
+          136,
+          137
+        ],
+        "acceptance_relevance": "Catalog parity with bounded Cursor billing workflow; does not register/deploy workers or repair protected family."
+      },
+      {
+        "seed": "mc.catalog.artifact-schemas@1.0.0",
+        "file": "packages/mission-control-db-contract/seeds/common/mc.catalog.artifact-schemas-1.0.0.json",
+        "sha256": "403f5c2128ace752bcdc0ba2f1e8a999d42a6b0315bff7e89d337768461d6838",
+        "owner_scope": "common",
+        "actor": "seed:mission-control-catalog",
+        "observed_status": "incompatible",
+        "reason": "Observed installed 1.3.0 fails declared >=1.4.1 <2.0.0; precedence does not establish whether a seed receipt exists.",
+        "compatibility": ">=1.4.1 <2.0.0",
+        "dependencies": [],
+        "record_total": 2,
+        "record_counts": [
+          {
+            "kind": "asset_decision",
+            "count": 1
+          },
+          {
+            "kind": "asset_version",
+            "count": 1
+          }
+        ],
+        "effect": "Published S0 artifact schema authority.",
+        "assets": [
+          {
+            "logical_key": "artifact-schema:artifact-schema:schema.s0-probe-report/1",
+            "asset_id": "definition:artifact_schema:schema.s0-probe-report",
+            "kind": "schema",
+            "version": "1"
+          }
+        ],
+        "source_lines": [
+          3,
+          4,
+          5,
+          7,
+          215,
+          216
+        ],
+        "acceptance_relevance": "Direct SPEC-09/MO-71 S0 evidence-schema relevance; Biotech installation is not the original AI Engineer G4a target; no upgrade inferred."
+      }
+    ]
+  },
+  "seed_applies": 0,
+  "frozen_R2B_action_sha256": "3565f88628e5cbaeebb2b2b1aaeb889f163d723f40c2fbce17257aa927f49f57",
+  "R2B_actions_attempted": 0,
+  "new_inference_calls": 0,
+  "new_credentials": 0,
+  "paid_cost_measurement_calls": 0,
+  "companion_document_sha256": "b5980afb20477fe1008441ae9ed1b9736aaf7a2af3e6528b5d1ac37ab77ab844"
+}

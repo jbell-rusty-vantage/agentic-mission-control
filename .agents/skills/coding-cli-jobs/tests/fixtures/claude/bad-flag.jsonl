@@ -1,0 +1,2 @@
+{"__fake__":{"stderr":"error: unknown option '--bogus-flag'\n"}}
+{"__fake__":{"exit":1}}

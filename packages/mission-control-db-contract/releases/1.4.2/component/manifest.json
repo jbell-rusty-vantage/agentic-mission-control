@@ -1,0 +1,278 @@
+{
+  "compatible_previous_fingerprints": [
+    "sha256:ef5a9e71c9c4a4fe23f343a5708c476a757bc1c5a61f9aacae3a76577b209c09",
+    "sha256:7da7567a7e9c547015e9f9add3769720a42ad18b6c47e11017dcb416998989ac",
+    "sha256:0113df03978540d777c5be712d8b17e0f3d2a3f98245cd8fd7661cef7f6b5d23",
+    "sha256:3154fa8d02008f337b6baf81cc58a962d9c71d1aff7963f62fd599012c02cc5c",
+    "sha256:b3e35a34c99bbcfbe48a02333737940dc917d073154491d962bb764e9f0ee1ce",
+    "sha256:e92a2562185c280db9eedf4fa9faef074e00d901a306a67236076be2720b1b93"
+  ],
+  "component": "mission_control",
+  "component_version": "1.4.2",
+  "contract_path": "generated/contract.json",
+  "contract_schema_digest": "sha256:356f26ed7f942a04cdae746cbe5923c5be8b9630cccba944261fab1806fb6f80",
+  "installer_protocol": "mission-control-sql/v2",
+  "min_postgres_version": 170000,
+  "ordered_migrations": [
+    {
+      "key": "0001_foundation",
+      "path": "migrations/0001_foundation.sql",
+      "sha256": "17fdeed4fd09b2a6ca82fa9dbc5fcb99a5255b25c86c4ac4055a0f4003c5c571"
+    },
+    {
+      "key": "0002_authoring",
+      "path": "migrations/0002_authoring.sql",
+      "sha256": "fe9f2f9adc7675db24b9458ea9be0d7e32a2c10aa4e708dd069d6a19af49e7b5"
+    },
+    {
+      "key": "0003_execution",
+      "path": "migrations/0003_execution.sql",
+      "sha256": "fd0f839bd389f66c9dbb139934d7333699718fcfaa143e5757b23fefff947f27"
+    },
+    {
+      "key": "0004_capability_artifacts",
+      "path": "migrations/0004_capability_artifacts.sql",
+      "sha256": "fe33a28c27f4fc9b965c417a407b5e1707a8bf8498c6dbf7b1cf90a47b8dfb07"
+    },
+    {
+      "key": "0005_commands_effects_recovery",
+      "path": "migrations/0005_commands_effects_recovery.sql",
+      "sha256": "db724c6fd630bbe672e8b9f655db908de0c5fe1298d36101f7afb292daa6024e"
+    },
+    {
+      "key": "0010_run_control_support",
+      "path": "migrations/0010_run_control_support.sql",
+      "sha256": "d4db0f9c534decb808e3d1ec29aed1a98a17cbf4f1abc01cdaa4b7bd963f5507"
+    },
+    {
+      "key": "0011_operation_journal_support",
+      "path": "migrations/0011_operation_journal_support.sql",
+      "sha256": "c053ab24e9f22d4a88005fd510bdbf3f53e3201582888045da187ec0634e39ed"
+    },
+    {
+      "key": "0012_runtime_lineage_support",
+      "path": "migrations/0012_runtime_lineage_support.sql",
+      "sha256": "5ba6d2fb9a66279028caeebac7db90e4098666831a658056628443cc234bdbbd"
+    },
+    {
+      "key": "0013_snapshot_fork_support",
+      "path": "migrations/0013_snapshot_fork_support.sql",
+      "sha256": "a67e8ed97071893969723a6d799ce02976e6a46235527c44edc282b0f463c52a"
+    },
+    {
+      "key": "0014_orchestration_support",
+      "path": "migrations/0014_orchestration_support.sql",
+      "sha256": "0639a883b6d403ae83cd9e7b46b3b22a2f08b3e1b567d2b3ca5f1ebe21550840"
+    },
+    {
+      "key": "0015_async_subagent_support",
+      "path": "migrations/0015_async_subagent_support.sql",
+      "sha256": "63b0a28c6a783058c1715f1873ac7ef0ec4cb4b11a375bedd290fbdd35640b14"
+    },
+    {
+      "key": "0016_coordinator_support",
+      "path": "migrations/0016_coordinator_support.sql",
+      "sha256": "baa2a9d2aa15269ca9facefa293620056fd72198ef2bb6232246a7bbbdc88dfb"
+    },
+    {
+      "key": "0017_runtime_kernel_support",
+      "path": "migrations/0017_runtime_kernel_support.sql",
+      "sha256": "74ecee43b86b78aea50f7e4b59740031483cd79a296f07b8034c05af529787dd"
+    },
+    {
+      "key": "0020_catalog_definitions",
+      "path": "migrations/0020_catalog_definitions.sql",
+      "sha256": "2d8be48cbfa8588d8feca5cb8824af902ab8a1465cb06240fe1b5c4b0a5b9a4d"
+    },
+    {
+      "key": "0021_capability_bundle_admission",
+      "path": "migrations/0021_capability_bundle_admission.sql",
+      "sha256": "f01ce20b42d74284a0c79fd76da71b30a39628184c84f00a057e67aef557189f"
+    },
+    {
+      "key": "0022_capability_search_projection",
+      "path": "migrations/0022_capability_search_projection.sql",
+      "sha256": "2d54d12db628a3015601b3723215f30ef69efdc79c2c15710a27263464f428f5"
+    },
+    {
+      "key": "0023_capability_discovery_custody",
+      "path": "migrations/0023_capability_discovery_custody.sql",
+      "sha256": "d2022c5b9b858734fe6e5b2fd72a04dc7a42d264092c3427d91b5a6f317fac23"
+    },
+    {
+      "key": "0024_workspace_artifact_custody",
+      "path": "migrations/0024_workspace_artifact_custody.sql",
+      "sha256": "c6ca8f833dc46c0e055866e491858a565d9721c998e94bb6b3b6f09946581ed9"
+    },
+    {
+      "key": "0025_capability_kinds_and_host_support",
+      "path": "migrations/0025_capability_kinds_and_host_support.sql",
+      "sha256": "ecb7396860160969d95a4ec755d811c2a96b142de50c75fd8fc910e1c6715a46"
+    },
+    {
+      "key": "0026_search_projection_nullable_embedding",
+      "path": "migrations/0026_search_projection_nullable_embedding.sql",
+      "sha256": "be28e26099ac899f55125c748ab2bbc634c281965e8e4415172704acb44dc6b1"
+    },
+    {
+      "key": "0027_provider_frames",
+      "path": "migrations/0027_provider_frames.sql",
+      "sha256": "5d81a799d9c01683deecdc21adf6a39239a5abda6c4de99a4dfd9afc3073d664"
+    },
+    {
+      "key": "0028_mission_chains",
+      "path": "migrations/0028_mission_chains.sql",
+      "sha256": "6fc1ed497bb166e2e8cfbd9772bcf1216719aa7ab97999c1a268911a15381a2c"
+    },
+    {
+      "key": "0029_command_mailbox_stop_fence_subscriptions",
+      "path": "migrations/0029_command_mailbox_stop_fence_subscriptions.sql",
+      "sha256": "c6d571e692e13100d235c80b40e1542a95990fab6b22f5fcc3c77371fff20549"
+    },
+    {
+      "key": "0030_lane_bindings",
+      "path": "migrations/0030_lane_bindings.sql",
+      "sha256": "c057bc275ab7162f1109646323a0aba82fd8c8b89bc9240df48ebc44501027cf"
+    },
+    {
+      "key": "0031_multi_provider_lanes",
+      "path": "migrations/0031_multi_provider_lanes.sql",
+      "sha256": "21ac0c9ae225d322f6fa44a9f49187d3f5d9018f663558a999ff42f5b80d2df1"
+    },
+    {
+      "key": "0032_run_cluster_binding_stream_hints",
+      "path": "migrations/0032_run_cluster_binding_stream_hints.sql",
+      "sha256": "8e5f588a21e4ab63b8bb353fd4d3ace256271d5b6e88b28f2e366935aa6be4a8"
+    },
+    {
+      "key": "0033_approvals_coordinator_inbox_lane_describes",
+      "path": "migrations/0033_approvals_coordinator_inbox_lane_describes.sql",
+      "sha256": "d72734e84e11c6e11475f60793d3b31899b7847bc75d4c1fc01e84a68f134cd0"
+    },
+    {
+      "key": "0034_provider_frame_lifecycle_body",
+      "path": "migrations/0034_provider_frame_lifecycle_body.sql",
+      "sha256": "f06c8eb077e7aec5c0ce7a01cadcbe92e26b72c2c440ec90b32b7c1315cdda68"
+    },
+    {
+      "key": "0035_signal_ingress",
+      "path": "migrations/0035_signal_ingress.sql",
+      "sha256": "e07b5e0e0aee20a58c994a6e2b74b91e344a31521891b20aef3f7da7330e8cc5"
+    },
+    {
+      "key": "0036_hosted_agent_api_lane_profiles",
+      "path": "migrations/0036_hosted_agent_api_lane_profiles.sql",
+      "sha256": "af7b4ccddfbfd47f5f8fafdd4406dda78e95c330a09ee665ef46c2c4b878cb9d"
+    },
+    {
+      "key": "0037_environment_preparation",
+      "path": "migrations/0037_environment_preparation.sql",
+      "sha256": "4611e1da647a75d139f284ea67282a1da007406c70d2578ecf63829cff21c6a6"
+    },
+    {
+      "key": "0038_owner_prerequisites",
+      "path": "migrations/0038_owner_prerequisites.sql",
+      "sha256": "69438e389a9e11fdf3b2af27d4442460150961662a3cb9fd84294df09fd6a18a"
+    },
+    {
+      "key": "0040_implemented_lane_describes",
+      "path": "migrations/0040_implemented_lane_describes.sql",
+      "sha256": "be3d1dc9444583a419610de7edb890659a9dc8b672a444b300a7e54b7493e0ac"
+    },
+    {
+      "key": "0041_placement_capacity",
+      "path": "migrations/0041_placement_capacity.sql",
+      "sha256": "ac6295d82a88cf09a3c1dea8a7b0de377fe5ed6a6d7a79d5cf0b862b6b342159"
+    },
+    {
+      "key": "0042_codex_01621_lane_describe",
+      "path": "migrations/0042_codex_01621_lane_describe.sql",
+      "sha256": "7b8df787ada45d0d3e84bc649c4d77e79eade98c7e76bfe9f5d15d5b0d5b82c4"
+    },
+    {
+      "key": "0043_cursor_cost_observation_contract",
+      "path": "migrations/0043_cursor_cost_observation_contract.sql",
+      "sha256": "2ecd0e76a19e5bcdd788c994bd3cc0f30ee38d5f759d919e2ba74972c8c3b900"
+    },
+    {
+      "key": "0044_ingress_mission_request_idempotency",
+      "path": "migrations/0044_ingress_mission_request_idempotency.sql",
+      "sha256": "87ad30fe0daebd2b22b91a2f8aad9536cfec927d0a52bfc53db47bf0db77d56f"
+    }
+  ],
+  "owned_schemas": [
+    "mission_control",
+    "mission_control_search"
+  ],
+  "postgres_major": 17,
+  "required_extensions": [
+    {
+      "name": "vector",
+      "required_by": [
+        "mission_control_search"
+      ],
+      "schema": "extensions"
+    },
+    {
+      "name": "pg_trgm",
+      "required_by": [
+        "mission_control_search"
+      ],
+      "schema": "extensions"
+    }
+  ],
+  "runtime_descriptor": {
+    "path": "../runtime/descriptor.json",
+    "sha256": "b0330c546284548791dffae3c19452952db008fe5b32d36e8cc1a63488b93cfd"
+  },
+  "runtime_roles": [
+    "mission_control_runtime",
+    "mission_control_family_writer",
+    "mission_control_catalog_writer",
+    "mission_control_outbox_worker",
+    "mission_control_readonly",
+    "mission_control_ingress"
+  ],
+  "schema_fingerprint": "sha256:1d6dcd1a96b44b7c3635ffd34cec7703703160b04bf52c24643157c72a472cc3",
+  "schema_fingerprint_algorithm": "mc-pg-catalog-v2",
+  "schema_fingerprints": {
+    "mission_control": "sha256:33f86ff136942677db47ffe907cb8410c85a0c9e01bc1dc91975be40bc922a1f",
+    "mission_control_search": "sha256:60b02da443726d651a4fdc74f6db2650b193b7d99c834a5e573dfa7a0db8e1ca"
+  },
+  "seed_compatibility": {
+    "bundle_format": "mission-control-seed/v1",
+    "component_range": ">=1.0.0 <2.0.0",
+    "seed_keys": [
+      "mc.installation",
+      "mc.catalog.workflow-parity",
+      "mc.catalog.runtime-profiles",
+      "mc.catalog.approved-assets",
+      "mc.app.bindings",
+      "mc.qualification.parity",
+      "mc.catalog.agent-capabilities",
+      "mc.app.biotech.agent-capabilities",
+      "mc.app.ai-engineer.agent-capabilities",
+      "mc.storage.capability-bundles",
+      "mc.app.biotech.agent-skills",
+      "mc.app.ai-engineer.agent-skills",
+      "mc.app.biotech.cognition-profiles",
+      "mc.app.biotech.environment-kits",
+      "mc.app.biotech.signal-skills",
+      "mc.app.biotech.watchers",
+      "mc.app.ai-engineer.cognition-profiles",
+      "mc.app.ai-engineer.environment-kits",
+      "mc.app.ai-engineer.signal-skills",
+      "mc.app.ai-engineer.watchers",
+      "mc.catalog.artifact-schemas"
+    ]
+  },
+  "source_identity": "mission-control-db-contract",
+  "source_inputs_digest": "sha256:3b7ffc4c07e5ae6e3407915a21dc56dac1b0aa8369fda25a9a8befa23b50387a",
+  "source_revision": "git:e76684781cb6d3d55dd9f98af51c613a5e220cbf+inputs:sha256:3b7ffc4c07e5ae6e3407915a21dc56dac1b0aa8369fda25a9a8befa23b50387a",
+  "supported_reader_versions": [
+    "mission-control-runtime/1"
+  ],
+  "supported_writer_versions": [
+    "mission-control-runtime/1"
+  ]
+}

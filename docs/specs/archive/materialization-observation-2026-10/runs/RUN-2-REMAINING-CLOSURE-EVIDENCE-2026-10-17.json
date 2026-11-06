@@ -1,0 +1,586 @@
+{
+  "schema": "mc.run2.remaining-closure.evidence.v1",
+  "updated_utc": "2026-10-17T12:53:53.834103+00:00",
+  "model_requirement": "gpt-6.1-sol only",
+  "application_source_commit": "d106d0c7191d25cda618ebd25fcebfff25aa1120",
+  "source_commits": [
+    "b505f277cf7add1806a223c18b9ddc4db9b0cb39",
+    "d106d0c7191d25cda618ebd25fcebfff25aa1120"
+  ],
+  "source_sha256": {
+    "src/mission_control/application/programs/service.py": "d74061253677639bc5dcd7e293c5e7a8452bbacc4744f6771adf6b3f127d2adb",
+    "tests/unit/orchestration/test_stagegraph_completion_replay.py": "ad1bdba0053b01a6314a25ff3b92ebd3a6a94f58ab83ba7be44cb4d2d0ca7afc"
+  },
+  "source_locations": {
+    "complete": "src/mission_control/application/programs/service.py:978",
+    "replay": "src/mission_control/application/programs/service.py:1183",
+    "regressions": "tests/unit/orchestration/test_stagegraph_completion_replay.py:49"
+  },
+  "operator_checkout": "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\run2-completion-offline",
+  "candidate_directory": "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\run2-completion-offline\\.scratch\\run2-completion-20261017\\continuation-v8\\recovery\\closure-host-r11",
+  "component_source_sha256": {
+    "pools.py": "05ed7a1b9705d6f4b0105e2dce3b4cf83f35c143d0a206809c20746d45db7241",
+    "readiness.py": "24edef55d7c9ba982634545d119166e22f5da068e065198723c6a6ccf2089738",
+    "readback.py": "2bdfdca26c7b26ca2717df10b406ab91c9b74158caddf996d1fa27f426de1dca",
+    "database_readiness.py": "d79ca68ae3c669decec6066ab1c7e8014542d9be9be9b4efe541e021702d982b",
+    "owned_host.py": "76d03aadd123a7490f2efcbfa4c46ebdf8b89f731e36ba4d3a50ee3993b8b80d",
+    "host_guard.py": "a850de62ddbf5d5fd1d45d9d4916b2c9f2be2ed56bf551ff6e9d5b32af099823",
+    "run_host.py": "a1b4f6832c0257b33ad7e61117670cd97c07a2eed881e4c4e6bba82901c07dd8",
+    "closure_guard.py": "03a7ad992741d4fa6ba2a4ce6178985d0fb474bd11ccd84359aaafea4414d67f",
+    "closure_runtime.py": "67938c0202a6a0646b4d887bbe3164753faaad61e6162b7b449cf31f8224bd6f",
+    "closure_activation.py": "ce3534f234c2a2049d0658ea87f6e8b6e321abcca8d0af44c0556c1ff720d874",
+    "closure_once.py": "29d242407835e30c9a2f2d0838f38fa9d3a5bc7ef84df9877daaff6912ecdc6a",
+    "closure_trust.py": "a00af1b3bfaf8c3ea022010fee0ef39f270b8dd8e616d639b06c4d4a78a41150",
+    "closure_host.py": "8da00c017d14ee205cb1b353a6864e6959d20b4b74991b3941da24f7e5236fe7",
+    "closure_qualification.py": "be164ebe82583ba62d021897b3888dcdd09abff1b2ff0fe89b4e1437ed4d8f95",
+    "closure_history_qualification.py": "923b3adf7767f9a909f1dfe2ce5cbd9aca5ff56e5fe935934993f2030e386175"
+  },
+  "source_manifest_sha256": "9b0b4b1617cec2b1c6739861658a310e4c12e6a8d9dbb705bd15fa6fdce75625",
+  "loaded_product_modules": 264,
+  "joined_proof": {
+    "file": "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\run2-completion-offline\\.scratch\\run2-completion-20261017\\continuation-v8\\recovery\\closure-host-r11\\owned-host-joinedproof11.json",
+    "sha256": "1737863d1522a105fed56aec5fa67eb416150043952f72c45e636f507758497c",
+    "utc": "2026-10-17T12:46:36.200092+00:00",
+    "disposition": "closure_memory_proof_passed",
+    "checks": [
+      "normal_commit_reply_loss_exact_receipt_and_afterimage_one_entry",
+      "second_sql_entry_refused",
+      "changed_commit_refused_before_entry",
+      "genuine_result_retained_identical_retry_exact_afterimage",
+      "changed_retry_request_refused",
+      "missing_afterimage_retry_refused",
+      "actual_sandbox_complete_chain_exact_command_guard",
+      "mixed_permitted_prefix_and_new_child_atomic_refusal",
+      "foreign_workflow_id_refused",
+      "foreign_run_id_refused",
+      "foreign_namespace_refused",
+      "foreign_task_queue_refused",
+      "duplicate_new_completion_refused",
+      "changed_type_refused",
+      "changed_queue_refused",
+      "changed_timeout_refused",
+      "changed_timestamp_refused",
+      "changed_new_update_refused",
+      "activation_time_shift_only_accepted",
+      "concrete_scoped_repository_afterimage_verifier_positive_fake_rows",
+      "concrete_verifier_receipt_mismatch_refused",
+      "concrete_verifier_head_mismatch_refused",
+      "concrete_verifier_journal_mismatch_refused",
+      "concrete_verifier_run_mismatch_refused",
+      "concrete_verifier_budget_mismatch_refused",
+      "concrete_verifier_effects_mismatch_refused",
+      "concrete_verifier_statuses_mismatch_refused",
+      "repeated_cancellation_mandatory_finite_readback_completed",
+      "actual_materializer_composition_insert_reply_loss_one_entry_and_replayed_result",
+      "changed_materializer_retry_refused_before_insert",
+      "runner_identity_initialization_sets_stop",
+      "runner_sandbox_initialization_sets_stop",
+      "actual_three_owned_readonly_pools_concrete_runtime_trust_freshness_join",
+      "actual_28_domain_snapshot_private_JSON_roundtrip_preserves_types_and_digest",
+      "actual_normal_commit_private_JSON_roundtrip_preserves_typed_evidence",
+      "expired_action_allows_only_readonly_inspection",
+      "concrete_28_domain_verifier_accepts_only_predicted_counterfactual_15_domain_delta",
+      "concrete_snapshot_extra_domain_refused",
+      "actual_server_family_unexpected_marker_refused",
+      "actual_server_root_unexpected_marker_refused",
+      "actual_retained_server_patch_markers_decoded_exactly",
+      "activation_default_off",
+      "activation_source_failure",
+      "activation_freshness_failure",
+      "activation_root_override_ambiguity",
+      "activation_normal_order_and_crossbuild_once",
+      "activation_repeated_cancel_joins_mandatory_readback",
+      "history_family_exact_server_shape",
+      "history_root_exact_server_shape",
+      "history_unexpected_timer",
+      "history_family_changed_sealed_payload",
+      "history_family_changed_genuine_completion",
+      "history_root_changed_sealed_payload",
+      "history_root_changed_genuine_completion",
+      "history_changed_patch_marker",
+      "history_changed_search_attribute_map",
+      "history_changed_original_child_identity"
+    ],
+    "guardian_seconds": 88.378,
+    "worker_seconds": 71.275,
+    "provider_calls": 0,
+    "SQL_writes": 0,
+    "real_Worker_starts": 0,
+    "Temporal_mutations": 0,
+    "snapshot_unchanged": true,
+    "pools_closed": true,
+    "child_reaped": true,
+    "forced_kill": false
+  },
+  "actual_observer": {
+    "file": "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\run2-completion-offline\\.scratch\\run2-completion-20261017\\continuation-v8\\recovery\\closure-host-r11\\owned-host-observer11.json",
+    "sha256": "f4841a6e1d7012c63d33eb2d6da068b5adea7889d7f482ac2146632195c98dba",
+    "utc": "2026-10-17T12:48:02.500895+00:00",
+    "guardian_seconds": 35.523,
+    "hard_seconds": 78,
+    "worker": {
+      "phase": "remaining_closure_held_no_SQL_change_verified",
+      "provider_calls": 0,
+      "automatic_retry": false,
+      "mode": "inspect",
+      "private_audit_root": "/home/overton/.local/state/mission-control/qualification/run2/recovery/remaining-closure-k4kqyz3x",
+      "credentials_saved": false,
+      "execution_authority_expired": true,
+      "inspection_reuses_pinned_contract_and_fresh_pool_principals": true,
+      "result_pool_readiness": {
+        "login": "mc_ai_engineer_runtime_login",
+        "capability": "mission_control_runtime",
+        "transaction_readonly": true,
+        "default_readonly": "on",
+        "required_grant_pairs_verified": 2
+      },
+      "snapshot": {
+        "digest": "sha256:e4cbbcc91db9dabeb976b40233bb519ee8f6e41a185606adf8bc30a44e4024d1",
+        "run_version": 8,
+        "phase": "cancelling"
+      },
+      "held_database_beforeimage_verified": true,
+      "histories": {
+        "family": {
+          "status": 1,
+          "events": 42,
+          "sha256": "195922596897a457f4f43797b6946b2a0634174660d6e981eeacc301a7c1fb87"
+        },
+        "root": {
+          "status": 1,
+          "events": 16,
+          "sha256": "eec4bcb070ea0c9f7af9cc88b0b52fa4c455a0e7816415194673f62123957bd6"
+        },
+        "foreign": {
+          "events": 2,
+          "sha256": "eaa90cf5f54c69daba7974e7598559c503d977a07925f8defac8711de7d3727e"
+        }
+      },
+      "routing": {
+        "current_version": "mission-control.0.1.0-a8d69c5b4850",
+        "current_version_changed_time": "2026-10-16T06:25:36.277805333Z",
+        "current_deployment_version": {
+          "build_id": "0.1.0-a8d69c5b4850",
+          "deployment_name": "mission-control"
+        },
+        "revision_number": "10"
+      },
+      "failed_operation_verified": true,
+      "temporal_observed": true,
+      "temporal_verified": true,
+      "owned_pools_closed": true
+    },
+    "child_reaped": true,
+    "forced_kill": false
+  },
+  "envelope_qualification": {
+    "file": "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\run2-completion-offline\\.scratch\\run2-completion-20261017\\continuation-v8\\recovery\\closure-host-r11\\owned-host-envelope11.json",
+    "sha256": "f5728adfe314595dfdce334ecb30a282838ba2f7af70b13b7b99ecb8af843bbe",
+    "guardian_seconds": 16.629,
+    "worker": {
+      "phase": "joined_activation_qualification_passed",
+      "owned_pools_closed": true,
+      "checks": [
+        "default_off",
+        "source_failure",
+        "freshness_failure",
+        "root_override_ambiguity",
+        "normal_order_and_crossbuild_once",
+        "repeated_cancel_joins_mandatory_readback"
+      ],
+      "check_count": 6,
+      "provider_calls": 0,
+      "network_calls": 0,
+      "real_worker_starts": 0,
+      "fixture_registry_removed": true,
+      "live_qualification": false,
+      "guardian_checks": [
+        "one_primary_then_independent_readonly_observer",
+        "primary_interrupt_still_inspects_after_reap"
+      ]
+    }
+  },
+  "counterfactual_normal_commit": {
+    "sha256": "sha256:80dde1918e9faa2a9833dd5a1c2617a096f9cc5115f13cdaa273ce870b643de3",
+    "expected_run_version": 8,
+    "resulting_run_version": 9,
+    "expected_family_version": 2,
+    "resulting_family_version": 3,
+    "phase": "terminal",
+    "outcome": "cancelled",
+    "budget_digest": "sha256:5865275458cf94f6373b7ff50f2bd3669944d12a5219c46837ba8f57b6b1ebae",
+    "effects_digest": "sha256:ee9a811087e6e2c60765df6d19b087de1aa5699403bc0a70301d42144d0cfd34",
+    "events": [
+      "workflow_run.terminalize",
+      "workflow_run.family_admission_committed"
+    ],
+    "ledger_entries": 0,
+    "effect_entries": 0,
+    "boundary_commands": 0,
+    "boundary_receipts": [
+      {
+        "schema_version": "belllabs.boundary-receipt.v1",
+        "command_id": "6a5398e3-2a73-4351-a354-a24a9a4ddc4b",
+        "idempotency_issuer": "[\"mc.command.v1\",\"service:run2-s0-launcher\",\"cancel\"]",
+        "run_id": "60f44a50-c0e4-5edb-ac13-0fb0436aaedb",
+        "request_scope": "mc/01a103c0-9a9e-70f3-9398-eb1573a98324/ai-engineer/00000000-0000-7000-8000-000000000001",
+        "ordinal": 1,
+        "state": "applied",
+        "recorded_by": "run_control",
+        "rejection_reason": null,
+        "detail": "terminal outcome cancelled",
+        "transport_ref": null,
+        "applied_run_version": 9,
+        "boundary_state": {},
+        "recorded_at": "2026-10-16T08:25:26.842252Z"
+      }
+    ],
+    "receipt_digest": "sha256:3eb5bd70d3538a702ce32f88bee615d57cfef9ceda256897d65d42493fd88fc4",
+    "live_commit_pin": false,
+    "timestamp_scope": "retained-history hypothesis; live activation timestamp must be exact actual SDK clock"
+  },
+  "counterfactual_typed_result": {
+    "sha256": "sha256:f2a1ec6b8887ff74df0b6b38b4c5b887ad316ca789b9752efa3e5c184d4eb1ee",
+    "outcome": "cancelled",
+    "artifact_count": 0,
+    "evidence_count": 0,
+    "completed_at": "2026-10-16T08:25:28.842252+00:00",
+    "identical_memory_replays": 2,
+    "row_count": 1,
+    "live_record": false
+  },
+  "database_readiness": {
+    "disposition": "readonly_catalog_readiness_verified",
+    "runtime": {
+      "login": "mc_ai_engineer_runtime_login",
+      "capability": "mission_control_runtime",
+      "transaction_readonly": true,
+      "default_readonly": "on",
+      "required_grant_pairs_verified": 6
+    },
+    "family": {
+      "login": "mc_ai_engineer_family_login",
+      "capability": "mission_control_family_writer",
+      "transaction_readonly": true,
+      "default_readonly": "on",
+      "required_grant_pairs_verified": 25
+    },
+    "component_version": "1.4.2",
+    "schema_fingerprint": "sha256:1d6dcd1a96b44b7c3635ffd34cec7703703160b04bf52c24643157c72a472cc3",
+    "identity_verified": true,
+    "migration_count": 37,
+    "attestation_verified": true,
+    "actual_DML_calls": 0,
+    "future_SQL_CAS_acceptance_proven": false,
+    "source_sha256": {
+      "deployments/ai-engineer/target.toml": "686a54ffcfda697675a914d4119376a0b7126d1b5eab2f2000a56fcb24c6d984",
+      "deployments/ai-engineer/release.lock.json": "df0d714edc297917875552c81455dfbdcbcb9bddd06d5b1aa736d1327e3f9409",
+      "packages/mission-control-db-contract/releases/1.4.2/component/manifest.json": "4953934315aad0804d74d0ace4277b9b43f211adcd265810126ab02f0083d892",
+      "packages/mission-control-db-contract/src/mission_control_db_contract/deployment.py": "04e3982b4585b8c668e5c2710ade96d2df07e8cf05eca7138497a5ecd298872f",
+      "packages/mission-control-db-contract/src/mission_control_db_contract/integrity.py": "307a40763f883578416633d4971e18be4d94294959d8c9cb79dc4f49a6841d61"
+    }
+  },
+  "result_pool_readiness": {
+    "login": "mc_ai_engineer_runtime_login",
+    "capability": "mission_control_runtime",
+    "transaction_readonly": true,
+    "default_readonly": "on",
+    "required_grant_pairs_verified": 3
+  },
+  "registry_runtime_read": {
+    "utc": "2026-10-17T12:49:00.612136+00:00",
+    "root_header_pin_verified": true,
+    "phase_one_consumed_verified": true,
+    "remaining_intent_present": false,
+    "intent_claims": 0,
+    "writes": 0,
+    "network_calls": 0,
+    "runtime_packages": {
+      "temporalio": {
+        "version": "1.34.0",
+        "source_sha256": {
+          "temporalio/bridge/temporal_sdk_bridge.abi3.so": "84e248718424fc7ab828d958d9de1449b5b8bc5c56727b472d3f198189872995",
+          "temporalio/client/_activity.py": "e235407ce06598c471b7c5e881e562f005c3a9d49e6770ee75319d9f5573401d",
+          "temporalio/contrib/aws/lambda_worker/_run_worker.py": "02703a2c64186068eea017ba6c2c04b240649aa588ddf52911b97d2d0d2b13d3",
+          "temporalio/contrib/deepagents/_activity.py": "fbdf34f34af7e48120b34c9aa7a1ab015821f9a4b836e6057167a595820f214c",
+          "temporalio/contrib/google_genai/_gemini_activity.py": "1259df4a16e644d08ebc4a62e3009f450239beaceb727c023d20162159e1308b",
+          "temporalio/contrib/langgraph/_activity.py": "31c8f12f95264c514763d9c061c614d66de4bfbdeea4a097822c0511f98e5285",
+          "temporalio/contrib/openai_agents/_invoke_model_activity.py": "ef8087277a5dbab13af883484591aec76a38e69fe24b8a95777d2a48e86b0a0b",
+          "temporalio/contrib/strands/_model_activity.py": "943b4dc12186b12904e8ac8dbbc6eb555a9fd10ef8d1de8364a40e9dbd8abb02",
+          "temporalio/contrib/strands/_sandbox_activity.py": "fec4b60e02188ae319c6ba5a4ce78ca78ec8afa6333e31d006c5b2f990498af4",
+          "temporalio/converter/_serialization_context.py": "aba3e38a8796ee8e8ae2bef8f43bfaa26721fbb14b28c686d18b764021d5867a",
+          "temporalio/nexus/_operation_context.py": "0793bc892126706fb7e4a49cacb94e2b4a4b0ba90bcd83886a70002df37608db",
+          "temporalio/testing/_activity.py": "6e2e2b3bb093d2621419ba74fa68bbbbb1ee14f615ec5eb6db8f01061b48ac58",
+          "temporalio/worker/_activity.py": "1f13fefa69491b22739f376f9072f018e9defe0625ab762f5bb9a5c05ce10b54",
+          "temporalio/worker/_worker.py": "8322aaed350a9c8d25f264455d32ae66aa83cb73934be8cd63d6e93368efde04",
+          "temporalio/worker/_workflow_instance.py": "8a8129d0ac6488a7d06f0acc7fbb380b5286eb009553452856a69e977e55e295",
+          "temporalio/workflow/_context.py": "bd04f2f2c568d5f9716ce85dc1f547625ea64048d29ec0e8bb15d93caa71b8c5"
+        }
+      },
+      "asyncpg": {
+        "version": "0.31.0",
+        "source_sha256": {
+          "asyncpg/connection.py": "e9abd5c153bc70cfadb61215f11140e90741c2fed5929e574b6548ef8092b48c",
+          "asyncpg/pgproto/pgproto.cpython-312-x86_64-linux-gnu.so": "353751076da78ab26e9f38742f14e2968d2db784f02019fa3ae295dde0ef8647",
+          "asyncpg/pool.py": "abc7101d29db47ff31fbefa2b23aa4fe8fc59924bd2c80ae3622a42024af84cf",
+          "asyncpg/protocol/protocol.cpython-312-x86_64-linux-gnu.so": "a1e70b6e2a2d5b36a3d66a4bd26f1894e81be67f48fc9a6ad24c5cb45e9e94df",
+          "asyncpg/protocol/record.cpython-312-x86_64-linux-gnu.so": "9a32bb134e4117d75b1017652c0223ad0bef587def1c1f9f00d9b684e24816eb"
+        }
+      },
+      "pydantic": {
+        "version": "2.13.4",
+        "source_sha256": {}
+      },
+      "pydantic-core": {
+        "version": "2.46.4",
+        "source_sha256": {
+          "pydantic_core/_pydantic_core.cpython-312-x86_64-linux-gnu.so": "7b3b21e8e6fc722fa6913a893d1f82968542135b0119f83c7cede35fc71c4a2f"
+        }
+      }
+    }
+  },
+  "registry_runtime_receipt_sha256": "5fc18a4d9a766d3af8503cd3b6c1fa23279daa67d28233f2bf2f26d75d7214ef",
+  "proposal": {
+    "schema": "mc.run2.remaining-closure.proposal.v1",
+    "proposal_sha256": "ded2af8090e729139128390f0bfe40a0ea8dae3ee512437ff55f78010f1732a8",
+    "envelope_without_expiry_digest": "sha256:f82bf605e66a7d03bb0e3fa3b85d14365a7f0f7ae165fce216b8136bade5561a",
+    "approval_required": true,
+    "approved_action_exists": false,
+    "allowed_post_approval_refresh": {
+      "field": "phase_action.expires",
+      "maximum_seconds_ahead": 650,
+      "other_fields_change_allowed": false
+    },
+    "component_source_sha256": {
+      "pools.py": "05ed7a1b9705d6f4b0105e2dce3b4cf83f35c143d0a206809c20746d45db7241",
+      "readiness.py": "24edef55d7c9ba982634545d119166e22f5da068e065198723c6a6ccf2089738",
+      "readback.py": "2bdfdca26c7b26ca2717df10b406ab91c9b74158caddf996d1fa27f426de1dca",
+      "database_readiness.py": "d79ca68ae3c669decec6066ab1c7e8014542d9be9be9b4efe541e021702d982b",
+      "owned_host.py": "76d03aadd123a7490f2efcbfa4c46ebdf8b89f731e36ba4d3a50ee3993b8b80d",
+      "host_guard.py": "a850de62ddbf5d5fd1d45d9d4916b2c9f2be2ed56bf551ff6e9d5b32af099823",
+      "run_host.py": "a1b4f6832c0257b33ad7e61117670cd97c07a2eed881e4c4e6bba82901c07dd8",
+      "closure_guard.py": "03a7ad992741d4fa6ba2a4ce6178985d0fb474bd11ccd84359aaafea4414d67f",
+      "closure_runtime.py": "67938c0202a6a0646b4d887bbe3164753faaad61e6162b7b449cf31f8224bd6f",
+      "closure_activation.py": "ce3534f234c2a2049d0658ea87f6e8b6e321abcca8d0af44c0556c1ff720d874",
+      "closure_once.py": "29d242407835e30c9a2f2d0838f38fa9d3a5bc7ef84df9877daaff6912ecdc6a",
+      "closure_trust.py": "a00af1b3bfaf8c3ea022010fee0ef39f270b8dd8e616d639b06c4d4a78a41150",
+      "closure_host.py": "8da00c017d14ee205cb1b353a6864e6959d20b4b74991b3941da24f7e5236fe7",
+      "closure_qualification.py": "be164ebe82583ba62d021897b3888dcdd09abff1b2ff0fe89b4e1437ed4d8f95",
+      "closure_history_qualification.py": "923b3adf7767f9a909f1dfe2ce5cbd9aca5ff56e5fe935934993f2030e386175"
+    },
+    "execution_host": {
+      "application_interpreter": "/home/overton/.venvs/mc-run2-s0-a8d69c5b4850/bin/python",
+      "application_binary_sha256": "ccc93c55c24bb92866cc2f9eff61b124abf5d1ee6c8da0ef9b5eed4d78a21f07",
+      "guardian_interpreter": "/usr/bin/python3.10",
+      "guardian_binary_sha256": "a2f33a6e006989270f4340528eb61f8f97366e00a5d1b602ac8672ea44fc56ae",
+      "hard_seconds": 340,
+      "uid": 1000
+    },
+    "phase_action": {
+      "build": "run2-remaining-closure-d106d0c7-v11",
+      "expires": 1792242035.1524518,
+      "active_seconds": 240,
+      "readback_seconds": 70,
+      "pool_close_seconds": 8,
+      "hard_seconds": 340,
+      "registry_root": "/home/overton/.local/state/mission-control/qualification/run2/recovery/registry",
+      "registry_pin": "0387e921e61b2f54e68107784f0df87016285396883649205d81e8feee4798a6",
+      "source_manifest_digest": "sha256:00e4538e3e81adf7dd66372a2240423ae5a13d1e42deb70624c7030164788276"
+    },
+    "supporting_evidence": {
+      "owned-host-joinedproof11.json": "1737863d1522a105fed56aec5fa67eb416150043952f72c45e636f507758497c",
+      "owned-host-observer11.json": "f4841a6e1d7012c63d33eb2d6da068b5adea7889d7f482ac2146632195c98dba",
+      "owned-host-envelope11.json": "f5728adfe314595dfdce334ecb30a282838ba2f7af70b13b7b99ecb8af843bbe",
+      "source-manifest.json": "9b0b4b1617cec2b1c6739861658a310e4c12e6a8d9dbb705bd15fa6fdce75625"
+    },
+    "registry_runtime_receipt_sha256": "5fc18a4d9a766d3af8503cd3b6c1fa23279daa67d28233f2bf2f26d75d7214ef",
+    "effects": {
+      "provider_admissions": 0,
+      "maximum_normal_terminal_SQL_entries": 1,
+      "maximum_typed_result_insert_entries": 1,
+      "global_current_or_ramp_changes": 0,
+      "ECS_service_changes": 0,
+      "new_cancel_commands": 0,
+      "R2A_replays": 0,
+      "R2B_phase_one_replays": 0
+    }
+  },
+  "independent_review": {
+    "model": "gpt-6.1-sol",
+    "reviewer": "managed_review",
+    "disposition": "preparation_ready_for_specific_owner_approval",
+    "remaining_P1_P2": 0,
+    "live_authority": false,
+    "proposal_sha256": "ded2af8090e729139128390f0bfe40a0ea8dae3ee512437ff55f78010f1732a8",
+    "envelope_without_expiry_digest": "sha256:f82bf605e66a7d03bb0e3fa3b85d14365a7f0f7ae165fce216b8136bade5561a",
+    "approved_action_absent": true,
+    "expiry_refresh_only_maximum_seconds": 650,
+    "limitations": [
+      "legacy phase-one transport schema label remains; enforced Action/intent/entrypoint targets are remaining closure only",
+      "actual SQL/CAS and live server closure are unproved until specific approval and execution"
+    ]
+  },
+  "focused_checks": [
+    {
+      "file": "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\completion-replay-evidence\\mypy-1792239545748617200.json",
+      "sha256": "5b8a467f7cb712b904659252a501120b3691dc83d22ab522eb06aca9ae6d53eb",
+      "mode": "mypy",
+      "exit_code": 0,
+      "elapsed_seconds": 26.265,
+      "sources": {
+        "src/mission_control/application/programs/service.py": "9ecba723a7a5276f306e90b50f05c414c25ab7c0db75a42318a1a6e4867297f9",
+        "tests/unit/orchestration/test_stagegraph_completion_replay.py": "1645a35ab0f27caedbf7569e87ac8c32d48758a680fb4b0b6d14bc98b23b8d74"
+      }
+    },
+    {
+      "file": "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\completion-replay-evidence\\pytest-1792239519359705700.json",
+      "sha256": "7dce5d4d874868f5c81c3d151e10455d84bf725564184625eb968705a98d4699",
+      "mode": "pytest",
+      "exit_code": 0,
+      "elapsed_seconds": 9.828,
+      "sources": {
+        "src/mission_control/application/programs/service.py": "9ecba723a7a5276f306e90b50f05c414c25ab7c0db75a42318a1a6e4867297f9",
+        "tests/unit/orchestration/test_stagegraph_completion_replay.py": "1645a35ab0f27caedbf7569e87ac8c32d48758a680fb4b0b6d14bc98b23b8d74"
+      }
+    },
+    {
+      "file": "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\completion-replay-evidence\\pytest-1792240612670821800.json",
+      "sha256": "54df98fac804a54f4dd95afe1deef334c0a0c647218775e14a49b7a003cb55ef",
+      "mode": "pytest",
+      "exit_code": 0,
+      "elapsed_seconds": 9.235,
+      "sources": {
+        "src/mission_control/application/programs/service.py": "d74061253677639bc5dcd7e293c5e7a8452bbacc4744f6771adf6b3f127d2adb",
+        "tests/unit/orchestration/test_stagegraph_completion_replay.py": "1d1f318a3abc7b4bbd36bf2ad317b558dfeceb1d7f40f120ec4218c86169ac25"
+      }
+    },
+    {
+      "file": "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\completion-replay-evidence\\ruff-1792239542469455100.json",
+      "sha256": "3d9bc9b979c20711e92f90e38802565b5a6b3433037ebdb29a39b46c79a1224d",
+      "mode": "ruff",
+      "exit_code": 0,
+      "elapsed_seconds": 0.219,
+      "sources": {
+        "src/mission_control/application/programs/service.py": "9ecba723a7a5276f306e90b50f05c414c25ab7c0db75a42318a1a6e4867297f9",
+        "tests/unit/orchestration/test_stagegraph_completion_replay.py": "1645a35ab0f27caedbf7569e87ac8c32d48758a680fb4b0b6d14bc98b23b8d74"
+      }
+    }
+  ],
+  "preservation": {
+    "original_worktrees": [
+      {
+        "path": "C:\\Users\\Pinda\\Proyectos\\BellLabs\\platform\\mission-control",
+        "head_unchanged": true,
+        "status_unchanged": true,
+        "dirty_hashes_unchanged": true
+      },
+      {
+        "path": "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\run2-completion-offline",
+        "head_unchanged": true,
+        "status_unchanged": true,
+        "dirty_hashes_unchanged": true
+      },
+      {
+        "path": "C:\\Users\\Pinda\\Proyectos\\BellLabs\\platform\\.worktrees\\run2-admission-failure",
+        "head_unchanged": true,
+        "status_unchanged": true,
+        "dirty_hashes_unchanged": true
+      },
+      {
+        "path": "C:\\Users\\Pinda\\Proyectos\\BellLabs\\platform\\.worktrees\\run2-claude-host-proof",
+        "head_unchanged": true,
+        "status_unchanged": true,
+        "dirty_hashes_unchanged": true
+      },
+      {
+        "path": "C:\\Users\\Pinda\\Proyectos\\BellLabs\\platform\\.worktrees\\run2-cli",
+        "head_unchanged": true,
+        "status_unchanged": true,
+        "dirty_hashes_unchanged": true
+      },
+      {
+        "path": "C:\\Users\\Pinda\\Proyectos\\BellLabs\\platform\\.worktrees\\run2-closed-workflow-recovery",
+        "head_unchanged": true,
+        "status_unchanged": true,
+        "dirty_hashes_unchanged": true
+      },
+      {
+        "path": "C:\\Users\\Pinda\\Proyectos\\BellLabs\\platform\\.worktrees\\run2-cursor",
+        "head_unchanged": true,
+        "status_unchanged": true,
+        "dirty_hashes_unchanged": true
+      },
+      {
+        "path": "C:\\Users\\Pinda\\Proyectos\\BellLabs\\platform\\.worktrees\\run2-cursor-c9",
+        "head_unchanged": true,
+        "status_unchanged": true,
+        "dirty_hashes_unchanged": true
+      },
+      {
+        "path": "C:\\Users\\Pinda\\Proyectos\\BellLabs\\platform\\.worktrees\\run2-events",
+        "head_unchanged": true,
+        "status_unchanged": true,
+        "dirty_hashes_unchanged": true
+      },
+      {
+        "path": "C:\\Users\\Pinda\\Proyectos\\BellLabs\\platform\\.worktrees\\run2-human-control-budget",
+        "head_unchanged": true,
+        "status_unchanged": true,
+        "dirty_hashes_unchanged": true
+      }
+    ],
+    "original_all_preserved": true,
+    "baseline_limit": "Known dirty hashes are checked. CLI baseline collapsed five untracked directories without child-byte hashes; status is compared at that original directory granularity, not claimed as a complete byte inventory.",
+    "main_head": "d106d0c7191d25cda618ebd25fcebfff25aa1120",
+    "main_clean": true,
+    "main_changed_paths_since_baseline": [
+      "src/mission_control/application/programs/service.py",
+      "tests/unit/orchestration/test_stagegraph_completion_replay.py"
+    ],
+    "main_tree": "5b5bd15fbf36389b31e8c935806ee919ca9a8dc8",
+    "push": false
+  },
+  "retained_nonpassing_proofs": [
+    {
+      "candidate": "closure-host-r8",
+      "file": "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\run2-completion-offline\\.scratch\\run2-completion-20261017\\continuation-v8\\recovery\\closure-host-r8\\owned-host-joinedproof8.json",
+      "sha256": "b57b9656793866ecf17618f59131be036a6b8e3c1932045097b1941fa4f81ab9",
+      "failure_type": "RuntimeError",
+      "writes": 0,
+      "automatic_retry": false
+    },
+    {
+      "candidate": "closure-host-r9",
+      "file": "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\run2-completion-offline\\.scratch\\run2-completion-20261017\\continuation-v8\\recovery\\closure-host-r9\\owned-host-joinedproof9.json",
+      "sha256": "365fc1a15adbf1239042eb881e7e812f4f31475ee5e8457fd3e4817877bc7d14",
+      "failure_type": "NameError",
+      "writes": 0,
+      "automatic_retry": false
+    },
+    {
+      "candidate": "closure-host-r10",
+      "file": "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\run2-completion-offline\\.scratch\\run2-completion-20261017\\continuation-v8\\recovery\\closure-host-r10\\owned-host-joinedproof10.json",
+      "sha256": "166c65145cf6cce81012946e429c47c163e1fb0c39b9814f49c85793ed63eb0c",
+      "failure_type": "AttributeError",
+      "writes": 0,
+      "automatic_retry": false
+    }
+  ],
+  "authority": {
+    "live_closure": "HELD_SPECIFIC_APPROVAL_REQUIRED",
+    "approved_action_exists": false,
+    "paid_model_calls": 0,
+    "R2A_rerun": false,
+    "R2B_phase_one_rerun": false,
+    "push": false
+  },
+  "claude_weekly_reset_candidate": {
+    "source_url": "https://support.claude.com/en/articles/17007452-what-is-a-limit-reset",
+    "origin": "parent report",
+    "eligibility_verified": false,
+    "expiry_verified": false,
+    "account_checked": false,
+    "consumed": false,
+    "separate_specific_approval_required_to_consume": true
+  }
+}

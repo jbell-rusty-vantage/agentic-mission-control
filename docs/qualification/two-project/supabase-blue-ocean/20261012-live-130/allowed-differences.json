@@ -1,0 +1,30 @@
+{
+  "format": "mission-control-allowed-differences/v1",
+  "allowed": [
+    {
+      "path": "storage_buckets/capability-bundles",
+      "change": "added",
+      "reason": "seed mc.storage.capability-bundles@1.0.0 (owner-approved 2026-10-12): private capability-bundles bucket and its four storage.objects policies"
+    },
+    {
+      "path": "storage_buckets",
+      "change": "removed",
+      "reason": "seed mc.storage.capability-bundles@1.0.0 (owner-approved 2026-10-12): private capability-bundles bucket and its four storage.objects policies (first bucket recorded; the empty marker is replaced)"
+    },
+    {
+      "path": "schemas/storage/relations/buckets*",
+      "change": "changed",
+      "reason": "seed mc.storage.capability-bundles@1.0.0 (owner-approved 2026-10-12): private capability-bundles bucket and its four storage.objects policies (one buckets row added)"
+    },
+    {
+      "path": "schemas/storage/structure/policies",
+      "change": "changed",
+      "reason": "seed mc.storage.capability-bundles@1.0.0 (owner-approved 2026-10-12): private capability-bundles bucket and its four storage.objects policies"
+    },
+    {
+      "path": "schemas/storage/structure_digest",
+      "change": "changed",
+      "reason": "seed mc.storage.capability-bundles@1.0.0 (owner-approved 2026-10-12): private capability-bundles bucket and its four storage.objects policies"
+    }
+  ]
+}

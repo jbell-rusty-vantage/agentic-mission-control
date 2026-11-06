@@ -1,0 +1,26 @@
+{
+  "name": "mc:envkit.mission-control-dev@1",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "user": "ubuntu",
+  "install": ".cursor/scripts/cloud-install.sh",
+  "start": ".cursor/scripts/cloud-start.sh",
+  "terminals": [
+    {
+      "name": "infra",
+      "command": ".cursor/scripts/cloud-infra.sh",
+      "description": "Starts the Docker Compose stack (application PostgreSQL with pgvector, Redis, Temporal, Temporal UI) in the background. Run `make wait` before integration or acceptance tests that need real PostgreSQL or Temporal."
+    }
+  ],
+  "ports": [
+    {
+      "name": "Mission Control API",
+      "port": 8000
+    },
+    {
+      "name": "Temporal UI",
+      "port": 8080
+    }
+  ]
+}

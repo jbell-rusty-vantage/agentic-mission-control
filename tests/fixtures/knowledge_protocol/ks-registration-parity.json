@@ -1,0 +1,708 @@
+{
+ "provenance": {
+  "generator": "scripts/ks_registration_parity.mjs",
+  "ksCommit": "c061e000b887591e3a40c6f2bd1db624ef4db833",
+  "command": "node scripts/ks_registration_parity.mjs <knowledge-services checkout> tests/fixtures/knowledge_protocol/ks-registration-parity.json"
+ },
+ "tenant": "7f3e2d1c-0b9a-4876-9543-210fedcba987",
+ "binding": "aiengineer-postgres",
+ "producer": {
+  "kind": "mission_invocation",
+  "installationId": "0b6a2c1e-4d3f-4a5b-8c7d-112233445566",
+  "applicationId": "ai-engineer",
+  "tenantId": "7f3e2d1c-0b9a-4876-9543-210fedcba987",
+  "issuer": "mission-control.ai-engineer",
+  "subject": "mission-control-runtime",
+  "mission": {
+   "missionId": "run-parity",
+   "runId": "run-parity",
+   "activationId": "6f1d3c2a-8b4e-5d7f-9a1b-2c3d4e5f6a7b",
+   "operationId": "stage/draft",
+   "operationAttempt": 1,
+   "executionGeneration": 1,
+   "lane": "deep_agents"
+  },
+  "recoveryAuthorityRef": null,
+  "invocationId": "inv-parity",
+  "authenticatedAt": "2026-10-28T12:00:00Z"
+ },
+ "expected": {
+  "task": {
+   "schemaVersion": "research-core.task.v2",
+   "id": "task-parity",
+   "tenant": "7f3e2d1c-0b9a-4876-9543-210fedcba987",
+   "binding": "aiengineer-postgres",
+   "domain": "engineering",
+   "originalTask": {
+    "kind": "artifact",
+    "id": "w1-task-ai-engineer",
+    "version": "artifact.v1",
+    "digest": "sha256:f1cff7449ee0fb6989475e787aa57f6c8f23487400e983a09af3ba52a9c73586",
+    "tenant": "7f3e2d1c-0b9a-4876-9543-210fedcba987",
+    "binding": "aiengineer-postgres"
+   },
+   "use": "engineering_reference.model_facts",
+   "audience": "internal",
+   "obligations": [
+    {
+     "id": "finding.size",
+     "description": "State each size with its source.",
+     "weight": 10000,
+     "required": true
+    }
+   ],
+   "asOf": "2026-10-28T00:00:00Z",
+   "permittedMedia": [
+    "text_markdown"
+   ],
+   "rubric": {
+    "kind": "rubric",
+    "id": "rubric-engineering",
+    "version": "research-rubric.engineering.v2",
+    "digest": "sha256:60451572636635dcff94b38d8f292adbcbebb814e9098a5eb9a29d7390e18509",
+    "tenant": "7f3e2d1c-0b9a-4876-9543-210fedcba987",
+    "binding": "aiengineer-postgres"
+   },
+   "policy": {
+    "kind": "policy",
+    "id": "policy-ai-engineer",
+    "version": "research-policy.ai-engineer.v2",
+    "digest": "sha256:0b6261c32c29d7ff7b731c7e228392d4d4d1a53e3e115637f1d9c7aaa96474d6",
+    "tenant": "7f3e2d1c-0b9a-4876-9543-210fedcba987",
+    "binding": "aiengineer-postgres"
+   },
+   "minimumRisk": "medium",
+   "limits": {
+    "calls": 20,
+    "tokens": 300000,
+    "costUsd": "1",
+    "deadline": "2026-11-30T00:00:00Z"
+   }
+  },
+  "fragments": [
+   {
+    "schemaVersion": "research-core.fragment.v2",
+    "id": "frag-mistral-7b",
+    "tenant": "7f3e2d1c-0b9a-4876-9543-210fedcba987",
+    "binding": "aiengineer-postgres",
+    "sourceVersion": "mistral-7b@2026-10-28",
+    "capture": {
+     "kind": "artifact",
+     "id": "capture-mistral-7b",
+     "version": "artifact.v1",
+     "digest": "sha256:785f2c3f0506d0736203805db3b61536262d76edd171e67124810bc1248ad36f",
+     "tenant": "7f3e2d1c-0b9a-4876-9543-210fedcba987",
+     "binding": "aiengineer-postgres"
+    },
+    "representation": {
+     "kind": "artifact",
+     "id": "representation-mistral-7b",
+     "version": "artifact.v1",
+     "digest": "sha256:54dfa4c1e7664ca42f1c47f2942dbc5f7bddb339c77caba6b9e3701f67252b8b",
+     "tenant": "7f3e2d1c-0b9a-4876-9543-210fedcba987",
+     "binding": "aiengineer-postgres"
+    },
+    "selector": {
+     "kind": "text_quote",
+     "value": "We introduce Mistral 7B, a 7-billion-parameter language model engineered for superior performance and efficiency.",
+     "resolverVersion": "text-quote.v3",
+     "normalizationVersion": "text-norm.v1"
+    },
+    "selectedDigest": "sha256:915efc600acc5393a2f27d232b1cee7f03e7a0d2b4816eebe5277b018f31b8a0",
+    "selectedSize": 113,
+    "context": {
+     "header": "mistral-7b source",
+     "footnotes": [],
+     "surroundingDigest": null
+    },
+    "parserLineage": [
+     "frozen-quote.v1"
+    ],
+    "captureCompleteness": "complete",
+    "access": {
+     "rights": "public",
+     "limits": []
+    },
+    "originFamily": null
+   },
+   {
+    "schemaVersion": "research-core.fragment.v2",
+    "id": "frag-gemma-2-27b",
+    "tenant": "7f3e2d1c-0b9a-4876-9543-210fedcba987",
+    "binding": "aiengineer-postgres",
+    "sourceVersion": "gemma-2-27b@2026-10-28",
+    "capture": {
+     "kind": "artifact",
+     "id": "capture-gemma-2-27b",
+     "version": "artifact.v1",
+     "digest": "sha256:00269e887187b597dd8649a9ba39cf6269b23d441f2d7fc69396738e70eaad68",
+     "tenant": "7f3e2d1c-0b9a-4876-9543-210fedcba987",
+     "binding": "aiengineer-postgres"
+    },
+    "representation": {
+     "kind": "artifact",
+     "id": "representation-gemma-2-27b",
+     "version": "artifact.v1",
+     "digest": "sha256:1435cf68f90dfccab6e93fd41539f31f5222d219f4cf0a3d59448765133e221e",
+     "tenant": "7f3e2d1c-0b9a-4876-9543-210fedcba987",
+     "binding": "aiengineer-postgres"
+    },
+    "selector": {
+     "kind": "text_quote",
+     "value": "ranging in scale from 2 billion to 27 billion parameters — “lightweight”, state-of-the-art.",
+     "resolverVersion": "text-quote.v3",
+     "normalizationVersion": "text-norm.v1"
+    },
+    "selectedDigest": "sha256:b1018c84a655c255b46f36004b6c759874c6c9a02e64d743d841985b75dd97f4",
+    "selectedSize": 97,
+    "context": {
+     "header": "gemma-2-27b source",
+     "footnotes": [],
+     "surroundingDigest": null
+    },
+    "parserLineage": [
+     "frozen-quote.v1"
+    ],
+    "captureCompleteness": "complete",
+    "access": {
+     "rights": "public",
+     "limits": []
+    },
+    "originFamily": null
+   },
+   {
+    "schemaVersion": "research-core.fragment.v2",
+    "id": "frag-llama-3-1-card",
+    "tenant": "7f3e2d1c-0b9a-4876-9543-210fedcba987",
+    "binding": "aiengineer-postgres",
+    "sourceVersion": "llama-3-1-card@2026-10-28",
+    "capture": {
+     "kind": "artifact",
+     "id": "capture-llama-3-1-card",
+     "version": "artifact.v1",
+     "digest": "sha256:fbb47d8e61fd52683505e5da2bb7dd2767cc56d60fa6baa1c9aee92e2d22f4e7",
+     "tenant": "7f3e2d1c-0b9a-4876-9543-210fedcba987",
+     "binding": "aiengineer-postgres"
+    },
+    "representation": {
+     "kind": "artifact",
+     "id": "representation-llama-3-1-card",
+     "version": "artifact.v1",
+     "digest": "sha256:5bfe25d3e84a9f3c6133bece9106c54278f0593c95cb3a5201f36d99e196517e",
+     "tenant": "7f3e2d1c-0b9a-4876-9543-210fedcba987",
+     "binding": "aiengineer-postgres"
+    },
+    "selector": {
+     "kind": "page_region",
+     "value": "page 1, table 'Model Information', rows 1-3",
+     "resolverVersion": "page-region.v3",
+     "normalizationVersion": "text-norm.v1"
+    },
+    "selectedDigest": "sha256:a6361f5ac78473485f630e2bba60947c4c1708fe808af519cc0062e5478cadd0",
+    "selectedSize": 31,
+    "context": {
+     "header": "llama-3-1-card source",
+     "footnotes": [],
+     "surroundingDigest": null
+    },
+    "parserLineage": [
+     "frozen-quote.v1"
+    ],
+    "captureCompleteness": "complete",
+    "access": {
+     "rights": "public",
+     "limits": []
+    },
+    "originFamily": null
+   }
+  ],
+  "assertions": [
+   {
+    "schemaVersion": "research-core.assertion.v2",
+    "id": "asr-mistral-7b",
+    "tenant": "7f3e2d1c-0b9a-4876-9543-210fedcba987",
+    "binding": "aiengineer-postgres",
+    "logicalId": "mistral-7b-size",
+    "proposition": "Mistral 7B is a language model with 7 billion parameters.",
+    "kind": "source_report",
+    "value": {
+     "type": "quantity",
+     "amount": "7000000000",
+     "unit": "parameters"
+    },
+    "subject": "mistral-7b",
+    "object": null,
+    "qualifiers": {
+     "profile": "engineering.v2",
+     "entity": "mistral-7b",
+     "population": null,
+     "time": null,
+     "unit": "parameters",
+     "jurisdiction": null,
+     "baseline": null,
+     "negation": false,
+     "modality": "asserted",
+     "comparison": null,
+     "runtime": null,
+     "softwareVersion": null,
+     "configuration": null,
+     "benchmarkEnvironment": null,
+     "denominator": null,
+     "repositoryCommit": null
+    },
+    "riskReasons": [],
+    "producer": {
+     "kind": "mission_invocation",
+     "installationId": "0b6a2c1e-4d3f-4a5b-8c7d-112233445566",
+     "applicationId": "ai-engineer",
+     "tenantId": "7f3e2d1c-0b9a-4876-9543-210fedcba987",
+     "issuer": "mission-control.ai-engineer",
+     "subject": "mission-control-runtime",
+     "mission": {
+      "missionId": "run-parity",
+      "runId": "run-parity",
+      "activationId": "6f1d3c2a-8b4e-5d7f-9a1b-2c3d4e5f6a7b",
+      "operationId": "stage/draft",
+      "operationAttempt": 1,
+      "executionGeneration": 1,
+      "lane": "deep_agents"
+     },
+     "recoveryAuthorityRef": null,
+     "invocationId": "inv-parity",
+     "authenticatedAt": "2026-10-28T12:00:00Z"
+    },
+    "premises": []
+   },
+   {
+    "schemaVersion": "research-core.assertion.v2",
+    "id": "asr-gemma-2-27b",
+    "tenant": "7f3e2d1c-0b9a-4876-9543-210fedcba987",
+    "binding": "aiengineer-postgres",
+    "logicalId": "gemma-2-27b-size",
+    "proposition": "The largest Gemma 2 model has 27 billion parameters.",
+    "kind": "source_report",
+    "value": {
+     "type": "quantity",
+     "amount": "27000000000",
+     "unit": "parameters"
+    },
+    "subject": "gemma-2-27b",
+    "object": null,
+    "qualifiers": {
+     "profile": "engineering.v2",
+     "entity": "gemma-2-27b",
+     "population": null,
+     "time": null,
+     "unit": "parameters",
+     "jurisdiction": null,
+     "baseline": null,
+     "negation": false,
+     "modality": "asserted",
+     "comparison": null,
+     "runtime": null,
+     "softwareVersion": null,
+     "configuration": null,
+     "benchmarkEnvironment": null,
+     "denominator": null,
+     "repositoryCommit": null
+    },
+    "riskReasons": [],
+    "producer": {
+     "kind": "mission_invocation",
+     "installationId": "0b6a2c1e-4d3f-4a5b-8c7d-112233445566",
+     "applicationId": "ai-engineer",
+     "tenantId": "7f3e2d1c-0b9a-4876-9543-210fedcba987",
+     "issuer": "mission-control.ai-engineer",
+     "subject": "mission-control-runtime",
+     "mission": {
+      "missionId": "run-parity",
+      "runId": "run-parity",
+      "activationId": "6f1d3c2a-8b4e-5d7f-9a1b-2c3d4e5f6a7b",
+      "operationId": "stage/draft",
+      "operationAttempt": 1,
+      "executionGeneration": 1,
+      "lane": "deep_agents"
+     },
+     "recoveryAuthorityRef": null,
+     "invocationId": "inv-parity",
+     "authenticatedAt": "2026-10-28T12:00:00Z"
+    },
+    "premises": []
+   },
+   {
+    "schemaVersion": "research-core.assertion.v2",
+    "id": "asr-ratio",
+    "tenant": "7f3e2d1c-0b9a-4876-9543-210fedcba987",
+    "binding": "aiengineer-postgres",
+    "logicalId": "gemma-over-mistral",
+    "proposition": "The largest Gemma 2 model is larger than Mistral 7B.",
+    "kind": "derivation",
+    "value": {
+     "type": "none"
+    },
+    "subject": "gemma-2-27b",
+    "object": "mistral-7b",
+    "qualifiers": {
+     "profile": "engineering.v2",
+     "entity": "gemma-2-27b",
+     "population": null,
+     "time": null,
+     "unit": "parameters",
+     "jurisdiction": null,
+     "baseline": null,
+     "negation": false,
+     "modality": "asserted",
+     "comparison": null,
+     "runtime": null,
+     "softwareVersion": null,
+     "configuration": null,
+     "benchmarkEnvironment": null,
+     "denominator": null,
+     "repositoryCommit": null
+    },
+    "riskReasons": [],
+    "producer": {
+     "kind": "mission_invocation",
+     "installationId": "0b6a2c1e-4d3f-4a5b-8c7d-112233445566",
+     "applicationId": "ai-engineer",
+     "tenantId": "7f3e2d1c-0b9a-4876-9543-210fedcba987",
+     "issuer": "mission-control.ai-engineer",
+     "subject": "mission-control-runtime",
+     "mission": {
+      "missionId": "run-parity",
+      "runId": "run-parity",
+      "activationId": "6f1d3c2a-8b4e-5d7f-9a1b-2c3d4e5f6a7b",
+      "operationId": "stage/draft",
+      "operationAttempt": 1,
+      "executionGeneration": 1,
+      "lane": "deep_agents"
+     },
+     "recoveryAuthorityRef": null,
+     "invocationId": "inv-parity",
+     "authenticatedAt": "2026-10-28T12:00:00Z"
+    },
+    "premises": [
+     {
+      "kind": "assertion",
+      "id": "asr-mistral-7b",
+      "version": "research-core.assertion.v2",
+      "digest": "sha256:1dea7a9dff5193d43123f2c333912b5d9a4489cff9ed488ff32949dac579642c",
+      "tenant": "7f3e2d1c-0b9a-4876-9543-210fedcba987",
+      "binding": "aiengineer-postgres"
+     },
+     {
+      "kind": "assertion",
+      "id": "asr-gemma-2-27b",
+      "version": "research-core.assertion.v2",
+      "digest": "sha256:dad04d3a4f362beaf6f5e83dbc8a5e20c6abe0ba5195bc100b606f228e4008a1",
+      "tenant": "7f3e2d1c-0b9a-4876-9543-210fedcba987",
+      "binding": "aiengineer-postgres"
+     }
+    ]
+   }
+  ],
+  "supportSets": [
+   {
+    "schemaVersion": "research-core.support_set.v2",
+    "id": "ss-mistral-7b",
+    "tenant": "7f3e2d1c-0b9a-4876-9543-210fedcba987",
+    "binding": "aiengineer-postgres",
+    "assertion": {
+     "kind": "assertion",
+     "id": "asr-mistral-7b",
+     "version": "research-core.assertion.v2",
+     "digest": "sha256:1dea7a9dff5193d43123f2c333912b5d9a4489cff9ed488ff32949dac579642c",
+     "tenant": "7f3e2d1c-0b9a-4876-9543-210fedcba987",
+     "binding": "aiengineer-postgres"
+    },
+    "qualifiersDigest": "sha256:c30b56a031585b26e6dd543ab07ecd2c9202419a2413daef6d4c741130760fa8",
+    "provenance": "declared_citation",
+    "required": [
+     {
+      "premise": "size",
+      "evidence": [
+       {
+        "kind": "fragment",
+        "id": "frag-mistral-7b",
+        "version": "research-core.fragment.v2",
+        "digest": "sha256:7dbe60b890692a720b6f5c69c0f6088797ece97aae58701dcb3dba6ab55c21a2",
+        "tenant": "7f3e2d1c-0b9a-4876-9543-210fedcba987",
+        "binding": "aiengineer-postgres"
+       }
+      ],
+      "derivedFrom": []
+     }
+    ],
+    "contrary": []
+   },
+   {
+    "schemaVersion": "research-core.support_set.v2",
+    "id": "ss-ratio",
+    "tenant": "7f3e2d1c-0b9a-4876-9543-210fedcba987",
+    "binding": "aiengineer-postgres",
+    "assertion": {
+     "kind": "assertion",
+     "id": "asr-ratio",
+     "version": "research-core.assertion.v2",
+     "digest": "sha256:2fdc1d0516dd02cbd59c76bdc993697c37314e575a0f7a02d10c38ae3e20a67b",
+     "tenant": "7f3e2d1c-0b9a-4876-9543-210fedcba987",
+     "binding": "aiengineer-postgres"
+    },
+    "qualifiersDigest": "sha256:9323e2214e5d91439dc984c1225afe738afda4a6b09d75fcefaff2808b1f5ae3",
+    "provenance": "declared_citation",
+    "required": [
+     {
+      "premise": "sizes",
+      "evidence": [
+       {
+        "kind": "fragment",
+        "id": "frag-gemma-2-27b",
+        "version": "research-core.fragment.v2",
+        "digest": "sha256:20b7955e744fd96719b315e2ab6b08f4357a9dcb6728656d627eb3aaf1b59fd1",
+        "tenant": "7f3e2d1c-0b9a-4876-9543-210fedcba987",
+        "binding": "aiengineer-postgres"
+       }
+      ],
+      "derivedFrom": [
+       {
+        "kind": "assertion",
+        "id": "asr-mistral-7b",
+        "version": "research-core.assertion.v2",
+        "digest": "sha256:1dea7a9dff5193d43123f2c333912b5d9a4489cff9ed488ff32949dac579642c",
+        "tenant": "7f3e2d1c-0b9a-4876-9543-210fedcba987",
+        "binding": "aiengineer-postgres"
+       },
+       {
+        "kind": "assertion",
+        "id": "asr-gemma-2-27b",
+        "version": "research-core.assertion.v2",
+        "digest": "sha256:dad04d3a4f362beaf6f5e83dbc8a5e20c6abe0ba5195bc100b606f228e4008a1",
+        "tenant": "7f3e2d1c-0b9a-4876-9543-210fedcba987",
+        "binding": "aiengineer-postgres"
+       }
+      ]
+     }
+    ],
+    "contrary": []
+   },
+   {
+    "schemaVersion": "research-core.support_set.v2",
+    "id": "ss-earlier-llama",
+    "tenant": "7f3e2d1c-0b9a-4876-9543-210fedcba987",
+    "binding": "aiengineer-postgres",
+    "assertion": {
+     "kind": "assertion",
+     "id": "asr-earlier-llama",
+     "version": "research-core.assertion.v2",
+     "digest": "sha256:095d8bddc35702d3f91ed4a7a79d93b385761e3f8791e133fe445f296d079431",
+     "tenant": "7f3e2d1c-0b9a-4876-9543-210fedcba987",
+     "binding": "aiengineer-postgres"
+    },
+    "qualifiersDigest": "sha256:2ce31bbb40a004fd2d8679b27872e2e541fd8633db35ddee4c5da259d30df16c",
+    "provenance": "replacement_search",
+    "required": [
+     {
+      "premise": "card",
+      "evidence": [
+       {
+        "kind": "fragment",
+        "id": "frag-llama-3-1-card",
+        "version": "research-core.fragment.v2",
+        "digest": "sha256:e46a423244a96a9712a94c9b5e2af599f29c29eeed58a913a4e6dcbba3528642",
+        "tenant": "7f3e2d1c-0b9a-4876-9543-210fedcba987",
+        "binding": "aiengineer-postgres"
+       }
+      ],
+      "derivedFrom": []
+     }
+    ],
+    "contrary": [
+     {
+      "kind": "fragment",
+      "id": "frag-mistral-7b",
+      "version": "research-core.fragment.v2",
+      "digest": "sha256:7dbe60b890692a720b6f5c69c0f6088797ece97aae58701dcb3dba6ab55c21a2",
+      "tenant": "7f3e2d1c-0b9a-4876-9543-210fedcba987",
+      "binding": "aiengineer-postgres"
+     }
+    ]
+   }
+  ],
+  "report": {
+   "reportId": "report-parity",
+   "revision": 1,
+   "kind": "evidence_report",
+   "structuredBody": {
+    "schemaVersion": "research-core.structured_body.v2",
+    "sections": [
+     {
+      "id": "findings",
+      "heading": [
+       {
+        "type": "text",
+        "text": "Findings"
+       }
+      ],
+      "headingExcludedReason": null,
+      "blocks": [
+       {
+        "type": "paragraph",
+        "id": "p1",
+        "inlines": [
+         {
+          "type": "claim",
+          "occurrenceId": "occ-asr-mistral-7b",
+          "assertion": {
+           "kind": "assertion",
+           "id": "asr-mistral-7b",
+           "version": "research-core.assertion.v2",
+           "digest": "sha256:1dea7a9dff5193d43123f2c333912b5d9a4489cff9ed488ff32949dac579642c",
+           "tenant": "7f3e2d1c-0b9a-4876-9543-210fedcba987",
+           "binding": "aiengineer-postgres"
+          },
+          "text": "Mistral 7B has 7 billion parameters",
+          "obligations": [
+           "finding.size"
+          ],
+          "attribution": null
+         },
+         {
+          "type": "citation",
+          "label": "c1",
+          "fragment": {
+           "kind": "fragment",
+           "id": "frag-mistral-7b",
+           "version": "research-core.fragment.v2",
+           "digest": "sha256:7dbe60b890692a720b6f5c69c0f6088797ece97aae58701dcb3dba6ab55c21a2",
+           "tenant": "7f3e2d1c-0b9a-4876-9543-210fedcba987",
+           "binding": "aiengineer-postgres"
+          }
+         }
+        ],
+        "excludedReason": null
+       },
+       {
+        "type": "list",
+        "id": "l1",
+        "ordered": false,
+        "items": [
+         [
+          {
+           "type": "claim",
+           "occurrenceId": "occ-asr-ratio",
+           "assertion": {
+            "kind": "assertion",
+            "id": "asr-ratio",
+            "version": "research-core.assertion.v2",
+            "digest": "sha256:2fdc1d0516dd02cbd59c76bdc993697c37314e575a0f7a02d10c38ae3e20a67b",
+            "tenant": "7f3e2d1c-0b9a-4876-9543-210fedcba987",
+            "binding": "aiengineer-postgres"
+           },
+           "text": "Gemma 2 27B is larger",
+           "obligations": [
+            "finding.size"
+           ],
+           "attribution": null
+          },
+          {
+           "type": "citation",
+           "label": "c2",
+           "fragment": {
+            "kind": "fragment",
+            "id": "frag-gemma-2-27b",
+            "version": "research-core.fragment.v2",
+            "digest": "sha256:20b7955e744fd96719b315e2ab6b08f4357a9dcb6728656d627eb3aaf1b59fd1",
+            "tenant": "7f3e2d1c-0b9a-4876-9543-210fedcba987",
+            "binding": "aiengineer-postgres"
+           }
+          }
+         ]
+        ],
+        "excludedReason": null
+       },
+       {
+        "type": "table",
+        "id": "t1",
+        "header": [
+         [
+          {
+           "type": "text",
+           "text": "Model"
+          }
+         ],
+         [
+          {
+           "type": "text",
+           "text": "Size"
+          }
+         ]
+        ],
+        "rows": [
+         [
+          [
+           {
+            "type": "text",
+            "text": "Gemma 2"
+           }
+          ],
+          [
+           {
+            "type": "claim",
+            "occurrenceId": "occ-asr-gemma-2-27b",
+            "assertion": {
+             "kind": "assertion",
+             "id": "asr-gemma-2-27b",
+             "version": "research-core.assertion.v2",
+             "digest": "sha256:dad04d3a4f362beaf6f5e83dbc8a5e20c6abe0ba5195bc100b606f228e4008a1",
+             "tenant": "7f3e2d1c-0b9a-4876-9543-210fedcba987",
+             "binding": "aiengineer-postgres"
+            },
+            "text": "27 billion",
+            "obligations": [
+             "finding.size"
+            ],
+            "attribution": null
+           },
+           {
+            "type": "citation",
+            "label": "c3",
+            "fragment": {
+             "kind": "fragment",
+             "id": "frag-gemma-2-27b",
+             "version": "research-core.fragment.v2",
+             "digest": "sha256:20b7955e744fd96719b315e2ab6b08f4357a9dcb6728656d627eb3aaf1b59fd1",
+             "tenant": "7f3e2d1c-0b9a-4876-9543-210fedcba987",
+             "binding": "aiengineer-postgres"
+            }
+           }
+          ]
+         ]
+        ],
+        "caption": [
+         {
+          "type": "text",
+          "text": "Sizes "
+         },
+         {
+          "type": "citation",
+          "label": "c4",
+          "fragment": {
+           "kind": "fragment",
+           "id": "frag-llama-3-1-card",
+           "version": "research-core.fragment.v2",
+           "digest": "sha256:e46a423244a96a9712a94c9b5e2af599f29c29eeed58a913a4e6dcbba3528642",
+           "tenant": "7f3e2d1c-0b9a-4876-9543-210fedcba987",
+           "binding": "aiengineer-postgres"
+          }
+         }
+        ],
+        "excludedReason": null,
+        "headerExcludedReason": null
+       }
+      ]
+     }
+    ]
+   }
+  }
+ }
+}

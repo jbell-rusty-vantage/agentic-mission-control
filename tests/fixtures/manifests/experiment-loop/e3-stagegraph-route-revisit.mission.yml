@@ -1,0 +1,214 @@
+# yaml-language-server: $schema=../../../../src/mission_control/contracts/schemas/mc.mission_manifest.v1.json
+# Experiment loop E3 (EXPERIMENT-LOOP-2026-11 section 3, OVE-169): Stage Graph route + revisit.
+#
+# collect -> check (typed route facts) -> route -> outline -> bounded Revisit Region
+# (draft <-> critique) -> write. Derived from sprint-oc-w2/graph.routes-first-match and
+# graph.revisit-refine.
+#
+#   check     submits schema.w2-triage-verdict@1; the host reads `source_count` and `severity`
+#             from the accepted, schema-validated bytes (never prose).
+#   route     check_route (first_match): `refine` when check.source_count >= 2 -> outline;
+#             else -> skip. With the two frozen sources the `refine` branch is expected.
+#             A region stage may not be a route target (compile rule, manifest.py:2012), so the
+#             route releases `outline` and the region entry binds `outline.plan`; on the else
+#             branch outline, draft and critique are skipped visibly.
+#   region    refine = draft (entry) -> critique (exit), max_visits 3, stops when
+#             critique.approved == true, no_progress on critique.score over 2 visits, carries
+#             the prior visit's verdict into the next draft.
+#   critique  approves only a draft ending with a "Limitation:" sentence; the first-visit draft
+#             instruction omits it, so a cooperative model needs exactly 2 visits.
+#   write     releases on the `final` any-group over [critique, skip]: the selected branch is
+#             its exact input, the skipped one a visible release omission.
+#
+# Schemas ship in seed mc.catalog.artifact-schemas@1.0.1 (W2 graph schemas). Structured goals use
+# `schema` acceptance (evaluated by the stage validator); text goals use `human: review_accept`,
+# owned by the final `review` human_gate (the only qualified human evaluator in a Stage Graph).
+# Overlay: interrupt_and_inject mid-`check`.
+manifest: mission/v1
+mission:
+  key: e3-stagegraph-route-revisit
+  title: E3 typed route into a bounded revisit region (frozen evidence)
+  application: ai-engineer
+  description: >
+    Experiment loop E3. Typed route facts select a bounded draft/critique revisit region; the
+    writer reads exactly the final visit's outputs.
+  goals:
+    - key: collected
+      description: Collect one line per frozen source with the model size its quote states
+      objectives:
+        - { key: collect_notes, description: Write the source notes from the frozen quotes }
+      criteria:
+        - { key: notes, description: The notes are submitted, evidence: [notes], acceptance: { human: review_accept } }
+    - key: checked
+      description: Classify the notes and submit the typed triage verdict
+      objectives:
+        - { key: check_notes, description: Count the sources and submit the verdict }
+      criteria:
+        - { key: verdict, description: The verdict validates against its schema, evidence: [verdict], acceptance: { schema: schema.w2-triage-verdict@1 } }
+    - key: drafted
+      description: Draft the summary, revising it from the prior critique on a revisit
+      objectives:
+        - { key: outline_summary, description: List the models the summary must cover }
+        - { key: draft_summary, description: Draft or revise the two-sentence summary }
+        - { key: skip_summary, description: Record why no draft is needed }
+      criteria:
+        - { key: draft, description: The draft (or the skip note) is submitted, evidence: [text, note], acceptance: { human: review_accept } }
+    - key: critiqued
+      description: Critique the draft and decide whether it is approved
+      objectives:
+        - { key: critique_draft, description: Score the draft and list its findings }
+      criteria:
+        - { key: critique, description: The critique validates against its schema, evidence: [critique_verdict], acceptance: { schema: schema.w2-critique-verdict@1 } }
+    - key: written
+      description: Write the final summary from the final draft and verdict
+      objectives:
+        - { key: write_final, description: Write the final summary }
+      criteria:
+        - { key: final, description: The final summary is submitted, evidence: [final], acceptance: { human: review_accept } }
+  environment:
+    lane: deep_agents
+    model: { profile: producer.fallback }
+    sandbox: { profile: research.standard }
+    capabilities:
+      # Exact pin; digest identical in seeds mc.catalog.knowledge-tools 1.1.0 and 1.2.0.
+      - { pin: "tool.knowledge-submit-output@2#sha256:f1fa75f1e3fa49e9061746cbe89f53a828e502fb93e142d3b34d8a854a2a64dd", kind: tool, as: submit_output }
+    # collect + check + outline + 2 x (draft + critique) + write = 8 agent turns expected (10 at the cap).
+    budget: { usd: 0.8, tokens: 600000, wall_clock: 60m, tool_calls: 48 }
+    governors: { depth: 1, fan_out: 1, iterations: 3, patience: 2 }
+    side_effects: [read_only, workspace_write]
+  program:
+    key: root
+    behavior: stage_graph
+    objectives: [collected, checked, drafted, critiqued, written]
+    routes:
+      - key: check_route
+        mode: first_match
+        branches:
+          - key: refine
+            when: [ { fact: check.source_count, op: ge, value: 2 } ]
+            release: [outline]
+        else: [skip]
+    revisits:
+      - key: refine
+        stages: [draft, critique]
+        entry: draft
+        exit: critique
+        max_visits: 3
+        until: [ { fact: critique.approved, op: eq, value: true } ]
+        progress: critique.score
+        patience: 2
+        carry: [critique_verdict]
+    nodes:
+      - key: collect
+        behavior: agent_executor
+        objectives: [collect_notes]
+        environment:
+          budget: { usd: 0.08, tokens: 60000, wall_clock: 10m, tool_calls: 4 }
+        instruction: |
+          Frozen sources (verbatim quotes; use nothing else):
+          - arxiv-2310.06825-abstract: "We introduce Mistral 7B, a 7-billion-parameter language model engineered for superior performance and efficiency."
+          - hf-meta-llama-llama-3.1-model-card: "a collection of pretrained and instruction tuned generative models in 8B, 70B and 405B sizes"
+          Call submit_output ONCE, obligation "collect.notes", one inline text item with exactly one line per
+          source: "<source id>: <model> - <size exactly as quoted>". Stop; never repeat a call that returned a receipt.
+        outputs:
+          - { name: notes, form: text, enforcement: required, media_type: text/plain }
+      - key: check
+        behavior: agent_executor
+        objectives: [check_notes]
+        environment:
+          budget: { usd: 0.08, tokens: 60000, wall_clock: 10m, tool_calls: 6 }
+        inputs:
+          - { name: notes, from: collect.notes, expand: inline }
+        instruction: |
+          Read the notes binding in /.mission/transfer.json. Call submit_output ONCE, obligation "check.verdict",
+          one inline JSON object {"severity":"high"|"normal","source_count":<number of source lines>,"rationale":"<one sentence>"}
+          (a JSON object, not a string). severity is "high" only when a line states a size its quote does not contain.
+          Stop; never repeat a call that returned a receipt.
+        outputs:
+          - { name: verdict, schema: schema.w2-triage-verdict@1 }
+        facts:
+          - { name: severity, output: verdict, pointer: /severity, type: string }
+          - { name: source_count, output: verdict, pointer: /source_count, type: integer }
+      - key: outline
+        behavior: agent_executor
+        objectives: [outline_summary]
+        environment:
+          budget: { usd: 0.05, tokens: 40000, wall_clock: 10m, tool_calls: 4 }
+        instruction: |
+          The route selected a refined summary. Call submit_output ONCE, obligation "outline.plan", one inline
+          text line: "cover: mistral-7b, llama-3-1". Stop; never repeat a call that returned a receipt.
+        outputs:
+          - { name: plan, form: text, enforcement: required, media_type: text/plain }
+      - key: draft
+        behavior: agent_executor
+        objectives: [draft_summary]
+        environment:
+          budget: { usd: 0.08, tokens: 70000, wall_clock: 10m, tool_calls: 6 }
+        inputs:
+          - { name: plan, from: outline.plan, expand: inline }
+          - { name: notes, from: collect.notes, expand: inline }
+        instruction: |
+          Read /.mission/transfer.json. Write a summary of the notes in exactly two sentences, one per model.
+          First visit (the index lists no carried verdict, binding carry-critique_verdict): submit only those two sentences.
+          On a revisit the index lists the prior verdict: address every finding it names and keep the two sentences.
+          Call submit_output ONCE, obligation "draft.text", one inline text item. Stop; never repeat a call that returned a receipt.
+        outputs:
+          - { name: text, form: text, enforcement: required, media_type: text/plain }
+      - key: critique
+        behavior: agent_executor
+        objectives: [critique_draft]
+        environment:
+          budget: { usd: 0.08, tokens: 60000, wall_clock: 10m, tool_calls: 6 }
+        inputs:
+          - { name: text, from: draft.text, expand: inline }
+        instruction: |
+          Read the draft binding in /.mission/transfer.json. Approve it only if its last sentence begins with
+          "Limitation:" and names a limitation of the frozen sources (for example that they are single quotes).
+          Call submit_output ONCE, obligation "critique.critique_verdict", one inline JSON object
+          {"approved":true|false,"score":<0-100>,"findings":["<what to change>"]} (a JSON object, not a string);
+          when not approved, findings name the missing "Limitation:" sentence. Stop; never repeat a call that returned a receipt.
+        outputs:
+          - { name: critique_verdict, schema: schema.w2-critique-verdict@1 }
+        facts:
+          - { name: approved, output: critique_verdict, pointer: /approved, type: boolean }
+          - { name: score, output: critique_verdict, pointer: /score, type: integer }
+      - key: skip
+        behavior: agent_executor
+        objectives: [skip_summary]
+        environment:
+          budget: { usd: 0.05, tokens: 40000, wall_clock: 10m, tool_calls: 4 }
+        instruction: |
+          The route found fewer than two sources, so no draft is written. Call submit_output ONCE, obligation
+          "skip.note", one inline text sentence saying so. Stop; never repeat a call that returned a receipt.
+        outputs:
+          - { name: note, form: text, enforcement: required, media_type: text/plain }
+      - key: write
+        behavior: agent_executor
+        objectives: [write_final]
+        environment:
+          budget: { usd: 0.08, tokens: 70000, wall_clock: 10m, tool_calls: 6 }
+        release_groups:
+          - { key: final, join: any, members: [critique, skip] }
+        inputs:
+          - { name: text, from: draft.text, expand: inline }
+          - { name: critique_verdict, from: critique.critique_verdict, expand: inline }
+          - { name: note, from: skip.note, expand: inline }
+        instruction: |
+          Read /.mission/transfer.json: you receive either the final draft and its verdict, or the skip note;
+          the other branch is a visible omission. Call submit_output ONCE, obligation "write.final", one inline text
+          item: the final draft verbatim (or the skip note), then one line "visits: <what the verdict shows>".
+          Stop; never repeat a call that returned a receipt.
+        outputs:
+          - { name: final, form: text, enforcement: required, media_type: text/plain }
+      - key: review
+        behavior: human_gate
+        objectives: [collected, drafted, written]
+        depends_on: [write]
+        task:
+          kind: REVIEW
+          prompt: Review the notes, the final draft or skip note, and the final summary.
+          reviewers: [owner]
+          packet: [collect.notes, write.final]
+          on_timeout: keep_waiting
+  controls:
+    commands_allowed: [pause, resume, cancel, queue_instruction, add_context, interrupt_and_inject]

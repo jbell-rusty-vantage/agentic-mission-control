@@ -1,0 +1,228 @@
+# -------------------------------
+# Python & FastAPI Backend Ignore
+# -------------------------------
+
+# Environment variables
+.env
+.env.*
+!.env.example
+.supabase.env
+supabase/.env
+aws.env
+openai.env
+.temporal.env   
+
+graphify-out  
+/graphify-out 
+
+# Python virtualenvs & tools
+.venv/
+venv/
+ENV/
+env/
+.uv/
+.uv-cache/
+.langgraph_api/
+pip-wheel-metadata/
+pip-log.txt
+
+# Compiled python files
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+.pyre/
+.pytype/
+.coverage
+.tox/
+.mypy_cache/
+.cache/
+*.py[cod]
+*.pyo
+
+# Logs
+*.log
+*.out
+*.pid
+/NUL
+
+# Test & Coverage outputs
+htmlcov/
+.coverage.*
+.nox/
+.cache/
+*.cover
+coverage.*
+site/
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# pytest
+.cache/
+.pytest_cache/
+.vscode/
+.idea/
+
+# Jupyter/IPython notebooks
+notebooks/
+.ipynb_checkpoints
+*.ipynb
+
+# C extensions
+*.so
+
+# Editor/IDE specific files
+*.swp
+*.swo
+*.orig
+*.bak
+*.tmp
+*.DS_Store
+*.sublime-workspace
+*.sublime-project
+
+# macOS, Windows, Linux system files
+.DS_Store
+._*
+Thumbs.db
+ehthumbs.db
+Icon?
+Desktop.ini
+$RECYCLE.BIN/
+Trash-*
+
+# node (in case of fullstack or agent UI sandboxes)
+node_modules/
+npm-debug.log*
+yarn-error.log
+yarn-debug.log*
+.pnpm-debug.log*
+package-lock.json
+yarn.lock
+
+# Temporal (local/cadence) ignore
+temporal-data/
+temporal/.local/
+.temporal/
+cadence-data/
+cadence/.local/
+
+# OpenAI Agents SDK/Cache
+openai_cache/
+openai_agents_cache/
+openai_settings.json
+
+# Supabase
+supabase/.temp/
+.supabase/
+.supabase_remote/
+.supabase/functions/.next/
+
+# AWS, serverless, sam, cdk etc.
+.aws/
+.aws-sam/
+aws-lambda-tools-defaults.json
+cdk.out/
+serverless/
+serverless-output/
+lambda-build/
+*.aws-debug.log
+.aws-config/
+
+# Docker ignore for dev tools
+docker-compose.override.yml
+docker-compose.local.yml
+*.dockerfile.env
+*.docker.env
+*.docker-compose*
+
+# Misc sandbox artifacts
+tmp/
+temp/
+sandbox/
+.sandbox/
+agent-sandbox/
+sandbox-work/agentic-capability-probe/
+sandbox-work/goal-directed-live/
+.artifacts/
+.scratch/
+app/.cursor/*_url_map.txt
+app/.cursor/raw_maps/
+.scratch/pytest-goal-workspace-runtime-audit/
+.scratch/pytest-of-Pinda/
+.scratch/temporal-test-server-*.exe
+.scratch/uv-*.lock
+# Do not ignore intentionally tracked example configs
+!.env.example
+
+# Pydantic/migration cache
+alembic/
+migrations/
+!src/mission_control/adapters/postgres/migrations/
+!src/mission_control/adapters/postgres/migrations/*.sql
+!integrations/biotech/src/biotech_mission_adapters/migrations/
+!integrations/biotech/src/biotech_mission_adapters/migrations/*.sql
+!packages/mission-control-db-contract/component/migrations/
+!packages/mission-control-db-contract/component/migrations/*.sql
+# Built common-SQL releases are tracked whole: the test fixture and `mission-db` install them
+# (1.4.3 and 1.4.4 had lost their migrations to the `migrations/` rule above).
+!packages/mission-control-db-contract/releases/*/component/migrations/
+!packages/mission-control-db-contract/releases/*/component/migrations/*.sql
+
+# VSCode
+.vscode/
+.history/
+
+# Local SQLite DB files
+*.db
+*.sqlite3
+
+# Security & secrets (just in case)
+secrets.json
+*.key
+*.crt
+certs/
+
+# Coverage outputs
+coverage.xml
+
+# Lock files
+poetry.lock
+
+# Misc user files
+*.tgz
+*.tar.gz
+*.zip
+*.bak
+*.old
+
+# Override: Keep example & template config files
+!.env.example
+!.env.template 
+
+
+app/personal_code  
+
+.scratch/schema-context-selection-runs 
+
+
+
+internal_hidden_docs/
+
+# Disposable local qualification output (retained for diagnostics).
+/pytest-of-Pinda/
+/.tmp-worker-startup-*/
+
+# Added 2026-10-07 with the tooling refresh
+.venv-wsl/
+.tmp*/
+.hypothesis/
+.scratch/mission-db/
+
+# mission-control-local-setup skill: tracked core, machine-local ledger
+.agents/skills/mission-control-local-setup/ledger/*
+!.agents/skills/mission-control-local-setup/ledger/README.md
+
+# Machine-local Claude skill links (absolute paths). Canonical copies are .agents/skills.
+.claude/skills/

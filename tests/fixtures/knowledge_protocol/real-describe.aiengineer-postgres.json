@@ -1,0 +1,56 @@
+{
+  "protocolVersions": [
+    "ks.knowledge_operation.v2"
+  ],
+  "binding": "aiengineer-postgres",
+  "application": "ai-engineer",
+  "coreSchemas": [
+    "research-core.task.v2",
+    "research-core.assertion.v2",
+    "research-core.support_set.v2",
+    "research-core.observation.v2",
+    "research-core.mapping.v2",
+    "research-report.v2",
+    "research-report-kind.v1",
+    "research-core.report_assessment.v1"
+  ],
+  "operations": [
+    "knowledge.describe",
+    "knowledge.read",
+    "report.register",
+    "report.derive",
+    "report.observe",
+    "report.seal",
+    "report.decide",
+    "report.review",
+    "decision.resolve",
+    "operation.get",
+    "operation.cancel",
+    "receipt.get"
+  ],
+  "auditorKind": "none",
+  "reportKinds": [
+    "evidence_report",
+    "study_appraisal"
+  ],
+  "media": [
+    "text.markdown",
+    "application.json"
+  ],
+  "guarantees": {
+    "exactRead": "exact_revision",
+    "receiptLookup": "by_effect_key",
+    "nativeCancellation": "native",
+    "admission": "unsupported",
+    "revocation": "unsupported",
+    "writeAtomicity": "single_transaction"
+  },
+  "signingIssuer": "knowledge-services",
+  "pinnedSchema": {
+    "name": "knowledge-verification-2.5.0",
+    "version": "knowledge-verification.v2",
+    "digest": "sha256:728e4d8aa64a857185be19181886da22ad8952dcec6e4f8a3bf9bf0578d2fd18"
+  },
+  "qualification": [],
+  "describedAt": "2026-10-28T05:11:15.68Z"
+}

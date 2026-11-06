@@ -1,0 +1,58 @@
+{
+  "mode": "Exact workflow design cards; no executable manifests or fabricated bindings; existing examples are reference scaffolds only",
+  "workflows": [
+    {
+      "id": "WF-SDLC-CONFIGURATION-RESOLUTION",
+      "purpose": "Real existing known gap: independently review/verify the planned immutable config:<key> EnvironmentKit resolution change. Do not start implementation now; A2 proposal is frozen for handoff.",
+      "base_manifest_source": "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\run2-final-main\\docs\\specs\\multi-provider-2026-10\\examples\\codex.stage-graph.mission.yml",
+      "base_sha256": "54ca8f2d14ac2977cf2425aabe988df221793988644836b446422df870bc74df",
+      "topology": "diagnose exact unsupported config pointer \u2192 implement minimal scoped resolver in isolated allowed worktree after future authority \u2192 independent reviewer/test-runner \u2192 review-required output; optionally same-lane independent verifier GoalLoop, never strip unsupported inherited DeepAgents selections silently",
+      "exact_cognition_profile": "plugin.cognition-sdlc@0.1.0#sha256:a57f772c4cb24e24fc84ae2aa14727a42f97d951aa918d85e8270abdc1216259",
+      "required_real_behavior": [
+        "Read unchanged repo AGENTS and exact owning architecture",
+        "Load TDD/diagnosing-bugs/review skills by mechanism",
+        "Reproduce true value_ref blocker; valid config literal resolution, missing/unknown/secret-like key refusal, override/inheritance/digest stability",
+        "Run meaningful focused tests in runner; retain actual commands/results",
+        "Register minimal diff, test log and machine-validated review report; human review separate from publication",
+        "Exercise one instruction intervention/cancel-or-completion with native identity and custody"
+      ],
+      "repo_selection": "Actual current Mission Control source checkpoint + reviewed dirty overlay must be copied/pinned to a dedicated isolated worktree via supported allocator; not an arithmetic fixture or default branch write",
+      "output_schema_join": "UNRESOLVED exact published schema/validator for diagnosis, patch and review reports; no fictional ref supplied",
+      "provider_choices": "claude_agent_sdk or codex supported local lane, separately bound correct native route; cursor_local only within exact selected budget/account/native prerequisites and supported controls",
+      "dispatchable": false
+    },
+    {
+      "id": "WF-KNOWLEDGE-CITED-REPORT-INGESTION",
+      "purpose": "Preserve original research\u2192cited report\u2192accepted ingest contract from SPRINT, use legitimate application Knowledge Services tools rather than fixed PubMed metadata stand-in",
+      "topology": "GoalLoop source discovery+verification \u2192 independent cited-report verifier \u2192 artifact accepted \u2192 chain released to ingestion with frozen artifact input",
+      "configuration": "plugin.cognition-knowledge@0.1.0 exact current seed ref, actual application-approved Knowledge Services MCP+OAuth/static secret refs+egress, exact input/output schema and immutable source artifacts",
+      "required_real_behavior": [
+        "Fetch real designated Artifact input at runtime",
+        "Use actual task-relevant sources/tools; references with evidence spans and retrieval provenance",
+        "Reject unsupported claims; validate cited report schema and CompletionContract",
+        "Register actual output bytes/digest/scope and accepted ingest receipt, chain dedupe",
+        "For remote S2/S3 use required mc_publish knowledge commit on mc/run/unit after review/admission, never provider done alone"
+      ],
+      "exact_missing": "No task-specific current Knowledge Services MCP deployment binding/credentials/network or full report schema sealed; do not invent one or call unrelated public search to manufacture readiness",
+      "dispatchable": false
+    },
+    {
+      "id": "WF-S0-ORIGINAL-CONTROL-MATRIX",
+      "purpose": "Retain all18 required original caller/lane/placement cells; useful capability mission does not erase them",
+      "configuration": "Existing three production-seed S0 manifests and schema.s0-probe-report@1 are legitimate CONTROL fixtures; disclose their limited representativeness",
+      "required_real_behavior": [
+        "Real wait/wake+inject; tool deny/allow; repo preservation; skill delivery/readback/exercise; cancel or accepted completion; exact native/process/accounting/custody cleanup"
+      ],
+      "dispatchable": false
+    },
+    {
+      "id": "WF-REMOTE-ORIGINAL-SDLC",
+      "purpose": "Original remote fix/test/publish SDLC CompletionContract for S1/S2/S3 after local fundamentals and next-session deploy gate",
+      "topology": "fix+tests \u2192 immutable bundle \u2192 verified governed push \u2192 draft PR via repo_pr",
+      "controls": "S1 synced kit/cognition/signals/gate watcher; S2 always_ask+inject+true budget gate; S3 required_actions+steer/cancel+killed-worker recovery",
+      "publication": "Separate admitted governed effect, not authorized by this source handoff",
+      "dispatchable": false
+    }
+  ],
+  "original_terminal_criteria": "Preserve SPRINT cancel-or-completion AND SPEC09 actual probe completion/cancellation requirements; do not waive either. Link additional bounded cancellation evidence if needed, no asserted fixed36."
+}

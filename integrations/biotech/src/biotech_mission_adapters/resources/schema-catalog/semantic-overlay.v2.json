@@ -1,0 +1,252 @@
+{
+  "overlay_version": "2",
+  "modules": [
+    {
+      "name": "organizations-and-people",
+      "purpose": "Durable actors and separately attributed temporal assertions.",
+      "seed_elements": [
+        "node:Organization",
+        "node:Person",
+        "node:Assertion"
+      ],
+      "closure_policy": "incident-relationships"
+    },
+    {
+      "name": "products-and-commerce",
+      "purpose": "Product identity and source-backed package or menu label versions.",
+      "seed_elements": [
+        "node:Product",
+        "node:LabelVersion"
+      ],
+      "closure_policy": "incident-relationships"
+    },
+    {
+      "name": "diagnostics-and-biomarkers",
+      "purpose": "Orderable tests, measurement definitions and exact assay procedures.",
+      "seed_elements": [
+        "node:LabTest",
+        "node:Biomarker",
+        "node:Metric",
+        "node:AssayVersion",
+        "enum:MeasurementPlatform"
+      ],
+      "closure_policy": "incident-relationships"
+    },
+    {
+      "name": "studies-and-evidence",
+      "purpose": "Studies, propositions and attributed assertion occurrences.",
+      "seed_elements": [
+        "node:Study",
+        "node:Claim",
+        "node:Assertion"
+      ],
+      "closure_policy": "incident-relationships"
+    },
+    {
+      "name": "documents-and-provenance",
+      "purpose": "Source identity, immutable captures, evidence locators and retrieval projections.",
+      "seed_elements": [
+        "node:Source",
+        "node:SourceSnapshot",
+        "node:SourceLocator",
+        "node:Chunk"
+      ],
+      "closure_policy": "incident-relationships"
+    }
+  ],
+  "elements": {
+    "node:Organization": {
+      "description": "A durable organization resolved by registry identifier, then normalized legal name and jurisdiction; a brand is a separate identity.",
+      "archetypes": [
+        "entity"
+      ],
+      "modules": [
+        "organizations-and-people"
+      ],
+      "task_cues": [
+        "Organization"
+      ]
+    },
+    "node:Person": {
+      "description": "A durable human identity; changing roles and affiliations are separate attributed assertions.",
+      "archetypes": [
+        "entity"
+      ],
+      "modules": [
+        "organizations-and-people"
+      ],
+      "task_cues": [
+        "Person"
+      ]
+    },
+    "node:Assertion": {
+      "description": "A source-attributed occurrence linking subject, predicate, object or literal, asserter, locators and validity; preserve qualifiers and recorded time.",
+      "archetypes": [
+        "assertion-or-evidence"
+      ],
+      "modules": [
+        "organizations-and-people",
+        "studies-and-evidence"
+      ],
+      "task_cues": [
+        "Assertion"
+      ]
+    },
+    "node:Product": {
+      "description": "A marketed product identity; product kind and branded identity are separate from laboratory test procedure and package label versions.",
+      "archetypes": [
+        "entity"
+      ],
+      "modules": [
+        "products-and-commerce"
+      ],
+      "task_cues": [
+        "Product"
+      ]
+    },
+    "node:LabelVersion": {
+      "description": "One version of a package label or menu declaration, with source-backed composition and serving details; not a generic product snapshot.",
+      "archetypes": [
+        "information-artifact"
+      ],
+      "modules": [
+        "products-and-commerce"
+      ],
+      "task_cues": [
+        "LabelVersion"
+      ]
+    },
+    "node:LabTest": {
+      "description": "An orderable or purchasable laboratory test; panels are LabTests of kind PANEL with INCLUDES_TEST composition episodes. Resolve by issuer and test code, otherwise issuer and verbatim name.",
+      "archetypes": [
+        "entity"
+      ],
+      "modules": [
+        "diagnostics-and-biomarkers"
+      ],
+      "task_cues": [
+        "LabTest"
+      ]
+    },
+    "node:Biomarker": {
+      "description": "A reusable biomarker definition kept distinct from a subject-specific measurement or an assay procedure.",
+      "archetypes": [
+        "entity"
+      ],
+      "modules": [
+        "diagnostics-and-biomarkers"
+      ],
+      "task_cues": [
+        "Biomarker"
+      ]
+    },
+    "node:Metric": {
+      "description": "A reusable reported measure or score definition kept distinct from an observed subject-specific value.",
+      "archetypes": [
+        "entity"
+      ],
+      "modules": [
+        "diagnostics-and-biomarkers"
+      ],
+      "task_cues": [
+        "Metric"
+      ]
+    },
+    "node:AssayVersion": {
+      "description": "The exact laboratory measurement procedure, instrument, software and specimen configuration; preserve NOT_REPORTED fields instead of guessing equivalence.",
+      "archetypes": [
+        "entity"
+      ],
+      "modules": [
+        "diagnostics-and-biomarkers"
+      ],
+      "task_cues": [
+        "AssayVersion"
+      ]
+    },
+    "enum:MeasurementPlatform": {
+      "description": "Controlled measurement or algorithm input technology categories; absorbs the historical TechnologyPlatform concept as an enum, not a node.",
+      "archetypes": [
+        "entity"
+      ],
+      "modules": [
+        "diagnostics-and-biomarkers"
+      ],
+      "task_cues": [
+        "MeasurementPlatform"
+      ]
+    },
+    "node:Study": {
+      "description": "A bounded research investigation kept distinct from the assertions and evidence derived from it.",
+      "archetypes": [
+        "entity"
+      ],
+      "modules": [
+        "studies-and-evidence"
+      ],
+      "task_cues": [
+        "Study"
+      ]
+    },
+    "node:Claim": {
+      "description": "A proposition kept distinct from an Assertion occurrence attributing who stated it, when and on what evidence.",
+      "archetypes": [
+        "assertion-or-evidence"
+      ],
+      "modules": [
+        "studies-and-evidence"
+      ],
+      "task_cues": [
+        "Claim"
+      ]
+    },
+    "node:Source": {
+      "description": "Stable source endpoint identity by normalized canonical URI; a changed captured page is a new SourceSnapshot.",
+      "archetypes": [
+        "information-artifact"
+      ],
+      "modules": [
+        "documents-and-provenance"
+      ],
+      "task_cues": [
+        "Source"
+      ]
+    },
+    "node:SourceSnapshot": {
+      "description": "An immutable captured Source version identified by source, content hash and retrieval time; retain capture completeness and content hash basis.",
+      "archetypes": [
+        "information-artifact"
+      ],
+      "modules": [
+        "documents-and-provenance"
+      ],
+      "task_cues": [
+        "SourceSnapshot"
+      ]
+    },
+    "node:SourceLocator": {
+      "description": "An addressable evidence location within a captured source; keep locator identity distinct from retrieval chunks.",
+      "archetypes": [
+        "information-artifact"
+      ],
+      "modules": [
+        "documents-and-provenance"
+      ],
+      "task_cues": [
+        "SourceLocator"
+      ]
+    },
+    "node:Chunk": {
+      "description": "A derived retrieval span of SourceSnapshot text. Never evidence, never a locator, never a mutation input; chunk writes are unsupported by this release.",
+      "archetypes": [
+        "information-artifact"
+      ],
+      "modules": [
+        "documents-and-provenance"
+      ],
+      "task_cues": [
+        "Chunk"
+      ]
+    }
+  }
+}

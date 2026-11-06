@@ -1,0 +1,87 @@
+# yaml-language-server: $schema=../../../../src/mission_control/contracts/schemas/mc.mission_manifest.v1.json
+# Sprint OC W2 (OVE-171 / WI-08) graph variant: an all-matching route over two fact sources.
+#
+# `scan_a` and `scan_b` each submit a structured flag. Route `follow_up` (all_matching): branch
+# `a` (scan_a.flagged == true) -> follow_a; branch `b` (scan_b.flagged == true) -> follow_b;
+# else -> no_follow. A true branch releases while the other branch's fact is still unknown;
+# `no_follow` needs both flags conclusively false. Every follow-up serves `followed` (whichever
+# branches are selected owe it). Schema `schema.w2-scan-flag@1` is not seeded (offline compile).
+manifest: mission/v1
+mission:
+  key: w2-graph-all-matching
+  title: W2 all-matching route over two scan flags
+  application: ai-engineer
+  goals:
+    - key: scanned
+      description: Scan both sources and submit their flags
+      criteria:
+        - { key: flags, description: Both flags are submitted, evidence: [flag_a, flag_b], acceptance: { human: review_accept } }
+    - key: followed
+      description: Follow up every flagged source, or record that none needs it
+      criteria:
+        - { key: follow, description: Each selected follow-up is submitted, evidence: [note_a, note_b, none], acceptance: { human: review_accept } }
+  environment:
+    lane: deep_agents
+    model: { profile: frontier.default }
+    sandbox: { profile: research.standard }
+    capabilities:
+      - { pin: "tool.knowledge-submit-output@2#sha256:f1fa75f1e3fa49e9061746cbe89f53a828e502fb93e142d3b34d8a854a2a64dd", kind: tool, as: submit_output }
+    budget: { usd: 1, tokens: 200000, wall_clock: 30m, tool_calls: 20 }
+    governors: { depth: 1, fan_out: 2, iterations: 1, patience: 1 }
+    side_effects: [read_only, workspace_write]
+  program:
+    key: root
+    behavior: stage_graph
+    objectives: [scanned, followed]
+    concurrency: 2
+    routes:
+      - key: follow_up
+        mode: all_matching
+        branches:
+          - { key: a, when: [ { fact: scan_a.flagged, op: eq, value: true } ], release: [follow_a] }
+          - { key: b, when: [ { fact: scan_b.flagged, op: eq, value: true } ], release: [follow_b] }
+        else: [no_follow]
+    nodes:
+      - key: scan_a
+        behavior: agent_executor
+        objectives: [scanned]
+        instruction: Submit obligation "scan_a.flag_a" as JSON {"flagged":true|false}.
+        outputs: [ { name: flag_a, schema: schema.w2-scan-flag@1 } ]
+        facts: [ { name: flagged, output: flag_a, pointer: /flagged, type: boolean } ]
+      - key: scan_b
+        behavior: agent_executor
+        objectives: [scanned]
+        instruction: Submit obligation "scan_b.flag_b" as JSON {"flagged":true|false}.
+        outputs: [ { name: flag_b, schema: schema.w2-scan-flag@1 } ]
+        facts: [ { name: flagged, output: flag_b, pointer: /flagged, type: boolean } ]
+      - key: follow_a
+        behavior: agent_executor
+        objectives: [followed]
+        instruction: Submit obligation "follow_a.note_a" as inline text.
+        outputs: [ { name: note_a, form: text, media_type: text/plain } ]
+      - key: follow_b
+        behavior: agent_executor
+        objectives: [followed]
+        instruction: Submit obligation "follow_b.note_b" as inline text.
+        outputs: [ { name: note_b, form: text, media_type: text/plain } ]
+      - key: no_follow
+        behavior: agent_executor
+        objectives: [followed]
+        instruction: Submit obligation "no_follow.none" as inline text.
+        outputs: [ { name: none, form: text, media_type: text/plain } ]
+      # Human criteria need a qualified human evaluator at launch (completion_support.py; compile
+      # reports them as start blockers since OVE-169): this final REVIEW gate owns every goal.
+      - key: review
+        behavior: human_gate
+        objectives: [scanned, followed]
+        # Route targets may be skipped, so the gate joins them (any) instead of depending on each.
+        release_groups:
+          - { key: followed, join: any, members: [follow_a, follow_b, no_follow] }
+        task:
+          kind: REVIEW
+          prompt: Review both scan flags and the follow-up.
+          reviewers: [owner]
+          packet: [scan_a.flag_a, scan_b.flag_b]
+          on_timeout: keep_waiting
+  controls:
+    commands_allowed: [pause, resume, cancel]

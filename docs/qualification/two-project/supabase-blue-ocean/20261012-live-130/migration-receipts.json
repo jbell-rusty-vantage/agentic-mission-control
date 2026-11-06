@@ -1,0 +1,195 @@
+{
+  "attestations": [
+    {
+      "component_version": "1.0.0",
+      "contract_schema_digest": "sha256:dbce50116df01e9a8d814f78e9ff61d91943afdfcc5fcb1a1d2d2001e488ab7f",
+      "fingerprint_algorithm": "mc-pg-catalog-v2",
+      "manifest_digest": "sha256:946bc371a7837ef5f52af8c8a7de4eb85aa8b801dd7cb61dab8512f709498a3e",
+      "schema_fingerprint": "sha256:ef5a9e71c9c4a4fe23f343a5708c476a757bc1c5a61f9aacae3a76577b209c09",
+      "supported_reader_versions": [
+        "mission-control-runtime/1"
+      ],
+      "supported_writer_versions": [
+        "mission-control-runtime/1"
+      ]
+    },
+    {
+      "component_version": "1.3.0",
+      "contract_schema_digest": "sha256:2f97ca232d6767dd1732f1d6f65898ed7d7b2c3bec11fcdbd3766c9a637c1aa4",
+      "fingerprint_algorithm": "mc-pg-catalog-v2",
+      "manifest_digest": "sha256:5bdb7563eb6b6b7182bad9bbbc99ea0d66c36cf638d2d5320f04f58610e08810",
+      "schema_fingerprint": "sha256:3154fa8d02008f337b6baf81cc58a962d9c71d1aff7963f62fd599012c02cc5c",
+      "supported_reader_versions": [
+        "mission-control-runtime/1"
+      ],
+      "supported_writer_versions": [
+        "mission-control-runtime/1"
+      ]
+    }
+  ],
+  "receipts": [
+    {
+      "component_version": "1.0.0",
+      "migration_digest": "sha256:17fdeed4fd09b2a6ca82fa9dbc5fcb99a5255b25c86c4ac4055a0f4003c5c571",
+      "migration_key": "0001_foundation"
+    },
+    {
+      "component_version": "1.0.0",
+      "migration_digest": "sha256:fe9f2f9adc7675db24b9458ea9be0d7e32a2c10aa4e708dd069d6a19af49e7b5",
+      "migration_key": "0002_authoring"
+    },
+    {
+      "component_version": "1.0.0",
+      "migration_digest": "sha256:fd0f839bd389f66c9dbb139934d7333699718fcfaa143e5757b23fefff947f27",
+      "migration_key": "0003_execution"
+    },
+    {
+      "component_version": "1.0.0",
+      "migration_digest": "sha256:fe33a28c27f4fc9b965c417a407b5e1707a8bf8498c6dbf7b1cf90a47b8dfb07",
+      "migration_key": "0004_capability_artifacts"
+    },
+    {
+      "component_version": "1.0.0",
+      "migration_digest": "sha256:db724c6fd630bbe672e8b9f655db908de0c5fe1298d36101f7afb292daa6024e",
+      "migration_key": "0005_commands_effects_recovery"
+    },
+    {
+      "component_version": "1.0.0",
+      "migration_digest": "sha256:d4db0f9c534decb808e3d1ec29aed1a98a17cbf4f1abc01cdaa4b7bd963f5507",
+      "migration_key": "0010_run_control_support"
+    },
+    {
+      "component_version": "1.0.0",
+      "migration_digest": "sha256:c053ab24e9f22d4a88005fd510bdbf3f53e3201582888045da187ec0634e39ed",
+      "migration_key": "0011_operation_journal_support"
+    },
+    {
+      "component_version": "1.0.0",
+      "migration_digest": "sha256:5ba6d2fb9a66279028caeebac7db90e4098666831a658056628443cc234bdbbd",
+      "migration_key": "0012_runtime_lineage_support"
+    },
+    {
+      "component_version": "1.0.0",
+      "migration_digest": "sha256:a67e8ed97071893969723a6d799ce02976e6a46235527c44edc282b0f463c52a",
+      "migration_key": "0013_snapshot_fork_support"
+    },
+    {
+      "component_version": "1.0.0",
+      "migration_digest": "sha256:0639a883b6d403ae83cd9e7b46b3b22a2f08b3e1b567d2b3ca5f1ebe21550840",
+      "migration_key": "0014_orchestration_support"
+    },
+    {
+      "component_version": "1.0.0",
+      "migration_digest": "sha256:63b0a28c6a783058c1715f1873ac7ef0ec4cb4b11a375bedd290fbdd35640b14",
+      "migration_key": "0015_async_subagent_support"
+    },
+    {
+      "component_version": "1.0.0",
+      "migration_digest": "sha256:baa2a9d2aa15269ca9facefa293620056fd72198ef2bb6232246a7bbbdc88dfb",
+      "migration_key": "0016_coordinator_support"
+    },
+    {
+      "component_version": "1.0.0",
+      "migration_digest": "sha256:74ecee43b86b78aea50f7e4b59740031483cd79a296f07b8034c05af529787dd",
+      "migration_key": "0017_runtime_kernel_support"
+    },
+    {
+      "component_version": "1.0.0",
+      "migration_digest": "sha256:2d8be48cbfa8588d8feca5cb8824af902ab8a1465cb06240fe1b5c4b0a5b9a4d",
+      "migration_key": "0020_catalog_definitions"
+    },
+    {
+      "component_version": "1.0.0",
+      "migration_digest": "sha256:f01ce20b42d74284a0c79fd76da71b30a39628184c84f00a057e67aef557189f",
+      "migration_key": "0021_capability_bundle_admission"
+    },
+    {
+      "component_version": "1.0.0",
+      "migration_digest": "sha256:2d54d12db628a3015601b3723215f30ef69efdc79c2c15710a27263464f428f5",
+      "migration_key": "0022_capability_search_projection"
+    },
+    {
+      "component_version": "1.0.0",
+      "migration_digest": "sha256:d2022c5b9b858734fe6e5b2fd72a04dc7a42d264092c3427d91b5a6f317fac23",
+      "migration_key": "0023_capability_discovery_custody"
+    },
+    {
+      "component_version": "1.0.0",
+      "migration_digest": "sha256:c6ca8f833dc46c0e055866e491858a565d9721c998e94bb6b3b6f09946581ed9",
+      "migration_key": "0024_workspace_artifact_custody"
+    },
+    {
+      "component_version": "1.3.0",
+      "migration_digest": "sha256:ecb7396860160969d95a4ec755d811c2a96b142de50c75fd8fc910e1c6715a46",
+      "migration_key": "0025_capability_kinds_and_host_support"
+    },
+    {
+      "component_version": "1.3.0",
+      "migration_digest": "sha256:be28e26099ac899f55125c748ab2bbc634c281965e8e4415172704acb44dc6b1",
+      "migration_key": "0026_search_projection_nullable_embedding"
+    },
+    {
+      "component_version": "1.3.0",
+      "migration_digest": "sha256:5d81a799d9c01683deecdc21adf6a39239a5abda6c4de99a4dfd9afc3073d664",
+      "migration_key": "0027_provider_frames"
+    },
+    {
+      "component_version": "1.3.0",
+      "migration_digest": "sha256:6fc1ed497bb166e2e8cfbd9772bcf1216719aa7ab97999c1a268911a15381a2c",
+      "migration_key": "0028_mission_chains"
+    },
+    {
+      "component_version": "1.3.0",
+      "migration_digest": "sha256:c6d571e692e13100d235c80b40e1542a95990fab6b22f5fcc3c77371fff20549",
+      "migration_key": "0029_command_mailbox_stop_fence_subscriptions"
+    },
+    {
+      "component_version": "1.3.0",
+      "migration_digest": "sha256:c057bc275ab7162f1109646323a0aba82fd8c8b89bc9240df48ebc44501027cf",
+      "migration_key": "0030_lane_bindings"
+    },
+    {
+      "component_version": "1.3.0",
+      "migration_digest": "sha256:21ac0c9ae225d322f6fa44a9f49187d3f5d9018f663558a999ff42f5b80d2df1",
+      "migration_key": "0031_multi_provider_lanes"
+    },
+    {
+      "component_version": "1.3.0",
+      "migration_digest": "sha256:8e5f588a21e4ab63b8bb353fd4d3ace256271d5b6e88b28f2e366935aa6be4a8",
+      "migration_key": "0032_run_cluster_binding_stream_hints"
+    },
+    {
+      "component_version": "1.3.0",
+      "migration_digest": "sha256:d72734e84e11c6e11475f60793d3b31899b7847bc75d4c1fc01e84a68f134cd0",
+      "migration_key": "0033_approvals_coordinator_inbox_lane_describes"
+    },
+    {
+      "component_version": "1.3.0",
+      "migration_digest": "sha256:f06c8eb077e7aec5c0ce7a01cadcbe92e26b72c2c440ec90b32b7c1315cdda68",
+      "migration_key": "0034_provider_frame_lifecycle_body"
+    }
+  ],
+  "verification": {
+    "attestation_verified": true,
+    "component_version": "1.3.0",
+    "fingerprint_algorithm": "mc-pg-catalog-v2",
+    "identity_verified": true,
+    "migration_count": 28,
+    "reader_version": "mission-control-runtime/1",
+    "runtime_roles_verified": [
+      "mission_control_catalog_writer",
+      "mission_control_family_writer",
+      "mission_control_outbox_worker",
+      "mission_control_readonly",
+      "mission_control_runtime"
+    ],
+    "schema_fingerprint": "sha256:3154fa8d02008f337b6baf81cc58a962d9c71d1aff7963f62fd599012c02cc5c",
+    "schema_fingerprint_verified": true,
+    "schema_fingerprints": {
+      "mission_control": "sha256:0c61401d113f60118fd45f16db50d338707918ac0b7625ca35c5c21fcf68a13a",
+      "mission_control_search": "sha256:14a2d768afd5067353cf46a33fefaad20d62f210517b945d3c043995ef47049c"
+    },
+    "status": "verified",
+    "writer_version": "mission-control-runtime/1"
+  }
+}

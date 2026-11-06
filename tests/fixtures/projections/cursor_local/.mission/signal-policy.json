@@ -1,0 +1,26 @@
+{
+  "batch": {
+    "max_delay_seconds": 30,
+    "max_signals": 20
+  },
+  "flush": [
+    "stop"
+  ],
+  "lane_profile": "cursor_local",
+  "materialization": {
+    "files": [
+      ".cursor/hooks.json",
+      ".cursor/rules/mc-mission.mdc"
+    ],
+    "skills": ".cursor/skills"
+  },
+  "schema_version": "mc.signal_policy.v1",
+  "signals": {
+    "stop": "stop",
+    "subagent_stop": "subagent.stopped"
+  },
+  "stdout": {
+    "stop": {},
+    "subagent_stop": {}
+  }
+}

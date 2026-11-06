@@ -1,0 +1,29 @@
+{
+  "batch": {
+    "max_delay_seconds": 30,
+    "max_signals": 20
+  },
+  "flush": [
+    "stop",
+    "session_end"
+  ],
+  "lane_profile": "claude_cloud",
+  "materialization": {
+    "files": [
+      ".claude/rules/mc-mission.md",
+      ".claude/settings.json"
+    ],
+    "skills": ".claude/skills"
+  },
+  "schema_version": "mc.signal_policy.v1",
+  "signals": {
+    "after_file_edit": "file.edited",
+    "after_shell": "shell.completed",
+    "before_compaction": "compaction.started",
+    "session_end": "session.ended",
+    "session_start": "session.started",
+    "stop": "stop",
+    "subagent_stop": "subagent.stopped"
+  },
+  "stdout": {}
+}

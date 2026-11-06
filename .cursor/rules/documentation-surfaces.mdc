@@ -1,0 +1,19 @@
+---
+description: Where a fact goes (five documentation surfaces), program ledgers, Linear issues and skills; read before editing docs, specs, AGENTS.md or skills
+globs: docs/**/*.md,AGENTS.md,**/AGENTS.md,.agents/skills/**,skills/**
+alwaysApply: false
+---
+
+# Documentation surfaces
+
+Pointers only; the content lives in the files named here.
+
+- The method (phases and their skills, canonical versus working documents, the session loop):
+  `.agents/skills/belllabs-method/SKILL.md`. Interviews: `grill-with-answers`; code shape:
+  `architecture-projection`; provider facts: `provider-research`.
+- Where a fact belongs: `docs/agents/documentation-surfaces.md`.
+- Before closing a session that touched documentation: `python docs/tools/check_docs.py`.
+- Program documents, `LEDGER.md`, archiving, Linear issues: `docs/agents/program-workspace.md`.
+- Matt Pocock skills and how they are configured here: `docs/agents/matt-pocock-skills.md`.
+- The index in `AGENTS.md` is compiled: edit `docs/agents/index-notes.toml` and run
+  `python docs/tools/agents_docs_index.py`, never the generated block.

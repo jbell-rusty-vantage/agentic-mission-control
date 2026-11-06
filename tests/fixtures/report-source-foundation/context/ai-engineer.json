@@ -1,0 +1,45 @@
+{
+  "format": "mc-report-source-context-profile.v1",
+  "id": "report-source-foundation-ai-engineer.v1",
+  "application": "ai-engineer",
+  "task_scope": "Report what two captured model sources say about one named technical property.",
+  "audience": "internal",
+  "use": "engineering_reference.model_facts",
+  "report_kind": "evidence_report@1.0.0",
+  "qualifier_profile": "engineering.v2",
+  "authority": "Shared Knowledge Services operational records; canonical domain navigation is read-only and grants no native write authority. Producer declares assertions/support/body; host binds scope, pins and digests; independent actors assess and decide use.",
+  "max_context_bytes": 196608,
+  "shared_contracts": [
+    "catalog/research/report-kinds/evidence_report.json",
+    "packages/research-core/src/records/report.ts",
+    "packages/research-core/src/records/fragment.ts",
+    "packages/research-core/src/records/assertion.ts",
+    "packages/research-core/src/records/support.ts",
+    "packages/research-core/src/records/task.ts",
+    "packages/research-core/src/ports/report.ts",
+    "packages/knowledge-operation-protocol/src/selected-read.ts",
+    "catalog/research/source-authority/engineering.json"
+  ],
+  "navigation_cards": [
+    "tasks/navigate-report.md",
+    "tasks/build-evidence-packet.md"
+  ],
+  "scope": {
+    "format": "ai-engineer-schema-scope/1",
+    "id": "report-source-foundation.v1",
+    "description": "Read-only navigation; operational report authority is shared KS. All retained vocabularies stay in materializer evidence, not the prompt.",
+    "include": {
+      "relations": [],
+      "functions": []
+    },
+    "closure": {
+      "fk_targets": "stub",
+      "vocabularies": "full"
+    },
+    "tasks": [
+      "navigate-report",
+      "build-evidence-packet"
+    ],
+    "queries": []
+  }
+}

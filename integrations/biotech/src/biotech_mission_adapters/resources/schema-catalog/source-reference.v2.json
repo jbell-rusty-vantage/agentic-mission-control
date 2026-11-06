@@ -1,0 +1,31 @@
+{
+  "reference_version": "2",
+  "authority": "biotech-knowledge-services-pinned-release",
+  "release_id": "biotech-schema-v2.0.2",
+  "schema_release_digest": "sha256:5fffb593c8ca94b289b768ac0a0b02df5739cb338b7a04ec88173589708c5a42",
+  "source_kind": "neo4j-graphql-source-sdl",
+  "path": "schema/pinned/release/sdl/assembled.graphql",
+  "git_revision": "d042678cb06de3c3c8b8f85e8ff9dff99858ad84",
+  "git_blob": "ec16fda58ea0e1525c354aee6d4640d4c88a2bc9",
+  "sha256": "fe2cc50afb4a48e16a2b5c3c37378b4d00a679a06d37bf312676c45c65c6589a",
+  "content_length": 389072,
+  "content_type": "application/graphql; charset=utf-8",
+  "semantic_overlay": {
+    "path": "semantic-overlay.v2.json",
+    "sha256": "5430b831d0ebedd3039188d3b8f4ebd57f0cb82de4d83c8ce144cc993e5b599d"
+  },
+  "consumer_api": {
+    "app": "bks-biotech-graphql-api",
+    "region": "iad",
+    "executable_graphql_digest": "sha256:a6ff3889afc445323f69344305e63a0d316facecf6b45780e2d3796ec9bf1a59",
+    "projection_manifest_digest": "sha256:8f9bc6b520caa09799c8eda9e99e69f98073a4b6852c9655f1f5aeb46c2a9e5f",
+    "image_digest": "sha256:0767bbc486bd2f4c0f9962efb4a3fc03a96ec8dc1a37239d220bb9f9114ceebf",
+    "release_version": 4,
+    "verification_basis": "Owner-approved current deployed release; public identity and Fly machine inspection matched source and executable identities."
+  },
+  "semantic_evidence": [
+    "sdl/assembled.graphql type and enum descriptions",
+    "COMPATIBILITY.md legacy.nodes and chunk.write",
+    "decisions/DECISIONS.md OD-43"
+  ]
+}

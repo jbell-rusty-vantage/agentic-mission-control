@@ -1,0 +1,576 @@
+{
+  "original_count": 18,
+  "qualified_complete_cells": 0,
+  "cells": [
+    {
+      "cell_id": "S0-01",
+      "caller": "Claude Code Windows",
+      "lane": "claude_agent_sdk",
+      "temporal": "local Temporal",
+      "status": "unqualified/unrun as complete original cell",
+      "required_proof": [
+        "current source/build/config/prerequisite/auth/owner/policy/lease exact",
+        "normal compile submit start identities and one governed root",
+        "real caller wait registered before terminal; actual wake and ack/cursor resumption",
+        "one interrupt_and_inject with accepted/delivered/applied and native correlation",
+        "required tool-family deny/allow, instruction preservation, delivered/discovered/exercised distinction",
+        "actual completed/accepted probe for caller-lane join plus explicit clean-cancel evidence as required; record per-run terminal disposition and link distinct bounded cancellation case if needed; provider done insufficient",
+        "immutable declared outputs/report/artifacts registered; actual/estimated/unknown usage/cost",
+        "cleanup after custody; native session/bridge and exact OS/pool/listener and reservations/effects disposition"
+      ],
+      "close_out_2026_10_19": {
+        "status": "partial-not-promoted",
+        "evidence": [
+          "Ledger sections: P3 G1 ordinary local serving; P5 S0-01 attempts (runs a-j); P5 outcome (run k).",
+          "Private receipts: run2-close-20261018/g1/s0-01/start.json; run2-close-20261018/g1/s0-01*/ (runs a, b, c, d, j); run2-close-20261018/g1/s0-01k/inspect-final.json, gate-approve.json, caller-loop.jsonl.",
+          "Run b 519816f2: wait registered before start, real review_required wake+ack, interrupt_and_inject delivered cancel_and_replace with native refs, skill mc-cognition-diagnosing-bugs invoked, WebFetch absent from native tool set (denial by absence), clean immediate cancel to terminal cancelled in about 30 s.",
+          "Run c 12627622: typed allow and typed deny of provider-permission tasks; inject accepted/consumed; attempt then failed (provider_error at interrupted turn).",
+          "Run d 7d65a750: first accepted native output (diagnose). Run j 831f33f4: patch operation completed, review accepted, parked at human owner_gate (owner decision pending).",
+          "Run k 554d2b2a: COMPLETED; wait registered before start, woken by review_required and terminal_result and acked; 4 accepted outputs (diagnosed, verified, reviewed, owner_review); independent review approve_with_nits; gate reviewer was the caller service (disclosed, not the human owner)."
+        ],
+        "gate": "Not promoted: the completion run (k) own inject remained queued and was never applied (applied inject evidenced only on runs b, c, d, j, not on a single completing run); usage/cost disposition unknown on every run; gate reviewer was the caller service rather than the human owner. Cleanup/exact-OS disposition and clean-cancel on the same completing run not joined (clean cancel evidenced on run b only). Per ledger: not promoted, recorded as partial."
+      },
+      "superseded_by_owner_decision": "E1"
+    },
+    {
+      "cell_id": "S0-02",
+      "caller": "Claude Code Windows",
+      "lane": "codex",
+      "temporal": "local Temporal",
+      "status": "unqualified/unrun as complete original cell",
+      "required_proof": [
+        "current source/build/config/prerequisite/auth/owner/policy/lease exact",
+        "normal compile submit start identities and one governed root",
+        "real caller wait registered before terminal; actual wake and ack/cursor resumption",
+        "one interrupt_and_inject with accepted/delivered/applied and native correlation",
+        "required tool-family deny/allow, instruction preservation, delivered/discovered/exercised distinction",
+        "actual completed/accepted probe for caller-lane join plus explicit clean-cancel evidence as required; record per-run terminal disposition and link distinct bounded cancellation case if needed; provider done insufficient",
+        "immutable declared outputs/report/artifacts registered; actual/estimated/unknown usage/cost",
+        "cleanup after custody; native session/bridge and exact OS/pool/listener and reservations/effects disposition"
+      ],
+      "close_out_2026_10_19": {
+        "status": "unrun",
+        "evidence": [
+          "Ledger \"Stock-take 2026-10-19 16:10 UTC\", Remaining for Gate L: codex lane prerequisites/attestation outstanding. No codex-lane run recorded; config/auth-profiles.json carries codex-api-configured (env:OPENAI_API_KEY) only as configuration (private run2-close-20261018/g1/config/auth-profiles.json a25f450a)."
+        ],
+        "gate": "Codex lane owner prerequisites/host attestation for the codex binding not prepared in this session; Codex WSL login absent, API-key route configured but unproven."
+      },
+      "superseded_by_owner_decision": "E1"
+    },
+    {
+      "cell_id": "S0-03",
+      "caller": "Claude Code Windows",
+      "lane": "cursor_local",
+      "temporal": "local Temporal",
+      "status": "unqualified/unrun as complete original cell",
+      "required_proof": [
+        "current source/build/config/prerequisite/auth/owner/policy/lease exact",
+        "normal compile submit start identities and one governed root",
+        "real caller wait registered before terminal; actual wake and ack/cursor resumption",
+        "one interrupt_and_inject with accepted/delivered/applied and native correlation",
+        "required tool-family deny/allow, instruction preservation, delivered/discovered/exercised distinction",
+        "actual completed/accepted probe for caller-lane join plus explicit clean-cancel evidence as required; record per-run terminal disposition and link distinct bounded cancellation case if needed; provider done insufficient",
+        "immutable declared outputs/report/artifacts registered; actual/estimated/unknown usage/cost",
+        "cleanup after custody; native session/bridge and exact OS/pool/listener and reservations/effects disposition"
+      ],
+      "close_out_2026_10_19": {
+        "status": "blocked",
+        "evidence": [
+          "Ledger \"P4 - LS-07 Cursor CLI cell\": cursor-agent commits about 3.6 GB within 30 s of start before any frame; attempt 1 stopped by memory guard after 46 s (695 MB commit headroom), attempt 2 after 31 s (480 MB); zero frames; no inference; no third attempt.",
+          "Private receipts: run2-close-20261018/ls/ls07-cursor-doctor.json, ls07-cursor-run.log, ls07-cursor-run2.log."
+        ],
+        "gate": "Host commit headroom: Windows cursor-agent CLI commits about 3.6 GB; two LS-07 attempts aborted by the memory guard. No cursor_local lane run was possible, so this lane cell was not run."
+      },
+      "superseded_by_owner_decision": "E1"
+    },
+    {
+      "cell_id": "S0-04",
+      "caller": "Codex Windows",
+      "lane": "claude_agent_sdk",
+      "temporal": "local Temporal",
+      "status": "unqualified/unrun as complete original cell",
+      "required_proof": [
+        "current source/build/config/prerequisite/auth/owner/policy/lease exact",
+        "normal compile submit start identities and one governed root",
+        "real caller wait registered before terminal; actual wake and ack/cursor resumption",
+        "one interrupt_and_inject with accepted/delivered/applied and native correlation",
+        "required tool-family deny/allow, instruction preservation, delivered/discovered/exercised distinction",
+        "actual completed/accepted probe for caller-lane join plus explicit clean-cancel evidence as required; record per-run terminal disposition and link distinct bounded cancellation case if needed; provider done insufficient",
+        "immutable declared outputs/report/artifacts registered; actual/estimated/unknown usage/cost",
+        "cleanup after custody; native session/bridge and exact OS/pool/listener and reservations/effects disposition"
+      ],
+      "close_out_2026_10_19": {
+        "status": "unrun",
+        "evidence": [
+          "Ledger: no Codex-caller session recorded in any phase; all callers were this Claude Code session."
+        ],
+        "gate": "Codex caller cells on claude_agent_sdk not attempted this session."
+      },
+      "superseded_by_owner_decision": "E1"
+    },
+    {
+      "cell_id": "S0-05",
+      "caller": "Codex Windows",
+      "lane": "codex",
+      "temporal": "local Temporal",
+      "status": "unqualified/unrun as complete original cell",
+      "required_proof": [
+        "current source/build/config/prerequisite/auth/owner/policy/lease exact",
+        "normal compile submit start identities and one governed root",
+        "real caller wait registered before terminal; actual wake and ack/cursor resumption",
+        "one interrupt_and_inject with accepted/delivered/applied and native correlation",
+        "required tool-family deny/allow, instruction preservation, delivered/discovered/exercised distinction",
+        "actual completed/accepted probe for caller-lane join plus explicit clean-cancel evidence as required; record per-run terminal disposition and link distinct bounded cancellation case if needed; provider done insufficient",
+        "immutable declared outputs/report/artifacts registered; actual/estimated/unknown usage/cost",
+        "cleanup after custody; native session/bridge and exact OS/pool/listener and reservations/effects disposition"
+      ],
+      "close_out_2026_10_19": {
+        "status": "unrun",
+        "evidence": [
+          "Ledger \"Stock-take 2026-10-19 16:10 UTC\", Remaining for Gate L: codex lane prerequisites/attestation outstanding. No codex-lane run recorded; config/auth-profiles.json carries codex-api-configured (env:OPENAI_API_KEY) only as configuration (private run2-close-20261018/g1/config/auth-profiles.json a25f450a)."
+        ],
+        "gate": "Codex lane owner prerequisites/host attestation for the codex binding not prepared in this session; Codex WSL login absent, API-key route configured but unproven."
+      },
+      "superseded_by_owner_decision": "E1"
+    },
+    {
+      "cell_id": "S0-06",
+      "caller": "Codex Windows",
+      "lane": "cursor_local",
+      "temporal": "local Temporal",
+      "status": "unqualified/unrun as complete original cell",
+      "required_proof": [
+        "current source/build/config/prerequisite/auth/owner/policy/lease exact",
+        "normal compile submit start identities and one governed root",
+        "real caller wait registered before terminal; actual wake and ack/cursor resumption",
+        "one interrupt_and_inject with accepted/delivered/applied and native correlation",
+        "required tool-family deny/allow, instruction preservation, delivered/discovered/exercised distinction",
+        "actual completed/accepted probe for caller-lane join plus explicit clean-cancel evidence as required; record per-run terminal disposition and link distinct bounded cancellation case if needed; provider done insufficient",
+        "immutable declared outputs/report/artifacts registered; actual/estimated/unknown usage/cost",
+        "cleanup after custody; native session/bridge and exact OS/pool/listener and reservations/effects disposition"
+      ],
+      "close_out_2026_10_19": {
+        "status": "blocked",
+        "evidence": [
+          "Ledger P4 and Stock-take: cursor_local and Cursor caller blocked by host commit headroom (about 3.6 GB for cursor-agent); no lane run attempted for this cell."
+        ],
+        "gate": "Host commit headroom: cursor-agent commits about 3.6 GB; two LS-07 attempts aborted by the memory guard. cursor_local lane blocked on this host."
+      },
+      "superseded_by_owner_decision": "E1"
+    },
+    {
+      "cell_id": "S0-07",
+      "caller": "Cursor Windows",
+      "lane": "claude_agent_sdk",
+      "temporal": "local Temporal",
+      "status": "unqualified/unrun as complete original cell",
+      "required_proof": [
+        "current source/build/config/prerequisite/auth/owner/policy/lease exact",
+        "normal compile submit start identities and one governed root",
+        "real caller wait registered before terminal; actual wake and ack/cursor resumption",
+        "one interrupt_and_inject with accepted/delivered/applied and native correlation",
+        "required tool-family deny/allow, instruction preservation, delivered/discovered/exercised distinction",
+        "actual completed/accepted probe for caller-lane join plus explicit clean-cancel evidence as required; record per-run terminal disposition and link distinct bounded cancellation case if needed; provider done insufficient",
+        "immutable declared outputs/report/artifacts registered; actual/estimated/unknown usage/cost",
+        "cleanup after custody; native session/bridge and exact OS/pool/listener and reservations/effects disposition"
+      ],
+      "close_out_2026_10_19": {
+        "status": "blocked",
+        "evidence": [
+          "Ledger P4 and Stock-take: Cursor caller blocked by host commit headroom (cursor-agent about 3.6 GB); two LS-07 attempts aborted by the memory guard (private run2-close-20261018/ls/ls07-cursor-run.log, ls07-cursor-run2.log)."
+        ],
+        "gate": "Host commit headroom: Cursor caller (cursor-agent) commits about 3.6 GB; aborted by the memory guard."
+      },
+      "superseded_by_owner_decision": "E1"
+    },
+    {
+      "cell_id": "S0-08",
+      "caller": "Cursor Windows",
+      "lane": "codex",
+      "temporal": "local Temporal",
+      "status": "unqualified/unrun as complete original cell",
+      "required_proof": [
+        "current source/build/config/prerequisite/auth/owner/policy/lease exact",
+        "normal compile submit start identities and one governed root",
+        "real caller wait registered before terminal; actual wake and ack/cursor resumption",
+        "one interrupt_and_inject with accepted/delivered/applied and native correlation",
+        "required tool-family deny/allow, instruction preservation, delivered/discovered/exercised distinction",
+        "actual completed/accepted probe for caller-lane join plus explicit clean-cancel evidence as required; record per-run terminal disposition and link distinct bounded cancellation case if needed; provider done insufficient",
+        "immutable declared outputs/report/artifacts registered; actual/estimated/unknown usage/cost",
+        "cleanup after custody; native session/bridge and exact OS/pool/listener and reservations/effects disposition"
+      ],
+      "close_out_2026_10_19": {
+        "status": "unrun",
+        "evidence": [
+          "Ledger \"Stock-take 2026-10-19 16:10 UTC\", Remaining for Gate L: codex lane prerequisites/attestation outstanding. No codex-lane run recorded; config/auth-profiles.json carries codex-api-configured (env:OPENAI_API_KEY) only as configuration (private run2-close-20261018/g1/config/auth-profiles.json a25f450a)."
+        ],
+        "gate": "Codex lane owner prerequisites/host attestation for the codex binding not prepared in this session; Codex WSL login absent, API-key route configured but unproven. The Cursor caller is additionally blocked by host commit headroom (cursor-agent about 3.6 GB)."
+      },
+      "superseded_by_owner_decision": "E1"
+    },
+    {
+      "cell_id": "S0-09",
+      "caller": "Cursor Windows",
+      "lane": "cursor_local",
+      "temporal": "local Temporal",
+      "status": "unqualified/unrun as complete original cell",
+      "required_proof": [
+        "current source/build/config/prerequisite/auth/owner/policy/lease exact",
+        "normal compile submit start identities and one governed root",
+        "real caller wait registered before terminal; actual wake and ack/cursor resumption",
+        "one interrupt_and_inject with accepted/delivered/applied and native correlation",
+        "required tool-family deny/allow, instruction preservation, delivered/discovered/exercised distinction",
+        "actual completed/accepted probe for caller-lane join plus explicit clean-cancel evidence as required; record per-run terminal disposition and link distinct bounded cancellation case if needed; provider done insufficient",
+        "immutable declared outputs/report/artifacts registered; actual/estimated/unknown usage/cost",
+        "cleanup after custody; native session/bridge and exact OS/pool/listener and reservations/effects disposition"
+      ],
+      "close_out_2026_10_19": {
+        "status": "blocked",
+        "evidence": [
+          "Ledger P4 and Stock-take: cursor_local and Cursor caller blocked by host commit headroom (about 3.6 GB for cursor-agent); no lane run attempted for this cell."
+        ],
+        "gate": "Host commit headroom: cursor-agent commits about 3.6 GB; two LS-07 attempts aborted by the memory guard. cursor_local lane blocked on this host."
+      },
+      "superseded_by_owner_decision": "E1"
+    },
+    {
+      "cell_id": "S0-10",
+      "caller": "Claude Code Windows",
+      "lane": "claude_agent_sdk",
+      "temporal": "Temporal Cloud",
+      "status": "unqualified/unrun as complete original cell",
+      "required_proof": [
+        "current source/build/config/prerequisite/auth/owner/policy/lease exact",
+        "normal compile submit start identities and one governed root",
+        "real caller wait registered before terminal; actual wake and ack/cursor resumption",
+        "one interrupt_and_inject with accepted/delivered/applied and native correlation",
+        "required tool-family deny/allow, instruction preservation, delivered/discovered/exercised distinction",
+        "actual completed/accepted probe for caller-lane join plus explicit clean-cancel evidence as required; record per-run terminal disposition and link distinct bounded cancellation case if needed; provider done insufficient",
+        "immutable declared outputs/report/artifacts registered; actual/estimated/unknown usage/cost",
+        "cleanup after custody; native session/bridge and exact OS/pool/listener and reservations/effects disposition"
+      ],
+      "close_out_2026_10_19": {
+        "status": "unrun",
+        "evidence": [
+          "Ledger Stock-take, Remaining for Gate L: Cloud cells S0-10..18 need Temporal Cloud namespace mission-control-dev.ih0e7 (verify search attributes, API key from AWS secret, re-point deployment/worker). All G1 runs used local disposable Temporal mc-run2-s0."
+        ],
+        "gate": "Temporal Cloud namespace mission-control-dev.ih0e7 not re-pointed this session; Cloud cells not attempted."
+      },
+      "superseded_by_owner_decision": "E1"
+    },
+    {
+      "cell_id": "S0-11",
+      "caller": "Claude Code Windows",
+      "lane": "codex",
+      "temporal": "Temporal Cloud",
+      "status": "unqualified/unrun as complete original cell",
+      "required_proof": [
+        "current source/build/config/prerequisite/auth/owner/policy/lease exact",
+        "normal compile submit start identities and one governed root",
+        "real caller wait registered before terminal; actual wake and ack/cursor resumption",
+        "one interrupt_and_inject with accepted/delivered/applied and native correlation",
+        "required tool-family deny/allow, instruction preservation, delivered/discovered/exercised distinction",
+        "actual completed/accepted probe for caller-lane join plus explicit clean-cancel evidence as required; record per-run terminal disposition and link distinct bounded cancellation case if needed; provider done insufficient",
+        "immutable declared outputs/report/artifacts registered; actual/estimated/unknown usage/cost",
+        "cleanup after custody; native session/bridge and exact OS/pool/listener and reservations/effects disposition"
+      ],
+      "close_out_2026_10_19": {
+        "status": "unrun",
+        "evidence": [
+          "Ledger Stock-take, Remaining for Gate L: Cloud cells S0-10..18 need Temporal Cloud namespace mission-control-dev.ih0e7 (verify search attributes, API key from AWS secret, re-point deployment/worker). All G1 runs used local disposable Temporal mc-run2-s0."
+        ],
+        "gate": "Temporal Cloud namespace mission-control-dev.ih0e7 not re-pointed this session; Cloud cells not attempted."
+      },
+      "superseded_by_owner_decision": "E1"
+    },
+    {
+      "cell_id": "S0-12",
+      "caller": "Claude Code Windows",
+      "lane": "cursor_local",
+      "temporal": "Temporal Cloud",
+      "status": "unqualified/unrun as complete original cell",
+      "required_proof": [
+        "current source/build/config/prerequisite/auth/owner/policy/lease exact",
+        "normal compile submit start identities and one governed root",
+        "real caller wait registered before terminal; actual wake and ack/cursor resumption",
+        "one interrupt_and_inject with accepted/delivered/applied and native correlation",
+        "required tool-family deny/allow, instruction preservation, delivered/discovered/exercised distinction",
+        "actual completed/accepted probe for caller-lane join plus explicit clean-cancel evidence as required; record per-run terminal disposition and link distinct bounded cancellation case if needed; provider done insufficient",
+        "immutable declared outputs/report/artifacts registered; actual/estimated/unknown usage/cost",
+        "cleanup after custody; native session/bridge and exact OS/pool/listener and reservations/effects disposition"
+      ],
+      "close_out_2026_10_19": {
+        "status": "unrun",
+        "evidence": [
+          "Ledger Stock-take, Remaining for Gate L: Cloud cells S0-10..18 need Temporal Cloud namespace mission-control-dev.ih0e7 (verify search attributes, API key from AWS secret, re-point deployment/worker). All G1 runs used local disposable Temporal mc-run2-s0."
+        ],
+        "gate": "Temporal Cloud namespace mission-control-dev.ih0e7 not re-pointed this session; Cloud cells not attempted."
+      },
+      "superseded_by_owner_decision": "E1"
+    },
+    {
+      "cell_id": "S0-13",
+      "caller": "Codex Windows",
+      "lane": "claude_agent_sdk",
+      "temporal": "Temporal Cloud",
+      "status": "unqualified/unrun as complete original cell",
+      "required_proof": [
+        "current source/build/config/prerequisite/auth/owner/policy/lease exact",
+        "normal compile submit start identities and one governed root",
+        "real caller wait registered before terminal; actual wake and ack/cursor resumption",
+        "one interrupt_and_inject with accepted/delivered/applied and native correlation",
+        "required tool-family deny/allow, instruction preservation, delivered/discovered/exercised distinction",
+        "actual completed/accepted probe for caller-lane join plus explicit clean-cancel evidence as required; record per-run terminal disposition and link distinct bounded cancellation case if needed; provider done insufficient",
+        "immutable declared outputs/report/artifacts registered; actual/estimated/unknown usage/cost",
+        "cleanup after custody; native session/bridge and exact OS/pool/listener and reservations/effects disposition"
+      ],
+      "close_out_2026_10_19": {
+        "status": "unrun",
+        "evidence": [
+          "Ledger Stock-take, Remaining for Gate L: Cloud cells S0-10..18 need Temporal Cloud namespace mission-control-dev.ih0e7 (verify search attributes, API key from AWS secret, re-point deployment/worker). All G1 runs used local disposable Temporal mc-run2-s0."
+        ],
+        "gate": "Temporal Cloud namespace mission-control-dev.ih0e7 not re-pointed this session; Cloud cells not attempted."
+      },
+      "superseded_by_owner_decision": "E1"
+    },
+    {
+      "cell_id": "S0-14",
+      "caller": "Codex Windows",
+      "lane": "codex",
+      "temporal": "Temporal Cloud",
+      "status": "unqualified/unrun as complete original cell",
+      "required_proof": [
+        "current source/build/config/prerequisite/auth/owner/policy/lease exact",
+        "normal compile submit start identities and one governed root",
+        "real caller wait registered before terminal; actual wake and ack/cursor resumption",
+        "one interrupt_and_inject with accepted/delivered/applied and native correlation",
+        "required tool-family deny/allow, instruction preservation, delivered/discovered/exercised distinction",
+        "actual completed/accepted probe for caller-lane join plus explicit clean-cancel evidence as required; record per-run terminal disposition and link distinct bounded cancellation case if needed; provider done insufficient",
+        "immutable declared outputs/report/artifacts registered; actual/estimated/unknown usage/cost",
+        "cleanup after custody; native session/bridge and exact OS/pool/listener and reservations/effects disposition"
+      ],
+      "close_out_2026_10_19": {
+        "status": "unrun",
+        "evidence": [
+          "Ledger Stock-take, Remaining for Gate L: Cloud cells S0-10..18 need Temporal Cloud namespace mission-control-dev.ih0e7 (verify search attributes, API key from AWS secret, re-point deployment/worker). All G1 runs used local disposable Temporal mc-run2-s0."
+        ],
+        "gate": "Temporal Cloud namespace mission-control-dev.ih0e7 not re-pointed this session; Cloud cells not attempted."
+      },
+      "superseded_by_owner_decision": "E1"
+    },
+    {
+      "cell_id": "S0-15",
+      "caller": "Codex Windows",
+      "lane": "cursor_local",
+      "temporal": "Temporal Cloud",
+      "status": "unqualified/unrun as complete original cell",
+      "required_proof": [
+        "current source/build/config/prerequisite/auth/owner/policy/lease exact",
+        "normal compile submit start identities and one governed root",
+        "real caller wait registered before terminal; actual wake and ack/cursor resumption",
+        "one interrupt_and_inject with accepted/delivered/applied and native correlation",
+        "required tool-family deny/allow, instruction preservation, delivered/discovered/exercised distinction",
+        "actual completed/accepted probe for caller-lane join plus explicit clean-cancel evidence as required; record per-run terminal disposition and link distinct bounded cancellation case if needed; provider done insufficient",
+        "immutable declared outputs/report/artifacts registered; actual/estimated/unknown usage/cost",
+        "cleanup after custody; native session/bridge and exact OS/pool/listener and reservations/effects disposition"
+      ],
+      "close_out_2026_10_19": {
+        "status": "unrun",
+        "evidence": [
+          "Ledger Stock-take, Remaining for Gate L: Cloud cells S0-10..18 need Temporal Cloud namespace mission-control-dev.ih0e7 (verify search attributes, API key from AWS secret, re-point deployment/worker). All G1 runs used local disposable Temporal mc-run2-s0."
+        ],
+        "gate": "Temporal Cloud namespace mission-control-dev.ih0e7 not re-pointed this session; Cloud cells not attempted."
+      },
+      "superseded_by_owner_decision": "E1"
+    },
+    {
+      "cell_id": "S0-16",
+      "caller": "Cursor Windows",
+      "lane": "claude_agent_sdk",
+      "temporal": "Temporal Cloud",
+      "status": "unqualified/unrun as complete original cell",
+      "required_proof": [
+        "current source/build/config/prerequisite/auth/owner/policy/lease exact",
+        "normal compile submit start identities and one governed root",
+        "real caller wait registered before terminal; actual wake and ack/cursor resumption",
+        "one interrupt_and_inject with accepted/delivered/applied and native correlation",
+        "required tool-family deny/allow, instruction preservation, delivered/discovered/exercised distinction",
+        "actual completed/accepted probe for caller-lane join plus explicit clean-cancel evidence as required; record per-run terminal disposition and link distinct bounded cancellation case if needed; provider done insufficient",
+        "immutable declared outputs/report/artifacts registered; actual/estimated/unknown usage/cost",
+        "cleanup after custody; native session/bridge and exact OS/pool/listener and reservations/effects disposition"
+      ],
+      "close_out_2026_10_19": {
+        "status": "unrun",
+        "evidence": [
+          "Ledger Stock-take, Remaining for Gate L: Cloud cells S0-10..18 need Temporal Cloud namespace mission-control-dev.ih0e7 (verify search attributes, API key from AWS secret, re-point deployment/worker). All G1 runs used local disposable Temporal mc-run2-s0."
+        ],
+        "gate": "Temporal Cloud namespace mission-control-dev.ih0e7 not re-pointed this session; Cloud cells not attempted."
+      },
+      "superseded_by_owner_decision": "E1"
+    },
+    {
+      "cell_id": "S0-17",
+      "caller": "Cursor Windows",
+      "lane": "codex",
+      "temporal": "Temporal Cloud",
+      "status": "unqualified/unrun as complete original cell",
+      "required_proof": [
+        "current source/build/config/prerequisite/auth/owner/policy/lease exact",
+        "normal compile submit start identities and one governed root",
+        "real caller wait registered before terminal; actual wake and ack/cursor resumption",
+        "one interrupt_and_inject with accepted/delivered/applied and native correlation",
+        "required tool-family deny/allow, instruction preservation, delivered/discovered/exercised distinction",
+        "actual completed/accepted probe for caller-lane join plus explicit clean-cancel evidence as required; record per-run terminal disposition and link distinct bounded cancellation case if needed; provider done insufficient",
+        "immutable declared outputs/report/artifacts registered; actual/estimated/unknown usage/cost",
+        "cleanup after custody; native session/bridge and exact OS/pool/listener and reservations/effects disposition"
+      ],
+      "close_out_2026_10_19": {
+        "status": "unrun",
+        "evidence": [
+          "Ledger Stock-take, Remaining for Gate L: Cloud cells S0-10..18 need Temporal Cloud namespace mission-control-dev.ih0e7 (verify search attributes, API key from AWS secret, re-point deployment/worker). All G1 runs used local disposable Temporal mc-run2-s0."
+        ],
+        "gate": "Temporal Cloud namespace mission-control-dev.ih0e7 not re-pointed this session; Cloud cells not attempted."
+      },
+      "superseded_by_owner_decision": "E1"
+    },
+    {
+      "cell_id": "S0-18",
+      "caller": "Cursor Windows",
+      "lane": "cursor_local",
+      "temporal": "Temporal Cloud",
+      "status": "unqualified/unrun as complete original cell",
+      "required_proof": [
+        "current source/build/config/prerequisite/auth/owner/policy/lease exact",
+        "normal compile submit start identities and one governed root",
+        "real caller wait registered before terminal; actual wake and ack/cursor resumption",
+        "one interrupt_and_inject with accepted/delivered/applied and native correlation",
+        "required tool-family deny/allow, instruction preservation, delivered/discovered/exercised distinction",
+        "actual completed/accepted probe for caller-lane join plus explicit clean-cancel evidence as required; record per-run terminal disposition and link distinct bounded cancellation case if needed; provider done insufficient",
+        "immutable declared outputs/report/artifacts registered; actual/estimated/unknown usage/cost",
+        "cleanup after custody; native session/bridge and exact OS/pool/listener and reservations/effects disposition"
+      ],
+      "close_out_2026_10_19": {
+        "status": "unrun",
+        "evidence": [
+          "Ledger Stock-take, Remaining for Gate L: Cloud cells S0-10..18 need Temporal Cloud namespace mission-control-dev.ih0e7 (verify search attributes, API key from AWS secret, re-point deployment/worker). All G1 runs used local disposable Temporal mc-run2-s0."
+        ],
+        "gate": "Temporal Cloud namespace mission-control-dev.ih0e7 not re-pointed this session; Cloud cells not attempted."
+      },
+      "superseded_by_owner_decision": "E1"
+    }
+  ],
+  "do_not_replace": "Representative SDLC/knowledge proof demonstrates usefulness but does not waive original18 control/caller/placement cells. Cloud variant is remote follow-on after explicit next-session gate.",
+  "original_text_boundary": {
+    "SPRINT": "Each run is woken through missionctl wait, receives interrupt_and_inject and ends with cancel or completion.",
+    "SPEC09_section9": "Each lane completes a probe mission launched from each tool; one run is cancelled cleanly; the same set passes on Temporal Cloud.",
+    "preserve_both": "Do not use OR to waive completion per caller/lane join or actual clean-cancellation evidence at both placements. Record per-run disposition; if a completion run cannot satisfy clean-cancel evidence schedule an extra bounded cancellation case as needed. No invented fixed36 count."
+  },
+  "finish_2026_10": {
+    "authority": "RUN-2-FINISH-INSTRUCTIONS-2026-10-19.md (owner decisions E1-E11)",
+    "source_commit": "f71d3d110417d49e9f243f8942be57a31becf751",
+    "matrix": "lane x scheduler materialize-and-run (MR) cells; the 18 caller x lane x scheduler cells above are retained and marked superseded_by_owner_decision E1",
+    "cells": [
+      {
+        "cell": "MR-01",
+        "lane": "claude_agent_sdk",
+        "scheduler": "local Temporal",
+        "required": "yes",
+        "status": "passed",
+        "runs": {
+          "run": "e7d24a4b-2e5f-557b-8aa9-b941fce57441",
+          "cancel_run": "cc6d5594-33b5-5953-a219-bafa86705b82"
+        },
+        "receipt": "run2-close-20261018/w1/MR-01-receipt.json",
+        "receipt_sha256": "23390b9a44eaeb0267410032f0d2eac0384b075da13dadd1bc106a18fc9b5ec3",
+        "supporting_runs": {
+          "k": "554d2b2a-3480-550a-b412-0be7900a1029",
+          "b": "519816f2"
+        }
+      },
+      {
+        "cell": "MR-02",
+        "lane": "codex",
+        "scheduler": "local Temporal",
+        "required": "yes",
+        "status": "passed",
+        "runs": {
+          "run": "a901422d-a65b-5d51-8b08-3827993a683e",
+          "cancel_run": "235fcc73-70ee-509a-8fe6-fe99dee936da"
+        },
+        "receipt": "run2-close-20261018/w2/MR-02-receipt.json",
+        "receipt_sha256": "966dba2d24844bddb9fec279e7c95347e657e4392d76f07e070bb52f59df6235",
+        "prior_attempts": {
+          "05ab6f57": "failed budget_hard_cap_exceeded (authoring)",
+          "eaa586c3": "parked in_doubt codex_usage_requires_reconciliation (sub-agent threads)"
+        }
+      },
+      {
+        "cell": "MR-03",
+        "lane": "cursor_local",
+        "scheduler": "local Temporal (WSL worker)",
+        "required": "one attempt (E2)",
+        "status": "blocked",
+        "runs": {
+          "run": "7132d2de-88f2-5c20-9b57-58a183dd6424"
+        },
+        "blocker": "lane defect: Cursor SDK observe_run rejected (ProviderConfigurationRejected) 6 s into the first turn while the native agent ran on unobserved; operation failed lane_turn_rejected; run parked cancelling on an unsettled usage reservation. Not memory: bridge peak RSS 199 MB, WSL available >= 3,344 MB.",
+        "moved_to": "Cursor provider sprint (E2)",
+        "compile": "ok, 0 blockers",
+        "c9_m4": "verified"
+      },
+      {
+        "cell": "MR-11",
+        "lane": "claude_agent_sdk",
+        "scheduler": "Temporal Cloud mission-control-dev.ih0e7",
+        "required": "yes (E3)",
+        "status": "passed",
+        "runs": {
+          "run": "37ce4f20-ca35-54e9-9cf5-f16040cf5df7"
+        },
+        "receipt": "run2-close-20261018/w4/MR-11-receipt.json",
+        "receipt_sha256": "01cd0ccf81ea7bbb982a92fbb44f2bdd2d115f082141583aaa6d64b6bd8535b5"
+      },
+      {
+        "cell": "MR-12",
+        "lane": "codex",
+        "scheduler": "Temporal Cloud mission-control-dev.ih0e7",
+        "required": "if MR-02 passed",
+        "status": "passed",
+        "runs": {
+          "run": "60cca228-bcd7-5cbe-8013-ba30e892c927"
+        },
+        "receipt": "run2-close-20261018/w4/MR-12-receipt.json",
+        "receipt_sha256": "0b41bf14e2ac9cd7ad2dbf29508b55fd393955b22e1946d5d098444af86bb9e4",
+        "note": "independent review verdict changes_required; harness reviewer (disclosed) accepted the reports as evidence, not the code"
+      },
+      {
+        "cell": "MR-13",
+        "lane": "cursor_local",
+        "scheduler": "Temporal Cloud",
+        "required": "if MR-03 passed",
+        "status": "not run (MR-03 blocked)"
+      }
+    ],
+    "passed": [
+      "MR-01",
+      "MR-02",
+      "MR-11",
+      "MR-12"
+    ],
+    "blocked": [
+      "MR-03"
+    ],
+    "not_run": [
+      "MR-13"
+    ],
+    "parked_runs": {
+      "ec193a1e-9e4f-574f-992d-a6ad16733ff2": "cancelling (E4, consolidation recovery)",
+      "eaa586c3-2fe5-5108-ab51-2de0fab19b1c": "in_doubt (codex sub-agent usage)",
+      "7132d2de-88f2-5c20-9b57-58a183dd6424": "cancelling (unsettled usage reservation)"
+    },
+    "cancelled_runs": {
+      "831f33f4-bf57-5b89-831f-1f2e3bd4c5f8": "run j cancelled as superseded by run k (E4)"
+    },
+    "ledger": "runs/RUN-2-CLOSE-STATUS.md section Finish"
+  }
+}

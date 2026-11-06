@@ -1,0 +1,84 @@
+# Application Profile for `biotech` (mc.application_profile.v1, ADR-0063, Sprint OC R4 / OVE-198).
+# What may differ per application, as data: bootstrap loads this file when the installation's
+# application id is `biotech` (`bootstrap/application_profiles.py`). Nothing in the kernel names
+# this application or its binding. `target.toml` beside it stays the installation identity.
+application_id = "biotech"
+revision = 2
+# Engineering default (R4): no repository source admits more than `internal` for this application's
+# missions today (ADR-0050 section 7 names no Application ceiling; no widening is configured; the
+# admitted proofs are public literature and internal notes, never PHI). A mission that declares more
+# is refused at resolution; one that declares none is treated as this ceiling
+# (`data_class_source = ceiling_default`).
+# Enforced at resolution, which today covers Deep Agents nodes only (R3 routes the other lanes
+# through the resolver). The Application Binding's hosted agent API widening (HL-18) may not
+# exceed it: manifest composition refuses such a binding (`require_hosted_widening_within_ceiling`).
+data_class_ceiling = "internal"
+# Declared, not yet consumed (OC-R7): nothing reads this value. The hosted agent API session
+# retention in force is `DEFAULT_SESSION_RETENTION_POLICY` (`domain/execution/session_retention.py`,
+# 7 days, the development Temporal namespace's history retention, DECISIONS R20; HL-18):
+# `adapters/temporal/hosted_lane_composition.py` composes `SessionRetentionService` without a policy,
+# so the Application Binding's `hosted_agent_apis.session_retention_seconds` is unread too. Changing
+# this number changes no deletion until that composition reads it (SELECTION-AND-ROUTING-INTERFACES 8.1).
+hosted_session_retention_days = 7
+
+[knowledge]
+# KS `packages/bindings/biotech-graph/src/backend.ts` BACKEND.describe() at KS sprint-oc 0978a85
+# (checked offline by tests/conformance/applications against ks_backend_descriptors.json; at W0
+# against the live describe).
+binding_id = "biotech-graph"
+apply_contract_name = "biotech-knowledge-apply"
+apply_contract_version = "v1"
+# The native apply payload layout the gateway builds (`application/knowledge/apply_payload.py`):
+# `{schemaVersion: "<contract>.<version>", intent, exactUse}`; the host binds the plan's own bytes
+# and refuses a recorded decision whose digest does not bind them (KS `apply-port.ts`).
+intent_schema_ref = "mc.knowledge_apply_payload.intent_envelope.v1"
+storage_class = "graph"
+write_atomicity = "marker_plus_outbox"
+# No KS backend serves K01 `readback` (R5); graph readback is the BKS consumer's, not K01's.
+readback_capability = "unsupported"
+# The knowledge charter skill compile mounts on every knowledge mission of this application
+# (latest admitted row, provenance `application:charter`); seed mc.app.biotech.agent-skills 1.0.4.
+charter_skill = "skill.biotech-knowledge-charter"
+
+[outputs]
+# The KS deterministic report assessment the submission service runs
+# (`application/outputs/submission_service.py::ASSESSMENT_CAPABILITY_PIN`).
+assessment_pin = "knowledge.report.assess@1"
+# Interpretation of annex OUTPUT-CONTRACTS section 5 using KS use classes
+# (research-core `authority/rules.ts::USE_CLASS_VALUES`): official and consequential uses need an
+# exact-use decision with review; consequential scientific use needs human sign-off (SV-D9).
+# Authors may tighten, never weaken.
+required_review_classes = ["official", "consequential"]
+consequential_signoff_classes = ["consequential"]
+allowed_forms = ["text", "structured", "file", "reference", "collection", "code_change", "effect_receipt", "control_record"]
+
+[transfer]
+# ADR-0024: custody in Supabase Storage (the S3-compatible payload store).
+custody_backend = "supabase-storage"
+# The Context Packer's default text budget (`application/context/pack_service.py::DEFAULT_MAX_TEXT_BYTES`).
+inline_bytes_ceiling = 65536
+file_capable = true
+binary_capable = true
+
+[workspace]
+# OVE-204 slice 5: the Workspace Closure (`domain/execution/workspace_closure.py`) the Deep Agents
+# adapter records at each attempt's settled boundary. Past `closure_max_files` files are omitted and
+# past `closure_max_bytes` promoted bytes a body is withheld (`complete = false`); capture never fails
+# the attempt. `closure_retention` is "mission" (ADR-0055 evidence life) or whole days (>= 30) after
+# which the frames expire pass deletes the closure rows of completed runs (payload bytes stay).
+closure_enabled = true
+closure_max_files = 512
+closure_max_bytes = 67108864
+closure_retention = "mission"
+
+[installation]
+# Operator defaults this application's installation uses when the environment does not set them
+# (they left `bootstrap/settings.py` in R4). Each is an ordinary setting override: the named
+# environment variable wins. The values are the pre-R4 settings defaults, unchanged.
+temporal_task_queue = "biotech-research-ingestion"  # TEMPORAL_TASK_QUEUE
+langsmith_project = "BellLabsBiotech"  # LANGSMITH_PROJECT
+agent_server_langsmith_project = "BellLabsBiotech-AgentServer-Local"  # AGENT_SERVER_LANGSMITH_PROJECT
+# The capability resource owner (`workspace://` locators), relative to MISSION_CONTROL_HOME: the
+# physical BellLabs/biotech directory when MISSION_CONTROL_HOME is BellLabs/platform/mission-control
+# (docs/DEVELOPMENT.md). MISSION_CONTROL_WORKSPACE_ROOT wins.
+capability_workspace_root = "../../biotech"

@@ -1,0 +1,2060 @@
+{
+  "schema": "mc.retrieval-baseline.v1",
+  "repo_head": "da8b4b065a357d3e26bd9ec401c47ec73dd9c248",
+  "summary": {
+    "screening": {
+      "queries": 23,
+      "recall_at_3": 1.0,
+      "recall_at_10": 1.0,
+      "mrr": 0.891,
+      "tasks": 4,
+      "task_concepts_set_recall": 0.471,
+      "task_modules_set_recall": 0.083,
+      "task_research_set_recall": 0.0,
+      "task_facts_set_recall": 1.0
+    },
+    "heldout": {
+      "queries": 16,
+      "recall_at_3": 1.0,
+      "recall_at_10": 1.0,
+      "mrr": 0.854,
+      "tasks": 5,
+      "task_concepts_set_recall": 0.54,
+      "task_modules_set_recall": 0.5,
+      "task_research_set_recall": 1.0,
+      "task_facts_set_recall": 1.0
+    },
+    "negative": {
+      "cases": 3,
+      "abstained": 1
+    },
+    "critical": {
+      "passed": 12,
+      "total": 15,
+      "cases": {
+        "S01": "pass",
+        "S02": "pass",
+        "S03": "pass",
+        "S05": "pass",
+        "S06": "pass",
+        "S07": "pass",
+        "S10": "pass",
+        "S15": "pass",
+        "S19": "pass",
+        "S20": "pass",
+        "S21": "pass",
+        "H06": "pass",
+        "T001": "fail",
+        "T002": "fail",
+        "T003": "fail"
+      }
+    }
+  },
+  "cases": [
+    {
+      "id": "S01",
+      "kind": "query",
+      "partition": "screening",
+      "critical": true,
+      "top10": [
+        "docs/knowledge/stage-graph.md",
+        "src/mission_control/domain/programs/AGENTS.md",
+        "src/mission_control/domain/authoring/AGENTS.md",
+        "docs/knowledge/parallel-swarm.md",
+        "src/mission_control/application/programs/AGENTS.md",
+        "docs/knowledge/workflow-systems.md",
+        "docs/adr/0068-parallel-swarm-is-a-stage-graph-profile-and-evaluator-optimizer-runs-on-goal-loop-machinery.md",
+        "docs/knowledge/index.md",
+        "GLOSSARY.md",
+        "docs/specs/provider-consolidation-2026-10/sprint-oc/NEXT-SESSION.md"
+      ],
+      "best_rank": 1,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 1.0,
+      "set_recall": {
+        "concepts": 1.0,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "stage-graph",
+          "workflow-systems"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "S02",
+      "kind": "query",
+      "partition": "screening",
+      "critical": true,
+      "top10": [
+        "src/mission_control/domain/programs/AGENTS.md",
+        "docs/knowledge/goal-loop.md",
+        "src/mission_control/application/programs/AGENTS.md",
+        "docs/knowledge/evaluator-optimizer.md",
+        "GLOSSARY.md",
+        "docs/knowledge/index.md",
+        "docs/knowledge/workflow-systems.md",
+        "docs/knowledge/human-gates.md",
+        "docs/knowledge/deployment.md",
+        "docs/knowledge/temporal-synthesis.md"
+      ],
+      "best_rank": 2,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 0.5,
+      "set_recall": {
+        "concepts": 1.0,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "goal-loop"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "S03",
+      "kind": "query",
+      "partition": "screening",
+      "critical": true,
+      "top10": [
+        "docs/adr/0068-parallel-swarm-is-a-stage-graph-profile-and-evaluator-optimizer-runs-on-goal-loop-machinery.md",
+        "docs/knowledge/workflow-systems.md",
+        "docs/knowledge/parallel-swarm.md",
+        "GLOSSARY.md",
+        "src/mission_control/domain/programs/AGENTS.md",
+        "GLOSSARY.md",
+        "GLOSSARY.md",
+        "docs/knowledge/recursive-composition.md",
+        "src/mission_control/domain/authoring/AGENTS.md",
+        "docs/knowledge/evaluator-optimizer.md"
+      ],
+      "best_rank": 2,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 0.5,
+      "set_recall": {
+        "concepts": 1.0,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "parallel-swarm",
+          "workflow-systems"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "S04",
+      "kind": "query",
+      "partition": "screening",
+      "critical": false,
+      "top10": [
+        "docs/knowledge/evaluator-optimizer.md",
+        "src/mission_control/domain/programs/AGENTS.md",
+        "docs/knowledge/workflow-systems.md",
+        "docs/adr/0068-parallel-swarm-is-a-stage-graph-profile-and-evaluator-optimizer-runs-on-goal-loop-machinery.md",
+        "docs/knowledge/recursive-composition.md",
+        "src/mission_control/application/programs/AGENTS.md",
+        "src/mission_control/domain/authoring/AGENTS.md",
+        "GLOSSARY.md",
+        "GLOSSARY.md",
+        "docs/knowledge/goal-loop.md"
+      ],
+      "best_rank": 1,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 1.0,
+      "set_recall": {
+        "concepts": 1.0,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "evaluator-optimizer",
+          "goal-loop"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "S05",
+      "kind": "query",
+      "partition": "screening",
+      "critical": true,
+      "top10": [
+        "docs/adr/0029-mission-chains-compile-to-linked-missions-released-by-outbox.md",
+        "docs/knowledge/mission-chains.md",
+        "docs/knowledge/workflow-systems.md",
+        "src/mission_control/application/programs/AGENTS.md",
+        "src/mission_control/application/AGENTS.md",
+        "GLOSSARY.md",
+        "docs/adr/0068-parallel-swarm-is-a-stage-graph-profile-and-evaluator-optimizer-runs-on-goal-loop-machinery.md",
+        "docs/specs/provider-consolidation-2026-10/sprint-oc/NEXT-SESSION.md",
+        "docs/knowledge/qualification.md",
+        "docs/knowledge/temporal-synthesis.md"
+      ],
+      "best_rank": 2,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 0.5,
+      "set_recall": {
+        "concepts": 1.0,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "mission-chains"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "S06",
+      "kind": "query",
+      "partition": "screening",
+      "critical": true,
+      "top10": [
+        "docs/knowledge/output-contracts.md",
+        "src/mission_control/domain/AGENTS.md",
+        "GLOSSARY.md",
+        "docs/knowledge/completion.md",
+        "docs/knowledge/goal-loop.md",
+        "GLOSSARY.md",
+        "GLOSSARY.md",
+        "docs/knowledge/collections-and-current-sets.md",
+        "docs/knowledge/index.md",
+        "GLOSSARY.md"
+      ],
+      "best_rank": 1,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 1.0,
+      "set_recall": {
+        "concepts": 1.0,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "output-contracts"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "S07",
+      "kind": "query",
+      "partition": "screening",
+      "critical": true,
+      "top10": [
+        "src/mission_control/application/programs/AGENTS.md",
+        "docs/knowledge/output-contracts.md",
+        "docs/knowledge/human-gates.md",
+        "docs/knowledge/stage-graph.md",
+        "docs/knowledge/recursive-composition.md",
+        "src/mission_control/domain/AGENTS.md",
+        "docs/knowledge/workflow-systems.md",
+        "docs/knowledge/index.md",
+        "docs/knowledge/coordinator-attention.md",
+        "docs/knowledge/trusted-judgment.md"
+      ],
+      "best_rank": 2,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 0.5,
+      "set_recall": {
+        "concepts": 0.5,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "output-contracts"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "S08",
+      "kind": "query",
+      "partition": "screening",
+      "critical": false,
+      "top10": [
+        "docs/knowledge/interventions.md",
+        "src/mission_control/application/AGENTS.md",
+        "src/mission_control/adapters/postgres/AGENTS.md",
+        "tests/AGENTS.md",
+        "src/mission_control/application/missions/AGENTS.md",
+        "docs/knowledge/temporal-synthesis.md",
+        "docs/knowledge/revisions.md",
+        "docs/adr/0057-the-precise-fork-closure-family-position-and-the-seed-head.md",
+        "src/mission_control/adapters/temporal/AGENTS.md",
+        "docs/knowledge/precise-fork.md"
+      ],
+      "best_rank": 1,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 1.0,
+      "set_recall": {
+        "concepts": 1.0,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "interventions"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "S09",
+      "kind": "query",
+      "partition": "screening",
+      "critical": false,
+      "top10": [
+        "docs/knowledge/precise-fork.md",
+        "docs/knowledge/recovery.md",
+        "docs/knowledge/interventions.md",
+        "docs/knowledge/qualification.md",
+        "src/mission_control/adapters/postgres/AGENTS.md",
+        "docs/adr/0054-the-mission-transcript-is-the-replayable-record.md",
+        "docs/knowledge/index.md",
+        "src/mission_control/adapters/cursor/AGENTS.md",
+        "docs/adr/0057-the-precise-fork-closure-family-position-and-the-seed-head.md",
+        "docs/adr/0031-temporal-lifecycle-synthesis-observe-activity-updates-seeded-forks.md"
+      ],
+      "best_rank": 1,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 1.0,
+      "set_recall": {
+        "concepts": 1.0,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "precise-fork",
+          "recovery"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "S10",
+      "kind": "query",
+      "partition": "screening",
+      "critical": true,
+      "top10": [
+        "docs/knowledge/agent-configuration.md",
+        "src/mission_control/adapters/deep_agents/AGENTS.md",
+        "src/mission_control/application/authoring/AGENTS.md",
+        "docs/research/mission-control/capability-evolution-2026-10-14.md",
+        "docs/knowledge/deep-agents-children.md",
+        "docs/knowledge/capabilities.md",
+        "docs/knowledge/hook-contributions.md",
+        "docs/knowledge/mission-manifest.md",
+        "docs/knowledge/log.md",
+        "docs/knowledge/model-catalog.md"
+      ],
+      "best_rank": 1,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 1.0,
+      "set_recall": {
+        "concepts": 0.5,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "agent-configuration"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "S11",
+      "kind": "query",
+      "partition": "screening",
+      "critical": false,
+      "top10": [
+        "docs/knowledge/model-catalog.md",
+        "docs/knowledge/agent-configuration.md",
+        "GLOSSARY.md",
+        "docs/adr/0063-one-resolution-seam-over-declared-lane-model-and-application-registries.md",
+        "src/mission_control/interfaces/http/AGENTS.md",
+        "src/mission_control/adapters/deep_agents/AGENTS.md",
+        "GLOSSARY.md",
+        "docs/knowledge/selection-workspace.md",
+        "docs/knowledge/interfaces.md",
+        "docs/knowledge/mission-manifest.md"
+      ],
+      "best_rank": 1,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 1.0,
+      "set_recall": {
+        "concepts": 1.0,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "model-catalog"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "S12",
+      "kind": "query",
+      "partition": "screening",
+      "critical": false,
+      "top10": [
+        "docs/knowledge/temporal-synthesis.md",
+        "docs/knowledge/mission-control.md",
+        "src/mission_control/adapters/temporal/AGENTS.md",
+        "docs/adr/0036-mission-stream-is-socket-io-over-shared-handlers-postgres-replay-redis-fanout.md",
+        "docs/adr/0031-temporal-lifecycle-synthesis-observe-activity-updates-seeded-forks.md",
+        "src/mission_control/application/missions/AGENTS.md",
+        "docs/knowledge/deep-agents-lane.md",
+        "docs/knowledge/index.md",
+        "docs/knowledge/mission-stream.md",
+        "docs/knowledge/recovery.md"
+      ],
+      "best_rank": 1,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 1.0,
+      "set_recall": {
+        "concepts": 1.0,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "temporal-synthesis"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "S13",
+      "kind": "query",
+      "partition": "screening",
+      "critical": false,
+      "top10": [
+        "docs/knowledge/deep-agents-children.md",
+        "src/mission_control/application/authoring/AGENTS.md",
+        "src/mission_control/adapters/agent_server/AGENTS.md",
+        "src/mission_control/adapters/deep_agents/AGENTS.md",
+        "docs/research/deep-agents/surface-0.7.5.md",
+        "docs/knowledge/deep-agents-lane.md",
+        "docs/knowledge/agent-configuration.md",
+        "docs/research/mission-control/capability-evolution-2026-10-14.md",
+        "docs/knowledge/lanes-and-harness.md",
+        "docs/knowledge/log.md"
+      ],
+      "best_rank": 1,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 1.0,
+      "set_recall": {
+        "concepts": 1.0,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "deep-agents-children"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "S14",
+      "kind": "query",
+      "partition": "screening",
+      "critical": false,
+      "top10": [
+        "docs/knowledge/provider-batch.md",
+        "src/mission_control/adapters/temporal/AGENTS.md",
+        "docs/research/provider-batch/batch-apis.md",
+        "docs/knowledge/temporal-synthesis.md",
+        "docs/knowledge/goals.md",
+        "docs/knowledge/index.md",
+        "docs/knowledge/evaluator-attempts.md",
+        "docs/knowledge/trusted-judgment.md",
+        "docs/research/eve/facts.md",
+        "docs/knowledge/wake-channels.md"
+      ],
+      "best_rank": 1,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 1.0,
+      "set_recall": {
+        "concepts": 1.0,
+        "research": 1.0,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "provider-batch"
+        ],
+        "research": [
+          "provider-batch/batch-apis"
+        ],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "S15",
+      "kind": "query",
+      "partition": "screening",
+      "critical": true,
+      "top10": [
+        "docs/knowledge/human-gates.md",
+        "docs/knowledge/goals.md",
+        "docs/knowledge/coordinator-surface.md",
+        "docs/knowledge/goal-loop.md",
+        "docs/adr/0038-two-origins-of-human-control-over-one-human-task-service.md",
+        "src/mission_control/domain/programs/AGENTS.md",
+        "src/mission_control/application/programs/AGENTS.md",
+        "GLOSSARY.md",
+        "src/mission_control/interfaces/mcp/AGENTS.md",
+        "docs/research/mission-control/capability-evolution-2026-10-14.md"
+      ],
+      "best_rank": 1,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 1.0,
+      "set_recall": {
+        "concepts": 1.0,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "human-gates",
+          "goals"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "S16",
+      "kind": "query",
+      "partition": "screening",
+      "critical": false,
+      "top10": [
+        "docs/knowledge/database-component.md",
+        "packages/mission-control-db-contract/AGENTS.md",
+        "docs/knowledge/persistence.md",
+        "deployments/AGENTS.md",
+        "GLOSSARY.md",
+        "docs/knowledge/applications.md",
+        "GLOSSARY.md",
+        "docs/knowledge/mission-control.md",
+        "docs/adr/0003-common-sql-owned-by-db-contract-package.md",
+        "docs/specs/provider-consolidation-2026-10/sprint-oc/APPLICATION-PORTS.md"
+      ],
+      "best_rank": 1,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 1.0,
+      "set_recall": {
+        "concepts": 1.0,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "database-component",
+          "persistence"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "S17",
+      "kind": "query",
+      "partition": "screening",
+      "critical": false,
+      "top10": [
+        "docs/knowledge/mission-stream.md",
+        "src/mission_control/interfaces/AGENTS.md",
+        "docs/adr/0036-mission-stream-is-socket-io-over-shared-handlers-postgres-replay-redis-fanout.md",
+        "src/mission_control/application/AGENTS.md",
+        "src/mission_control/adapters/AGENTS.md",
+        "src/mission_control/contracts/AGENTS.md",
+        "docs/knowledge/unit-and-point-joinability.md",
+        "docs/knowledge/mission-control.md",
+        "docs/knowledge/decisions.md",
+        "docs/adr/0016-required-ui-surfaces-with-fallback.md"
+      ],
+      "best_rank": 1,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 1.0,
+      "set_recall": {
+        "concepts": 1.0,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "mission-stream"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "S18",
+      "kind": "query",
+      "partition": "screening",
+      "critical": false,
+      "top10": [
+        "src/mission_control/application/selection/AGENTS.md",
+        "docs/knowledge/selection-workspace.md",
+        "src/mission_control/adapters/capabilities/AGENTS.md",
+        "docs/DEVELOPMENT.md",
+        "tests/AGENTS.md",
+        "docs/knowledge/capability-seeds.md",
+        "packages/mission-control-db-contract/AGENTS.md",
+        "GLOSSARY.md",
+        "docs/knowledge/applications.md",
+        "docs/knowledge/mission-manifest.md"
+      ],
+      "best_rank": 2,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 0.5,
+      "set_recall": {
+        "concepts": 1.0,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "selection-workspace"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "S19",
+      "kind": "query",
+      "partition": "screening",
+      "critical": true,
+      "top10": [
+        "docs/knowledge/budgets-and-usage.md",
+        "docs/knowledge/decisions.md",
+        "src/mission_control/domain/execution/AGENTS.md",
+        "docs/specs/provider-consolidation-2026-10/sprint-oc/NEXT-SESSION.md",
+        "src/mission_control/bootstrap/AGENTS.md",
+        "docs/knowledge/qualification.md",
+        "docs/knowledge/application-profile.md",
+        "docs/knowledge/deployment.md",
+        "docs/knowledge/model-catalog.md",
+        "src/mission_control/interfaces/http/AGENTS.md"
+      ],
+      "best_rank": 1,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 1.0,
+      "set_recall": {
+        "concepts": 1.0,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "budgets-and-usage",
+          "decisions"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "S20",
+      "kind": "query",
+      "partition": "screening",
+      "critical": true,
+      "top10": [
+        "docs/knowledge/applications.md",
+        "docs/specs/provider-consolidation-2026-10/sprint-oc/NEXT-SESSION.md",
+        "docs/adr/0001-one-python-distribution-clean-transformation.md",
+        "docs/specs/provider-consolidation-2026-10/sprint-oc/APPLICATION-PORTS.md",
+        "docs/knowledge/decisions.md",
+        "integrations/biotech/AGENTS.md",
+        "docs/adr/0059-application-content-and-shared-knowledge-authority.md",
+        "docs/knowledge/persistence.md",
+        "GLOSSARY.md",
+        "deployments/AGENTS.md"
+      ],
+      "best_rank": 1,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 1.0,
+      "set_recall": {
+        "concepts": 0.6666666666666666,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "applications",
+          "persistence"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "S21",
+      "kind": "query",
+      "partition": "screening",
+      "critical": true,
+      "top10": [
+        "docs/knowledge/qualification.md",
+        "docs/knowledge/selection-workspace.md",
+        "docs/DEVELOPMENT.md",
+        "docs/knowledge/watchers.md",
+        "docs/knowledge/workspace-closure.md",
+        "src/mission_control/adapters/temporal/AGENTS.md",
+        "docs/knowledge/signal-ingress.md",
+        "src/mission_control/application/authoring/AGENTS.md",
+        "tests/AGENTS.md",
+        "docs/agents/documentation-surfaces.md"
+      ],
+      "best_rank": 1,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 1.0,
+      "set_recall": {
+        "concepts": 0.5,
+        "research": null,
+        "modules": 1.0,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "qualification"
+        ],
+        "research": [],
+        "modules": [
+          "tests"
+        ],
+        "facts": []
+      },
+      "strict_modules_found": [
+        "tests"
+      ],
+      "pass": true
+    },
+    {
+      "id": "S22",
+      "kind": "query",
+      "partition": "screening",
+      "critical": false,
+      "top10": [
+        "docs/knowledge/decisions.md",
+        "docs/agents/program-workspace.md",
+        "docs/adr/0064-one-vendored-sdlc-toolchain-per-repository.md",
+        "docs/specs/provider-consolidation-2026-10/sprint-oc/NEXT-SESSION.md",
+        "docs/knowledge/deployment.md",
+        "docs/knowledge/human-gates.md",
+        "docs/adr/0055-retention-follows-the-mission.md",
+        "GLOSSARY.md",
+        "docs/knowledge/log.md",
+        "docs/knowledge/coordinator-surface.md"
+      ],
+      "best_rank": 1,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 1.0,
+      "set_recall": {
+        "concepts": 1.0,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "decisions"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "S23",
+      "kind": "query",
+      "partition": "screening",
+      "critical": false,
+      "top10": [
+        "docs/knowledge/knowledge-services.md",
+        "docs/knowledge/application-profile.md",
+        "GLOSSARY.md",
+        "integrations/biotech/AGENTS.md",
+        "docs/specs/provider-consolidation-2026-10/sprint-oc/APPLICATION-PORTS.md",
+        "docs/knowledge/trusted-judgment.md",
+        "docs/knowledge/durable-reactions.md",
+        "GLOSSARY.md",
+        "src/mission_control/adapters/AGENTS.md",
+        "docs/specs/provider-consolidation-2026-10/sprint-oc/NEXT-SESSION.md"
+      ],
+      "best_rank": 1,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 1.0,
+      "set_recall": {
+        "concepts": 1.0,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "knowledge-services"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "H01",
+      "kind": "query",
+      "partition": "heldout",
+      "critical": false,
+      "top10": [
+        "docs/knowledge/stage-graph.md",
+        "src/mission_control/domain/authoring/AGENTS.md",
+        "src/mission_control/domain/programs/AGENTS.md",
+        "src/mission_control/application/programs/AGENTS.md",
+        "docs/knowledge/durable-controls.md",
+        "src/mission_control/domain/AGENTS.md",
+        "docs/knowledge/budgets-and-usage.md",
+        "src/mission_control/adapters/AGENTS.md",
+        "docs/knowledge/evaluator-optimizer.md",
+        "docs/adr/0068-parallel-swarm-is-a-stage-graph-profile-and-evaluator-optimizer-runs-on-goal-loop-machinery.md"
+      ],
+      "best_rank": 1,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 1.0,
+      "set_recall": {
+        "concepts": 1.0,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "stage-graph"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "H02",
+      "kind": "query",
+      "partition": "heldout",
+      "critical": false,
+      "top10": [
+        "docs/knowledge/recursive-composition.md",
+        "docs/knowledge/index.md",
+        "docs/knowledge/human-gates.md",
+        "docs/knowledge/temporal-synthesis.md",
+        "docs/knowledge/output-contracts.md",
+        "docs/knowledge/stage-graph.md",
+        "docs/knowledge/deep-agents-children.md",
+        "GLOSSARY.md",
+        "docs/knowledge/completion.md",
+        "docs/knowledge/deep-agents-lane.md"
+      ],
+      "best_rank": 1,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 1.0,
+      "set_recall": {
+        "concepts": 0.5,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "recursive-composition"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "H03",
+      "kind": "query",
+      "partition": "heldout",
+      "critical": false,
+      "top10": [
+        "docs/knowledge/completion.md",
+        "docs/adr/0048-knowledge-workspaces-and-mission-branches.md",
+        "src/mission_control/domain/execution/AGENTS.md",
+        "src/mission_control/domain/AGENTS.md",
+        "docs/adr/0050-nine-lane-profiles-claude-managed-and-codex-agents-and-the-mission-data-class.md",
+        "docs/adr/0056-agents-never-write-tables.md",
+        "src/mission_control/application/programs/AGENTS.md",
+        "docs/knowledge/saved-result-settlement.md",
+        "docs/adr/0049-deprecate-mission-subscribe-push-in-favour-of-inbox-wait-channels.md",
+        "docs/adr/0052-remote-session-lane-base-shared-machinery-for-provider-session-apis.md"
+      ],
+      "best_rank": 1,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 1.0,
+      "set_recall": {
+        "concepts": 1.0,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "completion"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "H04",
+      "kind": "query",
+      "partition": "heldout",
+      "critical": false,
+      "top10": [
+        "docs/knowledge/environments.md",
+        "docs/knowledge/signal-ingress.md",
+        "docs/knowledge/secret-broker.md",
+        "docs/knowledge/index.md",
+        "docs/adr/0043-secret-broker-per-lane-delivery-minted-signal-credentials-never-commit-secrets.md",
+        "docs/adr/0030-cursor-lane-two-profiles-reducer-from-frames-hydrated-fork.md",
+        "docs/adr/0042-environment-kits-and-two-layer-base-mission-setup-with-one-bootstrap-entrypoint.md",
+        "src/mission_control/adapters/AGENTS.md",
+        "docs/knowledge/owner-probe-bootstrap.md",
+        "docs/knowledge/owner-prerequisites.md"
+      ],
+      "best_rank": 3,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 0.3333333333333333,
+      "set_recall": {
+        "concepts": 1.0,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "secret-broker"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "H05",
+      "kind": "query",
+      "partition": "heldout",
+      "critical": false,
+      "top10": [
+        "docs/knowledge/workspace-closure.md",
+        "GLOSSARY.md",
+        "docs/knowledge/index.md",
+        "docs/knowledge/hook-contributions.md",
+        "src/mission_control/interfaces/http/AGENTS.md",
+        "src/mission_control/adapters/deep_agents/AGENTS.md",
+        "GLOSSARY.md",
+        "docs/knowledge/saved-result-settlement.md",
+        "docs/knowledge/deep-agents-lane.md",
+        "docs/adr/0027-context-packet-tiers-and-workspace-materialization.md"
+      ],
+      "best_rank": 1,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 1.0,
+      "set_recall": {
+        "concepts": 1.0,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "workspace-closure"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "H06",
+      "kind": "query",
+      "partition": "heldout",
+      "critical": true,
+      "top10": [
+        "docs/research/deep-agents/sandbox-providers.md",
+        "docs/knowledge/deep-agents-lane.md",
+        "docs/research/daytona/sandbox-tiers.md",
+        "docs/knowledge/workspace-closure.md",
+        "src/mission_control/adapters/deep_agents/AGENTS.md",
+        "docs/knowledge/agent-configuration.md",
+        "src/mission_control/application/environments/AGENTS.md",
+        "docs/knowledge/hook-contributions.md",
+        "docs/research/deep-agents/surface-0.7.5.md",
+        "docs/knowledge/deployment.md"
+      ],
+      "best_rank": 1,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 1.0,
+      "set_recall": {
+        "concepts": 1.0,
+        "research": 1.0,
+        "modules": 1.0,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "deep-agents-lane"
+        ],
+        "research": [
+          "deep-agents/sandbox-providers",
+          "daytona/sandbox-tiers"
+        ],
+        "modules": [
+          "src/mission_control/adapters/deep_agents"
+        ],
+        "facts": []
+      },
+      "strict_modules_found": [
+        "src/mission_control/adapters/deep_agents"
+      ],
+      "pass": true
+    },
+    {
+      "id": "H07",
+      "kind": "query",
+      "partition": "heldout",
+      "critical": false,
+      "top10": [
+        "docs/knowledge/wake-channels.md",
+        "src/mission_control/interfaces/cli/AGENTS.md",
+        "src/mission_control/interfaces/mcp/AGENTS.md",
+        "src/mission_control/bootstrap/AGENTS.md",
+        "docs/adr/0049-deprecate-mission-subscribe-push-in-favour-of-inbox-wait-channels.md",
+        "src/mission_control/application/programs/AGENTS.md",
+        "docs/knowledge/index.md",
+        "docs/knowledge/provider-lanes.md",
+        "docs/knowledge/saved-result-settlement.md",
+        "docs/knowledge/mission-chains.md"
+      ],
+      "best_rank": 1,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 1.0,
+      "set_recall": {
+        "concepts": 0.5,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "wake-channels"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "H08",
+      "kind": "query",
+      "partition": "heldout",
+      "critical": false,
+      "top10": [
+        "docs/knowledge/session-ownership-and-dispatch.md",
+        "src/mission_control/adapters/temporal/AGENTS.md",
+        "docs/adr/0052-remote-session-lane-base-shared-machinery-for-provider-session-apis.md",
+        "docs/knowledge/saved-result-settlement.md",
+        "docs/knowledge/interventions.md",
+        "docs/knowledge/provider-batch.md",
+        "GLOSSARY.md",
+        "docs/adr/0041-continuation-is-a-persisted-phase-machine-driven-by-the-operation-workflow.md",
+        "docs/knowledge/placement-admission.md",
+        "docs/knowledge/budgets-and-usage.md"
+      ],
+      "best_rank": 1,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 1.0,
+      "set_recall": {
+        "concepts": 1.0,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "session-ownership-and-dispatch"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "H09",
+      "kind": "query",
+      "partition": "heldout",
+      "critical": false,
+      "top10": [
+        "src/mission_control/domain/authoring/AGENTS.md",
+        "docs/adr/0022-mission-manifest-yaml-authoring-surface.md",
+        "docs/knowledge/mission-manifest.md",
+        "docs/knowledge/revisions.md",
+        "GLOSSARY.md",
+        "docs/knowledge/placement-admission.md",
+        "docs/knowledge/authoring.md",
+        "src/mission_control/application/authoring/AGENTS.md",
+        "docs/adr/0046-watchers-as-compiled-bounded-deterministic-descriptors.md",
+        "docs/knowledge/watchers.md"
+      ],
+      "best_rank": 3,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 0.3333333333333333,
+      "set_recall": {
+        "concepts": 1.0,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "mission-manifest"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "H10",
+      "kind": "query",
+      "partition": "heldout",
+      "critical": false,
+      "top10": [
+        "docs/knowledge/revisions.md",
+        "src/mission_control/adapters/postgres/AGENTS.md",
+        "src/mission_control/domain/authoring/AGENTS.md",
+        "docs/knowledge/temporal-synthesis.md",
+        "docs/knowledge/interventions.md",
+        "src/mission_control/application/AGENTS.md",
+        "src/mission_control/application/programs/AGENTS.md",
+        "docs/knowledge/goal-loop.md",
+        "tests/AGENTS.md",
+        "src/mission_control/application/missions/AGENTS.md"
+      ],
+      "best_rank": 1,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 1.0,
+      "set_recall": {
+        "concepts": 0.5,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "revisions"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "H11",
+      "kind": "query",
+      "partition": "heldout",
+      "critical": false,
+      "top10": [
+        "docs/knowledge/deployment.md",
+        "docs/knowledge/lanes-and-harness.md",
+        "docs/research/2026-10-07-coding-lane-surfaces.md",
+        "docs/research/cursor/sdk-facts.md",
+        "docs/knowledge/goals.md",
+        "docs/research/mission-control/capability-evolution-2026-10-14.md",
+        "docs/WSL2_WORKER_RUNBOOK.md",
+        "docs/knowledge/cursor-lane.md",
+        "docs/adr/0052-remote-session-lane-base-shared-machinery-for-provider-session-apis.md",
+        "src/mission_control/adapters/cursor/AGENTS.md"
+      ],
+      "best_rank": 1,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 1.0,
+      "set_recall": {
+        "concepts": 1.0,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "goals",
+          "deployment"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "H12",
+      "kind": "query",
+      "partition": "heldout",
+      "critical": false,
+      "top10": [
+        "docs/knowledge/durable-controls.md",
+        "src/mission_control/adapters/AGENTS.md",
+        "src/mission_control/domain/AGENTS.md",
+        "GLOSSARY.md",
+        "docs/knowledge/human-gates.md",
+        "docs/knowledge/provider-batch.md",
+        "docs/knowledge/temporal-synthesis.md",
+        "docs/knowledge/index.md",
+        "GLOSSARY.md",
+        "docs/knowledge/workflow-systems.md"
+      ],
+      "best_rank": 1,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 1.0,
+      "set_recall": {
+        "concepts": 1.0,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "durable-controls",
+          "human-gates"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "H13",
+      "kind": "query",
+      "partition": "heldout",
+      "critical": false,
+      "top10": [
+        "docs/adr/0046-watchers-as-compiled-bounded-deterministic-descriptors.md",
+        "docs/knowledge/watchers.md",
+        "GLOSSARY.md",
+        "src/mission_control/adapters/temporal/AGENTS.md",
+        "GLOSSARY.md",
+        "GLOSSARY.md",
+        "docs/adr/0065-documentation-automation-bound-to-git-events-not-a-scheduler.md",
+        "GLOSSARY.md",
+        "docs/adr/0022-mission-manifest-yaml-authoring-surface.md",
+        "GLOSSARY.md"
+      ],
+      "best_rank": 2,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 0.5,
+      "set_recall": {
+        "concepts": 1.0,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "watchers"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "H14",
+      "kind": "query",
+      "partition": "heldout",
+      "critical": false,
+      "top10": [
+        "docs/knowledge/hook-contributions.md",
+        "GLOSSARY.md",
+        "src/mission_control/contracts/AGENTS.md",
+        "src/mission_control/adapters/deep_agents/AGENTS.md",
+        "GLOSSARY.md",
+        "docs/adr/0039-four-independent-progress-mechanisms-compaction-native-first-continuation-sealed.md",
+        "GLOSSARY.md",
+        "docs/knowledge/deep-agents-lane.md",
+        "docs/knowledge/log.md",
+        "GLOSSARY.md"
+      ],
+      "best_rank": 1,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 1.0,
+      "set_recall": {
+        "concepts": 0.5,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "hook-contributions"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "H15",
+      "kind": "query",
+      "partition": "heldout",
+      "critical": false,
+      "top10": [
+        "docs/knowledge/lanes-and-harness.md",
+        "GLOSSARY.md",
+        "docs/adr/0018-coding-agents-are-execution-lanes.md",
+        "docs/knowledge/session-ownership-and-dispatch.md",
+        "docs/research/2026-10-07-coding-lane-surfaces.md",
+        "tests/AGENTS.md",
+        "docs/knowledge/cursor-lane.md",
+        "docs/knowledge/provider-lanes.md",
+        "src/mission_control/domain/execution/AGENTS.md",
+        "src/mission_control/adapters/codex/AGENTS.md"
+      ],
+      "best_rank": 1,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 1.0,
+      "set_recall": {
+        "concepts": 1.0,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "lanes-and-harness"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "H16",
+      "kind": "query",
+      "partition": "heldout",
+      "critical": false,
+      "top10": [
+        "docs/research/mission-control/capability-evolution-2026-10-14.md",
+        "docs/knowledge/cursor-lane.md",
+        "docs/research/cursor/sdk-facts.md",
+        "docs/WSL2_WORKER_RUNBOOK.md",
+        "docs/research/2026-10-07-coding-lane-surfaces.md",
+        "docs/knowledge/provider-lanes.md",
+        "docs/adr/0035-seven-lane-profiles-versioned-provider-contracts-and-mission-v2.md",
+        "docs/research/eve/facts.md",
+        "src/mission_control/adapters/cursor/AGENTS.md",
+        "docs/knowledge/owner-prerequisites.md"
+      ],
+      "best_rank": 2,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 0.5,
+      "set_recall": {
+        "concepts": 1.0,
+        "research": 1.0,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "cursor-lane"
+        ],
+        "research": [
+          "cursor/sdk-facts"
+        ],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "N01",
+      "kind": "query",
+      "partition": "negative",
+      "critical": false,
+      "top10": [
+        "docs/knowledge/documentation-retrieval-fixtures.md",
+        "docs/adr/0012-coding-effects-are-separate-capabilities.md",
+        "docs/adr/0037-mission-control-allocates-workspaces-fork-is-snapshot-plus-packet-plus-conversation.md",
+        "docs/knowledge/durable-reactions.md",
+        "docs/adr/0065-documentation-automation-bound-to-git-events-not-a-scheduler.md",
+        "docs/research/deep-agents/surface-0.7.5.md",
+        "docs/adr/0029-mission-chains-compile-to-linked-missions-released-by-outbox.md",
+        "docs/adr/0064-one-vendored-sdlc-toolchain-per-repository.md",
+        "docs/WSL2_WORKER_RUNBOOK.md",
+        "docs/knowledge/index.md"
+      ],
+      "best_rank": null,
+      "hit_at_3": false,
+      "hit_at_10": false,
+      "rr": 0.0,
+      "set_recall": {
+        "concepts": null,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": false
+    },
+    {
+      "id": "N02",
+      "kind": "query",
+      "partition": "negative",
+      "critical": false,
+      "top10": [],
+      "best_rank": null,
+      "hit_at_3": false,
+      "hit_at_10": false,
+      "rr": 0.0,
+      "set_recall": {
+        "concepts": null,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "N03",
+      "kind": "query",
+      "partition": "negative",
+      "critical": false,
+      "top10": [
+        "skills/AGENTS.md",
+        "docs/knowledge/signal-ingress.md",
+        "GLOSSARY.md",
+        "docs/adr/0045-signal-ingress-trust-tiers-signals-are-evidence-never-authority.md",
+        "docs/knowledge/deployment.md",
+        "GLOSSARY.md",
+        "src/mission_control/adapters/AGENTS.md",
+        "GLOSSARY.md",
+        "deployments/AGENTS.md",
+        "docs/research/deep-agents/sandbox-providers.md"
+      ],
+      "best_rank": null,
+      "hit_at_3": false,
+      "hit_at_10": false,
+      "rr": 0.0,
+      "set_recall": {
+        "concepts": null,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": false
+    },
+    {
+      "id": "T001",
+      "kind": "task",
+      "partition": "screening",
+      "critical": true,
+      "top10": [
+        "docs/research/mission-control/capability-evolution-2026-10-14.md",
+        "docs/knowledge/goals.md",
+        "docs/knowledge/deployment.md",
+        "GLOSSARY.md",
+        "docs/knowledge/deep-agents-lane.md",
+        "docs/research/eve/facts.md",
+        "docs/agents/documentation-surfaces.md",
+        "docs/knowledge/lanes-and-harness.md",
+        "docs/MISSION_CONTROL_LOCAL_API.md",
+        "docs/knowledge/agent-configuration.md"
+      ],
+      "best_rank": 5,
+      "hit_at_3": false,
+      "hit_at_10": true,
+      "rr": 0.2,
+      "set_recall": {
+        "concepts": 0.2857142857142857,
+        "research": 0.0,
+        "modules": 0.0,
+        "facts": 1.0
+      },
+      "found": {
+        "concepts": [
+          "deep-agents-lane",
+          "agent-configuration"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": [
+          "daytona admitted by contract but no materializer factory",
+          "active systems: StageGraph, GoalDirected"
+        ]
+      },
+      "strict_modules_found": [],
+      "pass": false
+    },
+    {
+      "id": "T002",
+      "kind": "task",
+      "partition": "screening",
+      "critical": true,
+      "top10": [
+        "docs/knowledge/output-contracts.md",
+        "docs/knowledge/stage-graph.md",
+        "docs/knowledge/parallel-swarm.md",
+        "docs/knowledge/workflow-systems.md",
+        "docs/knowledge/human-gates.md",
+        "docs/knowledge/temporal-synthesis.md",
+        "docs/knowledge/recursive-composition.md",
+        "src/mission_control/domain/AGENTS.md",
+        "src/mission_control/application/programs/AGENTS.md",
+        "docs/knowledge/completion.md"
+      ],
+      "best_rank": 1,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 1.0,
+      "set_recall": {
+        "concepts": 0.6,
+        "research": null,
+        "modules": 0.3333333333333333,
+        "facts": 1.0
+      },
+      "found": {
+        "concepts": [
+          "output-contracts",
+          "stage-graph",
+          "completion"
+        ],
+        "research": [],
+        "modules": [
+          "src/mission_control/application/programs"
+        ],
+        "facts": [
+          "obligations are fulfilled through one submission act"
+        ]
+      },
+      "strict_modules_found": [
+        "src/mission_control/application/programs"
+      ],
+      "pass": false
+    },
+    {
+      "id": "T003",
+      "kind": "task",
+      "partition": "screening",
+      "critical": true,
+      "top10": [
+        "docs/knowledge/temporal-synthesis.md",
+        "docs/knowledge/interventions.md",
+        "docs/knowledge/recursive-composition.md",
+        "docs/adr/0057-the-precise-fork-closure-family-position-and-the-seed-head.md",
+        "docs/knowledge/revisions.md",
+        "docs/knowledge/goals.md",
+        "tests/AGENTS.md",
+        "src/mission_control/adapters/postgres/AGENTS.md",
+        "docs/knowledge/context-and-continuation.md",
+        "docs/knowledge/index.md"
+      ],
+      "best_rank": 2,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 0.5,
+      "set_recall": {
+        "concepts": 0.4,
+        "research": null,
+        "modules": 0.0,
+        "facts": 1.0
+      },
+      "found": {
+        "concepts": [
+          "interventions",
+          "context-and-continuation"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": [
+          "inject is delivered at a safe boundary"
+        ]
+      },
+      "strict_modules_found": [],
+      "pass": false
+    },
+    {
+      "id": "T004",
+      "kind": "task",
+      "partition": "screening",
+      "critical": false,
+      "top10": [
+        "src/mission_control/adapters/cursor/AGENTS.md",
+        "docs/knowledge/context-and-continuation.md",
+        "docs/knowledge/recovery.md",
+        "docs/knowledge/temporal-synthesis.md",
+        "docs/knowledge/precise-fork.md",
+        "docs/adr/0057-the-precise-fork-closure-family-position-and-the-seed-head.md",
+        "docs/knowledge/interventions.md",
+        "tests/AGENTS.md",
+        "docs/knowledge/human-gates.md",
+        "docs/knowledge/index.md"
+      ],
+      "best_rank": 3,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 0.3333333333333333,
+      "set_recall": {
+        "concepts": 0.6,
+        "research": null,
+        "modules": 0.0,
+        "facts": 1.0
+      },
+      "found": {
+        "concepts": [
+          "precise-fork",
+          "recovery",
+          "interventions"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": [
+          "a fork is a snapshot plus a context packet plus a conversation seed"
+        ]
+      },
+      "strict_modules_found": [],
+      "pass": false
+    },
+    {
+      "id": "T005",
+      "kind": "task",
+      "partition": "heldout",
+      "critical": false,
+      "top10": [
+        "src/mission_control/adapters/deep_agents/AGENTS.md",
+        "docs/knowledge/model-catalog.md",
+        "docs/research/deep-agents/surface-0.7.5.md",
+        "docs/knowledge/agent-configuration.md",
+        "docs/adr/0063-one-resolution-seam-over-declared-lane-model-and-application-registries.md",
+        "docs/knowledge/hook-contributions.md",
+        "docs/knowledge/log.md",
+        "docs/knowledge/deep-agents-children.md",
+        "deployments/AGENTS.md",
+        "docs/research/mission-control/capability-evolution-2026-10-14.md"
+      ],
+      "best_rank": 1,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 1.0,
+      "set_recall": {
+        "concepts": 0.4,
+        "research": 1.0,
+        "modules": 0.3333333333333333,
+        "facts": 1.0
+      },
+      "found": {
+        "concepts": [
+          "model-catalog",
+          "agent-configuration"
+        ],
+        "research": [
+          "deep-agents/surface-0.7.5"
+        ],
+        "modules": [
+          "src/mission_control/adapters/deep_agents"
+        ],
+        "facts": [
+          "routes resolve through one resolution seam over declared registries"
+        ]
+      },
+      "strict_modules_found": [
+        "src/mission_control/adapters/deep_agents"
+      ],
+      "pass": false
+    },
+    {
+      "id": "T006",
+      "kind": "task",
+      "partition": "heldout",
+      "critical": false,
+      "top10": [
+        "docs/knowledge/lanes-and-harness.md",
+        "src/mission_control/domain/execution/AGENTS.md",
+        "tests/AGENTS.md",
+        "src/mission_control/application/AGENTS.md",
+        "src/mission_control/adapters/temporal/AGENTS.md",
+        "docs/knowledge/deep-agents-lane.md",
+        "docs/knowledge/deep-agents-children.md",
+        "src/mission_control/adapters/deep_agents/AGENTS.md",
+        "docs/adr/0063-one-resolution-seam-over-declared-lane-model-and-application-registries.md",
+        "src/mission_control/application/environments/AGENTS.md"
+      ],
+      "best_rank": 1,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 1.0,
+      "set_recall": {
+        "concepts": 0.4,
+        "research": null,
+        "modules": 0.6666666666666666,
+        "facts": 1.0
+      },
+      "found": {
+        "concepts": [
+          "lanes-and-harness",
+          "deep-agents-lane"
+        ],
+        "research": [],
+        "modules": [
+          "src/mission_control/adapters/deep_agents",
+          "src/mission_control/application"
+        ],
+        "facts": [
+          "every lane follows the harness protocol"
+        ]
+      },
+      "strict_modules_found": [
+        "src/mission_control/adapters/deep_agents",
+        "src/mission_control/application"
+      ],
+      "pass": false
+    },
+    {
+      "id": "T007",
+      "kind": "task",
+      "partition": "heldout",
+      "critical": false,
+      "top10": [
+        "docs/knowledge/provider-batch.md",
+        "src/mission_control/adapters/temporal/AGENTS.md",
+        "src/mission_control/domain/AGENTS.md",
+        "docs/knowledge/temporal-synthesis.md",
+        "docs/knowledge/saved-result-settlement.md",
+        "docs/research/provider-batch/batch-apis.md",
+        "docs/knowledge/goals.md",
+        "docs/adr/0054-the-mission-transcript-is-the-replayable-record.md",
+        "docs/DEVELOPMENT.md",
+        "docs/knowledge/human-gates.md"
+      ],
+      "best_rank": 1,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 1.0,
+      "set_recall": {
+        "concepts": 0.75,
+        "research": 1.0,
+        "modules": 1.0,
+        "facts": 1.0
+      },
+      "found": {
+        "concepts": [
+          "provider-batch",
+          "temporal-synthesis",
+          "goals"
+        ],
+        "research": [
+          "provider-batch/batch-apis"
+        ],
+        "modules": [
+          "src/mission_control/adapters/temporal"
+        ],
+        "facts": [
+          "provider batch inference is a goal, not built"
+        ]
+      },
+      "strict_modules_found": [
+        "src/mission_control/adapters/temporal"
+      ],
+      "pass": true
+    },
+    {
+      "id": "T008",
+      "kind": "task",
+      "partition": "heldout",
+      "critical": false,
+      "top10": [
+        "docs/knowledge/persistence.md",
+        "packages/mission-control-db-contract/AGENTS.md",
+        "docs/knowledge/database-component.md",
+        "docs/adr/0002-one-service-two-applications-schema-per-app-database.md",
+        "docs/knowledge/applications.md",
+        "docs/knowledge/mission-control.md",
+        "deployments/AGENTS.md",
+        "GLOSSARY.md",
+        "docs/MISSION_CONTROL_LOCAL_API.md",
+        "GLOSSARY.md"
+      ],
+      "best_rank": 1,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 1.0,
+      "set_recall": {
+        "concepts": 0.75,
+        "research": null,
+        "modules": 0.5,
+        "facts": 1.0
+      },
+      "found": {
+        "concepts": [
+          "database-component",
+          "persistence",
+          "applications"
+        ],
+        "research": [],
+        "modules": [
+          "packages/mission-control-db-contract"
+        ],
+        "facts": [
+          "the common SQL lives only in the db-contract package"
+        ]
+      },
+      "strict_modules_found": [
+        "packages/mission-control-db-contract"
+      ],
+      "pass": true
+    },
+    {
+      "id": "T009",
+      "kind": "task",
+      "partition": "heldout",
+      "critical": false,
+      "top10": [
+        "docs/knowledge/selection-workspace.md",
+        "GLOSSARY.md",
+        "docs/knowledge/deep-agents-lane.md",
+        "docs/knowledge/goals.md",
+        "docs/research/mission-control/capability-evolution-2026-10-14.md",
+        "GLOSSARY.md",
+        "docs/knowledge/provider-batch.md",
+        "docs/knowledge/mission-manifest.md",
+        "docs/research/deep-agents/surface-0.7.5.md",
+        "docs/knowledge/cursor-lane.md"
+      ],
+      "best_rank": 1,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 1.0,
+      "set_recall": {
+        "concepts": 0.4,
+        "research": null,
+        "modules": 0.0,
+        "facts": 1.0
+      },
+      "found": {
+        "concepts": [
+          "selection-workspace",
+          "goals"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": [
+          "the Catalog Workspace is not built",
+          "missionctl search posts to the API"
+        ]
+      },
+      "strict_modules_found": [],
+      "pass": false
+    }
+  ]
+}

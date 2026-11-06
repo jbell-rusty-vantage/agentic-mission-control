@@ -1,0 +1,289 @@
+from __future__ import annotations
+
+from contextlib import AsyncExitStack
+from dataclasses import dataclass
+from datetime import timedelta
+from typing import Protocol
+
+import asyncpg
+from temporalio.client import Client
+from temporalio.worker import Worker, WorkerDeploymentConfig
+
+from mission_control.adapters.temporal.artifact_activities import (
+    ArtifactPromotionActivities,
+    create_generic_artifact_worker,
+)
+from mission_control.adapters.temporal.coordinator_runtime import (
+    CoordinatorWorkerActivities,
+    CoordinatorWorkerSet,
+    coordinator_task_queues,
+    create_coordinator_workers,
+)
+from mission_control.adapters.temporal.operation_activities import (
+    OperationExecutionActivities,
+    create_agent_cognitive_worker,
+)
+from mission_control.adapters.temporal.registration.task_queues import (
+    BellLabsTaskQueues,
+    generic_artifact_task_queue,
+    maintenance_task_queue,
+    watchers_task_queue,
+)
+from mission_control.application.authoring.manifest_submit import (
+    register_manifest_admission_policies,
+)
+from mission_control.application.authoring.service import ControlPlaneService
+from mission_control.application.execution.harness.hook_callbacks import HookCallbackService
+from mission_control.application.execution.harness.time_travel import TimeTravelRegistry
+from mission_control.application.execution.run_control_repository import RunControlRepository
+from mission_control.application.execution.service import (
+    AdmissionPolicyRegistry,
+    FamilyAdmissionRegistry,
+    RunConfigurationVerifier,
+    RunControlService,
+)
+from mission_control.application.programs.goal_directed import (
+    configure_goal_directed_family_admissions,
+)
+from mission_control.application.programs.service import register_stagegraph_family_mutations
+from mission_control.bootstrap.settings import Settings
+from mission_control.domain.execution.heartbeats import OperationHeartbeatPolicy
+from mission_control.domain.execution.usage_admission import LimitWaitPolicy
+
+
+@dataclass(frozen=True)
+class WorkerActivityComposition:
+    """Deployment-supplied, fully wired activity adapters.
+
+    `artifacts` serves `GenericArtifactWorkflow` (candidate capture and governed promotion)
+    on its own queue; `resources` holds provider lifespans the composition opened (the
+    persistent LangGraph saver and store) and is closed when the workers stop.
+    """
+
+    coordinator: CoordinatorWorkerActivities | None
+    operation: OperationExecutionActivities
+    artifacts: ArtifactPromotionActivities | None = None
+    resources: AsyncExitStack | None = None
+    # FT-G3: the Kernel Hook callback service the worker serves on its loopback listener
+    # (present when a file-based lane such as `cursor_local` is composed).
+    hook_callbacks: HookCallbackService | None = None
+    # 1.4.4 (P6.1): the time-travel router over the worker's pinned savers, for the fork
+    # seed copy served on the maintenance queue (`mc.fork_seed.v1`).
+    time_travel: TimeTravelRegistry | None = None
+
+
+class WorkerActivityCompositionFactory(Protocol):
+    async def build(
+        self,
+        *,
+        settings: Settings,
+        control_plane: ControlPlaneService,
+        run_control: RunControlService,
+        postgres_pool: asyncpg.Pool,
+    ) -> WorkerActivityComposition: ...
+
+
+@dataclass(frozen=True)
+class ProductionWorkerSet:
+    """The workers a launch-enabled deployment runs for one composition (RRM-009)."""
+
+    coordinator: CoordinatorWorkerSet | None
+    operation: Worker | None
+    artifacts: Worker | None
+    # MP-07/08/09: the lane task queues this worker also serves (the `task_queue` a Cursor,
+    # Claude or Codex binding routes its `lane.*` activities to), with the same activities.
+    lanes: tuple[Worker, ...] = ()
+
+    @property
+    def workers(self) -> tuple[Worker, ...]:
+        return (
+            *(self.coordinator.workers if self.coordinator is not None else ()),
+            *((self.operation,) if self.operation is not None else ()),
+            *((self.artifacts,) if self.artifacts is not None else ()),
+            *self.lanes,
+        )
+
+
+def operation_heartbeat_policy(settings: Settings) -> OperationHeartbeatPolicy:
+    """The deployment's heartbeat timeout per operation class (RRM-008 composed by RRM-009)."""
+
+    return OperationHeartbeatPolicy(
+        deep_agent_seconds=settings.operation_heartbeat_timeout_seconds,
+        deep_agent_async_children_seconds=(
+            settings.operation_async_children_heartbeat_timeout_seconds
+        ),
+        bound_seconds=settings.operation_bound_heartbeat_timeout_seconds,
+        deep_agent_segment_loop=settings.mission_control_lane_segment_loop,
+        # MP-05: the finite capacity-wait bounds every operation request carries.
+        capacity_wait=LimitWaitPolicy(
+            max_waits=settings.mission_control_capacity_max_waits,
+            max_total_wait_s=settings.mission_control_capacity_max_total_wait_s,
+            reset_margin_s=settings.mission_control_capacity_reset_margin_s,
+            fallback_backoff_s=settings.mission_control_capacity_fallback_backoff_s,
+            max_backoff_s=settings.mission_control_capacity_max_backoff_s,
+        ),
+    )
+
+
+def create_production_workers(
+    client: Client,
+    settings: Settings,
+    composition: WorkerActivityComposition,
+    *,
+    deployment_config: WorkerDeploymentConfig | None = None,
+) -> ProductionWorkerSet:
+    """Both family workers, the cognitive worker and the generic artifact worker, on the
+    canonical queues derived from `TEMPORAL_TASK_QUEUE`.
+
+    The workers that serve `operation.execute` also serve `operation.cancel` (RRM-008) and
+    drain with `WORKER_GRACEFUL_SHUTDOWN_SECONDS`, which must be shorter than every operation
+    heartbeat timeout the families declare: the composition refuses otherwise.
+
+    FT-G7: `deployment_config` (from `worker_deployment_config`) puts every worker of the
+    set into one Worker Deployment Version; `None` keeps unversioned workers.
+    """
+
+    operation_heartbeat_policy(settings).verify_graceful_shutdown(
+        settings.worker_graceful_shutdown_seconds
+    )
+    drain = timedelta(seconds=settings.worker_graceful_shutdown_seconds)
+    cognitive_queue = BellLabsTaskQueues.from_base(settings.task_queue_base).agent_cognitive
+    lane_queues = tuple(
+        dict.fromkeys(
+            queue for queue in settings.mission_control_lane_task_queues if queue != cognitive_queue
+        )
+    )
+    if settings.mission_control_worker_role == "lane":
+        base = settings.task_queue_base
+        reserved = {
+            base,
+            *vars(BellLabsTaskQueues.from_base(base)).values(),
+            *vars(coordinator_task_queues(base)).values(),
+            generic_artifact_task_queue(base),
+            watchers_task_queue(base),
+            f"{base}-linked-runs",
+            maintenance_task_queue(base),
+        }
+        if not lane_queues or reserved.intersection(settings.mission_control_lane_task_queues):
+            raise ValueError("lane-only worker requires explicit non-base lane queues")
+        activities = composition.operation.lane_activities()
+        if not activities:
+            raise ValueError("lane-only worker requires composed lane activities")
+        return ProductionWorkerSet(
+            coordinator=None,
+            operation=None,
+            artifacts=None,
+            lanes=tuple(
+                Worker(
+                    client,
+                    task_queue=queue,
+                    activities=activities,
+                    graceful_shutdown_timeout=drain,
+                    deployment_config=deployment_config,
+                )
+                for queue in lane_queues
+            ),
+        )
+    if composition.coordinator is None:
+        raise ValueError("base worker requires coordinator activities")
+    return ProductionWorkerSet(
+        coordinator=create_coordinator_workers(
+            client,
+            task_queues=coordinator_task_queues(settings.task_queue_base),
+            activities=composition.coordinator,
+            deployment_config=deployment_config,
+        ),
+        operation=create_agent_cognitive_worker(
+            client,
+            task_queue=cognitive_queue,
+            activities=composition.operation,
+            graceful_shutdown_timeout=drain,
+            deployment_config=deployment_config,
+        ),
+        artifacts=(
+            create_generic_artifact_worker(
+                client,
+                task_queue=generic_artifact_task_queue(settings.task_queue_base),
+                operations=composition.operation,
+                artifacts=composition.artifacts,
+                graceful_shutdown_timeout=drain,
+                deployment_config=deployment_config,
+            )
+            if composition.artifacts is not None
+            else None
+        ),
+        lanes=tuple(
+            create_agent_cognitive_worker(
+                client,
+                task_queue=queue,
+                activities=composition.operation,
+                graceful_shutdown_timeout=drain,
+                deployment_config=deployment_config,
+            )
+            for queue in lane_queues
+        ),
+    )
+
+
+async def production_workers_or_close(
+    client: Client,
+    settings: Settings,
+    composition: WorkerActivityComposition,
+    *,
+    deployment_config: WorkerDeploymentConfig | None = None,
+) -> ProductionWorkerSet:
+    """`create_production_workers`, closing the composition's resources (the persistent saver
+    and store) when the worker set refuses to start, for example on a drain that is not
+    shorter than a heartbeat timeout (RRM-009 review)."""
+
+    try:
+        return create_production_workers(
+            client, settings, composition, deployment_config=deployment_config
+        )
+    except BaseException:
+        if composition.resources is not None:
+            await composition.resources.aclose()
+        raise
+
+
+def compose_worker_run_control_service(
+    repository: RunControlRepository,
+    configuration_verifier: RunConfigurationVerifier,
+    policies: AdmissionPolicyRegistry,
+    family_admission_registry: FamilyAdmissionRegistry | None = None,
+) -> RunControlService:
+    """Build worker run control with an optional exact family-policy registry.
+
+    The worker admits manifest-lowered runs itself (nested bodies, released chain consumers),
+    so it always composes the manifest admission contract the API registers (loop iter-1 L1-01).
+    """
+
+    register_manifest_admission_policies(policies)
+    if family_admission_registry is None:
+        registry = FamilyAdmissionRegistry()
+        configure_goal_directed_family_admissions(registry)
+        register_stagegraph_family_mutations(registry)
+    else:
+        registry = family_admission_registry
+    return RunControlService(
+        repository,
+        configuration_verifier,
+        policies,
+        registry,
+    )
+
+
+async def main(
+    composition_factory: WorkerActivityCompositionFactory | None = None,
+    family_admission_registry: FamilyAdmissionRegistry | None = None,
+) -> None:
+    """Compatibility module entrypoint; the trusted Mission Control bootstrap owns startup."""
+    from mission_control.bootstrap.worker import main as mission_control_main
+
+    await mission_control_main(composition_factory, family_admission_registry)
+
+
+if __name__ == "__main__":
+    from mission_control.bootstrap.worker import run_cli
+
+    run_cli()

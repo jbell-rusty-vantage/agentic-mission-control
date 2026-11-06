@@ -1,0 +1,11 @@
+{
+  "schema_version": "mc.skill_bundle.v1",
+  "name": "biotech-knowledge-charter",
+  "version": "0.1.0",
+  "service_contract_range": ">=0.1.0,<0.2.0",
+  "files": {
+    "SKILL.md": "sha256:f3bb6d737aa4968c3abde93d1647757bbc7cf17499fc3d187881a0e39adb844f",
+    "references/ingestion-guide.md": "sha256:bcdf2315e1d0ab98907df89c163a5834f356d054f4cacccdbe520478822d2d34",
+    "references/research-procedure.md": "sha256:46ee5f019ce4f8b0d2870d28cd772a2ed0ed890c6a961e095028665bdf51adae"
+  }
+}

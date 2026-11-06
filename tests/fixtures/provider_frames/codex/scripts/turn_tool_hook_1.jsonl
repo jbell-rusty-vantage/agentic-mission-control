@@ -1,0 +1,5 @@
+{"_fixture": "codex/scripts/turn_tool_hook_1", "recorded": false, "note": "FIXTURE, not a live recording: one shell tool call gated by the projected PreToolUse hooks (tests/unit/codex/fixture_hooks.py runs them as Codex would); replayed by tests/unit/codex/fixture_app_server.py, never by Codex"}
+{"step": "tool", "tool_name": "Bash", "tool_input": {"command": "make deploy"}, "tool_use_id": "call-1"}
+{"step": "item", "item": {"type": "agentMessage", "id": "item-msg-hook-1", "text": "Done."}}
+{"step": "usage", "input": 40, "output": 10}
+{"step": "complete", "status": "completed"}

@@ -1,0 +1,59 @@
+{
+  "actor_ref": "seed:mission-control-catalog",
+  "component_compatibility": ">=1.0.0 <2.0.0",
+  "depends_on": [
+    {
+      "seed_key": "mc.catalog.approved-assets",
+      "seed_version": "1.0.1"
+    }
+  ],
+  "description": "Successor of mc.catalog.approved-assets@1.0.1 (applied, frozen): the reviewed approved assets whose logical keys neither applied version holds, including the canonical skills/mission-control bundle manifest at its present version. The coordinator skill and prompt definitions stay at the applied revision 1.",
+  "format": "mission-control-seed/v1",
+  "records": [
+    {
+      "fields": {
+        "asset_id": "skill-bundle-manifest:mission-control",
+        "contract": "mc.skill_bundle.v1",
+        "kind": "skill",
+        "manifest": {
+          "files": {
+            "SKILL.md": "sha256:c22a75c12e4b7485f26e53c63609a1753956dc60b24d8bf96537be0c41b6e75c",
+            "references/operations.json": "sha256:0e6896e28e58434b604d2afb9408afc69d7e19107154e34bed305234fcb24021",
+            "references/protocol.md": "sha256:c40bb836bf9b948c53f8edefe7159ef2d3dacfbca6add16a7fde704d46980a56"
+          },
+          "name": "mission-control",
+          "operation_catalog_digest": "sha256:0e6896e28e58434b604d2afb9408afc69d7e19107154e34bed305234fcb24021",
+          "schema_version": "mc.skill_bundle.v1",
+          "service_contract_range": ">=0.1.0,<0.2.0",
+          "version": "0.5.0"
+        },
+        "manifest_digest": "sha256:15da12618d26b39456ba7497a4e4c77ba31f566169d5c52612ed17734ad34381",
+        "manifest_ref": "repo://skills/mission-control/manifest.json",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "0.5.0"
+      },
+      "kind": "asset_version",
+      "logical_key": "skill-bundle-manifest:mission-control/0.5.0"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "skill-bundle-manifest:mission-control/0.5.0",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "skills/mission-control/manifest.json"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "skill-bundle-manifest:mission-control/0.5.0:admit"
+    }
+  ],
+  "seed_key": "mc.catalog.approved-assets",
+  "seed_version": "1.0.2"
+}

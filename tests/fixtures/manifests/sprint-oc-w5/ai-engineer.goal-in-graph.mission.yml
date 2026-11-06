@@ -1,0 +1,104 @@
+# yaml-language-server: $schema=../../../../src/mission_control/contracts/schemas/mc.mission_manifest.v1.json
+# Sprint OC W5 (OVE-176 / WI-13), AI Engineer: a Goal Loop nested in a Stage Graph stage.
+#
+# `research` is a nested Goal Loop body: it executes recursively as its own child run (its own
+# run control, budget account contained in the stage's reservation, iteration governor and
+# journal), never flattened into one stage. Only its declared outputs cross the boundary:
+# `report` (final export) and `progress_note` (early export: an independently accepted note may
+# leave an incomplete loop as lineage, without accepting the composite). `compare` binds the
+# exported report exactly. Placeholders the driver replaces before compile: __PACK__, __MODEL__.
+manifest: mission/v1
+mission:
+  key: w5-open-model-facts-nested-loop
+  title: W5 nested Goal Loop in a Stage Graph (frozen W1 evidence)
+  application: ai-engineer
+  description: >
+    Sprint OC W5 recursive composition. A Goal Loop body iterates on the report inside the
+    `research` stage; the consumer reads exactly the exported, accepted revision.
+  goals:
+    - key: model_facts_report
+      description: Register the sourced report from the frozen pack, iterating until it is accepted
+      objectives:
+        - key: register_report
+          description: Register the report built only from the frozen sources and submit the named outputs
+      criteria:
+        - key: report_submitted
+          description: The registered report revision is submitted for the report promise and independently assessed
+          evidence: [report, progress_note]
+          acceptance: { human: review_accept }
+    - key: report_comparison
+      description: Read the exact exported report revision and summarize what it states
+      objectives:
+        - key: compare_report
+          description: Read the report revision named in /.mission/inputs.json and submit a comparison
+      criteria:
+        - key: comparison_submitted
+          description: The comparison names the report revision it read and states its findings
+          evidence: [comparison]
+          acceptance: { human: review_accept }
+  environment:
+    lane: deep_agents
+    model: { profile: __MODEL__ }
+    sandbox: { profile: research.standard }
+    capabilities:
+      - { pin: "tool.knowledge-report-register@1#sha256:69e840eb7606d45285d5ebeb3ffe8a759353d4a3b7e495dfb2eb9c994b0474d2", kind: tool, as: report_register }
+      - { pin: "tool.knowledge-read@1#sha256:4d3e11e5d12ee6bb8bfa6e6c79cde3a8e42f199e2de14839c6363d86df6ebe8e", kind: tool, as: knowledge_read }
+      - { pin: "tool.knowledge-submit-output@2#sha256:f1fa75f1e3fa49e9061746cbe89f53a828e502fb93e142d3b34d8a854a2a64dd", kind: tool, as: submit_output }
+    budget: { usd: 2.0, tokens: 500000, wall_clock: 60m, tool_calls: 40 }
+    # depth bounds recursion: the nested loop is depth 1 (of at most 2 here).
+    governors: { depth: 2, fan_out: 1, iterations: 2, patience: 1 }
+    side_effects: [read_only, workspace_write, external_write_reversible]
+  program:
+    key: root
+    behavior: stage_graph
+    objectives: [model_facts_report, report_comparison]
+    nodes:
+      - key: research
+        behavior: goal_loop
+        objectives: [register_report]
+        objective: register_report
+        # The loop's capability aliases, not an objective (full compile: unresolved_action_space).
+        action_space: [report_register, submit_output]
+        environment:
+          budget: { usd: 1.2, tokens: 300000, wall_clock: 40m, tool_calls: 24 }
+          governors: { iterations: 2, patience: 1 }
+        outputs:
+          - name: report
+            form: reference
+            enforcement: required
+            requirements:
+              - { key: assessed, validator: "knowledge.report.assess@1" }
+          - { name: progress_note, form: text, enforcement: required, media_type: text/plain }
+        exports:
+          - { output: progress_note, timing: early }
+      - key: compare
+        behavior: agent_executor
+        objectives: [compare_report]
+        environment:
+          budget: { usd: 0.3, tokens: 120000, wall_clock: 15m, tool_calls: 8 }
+        inputs:
+          - { name: report, from: research.report, expand: reference }
+        instruction: |
+          Your only input is the report revision listed under binding "report" in /.mission/inputs.json.
+          Read it ONCE with knowledge_read using exactly the handle the index names. If the read is
+          refused, stop and report the refusal; never guess.
+          submit_output obligation "compare.comparison": inline text, at most four sentences: the
+          report id and revision you read, then each model and the parameter count it states.
+        outputs:
+          - { name: comparison, form: text, enforcement: required, media_type: text/plain }
+      # Human criteria need a qualified human evaluator at launch (completion_support.py; compile
+      # reports them as start blockers since OVE-169): a final REVIEW gate owns them.
+      - key: review
+        behavior: human_gate
+        objectives: [model_facts_report, report_comparison]
+        depends_on: [compare]
+        task:
+          kind: REVIEW
+          prompt: Review the exported report, its progress note and the comparison.
+          reviewers: [owner]
+          packet: [research.report, research.progress_note, compare.comparison]
+          on_timeout: keep_waiting
+  controls:
+    commands_allowed: [pause, resume, cancel]
+# The loop body's executor reads the frozen pack below (one fragment per model).
+# FROZEN PACK: __PACK__

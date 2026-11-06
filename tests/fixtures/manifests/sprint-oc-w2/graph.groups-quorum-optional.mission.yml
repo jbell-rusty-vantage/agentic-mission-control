@@ -1,0 +1,106 @@
+# yaml-language-server: $schema=../../../../src/mission_control/contracts/schemas/mc.mission_manifest.v1.json
+# Sprint OC W2 (OVE-171 / WI-08) graph variant: named any/quorum groups and optional omission.
+#
+# Three reviewers. `synthesize` releases on group `reviews` (quorum 2 with coverage
+# [safety, efficacy]): two safety reviews meet the quorum but not the coverage, so it waits for
+# the efficacy review (a quorum never waives coverage). Its selected set is the first qualifying
+# distinct set in durable acceptance order; a later review is surplus, keeps running (Graph
+# default) and never enters the sealed plan. `quick_take` releases on the first review of an
+# `any` group over the two safety reviewers. `synthesize` also reads `context` as an OPTIONAL
+# input: still pending when the group is ready, it is omitted visibly, never waited for.
+manifest: mission/v1
+mission:
+  key: w2-graph-groups
+  title: W2 quorum with coverage, any group and optional omission
+  application: ai-engineer
+  goals:
+    - key: reviewed
+      description: Review the dossier from three angles
+      criteria:
+        - { key: reviews, description: The reviews are submitted, evidence: [safety_one, safety_two, efficacy], acceptance: { human: review_accept } }
+    - key: synthesized
+      description: Synthesize the selected reviews
+      criteria:
+        - { key: synthesis, description: The synthesis is submitted, evidence: [synthesis, take], acceptance: { human: review_accept } }
+    - key: contextualized
+      description: Optional background context
+      importance: optional
+      criteria:
+        - { key: context, description: Context is submitted, evidence: [context], acceptance: { human: review_accept } }
+  environment:
+    lane: deep_agents
+    model: { profile: frontier.default }
+    sandbox: { profile: research.standard }
+    capabilities:
+      - { pin: "tool.knowledge-submit-output@2#sha256:f1fa75f1e3fa49e9061746cbe89f53a828e502fb93e142d3b34d8a854a2a64dd", kind: tool, as: submit_output }
+    budget: { usd: 1, tokens: 200000, wall_clock: 30m, tool_calls: 30 }
+    governors: { depth: 1, fan_out: 3, iterations: 1, patience: 1 }
+    side_effects: [read_only, workspace_write]
+  program:
+    key: root
+    behavior: stage_graph
+    objectives: [reviewed, synthesized, contextualized]
+    concurrency: 3
+    nodes:
+      - key: safety_a
+        behavior: agent_executor
+        objectives: [reviewed]
+        instruction: Submit obligation "safety_a.safety_one" as inline text, a safety review.
+        outputs: [ { name: safety_one, form: text, media_type: text/plain } ]
+      - key: safety_b
+        behavior: agent_executor
+        objectives: [reviewed]
+        instruction: Submit obligation "safety_b.safety_two" as inline text, a safety review.
+        outputs: [ { name: safety_two, form: text, media_type: text/plain } ]
+      - key: efficacy_c
+        behavior: agent_executor
+        objectives: [reviewed]
+        instruction: Submit obligation "efficacy_c.efficacy" as inline text, an efficacy review.
+        outputs: [ { name: efficacy, form: text, media_type: text/plain } ]
+      - key: background
+        behavior: agent_executor
+        objectives: [contextualized]
+        instruction: Submit obligation "background.context" as inline text, background context.
+        outputs: [ { name: context, form: text, enforcement: optional, media_type: text/plain } ]
+      - key: synthesize
+        behavior: agent_executor
+        objectives: [synthesized]
+        release_groups:
+          - key: reviews
+            join: { quorum: 2 }
+            members:
+              - { stage: safety_a, covers: [safety] }
+              - { stage: safety_b, covers: [safety] }
+              - { stage: efficacy_c, covers: [efficacy] }
+            coverage: [safety, efficacy]
+        inputs:
+          - { name: safety_one, from: safety_a.safety_one }
+          - { name: safety_two, from: safety_b.safety_two }
+          - { name: efficacy, from: efficacy_c.efficacy }
+          - { name: context, from: background.context, required: false }
+        instruction: Submit obligation "synthesize.synthesis" from the reviews in /.mission/inputs.json.
+        outputs: [ { name: synthesis, form: text, media_type: text/plain } ]
+      - key: quick_take
+        behavior: agent_executor
+        objectives: [synthesized]
+        release_groups:
+          - { key: first_safety, join: any, members: [safety_a, safety_b] }
+        inputs:
+          - { name: safety_one, from: safety_a.safety_one }
+          - { name: safety_two, from: safety_b.safety_two }
+        instruction: Submit obligation "quick_take.take" from the one safety review you received.
+        outputs: [ { name: take, form: text, media_type: text/plain } ]
+      # Human criteria need a qualified human evaluator at launch (completion_support.py; compile
+      # reports them as start blockers since OVE-169): this final REVIEW gate owns every goal.
+      - key: review
+        behavior: human_gate
+        objectives: [reviewed, synthesized, contextualized]
+        depends_on: [synthesize, quick_take]
+        task:
+          kind: REVIEW
+          prompt: Review the synthesis and the quick take.
+          reviewers: [owner]
+          packet: [synthesize.synthesis, quick_take.take]
+          on_timeout: keep_waiting
+  controls:
+    commands_allowed: [pause, resume, cancel]

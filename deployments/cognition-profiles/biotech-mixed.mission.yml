@@ -1,0 +1,99 @@
+# Authoring example only; replace fixture goals, model and capabilities before launch.
+manifest: mission/v2
+mission:
+  key: cognition-mixed
+  title: Cognition mixed authoring example
+  application: biotech
+  goals:
+  - key: evidence_map
+    description: Map the evidence
+    objectives:
+    - key: find_trials
+      description: Find the trials
+    criteria:
+    - key: coverage
+      description: Every study has a claim
+      evidence:
+      - claims
+      acceptance:
+        all:
+        - schema: claim_table@1
+        - human: review_accept
+  environment:
+    lane: deep_agents
+    model:
+      profile: producer.default
+      settings:
+        temperature: 0.2
+        reasoning:
+          effort: high
+    sandbox:
+      profile: research.standard
+      egress:
+      - pubmed
+    capabilities:
+    - search: pubmed literature retrieval
+      kind: mcp_server
+      as: pubmed
+      tools:
+      - search_articles
+    budget:
+      usd: 25.50
+      tokens: 2000000
+      wall_clock: 4h
+      tool_calls: 100
+    governors:
+      depth: 2
+      fan_out: 4
+      iterations: 8
+      patience: 2
+    side_effects:
+    - read_only
+    - workspace_write
+    plugins:
+    - pin: plugin.cognition-mixed@1#sha256:64ac3978f88fea533db1244b5f4d8f832020c93e0b84afc6f833be30a0d45f1b
+  program:
+    key: root
+    behavior: stage_graph
+    objectives:
+    - evidence_map
+    nodes:
+    - key: collect
+      behavior: goal_loop
+      objective: find_trials
+      action_space:
+      - pubmed
+      environment:
+        budget:
+          usd: 10
+        governors:
+          iterations: 5
+      outputs:
+      - name: sources
+        schema: source_manifest@1
+    - key: synthesize
+      behavior: agent_executor
+      objectives:
+      - evidence_map
+      depends_on:
+      - collect
+      inputs:
+      - name: sources
+        from: collect.sources
+        expand: materialize
+      instruction: .mission/instructions/synthesize.md
+      environment:
+        model:
+          profile: producer.fallback
+      outputs:
+      - name: claims
+        schema: claim_table@1
+  controls:
+    commands_allowed:
+    - pause
+    - resume
+    - cancel
+    subscriptions:
+    - events:
+      - run.completed
+      channel: stream

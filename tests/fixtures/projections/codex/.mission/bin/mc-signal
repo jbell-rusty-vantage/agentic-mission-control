@@ -1,0 +1,11 @@
+#!/bin/sh
+# mc-signal: report to Mission Control (SPEC-04 section 4.1; skill mc-signals).
+#   mc-signal <type> [message] [--data '<json object>']
+here=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+for python in python3 python; do
+  if "$python" -c "" >/dev/null 2>&1; then
+    exec "$python" "$here/../hooks/signal" emit "$@"
+  fi
+done
+echo "mc-signal: no python3 or python on PATH; nothing was recorded" >&2
+exit 3

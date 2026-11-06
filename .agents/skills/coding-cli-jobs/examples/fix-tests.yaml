@@ -1,0 +1,32 @@
+# Review repo, goal and verification before enabling live execution.
+{
+  "id": "fix-tests-example",
+  "cli": "codex",
+  "goal": "Fix the disposable fixture test without weakening assertions. Report the changed files.",
+  "repo": ".",
+  "host": "native",
+  "model": {
+    "name": null,
+    "effort": null
+  },
+  "auth": "subscription",
+  "permissions": "edit",
+  "worktree": {
+    "mode": "git",
+    "base": "HEAD",
+    "keep": "on_change"
+  },
+  "allow_commands": [
+    "python -m unittest *"
+  ],
+  "verify": [
+    "python -m unittest discover -s tests"
+  ],
+  "done_when": "verify_pass_and_agent_done",
+  "budget": {
+    "max_iterations": 1,
+    "max_turns_per_iteration": 4,
+    "wall_clock_min": 2,
+    "max_usd": null
+  }
+}

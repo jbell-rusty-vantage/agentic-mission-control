@@ -1,0 +1,40 @@
+{
+  "source": {
+    "repository": "platform/knowledge-services",
+    "branch": "sprint-oc",
+    "commit": "8a38b0f (+ uncommitted OVE-204 slice 4 read_intent, 2026-10-31)",
+    "files": [
+      "packages/bindings/aiengineer-postgres/src/backend.ts",
+      "packages/bindings/aiengineer-postgres/src/ingestion-apply.ts",
+      "packages/bindings/aiengineer-postgres/src/read-intent-port.ts",
+      "packages/bindings/biotech-graph/src/backend.ts",
+      "packages/bindings/biotech-graph/src/apply-port.ts"
+    ],
+    "note": "Copied by hand from each BACKEND.describe() (nativeContract resolved from INGESTION_APPLY_CONTRACT / BIOTECH_APPLY_CONTRACT). An offline drift guard only; W0 checks each Application Profile against the live knowledge.describe."
+  },
+  "backends": [
+    {
+      "id": "aiengineer-postgres",
+      "capabilities": ["research", "native_receipt_lookup", "revocation"],
+      "conditionalCapabilities": [
+        {"capability": "apply", "condition": "host_injected_apply_port"},
+        {"capability": "read_intent", "condition": "host_injected_read_intent_port"}
+      ],
+      "storageClass": "relational",
+      "writeAtomicity": "single_transaction",
+      "nativeCancellation": "native",
+      "nativeContract": {"name": "knowledge-ingestion-intent", "version": "v1"},
+      "researchStore": null
+    },
+    {
+      "id": "biotech-graph",
+      "capabilities": ["research", "apply", "delivery", "native_receipt_lookup", "revocation"],
+      "conditionalCapabilities": [],
+      "storageClass": "graph",
+      "writeAtomicity": "marker_plus_outbox",
+      "nativeCancellation": "stop_dispatch_and_reconcile",
+      "nativeContract": {"name": "biotech-knowledge-apply", "version": "v1"},
+      "researchStore": "aiengineer-postgres/PostgresResearchBinding"
+    }
+  ]
+}

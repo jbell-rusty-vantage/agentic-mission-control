@@ -1,0 +1,30 @@
+{
+  "schema_version": "mc.environment_kit.v1",
+  "id": "envkit.mission-control-dev",
+  "version": "1",
+  "title": "Mission Control development",
+  "description": "This repository: uv with the biotech and dbcontract groups, make, and Docker Compose for the services (application PostgreSQL 16 with pgvector, Redis, Temporal 1.31 with its admin-tools CLI image); PostgreSQL and Temporal run as those pinned images, not as host toolchains. Its base layer is the Mission Control-owned .cursor/environment.json, Dockerfile and scripts (DECISIONS R24).",
+  "toolchains": {"python": "3.12", "uv": "0.12"},
+  "system_packages": ["git", "curl", "jq", "make", "ripgrep", "docker-ce", "docker-compose-plugin"],
+  "base": {"install": ".cursor/scripts/cloud-install.sh"},
+  "mission": {
+    "steps": [
+      {
+        "name": "deps",
+        "run": "uv sync --frozen --group biotech --group dbcontract",
+        "when": "exists('uv.lock')"
+      }
+    ],
+    "health": [
+      {"name": "import", "run": "uv run --no-sync python -c 'import mission_control'"}
+    ],
+    "timeout_s": 600
+  },
+  "requires": {
+    "egress": ["pypi.org", "files.pythonhosted.org"]
+  },
+  "host_support": {
+    "local": "full",
+    "cursor_cloud": "full"
+  }
+}

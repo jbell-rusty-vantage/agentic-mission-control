@@ -1,0 +1,118 @@
+# Compileable authoring template; OWNER-SELECT values are deliberately unresolved for launch.
+manifest: mission/v2
+mission:
+  key: s0-claude-agent-sdk
+  title: S0 claude_agent_sdk evidence probe template
+  application: ai-engineer
+  goals:
+  - key: probe_evidence
+    description: Capture independently reviewable local harness probe evidence
+    objectives:
+    - key: exercise
+      description: Exercise admitted skill and governed tool decisions
+    criteria:
+    - key: report_valid
+      description: Required immutable report validates against the published production schema
+      evidence:
+      - report
+      acceptance:
+        schema: schema.s0-probe-report@1
+  - key: reviewed
+    description: Owner reviews native evidence and remaining qualification gates
+    criteria:
+    - key: owner_review
+      description: Authorized reviewer checks custody and native receipts; unrun remains unrun
+      evidence:
+      - report
+      acceptance:
+        human: review_accept
+  environment:
+    lane: claude_agent_sdk
+    model:
+      profile: claude.default
+    auth:
+      profile: claude-sdk-api
+    execution_environment:
+      kind: local_workspace
+      profile: worker.linux.default
+    workspace:
+      repo:
+        path: OWNER-SELECT/s0-fixture
+        ref: OWNER-SELECT-immutable-ref
+      policy:
+        mode: managed_worktree
+        reuse: within_run
+        dirty_input: reject
+        cleanup: retain_until_artifacts_registered
+    capabilities:
+    - pin: skill.mission-control-observe@0.3.1#sha256:ffba246e9bfd938218537712cb0bf2f7ab460b01eb2a9a7cd18baa91a186dacc
+      as: observe
+    requires:
+      controls:
+      - cancel
+      - interrupt_and_inject
+      approvals:
+      - workflow_gate
+      observation:
+      - terminal_result
+      - tool_lifecycle
+    budget:
+      tokens: 20000
+      wall_clock: 15m
+      tool_calls: 30
+    governors:
+      depth: 1
+      fan_out: 1
+      iterations: 2
+      patience: 1
+    side_effects:
+    - read_only
+    - workspace_write
+  program:
+    key: root
+    behavior: stage_graph
+    objectives:
+    - probe_evidence
+    - reviewed
+    nodes:
+    - key: probe
+      behavior: agent_executor
+      objectives:
+      - exercise
+      instruction: Preserve and follow existing repository instructions; do not replace AGENTS.md
+        or repository configuration. Inspect and exercise the admitted mission-control-observe skill
+        once. Record skill delivery, read-back and exercise separately with durable evidence references.
+        Record requested identity separately from actual observed SDK/CLI/host/auth/model and configuration.
+        Exercise only the reviewed allowed tool family and one explicit governed denied action; do
+        not weaken permissions to make the probe pass. The operator supplies scoped external inject
+        and cancellation controls and captures native acknowledgement; never fabricate those receipts
+        or cancel your own mission. Write a JSON report conforming to schema.s0-probe-report@1 to
+        s0-probe-report.json and submit it through the admitted immutable output channel. For absent
+        facts use unknown or unrun, never synthetic success. Record caller wakeup, usage uncertainty
+        and cleanup liability through durable references; those may remain unrun until the operator
+        closes custody and cleanup. A schema-valid report, agent self-report or provider completion
+        does not establish qualification or acceptance. Do not publish, deploy or alter auth/global
+        settings.
+      outputs:
+      - name: report
+        schema: schema.s0-probe-report@1
+        enforcement: required
+    - key: review
+      behavior: human_gate
+      objectives:
+      - reviewed
+      depends_on:
+      - probe
+      task:
+        kind: REVIEW
+        prompt: Review immutable probe report and native control, tool, identity and custody receipts.
+          Approval is not blanket lane qualification.
+        reviewers:
+        - OWNER-SELECT-s0-reviewer
+        packet:
+        - probe.report
+  controls:
+    commands_allowed:
+    - cancel
+    - interrupt_and_inject
+    - queue_instruction

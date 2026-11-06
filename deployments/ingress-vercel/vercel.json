@@ -1,0 +1,5 @@
+{
+  "regions": ["iad1"],
+  "trailingSlash": false,
+  "functions": {"app.py": {"maxDuration": 30}}
+}

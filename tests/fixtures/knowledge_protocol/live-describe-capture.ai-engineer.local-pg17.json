@@ -1,0 +1,137 @@
+{
+  "format": "ks.live-describe-capture.v1",
+  "capturedAt": "2026-11-01T01:24:18.847Z",
+  "purpose": "Sprint OC W0 (WI-24): the live K01 knowledge.describe of each configured binding, composed exactly as the KS executor composes it; read-only, no secret",
+  "composition": "startExecutorServer (verification-executor serve) -> KnowledgeOperationService.descriptorFor per backend",
+  "executor": {
+    "dist": "index.js",
+    "distSha256": "sha256:82e73d39783172189d310d7524f96525de18c6b9138e0ebc8fabcb6d127ce0bd",
+    "commit": "6a4dd304025a1e4d572593f4ce57579ad2998502",
+    "trackedChanges": 0,
+    "node": "v24.18.0"
+  },
+  "envFile": {
+    "name": "ks-executor.aie-local.env",
+    "variables": [
+      "KNOWLEDGE_DB_URL",
+      "KS_AI_ENGINEER_COMPONENT_DSN",
+      "KS_KNOWLEDGE_AUDIENCE",
+      "KS_KNOWLEDGE_BINDINGS_JSON",
+      "KS_KNOWLEDGE_ISSUER",
+      "KS_KNOWLEDGE_JWKS_FILE",
+      "KS_KNOWLEDGE_SEAL_ISSUER",
+      "KS_KNOWLEDGE_SEAL_KEY_FILE",
+      "KS_KNOWLEDGE_SEAL_KEY_ID",
+      "VERIFY_HOST",
+      "VERIFY_PORT"
+    ]
+  },
+  "registeredBackends": [
+    "aiengineer-postgres",
+    "biotech-graph",
+    "in-memory"
+  ],
+  "bindings": [
+    {
+      "application": "ai-engineer",
+      "binding": "aiengineer-postgres",
+      "installationId": "0192a4f0-0000-7000-8000-0000000a1e11",
+      "tenantsConfigured": 0,
+      "served": true,
+      "unsupportedReason": null,
+      "capabilities": [
+        "apply",
+        "native_receipt_lookup",
+        "read_intent",
+        "research",
+        "revocation"
+      ],
+      "registration": {
+        "id": "aiengineer-postgres",
+        "capabilities": [
+          "research",
+          "native_receipt_lookup",
+          "revocation"
+        ],
+        "conditionalCapabilities": [
+          {
+            "capability": "apply",
+            "condition": "host_injected_apply_port"
+          },
+          {
+            "capability": "read_intent",
+            "condition": "host_injected_read_intent_port"
+          }
+        ],
+        "storageClass": "relational",
+        "writeAtomicity": "single_transaction",
+        "nativeCancellation": "native",
+        "nativeContract": {
+          "name": "knowledge-ingestion-intent",
+          "version": "v1"
+        },
+        "researchStore": null
+      },
+      "describe": {
+        "protocolVersions": [
+          "ks.knowledge_operation.v2"
+        ],
+        "binding": "aiengineer-postgres",
+        "application": "ai-engineer",
+        "coreSchemas": [
+          "research-core.task.v2",
+          "research-core.assertion.v2",
+          "research-core.support_set.v2",
+          "research-core.observation.v2",
+          "research-core.mapping.v2",
+          "research-report.v2",
+          "research-report-kind.v1",
+          "research-core.report_assessment.v1"
+        ],
+        "operations": [
+          "knowledge.describe",
+          "knowledge.read",
+          "knowledge.apply",
+          "knowledge.plan_preview",
+          "knowledge.read_intent",
+          "report.register",
+          "report.derive",
+          "report.observe",
+          "report.seal",
+          "report.decide",
+          "report.review",
+          "decision.resolve",
+          "operation.get",
+          "operation.cancel",
+          "receipt.get"
+        ],
+        "auditorKind": "none",
+        "reportKinds": [
+          "evidence_report",
+          "study_appraisal"
+        ],
+        "media": [
+          "text.markdown",
+          "application.json"
+        ],
+        "guarantees": {
+          "exactRead": "exact_revision",
+          "receiptLookup": "by_effect_key",
+          "nativeCancellation": "native",
+          "admission": "exact_use_decision",
+          "revocation": "epoch_checked",
+          "writeAtomicity": "single_transaction"
+        },
+        "signingIssuer": "knowledge-services",
+        "pinnedSchema": {
+          "name": "knowledge-verification-2.5.0",
+          "version": "knowledge-verification.v2",
+          "digest": "sha256:728e4d8aa64a857185be19181886da22ad8952dcec6e4f8a3bf9bf0578d2fd18"
+        },
+        "qualification": [],
+        "describedAt": "2026-11-01T01:24:18.837Z"
+      },
+      "describeDigest": "sha256:3ac3ad5622f5212bcdeb70345c684ff81e5c60c0c276137b763774632052d656"
+    }
+  ]
+}

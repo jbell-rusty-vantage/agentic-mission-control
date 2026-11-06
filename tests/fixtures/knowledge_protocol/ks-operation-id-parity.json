@@ -1,0 +1,44 @@
+{
+  "schema": "mc.ks-operation-id-parity.v1",
+  "provenance": {
+    "knowledgeServicesCommit": "f8d5e48603ee7f6b0e76d6632d04245394846c96",
+    "source": "packages/host/src/knowledge-operation/service.ts",
+    "idLine": 1099,
+    "idExpression": "`op-${operation.replace(\".\", \"-\")}-${shortDigest({ tenant: scope.tenant, operation, requestId: envelope.requestId })}`",
+    "shortDigestLine": 156,
+    "shortDigestBody": "return digestCanonical(value).slice(7, 39);",
+    "digestCanonical": "packages/knowledge-operation-protocol dist digestCanonical"
+  },
+  "vectors": [
+    {
+      "tenant": "11111111-1111-4111-8111-111111111111",
+      "operation": "report.observe",
+      "requestId": "wi03-3969897dd5370e1339f2aab98875f8766193b7d3",
+      "operationId": "op-report-observe-6bb613a527a25db64fd5c3f76cb87110"
+    },
+    {
+      "tenant": "11111111-1111-4111-8111-111111111111",
+      "operation": "report.seal",
+      "requestId": "wi03-0000000000000000000000000000000000000000",
+      "operationId": "op-report-seal-f64e11e846beafb220773eac260cfffd"
+    },
+    {
+      "tenant": "0192a4f0-0000-7000-8000-00000000b10e",
+      "operation": "report.decide",
+      "requestId": "wi03-ffffffffffffffffffffffffffffffffffffffff",
+      "operationId": "op-report-decide-93215d3c9b4230409a1529c96c459624"
+    },
+    {
+      "tenant": "0192a4f0-0000-7000-8000-00000000b10e",
+      "operation": "decision.resolve",
+      "requestId": "wi03-1234567890abcdef1234567890abcdef12345678",
+      "operationId": "op-decision-resolve-2a669b3e06ba1bf27b9c663c742c51e2"
+    },
+    {
+      "tenant": "tenant-é-unicode",
+      "operation": "knowledge.read",
+      "requestId": "context:report-1/judge",
+      "operationId": "op-knowledge-read-dd182fc15e99221ab2552b0d554bd937"
+    }
+  ]
+}

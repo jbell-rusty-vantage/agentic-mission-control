@@ -1,0 +1,17 @@
+# Expected Neo4j Aura graph of the `biotech` installation: the Sprint OC disposable graph target
+# (OC-D196; sprint-oc/IMPLEMENTATION.md section 4.1). Identity facts only, never credentials; the
+# credentials stay in the BKS `.env` (`NEO4J_URI`, `NEO4J_AURA_USERNAME`, `NEO4J_AURA_PASSWORD`).
+# `scripts/sprint_oc_runtime_env.py` refuses any other host, refuses the instances listed under
+# [refuse], and writes Neo4j credentials only after `--confirm-graph` names this exact host.
+# A host name is not identity proof on its own (ESCALATION H3): the BKS installer's
+# `--confirm-graph` and the graph's KsReleaseMarker remain the install-time checks.
+format_version = 1
+
+[graph]
+app = "biotech"
+aura_instance_id = "8032ec07"
+host = "8032ec07.databases.neo4j.io"
+
+[refuse]
+# The AI Engineer Aura instance (aiengineer/.env NEO4J_AURA_URI): never a Biotech graph target.
+aura_instance_ids = ["4773dc72"]

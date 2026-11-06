@@ -1,0 +1,52 @@
+---
+type: Interview Answers
+title: "{{TOPIC}}, sitting {{SITTING}}: the owner's answers"
+description: "The decisions the owner took in sitting {{SITTING}} of {{INTERVIEW_NAME}} on {{DATE}}, each with its id, the owner's words, what it changes, what it becomes (ADR, spec section, glossary term, Linear issue) and where it was folded in. Open while the sitting runs; final when every decision has a destination."
+tags: [mission-control, interview, answers]
+interview: {{INTERVIEW}}
+sitting: "{{SITTING}}"
+date: {{DATE}}
+status: open
+---
+
+# {{TOPIC}}, sitting {{SITTING}}: answers
+
+Instruction: `{{INTERVIEW_NAME}}` (front matter `interview:`). Recorded by the interviewing agent on
+{{DATE}}. **Status `open`** while the sitting runs; set `final` when every decision below has a
+**Becomes** and a **Folded** entry, which `program_ledger.py check` then enforces.
+
+How to fill it: one row per decision, in the order asked. Quote the owner's words in **Answer**; put
+the agent's reading in **What it changes**, never in **Answer**. A decision the owner did not answer
+goes under *Assumptions*, not in the table.
+
+## Decisions
+
+| ID | Source | Question | Answer | Date | What it changes | Becomes | Folded |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| | - | | | {{DATE}} | | | |
+
+`Source`: the idea `ID-n` the sitting serves, or `-`.
+`Becomes`: `ADR-NNNN`, `spec <file> §n`, `GLOSSARY <term>`, `OVE-n`, or `none (reason)`.
+`Folded`: the link to the document edited to carry the decision, or `n/a`.
+
+## Mental model restated
+
+What the system does after these answers, in the owner's terms: a manifest fragment, a command, what
+they will see. Record the owner's correction if they gave one.
+
+## Assumptions (asked, not answered)
+
+| ID | Question | Assumption taken | Risk if wrong |
+| --- | --- | --- | --- |
+
+## Parking lot
+
+Items raised that belong to another round or sitting, with the round that takes them.
+
+## Conversion checklist
+
+- [ ] Decisions folded into the decision logs of the specification and supplements (links in **Folded**)
+- [ ] ADR candidates written for decisions with a lasting reason
+- [ ] Glossary terms added through `domain-modeling`
+- [ ] Linear: a comment on each decided issue; an issue filed for each accepted piece of work, ids in **Becomes**
+- [ ] Ledger: this file's row and the instruction's row updated

@@ -1,0 +1,53 @@
+# yaml-language-server: $schema=../../../src/mission_control/contracts/schemas/mc.mission_manifest.v1.json
+# Sprint V SV-16: a coordinator-authored mission that binds the seven knowledge tools from the
+# capability catalog (`mc.catalog.knowledge-tools`, kind `tool`) into its Deep Agents nodes.
+manifest: mission/v1
+mission:
+  key: knowledge-report
+  title: Register and submit a research report
+  application: ai-engineer
+  goals:
+    - key: report
+      description: Produce one registered, independently assessed report
+      objectives:
+        - { key: draft_report, description: Draft and register the report }
+      criteria:
+        - key: assessed
+          description: The registered report is submitted for the report obligation
+          evidence: [report]
+          acceptance:
+            all:
+              - { human: review_accept }
+  environment:
+    lane: deep_agents
+    model: { profile: frontier.default }
+    sandbox: { profile: research.standard }
+    capabilities:
+      - { search: "exact knowledge read report revision", kind: tool, as: knowledge_read }
+      - { search: "governed knowledge apply native intent", kind: tool, as: knowledge_apply }
+      - { search: "research report registration", kind: tool, as: report_register }
+      - { search: "report derivation domain proposals", kind: tool, as: report_derive }
+      - { search: "claim verification evidence", kind: tool, as: verify_claims }
+      - { pin: "tool.knowledge-submit-output@2#sha256:f1fa75f1e3fa49e9061746cbe89f53a828e502fb93e142d3b34d8a854a2a64dd", kind: tool, as: submit_output }
+      - { pin: "tool.knowledge-read-intent@1#sha256:2c591f2d5919e921a2b6cd3a71e8bc440f43c407174fb71995a70c4e03d9c639", kind: tool, as: knowledge_read_intent }
+    budget: { usd: 5, tokens: 200000, wall_clock: 1h, tool_calls: 40 }
+    governors: { depth: 1, fan_out: 1, iterations: 2, patience: 1 }
+    side_effects: [read_only, workspace_write, external_write_reversible]
+  program:
+    key: root
+    behavior: stage_graph
+    objectives: [report]
+    nodes:
+      - key: draft
+        behavior: agent_executor
+        objectives: [report]
+        instruction: .mission/instructions/draft.md
+        outputs: [ { name: report, schema: claim_table@1 } ]
+      - key: review
+        behavior: agent_executor
+        objectives: [report]
+        depends_on: [draft]
+        instruction: .mission/instructions/review.md
+        outputs: [ { name: review, schema: claim_table@1 } ]
+  controls:
+    commands_allowed: [pause, resume, cancel]

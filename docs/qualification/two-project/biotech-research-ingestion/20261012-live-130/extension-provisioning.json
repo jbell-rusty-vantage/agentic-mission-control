@@ -1,0 +1,13 @@
+{
+  "project_ref": "bxnetwiimwhtlrjlbtab",
+  "statement": "CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA extensions",
+  "result": {
+    "extname": "pg_trgm",
+    "nspname": "extensions",
+    "extversion": "1.6"
+  },
+  "server_version_num": "170006",
+  "login": "postgres",
+  "at": "2026-10-12T23:38:08.578101+00:00",
+  "reason": "release 1.3.0 required_extensions (mission_control_search); owner approval DECISIONS R18"
+}

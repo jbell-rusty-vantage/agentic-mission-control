@@ -1,0 +1,9 @@
+{
+  "schema_version": "mc.skill_bundle.v1",
+  "name": "mc-cognition-pr",
+  "version": "0.1.0",
+  "service_contract_range": ">=0.1.0,<0.2.0",
+  "files": {
+    "SKILL.md": "sha256:4696e2026c275bdd42da36b2e749601c32496d084afeea45fa320143e846d410"
+  }
+}

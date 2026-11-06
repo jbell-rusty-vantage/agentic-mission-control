@@ -1,0 +1,82 @@
+{
+  "files": {
+    ".cursor/agents/summarizer.md": "0o644",
+    ".cursor/agents/verifier.md": "0o644",
+    ".cursor/hooks.json": "0o644",
+    ".cursor/rules/mc-mission.mdc": "0o644",
+    ".cursor/skills/agent-browser/SKILL.md": "0o644",
+    ".cursor/skills/agent-browser/scripts/open.sh": "0o755",
+    ".cursor/skills/mc-signals/SKILL.md": "0o644",
+    ".mission/bin/mc-signal": "0o755",
+    ".mission/hooks/hook.mc-policy-template/hook.json": "0o644",
+    ".mission/hooks/hook.mc-policy-template/policy.py": "0o755",
+    ".mission/hooks/native_output.py": "0o644",
+    ".mission/hooks/run.py": "0o755",
+    ".mission/hooks/signal": "0o755",
+    ".mission/signal-policy.json": "0o644"
+  },
+  "in_process": null,
+  "report": {
+    "degraded": [
+      "mc.stop_fence: no native hook on cursor_cloud for before_mcp",
+      "mc.operation_intent: no native hook on cursor_cloud for before_mcp",
+      "mc.frame_capture: no native hook on cursor_cloud for session_start, session_end, before_model, before_mcp, after_compaction",
+      "subagent verifier: cursor_cloud subagents have no per-agent skill restriction; it sees every skill of the session",
+      "subagent verifier: cursor_cloud subagents have no per-agent MCP server restriction; it inherits the parent session's servers",
+      "subagent summarizer: cursor_cloud subagents have no per-agent max_turns limit"
+    ],
+    "overflow": [],
+    "plugin_expansions": [
+      [
+        "plugin.web-research@1.0.0#sha256:5e689e2b01672bf33996e75d5e372ff60c536ce1599a1458e867cd8f4bef5160",
+        [
+          "mcp.tavily@0.2.22#sha256:5e2d82cbc971f731d22f59e8993f63865f0dd4b85c27a052a0709bc07e8ac009",
+          "skill.agent-browser@0.38.2#sha256:9c53c074d7ac6a2728b638ac1f376c5fa9eb8f71603017c3ea638c2fd40548df"
+        ]
+      ]
+    ],
+    "requires_trust": [],
+    "skipped_members": [
+      "mcp.agent-browser@0.38.2#sha256:c01113dab94c0ed749a6086d3de01b1baf49f0f6c926e43ae642af798deac473"
+    ],
+    "unqualified": [
+      "tavily: inline MCP secret references on cursor_cloud are unverified; the provider must resolve them from its own secrets",
+      "firecrawl: inline MCP secret references on cursor_cloud are unverified; the provider must resolve them from its own secrets"
+    ],
+    "unsupported_on_lane": [
+      {
+        "event": "session_start",
+        "hook_id": "hook.mc-policy-template",
+        "required": false
+      },
+      {
+        "event": "before_model",
+        "hook_id": "hook.mc-policy-template",
+        "required": false
+      }
+    ]
+  },
+  "send_options": {
+    "mcp_servers": [
+      {
+        "headers": {
+          "Authorization": "Bearer ${env:TAVILY_API_KEY}"
+        },
+        "name": "mc-tavily",
+        "type": "http",
+        "url": "https://mcp.tavily.com/mcp/"
+      },
+      {
+        "headers": {
+          "Authorization": "Bearer ${env:FIRECRAWL_API_KEY}"
+        },
+        "name": "mc-firecrawl",
+        "type": "http",
+        "url": "https://mcp.firecrawl.dev/v2/mcp"
+      }
+    ],
+    "setting_sources": [
+      "project"
+    ]
+  }
+}

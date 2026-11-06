@@ -1,0 +1,85 @@
+{
+  "files": {},
+  "in_process": null,
+  "report": {
+    "degraded": [
+      "mc.stop_fence: no native hook on codex_agents for before_tool, before_shell, before_mcp, subagent_start",
+      "mc.operation_intent: no native hook on codex_agents for before_tool, before_shell, before_mcp, subagent_start",
+      "mc.frame_capture: no native hook on codex_agents for session_start, session_end, before_prompt, before_model, after_model, before_tool, after_tool, after_tool_failure, before_shell, after_shell, before_mcp, after_file_edit, before_compaction, after_compaction, subagent_start, subagent_stop, stop",
+      "mc.usage: no native hook on codex_agents for after_model, after_tool, stop",
+      "mcp.tavily@0.2.22#sha256:5e2d82cbc971f731d22f59e8993f63865f0dd4b85c27a052a0709bc07e8ac009: hosted MCP requires streamable HTTPS",
+      "mcp.firecrawl@3.28.2#sha256:702a4da344e2103ebc7ccc9d6a0990b6da82fbb73a422eeea16faa5c50f33838: hosted MCP credential transport is unavailable",
+      "hosted catalog hooks/subagent execution unavailable: hook.mc-policy-template@1.0.0#sha256:0648298b48be031996277ae472115a46e7964d2ac3882e61b84351f3c3f8a547, subagent.verifier@1.0.0#sha256:88c9eae68eb300b2971a2bec9e5a26ff4179fd661d6b7d861e4c6557b9aaee14, subagent.summarizer@1.0.0#sha256:d479f1971015ef0493532f5c5aae2445f16ba23102a584f4ab8c0c3c49d4f7d5"
+    ],
+    "overflow": [],
+    "plugin_expansions": [
+      [
+        "plugin.web-research@1.0.0#sha256:5e689e2b01672bf33996e75d5e372ff60c536ce1599a1458e867cd8f4bef5160",
+        [
+          "mcp.tavily@0.2.22#sha256:5e2d82cbc971f731d22f59e8993f63865f0dd4b85c27a052a0709bc07e8ac009",
+          "skill.agent-browser@0.38.2#sha256:9c53c074d7ac6a2728b638ac1f376c5fa9eb8f71603017c3ea638c2fd40548df"
+        ]
+      ]
+    ],
+    "requires_trust": [],
+    "skipped_members": [
+      "mcp.agent-browser@0.38.2#sha256:c01113dab94c0ed749a6086d3de01b1baf49f0f6c926e43ae642af798deac473",
+      "mcp.tavily@0.2.22#sha256:5e2d82cbc971f731d22f59e8993f63865f0dd4b85c27a052a0709bc07e8ac009",
+      "mcp.firecrawl@3.28.2#sha256:702a4da344e2103ebc7ccc9d6a0990b6da82fbb73a422eeea16faa5c50f33838",
+      "hook.mc-policy-template@1.0.0#sha256:0648298b48be031996277ae472115a46e7964d2ac3882e61b84351f3c3f8a547",
+      "subagent.verifier@1.0.0#sha256:88c9eae68eb300b2971a2bec9e5a26ff4179fd661d6b7d861e4c6557b9aaee14",
+      "subagent.summarizer@1.0.0#sha256:d479f1971015ef0493532f5c5aae2445f16ba23102a584f4ab8c0c3c49d4f7d5"
+    ],
+    "unqualified": [
+      "plugin.web-research@1.0.0#sha256:5e689e2b01672bf33996e75d5e372ff60c536ce1599a1458e867cd8f4bef5160: host support on codex_agents is unqualified; projected without materialization proof",
+      "mcp.tavily@0.2.22#sha256:5e2d82cbc971f731d22f59e8993f63865f0dd4b85c27a052a0709bc07e8ac009: host support on codex_agents is unqualified; projected without materialization proof",
+      "skill.agent-browser@0.38.2#sha256:9c53c074d7ac6a2728b638ac1f376c5fa9eb8f71603017c3ea638c2fd40548df: host support on codex_agents is unqualified; projected without materialization proof",
+      "mcp.firecrawl@3.28.2#sha256:702a4da344e2103ebc7ccc9d6a0990b6da82fbb73a422eeea16faa5c50f33838: host support on codex_agents is unqualified; projected without materialization proof",
+      "hook.mc-policy-template@1.0.0#sha256:0648298b48be031996277ae472115a46e7964d2ac3882e61b84351f3c3f8a547: host support on codex_agents is unqualified; projected without materialization proof",
+      "subagent.verifier@1.0.0#sha256:88c9eae68eb300b2971a2bec9e5a26ff4179fd661d6b7d861e4c6557b9aaee14: host support on codex_agents is unqualified; projected without materialization proof",
+      "subagent.summarizer@1.0.0#sha256:d479f1971015ef0493532f5c5aae2445f16ba23102a584f4ab8c0c3c49d4f7d5: host support on codex_agents is unqualified; projected without materialization proof"
+    ],
+    "unsupported_on_lane": [
+      {
+        "event": "before_shell",
+        "hook_id": "hook.mc-policy-template",
+        "required": false
+      },
+      {
+        "event": "before_tool",
+        "hook_id": "hook.mc-policy-template",
+        "required": false
+      },
+      {
+        "event": "session_start",
+        "hook_id": "hook.mc-policy-template",
+        "required": false
+      },
+      {
+        "event": "before_model",
+        "hook_id": "hook.mc-policy-template",
+        "required": false
+      }
+    ]
+  },
+  "send_options": {
+    "hosted_mcp_servers": [],
+    "hosted_skills": [
+      {
+        "description": "Browser automation guide.",
+        "files": [
+          {
+            "content_base64": "LS0tCm5hbWU6IGFnZW50LWJyb3dzZXIKZGVzY3JpcHRpb246IERyaXZlIGEgcmVhbCBicm93c2VyIHdpdGggYWdlbnQtYnJvd3Nlci4KLS0tCgpSdW4gYGFnZW50LWJyb3dzZXIgc2tpbGxzIGdldCBjb3JlYCBmb3IgdGhlIGZ1bGwgZ3VpZGUuCg==",
+            "path": "SKILL.md"
+          },
+          {
+            "content_base64": "IyEvYmluL3NoCmFnZW50LWJyb3dzZXIgb3BlbiAiJDEiCg==",
+            "path": "scripts/open.sh"
+          }
+        ],
+        "name": "agent-browser"
+      }
+    ],
+    "instructions": "Collect peer-reviewed evidence on rapamycin and lifespan.\nCite every claim.\n\n## Mission context\n\n- inputs/sources/source_manifest.json (materialized)\n- journal digest (reference)\n"
+  }
+}

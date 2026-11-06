@@ -1,0 +1,16 @@
+{
+  "format": "report-source-partial-fixture.v1",
+  "application": "ai-engineer",
+  "question": "What parameter count do two primary model sources explicitly state?",
+  "stop_after": "recorded_report_submission",
+  "default_execution": "scripted-local-services",
+  "discovery_route": "host_managed_ks",
+  "alternative_route": "direct_admitted_provider_tools_then_self_reported_ks_import",
+  "provider_skills": ["tavily-discovery", "firecrawl-discovery"],
+  "limits": {"queries_total": 3, "captures_total": 3, "sources_target": 2, "claims_min": 2, "claims_max": 4, "repair_attempts": 3, "paid_calls": 0},
+  "preselected": ["domain", "question", "report kind", "schema route", "budgets", "local source candidates in scripted mode"],
+  "agent_authored": ["query text", "selection reasons", "exact quotes", "assertions", "support sets", "report prose", "uncertainty"],
+  "required_host_preflight": ["tool names and live schemas", "skill digests", "local database identity", "artifact-storage identity", "executor transport", "K01 binding", "capture-to-fragment adapter", "MC invocation/output obligation"],
+  "proofs": ["discovery receipt preserved", "selection receipt preserved", "source bytes captured", "quotes located", "capture-to-fragment exact readback", "report registered", "report submitted", "same-call replay has no duplicate effect", "missing or mismatched capture refuses", "captured bytes survive service reconstruction"],
+  "unqualified": ["live search/model behavior", "independent acceptance", "native ingestion", "consumer delivery", "full Temporal mission", "W1/W2 release"]
+}

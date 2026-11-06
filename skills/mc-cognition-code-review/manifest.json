@@ -1,0 +1,9 @@
+{
+  "schema_version": "mc.skill_bundle.v1",
+  "name": "mc-cognition-code-review",
+  "version": "0.1.0",
+  "service_contract_range": ">=0.1.0,<0.2.0",
+  "files": {
+    "SKILL.md": "sha256:a1de146e27a1f5cc6d96abc0720217381254c30a5ffc0fe1f653a695daa5edc5"
+  }
+}

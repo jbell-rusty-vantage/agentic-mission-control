@@ -1,0 +1,52 @@
+---
+type: Specification
+title: "Run 2 approved planning refinements: identity, qualification and custody"
+description: "Approved narrow acceptance amendments, current architecture evidence, compatible delivery boundaries and verification rules for Specs 7-11; no runtime implementation or live execution authorization."
+tags: [mission-control, planning, qualification, providers]
+---
+
+# Run 2 approved planning refinements
+
+Approved by the owner on 2026-10-14 after the read-only decision memo. This document and the amended issue `run2_plan` records refine remaining acceptance, not completed Specs 1-6. Inspection base: `a2527f6f3c385a7f55272c41d90e6860b44781d0`, 2026-10-14. No runtime implementation, install, fixture, paid run, commit, deployment or Linear publication was performed by this planning task.
+
+## Authority and regeneration
+
+Read [RUN-2-HANDOFF](RUN-2-HANDOFF.md), [RUN-1-REPORT](RUN-1-REPORT.md), the accepted general spec, SPRINT/DECISIONS and the assigned spec/issue. The approved additions live in `../issues.json` under `run2_plan` and are rendered in each affected issue. Existing `deps`, scope, funding gates and sizes are unchanged; additional evidence joins below do not create a new queue or provider lane. `../generate_issues.py` reconstructs the original kickoff baseline and does not preserve these additions: **do not run it over this packet**. `issues.json` is the current issue source; maintain its plan fields and issue Markdown together. Generator modernization is outside this documentation-only amendment. The original issue size is retained; incremental effort is described separately.
+
+Historical issue problem statements are context, not fresh findings. Run 1 evidence supersedes claims that no implementation exists. Inspect current code before proposing a change; an already satisfied criterion closes with evidence, not duplicate implementation. The remaining default scope is the handoff's 40 non-funding issues. CM-11/12/14/15/16/17/20/22/06, MO-53, SC-01..03, broad Deep Agents changes and S4 remain deferred or gated as recorded.
+
+## Provider identities and priority
+
+Owner priority: (1) Claude Agent SDK and Anthropic Managed Agents; (2) Deep Agents; (3) Cursor local/cloud; (4) existing/planned OpenAI agents; (5) Codex local/cloud; (6) Claude Code local/cloud. This prioritizes unblocked evidence work, not automatic admission of deferred providers. Runtime, placement, model vendor/transport and billing are separate dimensions. `claude_agent_sdk` drives the local Claude Code harness; standalone SPEC-08 CLI jobs are an independent user workflow, not another Mission Control lane.
+
+The existing `codex_agents` wire ID denotes **OpenAI hosted Agents API**, implemented by HTTP against `/v1/agents/sessions`; it is not the application-run OpenAI Agents SDK, the `codex` local app-server lane or the subscription `codex_cloud` product. See [OpenAI evidence](RUN-2-OPENAI-ARCHITECTURE.md). Do not rename wire IDs or SQL enums. Neither an Agents SDK lane nor a standalone direct Responses API lane is planned by this packet. Direct Messages/Responses execution surfaces and Anthropic transport for Deep Agents need later explicit designs. Deep Agents currently has an OpenAI-only model component; model transport inside it is not a standalone direct API lane.
+
+## Shared acceptance rules
+
+1. **Identity receipt.** Record lane/runtime, placement/host, actual binary or SDK/wire-schema pins, requested model ID, provider-reported model ID (or unknown), auth profile/billing mode, binding/materialization/describe digests, exact configuration evidence and prerequisite freshness. Never translate IDs by replacing punctuation. CLI/provider default selection is recorded as a default; it is not a resolved serving model. Alias pinning does not promise immutable provider weights.
+2. **Evidence levels.** Separate delivered, read-back/loaded and exercised. Separate implementation, account enablement and exact-placement live qualification. Reuse `FeatureEvidence`, host support, projection reports and existing discovery. Do not create a generic feature/configuration overhaul or automatically refresh a running binding.
+3. **Fail before create.** Required unsupported controls/tool-family enforcement or supplied unsupported options fail before provider creation. Optional degradation is explicit and attributable to an authored choice. New arbitrary native tools are outside scope; qualify the selected existing tools, hooks, MCP and permission policies.
+4. **Compatibility.** Old binding dumps/digests and fixture identities remain stable. Prefer secret-free derived summaries and sidecar qualification receipts to new canonical fields. If a canonical field is unavoidable, send a small versioned/additive design to the integrator with absent-field round-trip, digest, fork, reattach, retry and approval-seal tests. The effective-configuration approval seal is not the provider-binding digest. Preserve component 1.4.0 and applied migration/seed bytes; no unallocated SQL slots.
+5. **Truthful lifecycle/accounting.** Accepted ingress, admitted command, delivered wake and applied effect are different states. Unknown usage/cost is not zero. Replayed frames/turns and late cost settlement cannot charge twice. An uncertain provider create is reconciled before retry; a missing required staged prompt cannot fall back silently. Provider idle/done is not mission acceptance.
+6. **Artifacts and review.** Distinguish durable input reference, provider file delivery, workspace materialization and model context. Do not infer model-native media support from materialized bytes. Outputs identify source channel, immutable digest and originating session/turn or branch head. Signed upload acknowledgement/path is not custody. Human review binds actual registered output/version/digest; acceptance grants no publication. No generalized media viewer or scanning pipeline is added.
+7. **Security/cost.** Store only opaque account/auth references, not credentials. Redact resolved secrets from frames, receipts and logs; no organization key enters a sandbox. Preserve data class, retention, scoped write grants and per-unit capacity. Paid runners stay default-off. Historical $10 slice ceilings are maximums, not new permission or evidence of remaining funds; reconcile unknown spend first.
+
+## Validation and escalation
+
+Commands in issue plans are proposed future verification, not executed results. Start with deterministic units/golden/request fixtures. Run one heavy process at a time. Common relevant seams: `tests/unit/authoring/test_hosted_launch_bindings.py`, `tests/unit/agentic_components/test_discovery_proof.py`, `test_host_projection.py`, `tests/unit/human_tasks/test_human_gate_rules.py`, `tests/unit/workspaces/test_workspace_materialization.py`, and `test_artifact_promotion.py`. Use exact existing module paths or add a focused regression beside the affected seam; do not invent passing test names.
+
+Before running tests, verify installed dependencies without installing. If missing, record blocked and request the required owner/environment decision. Durability requires disposable real PostgreSQL; scheduling/recovery requires actual isolated Temporal. Those future fixtures must identify their target before creation and never reuse a live database. Full release checks include authoritative mypy, Ruff/ty/deptry, architecture and relevant integration checks; missing Biotech SDL stays a blocker. Do not sum overlapping test counts or hide earlier failures.
+
+Each issue handoff maps criterion to source/test/receipt, exact revision/build/placement, command and disposition (passed/failed/blocked/unrun), observed resource identities, privacy/cleanup, settled/estimated/unknown cost, remaining owner inputs and smallest next step. Escalate contract/schema changes, lost/ambiguous native state, unmet prerequisites, stale evidence, budget uncertainty, inability to contain an effect, or cleanup failure. Do not downgrade the criterion to obtain a green result.
+
+## Anthropic vertical and the pause blocker
+
+Local first: MO-69 -> MO-71 -> MO-72, using `claude_agent_sdk` on the selected WSL host, existing SDK/CLI pins, owner-selected API auth/model, repo instruction preservation, one admitted skill and one enforceable tool decision, inject/cancel and custody. Fake providers prove refusals; only separately authorized exact-placement runs qualify. This extends S0 evidence without adding a harness.
+
+Remote: HL-24 still joins HL-09/17/18/23 with MO-74/77/79 and requires both existing knowledge and SDLC missions. Include selected agent version/skills/toolset, configuration seals, approval deny/allow, wake/recovery, verified output and separately governed publication. HL-25 follows; historical local S2 is not remote qualification, and current S3 acceptance/spend remains unresolved.
+
+**Pause baseline:** `adapters/anthropic_managed/harness.py` has `hold_budget(harness_execution_id, held: bool)`, with True holding and False releasing the budget gate; its only found invocations are tests. `application/execution/harness/describe.py` declares Managed Agents pause unsupported. `domain/execution/lane_turns.py:pause_decision_for` and `adapters/temporal/workflows/operation.py` support boundary holding, not provider budget hold. Therefore HL-24's required budget-gate pause/resume is **blocked** until governed production control wiring and actual budget-boundary receipts are demonstrated, or the owner explicitly amends that requirement. Boundary pause can be measured separately but cannot satisfy it. This planning task does not authorize implementation reopening or new paid probes. Any proposed wiring must be integrator-scoped and preserve replay, stop fences, ceilings, approval seals and no duplicate turns; never claim hard/native pause.
+
+## Relative effort and joins
+
+Derived identity output and CLI results are small-to-medium because existing shapes differ; no catalog is built. Cursor additions are small acceptance increments atop already planned medium recovery/accounting work. Ingress refinements are mostly existing acceptance with targeted negative/replay cases. Custody joins are small-to-medium cross-interface evidence work. Anthropic qualification is small-to-medium offline refinement; operational effort remains bounded by existing dependencies and owner inputs. Managed budget-pause wiring is an unresolved implementation boundary, not included in these effort claims. No invented delivery times.

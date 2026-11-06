@@ -1,0 +1,509 @@
+{
+  "mode": "names and exact public source refs only; NOT operational authority",
+  "cognition_sdlc_seed_refs": {
+    "skill.mc-cognition-tdd": {
+      "ref": {
+        "digest": "sha256:5dc15c04d3be2e09ac8ebccd12edcf4a3e4ab1e46ddfdaefe86ecf0b7152fde6",
+        "kind": "skill",
+        "lifecycle_status": "published",
+        "logical_id": "skill.mc-cognition-tdd",
+        "payload_ref": null,
+        "revision": 1,
+        "schema_version": "1"
+      },
+      "version": null,
+      "host_support": {
+        "profiles": {
+          "claude_agent_sdk": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "supported"
+          },
+          "claude_cloud": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "unqualified"
+          },
+          "claude_managed": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "unqualified"
+          },
+          "codex": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "supported"
+          },
+          "codex_agents": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "unqualified"
+          },
+          "codex_cloud": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "unqualified"
+          },
+          "cursor_cloud": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "supported"
+          },
+          "cursor_local": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "supported"
+          },
+          "deep_agents": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "supported"
+          }
+        },
+        "schema_version": "mc.capability_host_support.v1"
+      },
+      "seed_source": "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\run2-final-main\\packages\\mission-control-db-contract\\seeds\\ai-engineer\\mc.app.ai-engineer.cognition-profiles-1.0.0.json",
+      "seed_sha256": "b8d7340310b931825196da6c2779dafd75fa26d66076c5e50ca0798e93f26506",
+      "manifest_capability_version": "0.1.0"
+    },
+    "skill.mc-cognition-code-review": {
+      "ref": {
+        "digest": "sha256:35f63ad301e4aeb75d40d8d9cd8319d030a156c204ca37cd9a4de4454a3ee1d9",
+        "kind": "skill",
+        "lifecycle_status": "published",
+        "logical_id": "skill.mc-cognition-code-review",
+        "payload_ref": null,
+        "revision": 1,
+        "schema_version": "1"
+      },
+      "version": null,
+      "host_support": {
+        "profiles": {
+          "claude_agent_sdk": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "supported"
+          },
+          "claude_cloud": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "unqualified"
+          },
+          "claude_managed": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "unqualified"
+          },
+          "codex": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "supported"
+          },
+          "codex_agents": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "unqualified"
+          },
+          "codex_cloud": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "unqualified"
+          },
+          "cursor_cloud": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "supported"
+          },
+          "cursor_local": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "supported"
+          },
+          "deep_agents": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "supported"
+          }
+        },
+        "schema_version": "mc.capability_host_support.v1"
+      },
+      "seed_source": "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\run2-final-main\\packages\\mission-control-db-contract\\seeds\\ai-engineer\\mc.app.ai-engineer.cognition-profiles-1.0.0.json",
+      "seed_sha256": "b8d7340310b931825196da6c2779dafd75fa26d66076c5e50ca0798e93f26506",
+      "manifest_capability_version": "0.1.0"
+    },
+    "skill.mc-cognition-pr": {
+      "ref": {
+        "digest": "sha256:839fac1c87c3e6989ebf2fb1604d6c842f51c0d3fb6232074a3cbf0c27e6b1a6",
+        "kind": "skill",
+        "lifecycle_status": "published",
+        "logical_id": "skill.mc-cognition-pr",
+        "payload_ref": null,
+        "revision": 1,
+        "schema_version": "1"
+      },
+      "version": null,
+      "host_support": {
+        "profiles": {
+          "claude_agent_sdk": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "supported"
+          },
+          "claude_cloud": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "unqualified"
+          },
+          "claude_managed": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "unqualified"
+          },
+          "codex": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "supported"
+          },
+          "codex_agents": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "unqualified"
+          },
+          "codex_cloud": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "unqualified"
+          },
+          "cursor_cloud": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "supported"
+          },
+          "cursor_local": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "supported"
+          },
+          "deep_agents": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "supported"
+          }
+        },
+        "schema_version": "mc.capability_host_support.v1"
+      },
+      "seed_source": "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\run2-final-main\\packages\\mission-control-db-contract\\seeds\\ai-engineer\\mc.app.ai-engineer.cognition-profiles-1.0.0.json",
+      "seed_sha256": "b8d7340310b931825196da6c2779dafd75fa26d66076c5e50ca0798e93f26506",
+      "manifest_capability_version": "0.1.0"
+    },
+    "skill.mc-cognition-diagnosing-bugs": {
+      "ref": {
+        "digest": "sha256:6bb739981c07345b7dd74694eeb3787e4050331d52f57119632f3f58aa1fd490",
+        "kind": "skill",
+        "lifecycle_status": "published",
+        "logical_id": "skill.mc-cognition-diagnosing-bugs",
+        "payload_ref": null,
+        "revision": 1,
+        "schema_version": "1"
+      },
+      "version": null,
+      "host_support": {
+        "profiles": {
+          "claude_agent_sdk": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "supported"
+          },
+          "claude_cloud": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "unqualified"
+          },
+          "claude_managed": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "unqualified"
+          },
+          "codex": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "supported"
+          },
+          "codex_agents": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "unqualified"
+          },
+          "codex_cloud": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "unqualified"
+          },
+          "cursor_cloud": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "supported"
+          },
+          "cursor_local": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "supported"
+          },
+          "deep_agents": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "supported"
+          }
+        },
+        "schema_version": "mc.capability_host_support.v1"
+      },
+      "seed_source": "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\run2-final-main\\packages\\mission-control-db-contract\\seeds\\ai-engineer\\mc.app.ai-engineer.cognition-profiles-1.0.0.json",
+      "seed_sha256": "b8d7340310b931825196da6c2779dafd75fa26d66076c5e50ca0798e93f26506",
+      "manifest_capability_version": "0.1.0"
+    },
+    "subagent.mc-cognition-reviewer": {
+      "ref": {
+        "digest": "sha256:873b0a03f8ef9961a470a470d16501df088cba9d344f2b7445cfb76c56682320",
+        "kind": "subagent_profile",
+        "lifecycle_status": "published",
+        "logical_id": "subagent.mc-cognition-reviewer",
+        "payload_ref": null,
+        "revision": 1,
+        "schema_version": "1"
+      },
+      "version": null,
+      "host_support": {
+        "profiles": {
+          "claude_agent_sdk": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "supported"
+          },
+          "claude_cloud": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "unqualified"
+          },
+          "claude_managed": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "unqualified"
+          },
+          "codex": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "supported"
+          },
+          "codex_agents": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "unqualified"
+          },
+          "codex_cloud": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "unqualified"
+          },
+          "cursor_cloud": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "supported"
+          },
+          "cursor_local": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "supported"
+          },
+          "deep_agents": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "supported"
+          }
+        },
+        "schema_version": "mc.capability_host_support.v1"
+      },
+      "seed_source": "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\run2-final-main\\packages\\mission-control-db-contract\\seeds\\ai-engineer\\mc.app.ai-engineer.cognition-profiles-1.0.0.json",
+      "seed_sha256": "b8d7340310b931825196da6c2779dafd75fa26d66076c5e50ca0798e93f26506",
+      "manifest_capability_version": "0.1.0"
+    },
+    "subagent.mc-cognition-test-runner": {
+      "ref": {
+        "digest": "sha256:9dde3cfd6bb70181334b732c0baeafacb20a674f9331f6c20219ac44f093de26",
+        "kind": "subagent_profile",
+        "lifecycle_status": "published",
+        "logical_id": "subagent.mc-cognition-test-runner",
+        "payload_ref": null,
+        "revision": 1,
+        "schema_version": "1"
+      },
+      "version": null,
+      "host_support": {
+        "profiles": {
+          "claude_agent_sdk": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "supported"
+          },
+          "claude_cloud": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "unqualified"
+          },
+          "claude_managed": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "unqualified"
+          },
+          "codex": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "supported"
+          },
+          "codex_agents": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "unqualified"
+          },
+          "codex_cloud": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "unqualified"
+          },
+          "cursor_cloud": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "supported"
+          },
+          "cursor_local": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "supported"
+          },
+          "deep_agents": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "supported"
+          }
+        },
+        "schema_version": "mc.capability_host_support.v1"
+      },
+      "seed_source": "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\run2-final-main\\packages\\mission-control-db-contract\\seeds\\ai-engineer\\mc.app.ai-engineer.cognition-profiles-1.0.0.json",
+      "seed_sha256": "b8d7340310b931825196da6c2779dafd75fa26d66076c5e50ca0798e93f26506",
+      "manifest_capability_version": "0.1.0"
+    },
+    "plugin.cognition-sdlc": {
+      "ref": {
+        "digest": "sha256:a57f772c4cb24e24fc84ae2aa14727a42f97d951aa918d85e8270abdc1216259",
+        "kind": "plugin",
+        "lifecycle_status": "published",
+        "logical_id": "plugin.cognition-sdlc",
+        "payload_ref": null,
+        "revision": 1,
+        "schema_version": "1"
+      },
+      "version": null,
+      "host_support": {
+        "profiles": {
+          "claude_agent_sdk": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "supported"
+          },
+          "claude_cloud": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "unqualified"
+          },
+          "claude_managed": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "unqualified"
+          },
+          "codex": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "supported"
+          },
+          "codex_agents": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "unqualified"
+          },
+          "codex_cloud": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "unqualified"
+          },
+          "cursor_cloud": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "supported"
+          },
+          "cursor_local": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "supported"
+          },
+          "deep_agents": {
+            "evidence_ref": null,
+            "overlay": {},
+            "status": "supported"
+          }
+        },
+        "schema_version": "mc.capability_host_support.v1"
+      },
+      "seed_source": "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\run2-final-main\\packages\\mission-control-db-contract\\seeds\\ai-engineer\\mc.app.ai-engineer.cognition-profiles-1.0.0.json",
+      "seed_sha256": "b8d7340310b931825196da6c2779dafd75fa26d66076c5e50ca0798e93f26506",
+      "manifest_capability_version": "0.1.0"
+    }
+  },
+  "actual_existing_cursor_auto_profile": {
+    "source": "C:\\Users\\Pinda\\Proyectos\\BellLabs\\platform\\mission-control\\.scratch\\materialization-observation-2026-10\\run2\\resumed\\cursor-next-preparation\\e5ba-successor-preparation\\catalog.auto.actual-1.json",
+    "source_sha256": "aba575445ba3a553c3528f8272be37d84166de698ad125320f93967e8510eea9",
+    "definition_ref": {
+      "digest": "sha256:8e116c695855dea8b74d6d2505196c4b161e215623e7266dbab24c6eb9a8deef",
+      "kind": "agent_profile",
+      "lifecycle_status": "published",
+      "logical_id": "agent-profile.local-cursor-auto",
+      "payload_ref": null,
+      "revision": 1,
+      "schema_version": "1"
+    },
+    "fresh_DB_readiness": false,
+    "selected_current_model_must_still_join": true
+  },
+  "other_provider_agent_profiles": {
+    "claude_agent_sdk": "No current newly measured published exact profile ref sealed in this session; use supported current retained normal catalog source, fresh readback before launch",
+    "codex": "Same; sample deployment zero digest is illustrative and forbidden as live identity",
+    "claude_managed": "Existing saved hosted pack/agent/environment refs require exact selected configuration and fresh source-bound readback; no new resources here",
+    "codex_agents": "Same; only genuine agents=v1 HTTP contract"
+  },
+  "output_schemas": {
+    "existing_s0_schema": "schema.s0-probe-report@1 exists in committed common artifact-schema seed; this is the original control-fixture schema, not a general SDLC review schema",
+    "representative_examples": "diagnosis_note@1,patch_report@1,summary_note@1,coverage_report@1 appear in checked example fixture catalogs; current production presence NOT established by committed-seed scan",
+    "required_join": "Select real published schemas from app-scoped actual catalog with exact ref/digest/validator, or separately review an additive intended report-schema definition; do not relabel toy output or invent publication"
+  },
+  "tool_binding_boundary": {
+    "native_tools": "Read/search/shell/edit are lane-native provider tools governed by actual permission profile, kernel coverage and declared commands; they are not invented catalog deterministic_executor pins",
+    "mcp": "Use exact application-approved MCP ref+server/tool allowlist+deployment component+secret refs+host/network readiness only when needed by real task",
+    "warning": "mcp.agent-browser and Firecrawl are legitimate published catalog entries but do not belong automatically in a local config-resolver SDLC review; no artificial MCP call merely to show a checkmark",
+    "cursor": "deterministic_executor as catalog capability lacks Cursor launch projection; use supported native tools/governed effect route, preserve explicit refusal"
+  },
+  "environment_secret_refs": {
+    "runtime": "mission-control/ai-engineer/MC_AI_ENGINEER_RUNTIME_DSN",
+    "family": "mission-control/ai-engineer/MC_AI_ENGINEER_FAMILY_DSN",
+    "checkpoint": "mission-control/ai-engineer/LANGGRAPH_CHECKPOINT_DATABASE_DIRECT",
+    "temporal": "mission-control/ai-engineer/TEMPORAL_CLOUD_API_KEY",
+    "launcher": "Existing S0_LAUNCHER_AUTH; existing ai-engineer/.env selected SUPABASE_PUBLISHABLE_KEY source; no secret values copied",
+    "provider": "S0 Claude selected API key route; Codex actual ChatGPT owner home; Cursor exact canonical key/account fingerprint if selected API route; CLI restored subscription separately scoped",
+    "no_fallback": "No generic settings credential fallback, extra login/refresh, key rewrite, new IAM/grants or recovery authority reuse"
+  },
+  "current_prepared_queues": {
+    "prefix": "mc-run2-g1-ai-engineer-1d081297",
+    "local_lane": "mc-run2-g1-ai-engineer-1d081297-lane-wsl",
+    "callback": "127.0.0.1:18081",
+    "lease_root": "/home/overton/.local/state/mission-control/qualification/run2/native-c9-leases",
+    "status": "private source-only preparation, never served; exact source change after clean-code pass invalidates a prior sealed runtime assumption"
+  },
+  "source_pin_policy": "Rehash original selection sources and actual installed adapter/CLI/schema/import closure immediately before use; no source/model name alone proves served configuration."
+}

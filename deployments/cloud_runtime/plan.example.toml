@@ -1,0 +1,62 @@
+# This intentionally fails validation until all OWNER-SELECT values are resolved.
+# Reference existing resources only. It is not spending or deployment authorization.
+format_version = 1
+account_id = "298199649527"
+region = "us-east-2"
+cluster_arn = "OWNER-SELECT: dedicated approved cluster ARN"
+image = "OWNER-SELECT: reviewed image URI@sha256:digest"
+log_group = "/mission-control/runtime"
+subnet_ids = ["OWNER-SELECT: approved private subnet"]
+security_group_ids = ["OWNER-SELECT: approved security group"]
+
+[[tasks]]
+name = "mission-control-api"
+role = "api"
+runtime_dsn_env = "MC_BIOTECH_RUNTIME_DSN"
+deployment_file = "/etc/mission-control/deployment.json"
+configuration_digest = "OWNER-SELECT: reviewed configuration digest"
+execution_role_arn = "OWNER-SELECT: approved ECS execution role ARN"
+task_role_arn = "OWNER-SELECT: approved API task role ARN"
+cpu = 512
+memory = 2048
+[tasks.environment]
+MISSION_CONTROL_RUNTIME_OPTIONS_FACTORY = "OWNER-SELECT: reviewed.package:build"
+TEMPORAL_ADDRESS = "OWNER-SELECT: existing namespace endpoint"
+TEMPORAL_NAMESPACE = "OWNER-SELECT: existing namespace"
+S3_BUCKET = "OWNER-SELECT: approved private durable payload bucket"
+[tasks.secrets]
+MC_BIOTECH_RUNTIME_DSN = "OWNER-SELECT: existing restricted runtime secret ARN"
+TEMPORAL_CLOUD_API_KEY = "OWNER-SELECT: existing Temporal secret ARN"
+
+[[tasks]]
+name = "mission-control-biotech-worker"
+role = "worker"
+application_id = "biotech"
+binding_digest = "OWNER-SELECT: exact sealed application binding digest"
+runtime_dsn_env = "MC_BIOTECH_RUNTIME_DSN"
+family_dsn_env = "MC_BIOTECH_FAMILY_DSN"
+deployment_file = "/etc/mission-control/biotech-deployment.json"
+configuration_digest = "OWNER-SELECT: reviewed configuration digest"
+execution_role_arn = "OWNER-SELECT: approved ECS execution role ARN"
+task_role_arn = "OWNER-SELECT: approved worker task role ARN"
+cpu = 1024
+memory = 2048
+[tasks.environment]
+MISSION_CONTROL_RUNTIME_OPTIONS_FACTORY = "OWNER-SELECT: reviewed.package:build"
+TEMPORAL_ADDRESS = "OWNER-SELECT: existing namespace endpoint"
+TEMPORAL_NAMESPACE = "OWNER-SELECT: existing namespace"
+CAPABILITY_PINS_PATH = "/etc/mission-control/capability-pins.json"
+MISSION_CONTROL_WORKSPACE_ROOT = "/etc/mission-control/assets"
+S3_BUCKET = "OWNER-SELECT: approved private durable payload bucket"
+# Supabase Storage instead of AWS S3: uncomment, and add S3_ACCESS_KEY_ID / S3_SECRET_ACCESS_KEY
+# under [tasks.secrets] (they take precedence over the task role).
+# S3_ENDPOINT_URL = "OWNER-SELECT: https://<project-ref>.storage.supabase.co/storage/v1/s3"
+# S3_FORCE_PATH_STYLE = "true"
+# S3_REGION = "OWNER-SELECT: the project region"
+[tasks.secrets]
+MC_BIOTECH_RUNTIME_DSN = "OWNER-SELECT: existing restricted runtime secret ARN"
+MC_BIOTECH_FAMILY_DSN = "OWNER-SELECT: existing restricted family secret ARN"
+LANGGRAPH_CHECKPOINT_DATABASE_DIRECT = "OWNER-SELECT: existing restricted saver/store secret ARN"
+TEMPORAL_CLOUD_API_KEY = "OWNER-SELECT: existing Temporal secret ARN"
+# Add only provider/auth/tracing secrets needed by admitted lanes. Never copy .env.
+# Add a separate ai-engineer worker with its own binding, config, roles and secrets.

@@ -1,0 +1,22 @@
+---
+description: Mission Control program decisions and Temporal mechanics
+globs: src/mission_control/domain/**/*.py,src/mission_control/application/**/*.py,src/mission_control/adapters/temporal/**/*.py,src/mission_control/adapters/deep_agents/**/*.py
+alwaysApply: false
+---
+
+# Execution path
+
+Admitted immutable binding -> mc.mission_run.v1 root -> StageGraph or GoalDirected
+family -> mc.operation.v1 operation -> operation.execute -> bounded Deep Agents
+-> immutable journal/effect/settlement -> family reconciliation.
+
+Domain interpreters propose; application reducers authorize and terminalize.
+Temporal owns deterministic mechanics. Checkpoints and traces remain evidence.
+
+Read scoped source AGENTS.md and docs/knowledge/temporal-synthesis.md. Family changes must
+preserve scope/run/ERC/type/epoch identity, operation budget/settlement and linked
+parent boundaries. Actual workflow registration, activity registration and queue
+binding must agree. Test real histories/replay for execution claims.
+
+Do not restore old app/ paths, domain-specific engines or Mongo repositories.
+Retained historical work-package docs are provenance, not current instructions.

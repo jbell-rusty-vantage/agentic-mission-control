@@ -1,0 +1,40 @@
+{
+  "batch": {
+    "max_delay_seconds": 30,
+    "max_signals": 20
+  },
+  "flush": [
+    "stop"
+  ],
+  "lane_profile": "cursor_cloud",
+  "materialization": {
+    "files": [
+      ".cursor/hooks.json",
+      ".cursor/rules/mc-mission.mdc"
+    ],
+    "skills": ".cursor/skills"
+  },
+  "schema_version": "mc.signal_policy.v1",
+  "signals": {
+    "after_model": "agent.responded",
+    "after_tool": "tool.completed",
+    "before_compaction": "compaction.started",
+    "before_tool": "tool.started",
+    "stop": "stop",
+    "subagent_start": "subagent.started",
+    "subagent_stop": "subagent.stopped"
+  },
+  "stdout": {
+    "after_model": {},
+    "after_tool": {},
+    "before_compaction": {},
+    "before_tool": {
+      "permission": "allow"
+    },
+    "stop": {},
+    "subagent_start": {
+      "permission": "allow"
+    },
+    "subagent_stop": {}
+  }
+}

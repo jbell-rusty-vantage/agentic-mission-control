@@ -1,0 +1,192 @@
+{
+  "actor_ref": "seed:mission-control-catalog",
+  "component_compatibility": ">=1.0.0 <2.0.0",
+  "depends_on": [
+    {
+      "seed_key": "mc.app.biotech.agent-skills",
+      "seed_version": "1.0.3"
+    }
+  ],
+  "description": "The application's knowledge charter skill in 'biotech': skill.biotech-knowledge-charter. A new skill id starts at revision 1; all earlier 1.0.0, 1.0.1, 1.0.2, 1.0.3 records and custody bytes are preserved.",
+  "format": "mission-control-seed/v1",
+  "records": [
+    {
+      "fields": {
+        "asset_id": "definition:skill:skill.biotech-knowledge-charter",
+        "contract": "mission-control.published-definition/1",
+        "host_support": {
+          "profiles": {
+            "claude_agent_sdk": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "codex": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "cursor_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "cursor_local": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "deep_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            }
+          },
+          "schema_version": "mc.capability_host_support.v1"
+        },
+        "kind": "skill_bundle",
+        "manifest": {
+          "definition": {
+            "attachment_targets": [
+              "agent.main"
+            ],
+            "body_summary": "The Biotech knowledge charter - what the biotech/longevity knowledge graph holds, which entities and registered relationships a mission may author, the evidence bar, forbidden inferences and what counts as proof of ingestion. Use before researching, verifying or ingesting Biotech knowledge, when choosing what to capture from a source, or when a biotech_ingest preview refuses.",
+            "bundle_ref": {
+              "digest": "sha256:1b8e8070634129761268400ca7ed3c9c65a494d4309ac9098f4c37decfbba6b2",
+              "media_type": "application/vnd.mc.capability-bundle+json",
+              "size_bytes": 13357,
+              "uri": "capability-bundles://biotech/skill_bundle/skill.biotech-knowledge-charter/0.1.0/1b8e8070634129761268400ca7ed3c9c65a494d4309ac9098f4c37decfbba6b2"
+            },
+            "compatibility": {
+              "executables": [],
+              "network_capabilities": [],
+              "runtimes": [],
+              "workspace_capabilities": []
+            },
+            "compatible_compiler_versions": [
+              "control-plane-definitions/1"
+            ],
+            "conflicts_with": [],
+            "description": "The Biotech knowledge charter - what the biotech/longevity knowledge graph holds, which entities and registered relationships a mission may author, the evidence bar, forbidden inferences and what counts as proof of ingestion. Use before researching, verifying or ingesting Biotech knowledge, when choosing what to capture from a source, or when a biotech_ingest preview refuses.",
+            "file_manifest": [
+              {
+                "digest": "sha256:f3bb6d737aa4968c3abde93d1647757bbc7cf17499fc3d187881a0e39adb844f",
+                "executable": false,
+                "path": "SKILL.md",
+                "size_bytes": 5640
+              },
+              {
+                "digest": "sha256:2d61863d732302e12d1eb11bcc5db055e30b43c98c00970ced0d1b634b290b46",
+                "executable": false,
+                "path": "manifest.json",
+                "size_bytes": 487
+              },
+              {
+                "digest": "sha256:bcdf2315e1d0ab98907df89c163a5834f356d054f4cacccdbe520478822d2d34",
+                "executable": false,
+                "path": "references/ingestion-guide.md",
+                "size_bytes": 5653
+              },
+              {
+                "digest": "sha256:46ee5f019ce4f8b0d2870d28cd772a2ed0ed890c6a961e095028665bdf51adae",
+                "executable": false,
+                "path": "references/research-procedure.md",
+                "size_bytes": 1577
+              }
+            ],
+            "frontmatter": {
+              "description": "The Biotech knowledge charter - what the biotech/longevity knowledge graph holds, which entities and registered relationships a mission may author, the evidence bar, forbidden inferences and what counts as proof of ingestion. Use before researching, verifying or ingesting Biotech knowledge, when choosing what to capture from a source, or when a biotech_ingest preview refuses.",
+              "name": "biotech-knowledge-charter"
+            },
+            "host_support": {
+              "profiles": {
+                "claude_agent_sdk": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "codex": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "cursor_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "cursor_local": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "deep_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                }
+              },
+              "schema_version": "mc.capability_host_support.v1"
+            },
+            "kind": "skill",
+            "logical_id": "skill.biotech-knowledge-charter",
+            "manifest_digest": "sha256:1b8e8070634129761268400ca7ed3c9c65a494d4309ac9098f4c37decfbba6b2",
+            "maturity": "experimental",
+            "required_capabilities": [],
+            "review_status": "approved",
+            "schema_version": "1",
+            "skill_name": "biotech-knowledge-charter",
+            "source_provenance": {
+              "commit_digest": null,
+              "license": "proprietary",
+              "locator": "repo://skills/biotech-knowledge-charter",
+              "source": "local",
+              "upstream_identity": "skill.biotech-knowledge-charter",
+              "upstream_version": "0.1.0"
+            },
+            "title": "biotech-knowledge-charter"
+          },
+          "published_at": "2026-10-14T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:a9293924708a1be93bc49b59df6955c79ba5f804cf2847cb312a23a6d890e068",
+            "kind": "skill",
+            "lifecycle_status": "published",
+            "logical_id": "skill.biotech-knowledge-charter",
+            "payload_ref": null,
+            "revision": 1,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:3ab38597cba0f0ef2c04ff59152302f615b9f085083115a1aef2f5db75d43b3c",
+        "manifest_ref": "mc-catalog://definition/skill/skill.biotech-knowledge-charter/1",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "1"
+      },
+      "kind": "asset_version",
+      "logical_key": "agent-skill:skill:skill.biotech-knowledge-charter/1"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "agent-skill:skill:skill.biotech-knowledge-charter/1",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/agent_skills.py",
+          "skills/biotech-knowledge-charter"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "agent-skill:skill:skill.biotech-knowledge-charter/1:admit"
+    }
+  ],
+  "seed_key": "mc.app.biotech.agent-skills",
+  "seed_version": "1.0.4"
+}

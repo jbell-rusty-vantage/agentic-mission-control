@@ -1,0 +1,119 @@
+# yaml-language-server: $schema=../../../../src/mission_control/contracts/schemas/mc.mission_manifest.v1.json
+# Experiment loop E2 (EXPERIMENT-LOOP-2026-11 section 3, OVE-169): Stage Graph fan-out / join.
+#
+# Two parallel collectors (root concurrency 2), each reading ONE frozen source quote, feed an
+# `all` join (the default join of `synthesize`, whose two `from:` bindings are its only
+# dependencies). The two bindings use different Expansion Tiers on purpose so the two Context
+# Packet items can be compared in the transcript: `notes_a` is `materialize` (a file under the
+# receiver's workspace), `notes_b` is `reference` (a ref and digest only, no body). The
+# synthesizer must report what each tier actually delivered, never guess the referenced bytes.
+#
+# Acceptance: text outputs carry `human: review_accept`, which a Stage Graph evaluates only on a
+# human_gate REVIEW stage (`application/authoring/completion_support.py`), so one final `review`
+# gate owns both goals: the run waits there for an operator review decision.
+# Frozen sources (captured 2026-10-28, scripts/sprint_oc_w1_pack.mjs FIXTURES["ai-engineer"]) are
+# inline below; there are no placeholders. Overlay: queue an instruction at the `synthesize`
+# stage boundary (claimed at stage admission).
+manifest: mission/v1
+mission:
+  key: e2-stagegraph-fanout-join
+  title: E2 parallel collectors joined into one synthesis (frozen evidence)
+  application: ai-engineer
+  description: >
+    Experiment loop E2. Two parallel collectors, an all-join and a synthesizer with one
+    materialized and one referenced input.
+  goals:
+    - key: collected
+      description: Extract the parameter count each frozen source quote states for the model it names
+      objectives:
+        - { key: collect_mistral, description: Extract the size stated by the Mistral 7B abstract quote }
+        - { key: collect_llama, description: Extract the sizes stated by the Llama 3.1 model card quote }
+      criteria:
+        - key: notes_submitted
+          description: Each collector submitted one note naming its source id, model and quoted size
+          evidence: [notes_a, notes_b]
+          acceptance: { human: review_accept }
+    - key: synthesized
+      description: Combine both notes into one short synthesis and state how each input was delivered
+      objectives:
+        - { key: synthesize_notes, description: Synthesize the two accepted notes }
+      criteria:
+        - key: synthesis_submitted
+          description: The synthesis names both models with their quoted sizes and the delivery of each input
+          evidence: [synthesis]
+          acceptance: { human: review_accept }
+  environment:
+    lane: deep_agents
+    model: { profile: producer.fallback }
+    sandbox: { profile: research.standard }
+    capabilities:
+      # Exact pin; digest identical in seeds mc.catalog.knowledge-tools 1.1.0 and 1.2.0.
+      - { pin: "tool.knowledge-submit-output@2#sha256:f1fa75f1e3fa49e9061746cbe89f53a828e502fb93e142d3b34d8a854a2a64dd", kind: tool, as: submit_output }
+    # Three agent stages of about 3 model calls each; the stage budgets below sum under these.
+    budget: { usd: 0.5, tokens: 300000, wall_clock: 40m, tool_calls: 24 }
+    governors: { depth: 1, fan_out: 2, iterations: 1, patience: 1 }
+    side_effects: [read_only, workspace_write]
+  program:
+    key: root
+    behavior: stage_graph
+    objectives: [collected, synthesized]
+    concurrency: 2
+    nodes:
+      - key: collect_a
+        behavior: agent_executor
+        objectives: [collect_mistral]
+        environment:
+          budget: { usd: 0.1, tokens: 60000, wall_clock: 10m, tool_calls: 4 }
+        instruction: |
+          Frozen source arxiv-2310.06825-abstract ("Mistral 7B (arXiv:2310.06825), abstract"), verbatim quote:
+          "We introduce Mistral 7B, a 7-billion-parameter language model engineered for superior performance and efficiency."
+          Use only this quote. Call submit_output ONCE, obligation "collect_a.notes_a", one inline text item of
+          exactly two lines: "source: arxiv-2310.06825-abstract" and "mistral-7b: <parameter count exactly as quoted>".
+          Stop; never repeat a call that returned a receipt.
+        outputs:
+          - { name: notes_a, form: text, enforcement: required, media_type: text/plain }
+      - key: collect_b
+        behavior: agent_executor
+        objectives: [collect_llama]
+        environment:
+          budget: { usd: 0.1, tokens: 60000, wall_clock: 10m, tool_calls: 4 }
+        instruction: |
+          Frozen source hf-meta-llama-llama-3.1-model-card ("Meta Llama 3.1 model card, Model Information"), verbatim quote:
+          "a collection of pretrained and instruction tuned generative models in 8B, 70B and 405B sizes"
+          Use only this quote. Call submit_output ONCE, obligation "collect_b.notes_b", one inline text item of
+          exactly two lines: "source: hf-meta-llama-llama-3.1-model-card" and "llama-3-1: <sizes exactly as quoted>".
+          Stop; never repeat a call that returned a receipt.
+        outputs:
+          - { name: notes_b, form: text, enforcement: required, media_type: text/plain }
+      - key: synthesize
+        behavior: agent_executor
+        objectives: [synthesize_notes]
+        environment:
+          budget: { usd: 0.15, tokens: 100000, wall_clock: 15m, tool_calls: 8 }
+        inputs:
+          # The two bindings are the join: `synthesize` releases when both producers are accepted.
+          - { name: notes_a, from: collect_a.notes_a, expand: materialize }
+          - { name: notes_b, from: collect_b.notes_b, expand: reference }
+        instruction: |
+          Read /.mission/transfer.json, the access index of your exact inputs (bindings notes_a and notes_b).
+          notes_a is delivered as a file: read exactly the path the index lists for it. notes_b is delivered by
+          reference: record the ref and digest the index gives; read its bytes only if the index names a read
+          method you actually have; never guess its content.
+          Call submit_output ONCE, obligation "synthesize.synthesis", one inline text item of at most five lines:
+          one line per model with the size its note states (or "unread: <ref>"), then one line per binding
+          "delivery <binding>: <file path | reference ref+digest | missing>".
+          Stop; never repeat a call that returned a receipt.
+        outputs:
+          - { name: synthesis, form: text, enforcement: required, media_type: text/plain }
+      - key: review
+        behavior: human_gate
+        objectives: [collected, synthesized]
+        depends_on: [synthesize]
+        task:
+          kind: REVIEW
+          prompt: Review both collector notes and the synthesis, including what each input tier delivered.
+          reviewers: [owner]
+          packet: [collect_a.notes_a, collect_b.notes_b, synthesize.synthesis]
+          on_timeout: keep_waiting
+  controls:
+    commands_allowed: [pause, resume, cancel, queue_instruction, add_context, interrupt_and_inject]

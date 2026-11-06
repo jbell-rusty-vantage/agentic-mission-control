@@ -1,0 +1,14 @@
+---
+description: Evidence-driven implementation sequence
+alwaysApply: false
+---
+
+# Engineering sequence
+
+Read accepted Mission Control contracts, inspect code and tests, implement the
+authorized slice and validate behavior. Do not impose historical BellLabs ticket
+processes or repeat permission requests already covered by user authorization.
+
+Preserve dirty work and agree on concurrent ownership. Record gaps in the status
+and removal guide. Missing live credentials or budget must remain visible as
+unqualified evidence, never hidden by default skips.

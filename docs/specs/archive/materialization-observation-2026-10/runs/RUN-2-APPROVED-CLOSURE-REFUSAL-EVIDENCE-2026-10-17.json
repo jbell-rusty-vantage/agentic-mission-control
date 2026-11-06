@@ -1,0 +1,145 @@
+{
+  "schema": "mc.run2.remaining-closure.approved-prelaunch-refusal.v1",
+  "recorded_utc": "2026-10-17T18:16:33.256018+00:00",
+  "inspected_main_head": "c0298800ee02c2d4dfe8ab31cb396f03f4a89486",
+  "authority": {
+    "utc": "2026-10-17T18:11:59.662262+00:00",
+    "owner_approval": "Explicit Yes at 2026-10-17 18:07 UTC; delegated at 18:08 UTC by parent 01a0f9ac-fba4-704b-8ea9-2e34b97570e3",
+    "approved_scope": "One reviewed remaining family/root closure; fresh gates; expiry only <=650s; mandatory distinct readback and cleanup; no automatic retry",
+    "prior_literal_sha256": "ded2af8090e729139128390f0bfe40a0ea8dae3ee512437ff55f78010f1732a8",
+    "approved_literal_sha256": "4ef0d1c6ef84a057fd803f8fb02d084c66d8ea6bea62b33730d4da3282ed2dfb",
+    "stable_envelope_digest": "sha256:f82bf605e66a7d03bb0e3fa3b85d14365a7f0f7ae165fce216b8136bade5561a",
+    "changed_fields": [
+      "phase_action.expires"
+    ],
+    "expires_utc": "2026-10-17T18:22:49.661242+00:00",
+    "main_head": "c0298800ee02c2d4dfe8ab31cb396f03f4a89486",
+    "main_clean": true,
+    "local_source_and_receipt_pins_verified": true,
+    "registry_and_installed_runtime_refreshed": true,
+    "registry_runtime_receipt_sha256": "cefd47665f324fe873298974b7319f32c9a03352a80be1e72bf34525a7cab5be",
+    "live_state_principal_and_routing_gates": "Required inside reviewed host before permanent intent and at every activation stage",
+    "live_attempt_started": false
+  },
+  "launch_refusal": {
+    "utc": "2026-10-17T18:13:33.160544+00:00",
+    "invocation": "run_host.py --execute <approved-literal-sha256> approvedlive1",
+    "approved_literal_sha256": "4ef0d1c6ef84a057fd803f8fb02d084c66d8ea6bea62b33730d4da3282ed2dfb",
+    "exit_code": 1,
+    "refusal": "memory_start_gate",
+    "refusal_source": "run_host.py:57; prior to output creation, credentials, WSL spawn or live client creation",
+    "minimum_start_available_bytes": 1610612736,
+    "diagnostic_available_bytes": 2330714112,
+    "diagnostic_total_bytes": 16441667584,
+    "diagnostic_load_percent": 85,
+    "read_only_registry": {
+      "utc": "2026-10-17T18:13:33.140966+00:00",
+      "remaining_intent_present": false,
+      "phase_one_consumed_verified": true,
+      "header_pin_verified": true,
+      "writes": 0,
+      "claims": 0,
+      "network_calls": 0
+    },
+    "bridge_output_and_receipt_absent": true,
+    "owned_host_spawned": false,
+    "execution_intent_claims": 0,
+    "provider_calls": 0,
+    "database_connections_or_writes": 0,
+    "temporal_connections_or_changes": 0,
+    "independent_full_readback": "Not run: startup capacity gate refused before any live connection or mutation; no bypass",
+    "automatic_retry": false,
+    "sessions_or_services_stopped": false,
+    "resource_snapshot_limitation": "Initial sandbox CIM/process inventory denied/virtualized; reported zero values were invalid, not real capacity"
+  },
+  "observer": {
+    "utc": "2026-10-17T18:14:28.969934+00:00",
+    "mode": "observe",
+    "exit_code": 0,
+    "reason": null,
+    "elapsed_seconds": 37.562,
+    "memory_before": 2388877312,
+    "memory_after": 2019733504,
+    "action_sha256": "c64a1462739e3ee23b04ff7e656dfa5eeeb76c0e89e94a95a908241ec9f8d068",
+    "sources_unchanged": true,
+    "private_sender_joined": true,
+    "private_pipe_failure_types": [],
+    "credentials_saved": false,
+    "guard_receipt": {
+      "phase": "exact_owned_host_exit",
+      "mode": "observe",
+      "exit_code": 0,
+      "reason": null,
+      "forced_kill": false,
+      "elapsed_seconds": 37.222,
+      "hard_seconds": 78,
+      "exact_child_reaped": true,
+      "independent_forward_inspection_required": false,
+      "private_stderr_bytes": 0,
+      "private_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "worker": {
+        "phase": "remaining_closure_held_no_SQL_change_verified",
+        "provider_calls": 0,
+        "automatic_retry": false,
+        "mode": "inspect",
+        "private_audit_root": "/home/overton/.local/state/mission-control/qualification/run2/recovery/remaining-closure-99yess0r",
+        "credentials_saved": false,
+        "execution_authority_expired": true,
+        "inspection_reuses_pinned_contract_and_fresh_pool_principals": true,
+        "result_pool_readiness": {
+          "login": "mc_ai_engineer_runtime_login",
+          "capability": "mission_control_runtime",
+          "transaction_readonly": true,
+          "default_readonly": "on",
+          "required_grant_pairs_verified": 2
+        },
+        "snapshot": {
+          "digest": "sha256:e4cbbcc91db9dabeb976b40233bb519ee8f6e41a185606adf8bc30a44e4024d1",
+          "run_version": 8,
+          "phase": "cancelling"
+        },
+        "held_database_beforeimage_verified": true,
+        "histories": {
+          "family": {
+            "status": 1,
+            "events": 42,
+            "sha256": "195922596897a457f4f43797b6946b2a0634174660d6e981eeacc301a7c1fb87"
+          },
+          "root": {
+            "status": 1,
+            "events": 16,
+            "sha256": "eec4bcb070ea0c9f7af9cc88b0b52fa4c455a0e7816415194673f62123957bd6"
+          },
+          "foreign": {
+            "events": 2,
+            "sha256": "eaa90cf5f54c69daba7974e7598559c503d977a07925f8defac8711de7d3727e"
+          }
+        },
+        "routing": {
+          "current_version": "mission-control.0.1.0-a8d69c5b4850",
+          "current_version_changed_time": "2026-10-16T06:25:36.277805333Z",
+          "current_deployment_version": {
+            "build_id": "0.1.0-a8d69c5b4850",
+            "deployment_name": "mission-control"
+          },
+          "revision_number": "10"
+        },
+        "failed_operation_verified": true,
+        "temporal_observed": true,
+        "temporal_verified": true,
+        "owned_pools_closed": true
+      }
+    }
+  },
+  "receipts": {
+    "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\completion-replay-evidence\\remaining-closure-owner-authority.json": "6fef38e748433b4280674726f10094a083aa4d3273f86e64d15a7d2ed1dc1ec2",
+    "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\completion-replay-evidence\\remaining-closure-prelaunch-refusal.json": "2d5729f7c134c53da44db847cbf181bd19c19d4ec5930e1790fbeaffd819df89",
+    "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\completion-replay-evidence\\remaining-registry-runtime-approved-1808.json": "cefd47665f324fe873298974b7319f32c9a03352a80be1e72bf34525a7cab5be",
+    "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\run2-completion-offline\\.scratch\\run2-completion-20261017\\continuation-v8\\recovery\\closure-host-r11\\approved-action.json": "4ef0d1c6ef84a057fd803f8fb02d084c66d8ea6bea62b33730d4da3282ed2dfb",
+    "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\run2-completion-offline\\.scratch\\run2-completion-20261017\\continuation-v8\\recovery\\closure-host-r11\\owned-host-approvedread1.json": "3a9bc51d9b62ba86ad6d13115ebfaca50e3f62f8535b50e3242e5e7bc66f452d",
+    "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\run2-completion-offline\\.scratch\\run2-completion-20261017\\continuation-v8\\recovery\\closure-host-r11\\owned-host-approvedread1.txt": "4c84dbeae89674bfcbe0f1de642bbf48aa833bf2f6bd462a96b1d527762887aa"
+  },
+  "no_automatic_second_execute_invocation": true,
+  "native_remote_and_release_qualification_still_open": true,
+  "evidence_limit": "The execute refusal is an operator-observed traceback and verified source control flow, not a live-host receipt; the separate observer is an actual retained host receipt. No live serving or SQL CAS qualification occurred."
+}

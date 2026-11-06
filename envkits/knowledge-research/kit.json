@@ -1,0 +1,38 @@
+{
+  "schema_version": "mc.environment_kit.v1",
+  "id": "envkit.knowledge-research",
+  "version": "1",
+  "title": "Knowledge research",
+  "description": "Research and knowledge missions: uv-managed Python 3.12, Node.js for the stdio MCP servers, PDF and OCR tools, egress to the package registries and the hosted Tavily and Firecrawl MCP endpoints, and the installation's Knowledge Services API as KS_API_URL (an installation host, so the pinning manifest supplies it, typically from config:knowledge_services.public_url, and allows its egress).",
+  "toolchains": {"python": "3.12", "uv": "0.12", "node": "22"},
+  "system_packages": ["git", "curl", "poppler-utils", "tesseract-ocr"],
+  "base": {"install": "base/install.sh"},
+  "mission": {
+    "steps": [
+      {"name": "deps", "run": "uv sync --frozen", "when": "exists('uv.lock')"},
+      {"name": "outputs", "run": "mkdir -p outputs"}
+    ],
+    "health": [
+      {"name": "pdftotext", "run": "pdftotext -v"},
+      {"name": "tesseract", "run": "tesseract --version"}
+    ],
+    "timeout_s": 480
+  },
+  "requires": {
+    "variables": ["KS_API_URL"],
+    "secrets": ["TAVILY_API_KEY?", "FIRECRAWL_API_KEY?"],
+    "egress": [
+      "pypi.org",
+      "files.pythonhosted.org",
+      "registry.npmjs.org",
+      "mcp.tavily.com",
+      "mcp.firecrawl.dev"
+    ]
+  },
+  "host_support": {
+    "local": "full",
+    "cursor_cloud": "full",
+    "claude_cloud": "base_via_owner",
+    "codex_cloud": "base_via_owner"
+  }
+}

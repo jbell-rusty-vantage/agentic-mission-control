@@ -1,0 +1,217 @@
+{
+  "actor_ref": "seed:mission-control-catalog",
+  "component_compatibility": ">=1.4.1 <2.0.0",
+  "depends_on": [],
+  "description": "Published S0 artifact schema authority.",
+  "format": "mission-control-seed/v1",
+  "records": [
+    {
+      "fields": {
+        "asset_id": "definition:artifact_schema:schema.s0-probe-report",
+        "contract": "mission-control.published-definition/1",
+        "kind": "schema",
+        "manifest": {
+          "definition": {
+            "description": "SPEC-09/MO-71 evidence report; validation is separate from acceptance.",
+            "json_schema": {
+              "$defs": {
+                "evidence": {
+                  "additionalProperties": false,
+                  "if": {
+                    "properties": {
+                      "disposition": {
+                        "const": "observed"
+                      }
+                    }
+                  },
+                  "properties": {
+                    "disposition": {
+                      "enum": [
+                        "observed",
+                        "failed",
+                        "unknown",
+                        "unrun"
+                      ]
+                    },
+                    "evidence_refs": {
+                      "items": {
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "disposition",
+                    "evidence_refs"
+                  ],
+                  "then": {
+                    "properties": {
+                      "evidence_refs": {
+                        "minItems": 1
+                      }
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "additionalProperties": false,
+              "properties": {
+                "caller_wakeup": {
+                  "$ref": "#/$defs/evidence"
+                },
+                "cancel": {
+                  "$ref": "#/$defs/evidence"
+                },
+                "cleanup": {
+                  "$ref": "#/$defs/evidence"
+                },
+                "configuration": {
+                  "$ref": "#/$defs/evidence"
+                },
+                "immutable_output": {
+                  "$ref": "#/$defs/evidence"
+                },
+                "inject": {
+                  "$ref": "#/$defs/evidence"
+                },
+                "lane_profile": {
+                  "enum": [
+                    "claude_agent_sdk",
+                    "codex",
+                    "cursor_local"
+                  ]
+                },
+                "observed_identity": {
+                  "$ref": "#/$defs/evidence"
+                },
+                "repository_instructions": {
+                  "$ref": "#/$defs/evidence"
+                },
+                "requested_identity": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "auth_route": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "cli": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "host": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "model": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "runtime": {
+                      "minLength": 1,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "host",
+                    "runtime",
+                    "cli",
+                    "auth_route",
+                    "model"
+                  ],
+                  "type": "object"
+                },
+                "schema_version": {
+                  "const": "mc.s0_probe_report.v1"
+                },
+                "skill_delivered": {
+                  "$ref": "#/$defs/evidence"
+                },
+                "skill_exercised": {
+                  "$ref": "#/$defs/evidence"
+                },
+                "skill_read_back": {
+                  "$ref": "#/$defs/evidence"
+                },
+                "tool_allow": {
+                  "$ref": "#/$defs/evidence"
+                },
+                "tool_deny": {
+                  "$ref": "#/$defs/evidence"
+                },
+                "usage": {
+                  "$ref": "#/$defs/evidence"
+                }
+              },
+              "required": [
+                "schema_version",
+                "lane_profile",
+                "requested_identity",
+                "observed_identity",
+                "configuration",
+                "repository_instructions",
+                "skill_delivered",
+                "skill_read_back",
+                "skill_exercised",
+                "tool_allow",
+                "tool_deny",
+                "inject",
+                "cancel",
+                "immutable_output",
+                "caller_wakeup",
+                "usage",
+                "cleanup"
+              ],
+              "type": "object"
+            },
+            "kind": "artifact_schema",
+            "logical_id": "schema.s0-probe-report",
+            "schema_dialect": "https://json-schema.org/draft/2020-12/schema",
+            "schema_version": "1",
+            "title": "S0 local harness probe report"
+          },
+          "published_at": "2026-10-14T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:dd6ead55a820b297fe09395bd1f78b6fe120f1a4f4b2eae6b1634fe789885c2b",
+            "kind": "artifact_schema",
+            "lifecycle_status": "published",
+            "logical_id": "schema.s0-probe-report",
+            "payload_ref": null,
+            "revision": 1,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:c0edb1f9bb17dc792820450c789c6fd0bc3dcb3ca954d94b7bf8c3c1c1254e9b",
+        "manifest_ref": "mc-catalog://definition/artifact_schema/schema.s0-probe-report/1",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "1"
+      },
+      "kind": "asset_version",
+      "logical_key": "artifact-schema:artifact-schema:schema.s0-probe-report/1"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "artifact-schema:artifact-schema:schema.s0-probe-report/1",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "docs/specs/materialization-observation-2026-10/SPEC-09-local-harness-path.md",
+          "docs/specs/materialization-observation-2026-10/issues/MO-71-s0-probe-manifests-for-all-three-local-lanes.md"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "artifact-schema:artifact-schema:schema.s0-probe-report/1:admit"
+    }
+  ],
+  "seed_key": "mc.catalog.artifact-schemas",
+  "seed_version": "1.0.0"
+}

@@ -1,0 +1,22 @@
+{
+  "batch": {
+    "max_delay_seconds": 30,
+    "max_signals": 20
+  },
+  "flush": [
+    "stop"
+  ],
+  "lane_profile": "codex",
+  "materialization": {
+    "files": [
+      ".codex/hooks.json"
+    ],
+    "skills": ".agents/skills"
+  },
+  "schema_version": "mc.signal_policy.v1",
+  "signals": {
+    "stop": "stop",
+    "subagent_stop": "subagent.stopped"
+  },
+  "stdout": {}
+}

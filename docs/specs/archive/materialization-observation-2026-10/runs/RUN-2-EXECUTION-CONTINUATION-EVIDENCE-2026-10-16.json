@@ -1,0 +1,481 @@
+{
+  "schema": "run2.execution_continuation.v2",
+  "utc": "2026-10-16T15:28:38.482745+00:00",
+  "model": "gpt-6.1-sol",
+  "base": "a8d69c5b48506c6babcd7f3f74f0b92716423091",
+  "branch": "mo/run2-completion-offline-20261016",
+  "isolated_checkout": "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\run2-completion-offline",
+  "canonical": "C:\\Users\\Pinda\\Proyectos\\BellLabs\\platform\\mission-control",
+  "uncommitted": true,
+  "canonical_tracked_checked": 3980,
+  "canonical_drift": [],
+  "retained_worktrees": [
+    {
+      "metadata": {
+        "worktree": "C:/Users/Pinda/Proyectos/BellLabs/platform/mission-control",
+        "HEAD": "a8d69c5b48506c6babcd7f3f74f0b92716423091",
+        "branch": "refs/heads/mo/run2-integration"
+      },
+      "status": {
+        "exit": 0,
+        "stdout": " M docs/knowledge/index.md\n M docs/specs/materialization-observation-2026-10/runs/RUN-2-REPORT.md\n?? docs/specs/materialization-observation-2026-10/issues/bash.exe.stackdump\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-ASSESSMENT-EVIDENCE-2026-10-16.json\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-COMPLETION-ASSESSMENT-2026-10-16.md\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-COMPLETION-FINDINGS-2026-10-16.md\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-COMPLETION-PLAN-2026-10-16.md\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-SOL-EXECUTION-2026-10-16.md\n",
+        "stderr": ""
+      },
+      "retained_checkout": true,
+      "unchanged_from_first_tranche": true
+    },
+    {
+      "metadata": {
+        "worktree": "C:/Users/Pinda/Documents/Codex/2026-10-16/task/run2-completion-offline",
+        "HEAD": "a8d69c5b48506c6babcd7f3f74f0b92716423091",
+        "branch": "refs/heads/mo/run2-completion-offline-20261016"
+      },
+      "status": {
+        "exit": 0,
+        "stdout": " M docs/specs/materialization-observation-2026-10/runs/RUN-2-REPORT.md\n M src/mission_control/adapters/cursor/cloud.py\n M src/mission_control/adapters/cursor/frames.py\n M src/mission_control/application/execution/harness/cursor_usage.py\n M src/mission_control/application/execution/harness/describe.py\n M src/mission_control/application/execution/harness/lane_turns.py\n M tests/unit/cursor/test_cloud_usage_unknown.py\n M tests/unit/runtime/test_run2_cursor_usage.py\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-ASSESSMENT-EVIDENCE-2026-10-16.json\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-COMPLETION-ASSESSMENT-2026-10-16.md\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-COMPLETION-FINDINGS-2026-10-16.md\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-COMPLETION-PLAN-2026-10-16.md\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-CURRENT-RECONCILIATION-2026-10-16.md\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-EXECUTION-EVIDENCE-2026-10-16.json\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-EXECUTION-LEDGER-2026-10-16.md\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-G1-ACCEPTANCE-2026-10-16.md\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-INTEGRATION-2026-10-16.md\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-QUALIFICATION-ENVELOPES-2026-10-16.md\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-REMAINING-GATES-2026-10-16.md\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-SOL-EXECUTION-2026-10-16.md\n?? tests/unit/subscriptions/test_run2_caller_identity.py\n?? tests/unit/temporal/test_run2_managed_budget_composition.py\n",
+        "stderr": ""
+      },
+      "retained_checkout": false,
+      "unchanged_from_first_tranche": true
+    },
+    {
+      "metadata": {
+        "worktree": "C:/Users/Pinda/Proyectos/BellLabs/platform/.worktrees/run2-admission-failure",
+        "HEAD": "1c018ff010fcec2c04f64d007eb0d9a2a4b8fd2c",
+        "branch": "refs/heads/mo/run2-admission-failure"
+      },
+      "status": {
+        "exit": 0,
+        "stdout": "?? .ty-run2-worktree.toml\n",
+        "stderr": ""
+      },
+      "retained_checkout": true,
+      "unchanged_from_first_tranche": true
+    },
+    {
+      "metadata": {
+        "worktree": "C:/Users/Pinda/Proyectos/BellLabs/platform/.worktrees/run2-claude-host-proof",
+        "HEAD": "ee3e1953a47c51ac19d8c06179f7951419ce80fb",
+        "branch": "refs/heads/mo/run2-claude-host-proof"
+      },
+      "status": {
+        "exit": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      "retained_checkout": true,
+      "unchanged_from_first_tranche": true
+    },
+    {
+      "metadata": {
+        "worktree": "C:/Users/Pinda/Proyectos/BellLabs/platform/.worktrees/run2-cli",
+        "HEAD": "5b03afc4f214d335b5ef5dc96ba33100f1fb4d67",
+        "branch": "refs/heads/mo/run2-cli"
+      },
+      "status": {
+        "exit": 0,
+        "stdout": " M docs/knowledge/capabilities.md\n M docs/knowledge/cursor-lane.md\n M docs/knowledge/lanes-and-harness.md\n M docs/qualification/release/multi-provider-2026-10.md\n M skills/mission-control-author/references/manifest-cheatsheet.md\n M skills/mission-control-observe/SKILL.md\n M src/mission_control/adapters/codex/compose.py\n M src/mission_control/adapters/codex/harness.py\n M src/mission_control/adapters/codex/launcher.py\n M src/mission_control/adapters/codex/protocol.py\n M src/mission_control/application/execution/harness/describe.py\n M tests/fixtures/local_lane_workspaces.py\n M tests/unit/codex/fixture_app_server.py\n M tests/unit/codex/support.py\n M tests/unit/codex/test_harness.py\n M tests/unit/codex/test_launcher.py\n M tests/unit/codex/test_schema_pin.py\n M tests/unit/harness/test_local_lane_child_environments.py\n?? .agents/skills/claude-code-headless/\n?? .agents/skills/codex-exec/\n?? .agents/skills/coding-cli-jobs/\n?? .agents/skills/cursor-agent-headless/\n?? docs/specs/materialization-observation-2026-10/runs/CODEX-OWNER-AUTH.md\n?? scripts/codex_schema_refresh.py\n?? src/mission_control/adapters/codex/auth_preflight.py\n?? tests/fixtures/provider_frames/codex/schema-0.162.1/\n?? tests/unit/codex/test_auth_preflight.py\n",
+        "stderr": ""
+      },
+      "retained_checkout": true,
+      "unchanged_from_first_tranche": true
+    },
+    {
+      "metadata": {
+        "worktree": "C:/Users/Pinda/Proyectos/BellLabs/platform/.worktrees/run2-closed-workflow-recovery",
+        "HEAD": "7a96c511252c643a0fdea12e5ab11fec26eae1f9",
+        "branch": "refs/heads/mo/run2-closed-workflow-recovery"
+      },
+      "status": {
+        "exit": 0,
+        "stdout": "?? .ty-run2-worktree.toml\n",
+        "stderr": ""
+      },
+      "retained_checkout": true,
+      "unchanged_from_first_tranche": true
+    },
+    {
+      "metadata": {
+        "worktree": "C:/Users/Pinda/Proyectos/BellLabs/platform/.worktrees/run2-cursor",
+        "HEAD": "5b03afc4f214d335b5ef5dc96ba33100f1fb4d67",
+        "branch": "refs/heads/mo/run2-cursor"
+      },
+      "status": {
+        "exit": 0,
+        "stdout": " M src/mission_control/adapters/cursor/bridge.py\n M src/mission_control/adapters/cursor/bridge_spawn.py\n M src/mission_control/adapters/cursor/cloud.py\n M src/mission_control/adapters/cursor/cloud_api.py\n M src/mission_control/adapters/cursor/controls.py\n M src/mission_control/adapters/cursor/frames.py\n M src/mission_control/adapters/cursor/local.py\n M src/mission_control/adapters/postgres/frames/repository.py\n M src/mission_control/application/execution/harness/lane_turns.py\n M src/mission_control/application/frames/sink.py\n M src/mission_control/domain/execution/lanes.py\n M tests/fixtures/cursor_cloud.py\n M tests/unit/cursor/support.py\n M tests/unit/cursor/test_cloud_reconcile.py\n M tests/unit/cursor/test_cloud_usage_unknown.py\n M tests/unit/harness/test_cursor_cloud.py\n M tests/unit/harness/test_cursor_local.py\n M tests/unit/harness/test_describe_honesty.py\n M tests/unit/harness/test_lane_qualification_fixtures.py\n M tests/unit/harness/test_local_lane_child_environments.py\n M tests/unit/remote_session/test_cursor_cloud_client.py\n?? src/mission_control/adapters/cursor/conversation.py\n?? src/mission_control/adapters/cursor/cost.py\n?? src/mission_control/application/execution/harness/cursor_usage.py\n?? tests/unit/cursor/test_run2_bridge.py\n?? tests/unit/cursor/test_run2_conversation.py\n?? tests/unit/cursor/test_run2_cost.py\n?? tests/unit/cursor/test_run2_cursor.py\n?? tests/unit/runtime/test_run2_cursor_usage.py\n",
+        "stderr": ""
+      },
+      "retained_checkout": true,
+      "unchanged_from_first_tranche": true
+    },
+    {
+      "metadata": {
+        "worktree": "C:/Users/Pinda/Proyectos/BellLabs/platform/.worktrees/run2-cursor-c9",
+        "HEAD": "9f62c18645536888754f60c1dfed9ee55d79d131",
+        "branch": "refs/heads/mo/run2-cursor-c9"
+      },
+      "status": {
+        "exit": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      "retained_checkout": true,
+      "unchanged_from_first_tranche": true
+    },
+    {
+      "metadata": {
+        "worktree": "C:/Users/Pinda/Proyectos/BellLabs/platform/.worktrees/run2-events",
+        "HEAD": "5b03afc4f214d335b5ef5dc96ba33100f1fb4d67",
+        "branch": "refs/heads/mo/run2-events"
+      },
+      "status": {
+        "exit": 0,
+        "stdout": " M src/mission_control/adapters/temporal/workflows/operation.py\n?? src/mission_control/adapters/postgres/cursor_costs.py\n?? src/mission_control/adapters/postgres/ingress_drainer.py\n?? src/mission_control/adapters/supabase_storage/ingress.py\n?? src/mission_control/adapters/temporal/activities/cursor_costs.py\n?? src/mission_control/adapters/temporal/workflows/cursor_costs.py\n?? src/mission_control/application/execution/harness/cursor_costs.py\n?? src/mission_control/application/signals/artifacts.py\n?? src/mission_control/application/signals/drainer.py\n?? src/mission_control/application/signals/launch.py\n?? src/mission_control/bootstrap/ingress_drainer.py\n?? src/mission_control/bootstrap/worker_ingress.py\n?? tests/integration/postgres/test_run2_ingress_drainer_postgres.py\n?? tests/integration/test_run2_cursor_costs_postgres.py\n?? tests/unit/runtime/test_run2_cursor_costs.py\n?? tests/unit/runtime/test_run2_ingress_composition.py\n?? tests/unit/runtime/test_run2_ingress_wake.py\n?? tests/unit/signals/test_artifact_custody.py\n?? tests/unit/signals/test_drainer.py\n?? tests/unit/signals/test_remote_launch.py\n",
+        "stderr": ""
+      },
+      "retained_checkout": true,
+      "unchanged_from_first_tranche": true
+    },
+    {
+      "metadata": {
+        "worktree": "C:/Users/Pinda/Proyectos/BellLabs/platform/.worktrees/run2-human-control-budget",
+        "HEAD": "94eb433e165615baa4296b3e1cad4e705e2776b3",
+        "branch": "refs/heads/mo/run2-human-control-budget"
+      },
+      "status": {
+        "exit": 0,
+        "stdout": "?? .ty-run2-worktree.toml\n",
+        "stderr": ""
+      },
+      "retained_checkout": true,
+      "unchanged_from_first_tranche": true
+    }
+  ],
+  "owned_application_files": {
+    "src/mission_control/application/execution/harness/cursor_usage.py": {
+      "sha256": "6b02127c653bd9728db64ecd361336195cc90f9d0e3e026ea1266bc3dfe0872a",
+      "canonical_before_sha256": "29cde660d55d5b26b4f6cbe2480ed044fc0a5f06467e7fcaaacc70136f24d501",
+      "new_file": false
+    },
+    "src/mission_control/adapters/cursor/frames.py": {
+      "sha256": "1e0444fb52d76486cb4dee1848de4fbf8a7ee9f5f1bafca5f69457483f610ded",
+      "canonical_before_sha256": "ff9a56e0a9a84c497ff17424776e42d3d4ec08ca4a79d78147be3b9c0d6895fb",
+      "new_file": false
+    },
+    "src/mission_control/adapters/cursor/cloud.py": {
+      "sha256": "ae3298440bd90e17230dc1876500ed8a86c82abd8b66d64b3c0565199c100b6d",
+      "canonical_before_sha256": "15ed6132c1739d17d97e0e7bfb2855f727d62ea44d4554f1c375762fb2279864",
+      "new_file": false
+    },
+    "src/mission_control/application/execution/harness/lane_turns.py": {
+      "sha256": "8cd91773b4cfd9b1e16bbc81a0dbaff774df3cb59071b04e90178419aa8b5f30",
+      "canonical_before_sha256": "ce20cae335cf88ac3d384af015fc35d3cb247bf45452991a84267a623b7f889b",
+      "new_file": false
+    },
+    "src/mission_control/application/execution/harness/describe.py": {
+      "sha256": "3232e359f2fec8da885dbec5cc9b37f96ebb1c341b57db017cda6310741d3125",
+      "canonical_before_sha256": "66c3a65facf44c5577fbee5b940e54feb6a73950b83bc823e713fca5db83032f",
+      "new_file": false
+    },
+    "tests/unit/runtime/test_run2_cursor_usage.py": {
+      "sha256": "2dfa6f4138a3af890f60c277c7d7a98cfee7462a35d776cfd3e824758c3408fa",
+      "canonical_before_sha256": "fa809325436bc3a71f8ffcc0d6378c1795de55411d543e2b0afe6b22eb13ca0e",
+      "new_file": false
+    },
+    "tests/unit/cursor/test_cloud_usage_unknown.py": {
+      "sha256": "8071f1f81be1fa4e28ff3549114d3cdfd8da0e098fb048a64da00eac5139430f",
+      "canonical_before_sha256": "3d111c4a9c6745aa9e44080cb4db78c96315ef7827ee47dd7845b6d7c5dbeb0c",
+      "new_file": false
+    },
+    "tests/unit/temporal/test_run2_managed_budget_composition.py": {
+      "sha256": "bdcfe996b41f8563ded08a6e4faeef08cc7e052b41fa1ce538350b1755b8413a",
+      "canonical_before_sha256": null,
+      "new_file": true
+    },
+    "tests/unit/subscriptions/test_run2_caller_identity.py": {
+      "sha256": "978a7da7647292d5d4c04d6a91adc5986d2a1f3326b1d62d998d52afd186fc66",
+      "canonical_before_sha256": null,
+      "new_file": true
+    }
+  },
+  "excluded_inherited_changes": [
+    "docs/specs/materialization-observation-2026-10/runs/RUN-2-REPORT.md",
+    "docs/knowledge/index.md"
+  ],
+  "patches": {
+    "application.patch": {
+      "sha256": "9ade5a6378942389bbe9334a8a4c09e0b780c975fb32b25bae19b176b878a73f",
+      "bytes": 34958
+    },
+    "documentation.patch": {
+      "sha256": "44b92fb1f86b2e4ec9a683de93a54190a4c9047f41043c651aee5e60f93f81ef",
+      "bytes": 62797
+    }
+  },
+  "apply_check_only_no_application": {
+    "application": {
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    "documentation": {
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    "owned_diff_whitespace": {
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  },
+  "original_reference_pins": [
+    {
+      "path": "C:\\Users\\Pinda\\Proyectos\\BellLabs\\platform\\mission-control\\.scratch\\materialization-observation-2026-10\\run2\\resumed\\cursor-next-preparation\\a8d69-successor-preparation\\identity-recovery-preparation\\recovery-v3\\controller\\control_cursor_a8.py",
+      "sha256": "82981f0ae544eca63b216756ed819635d078f29f572732f02b065a34397ecc3c",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\Pinda\\Proyectos\\BellLabs\\platform\\mission-control\\.scratch\\materialization-observation-2026-10\\run2\\resumed\\cursor-next-preparation\\a8d69-successor-preparation\\identity-recovery-preparation\\controller-lifecycle-repair-preparation\\controller\\controller_guards.py",
+      "sha256": "25b4b955896cbe8bdc48dca47eeef65b4ad61ff7d8194387a75d30601c613b3d",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\Pinda\\Proyectos\\BellLabs\\platform\\mission-control\\.scratch\\materialization-observation-2026-10\\run2\\resumed\\cursor-next-preparation\\a8d69-successor-preparation\\identity-recovery-preparation\\observer\\bridge_ownership.py",
+      "sha256": "591da1cfe1d47b06cb120853c427a86874b3cb56087ba2919150649d26a7def9",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\Pinda\\Proyectos\\BellLabs\\platform\\mission-control\\.scratch\\materialization-observation-2026-10\\run2\\resumed\\cursor-next-preparation\\a8d69-successor-preparation\\identity-recovery-preparation\\controller-lifecycle-repair-preparation\\controller\\control_cursor_a8.py",
+      "sha256": "fc2e447101abe5e2d91c1286b111f5e04eb7be84dd4594b783407f69e69eb035",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\Pinda\\Proyectos\\BellLabs\\platform\\mission-control\\.scratch\\materialization-observation-2026-10\\run2\\resumed\\cursor-next-preparation\\a8d69-successor-preparation\\identity-recovery-preparation\\controller-lifecycle-repair-preparation\\controller\\test_execute_prestart_timeout.py",
+      "sha256": "4e7968ea3be7d5ad958b9c1f1f71719f215b36740b17213d218c777140fee3ed",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\Pinda\\Proyectos\\BellLabs\\platform\\mission-control\\.scratch\\materialization-observation-2026-10\\run2\\resumed\\cursor-next-preparation\\a8d69-successor-preparation\\identity-recovery-preparation\\observer\\native_supervisor.py",
+      "sha256": "ce795209ad332afd95944e8fa0c70893d8ecde5fb7aafa4f95e4a3a51900340f",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\Pinda\\Proyectos\\BellLabs\\platform\\mission-control\\.scratch\\materialization-observation-2026-10\\run2\\resumed\\cursor-next-preparation\\a8d69-successor-preparation\\identity-recovery-preparation\\controller-lifecycle-repair-preparation\\start_fence.py",
+      "sha256": "d81630a4286f118f9b8fbf4de168d1d3e0da8af2d287330875bc654e6e59e358",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\run2-completion-offline\\.scratch\\run2-completion-20261016\\w1\\controller\\control_cursor_a8.py",
+      "sha256": "64151be3577ab099a1eb0e580269e464c13a136aeb662a1129c45c9ed79b6773",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\run2-completion-offline\\.scratch\\run2-completion-20261016\\w1\\observer\\bridge_ownership.py",
+      "sha256": "8ec79f60058c3f64d3be9efb0d7a7dba7b4fc43f9f10ac4623297c5f84863fab",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\Pinda\\Proyectos\\BellLabs\\platform\\mission-control\\.scratch\\materialization-observation-2026-10\\run2\\resumed\\cursor-next-preparation\\a8d69-successor-preparation\\identity-recovery-preparation\\recovery\\start-existing-60f44a50-c0e4-5edb-ac13-0fb0436aaedb.once.json",
+      "sha256": "c30215e853a393b9e0f48a3b2e7ac1e97a98cb6b415766cdb9b28430b98dab37",
+      "unchanged": true
+    }
+  ],
+  "protected_fence_sha256": "c30215e853a393b9e0f48a3b2e7ac1e97a98cb6b415766cdb9b28430b98dab37",
+  "release": {
+    "version": "1.4.2",
+    "locked_files": 41,
+    "drift": []
+  },
+  "historical_first_tranche_sha256": "3864840f8dda8018196e7d6a401858d9aa322c636f043dba6f91fb5ab23b175c",
+  "audit_files_sha256": {
+    ".scratch/run2-completion-20261016/bounded_check.py": "d564ba36e8acc12ec06978c862c1eea594cda773104fcd6ee88b5909ac29af1f",
+    ".scratch/run2-completion-20261016/combined_check.py": "e875e9f3617b28a09a151c179bc7410d2b1e19ce75678406c4a618db8bede430",
+    ".scratch/run2-completion-20261016/durability/postgres-receipt.json": "7f3cef26fceadcced097f9a1804fab8bc1bc414fea43051cf2eae34cfe0c65a7",
+    ".scratch/run2-completion-20261016/durability/postgres-results.txt": "fc811701ae01694dc593ef4b4c338fd96820014a5b2f6af3b2c8cb0cc6be33bf",
+    ".scratch/run2-completion-20261016/durability/target-loopback.json": "895bc4688168c4bb3c3ab100324c6a40fce348dfe5f0651ac7fcf5695d64e311",
+    ".scratch/run2-completion-20261016/durability/target.json": "14b89170b1b3735fcab911bd22715bf0a776455bb054558b0377c4fb03535776",
+    ".scratch/run2-completion-20261016/durability/target.py": "ae9290df1a39cc1a8cf46a3c2dba7ecac1c5825874084c8d460ea06b03101d5e",
+    ".scratch/run2-completion-20261016/durability/temporal-collection-refusal.json": "78cb3222d7615b5a8336d089fb3f4380e7dd3c5440306ca102a393a7b9fdb3d7",
+    ".scratch/run2-completion-20261016/durability/temporal-collection-refusal.txt": "ddd266f95a9d6a0d3670db69f71e469520bbf72531c206028cb70a4cf747e2e2",
+    ".scratch/run2-completion-20261016/durability/temporal-receipt.json": "cdbe0989cbf13483f5ed1e97b38a4c958044bf5c7be87e20b8cfa067a30b3899",
+    ".scratch/run2-completion-20261016/durability/temporal-results.txt": "820bacf4e940c625462ff38783cc8384d50ed82c3c784b599302d99660476539",
+    ".scratch/run2-completion-20261016/durability/validate.py": "d30dcd184096c40df85af0b04f32806d10b0c42080e50d24a00fb8efc9c2cbed",
+    ".scratch/run2-completion-20261016/freeze_integration.py": "335c8eaa5f1445409fd6f2db5e246bc23409c068b8dca9f01edd44909c47888a",
+    ".scratch/run2-completion-20261016/g1-assembly/candidate.patch": "ba215492601cfd5b465360427f4f4043da977359415f43cbbd2cc7a32981ae3e",
+    ".scratch/run2-completion-20261016/g1-assembly/completed-format.txt": "b27fac3f0746a3a25e1ae59b18234b961e362e068bd80137cc08ce6b626f8463",
+    ".scratch/run2-completion-20261016/g1-assembly/completed-ruff.txt": "dc3caa5943bdd27fde969930cb055bb0aac43a0099693dcd8f4a375b47b4e712",
+    ".scratch/run2-completion-20261016/g1-assembly/completed-tests.txt": "6b69404de087b2b645346fe7280251ff98a7988b5930f8871a74f0b6c2ae67a4",
+    ".scratch/run2-completion-20261016/g1-assembly/expiry-final-format.txt": "f4398f19b71e24df3ece6ea73fea6c496fc25b26d02d1a64a08703275d462ae3",
+    ".scratch/run2-completion-20261016/g1-assembly/expiry-final-mypy.txt": "027e0a47faf27ee40c2371c0e3d1f51d0a130a7f827836d9451c175bdfbcf272",
+    ".scratch/run2-completion-20261016/g1-assembly/expiry-final-ruff-fix.txt": "dc3caa5943bdd27fde969930cb055bb0aac43a0099693dcd8f4a375b47b4e712",
+    ".scratch/run2-completion-20261016/g1-assembly/expiry-final-ruff.txt": "dc3caa5943bdd27fde969930cb055bb0aac43a0099693dcd8f4a375b47b4e712",
+    ".scratch/run2-completion-20261016/g1-assembly/expiry-final-tests.txt": "1761b8ee44c80edf4a73c6828133995ee743246e1794a14615716eb6a44f5f4e",
+    ".scratch/run2-completion-20261016/g1-assembly/expiry-fix.patch": "bf3ce4111b3a4aedeca0be63d690ae9a78674137e7b562db10732141c6dee214",
+    ".scratch/run2-completion-20261016/g1-assembly/final-assembly.txt": "84fb9ce1f564f5062c4f81d58b73d9a95a85df288f0c81d95a7060b532124a7d",
+    ".scratch/run2-completion-20261016/g1-assembly/final-format.txt": "b27fac3f0746a3a25e1ae59b18234b961e362e068bd80137cc08ce6b626f8463",
+    ".scratch/run2-completion-20261016/g1-assembly/final-mypy.txt": "027e0a47faf27ee40c2371c0e3d1f51d0a130a7f827836d9451c175bdfbcf272",
+    ".scratch/run2-completion-20261016/g1-assembly/final-ruff-fix.txt": "9b9a248f4b657d28cac516e23ba293ee4c9b53ded3c744903546ab76602b1459",
+    ".scratch/run2-completion-20261016/g1-assembly/final-ruff.txt": "dc3caa5943bdd27fde969930cb055bb0aac43a0099693dcd8f4a375b47b4e712",
+    ".scratch/run2-completion-20261016/g1-assembly/first-assembly.txt": "00fe101a8dc398d2fa0208a01f2dc0f3af7f285370cbcffc9252a9923b4e31c0",
+    ".scratch/run2-completion-20261016/g1-assembly/format.txt": "b9c6f5688cabbe3ed79672db1c6ba87430ca6dce7f4b8694bb5ed4f22e1f4bea",
+    ".scratch/run2-completion-20261016/g1-assembly/green-health-protection.txt": "7012d65b922f9f7077634dff8b6faa5b928b3a241ebb1f7d90c11c3692d539be",
+    ".scratch/run2-completion-20261016/g1-assembly/green-observation-expiry.txt": "f12f2fffe9d1391d7465fdd7878abb9ad795dcde5f0c86b0a4d60afd2cc6b7b1",
+    ".scratch/run2-completion-20261016/g1-assembly/lifecycle.py": "3bda88b7033c6956ba7169800c7df498b335ecbeaa914f9570ab079a2574ed79",
+    ".scratch/run2-completion-20261016/g1-assembly/mock_normal_api.py": "e9c71755fb70fe921552072805344a3a38d76a2e78141bc21b4132057b27b08b",
+    ".scratch/run2-completion-20261016/g1-assembly/mypy.txt": "4b1273ad3cdef815c808353256757219a5b77dd59e5dc18bca7f75de8514d485",
+    ".scratch/run2-completion-20261016/g1-assembly/receipt.json": "3b75798ff97b121549672a32e31338c034491aaeb0a195fda32b6d3e54b67d21",
+    ".scratch/run2-completion-20261016/g1-assembly/red-health-protection.txt": "e226be0dd75fcea939e1e9153ed71d589a8e4a7187031ff8b2db79baba8a24df",
+    ".scratch/run2-completion-20261016/g1-assembly/red-observation-expiry.txt": "9fae0fcda9273ef1aec37c496b2fe067d56de39dcfd2de262fe043dcdd852165",
+    ".scratch/run2-completion-20261016/g1-assembly/reference-only/native-supervisor.py.txt": "ce795209ad332afd95944e8fa0c70893d8ecde5fb7aafa4f95e4a3a51900340f",
+    ".scratch/run2-completion-20261016/g1-assembly/reference-only/reviewed-observer.py.txt": "8ec79f60058c3f64d3be9efb0d7a7dba7b4fc43f9f10ac4623297c5f84863fab",
+    ".scratch/run2-completion-20261016/g1-assembly/reference-only/reviewed-retired-controller.py.txt": "64151be3577ab099a1eb0e580269e464c13a136aeb662a1129c45c9ed79b6773",
+    ".scratch/run2-completion-20261016/g1-assembly/reference-only/start-fence-helper.py.txt": "d81630a4286f118f9b8fbf4de168d1d3e0da8af2d287330875bc654e6e59e358",
+    ".scratch/run2-completion-20261016/g1-assembly/reference-only/unfinished-controller.py.txt": "fc2e447101abe5e2d91c1286b111f5e04eb7be84dd4594b783407f69e69eb035",
+    ".scratch/run2-completion-20261016/g1-assembly/reference-only/unfinished-test.py.txt": "4e7968ea3be7d5ad958b9c1f1f71719f215b36740b17213d218c777140fee3ed",
+    ".scratch/run2-completion-20261016/g1-assembly/ruff-fix.txt": "2b42dd7ecf87ff9090fabd08e60aa33939dd65e5452d14946409ae74093a7c97",
+    ".scratch/run2-completion-20261016/g1-assembly/ruff.txt": "5e183575ea75c6d8f63f9140e7cb2e265c081b25e1c45eee140341c8391cf54c",
+    ".scratch/run2-completion-20261016/g1-assembly/source-pins.json": "73169e28e4f74472239d6fb4285cf6029054a473129a20de98357b3f79237795",
+    ".scratch/run2-completion-20261016/g1-assembly/test_lifecycle.py": "6bbbc277358607b5e1790eb077f7e6e856775469bb5b038eb632cefd2e1a8366",
+    ".scratch/run2-completion-20261016/integration/application.patch": "9ade5a6378942389bbe9334a8a4c09e0b780c975fb32b25bae19b176b878a73f",
+    ".scratch/run2-completion-20261016/integration/documentation.patch": "44b92fb1f86b2e4ec9a683de93a54190a4c9047f41043c651aee5e60f93f81ef",
+    ".scratch/run2-completion-20261016/readback/connection-probe.json": "5bd0a1709d6a0dd3f5351b4a59d0256af03ddbb2f40038515c9debc311daf5b3",
+    ".scratch/run2-completion-20261016/readback/connection_probe.py": "c8499cd386838ebd33dc17351eda43069979dc8de7204e8d287f3dedd64034f9",
+    ".scratch/run2-completion-20261016/readback/current-native-read-2.json": "5e0335d8b15848065dc396c0f434047bc0338fff7d4b5b17b87da17feb334d7b",
+    ".scratch/run2-completion-20261016/readback/current-native-read-3.json": "2d8f12c93bd8f01456f96b420faec6f070da8a441dcaa430ed20ee54637bd83f",
+    ".scratch/run2-completion-20261016/readback/current-native-read.json": "6e2f395c4f9d2f155b246093ac7495d53fa0b9dadc0310156d18049a90acd0d0",
+    ".scratch/run2-completion-20261016/readback/current-scoped-read.json": "ff66aa2e5ff748cd81a7996da765fdb3024548932ec55f455fded585e151b518",
+    ".scratch/run2-completion-20261016/readback/installed-1.4.2-read.json": "8d8e954ad744a7b55275b14d9095521c33e353e9af401fc14e7d4d2dceb19b4e",
+    ".scratch/run2-completion-20261016/readback/installed_read.py": "b7616699782075e2c4cd589a3d323e50e90c570d538b6b68b22c05859947d8a0",
+    ".scratch/run2-completion-20261016/readback/native_read.py": "7ea0eca9c00172816e5bf139e4f8c3f6e091d6026604018676021dd87627ed98",
+    ".scratch/run2-completion-20261016/readback/scoped_read.py": "87157cdb87b8cc5ab4343520f06a3527275be6bd0291008db4edec012d50c529",
+    ".scratch/run2-completion-20261016/review/CONTINUATION-REVIEW.md": "3dc77fdfdea07c7817d77cf4db0029153dafd11cc058f56b19e0b117bcc550bf",
+    ".scratch/run2-completion-20261016/review/REVIEW.md": "4a364d6de6774b536694d8fdbfb4ecc2e3126eee208520a56fc477f8c66e2bdc",
+    ".scratch/run2-completion-20261016/validate_documents.py": "1290c02d6a21a14c084404a7ca7f2b473bc33d109ff998fbd0630ffdde76cf60",
+    ".scratch/run2-completion-20261016/w1/changes.patch": "52a9cadf662b5985045dc97ce6f872591ec28d1b0546bc4d62a18002e01d8273",
+    ".scratch/run2-completion-20261016/w1/controller/control_cursor_a8.py": "64151be3577ab099a1eb0e580269e464c13a136aeb662a1129c45c9ed79b6773",
+    ".scratch/run2-completion-20261016/w1/controller/controller_guards.py": "25b4b955896cbe8bdc48dca47eeef65b4ad61ff7d8194387a75d30601c613b3d",
+    ".scratch/run2-completion-20261016/w1/observer/bridge_ownership.py": "8ec79f60058c3f64d3be9efb0d7a7dba7b4fc43f9f10ac4623297c5f84863fab",
+    ".scratch/run2-completion-20261016/w1/README.md": "91d79bd2f0727a6343061fee50b73fcfcf6718d5dbb2095fcdc1c0aef27e725f",
+    ".scratch/run2-completion-20261016/w1/source-pins.json": "acfd53e41b69d216b1fd6b008e73c5f9bea284aba61528ceef01daf3cbab2d75",
+    ".scratch/run2-completion-20261016/w1/test_safety.py": "10cb16641cd7b763c85ecdd0e7f05d59de4cd1a9a5731e4e2e7b4cf8f66b5679",
+    ".scratch/run2-completion-20261016/w10/architecture.txt": "234b0bc56515f8d0065ad7f10ed6d74c1b483c72ec8771d0edfbaa415a239dff",
+    ".scratch/run2-completion-20261016/w10/combined-regression.json": "508eea7c5d60e48c133567d8cd6b20127661240eebe83022efb2df6e10adb05a",
+    ".scratch/run2-completion-20261016/w10/combined-regression.txt": "50af86c61c1440a5352e25cb691240f799b2609bd72b09f020bb692fbb446941",
+    ".scratch/run2-completion-20261016/w10/continuation-doc-index.txt": "24bebe6e3584a82fbc0280ea4cfbca87a5f30727034feaf97d45f48a52aef6de",
+    ".scratch/run2-completion-20261016/w10/continuation-doc-links.txt": "84dde8e50d2e118632fd4399e877b84d3c7154771a1571c5c31b90c56b2e7e4c",
+    ".scratch/run2-completion-20261016/w10/continuation-doc-okf.txt": "3ad1284662870ef7810661af009f2d4b72f85daf7d611a5189863dcbe5be7786",
+    ".scratch/run2-completion-20261016/w10/continuation-resource-sample.json": "1f5c24501386c0a48454f13d44d5c18e670f48fadb93ab7bfdc30bb5d676e485",
+    ".scratch/run2-completion-20261016/w10/docs-index.txt": "24bebe6e3584a82fbc0280ea4cfbca87a5f30727034feaf97d45f48a52aef6de",
+    ".scratch/run2-completion-20261016/w10/docs-links.txt": "5f5b502b025b065d99cb5d3f4e7efb92c8ce859625db8e0170eaada0951d4fae",
+    ".scratch/run2-completion-20261016/w10/docs-okf.txt": "3ad1284662870ef7810661af009f2d4b72f85daf7d611a5189863dcbe5be7786",
+    ".scratch/run2-completion-20261016/w10/final-format.txt": "64dc14e868f32c562c84cd5472d78b7a583d2ed217cc61e995f4527cbec78263",
+    ".scratch/run2-completion-20261016/w10/final-mypy.txt": "385953f1ef64c4c524baf3b874509ca98e0edce5b268c34a3e907fce6e354fec",
+    ".scratch/run2-completion-20261016/w10/final-resource-sample.json": "035b4dc6a31b8c1ec9187d6d8f7e74c87fb96f1946ed2067a7cfdcfc5e8de5e6",
+    ".scratch/run2-completion-20261016/w10/final-ruff.txt": "44b3a0b223b5d90aa85613cea37113de7672ea1aa43c2e605ca6ce3d2a6b44f7",
+    ".scratch/run2-completion-20261016/w10/integrated-tracked.patch": "8c6cc5ea70983ec74afebf8ec787cd104720845872a3f76bc10cbcba577f3fe7",
+    ".scratch/run2-completion-20261016/w2/final-format.txt": "e0cc280fafdd20e9b3974a968cc39d662516aa2e26f852ef71ac3fc3b76585e6",
+    ".scratch/run2-completion-20261016/w2/final-ruff.txt": "dc3caa5943bdd27fde969930cb055bb0aac43a0099693dcd8f4a375b47b4e712",
+    ".scratch/run2-completion-20261016/w2/final-tests.txt": "5b41078cc50bc665e112dfa32d2793a76550903c38a9067060ba7cc84fbd15c0",
+    ".scratch/run2-completion-20261016/w2/green-all-no-git.txt": "2a2dbc90f6e831e672cbe48814486f74a91c3f7a27526ef2d60e75d0696f57e3",
+    ".scratch/run2-completion-20261016/w2/green-dimensions.txt": "0e9792658801d8d6c747472711a5a2a730b28cfd0375b72f2e011753f8e2a0ea",
+    ".scratch/run2-completion-20261016/w2/green-precedence.txt": "be5aca33b324988e1feeba16474391e419f894159d18fc7c54a9c8fe1c1fddbb",
+    ".scratch/run2-completion-20261016/w2/quality-0.txt": "0f06f4a9aff8b73a94ae92025b6399251c777b8b901f8f188d4120d83d6f9a35",
+    ".scratch/run2-completion-20261016/w2/quality-1.txt": "2d6a0b29a389bdae2f3f7faec8721ea6d1be3047da5a4299bdf833cfdb7ff8f2",
+    ".scratch/run2-completion-20261016/w2/quality-2.txt": "4be68a0a288308063ba4893957b41e6647a5751beaa8c481bf443d8182a343e2",
+    ".scratch/run2-completion-20261016/w2/quality-3.txt": "cb06b93ad46a118ec8ce7997d0ccd9ba24dc6088125b934a68a662daeb05a600",
+    ".scratch/run2-completion-20261016/w2/receipt.json": "983fcda3a57790eb0dee0177d447b968bc54ec78f0335a85ab36bec12d107681",
+    ".scratch/run2-completion-20261016/w2/red-cloud-direct.txt": "3cdeb107f16dd95087a7a5df927d3ccf732a0763ba2f7bb51505c4fab2309ca2",
+    ".scratch/run2-completion-20261016/w2/red-cloud.txt": "30a9319639bf7087aee1a2ce7fe251955b6d4421e4bf7850793e7462e2a1395d",
+    ".scratch/run2-completion-20261016/w2/red-dimensions.txt": "e2779509e4aefea042f690a89ea8074f8f1a46d169d9a6ddde0ae1b7c59cb2b1",
+    ".scratch/run2-completion-20261016/w2/red-precedence.txt": "adf1d7ca71aa7d263412b05b425bd3c025622f5e05dd57823da8f11a76067d18",
+    ".scratch/run2-completion-20261016/w2/w2.patch": "2a4b6b9fd002e04d41e56f4410bbe397f4224f76d03833727ed3f2de819a3cbf",
+    ".scratch/run2-completion-20261016/w3/final-format.txt": "7932918477617419a117795a418a99630adbebfd28a37b9a490041ad60b4a243",
+    ".scratch/run2-completion-20261016/w3/final-mypy.txt": "fe21cd5504dd71c1b9fe07fa87289781721026b1af85ec91546d7cef57ed1947",
+    ".scratch/run2-completion-20261016/w3/final-ruff-fix.txt": "dc3caa5943bdd27fde969930cb055bb0aac43a0099693dcd8f4a375b47b4e712",
+    ".scratch/run2-completion-20261016/w3/final-ruff.txt": "dc3caa5943bdd27fde969930cb055bb0aac43a0099693dcd8f4a375b47b4e712",
+    ".scratch/run2-completion-20261016/w3/final-tests.txt": "e4e6a475673ff5555ae5a6bad03014a91a7fb7632772ee9ef7e1df712cef8c6d",
+    ".scratch/run2-completion-20261016/w3/final-typed-tests.txt": "86df187df22f2792ecc065b4b9e13f521d66d7370d6be8a912ae4db2c4cd41dc",
+    ".scratch/run2-completion-20261016/w3/first-new-join.txt": "a33ad8f179a83efdc7cef3fc67c43ee77e1979ae645397992a8e9b76a1dede44",
+    ".scratch/run2-completion-20261016/w3/format.txt": "da12cc3f89b99c50e1cabfdc5c27787a185071181312cf8fd90091e660a93aa0",
+    ".scratch/run2-completion-20261016/w3/mypy.txt": "63c33fcccd41a9fd4617d984ea4375eeab4bc2713c128af09691942c193a029a",
+    ".scratch/run2-completion-20261016/w3/receipt.json": "7f3dd485aa7fa26553a21680ca8f469e4a8e99d39e53759a07840684c1e3a16d",
+    ".scratch/run2-completion-20261016/w3/ruff-fix.txt": "c691b75902df101fb45b2fdb2044f385c6d35bb3c7511c4413c4e4d251768b47",
+    ".scratch/run2-completion-20261016/w3/ruff.txt": "dc3caa5943bdd27fde969930cb055bb0aac43a0099693dcd8f4a375b47b4e712",
+    ".scratch/run2-completion-20261016/w3/shared-gates-escalated.txt": "e26d5d6283ff9f4d5ac09667d9817963774de11eb307e474137466c59ee200ec",
+    ".scratch/run2-completion-20261016/w3/tests.txt": "f670f2c396e10173368d27f2b20e1bdc5e5fc729f6ec333352df81577b594055",
+    ".scratch/run2-completion-20261016/w3-caller/completed-format.txt": "da12cc3f89b99c50e1cabfdc5c27787a185071181312cf8fd90091e660a93aa0",
+    ".scratch/run2-completion-20261016/w3-caller/completed-mypy.txt": "fe21cd5504dd71c1b9fe07fa87289781721026b1af85ec91546d7cef57ed1947",
+    ".scratch/run2-completion-20261016/w3-caller/completed-ruff.txt": "dc3caa5943bdd27fde969930cb055bb0aac43a0099693dcd8f4a375b47b4e712",
+    ".scratch/run2-completion-20261016/w3-caller/final-format.txt": "da12cc3f89b99c50e1cabfdc5c27787a185071181312cf8fd90091e660a93aa0",
+    ".scratch/run2-completion-20261016/w3-caller/final-mypy.txt": "0e93bdadb9e39d68107570b946e570a4f3394e3d4b937c1a4c7e244c0916ce71",
+    ".scratch/run2-completion-20261016/w3-caller/final-ruff-fix.txt": "0e6f9853efa782e9a43636703ad2fae86991c0f63f4a7e288f20bdc42a7671c1",
+    ".scratch/run2-completion-20261016/w3-caller/final-ruff.txt": "dc3caa5943bdd27fde969930cb055bb0aac43a0099693dcd8f4a375b47b4e712",
+    ".scratch/run2-completion-20261016/w3-caller/final-tests.txt": "85fb5021c8f8626aadaa7c0531b046b4bbf813d7cc2f80689063483836e44606",
+    ".scratch/run2-completion-20261016/w3-caller/final-typed-tests.txt": "e091e1034c992f4a4d313a77c0fb178700fcb346ef966b158011c9728bb77650",
+    ".scratch/run2-completion-20261016/w3-caller/first-join.txt": "b9af4211a00b33952cb4e22f4a97129461150a6e53498afad09b223c8d1dcfa7",
+    ".scratch/run2-completion-20261016/w3-caller/receipt.json": "71735b4e72039f3377bdfe06f099fd5fbf15c52affac0c70159a096c89376197",
+    ".scratch/run2-completion-20261016/w4/offline-gates.txt": "f7e9f653d631380165a2bc5f98d45a1092832c7a2c47fb7b64aa4cfa14c3fb5e",
+    ".scratch/run2-completion-20261016/w5/fake-cli.txt": "8c63def634e2acb413098781f7eaf07637321b6198f4339b8f902d97663fc046",
+    "docs/specs/materialization-observation-2026-10/runs/RUN-2-CURRENT-RECONCILIATION-2026-10-16.md": "277b83247e795c920ea5d6e71c303c1981029b58459da7a8d9572ec708b91a05",
+    "docs/specs/materialization-observation-2026-10/runs/RUN-2-EXECUTION-EVIDENCE-2026-10-16.json": "3864840f8dda8018196e7d6a401858d9aa322c636f043dba6f91fb5ab23b175c",
+    "docs/specs/materialization-observation-2026-10/runs/RUN-2-EXECUTION-LEDGER-2026-10-16.md": "f48b085349f378e8a9ea9583127d8ce66db98e98d917c6baad8bc1a7b1c294eb",
+    "docs/specs/materialization-observation-2026-10/runs/RUN-2-G1-ACCEPTANCE-2026-10-16.md": "6a6fb9c36f33fba56837a6fd7ce986b7708cd781b8e61d4603fea4e93bd9fc31",
+    "docs/specs/materialization-observation-2026-10/runs/RUN-2-INTEGRATION-2026-10-16.md": "58b77476ba3aa654f7d452152d67d6cb127b6392bb4e0f3dff495681b417c774",
+    "docs/specs/materialization-observation-2026-10/runs/RUN-2-QUALIFICATION-ENVELOPES-2026-10-16.md": "4acafd615f957efdeb0a97992e55e24014afb473cb70fec4e03e52cabd3c75e3",
+    "docs/specs/materialization-observation-2026-10/runs/RUN-2-REMAINING-GATES-2026-10-16.md": "316cba9e30e93b8dbdc7d5ee552d27032b76a7c42528cf469a6a41dec1530662"
+  },
+  "audit_archive": {
+    "path": ".scratch/run2-completion-20261016/integration/audit-files.zip",
+    "sha256": "151e9630e5e7380454062e03c004a12a37ad8ecae56c8d28d3dd630dd0c55d22",
+    "bytes": 278780
+  },
+  "validation": {
+    "combined": "505 passed in87.86s;7 warnings",
+    "disposable_postgres": "13 passed in78.53s;5 warnings",
+    "disposable_temporal": "4 passed in25.60s;59 warnings",
+    "changed_python_quality": "prior9-file Ruff/format +5-source mypy passed; new G1 threefile Ruff/two-source mypy passed; source bytes unchanged",
+    "docs": "six documents links/whitespace/C0 pass; generated index current; OKF45 concepts pass",
+    "independent_sol": "G1 P1 resolved; offline patch and final evidence docs go; full G1 unqualified",
+    "counts_non_additive": true
+  },
+  "current_read_state": {
+    "protected": "cancellingv5/deliveredcancel/liveharness/claimedproducer/reservedslot-attempt/no_usage; actual recovery_liability refusal",
+    "native": "matched stable private-copy FINISHED926070,2946bytes unchanged digest; no durable custody/cost settlement",
+    "installed": "fresh1.4.2 verified37 exactreceipts/fullowned-schemafingerprint/attestation/sixroles"
+  },
+  "resources": {
+    "Utc": "2026-10-16T15:26:03.1213397Z",
+    "TotalKiB": 16056316,
+    "FreeKiB": 4079884,
+    "ExactOwnedTestProcesses": 0,
+    "CachedTestServerProcesses": 0
+  },
+  "cleanup": {
+    "first_refused_fixture": "exact_owned_container_network_removed",
+    "qualified_fixture": "exact_owned_container_network_removed",
+    "protected_containers_preserved": true
+  },
+  "authority": {
+    "new_native_runs": 0,
+    "new_native_spend_usd": 0,
+    "shared_data_mutations": 0,
+    "service_restarts": 0,
+    "credentials_configured": false,
+    "merge_commit_push_publication": false
+  },
+  "remaining": [
+    "protected application-service reconciliation/custody/usage-cost/effect-command settlement needs exact writer request",
+    "fullG1 bounded live transport/actualregistry/NativeSupervisor/privatecustody/exactdirect-wrappercleanup",
+    "nativeLS07-08/18S0/remoteR-S1/S2thenS3 acceptance and current funded authority",
+    "seeds-pins-prerequisites/referencecheckpointer/BiotechSDL/broadprovisionedrelease-two-projectproof",
+    "remote admission integration unrun: selected existing Temporal CLI not located; no download/shared substitute"
+  ],
+  "do_not_redo": [
+    "protected start/resubmit",
+    "Full3 approval/account setup",
+    "1.4.2 reapply",
+    "retained worktree cleanup",
+    "automaticAF-FOLLOWON-01"
+  ]
+}

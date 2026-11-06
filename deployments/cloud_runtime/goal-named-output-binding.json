@@ -1,0 +1,12 @@
+{
+  "deep_agents": {
+    "goal_output_schemas": {
+      "executor": {
+        "schema_id": "belllabs.goal-executor-observation.v1",
+        "revision": 2,
+        "schema_digest": "sha256:d0f359929f3a05e36cd9ca80710fb5c3b01bcd6975c7d27c27e6d090067dc1cb",
+        "strict": true
+      }
+    }
+  }
+}

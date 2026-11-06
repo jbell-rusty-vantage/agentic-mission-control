@@ -1,0 +1,28 @@
+---
+description: Configured Mission Control startup and public API
+globs: src/mission_control/bootstrap/**/*.py,src/mission_control/interfaces/**/*.py,Makefile,docker-compose*.yml,.env.example
+alwaysApply: false
+---
+
+# Configured operation
+
+Read docs/MISSION_CONTROL_LOCAL_API.md. Provision installation identity, migrations,
+restricted roles and accepted runtime options before startup; startup is read-only.
+
+```powershell
+uv sync
+docker compose up -d
+uv run python -m mission_control.bootstrap.preflight
+uv run uvicorn mission_control.bootstrap.api:create_app --factory --loop mission_control.bootstrap.api:api_loop_factory --host 127.0.0.1 --port 8000
+uv run python -m mission_control.bootstrap.worker
+```
+
+The worker requires explicit selected application and binding pin. CLI missionctl
+uses the signed application-scoped API. Agent Server's canonical configuration is
+agent_server/langgraph.json and never defines a competing mission scheduler.
+
+Readiness is production_common only (common release installed by mission-db);
+local disposable proof is not a live installation.
+Never point application services at Temporal's private database. Never remove
+Compose volumes or user records to fix readiness. No live destructive changes or
+paid provider qualification without authorization.

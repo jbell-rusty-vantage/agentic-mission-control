@@ -1,0 +1,38 @@
+{
+  "applied_migrations": [
+    "0025_capability_kinds_and_host_support",
+    "0026_search_projection_nullable_embedding",
+    "0027_provider_frames",
+    "0028_mission_chains",
+    "0029_command_mailbox_stop_fence_subscriptions",
+    "0030_lane_bindings",
+    "0031_multi_provider_lanes",
+    "0032_run_cluster_binding_stream_hints",
+    "0033_approvals_coordinator_inbox_lane_describes",
+    "0034_provider_frame_lifecycle_body"
+  ],
+  "attestation_verified": true,
+  "component_version": "1.3.0",
+  "fingerprint_algorithm": "mc-pg-catalog-v2",
+  "identity_verified": true,
+  "migration_count": 28,
+  "outcome": "applied",
+  "plan_digest": "sha256:6802d843d17dfdb5425e2c18b4491de26947aaa611074963b979c936185f6829",
+  "plan_matched": true,
+  "reader_version": "mission-control-runtime/1",
+  "runtime_roles_verified": [
+    "mission_control_catalog_writer",
+    "mission_control_family_writer",
+    "mission_control_outbox_worker",
+    "mission_control_readonly",
+    "mission_control_runtime"
+  ],
+  "schema_fingerprint": "sha256:3154fa8d02008f337b6baf81cc58a962d9c71d1aff7963f62fd599012c02cc5c",
+  "schema_fingerprint_verified": true,
+  "schema_fingerprints": {
+    "mission_control": "sha256:0c61401d113f60118fd45f16db50d338707918ac0b7625ca35c5c21fcf68a13a",
+    "mission_control_search": "sha256:14a2d768afd5067353cf46a33fefaad20d62f210517b945d3c043995ef47049c"
+  },
+  "status": "verified",
+  "writer_version": "mission-control-runtime/1"
+}

@@ -1,0 +1,10 @@
+# The cloud Environment Kit (SPEC-06 section 4.1). One environment per kit digest.
+kit: ai-engineer-knowledge
+packages: {}
+networking:
+  # Always limited; the Signal Ingress host is added at sync time.
+  allowed_hosts:
+    - api.firecrawl.dev
+  include_signal_ingress: true
+  allow_package_managers: false
+  allow_mcp_servers: false

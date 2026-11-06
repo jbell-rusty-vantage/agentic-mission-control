@@ -1,0 +1,1922 @@
+{
+  "schema": "mc.retrieval-baseline.v1",
+  "repo_head": "66185d2e0f9567fded7731d6256f67d0c14dcced",
+  "summary": {
+    "screening": {
+      "queries": 23,
+      "recall_at_3": 0.478,
+      "recall_at_10": 0.609,
+      "mrr": 0.366,
+      "tasks": 4,
+      "task_concepts_set_recall": 0.286,
+      "task_modules_set_recall": 0.0,
+      "task_research_set_recall": 0.0,
+      "task_facts_set_recall": 0.875
+    },
+    "heldout": {
+      "queries": 16,
+      "recall_at_3": 0.625,
+      "recall_at_10": 0.812,
+      "mrr": 0.527,
+      "tasks": 4,
+      "task_concepts_set_recall": 0.25,
+      "task_modules_set_recall": 0.0,
+      "task_research_set_recall": 0.0,
+      "task_facts_set_recall": 0.75
+    },
+    "negative": {
+      "cases": 3,
+      "abstained": 1
+    },
+    "critical": {
+      "passed": 7,
+      "total": 15,
+      "cases": {
+        "S01": "pass",
+        "S02": "fail",
+        "S03": "pass",
+        "S05": "pass",
+        "S06": "pass",
+        "S07": "pass",
+        "S10": "pass",
+        "S15": "pass",
+        "S19": "fail",
+        "S20": "fail",
+        "S21": "fail",
+        "H06": "fail",
+        "T001": "fail",
+        "T002": "fail",
+        "T003": "fail"
+      }
+    }
+  },
+  "cases": [
+    {
+      "id": "S01",
+      "kind": "query",
+      "partition": "screening",
+      "critical": true,
+      "top10": [
+        "docs/knowledge/workflow-systems.md",
+        "GLOSSARY.md",
+        "mission-control-general/workflow-types/01-STAGE_GRAPH.md",
+        "docs/knowledge/parallel-swarm.md",
+        "GLOSSARY.md",
+        "mission-control-general/workflow-types/00-EXECUTION_PROGRAM_MODEL.md",
+        "GLOSSARY.md",
+        "mission-control-general/workflow-types/03-PARALLEL_SWARM.md",
+        "docs/knowledge/execution.md",
+        "mission-control-general/workflow-types/index.md"
+      ],
+      "best_rank": 1,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 1.0,
+      "set_recall": {
+        "concepts": 0.5,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "workflow-systems"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "S02",
+      "kind": "query",
+      "partition": "screening",
+      "critical": true,
+      "top10": [
+        "GLOSSARY.md",
+        "docs/knowledge/completion.md",
+        "mission-control-general/general-mission-control/expansion/issues/MC-P003.md",
+        "docs/knowledge/workflow-systems.md",
+        "docs/knowledge/execution.md",
+        "mission-control-general/general-mission-control/expansion/CONTEXT-STATE-AND-CONTROL.md",
+        "docs/knowledge/evaluator-optimizer.md",
+        "docs/adr/0041-continuation-is-a-persisted-phase-machine-driven-by-the-operation-workflow.md",
+        "docs/knowledge/collections-and-current-sets.md",
+        "mission-control-general/workflow-types/02-GOAL_LOOP.md"
+      ],
+      "best_rank": null,
+      "hit_at_3": false,
+      "hit_at_10": false,
+      "rr": 0.0,
+      "set_recall": {
+        "concepts": 0.0,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": false
+    },
+    {
+      "id": "S03",
+      "kind": "query",
+      "partition": "screening",
+      "critical": true,
+      "top10": [
+        "docs/knowledge/parallel-swarm.md",
+        "mission-control-general/workflow-types/03-PARALLEL_SWARM.md",
+        "GLOSSARY.md",
+        "GLOSSARY.md",
+        "mission-control-general/workflow-types/00-EXECUTION_PROGRAM_MODEL.md",
+        "docs/knowledge/workflow-systems.md",
+        "GLOSSARY.md",
+        "mission-control-general/workflow-types/index.md",
+        "docs/knowledge/recursive-composition.md",
+        "mission-control-general/workflow-types/01-STAGE_GRAPH.md"
+      ],
+      "best_rank": 1,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 1.0,
+      "set_recall": {
+        "concepts": 1.0,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "parallel-swarm",
+          "workflow-systems"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "S04",
+      "kind": "query",
+      "partition": "screening",
+      "critical": false,
+      "top10": [
+        "GLOSSARY.md",
+        "mission-control-general/workflow-types/04-EVALUATOR_OPTIMIZER.md",
+        "GLOSSARY.md",
+        "docs/knowledge/evaluator-optimizer.md",
+        "mission-control-general/workflow-types/index.md",
+        "mission-control-general/workflow-types/00-EXECUTION_PROGRAM_MODEL.md",
+        "docs/knowledge/recursive-composition.md",
+        "docs/knowledge/workflow-systems.md",
+        "mission-control-general/general-mission-control/OUTPUT-CONTRACTS.md",
+        "mission-control-general/general-mission-control/IMPLEMENTATION.md"
+      ],
+      "best_rank": 4,
+      "hit_at_3": false,
+      "hit_at_10": true,
+      "rr": 0.25,
+      "set_recall": {
+        "concepts": 0.5,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "evaluator-optimizer"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": false
+    },
+    {
+      "id": "S05",
+      "kind": "query",
+      "partition": "screening",
+      "critical": true,
+      "top10": [
+        "docs/adr/0029-mission-chains-compile-to-linked-missions-released-by-outbox.md",
+        "docs/knowledge/mission-chains.md",
+        "GLOSSARY.md",
+        "docs/specs/provider-consolidation-2026-10/sprint-oc/SESSION-CODEX-RESUME-2026-10-29.md",
+        "mission-control-general/general-mission-control/DOCUMENTATION-CLEANUP.md",
+        "docs/specs/provider-consolidation-2026-10/sprint-oc/NEXT-SESSION.md",
+        "docs/knowledge/execution.md",
+        "docs/knowledge/index.md",
+        "mission-control-general/workflow-types/01-STAGE_GRAPH.md",
+        "mission-control-general/general-mission-control/IMPLEMENTATION.md"
+      ],
+      "best_rank": 2,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 0.5,
+      "set_recall": {
+        "concepts": 1.0,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "mission-chains"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "S06",
+      "kind": "query",
+      "partition": "screening",
+      "critical": true,
+      "top10": [
+        "docs/knowledge/output-contracts.md",
+        "GLOSSARY.md",
+        "mission-control-general/general-mission-control/OUTPUT-CONTRACTS.md",
+        "docs/knowledge/completion.md",
+        "docs/knowledge/collections-and-current-sets.md",
+        "docs/knowledge/coordinator-attention.md",
+        "GLOSSARY.md",
+        "GLOSSARY.md",
+        "docs/adr/0058-composable-output-obligations-and-one-submission-act.md",
+        "GLOSSARY.md"
+      ],
+      "best_rank": 1,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 1.0,
+      "set_recall": {
+        "concepts": 1.0,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "output-contracts"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "S07",
+      "kind": "query",
+      "partition": "screening",
+      "critical": true,
+      "top10": [
+        "docs/knowledge/deep-agents-turn-stops.md",
+        "docs/knowledge/output-contracts.md",
+        "docs/knowledge/recursive-composition.md",
+        "mission-control-general/workflow-types/01-STAGE_GRAPH.md",
+        "docs/knowledge/workflow-systems.md",
+        "docs/knowledge/index.md",
+        "mission-control-general/workflow-types/00-EXECUTION_PROGRAM_MODEL.md",
+        "docs/knowledge/coordinator-attention.md",
+        "docs/knowledge/parallel-swarm.md",
+        "mission-control-general/workflow-types/02-GOAL_LOOP.md"
+      ],
+      "best_rank": 2,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 0.5,
+      "set_recall": {
+        "concepts": 0.5,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "output-contracts"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "S08",
+      "kind": "query",
+      "partition": "screening",
+      "critical": false,
+      "top10": [
+        "docs/adr/0057-the-precise-fork-closure-family-position-and-the-seed-head.md",
+        "docs/knowledge/interventions.md",
+        "docs/knowledge/precise-fork.md",
+        "mission-control-general/runtime-facts/EVE_FACTS.md",
+        "docs/knowledge/recovery.md",
+        "mission-control-general/runtime-facts/CURSOR_SDK_FACTS.md",
+        "docs/knowledge/provider-lanes.md",
+        "docs/knowledge/events-and-commands.md",
+        "docs/adr/0065-documentation-automation-bound-to-git-events-not-a-scheduler.md",
+        "docs/adr/0032-interventions-real-queue-inject-cancel-fork-and-subscriptions.md"
+      ],
+      "best_rank": 2,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 0.5,
+      "set_recall": {
+        "concepts": 1.0,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "interventions"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "S09",
+      "kind": "query",
+      "partition": "screening",
+      "critical": false,
+      "top10": [
+        "docs/knowledge/precise-fork.md",
+        "docs/knowledge/recovery.md",
+        "docs/adr/0057-the-precise-fork-closure-family-position-and-the-seed-head.md",
+        "mission-control-general/general-mission-control/EVIDENCE.md",
+        "docs/adr/0054-the-mission-transcript-is-the-replayable-record.md",
+        "docs/knowledge/workspace-closure.md",
+        "mission-control-general/general-mission-control/expansion/issues/MC-P007.md",
+        "docs/adr/0031-temporal-lifecycle-synthesis-observe-activity-updates-seeded-forks.md",
+        "mission-control-general/general-mission-control/RUNTIME-CONTRACTS.md",
+        "docs/adr/0005-deep-agents-first-extend-not-fork.md"
+      ],
+      "best_rank": 1,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 1.0,
+      "set_recall": {
+        "concepts": 1.0,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "precise-fork",
+          "recovery"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "S10",
+      "kind": "query",
+      "partition": "screening",
+      "critical": true,
+      "top10": [
+        "docs/knowledge/agent-configuration.md",
+        "docs/knowledge/deep-agents-lane.md",
+        "docs/knowledge/index.md",
+        "docs/knowledge/async-children.md",
+        "docs/knowledge/capabilities.md",
+        "mission-control-general/general-mission-control/expansion/CATALOG-AND-ENVIRONMENTS.md",
+        "docs/knowledge/log.md",
+        "docs/knowledge/mission-manifest.md",
+        "docs/knowledge/model-catalog.md",
+        "mission-control-general/general-mission-control/MISSION_CONTROL_SYSTEM_PROPOSAL.md"
+      ],
+      "best_rank": 1,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 1.0,
+      "set_recall": {
+        "concepts": 1.0,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "agent-configuration",
+          "deep-agents-lane"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "S11",
+      "kind": "query",
+      "partition": "screening",
+      "critical": false,
+      "top10": [
+        "docs/knowledge/agent-configuration.md",
+        "docs/knowledge/model-catalog.md",
+        "GLOSSARY.md",
+        "docs/knowledge/deep-agents-lane.md",
+        "docs/knowledge/interfaces.md",
+        "docs/knowledge/selection-workspace.md",
+        "GLOSSARY.md",
+        "docs/knowledge/mission-manifest.md",
+        "docs/adr/0063-one-resolution-seam-over-declared-lane-model-and-application-registries.md",
+        "docs/knowledge/log.md"
+      ],
+      "best_rank": 2,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 0.5,
+      "set_recall": {
+        "concepts": 1.0,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "model-catalog"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "S12",
+      "kind": "query",
+      "partition": "screening",
+      "critical": false,
+      "top10": [
+        "docs/adr/0036-mission-stream-is-socket-io-over-shared-handlers-postgres-replay-redis-fanout.md",
+        "docs/adr/0031-temporal-lifecycle-synthesis-observe-activity-updates-seeded-forks.md",
+        "docs/knowledge/mission-stream.md",
+        "docs/knowledge/recovery.md",
+        "docs/knowledge/lanes-and-harness.md",
+        "GLOSSARY.md",
+        "docs/knowledge/events-and-commands.md",
+        "mission-control-general/general-mission-control/DATABASE.md",
+        "docs/knowledge/provider-lanes.md",
+        "mission-control-general/general-mission-control/expansion/DEPLOYMENT-AND-RELEASE.md"
+      ],
+      "best_rank": null,
+      "hit_at_3": false,
+      "hit_at_10": false,
+      "rr": 0.0,
+      "set_recall": {
+        "concepts": 0.0,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": false
+    },
+    {
+      "id": "S13",
+      "kind": "query",
+      "partition": "screening",
+      "critical": false,
+      "top10": [
+        "docs/knowledge/async-children.md",
+        "docs/knowledge/deep-agents-lane.md",
+        "mission-control-general/general-mission-control/README.md",
+        "docs/knowledge/index.md",
+        "mission-control-general/general-mission-control/MISSION_CONTROL_SYSTEM_PROPOSAL.md",
+        "docs/knowledge/log.md",
+        "docs/knowledge/deep-agents-turn-stops.md",
+        "mission-control-general/general-mission-control/SPECIFICATION.md",
+        "docs/knowledge/lanes-and-harness.md",
+        "GLOSSARY.md"
+      ],
+      "best_rank": null,
+      "hit_at_3": false,
+      "hit_at_10": false,
+      "rr": 0.0,
+      "set_recall": {
+        "concepts": 0.0,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": false
+    },
+    {
+      "id": "S14",
+      "kind": "query",
+      "partition": "screening",
+      "critical": false,
+      "top10": [
+        "docs/specs/provider-consolidation-2026-10/sprint-oc/SESSION-CODEX-RESUME-2026-10-29.md",
+        "docs/knowledge/evaluator-attempts.md",
+        "docs/knowledge/trusted-judgment.md",
+        "docs/specs/provider-consolidation-2026-10/sprint-oc/NEXT-SESSION.md",
+        "mission-control-general/runtime-facts/EVE_FACTS.md",
+        "docs/knowledge/wake-channels.md",
+        "docs/adr/0046-watchers-as-compiled-bounded-deterministic-descriptors.md",
+        "docs/adr/0054-the-mission-transcript-is-the-replayable-record.md",
+        "docs/adr/0040-native-frames-normalized-lifecycle-lineage-graph-bounded-coordinator-subscriptions.md",
+        "mission-control-general/workflow-types/03-PARALLEL_SWARM.md"
+      ],
+      "best_rank": null,
+      "hit_at_3": false,
+      "hit_at_10": false,
+      "rr": 0.0,
+      "set_recall": {
+        "concepts": 0.0,
+        "research": 0.0,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": false
+    },
+    {
+      "id": "S15",
+      "kind": "query",
+      "partition": "screening",
+      "critical": true,
+      "top10": [
+        "mission-control-general/general-mission-control/expansion/issues/MC-F013.md",
+        "mission-control-general/general-mission-control/expansion/CONTEXT-STATE-AND-CONTROL.md",
+        "docs/knowledge/human-gates.md",
+        "mission-control-general/workflow-types/04-EVALUATOR_OPTIMIZER.md",
+        "mission-control-general/workflow-types/02-GOAL_LOOP.md",
+        "docs/adr/0038-two-origins-of-human-control-over-one-human-task-service.md",
+        "mission-control-general/workflow-types/05-EXECUTORS_AND_DURABLE_CONTROLS.md",
+        "mission-control-general/general-mission-control/WORKED-MISSION.md",
+        "GLOSSARY.md",
+        "mission-control-general/general-mission-control/expansion/EXPERIENCE-AND-STREAMS.md"
+      ],
+      "best_rank": 3,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 0.3333333333333333,
+      "set_recall": {
+        "concepts": 0.5,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "human-gates"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "S16",
+      "kind": "query",
+      "partition": "screening",
+      "critical": false,
+      "top10": [
+        "mission-control-general/general-mission-control/CODEBASE-ORGANIZATION.md",
+        "GLOSSARY.md",
+        "mission-control-general/general-mission-control/DATABASE.md",
+        "GLOSSARY.md",
+        "mission-control-general/general-mission-control/SPECIFICATION.md",
+        "docs/knowledge/persistence.md",
+        "mission-control-general/general-mission-control/IMPLEMENTATION.md",
+        "docs/specs/provider-consolidation-2026-10/sprint-oc/APPLICATION-PORTS.md",
+        "mission-control-general/general-mission-control/README.md",
+        "docs/adr/0003-common-sql-owned-by-db-contract-package.md"
+      ],
+      "best_rank": 6,
+      "hit_at_3": false,
+      "hit_at_10": true,
+      "rr": 0.16666666666666666,
+      "set_recall": {
+        "concepts": 0.5,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "persistence"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": false
+    },
+    {
+      "id": "S17",
+      "kind": "query",
+      "partition": "screening",
+      "critical": false,
+      "top10": [
+        "docs/adr/0036-mission-stream-is-socket-io-over-shared-handlers-postgres-replay-redis-fanout.md",
+        "docs/knowledge/mission-stream.md",
+        "docs/knowledge/unit-and-point-joinability.md",
+        "mission-control-general/general-mission-control/expansion/TECHNOLOGY-EVIDENCE.md",
+        "docs/knowledge/interfaces.md",
+        "docs/adr/0038-two-origins-of-human-control-over-one-human-task-service.md",
+        "docs/knowledge/events-and-commands.md",
+        "mission-control-general/runtime-facts/CURSOR_SDK_FACTS.md",
+        "mission-control-general/general-mission-control/expansion/DEPLOYMENT-AND-RELEASE.md",
+        "mission-control-general/general-mission-control/expansion/EXPERIENCE-AND-STREAMS.md"
+      ],
+      "best_rank": 2,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 0.5,
+      "set_recall": {
+        "concepts": 1.0,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "mission-stream"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "S18",
+      "kind": "query",
+      "partition": "screening",
+      "critical": false,
+      "top10": [
+        "mission-control-general/general-mission-control/DOCUMENTATION-CLEANUP.md",
+        "GLOSSARY.md",
+        "mission-control-general/general-mission-control/MISSION_CONTROL_SYSTEM_PROPOSAL.md",
+        "mission-control-general/general-mission-control/expansion/EXPERIENCE-AND-STREAMS.md",
+        "docs/knowledge/capability-seeds.md",
+        "docs/knowledge/selection-workspace.md",
+        "docs/specs/provider-consolidation-2026-10/sprint-oc/SESSION-CODEX-RESUME-2026-10-29.md",
+        "mission-control-general/general-mission-control/expansion/DEPLOYMENT-AND-RELEASE.md",
+        "docs/specs/provider-consolidation-2026-10/sprint-oc/APPLICATION-PORTS.md",
+        "docs/knowledge/provider-frames-and-transcript.md"
+      ],
+      "best_rank": 6,
+      "hit_at_3": false,
+      "hit_at_10": true,
+      "rr": 0.16666666666666666,
+      "set_recall": {
+        "concepts": 1.0,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "selection-workspace"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": false
+    },
+    {
+      "id": "S19",
+      "kind": "query",
+      "partition": "screening",
+      "critical": true,
+      "top10": [
+        "docs/specs/provider-consolidation-2026-10/sprint-oc/NEXT-SESSION.md",
+        "docs/knowledge/agent-configuration.md",
+        "docs/specs/provider-consolidation-2026-10/sprint-oc/SESSION-CODEX-RESUME-2026-10-29.md",
+        "docs/knowledge/model-catalog.md",
+        "docs/knowledge/index.md",
+        "docs/knowledge/application-profile.md",
+        "docs/knowledge/log.md",
+        "docs/knowledge/collections-and-current-sets.md",
+        "docs/knowledge/async-children.md",
+        "docs/adr/0063-one-resolution-seam-over-declared-lane-model-and-application-registries.md"
+      ],
+      "best_rank": null,
+      "hit_at_3": false,
+      "hit_at_10": false,
+      "rr": 0.0,
+      "set_recall": {
+        "concepts": 0.0,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": false
+    },
+    {
+      "id": "S20",
+      "kind": "query",
+      "partition": "screening",
+      "critical": true,
+      "top10": [
+        "mission-control-general/general-mission-control/WORKED-MISSION.md",
+        "mission-control-general/general-mission-control/expansion/KNOWLEDGE-SERVICES.md",
+        "mission-control-general/general-mission-control/expansion/WORKED-SCENARIOS.md",
+        "mission-control-general/general-mission-control/MISSION_CONTROL_SYSTEM_PROPOSAL.md",
+        "mission-control-general/general-mission-control/expansion/issues/MC-F022.md",
+        "mission-control-general/general-mission-control/EVIDENCE.md",
+        "docs/specs/provider-consolidation-2026-10/sprint-oc/APPLICATION-PORTS.md",
+        "mission-control-general/general-mission-control/SPECIFICATION.md",
+        "docs/adr/0001-one-python-distribution-clean-transformation.md",
+        "mission-control-general/general-mission-control/CODEBASE-ORGANIZATION.md"
+      ],
+      "best_rank": null,
+      "hit_at_3": false,
+      "hit_at_10": false,
+      "rr": 0.0,
+      "set_recall": {
+        "concepts": 0.0,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": false
+    },
+    {
+      "id": "S21",
+      "kind": "query",
+      "partition": "screening",
+      "critical": true,
+      "top10": [
+        "docs/knowledge/selection-workspace.md",
+        "docs/specs/provider-consolidation-2026-10/sprint-oc/NEXT-SESSION.md",
+        "docs/knowledge/signal-ingress.md",
+        "docs/knowledge/workspace-closure.md",
+        "docs/knowledge/completion.md",
+        "docs/knowledge/watchers.md",
+        "docs/knowledge/hook-contributions.md",
+        "docs/knowledge/application-profile.md",
+        "docs/knowledge/transcript-projection.md",
+        "docs/knowledge/async-children.md"
+      ],
+      "best_rank": null,
+      "hit_at_3": false,
+      "hit_at_10": false,
+      "rr": 0.0,
+      "set_recall": {
+        "concepts": 0.0,
+        "research": null,
+        "modules": 0.0,
+        "facts": null
+      },
+      "found": {
+        "concepts": [],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": false
+    },
+    {
+      "id": "S22",
+      "kind": "query",
+      "partition": "screening",
+      "critical": false,
+      "top10": [
+        "docs/agents/program-workspace.md",
+        "docs/adr/0064-one-vendored-sdlc-toolchain-per-repository.md",
+        "docs/knowledge/index.md",
+        "docs/adr/0055-retention-follows-the-mission.md",
+        "GLOSSARY.md",
+        "docs/knowledge/agent-configuration.md",
+        "docs/knowledge/log.md",
+        "mission-control-general/workflow-types/00-EXECUTION_PROGRAM_MODEL.md",
+        "docs/knowledge/qualification.md",
+        "docs/agents/documentation-surfaces.md"
+      ],
+      "best_rank": null,
+      "hit_at_3": false,
+      "hit_at_10": false,
+      "rr": 0.0,
+      "set_recall": {
+        "concepts": 0.0,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": false
+    },
+    {
+      "id": "S23",
+      "kind": "query",
+      "partition": "screening",
+      "critical": false,
+      "top10": [],
+      "best_rank": null,
+      "hit_at_3": false,
+      "hit_at_10": false,
+      "rr": 0.0,
+      "set_recall": {
+        "concepts": 0.0,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": false
+    },
+    {
+      "id": "H01",
+      "kind": "query",
+      "partition": "heldout",
+      "critical": false,
+      "top10": [
+        "docs/knowledge/workflow-systems.md",
+        "mission-control-general/workflow-types/01-STAGE_GRAPH.md",
+        "docs/knowledge/budgets-and-usage.md",
+        "docs/knowledge/evaluator-optimizer.md",
+        "mission-control-general/workflow-types/04-EVALUATOR_OPTIMIZER.md",
+        "docs/knowledge/precise-fork.md",
+        "docs/knowledge/execution.md",
+        "docs/knowledge/trusted-judgment.md",
+        "docs/knowledge/recursive-composition.md",
+        "GLOSSARY.md"
+      ],
+      "best_rank": null,
+      "hit_at_3": false,
+      "hit_at_10": false,
+      "rr": 0.0,
+      "set_recall": {
+        "concepts": 0.0,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": false
+    },
+    {
+      "id": "H02",
+      "kind": "query",
+      "partition": "heldout",
+      "critical": false,
+      "top10": [
+        "docs/knowledge/execution.md",
+        "docs/knowledge/recursive-composition.md",
+        "mission-control-general/workflow-types/00-EXECUTION_PROGRAM_MODEL.md",
+        "mission-control-general/general-mission-control/expansion/issues/MC-P003.md",
+        "mission-control-general/general-mission-control/expansion/CONTEXT-STATE-AND-CONTROL.md",
+        "mission-control-general/general-mission-control/WORKED-MISSION.md",
+        "docs/knowledge/evaluator-optimizer.md",
+        "GLOSSARY.md",
+        "docs/adr/0029-mission-chains-compile-to-linked-missions-released-by-outbox.md",
+        "GLOSSARY.md"
+      ],
+      "best_rank": 2,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 0.5,
+      "set_recall": {
+        "concepts": 0.5,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "recursive-composition"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "H03",
+      "kind": "query",
+      "partition": "heldout",
+      "critical": false,
+      "top10": [
+        "mission-control-general/workflow-types/03-PARALLEL_SWARM.md",
+        "GLOSSARY.md",
+        "docs/knowledge/completion.md",
+        "docs/knowledge/index.md",
+        "docs/knowledge/evaluator-optimizer.md",
+        "mission-control-general/workflow-types/07-MISSION_REVISION_AND_RUNTIME_EVOLUTION.md",
+        "docs/knowledge/parallel-swarm.md",
+        "docs/agents/program-workspace.md",
+        "mission-control-general/workflow-types/00-EXECUTION_PROGRAM_MODEL.md",
+        "mission-control-general/workflow-types/04-EVALUATOR_OPTIMIZER.md"
+      ],
+      "best_rank": 3,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 0.3333333333333333,
+      "set_recall": {
+        "concepts": 1.0,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "completion"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "H04",
+      "kind": "query",
+      "partition": "heldout",
+      "critical": false,
+      "top10": [
+        "docs/knowledge/environments.md",
+        "docs/adr/0030-cursor-lane-two-profiles-reducer-from-frames-hydrated-fork.md",
+        "docs/adr/0042-environment-kits-and-two-layer-base-mission-setup-with-one-bootstrap-entrypoint.md",
+        "docs/knowledge/secret-broker.md",
+        "docs/adr/0043-secret-broker-per-lane-delivery-minted-signal-credentials-never-commit-secrets.md",
+        "docs/knowledge/owner-probe-bootstrap.md",
+        "docs/knowledge/cursor-lane.md",
+        "docs/knowledge/index.md",
+        "GLOSSARY.md",
+        "docs/knowledge/owner-prerequisites.md"
+      ],
+      "best_rank": 4,
+      "hit_at_3": false,
+      "hit_at_10": true,
+      "rr": 0.25,
+      "set_recall": {
+        "concepts": 1.0,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "secret-broker"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": false
+    },
+    {
+      "id": "H05",
+      "kind": "query",
+      "partition": "heldout",
+      "critical": false,
+      "top10": [
+        "docs/knowledge/workspace-closure.md",
+        "GLOSSARY.md",
+        "docs/knowledge/hook-contributions.md",
+        "docs/knowledge/index.md",
+        "docs/knowledge/execution.md",
+        "docs/knowledge/saved-result-settlement.md",
+        "GLOSSARY.md",
+        "docs/adr/0027-context-packet-tiers-and-workspace-materialization.md",
+        "docs/knowledge/output-contracts.md",
+        "docs/adr/0041-continuation-is-a-persisted-phase-machine-driven-by-the-operation-workflow.md"
+      ],
+      "best_rank": 1,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 1.0,
+      "set_recall": {
+        "concepts": 1.0,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "workspace-closure"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "H06",
+      "kind": "query",
+      "partition": "heldout",
+      "critical": true,
+      "top10": [
+        "docs/knowledge/workspace-closure.md",
+        "docs/knowledge/hook-contributions.md",
+        "mission-control-general/general-mission-control/EVIDENCE.md",
+        "docs/knowledge/deep-agents-lane.md",
+        "mission-control-general/general-mission-control/expansion/CATALOG-AND-ENVIRONMENTS.md",
+        "mission-control-general/general-mission-control/expansion/ARCHITECTURE-AND-ADRS.md",
+        "docs/knowledge/deep-agents-turn-stops.md",
+        "mission-control-general/general-mission-control/SPECIFICATION.md",
+        "mission-control-general/runtime-facts/EVE_FACTS.md",
+        "mission-control-general/general-mission-control/CODEBASE-ORGANIZATION.md"
+      ],
+      "best_rank": 4,
+      "hit_at_3": false,
+      "hit_at_10": true,
+      "rr": 0.25,
+      "set_recall": {
+        "concepts": 1.0,
+        "research": 0.0,
+        "modules": 0.0,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "deep-agents-lane"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": false
+    },
+    {
+      "id": "H07",
+      "kind": "query",
+      "partition": "heldout",
+      "critical": false,
+      "top10": [
+        "docs/knowledge/wake-channels.md",
+        "docs/adr/0049-deprecate-mission-subscribe-push-in-favour-of-inbox-wait-channels.md",
+        "docs/knowledge/index.md",
+        "docs/knowledge/provider-lanes.md",
+        "docs/agents/program-workspace.md",
+        "mission-control-general/runtime-facts/EVE_FACTS.md",
+        "docs/knowledge/async-children.md",
+        "mission-control-general/general-mission-control/WORKED-MISSION.md",
+        "mission-control-general/workflow-types/00-EXECUTION_PROGRAM_MODEL.md",
+        "docs/knowledge/release-and-qualification.md"
+      ],
+      "best_rank": 1,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 1.0,
+      "set_recall": {
+        "concepts": 0.5,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "wake-channels"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "H08",
+      "kind": "query",
+      "partition": "heldout",
+      "critical": false,
+      "top10": [
+        "docs/knowledge/session-ownership-and-dispatch.md",
+        "docs/knowledge/saved-result-settlement.md",
+        "docs/knowledge/interventions.md",
+        "docs/adr/0052-remote-session-lane-base-shared-machinery-for-provider-session-apis.md",
+        "docs/adr/0041-continuation-is-a-persisted-phase-machine-driven-by-the-operation-workflow.md",
+        "mission-control-general/workflow-types/00-EXECUTION_PROGRAM_MODEL.md",
+        "docs/knowledge/placement-admission.md",
+        "GLOSSARY.md",
+        "docs/knowledge/budgets-and-usage.md",
+        "mission-control-general/workflow-types/05-EXECUTORS_AND_DURABLE_CONTROLS.md"
+      ],
+      "best_rank": 1,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 1.0,
+      "set_recall": {
+        "concepts": 1.0,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "session-ownership-and-dispatch"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "H09",
+      "kind": "query",
+      "partition": "heldout",
+      "critical": false,
+      "top10": [
+        "docs/adr/0022-mission-manifest-yaml-authoring-surface.md",
+        "docs/knowledge/mission-manifest.md",
+        "GLOSSARY.md",
+        "docs/knowledge/placement-admission.md",
+        "docs/knowledge/authoring.md",
+        "docs/knowledge/revisions.md",
+        "docs/adr/0046-watchers-as-compiled-bounded-deterministic-descriptors.md",
+        "docs/knowledge/watchers.md",
+        "docs/knowledge/environments.md",
+        "docs/knowledge/model-catalog.md"
+      ],
+      "best_rank": 2,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 0.5,
+      "set_recall": {
+        "concepts": 1.0,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "mission-manifest"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "H10",
+      "kind": "query",
+      "partition": "heldout",
+      "critical": false,
+      "top10": [
+        "mission-control-general/workflow-types/07-MISSION_REVISION_AND_RUNTIME_EVOLUTION.md",
+        "mission-control-general/workflow-types/01-STAGE_GRAPH.md",
+        "mission-control-general/workflow-types/02-GOAL_LOOP.md",
+        "mission-control-general/general-mission-control/SPECIFICATION.md",
+        "mission-control-general/workflow-types/06-MISSION_INVOCATION.md",
+        "mission-control-general/workflow-types/00-EXECUTION_PROGRAM_MODEL.md",
+        "mission-control-general/workflow-types/03-PARALLEL_SWARM.md",
+        "docs/adr/0041-continuation-is-a-persisted-phase-machine-driven-by-the-operation-workflow.md",
+        "mission-control-general/general-mission-control/RUNTIME-CONTRACTS.md",
+        "docs/knowledge/parallel-swarm.md"
+      ],
+      "best_rank": null,
+      "hit_at_3": false,
+      "hit_at_10": false,
+      "rr": 0.0,
+      "set_recall": {
+        "concepts": 0.0,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": false
+    },
+    {
+      "id": "H11",
+      "kind": "query",
+      "partition": "heldout",
+      "critical": false,
+      "top10": [
+        "docs/adr/0052-remote-session-lane-base-shared-machinery-for-provider-session-apis.md",
+        "mission-control-general/runtime-facts/CURSOR_SDK_FACTS.md",
+        "docs/knowledge/cursor-lane.md",
+        "docs/adr/0030-cursor-lane-two-profiles-reducer-from-frames-hydrated-fork.md",
+        "mission-control-general/general-mission-control/DOCUMENTATION-CLEANUP.md",
+        "docs/knowledge/provider-lanes.md",
+        "docs/adr/0066-provider-adapter-for-model-driven-sdlc-steps-cursor-first.md",
+        "docs/adr/0050-nine-lane-profiles-claude-managed-and-codex-agents-and-the-mission-data-class.md",
+        "docs/adr/0019-coding-lanes-worker-hosted-local-first.md",
+        "docs/knowledge/placement-admission.md"
+      ],
+      "best_rank": null,
+      "hit_at_3": false,
+      "hit_at_10": false,
+      "rr": 0.0,
+      "set_recall": {
+        "concepts": 0.0,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": false
+    },
+    {
+      "id": "H12",
+      "kind": "query",
+      "partition": "heldout",
+      "critical": false,
+      "top10": [
+        "docs/knowledge/durable-controls.md",
+        "mission-control-general/workflow-types/05-EXECUTORS_AND_DURABLE_CONTROLS.md",
+        "GLOSSARY.md",
+        "docs/knowledge/human-gates.md",
+        "docs/knowledge/workflow-systems.md",
+        "mission-control-general/workflow-types/00-EXECUTION_PROGRAM_MODEL.md",
+        "GLOSSARY.md",
+        "mission-control-general/general-mission-control/MISSION_CONTROL_SYSTEM_PROPOSAL.md",
+        "docs/knowledge/index.md",
+        "mission-control-general/runtime-facts/EVE_FACTS.md"
+      ],
+      "best_rank": 1,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 1.0,
+      "set_recall": {
+        "concepts": 1.0,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "durable-controls",
+          "human-gates"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "H13",
+      "kind": "query",
+      "partition": "heldout",
+      "critical": false,
+      "top10": [
+        "docs/adr/0046-watchers-as-compiled-bounded-deterministic-descriptors.md",
+        "docs/knowledge/watchers.md",
+        "GLOSSARY.md",
+        "GLOSSARY.md",
+        "docs/adr/0065-documentation-automation-bound-to-git-events-not-a-scheduler.md",
+        "GLOSSARY.md",
+        "GLOSSARY.md",
+        "GLOSSARY.md",
+        "GLOSSARY.md",
+        "GLOSSARY.md"
+      ],
+      "best_rank": 2,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 0.5,
+      "set_recall": {
+        "concepts": 1.0,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "watchers"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "H14",
+      "kind": "query",
+      "partition": "heldout",
+      "critical": false,
+      "top10": [
+        "docs/knowledge/hook-contributions.md",
+        "GLOSSARY.md",
+        "GLOSSARY.md",
+        "mission-control-general/general-mission-control/expansion/CONTEXT-STATE-AND-CONTROL.md",
+        "GLOSSARY.md",
+        "docs/knowledge/log.md",
+        "docs/adr/0026-hook-scripts-one-event-vocabulary-projected-per-lane.md",
+        "docs/knowledge/deep-agents-lane.md",
+        "GLOSSARY.md",
+        "docs/adr/0039-four-independent-progress-mechanisms-compaction-native-first-continuation-sealed.md"
+      ],
+      "best_rank": 1,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 1.0,
+      "set_recall": {
+        "concepts": 0.5,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "hook-contributions"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "H15",
+      "kind": "query",
+      "partition": "heldout",
+      "critical": false,
+      "top10": [
+        "docs/knowledge/lanes-and-harness.md",
+        "GLOSSARY.md",
+        "docs/knowledge/session-ownership-and-dispatch.md",
+        "docs/adr/0018-coding-agents-are-execution-lanes.md",
+        "mission-control-general/workflow-types/05-EXECUTORS_AND_DURABLE_CONTROLS.md",
+        "docs/knowledge/cursor-lane.md",
+        "docs/knowledge/provider-lanes.md",
+        "docs/knowledge/deep-agents-lane.md",
+        "docs/adr/0063-one-resolution-seam-over-declared-lane-model-and-application-registries.md",
+        "docs/adr/0050-nine-lane-profiles-claude-managed-and-codex-agents-and-the-mission-data-class.md"
+      ],
+      "best_rank": 1,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 1.0,
+      "set_recall": {
+        "concepts": 1.0,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "lanes-and-harness"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "H16",
+      "kind": "query",
+      "partition": "heldout",
+      "critical": false,
+      "top10": [
+        "mission-control-general/runtime-facts/CURSOR_SDK_FACTS.md",
+        "mission-control-general/general-mission-control/RUNTIME-CONTRACTS.md",
+        "mission-control-general/workflow-types/05-EXECUTORS_AND_DURABLE_CONTROLS.md",
+        "mission-control-general/general-mission-control/MISSION_CONTROL_SYSTEM_PROPOSAL.md",
+        "mission-control-general/general-mission-control/EVIDENCE.md",
+        "docs/adr/0035-seven-lane-profiles-versioned-provider-contracts-and-mission-v2.md",
+        "mission-control-general/general-mission-control/expansion/TECHNOLOGY-EVIDENCE.md",
+        "docs/adr/0042-environment-kits-and-two-layer-base-mission-setup-with-one-bootstrap-entrypoint.md",
+        "mission-control-general/general-mission-control/IMPLEMENTATION.md",
+        "docs/knowledge/cursor-lane.md"
+      ],
+      "best_rank": 10,
+      "hit_at_3": false,
+      "hit_at_10": true,
+      "rr": 0.1,
+      "set_recall": {
+        "concepts": 1.0,
+        "research": 0.0,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [
+          "cursor-lane"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": false
+    },
+    {
+      "id": "N01",
+      "kind": "query",
+      "partition": "negative",
+      "critical": false,
+      "top10": [
+        "docs/adr/0012-coding-effects-are-separate-capabilities.md",
+        "mission-control-general/general-mission-control/expansion/TEAM-WORKSPACE.md",
+        "docs/adr/0037-mission-control-allocates-workspaces-fork-is-snapshot-plus-packet-plus-conversation.md",
+        "docs/adr/0065-documentation-automation-bound-to-git-events-not-a-scheduler.md",
+        "docs/specs/provider-consolidation-2026-10/sprint-oc/SESSION-CODEX-RESUME-2026-10-29.md",
+        "docs/adr/0029-mission-chains-compile-to-linked-missions-released-by-outbox.md",
+        "mission-control-general/general-mission-control/expansion/ARCHITECTURE-AND-ADRS.md",
+        "mission-control-general/general-mission-control/expansion/issues/MC-F016.md",
+        "docs/specs/provider-consolidation-2026-10/sprint-oc/NEXT-SESSION.md",
+        "docs/adr/0064-one-vendored-sdlc-toolchain-per-repository.md"
+      ],
+      "best_rank": null,
+      "hit_at_3": false,
+      "hit_at_10": false,
+      "rr": 0.0,
+      "set_recall": {
+        "concepts": null,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": false
+    },
+    {
+      "id": "N02",
+      "kind": "query",
+      "partition": "negative",
+      "critical": false,
+      "top10": [],
+      "best_rank": null,
+      "hit_at_3": false,
+      "hit_at_10": false,
+      "rr": 0.0,
+      "set_recall": {
+        "concepts": null,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": true
+    },
+    {
+      "id": "N03",
+      "kind": "query",
+      "partition": "negative",
+      "critical": false,
+      "top10": [
+        "GLOSSARY.md",
+        "docs/adr/0045-signal-ingress-trust-tiers-signals-are-evidence-never-authority.md",
+        "docs/knowledge/signal-ingress.md",
+        "GLOSSARY.md",
+        "GLOSSARY.md",
+        "docs/knowledge/owner-probe-bootstrap.md",
+        "docs/knowledge/wake-channels.md",
+        "docs/adr/0049-deprecate-mission-subscribe-push-in-favour-of-inbox-wait-channels.md",
+        "docs/knowledge/environments.md",
+        "docs/adr/0048-knowledge-workspaces-and-mission-branches.md"
+      ],
+      "best_rank": null,
+      "hit_at_3": false,
+      "hit_at_10": false,
+      "rr": 0.0,
+      "set_recall": {
+        "concepts": null,
+        "research": null,
+        "modules": null,
+        "facts": null
+      },
+      "found": {
+        "concepts": [],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": false
+    },
+    {
+      "id": "T001",
+      "kind": "task",
+      "partition": "screening",
+      "critical": true,
+      "top10": [
+        "mission-control-general/general-mission-control/SPECIFICATION.md",
+        "mission-control-general/workflow-types/08-CONTINUATION_COMPACTION_AND_TRANSFER.md",
+        "mission-control-general/runtime-facts/EVE_FACTS.md",
+        "mission-control-general/general-mission-control/DOCUMENTATION-CLEANUP.md",
+        "mission-control-general/general-mission-control/expansion/ARCHITECTURE-AND-ADRS.md",
+        "GLOSSARY.md",
+        "docs/knowledge/deep-agents-lane.md",
+        "docs/specs/provider-consolidation-2026-10/sprint-oc/NEXT-SESSION.md",
+        "docs/knowledge/operations.md",
+        "mission-control-general/general-mission-control/RUNTIME-CONTRACTS.md"
+      ],
+      "best_rank": 7,
+      "hit_at_3": false,
+      "hit_at_10": true,
+      "rr": 0.14285714285714285,
+      "set_recall": {
+        "concepts": 0.14285714285714285,
+        "research": 0.0,
+        "modules": 0.0,
+        "facts": 0.5
+      },
+      "found": {
+        "concepts": [
+          "deep-agents-lane"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": [
+          "active systems: StageGraph, GoalDirected"
+        ]
+      },
+      "strict_modules_found": [],
+      "pass": false
+    },
+    {
+      "id": "T002",
+      "kind": "task",
+      "partition": "screening",
+      "critical": true,
+      "top10": [
+        "docs/knowledge/execution.md",
+        "docs/knowledge/recursive-composition.md",
+        "docs/knowledge/output-contracts.md",
+        "mission-control-general/general-mission-control/OUTPUT-CONTRACTS.md",
+        "docs/knowledge/workflow-systems.md",
+        "mission-control-general/workflow-types/01-STAGE_GRAPH.md",
+        "mission-control-general/workflow-types/00-EXECUTION_PROGRAM_MODEL.md",
+        "mission-control-general/general-mission-control/expansion/CONTEXT-STATE-AND-CONTROL.md",
+        "docs/knowledge/deep-agents-turn-stops.md",
+        "docs/knowledge/completion.md"
+      ],
+      "best_rank": 3,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 0.3333333333333333,
+      "set_recall": {
+        "concepts": 0.4,
+        "research": null,
+        "modules": 0.0,
+        "facts": 1.0
+      },
+      "found": {
+        "concepts": [
+          "output-contracts",
+          "completion"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": [
+          "obligations are fulfilled through one submission act"
+        ]
+      },
+      "strict_modules_found": [],
+      "pass": false
+    },
+    {
+      "id": "T003",
+      "kind": "task",
+      "partition": "screening",
+      "critical": true,
+      "top10": [
+        "docs/adr/0057-the-precise-fork-closure-family-position-and-the-seed-head.md",
+        "docs/knowledge/interventions.md",
+        "mission-control-general/workflow-types/02-GOAL_LOOP.md",
+        "docs/knowledge/recursive-composition.md",
+        "mission-control-general/general-mission-control/RUNTIME-CONTRACTS.md",
+        "mission-control-general/general-mission-control/OUTPUT-CONTRACTS.md",
+        "mission-control-general/general-mission-control/expansion/CATALOG-AND-ENVIRONMENTS.md",
+        "docs/specs/provider-consolidation-2026-10/sprint-oc/NEXT-SESSION.md",
+        "mission-control-general/workflow-types/00-EXECUTION_PROGRAM_MODEL.md",
+        "docs/adr/0058-composable-output-obligations-and-one-submission-act.md"
+      ],
+      "best_rank": 2,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 0.5,
+      "set_recall": {
+        "concepts": 0.2,
+        "research": null,
+        "modules": 0.0,
+        "facts": 1.0
+      },
+      "found": {
+        "concepts": [
+          "interventions"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": [
+          "inject is delivered at a safe boundary"
+        ]
+      },
+      "strict_modules_found": [],
+      "pass": false
+    },
+    {
+      "id": "T004",
+      "kind": "task",
+      "partition": "screening",
+      "critical": false,
+      "top10": [
+        "docs/knowledge/recovery.md",
+        "docs/knowledge/precise-fork.md",
+        "docs/adr/0057-the-precise-fork-closure-family-position-and-the-seed-head.md",
+        "docs/knowledge/context-and-continuation.md",
+        "docs/knowledge/index.md",
+        "mission-control-general/general-mission-control/WORKED-MISSION.md",
+        "docs/knowledge/recursive-composition.md",
+        "docs/adr/0037-mission-control-allocates-workspaces-fork-is-snapshot-plus-packet-plus-conversation.md",
+        "mission-control-general/general-mission-control/OUTPUT-CONTRACTS.md",
+        "GLOSSARY.md"
+      ],
+      "best_rank": 1,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 1.0,
+      "set_recall": {
+        "concepts": 0.4,
+        "research": null,
+        "modules": 0.0,
+        "facts": 1.0
+      },
+      "found": {
+        "concepts": [
+          "precise-fork",
+          "recovery"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": [
+          "a fork is a snapshot plus a context packet plus a conversation seed"
+        ]
+      },
+      "strict_modules_found": [],
+      "pass": false
+    },
+    {
+      "id": "T005",
+      "kind": "task",
+      "partition": "heldout",
+      "critical": false,
+      "top10": [
+        "docs/knowledge/deep-agents-turn-stops.md",
+        "docs/knowledge/deep-agents-lane.md",
+        "docs/knowledge/agent-configuration.md",
+        "docs/knowledge/model-catalog.md",
+        "docs/adr/0063-one-resolution-seam-over-declared-lane-model-and-application-registries.md",
+        "docs/knowledge/log.md",
+        "docs/knowledge/interventions.md",
+        "docs/knowledge/mission-manifest.md",
+        "GLOSSARY.md",
+        "GLOSSARY.md"
+      ],
+      "best_rank": 2,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 0.5,
+      "set_recall": {
+        "concepts": 0.6,
+        "research": 0.0,
+        "modules": 0.0,
+        "facts": 1.0
+      },
+      "found": {
+        "concepts": [
+          "model-catalog",
+          "agent-configuration",
+          "deep-agents-lane"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": [
+          "routes resolve through one resolution seam over declared registries"
+        ]
+      },
+      "strict_modules_found": [],
+      "pass": false
+    },
+    {
+      "id": "T006",
+      "kind": "task",
+      "partition": "heldout",
+      "critical": false,
+      "top10": [
+        "docs/knowledge/async-children.md",
+        "mission-control-general/general-mission-control/MISSION_CONTROL_SYSTEM_PROPOSAL.md",
+        "docs/knowledge/lanes-and-harness.md",
+        "docs/knowledge/deep-agents-lane.md",
+        "mission-control-general/general-mission-control/RUNTIME-CONTRACTS.md",
+        "docs/adr/0063-one-resolution-seam-over-declared-lane-model-and-application-registries.md",
+        "docs/knowledge/agent-configuration.md",
+        "docs/knowledge/deep-agents-turn-stops.md",
+        "mission-control-general/workflow-types/05-EXECUTORS_AND_DURABLE_CONTROLS.md",
+        "mission-control-general/general-mission-control/SPECIFICATION.md"
+      ],
+      "best_rank": 3,
+      "hit_at_3": true,
+      "hit_at_10": true,
+      "rr": 0.3333333333333333,
+      "set_recall": {
+        "concepts": 0.4,
+        "research": null,
+        "modules": 0.0,
+        "facts": 1.0
+      },
+      "found": {
+        "concepts": [
+          "lanes-and-harness",
+          "deep-agents-lane"
+        ],
+        "research": [],
+        "modules": [],
+        "facts": [
+          "every lane follows the harness protocol"
+        ]
+      },
+      "strict_modules_found": [],
+      "pass": false
+    },
+    {
+      "id": "T007",
+      "kind": "task",
+      "partition": "heldout",
+      "critical": false,
+      "top10": [
+        "docs/specs/provider-consolidation-2026-10/sprint-oc/SESSION-CODEX-RESUME-2026-10-29.md",
+        "docs/specs/provider-consolidation-2026-10/sprint-oc/NEXT-SESSION.md",
+        "mission-control-general/workflow-types/01-STAGE_GRAPH.md",
+        "mission-control-general/workflow-types/00-EXECUTION_PROGRAM_MODEL.md",
+        "docs/knowledge/index.md",
+        "docs/adr/0054-the-mission-transcript-is-the-replayable-record.md",
+        "mission-control-general/workflow-types/03-PARALLEL_SWARM.md",
+        "docs/knowledge/evaluator-attempts.md",
+        "docs/knowledge/saved-result-settlement.md",
+        "mission-control-general/general-mission-control/OUTPUT-CONTRACTS.md"
+      ],
+      "best_rank": null,
+      "hit_at_3": false,
+      "hit_at_10": false,
+      "rr": 0.0,
+      "set_recall": {
+        "concepts": 0.0,
+        "research": 0.0,
+        "modules": 0.0,
+        "facts": 0.0
+      },
+      "found": {
+        "concepts": [],
+        "research": [],
+        "modules": [],
+        "facts": []
+      },
+      "strict_modules_found": [],
+      "pass": false
+    },
+    {
+      "id": "T008",
+      "kind": "task",
+      "partition": "heldout",
+      "critical": false,
+      "top10": [
+        "mission-control-general/general-mission-control/CODEBASE-ORGANIZATION.md",
+        "docs/adr/0002-one-service-two-applications-schema-per-app-database.md",
+        "mission-control-general/general-mission-control/VALIDATION.md",
+        "mission-control-general/general-mission-control/SPECIFICATION.md",
+        "mission-control-general/general-mission-control/DATABASE.md",
+        "mission-control-general/general-mission-control/README.md",
+        "mission-control-general/general-mission-control/IMPLEMENTATION.md",
+        "GLOSSARY.md",
+        "GLOSSARY.md",
+        "mission-control-general/general-mission-control/MISSION_CONTROL_SYSTEM_PROPOSAL.md"
+      ],
+      "best_rank": null,
+      "hit_at_3": false,
+      "hit_at_10": false,
+      "rr": 0.0,
+      "set_recall": {
+        "concepts": 0.0,
+        "research": null,
+        "modules": 0.0,
+        "facts": 1.0
+      },
+      "found": {
+        "concepts": [],
+        "research": [],
+        "modules": [],
+        "facts": [
+          "the common SQL lives only in the db-contract package"
+        ]
+      },
+      "strict_modules_found": [],
+      "pass": false
+    }
+  ]
+}

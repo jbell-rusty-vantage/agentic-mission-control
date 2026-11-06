@@ -1,0 +1,732 @@
+{
+  "schema": "mission-control-run2-planning-assessment-evidence/v1",
+  "assessment_only": true,
+  "created_at_utc": "2026-10-16T13:24:45.889257+00:00",
+  "source_root": "C:\\Users\\Pinda\\Proyectos\\BellLabs\\platform\\mission-control",
+  "models": {
+    "lead_required": "gpt-6.1-sol",
+    "reviewer_assigned": "gpt-6.1-sol",
+    "review_tasks": [
+      "managed wiring / recovery limits",
+      "Cursor usage normalization / current release",
+      "planning consistency"
+    ],
+    "max_concurrent_workers": 1
+  },
+  "baseline": {
+    "utc": "2026-10-16T13:06:46.6753401Z",
+    "branch": "mo/run2-integration",
+    "head": "a8d69c5b48506c6babcd7f3f74f0b92716423091",
+    "status": [
+      " M docs/knowledge/index.md",
+      " M docs/specs/materialization-observation-2026-10/runs/RUN-2-REPORT.md",
+      "?? docs/specs/materialization-observation-2026-10/issues/bash.exe.stackdump"
+    ],
+    "tracked_count": 3980,
+    "full_hash_inventory_sha256": "6e7192190b4c1507c0d35a230b0ad4c70fb85fb7a7e2841b60256b030d9690ba",
+    "full_hash_inventory_location": "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\mission-assessment-baseline.json"
+  },
+  "final": {
+    "utc": "2026-10-16T13:24:45.890520+00:00",
+    "branch": "mo/run2-integration",
+    "head": "a8d69c5b48506c6babcd7f3f74f0b92716423091",
+    "status": [
+      " M docs/knowledge/index.md",
+      " M docs/specs/materialization-observation-2026-10/runs/RUN-2-REPORT.md",
+      "?? docs/specs/materialization-observation-2026-10/issues/bash.exe.stackdump",
+      "?? docs/specs/materialization-observation-2026-10/runs/RUN-2-ASSESSMENT-EVIDENCE-2026-10-16.json",
+      "?? docs/specs/materialization-observation-2026-10/runs/RUN-2-COMPLETION-ASSESSMENT-2026-10-16.md",
+      "?? docs/specs/materialization-observation-2026-10/runs/RUN-2-COMPLETION-FINDINGS-2026-10-16.md",
+      "?? docs/specs/materialization-observation-2026-10/runs/RUN-2-COMPLETION-PLAN-2026-10-16.md",
+      "?? docs/specs/materialization-observation-2026-10/runs/RUN-2-SOL-EXECUTION-2026-10-16.md"
+    ],
+    "baseline_tracked_byte_changes": [],
+    "new_document_paths": [
+      "docs/specs/materialization-observation-2026-10/runs/RUN-2-COMPLETION-ASSESSMENT-2026-10-16.md",
+      "docs/specs/materialization-observation-2026-10/runs/RUN-2-COMPLETION-FINDINGS-2026-10-16.md",
+      "docs/specs/materialization-observation-2026-10/runs/RUN-2-COMPLETION-PLAN-2026-10-16.md",
+      "docs/specs/materialization-observation-2026-10/runs/RUN-2-SOL-EXECUTION-2026-10-16.md",
+      "docs/specs/materialization-observation-2026-10/runs/RUN-2-ASSESSMENT-EVIDENCE-2026-10-16.json"
+    ]
+  },
+  "checks": {
+    "pure_probes_and_release_files": {
+      "controller_probe": {
+        "method": "compile only cancel_is_needed AST; synthetic facts",
+        "start_or_cancel_calls": 0,
+        "phase_result": {
+          "pending": false,
+          "active": true,
+          "waiting": true,
+          "paused": true,
+          "cancelling": false,
+          "terminal": false
+        }
+      },
+      "usage_probes": {
+        "complete_native_total": {
+          "disposition": "estimated",
+          "input_tokens": 10,
+          "output_tokens": 5,
+          "total_tokens": 39,
+          "cost_micros_usd": null,
+          "cache_read_tokens": 20,
+          "cache_write_tokens": 4
+        },
+        "absent_total_with_caches": {
+          "disposition": "estimated",
+          "input_tokens": 10,
+          "output_tokens": 5,
+          "total_tokens": 15,
+          "cost_micros_usd": null,
+          "cache_read_tokens": 20,
+          "cache_write_tokens": 4
+        },
+        "cumulative_then_late_smaller_observation": {
+          "disposition": "estimated",
+          "input_tokens": 1,
+          "output_tokens": 2,
+          "total_tokens": 3,
+          "cost_micros_usd": null,
+          "cache_read_tokens": 0,
+          "cache_write_tokens": 0
+        },
+        "smaller_then_cumulative": {
+          "disposition": "estimated",
+          "input_tokens": 10,
+          "output_tokens": 5,
+          "total_tokens": 39,
+          "cost_micros_usd": null,
+          "cache_read_tokens": 20,
+          "cache_write_tokens": 4
+        }
+      },
+      "release_lock": {
+        "version": "1.4.2",
+        "root": "C:\\Users\\Pinda\\Proyectos\\BellLabs\\platform\\mission-control\\packages\\mission-control-db-contract\\releases\\1.4.2\\component",
+        "file_count": 41,
+        "mismatches": []
+      },
+      "limits": [
+        "No service, database, provider or actual-run observation",
+        "Usage order sensitivity is a synthetic risk; actual terminal-frame ordering was not re-read",
+        "No code, tests, migrations or deployment files changed"
+      ]
+    },
+    "drainer_pytest": {
+      "disposition": "passed",
+      "count": 7,
+      "warning_count": 1,
+      "test_duration_seconds": 1.16,
+      "outer_timeout_seconds": 60,
+      "capture": "assessment tool-result transcription, not a signed runtime receipt",
+      "selection": "tests/unit/signals/test_drainer.py",
+      "options": "-B --confcutdir=tests/unit/signals -p pytest_asyncio.plugin -p no:cacheprovider -o addopts=; PYTEST_DISABLE_PLUGIN_AUTOLOAD=1; tracing disabled; private basetemp",
+      "warning": "Unknown config option timeout because timeout plugin disabled; outer subprocess bound used",
+      "first_attempt": "sandboxed startup stalled, no test result; only exact owned child PID4872/parent17448 and command/temp identity verified then stopped; bounded unsandboxed read-access retry passed"
+    },
+    "metadata_versions": {
+      "pytest": "8.4.2",
+      "pytest-asyncio": "1.4.0",
+      "pydantic": "2.13.4",
+      "temporalio": "1.34.0",
+      "psycopg": "3.3.4",
+      "cursor-sdk": "1.0.37",
+      "claude-agent-sdk": "0.2.165",
+      "openai": "2.44.0"
+    },
+    "unrun": [
+      "live database/native/AWS/Temporal observation",
+      "provider model experiments",
+      "real CLI jobs",
+      "PostgreSQL/Temporal/replay suites",
+      "broad lint/type/unit/conformance/release suites"
+    ]
+  },
+  "retained_receipt_summaries": {
+    "saved_migration_verification": {
+      "component_version": "1.4.2",
+      "migration_count": 37,
+      "schema_fingerprint": "sha256:1d6dcd1a96b44b7c3635ffd34cec7703703160b04bf52c24643157c72a472cc3",
+      "status": "verified",
+      "identity_verified": true,
+      "attestation_verified": true,
+      "schema_fingerprint_verified": true
+    },
+    "saved_native_tail": {
+      "observed_at": "2026-10-16T08:29:53.726744+00:00",
+      "stored_status": "FINISHED",
+      "finished_at": "2026-10-16T08:20:51.998Z",
+      "result_bytes": 2946,
+      "result_sha256": "2e4aac0d29aae546e783667baef26ec7850b3f34586d62908f1f66171e194a7c",
+      "recognized_counters": {
+        "inputTokens": 456013,
+        "outputTokens": 14072,
+        "cacheReadTokens": 417705,
+        "cacheWriteTokens": 38280,
+        "totalTokens": 926070
+      }
+    },
+    "saved_cancellation": {
+      "http_status": 202,
+      "run_id": "60f44a50-c0e4-5edb-ac13-0fb0436aaedb",
+      "status": "accepted",
+      "resulting_run_version": 5,
+      "phase": "cancelling",
+      "terminal_outcome": null,
+      "recorded_at": "2026-10-16T08:25:24.301266Z"
+    },
+    "saved_cloud_shutdown": {
+      "phase": "stopped_verified",
+      "desired": 0,
+      "running": 0,
+      "pending": 0
+    }
+  },
+  "official_docs_checked_utc": "2026-10-16",
+  "official_docs": [
+    "https://cursor.com/docs/sdk/typescript",
+    "https://platform.claude.com/docs/en/managed-agents/budgets",
+    "https://platform.claude.com/docs/en/managed-agents/session-observability",
+    "https://developers.openai.com/api/docs/guides/agents-api/overview"
+  ],
+  "research_limits": [
+    "Firecrawl developer index returned official passages; scrape failed DNS, official web fallback succeeded",
+    "Current manuals do not certify pinned installed behavior/account access",
+    "All saved receipts are historical observations; current shared runtime state was not queried"
+  ],
+  "independent_review": {
+    "model": "gpt-6.1-sol",
+    "disposition": "Planning set suitable for owner review of offline correction wave; native actions remain gated",
+    "correction_applied": "ASCII dependency arrows/comparator and spacing in execution prompt",
+    "limits": "Reviewer did not independently revalidate all 40 dependency mappings; exact mapping was checked programmatically against issues.json"
+  },
+  "document_validation": {
+    "markdown_files": 4,
+    "issue_count": 40,
+    "exact_issue_dependency_match": true,
+    "link_fence_control_character_errors": []
+  },
+  "repository_document_checks": {
+    "agents_docs_index": {
+      "exit_code": 0,
+      "result": "current; no generated write required because runs are outside indexed groups"
+    },
+    "okf": {
+      "exit_code": 0,
+      "stdout": "OKF structure valid: 45 concept document(s) in C:\\Users\\Pinda\\Proyectos\\BellLabs\\platform\\mission-control\\docs\\knowledge\n",
+      "stderr": ""
+    },
+    "tracked_diff_check": {
+      "exit_code": 2,
+      "trailing_whitespace_count": 179,
+      "paths": [
+        "docs/specs/materialization-observation-2026-10/runs/RUN-2-REPORT.md"
+      ],
+      "disposition": "pre-existing dirty report preserved; original tracked hashes unchanged"
+    }
+  },
+  "context_only_pins": [
+    {
+      "path": "C:\\Users\\Pinda\\Proyectos\\BellLabs\\platform\\MISSION-CONTROL-NEXT-STAGE-CONTRACT-DESIGN-2026-10-16.md",
+      "sha256": "5b50734156684152a241b60e84ca6c8a32564990530800ecef4834891e81292c"
+    },
+    {
+      "path": "C:\\Users\\Pinda\\Proyectos\\BellLabs\\platform\\MISSION-CONTROL-NEXT-STAGE-EVIDENCE-2026-10-16.md",
+      "sha256": "4d13304e8dc27a16dbfdc439d1b7b96604eaaa1eb1932d4cf52afd680dcb36d7"
+    }
+  ],
+  "probe_script": {
+    "path": "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\assessment_checks.py",
+    "sha256": "225417564657d960a2f506c544be56fed7d2acf95aa9514790863030535962c1"
+  },
+  "inspected_pins": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "23372c46990b1ccc7d0dd6b9e8b8c47618fbda90e910aa8cfbfe59c5b0d05e7f",
+      "bytes": 15633
+    },
+    {
+      "path": "docs/AGENTS.md",
+      "sha256": "f915e2ee67f97f9f4b7111afc66ab13225baaef9cbd72842469f355b61194a64",
+      "bytes": 1133
+    },
+    {
+      "path": "mission-control-general/general-mission-control/SPECIFICATION.md",
+      "sha256": "8e1ae9cee5e9e95cf63c5bd8887bfb41c0beddd2b8e5513bdc98ccca2082625b",
+      "bytes": 49506
+    },
+    {
+      "path": "mission-control-general/general-mission-control/RUNTIME-CONTRACTS.md",
+      "sha256": "4fb1dbade485fa5300db67943683f671c7ad6e1d949b2c978a274e68cb381244",
+      "bytes": 27362
+    },
+    {
+      "path": "docs/specs/materialization-observation-2026-10/SPRINT.md",
+      "sha256": "53a94c261a24afa4c2b21948dd4873a8cfb75027f362a9898aaa048759926112",
+      "bytes": 13427
+    },
+    {
+      "path": "docs/specs/materialization-observation-2026-10/DECISIONS.md",
+      "sha256": "19d744bda5c36a17e6ac83a99082cbb5b68b60cef13ba81e3db54d2ac297241f",
+      "bytes": 21287
+    },
+    {
+      "path": "docs/specs/materialization-observation-2026-10/PLAN.md",
+      "sha256": "a1ea2818b7f1c0646fe16d1920951bae54a5ebef2183ed6076cec5db1a0be231",
+      "bytes": 7868
+    },
+    {
+      "path": "docs/specs/materialization-observation-2026-10/TEAM-WORKSPACE.md",
+      "sha256": "b7ff26d923ee06e9d290e2d8ae62007d6d1e1747832e19a76db19de29f264c88",
+      "bytes": 14841
+    },
+    {
+      "path": "docs/specs/materialization-observation-2026-10/issues.json",
+      "sha256": "6ba95a51bcdbe4973167443b69e71b377cc4169a226b12567a8cfff01e3b289d",
+      "bytes": 182044
+    },
+    {
+      "path": "docs/specs/materialization-observation-2026-10/SPEC-07-cursor-maturity.md",
+      "sha256": "eb5e3f8f121c4ed12e02fc0c5cfe096985047035124ecb87047f9dc9e4ee9fea",
+      "bytes": 7898
+    },
+    {
+      "path": "docs/specs/materialization-observation-2026-10/SPEC-08-local-cli-skills.md",
+      "sha256": "fe76fcf2d6b842cf443168803750f9f64848936b358e4df092199abf681bdbfa",
+      "bytes": 17600
+    },
+    {
+      "path": "docs/specs/materialization-observation-2026-10/SPEC-09-local-harness-path.md",
+      "sha256": "5f9cf06557751279fda73f4da108fcee01c7bf9f75dc7b499b1897456fbbf621",
+      "bytes": 10971
+    },
+    {
+      "path": "docs/specs/materialization-observation-2026-10/SPEC-10-ingress-on-vercel.md",
+      "sha256": "04b2f36997fb2568f9719aac39c3da4cda1425e345e63b586115aba8d8e30931",
+      "bytes": 12213
+    },
+    {
+      "path": "docs/specs/materialization-observation-2026-10/SPEC-11-remote-worker-on-aws.md",
+      "sha256": "e065b48eb78b665096fd053e0257e8d068994334db97e4b0cec2b74e51404220",
+      "bytes": 15566
+    },
+    {
+      "path": "docs/specs/materialization-observation-2026-10/runs/RUN-2-REPORT.md",
+      "sha256": "320627c1b5d4aec9ba74e33565a8fb9ccbe7d3218f847ccc32dad3e093adca35",
+      "bytes": 162782
+    },
+    {
+      "path": "docs/specs/materialization-observation-2026-10/runs/RUN-2-PLANNING-AMENDMENTS.md",
+      "sha256": "6fdd90cd42cc072941ec921c3eddde67c8497aecb1e458eb9b79e46e51acd293",
+      "bytes": 10482
+    },
+    {
+      "path": "docs/specs/materialization-observation-2026-10/runs/RUN-2-OPENAI-ARCHITECTURE.md",
+      "sha256": "4c8f8da12bbb16d2ddeb5c9d832c4a115975cbdc0911030329282cc1364c1b9a",
+      "bytes": 6657
+    },
+    {
+      "path": "docs/specs/materialization-observation-2026-10/runs/RUN-2-AGENT-TEAM-KICKOFF.md",
+      "sha256": "4074965e96fd93bf2b76e40ba2b96d41be69d8c884ce384eaecdb7045e5a641f",
+      "bytes": 16400
+    },
+    {
+      "path": "docs/knowledge/index.md",
+      "sha256": "89cf1e3d520539109f9ec9b1b29e9f389c55ea8849c89bec6b21380f046c126d",
+      "bytes": 8650
+    },
+    {
+      "path": "src/mission_control/application/execution/harness/cursor_usage.py",
+      "sha256": "29cde660d55d5b26b4f6cbe2480ed044fc0a5f06467e7fcaaacc70136f24d501",
+      "bytes": 4265
+    },
+    {
+      "path": "src/mission_control/application/execution/harness/cursor_costs.py",
+      "sha256": "d5924203b1f0d50f80ff5ef229a215a63a49bb882b515be8685fecc30c68f734",
+      "bytes": 5622
+    },
+    {
+      "path": "src/mission_control/application/execution/harness/lane_turns.py",
+      "sha256": "ce20cae335cf88ac3d384af015fc35d3cb247bf45452991a84267a623b7f889b",
+      "bytes": 153318
+    },
+    {
+      "path": "src/mission_control/application/execution/harness/describe.py",
+      "sha256": "66c3a65facf44c5577fbee5b940e54feb6a73950b83bc823e713fca5db83032f",
+      "bytes": 33262
+    },
+    {
+      "path": "src/mission_control/application/execution/harness/budget_controls.py",
+      "sha256": "ebf7692e021732bde37814d6627879b8f3ca5a177a1ea45bf4b785bb872e5056",
+      "bytes": 15635
+    },
+    {
+      "path": "src/mission_control/application/execution/harness/dispatch.py",
+      "sha256": "776bbf66af843235ed02e8718dbb4cf16170de1cb16c15a0910a0519efe326bf",
+      "bytes": 12759
+    },
+    {
+      "path": "src/mission_control/application/execution/harness/protocol.py",
+      "sha256": "9d98fd5eb5c6b7b9dfe139efdf85b66ab3b1e5a15ea2a84150b115fba85a926d",
+      "bytes": 8124
+    },
+    {
+      "path": "src/mission_control/adapters/cursor/bridge.py",
+      "sha256": "e9e5b83b77dc85be361c8cc6aad8949a50b40106c809f4c598ad3868730ca48e",
+      "bytes": 23762
+    },
+    {
+      "path": "src/mission_control/adapters/cursor/bridge_spawn.py",
+      "sha256": "1dce9e0ff5a2eb903ed00710de332cfac43e8da6e19b913a6e91c3874dec9605",
+      "bytes": 12394
+    },
+    {
+      "path": "src/mission_control/adapters/cursor/frames.py",
+      "sha256": "ff9a56e0a9a84c497ff17424776e42d3d4ec08ca4a79d78147be3b9c0d6895fb",
+      "bytes": 9965
+    },
+    {
+      "path": "src/mission_control/adapters/cursor/cloud.py",
+      "sha256": "15ed6132c1739d17d97e0e7bfb2855f727d62ea44d4554f1c375762fb2279864",
+      "bytes": 71366
+    },
+    {
+      "path": "src/mission_control/adapters/cursor/local.py",
+      "sha256": "24aed84b056f0ef830aa7acfe59a6d6393f2c637d9ae161c0727f0d2bba23567",
+      "bytes": 58612
+    },
+    {
+      "path": "src/mission_control/adapters/remote_session/usage.py",
+      "sha256": "d94d4607cc343bc093563cda5b143a2736d2fdcdf505f9adb022d3ea754be82b",
+      "bytes": 1676
+    },
+    {
+      "path": "src/mission_control/adapters/anthropic_managed/harness.py",
+      "sha256": "c5da2b01b38240ac96d14f82836c517d3157c7e07f983509685e9a93311228bc",
+      "bytes": 40217
+    },
+    {
+      "path": "src/mission_control/adapters/temporal/workflows/stagegraph.py",
+      "sha256": "ab53655e59846a9a63b8781a0947ff3486eeb08b7a5237256a31c2175b011f06",
+      "bytes": 74888
+    },
+    {
+      "path": "src/mission_control/adapters/temporal/workflows/goal_directed.py",
+      "sha256": "d61fbd0b44e7a2a000dba546c69177a06542da8cdb4cacdd100f013c9a596e13",
+      "bytes": 96536
+    },
+    {
+      "path": "src/mission_control/adapters/temporal/workflows/budget_controls.py",
+      "sha256": "83c042c38e54d13e53aff17fc9c8d9c4778c48d91831384f20a5021859a03d63",
+      "bytes": 3504
+    },
+    {
+      "path": "src/mission_control/adapters/temporal/activities/lane_turn.py",
+      "sha256": "78faf7fedf6b82250587aede8426fd0b201268e02ecc3fb6e4028271affae2c3",
+      "bytes": 11344
+    },
+    {
+      "path": "src/mission_control/adapters/temporal/deployment_composition.py",
+      "sha256": "309a829502a8021829e950f84557a97d9d3fd15bae7e33fd456561f32d8cdabb",
+      "bytes": 72086
+    },
+    {
+      "path": "src/mission_control/adapters/temporal/closed_workflow.py",
+      "sha256": "7b7418b205f621f5d166c27b0c292a63652ebd3ca1a4c9841e63e3e0f26210d2",
+      "bytes": 15650
+    },
+    {
+      "path": "src/mission_control/adapters/postgres/closed_workflow.py",
+      "sha256": "2b2de36826fc68df02f6037f7f1ec83a388235e1edca6313f9a11e1c1c423a93",
+      "bytes": 16366
+    },
+    {
+      "path": "src/mission_control/application/recovery/closed_workflow.py",
+      "sha256": "7e7c97c73b7b2f4d85446cedc827b2fc4bd998e6dfae9f61918ea0d7e059627c",
+      "bytes": 14247
+    },
+    {
+      "path": "src/mission_control/application/subscriptions/launcher.py",
+      "sha256": "0c2674a43ba847e64224e0b42498eb2d28730458509146c70f00ffb6bae7441b",
+      "bytes": 2524
+    },
+    {
+      "path": "src/mission_control/application/subscriptions/coordinator_service.py",
+      "sha256": "1cbce7744e4c8db45cda49339817a2e796d7dc73886f4a666f9f39301986f5b0",
+      "bytes": 34597
+    },
+    {
+      "path": "src/mission_control/application/subordinates/service.py",
+      "sha256": "af35b7e085da39256e232751d37ae4820ab69d4357ccdf8d3d3b017bdc0b44ff",
+      "bytes": 78727
+    },
+    {
+      "path": "src/mission_control/application/context/fork_context.py",
+      "sha256": "ee2cf6c406459a5054217a869cfbac35ed9992ecc60d60f40cebf038602e7d7b",
+      "bytes": 3286
+    },
+    {
+      "path": "src/mission_control/application/context/lane_continuation.py",
+      "sha256": "28814af692d318d901b668cedd66f84156d614ad5fb51af0cb88b17c3491ea47",
+      "bytes": 8688
+    },
+    {
+      "path": "src/mission_control/application/recovery/run_forks.py",
+      "sha256": "762c778f64059033d9e22a2f39167d11f39c840a8641729e7cd47d96b2a04cb5",
+      "bytes": 64565
+    },
+    {
+      "path": "src/mission_control/bootstrap/binding_summary.py",
+      "sha256": "c97916e6cd76c19572fb3438a49eae06bd74a9bc0ceea676dfd8f396c1dd0cc8",
+      "bytes": 3514
+    },
+    {
+      "path": "src/mission_control/application/signals/drainer.py",
+      "sha256": "3b777b07587dafe6529387c83773d7d4b202f0729593f69294acf909058226fc",
+      "bytes": 7148
+    },
+    {
+      "path": "src/mission_control/application/signals/wake.py",
+      "sha256": "bc5af45eca54ba31e9bab37d535ffc209ca6c059d2af8e2810c7da9a6238429b",
+      "bytes": 2372
+    },
+    {
+      "path": "src/mission_control/application/signals/artifacts.py",
+      "sha256": "6a516f94e2b8f05dd941ed6335c593aabc1dfb3f8becb6daa9c7c3745cf2f1f4",
+      "bytes": 4813
+    },
+    {
+      "path": "tests/unit/runtime/test_run2_cursor_usage.py",
+      "sha256": "fa809325436bc3a71f8ffcc0d6378c1795de55411d543e2b0afe6b22eb13ca0e",
+      "bytes": 12560
+    },
+    {
+      "path": "tests/unit/cursor/test_run2_cost.py",
+      "sha256": "616ba55701c432c2a74af449276a848267237d107601d7ef0c87348ac25a7ad5",
+      "bytes": 9549
+    },
+    {
+      "path": "tests/unit/cursor/test_run2_bridge.py",
+      "sha256": "7a167f8c90ae5ba5ab6508f1753d041aba224345c687035aa8cd141fa26697a6",
+      "bytes": 9110
+    },
+    {
+      "path": "tests/unit/signals/test_drainer.py",
+      "sha256": "b2255ad0236cf854aec38dc567ba02ccffd8289019fbbbea4e7094dfd29766f4",
+      "bytes": 5043
+    },
+    {
+      "path": "tests/unit/signals/test_artifact_custody.py",
+      "sha256": "cd7e62805e7f4cceec6ca0f67ebf324e9f2adad0b9c6ad22246254a9ecb60e10",
+      "bytes": 4615
+    },
+    {
+      "path": "tests/unit/subscriptions/test_mo43_wake_channels.py",
+      "sha256": "3f1458ea7dd85f88e12eab7d8d9590da2f278d01e3bd03d148380521e165091f",
+      "bytes": 26287
+    },
+    {
+      "path": "tests/unit/operations/test_checkpoint_recovery_classification.py",
+      "sha256": "ac4b70b8bccc2773857324621951ffed8fa42ec2a50cce7d0fd1bd92fd0f1cf4",
+      "bytes": 54720
+    },
+    {
+      "path": "tests/unit/integrations/test_async_subagent_submission_fence.py",
+      "sha256": "0e05f6fac16a4cd42a543709e9dc0fcceefdd9743190cad3eb01d1618e604be5",
+      "bytes": 46080
+    },
+    {
+      "path": "tests/unit/context/test_fork_conversation_custody.py",
+      "sha256": "98831d2669e6870f911bb9f3597be1da9c4c5c01fc1e5d793d103f352935fe7f",
+      "bytes": 9257
+    },
+    {
+      "path": "tests/integration/temporal/test_managed_budget_families.py",
+      "sha256": "846628e92ff113618542bb4010115891e95bb0190937a85f36ccc3f4813e7c3a",
+      "bytes": 14304
+    },
+    {
+      "path": "tests/integration/temporal/test_remote_mission_admission.py",
+      "sha256": "a07d5ec42ad13964fffa1147c836cb0c616e77015056436155bd8cd64363d3d6",
+      "bytes": 18876
+    },
+    {
+      "path": "deployments/ai-engineer/release.lock.json",
+      "sha256": "df0d714edc297917875552c81455dfbdcbcb9bddd06d5b1aa736d1327e3f9409",
+      "bytes": 5383
+    },
+    {
+      "path": "packages/mission-control-db-contract/component/manifest.json",
+      "sha256": "7ba8ec65917f99e8d16feb5c93835fe2495d82dee942327d06c33ee23b3b84d1",
+      "bytes": 10067
+    },
+    {
+      "path": "packages/mission-control-db-contract/releases/1.4.2/component/manifest.json",
+      "sha256": "4953934315aad0804d74d0ace4277b9b43f211adcd265810126ab02f0083d892",
+      "bytes": 10914
+    },
+    {
+      "path": ".scratch/materialization-observation-2026-10/run2/resumed/SESSION-END-2026-10-16-MISSION-HANDOFF.md",
+      "sha256": "a8ce3a8d6665b27309ea45191b1f2ff5f9bd8fc7debf032a7101567f3b8a7710",
+      "bytes": 32148
+    },
+    {
+      "path": ".scratch/materialization-observation-2026-10/run2/resumed/SESSION-END-2026-10-16-MULTI-PROVIDER-SURVEY.md",
+      "sha256": "29a81f849a9b552352576fecc8c8f8389924abae5a9c5f7f40300123d6bd8ff7",
+      "bytes": 45494
+    },
+    {
+      "path": ".scratch/materialization-observation-2026-10/run2/resumed/cursor-next-preparation/a8d69-successor-preparation/identity-recovery-preparation/recovery-v3/controller/control_cursor_a8.py",
+      "sha256": "82981f0ae544eca63b216756ed819635d078f29f572732f02b065a34397ecc3c",
+      "bytes": 33155
+    },
+    {
+      "path": ".scratch/materialization-observation-2026-10/run2/resumed/cursor-next-preparation/a8d69-successor-preparation/identity-recovery-preparation/observer/bridge_ownership.py",
+      "sha256": "591da1cfe1d47b06cb120853c427a86874b3cb56087ba2919150649d26a7def9",
+      "bytes": 13812
+    },
+    {
+      "path": ".scratch/materialization-observation-2026-10/run2/resumed/live-apply-142/verify-receipt.json",
+      "sha256": "d98554d856af7431bdc8bf3814c54fc7b8c4cf9bc7c14d6a53a7d2e0d64adab0",
+      "bytes": 1132
+    },
+    {
+      "path": ".scratch/materialization-observation-2026-10/run2/resumed/live-apply-142/completed.json",
+      "sha256": "3889325d8bd70910bbc160d66a4c06ca32278076ffd882e8677c365e991729f6",
+      "bytes": 8825
+    },
+    {
+      "path": ".scratch/materialization-observation-2026-10/run2/resumed/cursor-next-preparation/a8d69-successor-preparation/identity-recovery-preparation/post-start-containment-1/normal-cancel-result.json",
+      "sha256": "69096129d3785717cb871e2a28c5cb58db8c7748b2539a4d9be97c645ce1a2de",
+      "bytes": 3928
+    },
+    {
+      "path": ".scratch/materialization-observation-2026-10/run2/resumed/cursor-next-preparation/a8d69-successor-preparation/identity-recovery-preparation/post-start-containment-1/after-normal-inspection.json",
+      "sha256": "99c2ea3a47c7ab18c022e0d946fb2a2bcad03d227c72b3db4c05159090e45280",
+      "bytes": 4308
+    },
+    {
+      "path": ".scratch/materialization-observation-2026-10/run2/resumed/cursor-next-preparation/a8d69-successor-preparation/identity-recovery-preparation/post-start-containment-1/bridge-root-stop.json",
+      "sha256": "283f2d2f8f4900b4c1879af711ab86c5e4531bf5c80989cf100db94641889234",
+      "bytes": 754
+    },
+    {
+      "path": ".scratch/materialization-observation-2026-10/run2/resumed/cursor-next-preparation/a8d69-successor-preparation/identity-recovery-preparation/post-start-containment-1/post-stop-native-audit-1792139310943252100.sanitized.json",
+      "sha256": "bf60b16d81e7165e3c5c7db3f4aec01b9e0c39bbd8a80f6294d4c5116b91fd6c",
+      "bytes": 1322
+    },
+    {
+      "path": ".scratch/materialization-observation-2026-10/run2/resumed/cursor-next-preparation/a8d69-successor-preparation/identity-recovery-preparation/post-start-containment-1/native-helper-tail-1792139393748855200.sanitized.json",
+      "sha256": "041bc89645b1861d2780428379932a9bd4a5e4086b6f682773dbc77c3cbaa043",
+      "bytes": 59376
+    },
+    {
+      "path": ".scratch/materialization-observation-2026-10/run2/resumed/cursor-next-preparation/a8d69-successor-preparation/identity-recovery-preparation/cloud-v3/shutdown-1792139168278236500.sanitized.json",
+      "sha256": "74a2dc4b6ec47a0b302602b158b4d98a75b10da4122fabeef9a7b421c6d64eb2",
+      "bytes": 854
+    }
+  ],
+  "planning_documents": [
+    {
+      "path": "docs/specs/materialization-observation-2026-10/runs/RUN-2-COMPLETION-ASSESSMENT-2026-10-16.md",
+      "sha256": "37c89585b645afdc1ff04a72d42b3a899342571e76d9c3e2dfd08adc559873c9"
+    },
+    {
+      "path": "docs/specs/materialization-observation-2026-10/runs/RUN-2-COMPLETION-FINDINGS-2026-10-16.md",
+      "sha256": "e98e1e08c63e0b35702a35022f116b2938a42ca22210013f6c9d83bc4682fe60"
+    },
+    {
+      "path": "docs/specs/materialization-observation-2026-10/runs/RUN-2-COMPLETION-PLAN-2026-10-16.md",
+      "sha256": "29e882363d2969f5b6fc7ff95538d62f9d8995a72ebc1d39ba60ddafa66a1493"
+    },
+    {
+      "path": "docs/specs/materialization-observation-2026-10/runs/RUN-2-SOL-EXECUTION-2026-10-16.md",
+      "sha256": "b2ce3655f44fcdb1c0965c491c21ec857d283419792aeebf6a137b207e6ac0b6"
+    }
+  ],
+  "scope_limits": [
+    "No application/test/migration/deployment settings/runtime state edits",
+    "No commits/pushes/live mutations/service restarts/paid inference",
+    "Baseline-tracked files compared by SHA256; expected deliverables are new planning files only",
+    "Ignored private trees were not exhaustively snapshotted; only selected inspected receipts/helpers pinned",
+    "Git status/worktree/byte sampling is not an atomic filesystem snapshot"
+  ],
+  "manual_follow_on_documentation": {
+    "added_at_utc": "2026-10-16T14:00:32.505009+00:00",
+    "local_draft_path": ".scratch/agent-facing-consolidation-follow-on/issues/01-agent-facing-mission-control-consolidation.md",
+    "sha256": "8890b254f3180ad99e7af9551ec99ba98404fbfd8b26c306c78061faeb110033",
+    "status": "NOT SCHEDULED / MANUAL FOLLOW-ON",
+    "user_sequence": "AFTER the current sprint; separate explicit manual initiation",
+    "effect": "Documentation only. No change to W0-W10 bodies, graph, current issue membership/dependencies, gates or scheduling.",
+    "knowledge_services_implementation": "excluded",
+    "narrow_cli_source_pins": [
+      {
+        "path": "pyproject.toml",
+        "sha256": "cab9352465822bc6f2f0cbe0a0f30517bb54f050e80fed53b9ed94464c3c8e1f"
+      },
+      {
+        "path": "Makefile",
+        "sha256": "3f66a3c4af058d1fad13e25e90d790e59f750a42a1b4f2fa1bb83481f28de7a3"
+      },
+      {
+        "path": "src/mission_control/interfaces/cli/main.py",
+        "sha256": "c6c02764a2f00dd4742f337524f0b49a1960db16b25a29bde7bf2488d6167688"
+      },
+      {
+        "path": "src/mission_control/interfaces/cli/__main__.py",
+        "sha256": "c11a4e62a0587ac240a2f4ed01e52536dc8e86c0c081b99c35803b5048e0443d"
+      },
+      {
+        "path": "src/mission_control/interfaces/cli/token.py",
+        "sha256": "3d897e1c70dc3e4ca2827ba8b6ff9717d39e889e484bb90a9da31c3a7b911fc7"
+      },
+      {
+        "path": "src/mission_control/interfaces/cli/setup.py",
+        "sha256": "a5f1dfc7dbe5162192009f5512bf20a9d6ab8f181a147869cd7f270e4499282e"
+      },
+      {
+        "path": "src/mission_control/interfaces/mcp/operator_server.py",
+        "sha256": "2371e223849465c5247224a43fa3e54b09cce70d1109f57b6dd4fceffd0d16e2"
+      },
+      {
+        "path": "src/mission_control/interfaces/mcp/coordinator_server.py",
+        "sha256": "fcfa7d78e45943f7792bc139420f0882001832230ba411e35cb0fb33c091a628"
+      },
+      {
+        "path": "src/mission_control/interfaces/mcp/__main__.py",
+        "sha256": "ed961410d0e7c18f3f224ae71956cf3e786db8666cf9251ee5b62fb1e91c9ba1"
+      },
+      {
+        "path": "skills/mission-control/SKILL.md",
+        "sha256": "c22a75c12e4b7485f26e53c63609a1753956dc60b24d8bf96537be0c41b6e75c"
+      },
+      {
+        "path": ".agents/skills/mission-control-coordinator/SKILL.md",
+        "sha256": "e0d29e37f2f2452b600cec99745298e440c47bd8188ba8f65c9cd44a755646ea"
+      }
+    ],
+    "protected_execution_file_pins": [
+      {
+        "path": "docs/specs/materialization-observation-2026-10/issues.json",
+        "sha256": "6ba95a51bcdbe4973167443b69e71b377cc4169a226b12567a8cfff01e3b289d"
+      },
+      {
+        "path": "docs/specs/materialization-observation-2026-10/SPRINT.md",
+        "sha256": "53a94c261a24afa4c2b21948dd4873a8cfb75027f362a9898aaa048759926112"
+      },
+      {
+        "path": "docs/specs/materialization-observation-2026-10/PLAN.md",
+        "sha256": "a1ea2818b7f1c0646fe16d1920951bae54a5ebef2183ed6076cec5db1a0be231"
+      },
+      {
+        "path": "docs/specs/materialization-observation-2026-10/TEAM-WORKSPACE.md",
+        "sha256": "b7ff26d923ee06e9d290e2d8ae62007d6d1e1747832e19a76db19de29f264c88"
+      },
+      {
+        "path": "docs/specs/materialization-observation-2026-10/ISSUES.md",
+        "sha256": "c6aabae42e3bc74bf7b5687b9bb3c330e3195f989e77b866e71cae9c65f257bd"
+      }
+    ]
+  }
+}

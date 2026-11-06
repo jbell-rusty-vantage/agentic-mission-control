@@ -1,0 +1,22 @@
+---
+description: Mission Control source ownership and navigation
+globs: src/mission_control/**/*.py,tests/**/*.py
+alwaysApply: false
+---
+
+# Source placement
+
+Use AGENTS.md and docs/knowledge/mission-control.md for the module map.
+Under src/mission_control:
+
+| Group | Ownership |
+| --- | --- |
+| contracts | Public wire models and contract vocabulary |
+| domain | Pure invariants, interpreters and deterministic decisions |
+| application | Admission, commands, use cases and ports |
+| adapters | PostgreSQL, Temporal, bounded harnesses and SDKs |
+| interfaces | HTTP/MCP/CLI transport |
+| bootstrap | Trusted configuration, wiring and entrypoints |
+
+Do not duplicate contracts or schedulers. Domain cannot import provider SDKs.
+Preserve behavior using reducer, persistence and runtime tests.

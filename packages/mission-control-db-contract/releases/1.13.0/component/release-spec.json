@@ -1,0 +1,88 @@
+{
+  "component": "mission_control",
+  "component_version": "1.13.0",
+  "installer_protocol": "mission-control-sql/v2",
+  "owned_schemas": [
+    "mission_control",
+    "mission_control_search"
+  ],
+  "postgres_major": 17,
+  "min_postgres_version": 170000,
+  "required_extensions": [
+    {
+      "name": "vector",
+      "schema": "extensions",
+      "required_by": [
+        "mission_control_search"
+      ]
+    },
+    {
+      "name": "pg_trgm",
+      "schema": "extensions",
+      "required_by": [
+        "mission_control_search"
+      ]
+    }
+  ],
+  "supported_reader_versions": [
+    "mission-control-runtime/1"
+  ],
+  "supported_writer_versions": [
+    "mission-control-runtime/1"
+  ],
+  "runtime_roles": [
+    "mission_control_runtime",
+    "mission_control_family_writer",
+    "mission_control_catalog_writer",
+    "mission_control_outbox_worker",
+    "mission_control_readonly",
+    "mission_control_ingress"
+  ],
+  "compatible_previous_fingerprints": [
+    "sha256:ef5a9e71c9c4a4fe23f343a5708c476a757bc1c5a61f9aacae3a76577b209c09",
+    "sha256:7da7567a7e9c547015e9f9add3769720a42ad18b6c47e11017dcb416998989ac",
+    "sha256:0113df03978540d777c5be712d8b17e0f3d2a3f98245cd8fd7661cef7f6b5d23",
+    "sha256:3154fa8d02008f337b6baf81cc58a962d9c71d1aff7963f62fd599012c02cc5c",
+    "sha256:b3e35a34c99bbcfbe48a02333737940dc917d073154491d962bb764e9f0ee1ce",
+    "sha256:e92a2562185c280db9eedf4fa9faef074e00d901a306a67236076be2720b1b93",
+    "sha256:1d6dcd1a96b44b7c3635ffd34cec7703703160b04bf52c24643157c72a472cc3",
+    "sha256:9e8297f71de8a58c6cbe3c821ee6ac99795e44fdfd170eca1b099dc17157fb54",
+    "sha256:dcb652ba8f50b17f47164f46896a9de0ed5bed669dccf284abf7e5191e92aa03",
+    "sha256:e18dc014f5c1b3a22d661da44356156ff1e2c0c24fae89275ab7ab96003d79d4",
+    "sha256:7eddd43091ffce59c0e719e7705097d6f5d4bd635e632ca1cab366bddcfeadcf",
+    "sha256:ee099c2994f6acc91aa5b91427c3ef1e5ff235abd4b00fc675e3b4193c3164ba",
+    "sha256:e2e8e6b8074ae98b7576cb06f36b7d8962bc4505a7ea51b7d816eb0142cba059",
+    "sha256:786f3aa9d2908f65ecacc4d0b17886c1029216db4fc95b8c0a874cb1573651ba",
+    "sha256:0ec08735ca9265dc97f30409b3d0008eccc4edf1deca63e163b9890582dba223",
+    "sha256:de10791b71f556e0a8761a3e6c298108452a96c2ae66ad31fb33b45dee9efd95",
+    "sha256:729c2e9dc10701da5113114004fd0378a3053776de219dd5e899d64404834cce"
+  ],
+  "seed_compatibility": {
+    "bundle_format": "mission-control-seed/v1",
+    "component_range": ">=1.0.0 <2.0.0",
+    "seed_keys": [
+      "mc.installation",
+      "mc.catalog.workflow-parity",
+      "mc.catalog.runtime-profiles",
+      "mc.catalog.approved-assets",
+      "mc.app.bindings",
+      "mc.qualification.parity",
+      "mc.catalog.agent-capabilities",
+      "mc.app.biotech.agent-capabilities",
+      "mc.app.ai-engineer.agent-capabilities",
+      "mc.storage.capability-bundles",
+      "mc.app.biotech.agent-skills",
+      "mc.app.ai-engineer.agent-skills",
+      "mc.app.biotech.cognition-profiles",
+      "mc.app.biotech.environment-kits",
+      "mc.app.biotech.signal-skills",
+      "mc.app.biotech.watchers",
+      "mc.app.ai-engineer.cognition-profiles",
+      "mc.app.ai-engineer.environment-kits",
+      "mc.app.ai-engineer.signal-skills",
+      "mc.app.ai-engineer.watchers",
+      "mc.catalog.artifact-schemas"
+    ]
+  },
+  "runtime_descriptor_path": "../runtime/descriptor.json"
+}

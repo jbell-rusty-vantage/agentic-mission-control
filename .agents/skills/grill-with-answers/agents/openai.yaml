@@ -1,0 +1,5 @@
+interface:
+  display_name: "Grill with Answers"
+  short_description: "Interview the owner and record each decision in an answers file"
+policy:
+  allow_implicit_invocation: false

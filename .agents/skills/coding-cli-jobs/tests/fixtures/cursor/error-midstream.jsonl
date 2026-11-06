@@ -1,0 +1,4 @@
+{"type":"system","subtype":"init","apiKeySource":"login","cwd":"C:\\w\\.worktrees\\fix-z","session_id":"e0000000-0000-4000-8000-000000000001","model":"Auto","permissionMode":"default"}
+{"type":"retry","subtype":"starting","attempt":1,"is_resume":false,"session_id":"e0000000-0000-4000-8000-000000000001","timestamp_ms":1791820000000}
+{"__fake__":{"stderr":"Error: model request failed (synthetic)\n"}}
+{"__fake__":{"exit":1}}

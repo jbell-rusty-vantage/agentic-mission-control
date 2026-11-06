@@ -1,0 +1,377 @@
+{
+  "actor_ref": "seed:mission-control-catalog",
+  "component_compatibility": ">=1.0.0 <2.0.0",
+  "depends_on": [],
+  "description": "Sprint V knowledge tools (knowledge_read, knowledge_apply, report_register, report_derive, verify_claims, submit_output) as catalog tool capability rows; the deployment binds each row's digest to its exact Deep Agents tool component.",
+  "format": "mission-control-seed/v1",
+  "records": [
+    {
+      "fields": {
+        "asset_id": "definition:tool:tool.knowledge-read",
+        "contract": "mission-control.published-definition/1",
+        "kind": "tool",
+        "manifest": {
+          "definition": {
+            "attachment_targets": [
+              "agent"
+            ],
+            "capability_kind": "tool",
+            "compatible_compiler_versions": [],
+            "conflicts_with": [],
+            "description": "Resolve one exact report revision (handle and digest) through the application knowledge binding; returns an operation handle and the exact package reference.",
+            "kind": "tool",
+            "logical_id": "tool.knowledge-read",
+            "maturity": "experimental",
+            "schema_version": "1",
+            "title": "Exact knowledge read"
+          },
+          "published_at": "2026-10-25T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:4d3e11e5d12ee6bb8bfa6e6c79cde3a8e42f199e2de14839c6363d86df6ebe8e",
+            "kind": "tool",
+            "lifecycle_status": "published",
+            "logical_id": "tool.knowledge-read",
+            "payload_ref": null,
+            "revision": 1,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:d2c0f4a55dec38079a6beecaff29576c7c40598cde2944bd756c8032b103192b",
+        "manifest_ref": "mc-catalog://definition/tool/tool.knowledge-read/1",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "1"
+      },
+      "kind": "asset_version",
+      "logical_key": "knowledge-tool:tool:tool.knowledge-read/1"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "knowledge-tool:tool:tool.knowledge-read/1",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "src/mission_control/application/knowledge/toolset.py",
+          "src/mission_control/adapters/deep_agents/knowledge_tools.py",
+          "docs/specs/provider-consolidation-2026-10/SPRINT-V-DESIGN.md#8-agent-surface-reports-and-observability"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "knowledge-tool:tool:tool.knowledge-read/1:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:tool:tool.knowledge-apply",
+        "contract": "mission-control.published-definition/1",
+        "kind": "tool",
+        "manifest": {
+          "definition": {
+            "attachment_targets": [
+              "agent"
+            ],
+            "capability_kind": "tool",
+            "compatible_compiler_versions": [],
+            "conflicts_with": [],
+            "description": "Apply one host-recorded use decision exactly once through the application binding: the agent names the decision handle, the host supplies the exact use; journaled before dispatch and settled by its receipt or its reported delivery.",
+            "kind": "tool",
+            "logical_id": "tool.knowledge-apply",
+            "maturity": "experimental",
+            "schema_version": "1",
+            "title": "Governed knowledge apply"
+          },
+          "published_at": "2026-10-25T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:77a6e03a65a82bd7f548b148c357e38daa335a1a119ff505e7ed5d888eb5ef87",
+            "kind": "tool",
+            "lifecycle_status": "published",
+            "logical_id": "tool.knowledge-apply",
+            "payload_ref": null,
+            "revision": 1,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:5533ade15c24b224e0ebca7de027e04235cc878541fa0a61b55d3305fb2a2b7a",
+        "manifest_ref": "mc-catalog://definition/tool/tool.knowledge-apply/1",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "1"
+      },
+      "kind": "asset_version",
+      "logical_key": "knowledge-tool:tool:tool.knowledge-apply/1"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "knowledge-tool:tool:tool.knowledge-apply/1",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "src/mission_control/application/knowledge/toolset.py",
+          "src/mission_control/adapters/deep_agents/knowledge_tools.py",
+          "docs/specs/provider-consolidation-2026-10/SPRINT-V-DESIGN.md#8-agent-surface-reports-and-observability"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "knowledge-tool:tool:tool.knowledge-apply/1:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:tool:tool.knowledge-report-register",
+        "contract": "mission-control.published-definition/1",
+        "kind": "tool",
+        "manifest": {
+          "definition": {
+            "attachment_targets": [
+              "agent"
+            ],
+            "capability_kind": "tool",
+            "compatible_compiler_versions": [],
+            "conflicts_with": [],
+            "description": "Register a research report draft with the application knowledge service; returns the receipt and the exact report handle.",
+            "kind": "tool",
+            "logical_id": "tool.knowledge-report-register",
+            "maturity": "experimental",
+            "schema_version": "1",
+            "title": "Research report registration"
+          },
+          "published_at": "2026-10-25T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:69e840eb7606d45285d5ebeb3ffe8a759353d4a3b7e495dfb2eb9c994b0474d2",
+            "kind": "tool",
+            "lifecycle_status": "published",
+            "logical_id": "tool.knowledge-report-register",
+            "payload_ref": null,
+            "revision": 1,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:af248e5db6cf1f9ad0e163598150f0d1c05fb0e101de97589854f05c53a8115b",
+        "manifest_ref": "mc-catalog://definition/tool/tool.knowledge-report-register/1",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "1"
+      },
+      "kind": "asset_version",
+      "logical_key": "knowledge-tool:tool:tool.knowledge-report-register/1"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "knowledge-tool:tool:tool.knowledge-report-register/1",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "src/mission_control/application/knowledge/toolset.py",
+          "src/mission_control/adapters/deep_agents/knowledge_tools.py",
+          "docs/specs/provider-consolidation-2026-10/SPRINT-V-DESIGN.md#8-agent-surface-reports-and-observability"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "knowledge-tool:tool:tool.knowledge-report-register/1:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:tool:tool.knowledge-report-derive",
+        "contract": "mission-control.published-definition/1",
+        "kind": "tool",
+        "manifest": {
+          "definition": {
+            "attachment_targets": [
+              "agent"
+            ],
+            "capability_kind": "tool",
+            "compatible_compiler_versions": [],
+            "conflicts_with": [],
+            "description": "Derive exact domain proposals from a registered report revision (asynchronous handle).",
+            "kind": "tool",
+            "logical_id": "tool.knowledge-report-derive",
+            "maturity": "experimental",
+            "schema_version": "1",
+            "title": "Report derivation"
+          },
+          "published_at": "2026-10-25T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:1e17eea0f94ce320ebff03cd9c3a3868f5be8074563ad1adb8d76a9451a0edf6",
+            "kind": "tool",
+            "lifecycle_status": "published",
+            "logical_id": "tool.knowledge-report-derive",
+            "payload_ref": null,
+            "revision": 1,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:504c50ee1b88b626250c1d63dad69f60f95fd44f83ba8d6d5329622ba3f8b070",
+        "manifest_ref": "mc-catalog://definition/tool/tool.knowledge-report-derive/1",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "1"
+      },
+      "kind": "asset_version",
+      "logical_key": "knowledge-tool:tool:tool.knowledge-report-derive/1"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "knowledge-tool:tool:tool.knowledge-report-derive/1",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "src/mission_control/application/knowledge/toolset.py",
+          "src/mission_control/adapters/deep_agents/knowledge_tools.py",
+          "docs/specs/provider-consolidation-2026-10/SPRINT-V-DESIGN.md#8-agent-surface-reports-and-observability"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "knowledge-tool:tool:tool.knowledge-report-derive/1:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:tool:tool.knowledge-verify-claims",
+        "contract": "mission-control.published-definition/1",
+        "kind": "tool",
+        "manifest": {
+          "definition": {
+            "attachment_targets": [
+              "agent"
+            ],
+            "capability_kind": "tool",
+            "compatible_compiler_versions": [],
+            "conflicts_with": [],
+            "description": "Verify claims against evidence through the knowledge service (asynchronous handle with progress and findings).",
+            "kind": "tool",
+            "logical_id": "tool.knowledge-verify-claims",
+            "maturity": "experimental",
+            "schema_version": "1",
+            "title": "Claim verification"
+          },
+          "published_at": "2026-10-25T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:ef9f63d3a5dc2b052bfaf457be8ef1a7de6532d112f846271eb230a39b8a9957",
+            "kind": "tool",
+            "lifecycle_status": "published",
+            "logical_id": "tool.knowledge-verify-claims",
+            "payload_ref": null,
+            "revision": 1,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:f3ed7c7abc22deb4e57fa3b8b25b0adb8c9d26118911abae3edf060b71f7da5d",
+        "manifest_ref": "mc-catalog://definition/tool/tool.knowledge-verify-claims/1",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "1"
+      },
+      "kind": "asset_version",
+      "logical_key": "knowledge-tool:tool:tool.knowledge-verify-claims/1"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "knowledge-tool:tool:tool.knowledge-verify-claims/1",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "src/mission_control/application/knowledge/toolset.py",
+          "src/mission_control/adapters/deep_agents/knowledge_tools.py",
+          "docs/specs/provider-consolidation-2026-10/SPRINT-V-DESIGN.md#8-agent-surface-reports-and-observability"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "knowledge-tool:tool:tool.knowledge-verify-claims/1:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:tool:tool.knowledge-submit-output",
+        "contract": "mission-control.published-definition/1",
+        "kind": "tool",
+        "manifest": {
+          "definition": {
+            "attachment_targets": [
+              "agent"
+            ],
+            "capability_kind": "tool",
+            "compatible_compiler_versions": [],
+            "conflicts_with": [],
+            "description": "Submit the exact handles or paths that fulfil one output obligation; a selected report is assessed independently under the host.",
+            "kind": "tool",
+            "logical_id": "tool.knowledge-submit-output",
+            "maturity": "experimental",
+            "schema_version": "1",
+            "title": "Output submission"
+          },
+          "published_at": "2026-10-25T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:5f5bf9da0c47856467e70e4a7abfa66947b8e8edce9487092c302c082d1556f2",
+            "kind": "tool",
+            "lifecycle_status": "published",
+            "logical_id": "tool.knowledge-submit-output",
+            "payload_ref": null,
+            "revision": 1,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:a1428dd12f619b2c0edda43db0532c46730ec897e40672f1fd274d0de2d70c29",
+        "manifest_ref": "mc-catalog://definition/tool/tool.knowledge-submit-output/1",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "1"
+      },
+      "kind": "asset_version",
+      "logical_key": "knowledge-tool:tool:tool.knowledge-submit-output/1"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "knowledge-tool:tool:tool.knowledge-submit-output/1",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "src/mission_control/application/knowledge/toolset.py",
+          "src/mission_control/adapters/deep_agents/knowledge_tools.py",
+          "docs/specs/provider-consolidation-2026-10/SPRINT-V-DESIGN.md#8-agent-surface-reports-and-observability"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "knowledge-tool:tool:tool.knowledge-submit-output/1:admit"
+    }
+  ],
+  "seed_key": "mc.catalog.knowledge-tools",
+  "seed_version": "1.0.0"
+}

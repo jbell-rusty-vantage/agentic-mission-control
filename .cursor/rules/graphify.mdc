@@ -1,0 +1,11 @@
+---
+description: Optional source navigation; generated maps are not architecture authority
+alwaysApply: false
+---
+
+# Optional source maps
+
+Prefer scoped text searches and the source AGENTS.md navigation. Existing
+Graphify outputs may describe the old layout and are not accepted architecture.
+Regenerate only when useful, targeting src/mission_control, with an explicitly
+local AST-only command. Do not launch paid analysis merely for navigation.

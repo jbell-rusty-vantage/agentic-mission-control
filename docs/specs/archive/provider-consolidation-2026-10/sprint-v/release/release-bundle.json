@@ -1,0 +1,566 @@
+{
+  "format": "belllabs.sprint-v.release-bundle.v1",
+  "status": "part-1 skeleton (SV-17 F1, 2026-10-25); part 2 appends KS retirements and the fresh-install-from-bundle domain proofs; part 2 appended (SV-17 F2, 2026-10-25): retirements, KS pins, domain-path proofs, final capability matrix",
+  "realWorkGate": "CLOSED",
+  "evidenceOnly": "disposable targets only; no live database, Aura graph or Fly service was changed; lock files are target-file facts",
+  "components": {
+    "knowledgeVerification": {
+      "owner": "platform/knowledge-services packages/knowledge-db-contract",
+      "package": "@aiengineer/knowledge-db-contract",
+      "version": "2.4.0",
+      "componentDigest": "sha256:309a8c9b8ac792a9f9cf1d6b9ff1070bba763f6c7113750847680d4c9c5c64c7",
+      "installerProtocol": "knowledge-verification-sql/v1",
+      "migrations": [
+        {
+          "key": "0001_verification_foundation",
+          "sha256": "e17cd1ee0f9134d532aae3c5b1061625e5668a72b0c2be291b410537ad2acca2"
+        },
+        {
+          "key": "0002_observations_reports_and_custody",
+          "sha256": "eb15347345be901583c5d479247e7c8b8299a737a5209818e32b7588db457b69"
+        },
+        {
+          "key": "0003_admission_revocation_and_outbox",
+          "sha256": "adb0fce5968f2db6f725d5e508b1551d5cdc1bcd0964ee6f8a29d7615098ffae"
+        },
+        {
+          "key": "0004_operations",
+          "sha256": "984f4cabcadae30d069da8c6fbab8b318db4193f147ac3a01af91ed6ec2c9ed4"
+        },
+        {
+          "key": "0005_signatures_review_and_outbox",
+          "sha256": "cba1dfc79e670f9902425abd4f7188621c8d46ca5287069414b74055f54cc43e"
+        },
+        {
+          "key": "0006_credential_use_and_protocol_receipts",
+          "sha256": "0026c4891f1b48173a4fa8703ac7f417e02440cee8b866010350cf5012484ed5"
+        },
+        {
+          "key": "0007_server_clock_and_required_values_digest",
+          "sha256": "ec380a252b44ab7caa5d8e6bc71ac8b51d812de1ba80fa75f06b2f96d82f5f39"
+        }
+      ],
+      "source": "KS working tree (uncommitted, base ae593410)",
+      "consumers": [
+        "ai-engineer (binding aiengineer-postgres)",
+        "biotech (binding biotech-graph)"
+      ],
+      "previousPin": {
+        "version": "2.3.0",
+        "componentDigest": "sha256:06951864964ff9a347d35eafa6a168f4271fcb723cf7ce82c75e9270c8b453b5"
+      },
+      "confirmation": "working-tree digest observed 2026-10-25 16:40 (0007 unchanged since 15:26); B1b follow-up 4 receipt digest to confirm"
+    },
+    "missionControlCommon": {
+      "owner": "platform/mission-control packages/mission-control-db-contract",
+      "releaseAuthority": "packages/mission-control-db-contract/releases/<version>/component; the root component/ is the retired frozen 1.4.0 input",
+      "version": "1.6.0",
+      "manifestSha256": "sha256:f8799abebcf0cf8921b1da4279a5775ed7e68d55e8850fbea3e01257e9bd29d3",
+      "schemaFingerprint": "sha256:7eddd43091ffce59c0e719e7705097d6f5d4bd635e632ca1cab366bddcfeadcf",
+      "contractSchemaDigest": "sha256:82797cf5e0f7bb6763bcb854cc1eab01a3a87493dc369324b4179fa51c4aca4b",
+      "sourceRevision": "git:3aabe91ba92895ef09309a0d23c4325bf2dfe519+inputs:sha256:418254a3a26d7aca2315019f5633316b71dcaf4b55ae9c6e7b165433db7e872e",
+      "readerWriter": "mission-control-runtime/1",
+      "runtimeRoles": [
+        "mission_control_runtime",
+        "mission_control_family_writer",
+        "mission_control_catalog_writer",
+        "mission_control_outbox_worker",
+        "mission_control_readonly",
+        "mission_control_ingress"
+      ],
+      "requiredExtensions": [
+        {
+          "name": "vector",
+          "required_by": [
+            "mission_control_search"
+          ],
+          "schema": "extensions"
+        },
+        {
+          "name": "pg_trgm",
+          "required_by": [
+            "mission_control_search"
+          ],
+          "schema": "extensions"
+        }
+      ],
+      "targetLocks": {
+        "ai-engineer": {
+          "path": "platform/mission-control/docs/specs/provider-consolidation-2026-10/sprint-v/release/locks/ai-engineer/release.lock.json",
+          "fileSha256": "sha256:ce8f69d8ac9af1cfb51c4c37734e2016e4ed1bb35d181f157748d4215cd89dca",
+          "lockDigest": "sha256:03d5cc07d31850215d4349a309dc9a895aec54d5c7a6a60dd19e9c6b75024564",
+          "replaces": {
+            "path": "platform/mission-control/deployments/ai-engineer/release.lock.json",
+            "componentVersion": "1.4.2",
+            "lockDigest": "sha256:508d0415293f0873a3cdbf6daf3e3a2d2e2813b5b2dd50c75ab2c7d84ae1d0bc",
+            "fileSha256": "sha256:df0d714edc297917875552c81455dfbdcbcb9bddd06d5b1aa736d1327e3f9409"
+          }
+        },
+        "biotech": {
+          "path": "platform/mission-control/docs/specs/provider-consolidation-2026-10/sprint-v/release/locks/biotech/release.lock.json",
+          "fileSha256": "sha256:3677fa00c684e4d029575710828df127ac4300a2167bc609d2138a400771e222",
+          "lockDigest": "sha256:582dbf2712c10738d6b62359aeb16021ccbd5246e60230207fd6e54c7f8dbc49",
+          "replaces": {
+            "path": "platform/mission-control/deployments/biotech/release.lock.json",
+            "componentVersion": "1.3.0",
+            "lockDigest": "sha256:baf54ed07a79f20423f854de993896fb2d1f73d8f21bce582610b7237a6cd314",
+            "fileSha256": "sha256:0562a6ed4aca9d28787f4786f0980a22a98f6fd09c13672ff6fe7100ec931212"
+          }
+        }
+      },
+      "deploymentLocksUnchanged": true,
+      "rebuildNote": "release 1.6.0 (unapplied) was rebuilt in place at 16:07 after a 0055 edit by another helper; the target locks were rewritten"
+    },
+    "biotechGraphSchema": {
+      "owner": "biotech/biotech-knowledge-services schema/source (SV-D10)",
+      "releaseId": "biotech-schema-v2.2.0",
+      "schemaReleaseDigest": "sha256:2df9d3bc0548b92d317fc27ee1e3283fb6326a15709f199457423b6d9b025a74",
+      "schemaDigest": "sha256:de8ab942f3b2fac85011938adcddd75244bc9b5e7c53df07ebc7490b888f6576",
+      "queryCatalogDigest": "sha256:39c7a9d3a3f13f2c8e287bb42ea528c060a2cfc8ebe01d8a4a79abcbe27896b6",
+      "ddlDigest": "sha256:f0622dba117bd16236e575546764bd49444b604e95893eef665d1e796199ddb3",
+      "contentTreeDigest": "sha256:4f6b35af801894420068a91acab33dbf8c95dab6f1d5bbad31447b7bc0504673",
+      "pinnedAt": "2026-10-25",
+      "deployed": "biotech-schema-v2.0.2 (2026-10-12); v2.1.0 and v2.2.0 are repository pins"
+    },
+    "aiEngineerDomain": {
+      "owner": "aiengineer/ai-engineer-db-contract supabase/migrations",
+      "contractVersion": "0.5.0",
+      "migrationCount": 186,
+      "headMigration": "20261025010200_research_admission_values_required",
+      "headMigrationSha256": "sha256:83085f4b775b91c00529791bf5e9da7169fea6fd9a3524c7825fc43574fd4849",
+      "requiresComponent": "knowledge_verification 2.x installed first; 20261025010000 requires the 2.3.0 objects, 20261025010200 the 2.4.0 objects",
+      "sprintVMigrations": [
+        "20261024010000",
+        "20261024010100",
+        "20261024010200",
+        "20261025010000",
+        "20261025010100",
+        "20261025010200"
+      ]
+    },
+    "k01": {
+      "owner": "platform/knowledge-services packages/knowledge-operation-protocol",
+      "package": "@aiengineer/knowledge-operation-protocol",
+      "version": "2.0.0",
+      "goldenFixtureSha256": "sha256:7bdeb2b120c256a64fcd9ecd0ae526aee266758a102de4e884098acda16cb19d",
+      "schemaIndexSha256": "sha256:c97f98c5a8f9a0cfb40eba3416318c01f1bffe873c26a0e33cfae4bed88d6567",
+      "mcCopy": "platform/mission-control/tests/fixtures/knowledge_protocol (15/15 files byte-identical, re-checked by F2)",
+      "note": "re-recorded by F2 after E-KS rounds 3-4 (receipt-lookup delivery, envelope use/audience)",
+      "goldenFixtureSha256Part1": "sha256:9455c4e74c7f129cba9296431cf397d4c4baf61272a1f218b9a3ed086bee5cb1"
+    }
+  },
+  "generatedTypes": [
+    {
+      "artifact": "aiengineer/ai-engineer-db-contract/src/database.generated.ts",
+      "owner": "ai-engineer-db-contract",
+      "sha256": "sha256:ecd1b06d59d0c14025ed4f38eecba5ab74f59f236763dc75c02f5ffeaeda62b8",
+      "method": "native generator delta (fresh DB at 20261024010200 vs + 20261025010000) applied to the committed file",
+      "consumers": [
+        {
+          "consumer": "platform/knowledge-services packages/persistence, packages/knowledge-db, apps/verification-executor",
+          "pin": "vendor/aiengineer-database-contract-0.5.0.tgz (sha256:c2f6c68b127de4d9f51d64a492a09ca0af4ef9aba246564c8a793670180d8f7b)",
+          "state": "current (part 2)",
+          "pinPart1": "vendor/aiengineer-database-contract-0.4.16.tgz"
+        },
+        {
+          "consumer": "aiengineer/agents_dashboard, aiengineer/ai-engineer-industry-cloud-automated-research",
+          "pin": "own pins (not inspected)",
+          "state": "unverified"
+        }
+      ],
+      "note": "unchanged by 20261025010100 (RLS flags) and 20261025010200 (function body): native generation at head equals the run-3 generation"
+    },
+    {
+      "artifact": "platform/mission-control/packages/mission-control-db-contract/releases/1.6.0/component/generated/contract.json",
+      "owner": "mission-control-db-contract (release-build)",
+      "digest": "sha256:82797cf5e0f7bb6763bcb854cc1eab01a3a87493dc369324b4179fa51c4aca4b",
+      "consumers": [
+        {
+          "consumer": "MC runtime adapters",
+          "pin": "exact required_component_version in runtime bindings",
+          "state": "1.6.0 built; deployment locks unchanged"
+        }
+      ]
+    },
+    {
+      "artifact": "platform/knowledge-services/packages/knowledge-operation-protocol/schemas/*.json",
+      "owner": "K01",
+      "consumers": [
+        {
+          "consumer": "platform/mission-control tests/fixtures/knowledge_protocol and Python models",
+          "pin": "byte copy",
+          "state": "15/15 identical"
+        }
+      ]
+    },
+    {
+      "artifact": "biotech/biotech-knowledge-services/apps/graphql-api generated executable and registry",
+      "owner": "BKS",
+      "digest": {
+        "executable": "sha256:0ae100d2ec9624c1128b8f71939d3de2703dd7688cb6015ee7eea67f71d1a784",
+        "registry": "sha256:9e7895a0c8ca16b20828b65eccf21e54507fb5980b093d63f223ffcf75ee7fa7"
+      },
+      "consumers": [
+        {
+          "consumer": "packages/graphql-client; KS bindings/biotech-graph (contract mirrors, no TS import)",
+          "pin": "schemaReleaseDigest sha256:2df9d3bc0548b92d317fc27ee1e3283fb6326a15709f199457423b6d9b025a74",
+          "state": "api:check current"
+        }
+      ]
+    }
+  ],
+  "grantsAndCustody": {
+    "aiEngineer": {
+      "capabilityRoleGrants": [
+        [
+          "knowledge_verification_reader",
+          "app_reader"
+        ],
+        [
+          "knowledge_verification_reader",
+          "pipeline_agent"
+        ],
+        [
+          "knowledge_verification_writer",
+          "executor_service"
+        ],
+        [
+          "knowledge_verification_reviewer",
+          "executor_service"
+        ],
+        [
+          "knowledge_verification_outbox_worker",
+          "executor_service"
+        ],
+        [
+          "knowledge_verification_writer",
+          "verifier_agent"
+        ],
+        [
+          "knowledge_verification_reader",
+          "control_plane"
+        ],
+        [
+          "knowledge_verification_reviewer",
+          "control_plane"
+        ],
+        [
+          "knowledge_verification_outbox_worker",
+          "control_plane"
+        ]
+      ],
+      "grantOwner": "20261024010000_knowledge_component_binding.sql (the installer verifies, never re-issues)",
+      "bindingPin": "knowledge_service.verification_component_binding (version 2.x; keys a subset of the installed receipts)",
+      "custody": "knowledge_verification.artifact_custody: RLS forced, not readable by anon/authenticated",
+      "withdrawnGrants": "every grant on the 22 withdrawn relations, the review-state view and the drift functions went with the objects (20261025010000)",
+      "nativeGuard": "research.assert_admitted_use / require_admitted_use: executor_service only"
+    },
+    "biotech": {
+      "component": "application biotech, binding biotech-graph; dispatch payload custody = component artifact_custody inline rows (D2)",
+      "missionControlRoles": [
+        "mission_control_runtime",
+        "mission_control_family_writer",
+        "mission_control_catalog_writer",
+        "mission_control_outbox_worker",
+        "mission_control_readonly",
+        "mission_control_ingress"
+      ],
+      "graph": "KsReleaseMarker + writer DDL of the pinned release; BKS plan/receipt custody stays file-based under BKS_RUNS_DIR"
+    }
+  },
+  "installers": {
+    "aiEngineer": {
+      "path": "aiengineer/ai-engineer-db-contract/scripts/install-ai-engineer.mjs",
+      "sha256": "sha256:7df673e0730459f291536fc6710ddbd3a55ce000ea6b9e68e99e6431470566dd",
+      "command": "node scripts/install-ai-engineer.mjs --workdir <disposable supabase workdir> --component-installation-id <uuid> --mc-installation-id <uuid> [--skip-mission-control]",
+      "steps": [
+        "preflight",
+        "component",
+        "domain-migrations",
+        "custody-grants",
+        "mission-control",
+        "receipt"
+      ],
+      "receipts": {
+        "resumed": "aiengineer/ai-engineer-db-contract/.scratch/sprint-v/proofs/SV-17/run-2/receipt-C.json",
+        "repeat": "aiengineer/ai-engineer-db-contract/.scratch/sprint-v/proofs/SV-17/run-2/receipt-D.json",
+        "journal": "aiengineer/ai-engineer-db-contract/.scratch/sprint-v/proofs/SV-17/run-2/install-state/progress.jsonl",
+        "component-2.4.0-fresh": "aiengineer/ai-engineer-db-contract/.scratch/sprint-v/proofs/SV-17/run-4/receipt-fresh.json",
+        "component-2.4.0-repeat": "aiengineer/ai-engineer-db-contract/.scratch/sprint-v/proofs/SV-17/run-4/receipt-repeat.json"
+      }
+    },
+    "biotech": {
+      "path": "biotech/biotech-knowledge-services/scripts/install-biotech.mjs",
+      "sha256": "sha256:5a9fd98609d84afa5754a98f366f94cc37f5efa923227f3b2c32893c4a59c471",
+      "command": "node scripts/install-biotech.mjs --pg-admin-dsn-env <NAME> [--create-database] --neo4j-uri neo4j://localhost:7690 --neo4j-password-env <NAME> --component-installation-id <uuid> --mc-installation-id <uuid> --state-dir <dir>",
+      "steps": [
+        "preflight",
+        "component",
+        "mission-control",
+        "graph-release",
+        "executor-config",
+        "receipt"
+      ],
+      "executorEnvNames": {
+        "ksExecutor": [
+          "KS_KNOWLEDGE_BINDINGS_JSON",
+          "KS_BIOTECH_EXECUTOR_URL",
+          "KS_BIOTECH_EXECUTOR_TOKEN",
+          "KS_BIOTECH_EXECUTOR_READ_TOKEN",
+          "the databaseUrlEnv named by the biotech entry of KS_KNOWLEDGE_BINDINGS_JSON"
+        ],
+        "bksExecutor": [
+          "NEO4J_URI",
+          "NEO4J_USERNAME",
+          "NEO4J_PASSWORD",
+          "BKS_EXECUTOR_TOKENS",
+          "BKS_VERIFICATION_DSN",
+          "BKS_VERIFICATION_TENANTS"
+        ]
+      },
+      "receipts": {
+        "resumed": "biotech/biotech-knowledge-services/.scratch/sprint-v/proofs/SV-17/F1/biotech-run-3/receipt-C.json",
+        "repeat": "biotech/biotech-knowledge-services/.scratch/sprint-v/proofs/SV-17/F1/biotech-run-3/receipt-D.json",
+        "journal": "biotech/biotech-knowledge-services/.scratch/sprint-v/proofs/SV-17/F1/biotech-run-3/state/progress.jsonl",
+        "component-2.4.0-fresh": "biotech/biotech-knowledge-services/.scratch/sprint-v/proofs/SV-17/F1/biotech-run-240/receipt-fresh.json",
+        "component-2.4.0-repeat": "biotech/biotech-knowledge-services/.scratch/sprint-v/proofs/SV-17/F1/biotech-run-240/receipt-repeat.json"
+      }
+    },
+    "releasePath": "integrator decision 2026-10-25: the root installers are the only release and fresh-install path; AIDB db:start, db:migrate and scripts/apply-disposable-migration.mjs are disposable development tools, never a release or startup path"
+  },
+  "capabilities": [
+    {
+      "capability": "AI Engineer fresh install (component 2.3.0, 184 migrations, grants/custody, MC 1.6.0)",
+      "state": "supported",
+      "proof": "run-2: crash after component and external kill at 70/184 migrations; rerun completed; repeat changed:false"
+    },
+    {
+      "capability": "AI Engineer native exact-use admission, report v2 projection, exact package read, same-key concurrency",
+      "state": "supported",
+      "proof": "knowledge_component_binding.sql, research_report_v2_projection.sql, research_report_v2_concurrency.mjs on the fresh install"
+    },
+    {
+      "capability": "Verified claims only under an admission-bound receipt",
+      "state": "supported",
+      "proof": "legacy_verification_withdrawal.sql W3/W4"
+    },
+    {
+      "capability": "Legacy AIDB verification runs, adjudication, drift outbox, recovery ledger, v1 seals/assessments/ingestion links",
+      "state": "unsupported",
+      "proof": "withdrawn by 20261025010000 (W1); KS code still calling them fails until part 2 retires it"
+    },
+    {
+      "capability": "v1 report packages",
+      "state": "degraded",
+      "proof": "read-only history; inserts raise REPORT_V1_WITHDRAWN (W5)"
+    },
+    {
+      "capability": "Retrieval history claim authorization",
+      "state": "degraded",
+      "proof": "now requires research.use_admission; claims verified only through the withdrawn path are no longer authorized (retrieval_history.sql passes)"
+    },
+    {
+      "capability": "Biotech fresh install (component biotech, MC 1.6.0, graph v2.2.0 DDL/marker, executor config names)",
+      "state": "supported",
+      "proof": "biotech-run-3: crash after component and external kill during graph DDL; rerun completed; repeat changed:false; missing env name and Aura URI refused"
+    },
+    {
+      "capability": "BKS ingest skill worked examples on v2.2.0 through the executor HTTP path",
+      "state": "supported",
+      "proof": "skill-examples.integration.test.ts 10/10 on a disposable Neo4j"
+    },
+    {
+      "capability": "KS executor and both domain paths from the bundle (SV-09 T0, SV-12 conformance)",
+      "state": "unrun",
+      "proof": "part 2"
+    },
+    {
+      "capability": "MC runtime descriptor (runtime-apply) and seed bundles on the fresh installs",
+      "state": "unrun",
+      "proof": "the installers stop at plan/apply/verify"
+    },
+    {
+      "capability": "Interrupted MC apply (kill inside the mission-db transaction)",
+      "state": "unrun",
+      "proof": "relies on mission-db one-transaction apply; not killed here"
+    },
+    {
+      "capability": "CI fresh chain (contract.yml)",
+      "state": "unrun",
+      "proof": "needs vars.KS_COMPONENT_REF and secrets.KS_READ_TOKEN; never executed here"
+    },
+    {
+      "capability": "Live cutover of the shared/cloud databases, Aura, Fly",
+      "state": "unsupported",
+      "proof": "out of scope; owner go required"
+    }
+  ],
+  "part2": {
+    "helper": "SV-17 F2",
+    "retiredPaths": {
+      "removedFiles": 350,
+      "removedLines": 95951,
+      "tracked": true,
+      "backup": "platform/knowledge-services/.scratch/sprint-v/proofs/SV-17/F2/removed/",
+      "surfaces": [
+        "verification.v1 claims/report/metric operations (all transports, worker sealers, client)",
+        "adjudication request/decision and reads",
+        "audit-bundle inspection",
+        "run/manifest/case/evidence reads",
+        "claims/report result reads",
+        "semantic observation/reconciliation",
+        "Eve runtime attestation",
+        "offline claims/report diagnostics demo",
+        "internal drift revalidation queue (verification.drift.consume)",
+        "durable verification recovery host",
+        "report package service (v1 seals/assessments/ingestion links)",
+        "content-link authority over legacy claim evidence (library kept, uncomposed)",
+        "executor file-store run truth, verifier chain, intent files, evidence oracle",
+        "skill knowledge-verification-recovery",
+        "55 proof scripts of retired surfaces",
+        "dead twin scripts/.verification-remote-persistence-8b83958c-*.ts (R3)",
+        "Eve runtime attestation modules in contracts and core (R3; no importer)"
+      ],
+      "retainedVerificationV1": [
+        "captureSource",
+        "parseArtifact",
+        "extractStructuredData",
+        "verifyExtraction",
+        "runBenchmark",
+        "compareBenchmarkRuns",
+        "replayRun"
+      ],
+      "retiredConfigurationRefusal": [
+        "VERIFICATION_RETIRED_CONFIGURATION:<NAME>",
+        "EXECUTOR_RETIRED_CONFIGURATION:<NAME>"
+      ]
+    },
+    "ksPins": {
+      "aidbVendor": {
+        "file": "vendor/aiengineer-database-contract-0.5.0.tgz",
+        "sha256": "sha256:c2f6c68b127de4d9f51d64a492a09ca0af4ef9aba246564c8a793670180d8f7b",
+        "replaces": "0.4.16"
+      },
+      "minComponentVersion": "2.4.0",
+      "componentDigest": "sha256:309a8c9b8ac792a9f9cf1d6b9ff1070bba763f6c7113750847680d4c9c5c64c7",
+      "useClassRegistry": "catalog/research/use-classes.json (KNOWLEDGE_USE_CLASSES_FILE)",
+      "ksSource": "ae59341 + uncommitted working tree"
+    },
+    "domainPathProofs": [
+      {
+        "proof": "AI Engineer installer fresh + repeat",
+        "result": "changed:true (186 migrations, MC applied) then changed:false",
+        "evidence": "platform/knowledge-services/.scratch/sprint-v/proofs/SV-17/F2/aidb-run/"
+      },
+      {
+        "proof": "AI Engineer interrupted cycle",
+        "result": "interrupt-after component exit 1; external kill at 20/186; rerun resumed (166 applied); repeat changed:false",
+        "evidence": "platform/knowledge-services/.scratch/sprint-v/proofs/SV-17/F2/aidb-run/"
+      },
+      {
+        "proof": "KS suites on the installed AIDB database",
+        "result": "executor 116 passed/2 skipped (aidb-apply, postgres, biotech integration, 18 conformance); persistence 242 passed; knowledge-db 380 passed, 3 PROMOTION_SELECTION_REQUIRED labelled unverified pre-existing (not rerun at HEAD)",
+        "evidence": "platform/knowledge-services/.scratch/sprint-v/proofs/SV-17/F2/aidb-run/"
+      },
+      {
+        "proof": "SV-09 T0 harness",
+        "result": "T0 PASSED on component 2.4.0",
+        "evidence": "platform/knowledge-services/.scratch/sprint-v/proofs/SV-09/t0-sv17-f2/"
+      },
+      {
+        "proof": "Biotech installer fresh + repeat + interrupted cycle",
+        "result": "fresh changed:true; repeat changed:false; interrupt-after component/mission-control exit 1; rerun resumed; repeat changed:false",
+        "evidence": "platform/knowledge-services/.scratch/sprint-v/proofs/SV-17/F2/bio-run/attempt-170426/"
+      },
+      {
+        "proof": "SV-12 KS T1 over the real BKS executor on the installed database",
+        "result": "9 passed, 2 skipped (no consumer fault hook over HTTP)",
+        "evidence": "platform/knowledge-services/.scratch/sprint-v/proofs/SV-17/F2/bio-run/attempt-170426/vitest.txt"
+      }
+    ],
+    "capabilityMatrixFinal": [
+      {
+        "capability": "AI Engineer fresh/repeat/interrupted install from the bundle",
+        "state": "supported"
+      },
+      {
+        "capability": "Biotech fresh/repeat/interrupted install from the bundle",
+        "state": "supported"
+      },
+      {
+        "capability": "AI Engineer report register/assess/derive, exact read, native exact-use admission",
+        "state": "supported"
+      },
+      {
+        "capability": "knowledge.apply over K01 on the AIDB guard path",
+        "state": "supported"
+      },
+      {
+        "capability": "Biotech admission/dispatch/ack/official read, duplicate/reordered/lost-response/graph-down/revocation over HTTP",
+        "state": "supported"
+      },
+      {
+        "capability": "K08 use classes (official use without exactUse -> REVIEW_REQUIRED)",
+        "state": "supported"
+      },
+      {
+        "capability": "Retained verification.v1 capture/parse/extraction/replay/benchmark",
+        "state": "supported",
+        "note": "two pre-existing failing tests (contracts golden line endings; registered benchmark replay fixture not in git); three knowledge-db PROMOTION_SELECTION_REQUIRED failures unverified pre-existing"
+      },
+      {
+        "capability": "Executor capture/locate/register/artifact (non-authoritative cache)",
+        "state": "supported"
+      },
+      {
+        "capability": "K01 knowledge.apply declared use (envelope use/audience or intent declaredUse; no default)",
+        "state": "supported",
+        "note": "native-ports.test.ts; register-side rule untested"
+      },
+      {
+        "capability": "v1 report packages, retrieval-history authorization",
+        "state": "degraded"
+      },
+      {
+        "capability": "K01 verify.claims (MC verify_claims tool)",
+        "state": "unsupported"
+      },
+      {
+        "capability": "verification.v1 claims/report/metric/adjudication/audit/semantic/run-case reads/drift/recovery",
+        "state": "unsupported"
+      },
+      {
+        "capability": "Biotech consumer-side native rollback and lost ack after graph commit",
+        "state": "unrun over HTTP, proven in-process",
+        "note": "D1's in-process BKS T1"
+      },
+      {
+        "capability": "Storage-backed executor checkpoint/source-discovery integration",
+        "state": "unrun"
+      },
+      {
+        "capability": "MC runtime descriptor, seed bundles, interrupted MC apply, CI contract.yml",
+        "state": "unrun"
+      },
+      {
+        "capability": "MC knowledge lane: delivery gating of a dependent invocation",
+        "state": "supported",
+        "note": "for invocations using the knowledge tools"
+      },
+      {
+        "capability": "MC knowledge lane: real AIDB knowledge.apply driven from MC over the wire",
+        "state": "unrun"
+      },
+      {
+        "capability": "MC knowledge lane: verify_claims tool",
+        "state": "unsupported"
+      },
+      {
+        "capability": "Live cutover of shared/cloud databases, Aura, Fly",
+        "state": "unsupported"
+      }
+    ],
+    "realWorkGate": "CLOSED"
+  },
+  "capabilitiesStatus": "top-level capabilities are the part-1 matrix (2026-10-25, component 2.3.0, 184 migrations); historical, superseded by part2.capabilityMatrixFinal"
+}

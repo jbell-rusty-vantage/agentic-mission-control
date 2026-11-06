@@ -1,0 +1,871 @@
+{
+  "mode": "2026-10-18 source-only final handoff preparation",
+  "source_ledger_sha256": "3edd4f2fad4052fa7acf78518caf3e87096c21304580b0dee8b30f01162feda0",
+  "rows": [
+    {
+      "spec_id": "SPEC-01",
+      "title": "SPEC-01: Environment materialization — variables, secrets, runtimes, network, git and provider environments",
+      "source_file": "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\run2-final-main\\docs\\specs\\materialization-observation-2026-10\\SPEC-01-environments.md",
+      "source_sha256": "ce5460ca3c30c11cb8cfc8da6db27fbdd6ce83023f6164ca60eff152614ed0ae",
+      "acceptance_clauses_verbatim": [
+        {
+          "line": 230,
+          "text": "- One manifest with `kit`, `variables`, `secrets`, `network` and `git` compiles for all six profiles. It yields per-lane projections plus a list of owner prerequisites for the lanes that need them, without contacting a provider."
+        },
+        {
+          "line": 231,
+          "text": "- **Local lanes:**"
+        },
+        {
+          "line": 232,
+          "text": "  - A missing required secret fails preflight."
+        },
+        {
+          "line": 233,
+          "text": "  - The child env contains exactly the allowlist."
+        },
+        {
+          "line": 234,
+          "text": "  - A pre-push to a non-`mc/` ref is rejected."
+        },
+        {
+          "line": 235,
+          "text": "  - A receipt with `prepared` is produced."
+        },
+        {
+          "line": 236,
+          "text": "- **cursor_cloud with `sync`:**"
+        },
+        {
+          "line": 237,
+          "text": "  - A drill creates `mc-<kit>-<digest>` and syncs secret names."
+        },
+        {
+          "line": 238,
+          "text": "  - The launched agent produces a `prepared` receipt signal."
+        },
+        {
+          "line": 239,
+          "text": "  - A second mission with the same kit reuses the environment without an update."
+        },
+        {
+          "line": 240,
+          "text": "- **No secret value** appears in any committed file, frame, log or binding. A test injects a sentinel secret and greps all outputs."
+        }
+      ],
+      "primary_issue_ids": [
+        "MO-04",
+        "MO-06",
+        "MO-10",
+        "MO-11",
+        "MO-12",
+        "MO-13",
+        "MO-14",
+        "MO-15",
+        "MO-16"
+      ],
+      "crosscutting_ids": [
+        "SC-01",
+        "SC-03"
+      ],
+      "capability": "EnvironmentKit, variables/config refs, secrets, setup receipt, network/git/provider environment",
+      "representative_workflow": "SDLC config-resolution change review with real repo/toolchain; knowledge cited report with runtime artifact input",
+      "selected_issue_joins": [
+        "MO-11",
+        "MO-12",
+        "MO-13",
+        "MO-14",
+        "MO-72",
+        "CM-21"
+      ],
+      "observable_proof": "Compile exact kit/vars/secretnames/network/git; missing secret refused; child allowlist; prepared receipt; Cursor sync then unchanged reuse; no secrets in outputs",
+      "current_frontier_and_limits": "Known implementation gap: config:<key> installation source absent; frozen for next session. Existing local/Cloud projection implementation otherwise needs exact configured/native proof.",
+      "whole_spec_status_from_ledger": "in progress",
+      "whole_spec_qualified": false,
+      "original_next_not_authority": "Use the existing selected kit and exact current prerequisite/binding snapshot; establish Cursor repository access and authentication, then record prepared signals, a second unchanged mission and governed branch/PR custody. Join local environment proof to S0 rather than infer it from pure compilation."
+    },
+    {
+      "spec_id": "SPEC-02",
+      "title": "SPEC-02: Cognition materialization — skills, subagents, hooks, instructions, MCP and plugins per provider",
+      "source_file": "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\run2-final-main\\docs\\specs\\materialization-observation-2026-10\\SPEC-02-cognition.md",
+      "source_sha256": "54ff90cf590f3c358f6a0e26df9d652b66f5af19bd309099867dff07b2010a30",
+      "acceptance_clauses_verbatim": [
+        {
+          "line": 157,
+          "text": "- One manifest selecting a skill, a subagent, a catalog hook, an MCP server and a plugin renders golden fixtures for all six profiles, with a degradation report per lane. Fixtures are re-recorded from the fact sheets."
+        },
+        {
+          "line": 158,
+          "text": "- **Local, against a fixture repo with its own `AGENTS.md`, `.claude/skills/x` and `.cursor/hooks.json`:**"
+        },
+        {
+          "line": 159,
+          "text": "  - Launch succeeds on all three local lanes."
+        },
+        {
+          "line": 160,
+          "text": "  - The repo files are byte-identical afterwards."
+        },
+        {
+          "line": 161,
+          "text": "  - The mission overlay is present."
+        },
+        {
+          "line": 162,
+          "text": "  - Discovery reports both the repo and the mission items."
+        },
+        {
+          "line": 163,
+          "text": "- **Codex:**"
+        },
+        {
+          "line": 164,
+          "text": "  - The kernel `before_tool` hook denies a forbidden command end-to-end on a live CLI drill, with trust handled."
+        },
+        {
+          "line": 165,
+          "text": "  - The release statement is updated to match the result."
+        },
+        {
+          "line": 166,
+          "text": "- **cursor_cloud drill:**"
+        },
+        {
+          "line": 167,
+          "text": "  - Inline `mcpServers` reach the agent."
+        },
+        {
+          "line": 168,
+          "text": "  - `.cursor/rules/mc-mission.mdc` is honoured."
+        },
+        {
+          "line": 169,
+          "text": "  - A `materialization.observed` signal arrives (needs SPEC-04 ingress)."
+        }
+      ],
+      "primary_issue_ids": [
+        "MO-01",
+        "MO-02",
+        "MO-03",
+        "MO-30",
+        "MO-31",
+        "MO-32",
+        "MO-33",
+        "MO-34",
+        "MO-35"
+      ],
+      "crosscutting_ids": [],
+      "capability": "Cognition profile expansion, skills/subagents/hooks/MCP, additive instructions, ambient inventory",
+      "representative_workflow": "Same SDLC workflow selects real cognition/sdlc; knowledge workflow selects cognition/knowledge plus actual Knowledge Services MCP",
+      "selected_issue_joins": [
+        "MO-01",
+        "MO-02",
+        "MO-03",
+        "MO-31",
+        "MO-33",
+        "MO-34",
+        "MO-35"
+      ],
+      "observable_proof": "Exact bundle custody/digests; unchanged repo AGENTS/skills/hooks; delivered then mechanism-reported discovery then exercised skill/hook; Codex trusted deny; Cursor inline MCP+observed signal",
+      "current_frontier_and_limits": "Cognition seed exists; no full selected live capability bindings/custody join. Provider-specific unsupported behavior must refuse.",
+      "whole_spec_status_from_ledger": "in progress",
+      "whole_spec_qualified": false,
+      "original_next_not_authority": "Run the existing minimal local probes with one sealed skill/hook and preserved repo instructions, retain native discovery and deny evidence, then qualify Cursor observed signals through the existing ingress once prerequisites pass. No broad new cognition feature is implied."
+    },
+    {
+      "spec_id": "SPEC-03",
+      "title": "SPEC-03: Workspaces, worktrees and parallel placement for SDLC and knowledge missions",
+      "source_file": "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\run2-final-main\\docs\\specs\\materialization-observation-2026-10\\SPEC-03-workspaces-and-placement.md",
+      "source_sha256": "4095da4175c44152089c766dae1c9bb1ae37dd8eee93ef145f65dcdc202df7ff",
+      "acceptance_clauses_verbatim": [
+        {
+          "line": 124,
+          "text": "- The three local lanes run with `policy.reuse: within_run`, a dirty-input refusal and cleanup after registration. The worktrees are removed and the snapshots are retained."
+        },
+        {
+          "line": 125,
+          "text": "- **Fan-out of 5 cursor_cloud members** against one repo:"
+        },
+        {
+          "line": 126,
+          "text": "  - produces 5 `mc/{run}/m{i}` branches, 5 agents and 5 head-SHA artifacts;"
+        },
+        {
+          "line": 127,
+          "text": "  - throttles correctly when `max_active_agents: 3`."
+        },
+        {
+          "line": 128,
+          "text": "- **A knowledge mission with no code repo:**"
+        },
+        {
+          "line": 129,
+          "text": "  - launches on cursor_cloud against the knowledge workspace repo;"
+        },
+        {
+          "line": 130,
+          "text": "  - fetches an Artifact input at run time;"
+        },
+        {
+          "line": 131,
+          "text": "  - uploads an output Artifact that satisfies its Completion Contract."
+        },
+        {
+          "line": 132,
+          "text": "- A forked cloud→local attempt reproduces the cloud head SHA in a local lease."
+        }
+      ],
+      "primary_issue_ids": [
+        "MO-05",
+        "MO-08",
+        "MO-50",
+        "MO-51",
+        "MO-52",
+        "MO-53"
+      ],
+      "crosscutting_ids": [
+        "CM-22",
+        "MO-10"
+      ],
+      "capability": "Workspaces, dirty input, snapshots, isolation/fanout and custody-before-cleanup",
+      "representative_workflow": "SDLC managed worktree with test evidence; knowledge artifact input/output; five cloud units throttled three",
+      "selected_issue_joins": [
+        "MO-05",
+        "MO-08",
+        "MO-51",
+        "CM-10",
+        "MO-53"
+      ],
+      "observable_proof": "Exact lease/base/inode before effects, distinct branches/heads, dirty refusal; registered snapshot/output before cleanup; five cloud members limit3",
+      "current_frontier_and_limits": "Earlier v2 partial cleanup is not typed proof; missing retired inode cannot be invented. MO-53 cross-lane fork deferred.",
+      "whole_spec_status_from_ledger": "in progress",
+      "whole_spec_qualified": false,
+      "original_next_not_authority": "Join allocator/custody/cleanup to the exact S0 cells and the Cursor fan-out/knowledge drill, with immutable head/output evidence and declared concurrency. Retain failed work until custody instead of forcing cleanup."
+    },
+    {
+      "spec_id": "SPEC-04",
+      "title": "SPEC-04: Watchers, signals and callbacks — formal observation from provider environments to the orchestrating agent",
+      "source_file": "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\run2-final-main\\docs\\specs\\materialization-observation-2026-10\\SPEC-04-watchers-and-callbacks.md",
+      "source_sha256": "524bee796528d37f4a738b1d57c100f2dfbc3d47e1adc3bec3553da33f1d6a48",
+      "acceptance_clauses_verbatim": [
+        {
+          "line": 257,
+          "text": "- **Ingress:**"
+        },
+        {
+          "line": 258,
+          "text": "  - Run-token, Cursor-OIDC, provider-HMAC and environment-key signals are each accepted at their tier and rejected when wrong."
+        },
+        {
+          "line": 259,
+          "text": "  - Duplicates are dropped."
+        },
+        {
+          "line": 260,
+          "text": "  - Payload limits are enforced."
+        },
+        {
+          "line": 261,
+          "text": "  - Frames are persisted and visible in the transcript."
+        },
+        {
+          "line": 262,
+          "text": "- **cursor_cloud drill:**"
+        },
+        {
+          "line": 263,
+          "text": "  - The Telemetry Hook Pack delivers `session.started`, `materialization.observed` and `stop` signals through the tunnel."
+        },
+        {
+          "line": 264,
+          "text": "  - A gate hook enforces a `stop` within one tool call."
+        },
+        {
+          "line": 265,
+          "text": "- **Watchers:**"
+        },
+        {
+          "line": 266,
+          "text": "  - `ci-red-fix`, `stalled` and `artifact-to-ingest` fire deterministically in a Temporal test environment."
+        },
+        {
+          "line": 267,
+          "text": "  - They respect `max_fires`, rate, recursion and budget."
+        },
+        {
+          "line": 268,
+          "text": "  - A replay produces no duplicate actions."
+        },
+        {
+          "line": 269,
+          "text": "- **Wake:** a Claude Code coordinator using recipe 1 is woken by a real `run.completed` without polling in its own context. Recorded as a qualification transcript."
+        },
+        {
+          "line": 270,
+          "text": "- **No dead fields:** `controls.notifications` is consumed, and `channel: mcp` either works or is rejected by validation."
+        }
+      ],
+      "primary_issue_ids": [
+        "MO-41",
+        "MO-42",
+        "MO-43",
+        "MO-44",
+        "MO-45",
+        "MO-46",
+        "MO-47"
+      ],
+      "crosscutting_ids": [
+        "SC-02",
+        "SC-03"
+      ],
+      "capability": "Native observation, typed signals/watchers/wake and one-tool stop",
+      "representative_workflow": "SDLC completion/review wake and inject; knowledge artifact.ready to accepted ingestion chain",
+      "selected_issue_joins": [
+        "MO-40",
+        "MO-41",
+        "MO-42",
+        "MO-43",
+        "MO-44",
+        "MO-45",
+        "MO-72"
+      ],
+      "observable_proof": "Signal tier/dedupe/transcript; deterministic limit/replay; actual idle caller wake/ack/resume; stop within one tool, not just HTTP202",
+      "current_frontier_and_limits": "Original watcher/wake issue boundaries done; wider selected native/remote cells not qualified.",
+      "whole_spec_status_from_ledger": "in progress",
+      "whole_spec_qualified": false,
+      "original_next_not_authority": "Use the existing real caller wait/ack path in S0 and the scoped Cursor signal/gate drill in S1. Preserve dedupe, trust tiers, stop ordering and source-bound frames; provider webhooks only wake reconciliation."
+    },
+    {
+      "spec_id": "SPEC-05",
+      "title": "SPEC-05: Owner prerequisites and pre-spawn preflight — what only the owner can do, surfaced before a mission spawns",
+      "source_file": "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\run2-final-main\\docs\\specs\\materialization-observation-2026-10\\SPEC-05-owner-prerequisites.md",
+      "source_sha256": "c8bf74c014c356438f3ff2c7be339bd8eb72274520cf974f464db1d673725b6c",
+      "acceptance_clauses_verbatim": [
+        {
+          "line": 115,
+          "text": "- Preflight of a manifest that targets claude_cloud on a fresh installation lists A1–A7 and M1–M4 with generated paste blocks, and exits non-zero."
+        },
+        {
+          "line": 116,
+          "text": "- After the steps and attestations, the probe mission runs and the prerequisites flip to `verified`."
+        },
+        {
+          "line": 117,
+          "text": "- An expired A6 turns the lane back to blocked before the next launch."
+        },
+        {
+          "line": 118,
+          "text": "- A launch through the API with unmet prerequisites returns `PREREQUISITES_UNMET` with the same list. The coordinator skill relays it verbatim."
+        }
+      ],
+      "primary_issue_ids": [
+        "MO-20",
+        "MO-21",
+        "MO-22"
+      ],
+      "crosscutting_ids": [
+        "MO-12",
+        "MO-13"
+      ],
+      "capability": "Exact owner prerequisites, freshness, setup/preflight and typed launch refusal",
+      "representative_workflow": "Preflight same complete SDLC/knowledge manifest selected for launch, not generic account checklist",
+      "selected_issue_joins": [
+        "MO-22",
+        "MO-69",
+        "MO-72"
+      ],
+      "observable_proof": "Same PREREQUISITES_UNMET before create at API/CLI/MCP; generated kit/policy-bound steps; verified/stale/expired behavior",
+      "current_frontier_and_limits": "Human auth facts have dated surface scope; no repeat login when already done; do not elevate attestation to verified native readiness.",
+      "whole_spec_status_from_ledger": "in progress",
+      "whole_spec_qualified": false,
+      "original_next_not_authority": "Resolve only the concrete prerequisite IDs reported for the next selected current-sprint lane, run its supported verification probe, and retain freshness/configuration evidence before launch. Current Cursor login/SCM access and exact native quota/budget evidence remain separate gates."
+    },
+    {
+      "spec_id": "SPEC-06",
+      "title": "SPEC-06: API-billed hosted lanes — Anthropic Managed Agents, OpenAI Agents API (Codex harness) and Sandbox Host placement",
+      "source_file": "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\run2-final-main\\docs\\specs\\materialization-observation-2026-10\\SPEC-06-hosted-api-lanes.md",
+      "source_sha256": "b5ae8cd1a2d1f9ae265ff4b4ceed41c426551885bfc61d596dfc12161036619f",
+      "acceptance_clauses_verbatim": [
+        {
+          "line": 295,
+          "text": "The cloud placements are drilled in HL-24 (`claude_managed`) and HL-25 (`codex_agents`), launched remotely through the AWS worker (SPRINT S2, S3). The self-hosted and Sandbox Host drills are HL-20, funding-gated (R31). Prepare starts from pack files (R30, HL-07, HL-11) and moves to the full projection in HL-21."
+        },
+        {
+          "line": 297,
+          "text": "- Both new profiles pass the lane conformance suite against fakes, and describe honestly per §9."
+        },
+        {
+          "line": 298,
+          "text": "- **`claude_managed` cloud drill:**"
+        },
+        {
+          "line": 299,
+          "text": "  - A knowledge mission uploads skills, runs `mc_prepare`, emits signals, produces an output file, and settles usage and cost from `list_cost`."
+        },
+        {
+          "line": 300,
+          "text": "  - The budget-gate pause and resume works."
+        },
+        {
+          "line": 301,
+          "text": "  - An interrupt-and-inject works."
+        },
+        {
+          "line": 302,
+          "text": "- **`claude_managed` self-hosted drill:**"
+        },
+        {
+          "line": 303,
+          "text": "  - A code mission on a Docker SandboxHost runs in a worktree lease."
+        },
+        {
+          "line": 304,
+          "text": "  - The kernel deny works through the tool wrapper."
+        },
+        {
+          "line": 305,
+          "text": "  - `mc_publish` pushes a verified bundle and the PR is created through the effect."
+        },
+        {
+          "line": 306,
+          "text": "- **`codex_agents` drills:**"
+        },
+        {
+          "line": 307,
+          "text": "  - Hosted: a knowledge mission with artifacts."
+        },
+        {
+          "line": 308,
+          "text": "  - Self-hosted: a code mission with exec-server in Docker."
+        },
+        {
+          "line": 309,
+          "text": "  - Cancel, steer and the function-tool approval round trip."
+        },
+        {
+          "line": 310,
+          "text": "  - Recovery after killing the worker mid-stream reconciles from items with no duplicate frames."
+        },
+        {
+          "line": 311,
+          "text": "- **`claude_agent_sdk` @sandbox drill:** the Claude Code CLI in Docker through the Model Gateway; hooks fire in-process; resume on a different worker through `SessionStore`."
+        },
+        {
+          "line": 312,
+          "text": "- **Policy refusals:**"
+        },
+        {
+          "line": 313,
+          "text": "  - A PHI-classed mission is refused on all API lanes."
+        },
+        {
+          "line": 314,
+          "text": "  - No org API key is present in any sandbox env or file (sentinel test)."
+        }
+      ],
+      "primary_issue_ids": [
+        "HL-01",
+        "HL-02",
+        "HL-03",
+        "HL-04",
+        "HL-05",
+        "HL-06",
+        "HL-07",
+        "HL-08",
+        "HL-09",
+        "HL-10",
+        "HL-11",
+        "HL-12",
+        "HL-13",
+        "HL-14",
+        "HL-15",
+        "HL-16",
+        "HL-17",
+        "HL-18",
+        "HL-19",
+        "HL-20",
+        "HL-21",
+        "MO-73"
+      ],
+      "crosscutting_ids": [
+        "HL-23",
+        "HL-24",
+        "HL-25",
+        "MO-63"
+      ],
+      "capability": "Managed Agents cloud, hosted OpenAI Agents API, packs, auth, data class, effects and budget controls",
+      "representative_workflow": "Original S2 knowledge+SDLC remote contracts, then identical S3 contracts",
+      "selected_issue_joins": [
+        "HL-07",
+        "HL-08",
+        "HL-09",
+        "HL-11",
+        "HL-12",
+        "HL-13",
+        "HL-17",
+        "HL-18",
+        "HL-21",
+        "HL-23",
+        "HL-24",
+        "HL-25",
+        "MO-73"
+      ],
+      "observable_proof": "Native approval deny/allow/timeout; prepare gating; real budget_reached hold+readback+resume; inject; history/items recovery; cost disposition; output bytes/custody before delete; publication separate",
+      "current_frontier_and_limits": "Production budget callers already wired. Required actual Managed budget behavior remains unqualified; capPATCH/turn boundary cannot replace it. S4 funding held.",
+      "whole_spec_status_from_ledger": "blocked",
+      "whole_spec_qualified": false,
+      "original_next_not_authority": "First reconcile inclusive category costs/reserves and the exact owner-selected pack/prerequisites. After the existing lane-specific gates pass, qualify HL-24's two remote missions including the real budget-gate behavior; only then qualify HL-25's two missions/approval/recovery. Retain the genuine existing API products; no Agents SDK/Responses substitution."
+    },
+    {
+      "spec_id": "SPEC-07",
+      "title": "SPEC-07: Cursor lanes to full maturity — lifecycle, control, accounting and portability for cursor_local and cursor_cloud",
+      "source_file": "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\run2-final-main\\docs\\specs\\materialization-observation-2026-10\\SPEC-07-cursor-maturity.md",
+      "source_sha256": "eb5e3f8f121c4ed12e02fc0c5cfe096985047035124ecb87047f9dc9e4ee9fea",
+      "acceptance_clauses_verbatim": [],
+      "primary_issue_ids": [
+        "CM-01",
+        "CM-02",
+        "CM-03",
+        "CM-04",
+        "CM-05",
+        "CM-06",
+        "CM-07",
+        "CM-08",
+        "CM-09",
+        "CM-10",
+        "CM-11",
+        "CM-12",
+        "CM-13",
+        "CM-14",
+        "CM-15",
+        "CM-16",
+        "CM-17",
+        "CM-18",
+        "CM-19",
+        "CM-20",
+        "CM-21",
+        "CM-22"
+      ],
+      "crosscutting_ids": [
+        "MO-06",
+        "MO-13",
+        "MO-14",
+        "MO-30",
+        "MO-31",
+        "MO-41",
+        "MO-42",
+        "MO-45",
+        "MO-51"
+      ],
+      "capability": "Cursor lifecycle/replay/continuation/usage/cost/output/PR/parallel/native host",
+      "representative_workflow": "Cursor variant of real SDLC and cited knowledge workflow, applicable CD01..20 only",
+      "selected_issue_joins": [
+        "CM-01",
+        "CM-02",
+        "CM-03",
+        "CM-04",
+        "CM-05",
+        "CM-07",
+        "CM-08",
+        "CM-09",
+        "CM-10",
+        "CM-13",
+        "CM-18",
+        "CM-19",
+        "CM-21"
+      ],
+      "observable_proof": "Requested/observed model separate; all-turn attributed usage; unknown cost; reattach no resend; exact branch/output/PR before archive; independent units; honest controls",
+      "current_frontier_and_limits": "CLI metadata is not SDK/Cloud readiness. Latest post-login guard refused mixed stored key before native; no auth mutation is inferred.",
+      "whole_spec_status_from_ledger": "blocked",
+      "whole_spec_qualified": false,
+      "original_next_not_authority": "Resolve only the exact selected Cursor surface authentication/repository/native prerequisites and inclusive budget, then execute the applicable in-sprint CD drill cells and update describe matrices only from their receipts. Preserve requested versus observed model and unknown dollar usage."
+    },
+    {
+      "spec_id": "SPEC-08",
+      "title": "SPEC-08: Local CLI job skills — teaching any agent to drive Claude Code, Codex and Cursor CLIs headlessly, outside Mission Control",
+      "source_file": "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\run2-final-main\\docs\\specs\\materialization-observation-2026-10\\SPEC-08-local-cli-skills.md",
+      "source_sha256": "fe76fcf2d6b842cf443168803750f9f64848936b358e4df092199abf681bdbfa",
+      "acceptance_clauses_verbatim": [
+        {
+          "line": 169,
+          "text": "- **Offline:**"
+        },
+        {
+          "line": 170,
+          "text": "  - Unit tests for the job schema validation, adapter argv construction for every profile and OS, the env allowlist and redaction, and the result schema."
+        },
+        {
+          "line": 171,
+          "text": "  - A fake-CLI harness: scripted executables emitting recorded JSONL drive the loop through done, blocked, budget and timeout."
+        },
+        {
+          "line": 172,
+          "text": "- **Live smoke (owner-authorized, cheap prompts, subscription accounts), to answer the open items:**"
+        },
+        {
+          "line": 173,
+          "text": "  - Cursor: does `-p` write without `--force`? Does it read the prompt from stdin?"
+        },
+        {
+          "line": 174,
+          "text": "  - Codex: exit codes and sandbox on Windows vs WSL."
+        },
+        {
+          "line": 175,
+          "text": "  - Claude: `result.subtype` on max-turns and schema failure."
+        },
+        {
+          "line": 176,
+          "text": "  - Which usage pool `claude -p` draws from after 2026-10-07."
+        },
+        {
+          "line": 177,
+          "text": "- **End-to-end:** a Claude Code session launches two parallel jobs (a Codex fix and a Cursor review) in the background, is woken on completion, and reads both results."
+        }
+      ],
+      "primary_issue_ids": [
+        "LS-01",
+        "LS-02",
+        "LS-03",
+        "LS-04",
+        "LS-05",
+        "LS-06",
+        "LS-07",
+        "LS-08"
+      ],
+      "crosscutting_ids": [
+        "MO-08"
+      ],
+      "capability": "Direct CLI jobs, auth/config/permission, verifier, child custody and caller wake",
+      "representative_workflow": "Real Codex fix + independent Cursor review of same bounded SDLC change under one background Claude caller",
+      "selected_issue_joins": [
+        "LS-01",
+        "LS-02",
+        "LS-03",
+        "LS-04",
+        "LS-05",
+        "LS-06",
+        "LS-07",
+        "LS-08"
+      ],
+      "observable_proof": "Two genuinely parallel isolated jobs; actual parent background wake and read both result.json; verify runs in runner; exact auth/model/config/exit/result/cost/cleanup",
+      "current_frontier_and_limits": "Claude maxturn/completion/schema subtype narrow observations done; remaining LS07 and LS08 not qualified. Direct jobs have no MissionControl runtime.",
+      "whole_spec_status_from_ledger": "blocked",
+      "whole_spec_qualified": false,
+      "original_next_not_authority": "Establish current native authentication/quota and inclusive LS category costs/reserves, then perform only the missing LS-07 cells within remaining budget. Once those pass, run LS-08's exact parallel fix/review with retained child cleanup, verifier evidence, caller wake and results."
+    },
+    {
+      "spec_id": "SPEC-09",
+      "title": "SPEC-09: Local harness path (slice S0) — Claude Code, Codex and Cursor harnesses through Mission Control on a WSL2 worker with local or Cloud Temporal",
+      "source_file": "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\run2-final-main\\docs\\specs\\materialization-observation-2026-10\\SPEC-09-local-harness-path.md",
+      "source_sha256": "5f9cf06557751279fda73f4da108fcee01c7bf9f75dc7b499b1897456fbbf621",
+      "acceptance_clauses_verbatim": [
+        {
+          "line": 119,
+          "text": "- **Readiness is green on the WSL worker for all three lanes:**"
+        },
+        {
+          "line": 120,
+          "text": "  - the CLIs found at pinned versions, not Windows shims;"
+        },
+        {
+          "line": 121,
+          "text": "  - auth per route;"
+        },
+        {
+          "line": 122,
+          "text": "  - lease roots on the Linux filesystem."
+        },
+        {
+          "line": 123,
+          "text": "- **Each lane completes a probe mission launched from each tool** (Claude Code, Codex, Cursor) on Windows, which is nine runs. In each run:"
+        },
+        {
+          "line": 124,
+          "text": "  - the caller is woken by `missionctl wait`;"
+        },
+        {
+          "line": 125,
+          "text": "  - one inject is delivered and recorded;"
+        },
+        {
+          "line": 126,
+          "text": "  - one run is cancelled cleanly;"
+        },
+        {
+          "line": 127,
+          "text": "  - the worktrees are cleaned after custody."
+        },
+        {
+          "line": 128,
+          "text": "- **The same three-lane probe set passes on Temporal Cloud.**"
+        },
+        {
+          "line": 129,
+          "text": "- **No secret appears in frames or logs; the child envs contain only the allowlist.**"
+        }
+      ],
+      "primary_issue_ids": [
+        "MO-63",
+        "MO-64",
+        "MO-65",
+        "MO-66",
+        "MO-67",
+        "MO-68",
+        "MO-69",
+        "MO-70",
+        "MO-71",
+        "MO-72"
+      ],
+      "crosscutting_ids": [
+        "CM-04",
+        "MO-04",
+        "MO-08",
+        "MO-21",
+        "MO-43"
+      ],
+      "capability": "Actual configured launch/API/worker, local and Cloud Temporal, all caller/lane cells",
+      "representative_workflow": "SDLC/knowledge representative workflows plus original required S0 control fixture cells",
+      "selected_issue_joins": [
+        "MO-63",
+        "MO-64",
+        "MO-67",
+        "MO-68",
+        "MO-69",
+        "MO-70",
+        "MO-71",
+        "MO-72"
+      ],
+      "observable_proof": "Real authenticated current launch composition and one base; three lanes found/version/auth; Linux leases; eighteen cells each wait/wake/inject/cancel-or-completion/custody/secret evidence",
+      "current_frontier_and_limits": "Current wheel/model/health/auth/read-only API foundations passed; ordinary normal launch/base/lane remains disabled/unqualified. Diagnostic pass is not G1.",
+      "whole_spec_status_from_ledger": "blocked",
+      "whole_spec_qualified": false,
+      "original_next_not_authority": "After the lead's distinct residual delivery/readback finishes, inspect the new independent recovery receipt without rerunning a consumed intent. Establish eligible G1/native and current selected prerequisites, then execute missing MO-72 caller/lane cells and MO-67 Cloud counterparts one bounded owned job at a time. Record failures/unrun cells without qualification promotion."
+    },
+    {
+      "spec_id": "SPEC-10",
+      "title": "SPEC-10: Signal Ingress on Vercel — routes, authentication, database functions, drainer, artifacts and deployment",
+      "source_file": "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\run2-final-main\\docs\\specs\\materialization-observation-2026-10\\SPEC-10-ingress-on-vercel.md",
+      "source_sha256": "04b2f36997fb2568f9719aac39c3da4cda1425e345e63b586115aba8d8e30931",
+      "acceptance_clauses_verbatim": [
+        {
+          "line": 151,
+          "text": "- **Per route:** tier accept and reject tests, dedupe, size and rate limits, and forged or replayed webhook rejection (fixture deliveries)."
+        },
+        {
+          "line": 152,
+          "text": "- **The import-closure test passes**; the Vercel build is under the size limit."
+        },
+        {
+          "line": 153,
+          "text": "- **Real local PostgreSQL tests** for every SQL function, including the gate's intent-before-allow ordering and token revocation."
+        },
+        {
+          "line": 154,
+          "text": "- **Drill S1:**"
+        },
+        {
+          "line": 155,
+          "text": "  - Cursor cloud hooks deliver ordered signals through the deployed ingress."
+        },
+        {
+          "line": 156,
+          "text": "  - The gate's measured p99 is recorded."
+        },
+        {
+          "line": 157,
+          "text": "  - A stop takes effect within one tool call."
+        },
+        {
+          "line": 158,
+          "text": "  - An artifact over 4.5 MB arrives through the signed upload and is verified into custody."
+        }
+      ],
+      "primary_issue_ids": [
+        "MO-40",
+        "MO-74",
+        "MO-75",
+        "MO-76",
+        "MO-79"
+      ],
+      "crosscutting_ids": [],
+      "capability": "Thin Vercel ingress, SQL gates/inbox, drainer, signed uploads/webhooks/launch",
+      "representative_workflow": "Remote request of original knowledge+SDLC contracts; deployed Cursor signal/gate/large artifact",
+      "selected_issue_joins": [
+        "MO-40",
+        "MO-74",
+        "MO-75",
+        "MO-76",
+        "MO-79"
+      ],
+      "observable_proof": "Tier accept/reject/dedupe/rate; intent-before-allow/revocation; crash after persist before wake; ordered native signals; gate p99<=400ms; >4.5MB verified digest/scope custody",
+      "current_frontier_and_limits": "Historical Vercel deployment exists, current build not redeployed. No Vercel worker/API/MCP public expansion. Remote work next session only.",
+      "whole_spec_status_from_ledger": "in progress",
+      "whole_spec_qualified": false,
+      "original_next_not_authority": "After selected provider/ingress prerequisites and budget pass, join the existing deployed routes to S1 signals/gates and R/S2 launch admission. Retain SQL inbox/outbox authority and crash-after-persist/before-wake idempotency; verify actual upload bytes/digest/scope before acceptance/publication."
+    },
+    {
+      "spec_id": "SPEC-11",
+      "title": "SPEC-11: Remote operation (slice R): thin Temporal worker on AWS ECS Fargate and the remote launch path",
+      "source_file": "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\run2-final-main\\docs\\specs\\materialization-observation-2026-10\\SPEC-11-remote-worker-on-aws.md",
+      "source_sha256": "e065b48eb78b665096fd053e0257e8d068994334db97e4b0cec2b74e51404220",
+      "acceptance_clauses_verbatim": [
+        {
+          "line": 166,
+          "text": "- The service runs one task with no inbound rules, and readiness passes against Temporal Cloud, Supabase (pooler) and S3."
+        },
+        {
+          "line": 167,
+          "text": "- **Laptop-off proof:** with the owner's machine powered off, a hosted-lane probe mission runs to completion on the AWS worker, and its frames and payloads land in Postgres and S3."
+        },
+        {
+          "line": 168,
+          "text": "- **Restart proof:** stopping and restarting the service mid-session reattaches with no duplicate frames."
+        },
+        {
+          "line": 169,
+          "text": "- **Secret sentinel:** no secret value in the image, task definition, logs, repo or handoff."
+        },
+        {
+          "line": 170,
+          "text": "- `deploy.ps1` redeploys a new build with no console steps."
+        },
+        {
+          "line": 171,
+          "text": "- The 24-hour CPU and memory profile and the cost estimate are recorded in the handoff."
+        }
+      ],
+      "primary_issue_ids": [
+        "MO-77",
+        "MO-78"
+      ],
+      "crosscutting_ids": [
+        "HL-24",
+        "HL-25",
+        "MO-11",
+        "MO-63",
+        "MO-64",
+        "MO-67",
+        "MO-75",
+        "MO-79"
+      ],
+      "capability": "One thin AWS base/hosted/drainer worker with source/build/storage and remote lifecycle",
+      "representative_workflow": "Original R outside-network/laptop-off/restart proof tied to S2 probe then S3",
+      "selected_issue_joins": [
+        "MO-77",
+        "MO-78",
+        "MO-79",
+        "HL-24",
+        "HL-25"
+      ],
+      "observable_proof": "One0.5vCPU/2GiB egress-only task; real readiness; laptop-off actual progression/Postgres+S3; restart no duplicate frames; sentinel/redeploy;24h CPU/memory/cost",
+      "current_frontier_and_limits": "MO78 own setup accepted; latest AWS desired/running/pending0. Historical task16 not fresh current-build deployment. No activation this session.",
+      "whole_spec_status_from_ledger": "in progress",
+      "whole_spec_qualified": false,
+      "original_next_not_authority": "After current recovery, release/prerequisite/cost gates and the exact authorized remote envelope are satisfied, use the existing R/S2 path for the outside-network/laptop-off and restart evidence, plus the required resource/cost observation. Preserve one base worker, fixed account/region/resources and exact bound build."
+    }
+  ],
+  "no_status_edits": true,
+  "precedence": "Latest human stop-before-deploy instruction and current receipts override stale baseline observations; original acceptance remains unchanged.",
+  "S0_terminal_clause_override": "Preserve original SPRINT cancelORcompletion plus SPEC09 caller/lane probe completion and explicit cleancancel at both placements. Link extra bounded cancellation case when needed; do not assert fixed36."
+}

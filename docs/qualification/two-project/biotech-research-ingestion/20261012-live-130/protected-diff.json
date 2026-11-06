@@ -1,0 +1,57 @@
+{
+  "difference_count": 10,
+  "differences": [
+    {
+      "allowed_by": "seed mc.storage.capability-bundles@1.0.0 (owner-approved 2026-10-12): private capability-bundles bucket and its four storage.objects policies",
+      "change": "added",
+      "path": "storage_buckets/capability-bundles"
+    },
+    {
+      "allowed_by": "seed mc.storage.capability-bundles@1.0.0 (owner-approved 2026-10-12): private capability-bundles bucket and its four storage.objects policies (first bucket recorded; the empty marker is replaced)",
+      "change": "removed",
+      "path": "storage_buckets"
+    },
+    {
+      "allowed_by": "seed mc.storage.capability-bundles@1.0.0 (owner-approved 2026-10-12): private capability-bundles bucket and its four storage.objects policies (one buckets row added)",
+      "change": "changed",
+      "path": "schemas/storage/relations/buckets/chunks"
+    },
+    {
+      "allowed_by": "seed mc.storage.capability-bundles@1.0.0 (owner-approved 2026-10-12): private capability-bundles bucket and its four storage.objects policies (one buckets row added)",
+      "change": "changed",
+      "path": "schemas/storage/relations/buckets/chunks/0/digest"
+    },
+    {
+      "allowed_by": "seed mc.storage.capability-bundles@1.0.0 (owner-approved 2026-10-12): private capability-bundles bucket and its four storage.objects policies (one buckets row added)",
+      "change": "changed",
+      "path": "schemas/storage/relations/buckets/chunks/0/index"
+    },
+    {
+      "allowed_by": "seed mc.storage.capability-bundles@1.0.0 (owner-approved 2026-10-12): private capability-bundles bucket and its four storage.objects policies (one buckets row added)",
+      "change": "changed",
+      "path": "schemas/storage/relations/buckets/chunks/0/rows"
+    },
+    {
+      "allowed_by": "seed mc.storage.capability-bundles@1.0.0 (owner-approved 2026-10-12): private capability-bundles bucket and its four storage.objects policies (one buckets row added)",
+      "change": "changed",
+      "path": "schemas/storage/relations/buckets/content_digest"
+    },
+    {
+      "allowed_by": "seed mc.storage.capability-bundles@1.0.0 (owner-approved 2026-10-12): private capability-bundles bucket and its four storage.objects policies (one buckets row added)",
+      "change": "changed",
+      "path": "schemas/storage/relations/buckets/row_count"
+    },
+    {
+      "allowed_by": "seed mc.storage.capability-bundles@1.0.0 (owner-approved 2026-10-12): private capability-bundles bucket and its four storage.objects policies",
+      "change": "changed",
+      "path": "schemas/storage/structure/policies"
+    },
+    {
+      "allowed_by": "seed mc.storage.capability-bundles@1.0.0 (owner-approved 2026-10-12): private capability-bundles bucket and its four storage.objects policies",
+      "change": "changed",
+      "path": "schemas/storage/structure_digest"
+    }
+  ],
+  "status": "allowed",
+  "unallowed_count": 0
+}

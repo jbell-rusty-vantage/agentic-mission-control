@@ -1,0 +1,6 @@
+# Vault credential names only. Values are read from the worker environment at sync time and
+# substituted by the provider at egress; the sandbox sees a placeholder (SPEC-06 section 4.1).
+credentials:
+  - name: FIRECRAWL_API_KEY
+    allowed_hosts:
+      - api.firecrawl.dev

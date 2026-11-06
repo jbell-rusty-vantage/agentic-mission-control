@@ -1,0 +1,192 @@
+{
+  "actor_ref": "seed:mission-control-catalog",
+  "component_compatibility": ">=1.0.0 <2.0.0",
+  "depends_on": [
+    {
+      "seed_key": "mc.app.biotech.agent-skills",
+      "seed_version": "1.0.2"
+    }
+  ],
+  "description": "Model Catalog authoring guidance successor in 'biotech': skill.mission-control-author. New definition revisions preserve all earlier 1.0.0, 1.0.1, 1.0.2 records and custody bytes.",
+  "format": "mission-control-seed/v1",
+  "records": [
+    {
+      "fields": {
+        "asset_id": "definition:skill:skill.mission-control-author",
+        "contract": "mission-control.published-definition/1",
+        "host_support": {
+          "profiles": {
+            "claude_agent_sdk": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "codex": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "cursor_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "cursor_local": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "deep_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            }
+          },
+          "schema_version": "mc.capability_host_support.v1"
+        },
+        "kind": "skill_bundle",
+        "manifest": {
+          "definition": {
+            "attachment_targets": [
+              "agent.main"
+            ],
+            "body_summary": "Author mission/v2 manifests, declare bounded watchers and notification controls, compile and preflight, then submit and perform an authorized start. Use for a new research, ingestion, content or coding mission, editing a manifest, interpreting validation blockers or preparing launch-then-wait supervision.",
+            "bundle_ref": {
+              "digest": "sha256:55c8a1f29c3174a4b1e600a6caed213a0eeb90357450d95a550806456f23c4d2",
+              "media_type": "application/vnd.mc.capability-bundle+json",
+              "size_bytes": 17554,
+              "uri": "capability-bundles://biotech/skill_bundle/skill.mission-control-author/0.3.2/55c8a1f29c3174a4b1e600a6caed213a0eeb90357450d95a550806456f23c4d2"
+            },
+            "compatibility": {
+              "executables": [],
+              "network_capabilities": [],
+              "runtimes": [],
+              "workspace_capabilities": []
+            },
+            "compatible_compiler_versions": [
+              "control-plane-definitions/1"
+            ],
+            "conflicts_with": [],
+            "description": "Author mission/v2 manifests, declare bounded watchers and notification controls, compile and preflight, then submit and perform an authorized start. Use for a new research, ingestion, content or coding mission, editing a manifest, interpreting validation blockers or preparing launch-then-wait supervision.",
+            "file_manifest": [
+              {
+                "digest": "sha256:e9f8d4e88571fc7fca4913afe3a7791ea30cb5349e5a0c641ff79d9c1755f7ab",
+                "executable": false,
+                "path": "SKILL.md",
+                "size_bytes": 6768
+              },
+              {
+                "digest": "sha256:ff0d4addecf57f5bb1f479c8df1bb21ae4b9f042b32b24079c38db953e9afe2f",
+                "executable": false,
+                "path": "manifest.json",
+                "size_bytes": 487
+              },
+              {
+                "digest": "sha256:35dca4f472024b886b113aa12b0fa187f87be0a4324b27784ab5a0749ee89520",
+                "executable": false,
+                "path": "references/manifest-cheatsheet.md",
+                "size_bytes": 7563
+              },
+              {
+                "digest": "sha256:25ec3a69e247bb033a84bcc90eec5d948a506cefa14d47c1555da71686008ba4",
+                "executable": false,
+                "path": "references/validation-report.md",
+                "size_bytes": 2736
+              }
+            ],
+            "frontmatter": {
+              "description": "Author mission/v2 manifests, declare bounded watchers and notification controls, compile and preflight, then submit and perform an authorized start. Use for a new research, ingestion, content or coding mission, editing a manifest, interpreting validation blockers or preparing launch-then-wait supervision.",
+              "name": "mission-control-author"
+            },
+            "host_support": {
+              "profiles": {
+                "claude_agent_sdk": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "codex": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "cursor_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "cursor_local": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "deep_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                }
+              },
+              "schema_version": "mc.capability_host_support.v1"
+            },
+            "kind": "skill",
+            "logical_id": "skill.mission-control-author",
+            "manifest_digest": "sha256:55c8a1f29c3174a4b1e600a6caed213a0eeb90357450d95a550806456f23c4d2",
+            "maturity": "qualified",
+            "required_capabilities": [],
+            "review_status": "approved",
+            "schema_version": "1",
+            "skill_name": "mission-control-author",
+            "source_provenance": {
+              "commit_digest": null,
+              "license": "proprietary",
+              "locator": "repo://skills/mission-control-author",
+              "source": "local",
+              "upstream_identity": "skill.mission-control-author",
+              "upstream_version": "0.3.2"
+            },
+            "title": "mission-control-author"
+          },
+          "published_at": "2026-10-14T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:5728f0c678084e9083f316d65cdef9eaa27c1223214186b8f14f3e5224e34413",
+            "kind": "skill",
+            "lifecycle_status": "published",
+            "logical_id": "skill.mission-control-author",
+            "payload_ref": null,
+            "revision": 4,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:9a96dcb921db5a1abb3a4673fdd903b9b8c943c3e7193174c5eda173999ae0b0",
+        "manifest_ref": "mc-catalog://definition/skill/skill.mission-control-author/4",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "4"
+      },
+      "kind": "asset_version",
+      "logical_key": "agent-skill:skill:skill.mission-control-author/4"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "agent-skill:skill:skill.mission-control-author/4",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/agent_skills.py",
+          "skills/mission-control-author"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "agent-skill:skill:skill.mission-control-author/4:admit"
+    }
+  ],
+  "seed_key": "mc.app.biotech.agent-skills",
+  "seed_version": "1.0.3"
+}

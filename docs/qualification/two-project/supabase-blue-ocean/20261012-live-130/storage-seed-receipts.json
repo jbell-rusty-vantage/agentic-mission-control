@@ -1,0 +1,41 @@
+{
+  "bundles": [
+    {
+      "outcome": "applied",
+      "receipt": {
+        "applied_by": "postgres",
+        "component_version": "1.3.0",
+        "record_counts": {
+          "created": 5,
+          "records": {
+            "storage_bucket": 1,
+            "storage_policy": 4
+          },
+          "reused": 0,
+          "revoked": 0
+        },
+        "seed_digest": "sha256:34af7f713e5f9394e071cc0d1ac67ee4d430bc6b856376348d9aeec64e0b6828",
+        "seed_key": "mc.storage.capability-bundles",
+        "seed_version": "1.0.0"
+      },
+      "seed_key": "mc.storage.capability-bundles",
+      "seed_version": "1.0.0"
+    }
+  ],
+  "status": "seeded",
+  "target": {
+    "app": "ai-engineer",
+    "application_id": "ai-engineer",
+    "approved_by": "project owner, Claude Code session 2026-10-03 (approved LIVE_PLAN.md)",
+    "database_host": "aws-1-us-east-1.pooler.supabase.com",
+    "database_name": "postgres",
+    "database_port": "5432",
+    "database_session_user": "postgres",
+    "database_user": "postgres.wkythqbofmckbuoothhn",
+    "environment": "production",
+    "identity_evidence": "docs/qualification/two-project/supabase-blue-ocean/g0-readonly-20261003/identity.json; route host/login carry project ref; credential source .env POSTGRES_URL_NON_POOLING (aiengineer apps)",
+    "installation_id": "01a103c0-9a9e-70f3-9398-eb1573a98324",
+    "project_label": "supabase-blue-ocean",
+    "project_ref": "wkythqbofmckbuoothhn"
+  }
+}

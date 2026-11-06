@@ -1,0 +1,116 @@
+# yaml-language-server: $schema=../../../../src/mission_control/contracts/schemas/mc.mission_manifest.v1.json
+# Sprint OC W1 (OVE-169 / WI-06), AI Engineer: the first ordinary GoalDirected report.
+#
+# Frozen inputs (OC-D192): the task contract and two captured sources, one verbatim quote each
+# (scripts/sprint_oc_w1_pack.mjs). The pack authors NO claim. The producer writes every assertion,
+# support set and the report body; the host computes every KS record digest from that content
+# (W1 fix D1). It submits four named promises:
+#
+#   report        reference  required  (KS report revision; independent judge + auditor through KS)
+#   progress_note text       required  (the run's progress note)
+#   summary       text       expected  (a shortfall is visible, never blocking)
+#   caveats       text       optional  (absence is silent)
+#
+# Objective criteria: one assertion per source, stating exactly the parameter count the quote
+# states for the named model; each claim cites only its own source fragment; no claim without a
+# source (the auditor census finds any). `__PACK__` is replaced by the driver before compile.
+# Native-write variant: after the report is assessed and its KS use decision recorded, the host
+# reports the decision handle; the producer applies it once through `knowledge_apply`
+# (AIDB knowledge.apply port, readback from AIDB knowledge rows) and submits the exact effect receipt for `native_receipt` (effect_receipt, required:
+# fulfilled only when the effect settles `applied` from its protocol receipt in this run).
+# Requires at least two real iterations; a third permits one bounded repair. Qualification unrun.
+manifest: mission/v1
+mission:
+  key: w1-open-model-facts-native
+  title: W1 AI Engineer native-write variant (AIDB knowledge apply path)
+  application: ai-engineer
+  description: >
+    Sprint OC W1 ordinary GoalDirected report. Small real knowledge task with frozen inputs.
+  goals:
+    - key: model_facts_report
+      description: |
+        Report, for each pack fragment, the parameter count its quote states for the model it names.
+        Use only the quotes; you author every claim; never write digest/tenant/binding/schemaVersion/producer; record ids MUST
+        start with pack.reportId (ids are write-once across runs).
+        1 Assertions, one per fragment: {"id":"<reportId>-asr-N","logicalId":"<slug>-size","proposition":"..",
+        "kind":"source_report","value":{"type":"quantity","amount":"<digits>","unit":"parameters"},
+        "subject":"<slug>","object":null,"riskReasons":[],"premises":[],"qualifiers":{"profile":
+        "engineering.v2","entity":"<slug>","unit":"parameters","negation":false,"modality":"asserted",
+        + null population,time,jurisdiction,baseline,comparison,runtime,softwareVersion,configuration,
+        benchmarkEnvironment,denominator,repositoryCommit}}.
+        2 Support sets: {"id":"<reportId>-ss-N","assertion":"<reportId>-asr-N","provenance":"declared_citation","required":
+        [{"premise":"size","evidence":["<fragment id>"],"derivedFrom":[]}],"contrary":[]}.
+        3 Body {"sections":[..]}: EXACTLY four sections, ids scope, findings, evidence, limitations, in that order; section {"id","heading":
+        [{"type":"text","text":".."}],"headingExcludedReason":"section title","blocks":[..]}; block
+        {"type":"paragraph","id":"pK","inlines":[..],"excludedReason":"<why framing>"}. Evidence section:
+        one framing paragraph citing each fragment. Findings (excludedReason MUST be null): one
+        paragraph per assertion, inlines [{"type":"claim","occurrenceId":"occ-N",
+        "assertion":"<reportId>-asr-N","text":"..","obligations":["finding.size"],"attribution":".."},{"type":"text",
+        "text":" "},{"type":"citation","label":"<letters, digits, _ or - only>","fragment":"<fragment id>"}]. No claim elsewhere.
+        4 Call report_register ONCE. Its single argument "report" is a JSON object (not a string) with
+        exactly five keys: "task" (pack.task as given), "fragments" (pack.fragments as given), "assertions",
+        "supportSets", and "report" = {"reportId":<pack.reportId>,"revision":1,"kind":"evidence_report",
+        "structuredBody":<body>}. On a refusal, fix the named fields AND append "-r2" to every assertion and support-set id (a
+        refused attempt may already hold the old ids), then call once more; the result
+        carries a handle only on success; never invent a handle or digest.
+        5 submit_output obligation "root.report": [{"kind":"handle","ref":<report handle>,"digest":<digest>}].
+        6 submit_output obligation "root.progress_note": inline text, what you did and what remains.
+        7 submit_output obligation "root.summary": inline text, one sentence per model.
+        8 "root.caveats" only if a quote is ambiguous. FIRST ITERATION: submit the report and
+        progress_note, then stop. Do not apply native writes before the report is independently
+        assessed and accepted. The native_receipt remains required and unmet in this iteration.
+        LATER ITERATION: read the exact accepted report handle and digest supplied by the host's
+        selected context; reuse that revision, never register or resubmit a replacement report.
+        Call knowledge_apply with {"report":<accepted report handle>,"digest":<exact digest>}.
+        If it returns pending_review with result.effect_key, explicitly call submit_output with
+        {"obligation":"root.native_receipt","items":[{"kind":"inline","effect_key":<result.effect_key>}]}.
+        This selects the pending effect; it does not claim the native write already committed.
+        If it returns a protocol receipt, submit that exact effect_key in the same inline shape.
+        Submit a fresh root.progress_note for this iteration. Never repeat knowledge_apply after
+        receiving an effect key or receipt; the host owns review and saved-result settlement.
+        On SCHEMA_UNSUPPORTED, report the blocker in progress_note; never invent an intent or
+        submit a fabricated native_receipt. Biotech native mapping remains an explicit blocker.
+
+        FROZEN PACK (task and sources, JSON): __PACK__
+      objectives:
+        - key: register_report
+          description: Register the report built only from the frozen sources and submit the named outputs
+      criteria:
+        - key: report_submitted
+          description: The registered report revision is submitted for the report promise and independently assessed
+          evidence: [report, progress_note]
+          acceptance: { human: review_accept }
+  environment:
+    lane: deep_agents
+    model: { profile: __PRODUCER__ }
+    sandbox: { profile: research.standard }
+    capabilities:
+      # Exact pins (seed mc.catalog.knowledge-tools@1.0.0), not `search`: hybrid search fails on the
+      # restricted runtime login (W1 finding D7).
+      - { pin: "tool.knowledge-report-register@1#sha256:69e840eb7606d45285d5ebeb3ffe8a759353d4a3b7e495dfb2eb9c994b0474d2", kind: tool, as: report_register }
+      - { pin: "tool.knowledge-apply@1#sha256:77a6e03a65a82bd7f548b148c357e38daa335a1a119ff505e7ed5d888eb5ef87", kind: tool, as: knowledge_apply }
+      - { pin: "tool.knowledge-submit-output@2#sha256:f1fa75f1e3fa49e9061746cbe89f53a828e502fb93e142d3b34d8a854a2a64dd", kind: tool, as: submit_output }
+    budget: { usd: 1, tokens: 300000, wall_clock: 30m, tool_calls: 20 }
+    governors: { depth: 1, fan_out: 1, iterations: 3, patience: 3 }
+    side_effects: [read_only, workspace_write, external_write_reversible]
+  program:
+    key: root
+    behavior: goal_loop
+    objective: model_facts_report
+    action_space: [root]
+    verifier:
+      independent: true
+      environment:
+        model: { profile: producer.fallback }
+    outputs:
+      - name: report
+        form: reference
+        enforcement: required
+        requirements:
+          - { key: assessed, validator: "knowledge.report.assess@1" }
+      - { name: progress_note, form: text, enforcement: required, media_type: text/plain, scope: iteration }
+      - { name: summary, form: text, enforcement: expected, media_type: text/plain, scope: iteration }
+      - { name: caveats, form: text, enforcement: optional, media_type: text/plain, scope: iteration }
+      - { name: native_receipt, form: effect_receipt, enforcement: required, receipts: [knowledge_apply] }
+  controls:
+    commands_allowed: [pause, resume, cancel]

@@ -1,0 +1,544 @@
+{
+  "actor_ref": "seed:mission-control-catalog",
+  "component_compatibility": ">=1.0.0 <2.0.0",
+  "depends_on": [
+    {
+      "seed_key": "mc.app.biotech.agent-skills",
+      "seed_version": "1.0.0"
+    }
+  ],
+  "description": "Materialization and observation skill successor in 'biotech': skill.mission-control, skill.mission-control-author, skill.mission-control-observe. New revision 2 definitions preserve all applied 1.0.0 records and custody bytes.",
+  "format": "mission-control-seed/v1",
+  "records": [
+    {
+      "fields": {
+        "asset_id": "definition:skill:skill.mission-control",
+        "contract": "mission-control.published-definition/1",
+        "host_support": {
+          "profiles": {
+            "claude_agent_sdk": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "codex": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "cursor_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "cursor_local": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "deep_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            }
+          },
+          "schema_version": "mc.capability_host_support.v1"
+        },
+        "kind": "skill_bundle",
+        "manifest": {
+          "definition": {
+            "attachment_targets": [
+              "agent.main"
+            ],
+            "body_summary": "Route Mission Control authoring, catalog selection, durable run supervision, controls and mission chains through missionctl. Use to compile or launch a manifest, pin capabilities, wait for runs, inspect a wake or transcript, declare watchers, intervene in execution or compose linked missions.",
+            "bundle_ref": {
+              "digest": "sha256:69353783fb6cbb4e93310606971a9900bb0fc0e8c79a7587e44f919919930fbb",
+              "media_type": "application/vnd.mc.capability-bundle+json",
+              "size_bytes": 13669,
+              "uri": "capability-bundles://biotech/skill_bundle/skill.mission-control/0.5.0/69353783fb6cbb4e93310606971a9900bb0fc0e8c79a7587e44f919919930fbb"
+            },
+            "compatibility": {
+              "executables": [],
+              "network_capabilities": [],
+              "runtimes": [],
+              "workspace_capabilities": []
+            },
+            "compatible_compiler_versions": [
+              "control-plane-definitions/1"
+            ],
+            "conflicts_with": [],
+            "description": "Route Mission Control authoring, catalog selection, durable run supervision, controls and mission chains through missionctl. Use to compile or launch a manifest, pin capabilities, wait for runs, inspect a wake or transcript, declare watchers, intervene in execution or compose linked missions.",
+            "file_manifest": [
+              {
+                "digest": "sha256:c22a75c12e4b7485f26e53c63609a1753956dc60b24d8bf96537be0c41b6e75c",
+                "executable": false,
+                "path": "SKILL.md",
+                "size_bytes": 3637
+              },
+              {
+                "digest": "sha256:10fab713a1f192dfa1838e032a7dcb8ed848eb4d3425f0e02d5827e859e28a4b",
+                "executable": false,
+                "path": "manifest.json",
+                "size_bytes": 569
+              },
+              {
+                "digest": "sha256:0e6896e28e58434b604d2afb9408afc69d7e19107154e34bed305234fcb24021",
+                "executable": false,
+                "path": "references/operations.json",
+                "size_bytes": 1740
+              },
+              {
+                "digest": "sha256:c40bb836bf9b948c53f8edefe7159ef2d3dacfbca6add16a7fde704d46980a56",
+                "executable": false,
+                "path": "references/protocol.md",
+                "size_bytes": 7723
+              }
+            ],
+            "frontmatter": {
+              "description": "Route Mission Control authoring, catalog selection, durable run supervision, controls and mission chains through missionctl. Use to compile or launch a manifest, pin capabilities, wait for runs, inspect a wake or transcript, declare watchers, intervene in execution or compose linked missions.",
+              "name": "mission-control"
+            },
+            "host_support": {
+              "profiles": {
+                "claude_agent_sdk": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "codex": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "cursor_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "cursor_local": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "deep_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                }
+              },
+              "schema_version": "mc.capability_host_support.v1"
+            },
+            "kind": "skill",
+            "logical_id": "skill.mission-control",
+            "manifest_digest": "sha256:69353783fb6cbb4e93310606971a9900bb0fc0e8c79a7587e44f919919930fbb",
+            "maturity": "qualified",
+            "required_capabilities": [],
+            "review_status": "approved",
+            "schema_version": "1",
+            "skill_name": "mission-control",
+            "source_provenance": {
+              "commit_digest": null,
+              "license": "proprietary",
+              "locator": "repo://skills/mission-control",
+              "source": "local",
+              "upstream_identity": "skill.mission-control",
+              "upstream_version": "0.5.0"
+            },
+            "title": "mission-control"
+          },
+          "published_at": "2026-10-14T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:7a8bdad84eaf0b3b367bc99bcce39c729067dd7a426a731a7088e05f37c3d32b",
+            "kind": "skill",
+            "lifecycle_status": "published",
+            "logical_id": "skill.mission-control",
+            "payload_ref": null,
+            "revision": 2,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:55a93d452f787fec66845febd5b1607e6a42f94cbf1ae3c6ac05c5c91ca88231",
+        "manifest_ref": "mc-catalog://definition/skill/skill.mission-control/2",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "2"
+      },
+      "kind": "asset_version",
+      "logical_key": "agent-skill:skill:skill.mission-control/2"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "agent-skill:skill:skill.mission-control/2",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/agent_skills.py",
+          "skills/mission-control"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "agent-skill:skill:skill.mission-control/2:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:skill:skill.mission-control-author",
+        "contract": "mission-control.published-definition/1",
+        "host_support": {
+          "profiles": {
+            "claude_agent_sdk": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "codex": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "cursor_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "cursor_local": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "deep_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            }
+          },
+          "schema_version": "mc.capability_host_support.v1"
+        },
+        "kind": "skill_bundle",
+        "manifest": {
+          "definition": {
+            "attachment_targets": [
+              "agent.main"
+            ],
+            "body_summary": "Author mission/v2 manifests, declare bounded watchers and notification controls, compile and preflight, then submit and perform an authorized start. Use for a new research, ingestion, content or coding mission, editing a manifest, interpreting validation blockers or preparing launch-then-wait supervision.",
+            "bundle_ref": {
+              "digest": "sha256:6a232a72885cd62e023b49a6c480de3eeaf5b9f24842b17a16a0116740b39821",
+              "media_type": "application/vnd.mc.capability-bundle+json",
+              "size_bytes": 15438,
+              "uri": "capability-bundles://biotech/skill_bundle/skill.mission-control-author/0.3.0/6a232a72885cd62e023b49a6c480de3eeaf5b9f24842b17a16a0116740b39821"
+            },
+            "compatibility": {
+              "executables": [],
+              "network_capabilities": [],
+              "runtimes": [],
+              "workspace_capabilities": []
+            },
+            "compatible_compiler_versions": [
+              "control-plane-definitions/1"
+            ],
+            "conflicts_with": [],
+            "description": "Author mission/v2 manifests, declare bounded watchers and notification controls, compile and preflight, then submit and perform an authorized start. Use for a new research, ingestion, content or coding mission, editing a manifest, interpreting validation blockers or preparing launch-then-wait supervision.",
+            "file_manifest": [
+              {
+                "digest": "sha256:4e6acfdb49189993806f6f9989096d31cba719f9c77a0d570ba147d317c0cd2a",
+                "executable": false,
+                "path": "SKILL.md",
+                "size_bytes": 5634
+              },
+              {
+                "digest": "sha256:5d59240ba7e1bbc244c846a0f3ed6b0911842184b240b10e9452623c7f47876c",
+                "executable": false,
+                "path": "manifest.json",
+                "size_bytes": 487
+              },
+              {
+                "digest": "sha256:6badf4205c27305ebe370a7632bf8ea6c9935d5fa30cdb802f82e12cb3903c9f",
+                "executable": false,
+                "path": "references/manifest-cheatsheet.md",
+                "size_bytes": 6581
+              },
+              {
+                "digest": "sha256:25ec3a69e247bb033a84bcc90eec5d948a506cefa14d47c1555da71686008ba4",
+                "executable": false,
+                "path": "references/validation-report.md",
+                "size_bytes": 2736
+              }
+            ],
+            "frontmatter": {
+              "description": "Author mission/v2 manifests, declare bounded watchers and notification controls, compile and preflight, then submit and perform an authorized start. Use for a new research, ingestion, content or coding mission, editing a manifest, interpreting validation blockers or preparing launch-then-wait supervision.",
+              "name": "mission-control-author"
+            },
+            "host_support": {
+              "profiles": {
+                "claude_agent_sdk": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "codex": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "cursor_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "cursor_local": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "deep_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                }
+              },
+              "schema_version": "mc.capability_host_support.v1"
+            },
+            "kind": "skill",
+            "logical_id": "skill.mission-control-author",
+            "manifest_digest": "sha256:6a232a72885cd62e023b49a6c480de3eeaf5b9f24842b17a16a0116740b39821",
+            "maturity": "qualified",
+            "required_capabilities": [],
+            "review_status": "approved",
+            "schema_version": "1",
+            "skill_name": "mission-control-author",
+            "source_provenance": {
+              "commit_digest": null,
+              "license": "proprietary",
+              "locator": "repo://skills/mission-control-author",
+              "source": "local",
+              "upstream_identity": "skill.mission-control-author",
+              "upstream_version": "0.3.0"
+            },
+            "title": "mission-control-author"
+          },
+          "published_at": "2026-10-14T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:f4d4d9ceebbac8826e8effe52e8f1c9d43f408d9e9603e973cd7f36042d98e77",
+            "kind": "skill",
+            "lifecycle_status": "published",
+            "logical_id": "skill.mission-control-author",
+            "payload_ref": null,
+            "revision": 2,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:38dbe2a21c9a815fa3f9072658be44d7255732765bac7038dbca014d49b46924",
+        "manifest_ref": "mc-catalog://definition/skill/skill.mission-control-author/2",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "2"
+      },
+      "kind": "asset_version",
+      "logical_key": "agent-skill:skill:skill.mission-control-author/2"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "agent-skill:skill:skill.mission-control-author/2",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/agent_skills.py",
+          "skills/mission-control-author"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "agent-skill:skill:skill.mission-control-author/2:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:skill:skill.mission-control-observe",
+        "contract": "mission-control.published-definition/1",
+        "host_support": {
+          "profiles": {
+            "claude_agent_sdk": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "codex": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "cursor_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "cursor_local": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "deep_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            }
+          },
+          "schema_version": "mc.capability_host_support.v1"
+        },
+        "kind": "skill_bundle",
+        "manifest": {
+          "definition": {
+            "attachment_targets": [
+              "agent.main"
+            ],
+            "body_summary": "Supervise Mission Control runs with durable inbox waits, inspect state after a wake, read transcripts and delivery reports, or declare bounded watchers. Use for launch-then-wait, supervising several runs, recovering pending notifications, investigating a blocked run, or choosing a watcher reaction.",
+            "bundle_ref": {
+              "digest": "sha256:1347c316baf67929bee04130efe8dfc6fc5c9735ae80aca86158df400931dcdb",
+              "media_type": "application/vnd.mc.capability-bundle+json",
+              "size_bytes": 9769,
+              "uri": "capability-bundles://biotech/skill_bundle/skill.mission-control-observe/0.3.0/1347c316baf67929bee04130efe8dfc6fc5c9735ae80aca86158df400931dcdb"
+            },
+            "compatibility": {
+              "executables": [],
+              "network_capabilities": [],
+              "runtimes": [],
+              "workspace_capabilities": []
+            },
+            "compatible_compiler_versions": [
+              "control-plane-definitions/1"
+            ],
+            "conflicts_with": [],
+            "description": "Supervise Mission Control runs with durable inbox waits, inspect state after a wake, read transcripts and delivery reports, or declare bounded watchers. Use for launch-then-wait, supervising several runs, recovering pending notifications, investigating a blocked run, or choosing a watcher reaction.",
+            "file_manifest": [
+              {
+                "digest": "sha256:4cf39d4c5907777fa45d3467d399ee2187a62afb4b3a66b10ac59693a13eeaaf",
+                "executable": false,
+                "path": "SKILL.md",
+                "size_bytes": 4627
+              },
+              {
+                "digest": "sha256:2350f75c0aa3c0970e7ce4f735d315e951869600254f211401c63510a820acc2",
+                "executable": false,
+                "path": "manifest.json",
+                "size_bytes": 481
+              },
+              {
+                "digest": "sha256:64d81e092c1792c5a5213dd6a9bb7b1585ad2a4a5fb14dc85aa3cc1fbc9bab84",
+                "executable": false,
+                "path": "references/transcript-format.md",
+                "size_bytes": 1813
+              },
+              {
+                "digest": "sha256:675c5ba7180862be71427816990f2ab474385b4b418469e0bbd41172a5053f93",
+                "executable": false,
+                "path": "references/wait-recipes.md",
+                "size_bytes": 2848
+              }
+            ],
+            "frontmatter": {
+              "description": "Supervise Mission Control runs with durable inbox waits, inspect state after a wake, read transcripts and delivery reports, or declare bounded watchers. Use for launch-then-wait, supervising several runs, recovering pending notifications, investigating a blocked run, or choosing a watcher reaction.",
+              "name": "mission-control-observe"
+            },
+            "host_support": {
+              "profiles": {
+                "claude_agent_sdk": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "codex": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "cursor_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "cursor_local": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "deep_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                }
+              },
+              "schema_version": "mc.capability_host_support.v1"
+            },
+            "kind": "skill",
+            "logical_id": "skill.mission-control-observe",
+            "manifest_digest": "sha256:1347c316baf67929bee04130efe8dfc6fc5c9735ae80aca86158df400931dcdb",
+            "maturity": "qualified",
+            "required_capabilities": [],
+            "review_status": "approved",
+            "schema_version": "1",
+            "skill_name": "mission-control-observe",
+            "source_provenance": {
+              "commit_digest": null,
+              "license": "proprietary",
+              "locator": "repo://skills/mission-control-observe",
+              "source": "local",
+              "upstream_identity": "skill.mission-control-observe",
+              "upstream_version": "0.3.0"
+            },
+            "title": "mission-control-observe"
+          },
+          "published_at": "2026-10-14T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:95bd7f2ba59bddf05ff872ed117550467aa6a148175dc3d4f10c88227b52eb54",
+            "kind": "skill",
+            "lifecycle_status": "published",
+            "logical_id": "skill.mission-control-observe",
+            "payload_ref": null,
+            "revision": 2,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:83809a9a5f321bcb59239fa9c98e1e4c61ebec0cec322f2d4adcf92ee905b093",
+        "manifest_ref": "mc-catalog://definition/skill/skill.mission-control-observe/2",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "2"
+      },
+      "kind": "asset_version",
+      "logical_key": "agent-skill:skill:skill.mission-control-observe/2"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "agent-skill:skill:skill.mission-control-observe/2",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/agent_skills.py",
+          "skills/mission-control-observe"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "agent-skill:skill:skill.mission-control-observe/2:admit"
+    }
+  ],
+  "seed_key": "mc.app.biotech.agent-skills",
+  "seed_version": "1.0.1"
+}

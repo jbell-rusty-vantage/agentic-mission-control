@@ -1,0 +1,30 @@
+{
+  "schema_version": "mc.environment_kit.v1",
+  "id": "envkit.python-uv-node",
+  "version": "1",
+  "title": "Python with uv and Node.js with npm",
+  "description": "Repositories with a uv-managed Python 3.12 environment and an npm-managed Node.js 22 package: the mission layer syncs both locked dependency sets.",
+  "toolchains": {"python": "3.12", "uv": "0.12", "node": "22", "npm": "10"},
+  "system_packages": ["git", "curl", "ripgrep", "jq"],
+  "base": {"install": "base/install.sh"},
+  "mission": {
+    "steps": [
+      {"name": "python-deps", "run": "uv sync --frozen", "when": "exists('uv.lock')"},
+      {"name": "node-deps", "run": "npm ci", "when": "exists('package-lock.json')"}
+    ],
+    "health": [
+      {"name": "python", "run": "uv run --no-sync python --version"},
+      {"name": "node", "run": "node --version"}
+    ],
+    "timeout_s": 600
+  },
+  "requires": {
+    "egress": ["pypi.org", "files.pythonhosted.org", "registry.npmjs.org"]
+  },
+  "host_support": {
+    "local": "full",
+    "cursor_cloud": "full",
+    "claude_cloud": "base_via_owner",
+    "codex_cloud": "base_via_owner"
+  }
+}

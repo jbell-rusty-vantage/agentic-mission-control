@@ -1,0 +1,27 @@
+{
+  "bucket": "capability-bundles",
+  "policies": [
+    {
+      "cmd": "ALL",
+      "mode": "RESTRICTIVE",
+      "policy": "mc_capability_bundles_application_prefix_guard"
+    },
+    {
+      "cmd": "INSERT",
+      "mode": "PERMISSIVE",
+      "policy": "mc_capability_bundles_publisher_insert"
+    },
+    {
+      "cmd": "SELECT",
+      "mode": "PERMISSIVE",
+      "policy": "mc_capability_bundles_publisher_select"
+    },
+    {
+      "cmd": "SELECT",
+      "mode": "PERMISSIVE",
+      "policy": "mc_capability_bundles_reader_select"
+    }
+  ],
+  "problems": [],
+  "status": "verified"
+}

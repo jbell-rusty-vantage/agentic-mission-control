@@ -1,0 +1,28 @@
+{
+  "schema_version": "mc.environment_kit.v1",
+  "id": "envkit.python-uv",
+  "version": "1",
+  "title": "Python with uv",
+  "description": "Python 3.12 projects managed by uv: the base layer installs uv and Python 3.12; the mission layer syncs the locked environment and checks the interpreter runs.",
+  "toolchains": {"python": "3.12", "uv": "0.12"},
+  "system_packages": ["git", "curl"],
+  "base": {"install": "base/install.sh"},
+  "mission": {
+    "steps": [
+      {"name": "deps", "run": "uv sync --frozen", "when": "exists('uv.lock')"}
+    ],
+    "health": [
+      {"name": "python", "run": "uv run --no-sync python --version"}
+    ],
+    "timeout_s": 480
+  },
+  "requires": {
+    "egress": ["pypi.org", "files.pythonhosted.org"]
+  },
+  "host_support": {
+    "local": "full",
+    "cursor_cloud": "full",
+    "claude_cloud": "base_via_owner",
+    "codex_cloud": "base_via_owner"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "schema_version": "mc.skill_bundle.v1",
+  "name": "mc-cognition-tdd",
+  "version": "0.1.0",
+  "service_contract_range": ">=0.1.0,<0.2.0",
+  "files": {
+    "SKILL.md": "sha256:1ad2fa004f9c3465d4de23149284c24ce118c4c4cf5f22b27211fd1f1cdd1b5d"
+  }
+}

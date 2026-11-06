@@ -1,0 +1,42 @@
+import pytest
+from pydantic import SecretStr, ValidationError
+
+from mission_control.bootstrap.settings import Settings
+from tests.fixtures.isolated_settings import isolated_settings
+
+
+def test_preemptive_settings_contract() -> None:
+    settings = isolated_settings(database_url=SecretStr("postgresql://settings.invalid:5432/db"))
+    # OC-R6: models come from deployments/<app>/models.toml, never from settings.
+    assert not hasattr(settings, "openai_model") and not hasattr(settings, "anthropic_model")
+    assert settings.firecrawl_api_key is None or settings.firecrawl_api_key.get_secret_value()
+    # OC-R4 review B2: no neutral queue; the environment or the selected profile supplies it.
+    assert settings.temporal_task_queue is None
+    assert settings.postgres_dsn
+    assert settings.coordinator_mcp_enabled is False
+    assert settings.capability_search_enabled is False
+    assert settings.external_capability_discovery_enabled is False
+    assert settings.coordinator_launch_enabled is False
+    assert settings.capability_embedding_model == "text-embedding-3-small"
+    assert settings.capability_embedding_dimensions == 1536
+    assert settings.coordinator_launch_ticket_ttl_seconds == 900
+
+
+def test_coordinator_settings_reject_floating_skill_package_and_wrong_embedding() -> None:
+    settings = isolated_settings()
+    payload = settings.model_dump()
+    assert Settings.model_validate(payload) is not None
+    with pytest.raises(ValidationError):
+        Settings.model_validate(
+            {
+                **payload,
+                "npx_skills_package_version": "latest",
+            }
+        )
+    with pytest.raises(ValidationError):
+        Settings.model_validate(
+            {
+                **payload,
+                "capability_embedding_dimensions": 3072,
+            }
+        )

@@ -1,0 +1,14 @@
+---
+description: Framework-neutral contracts and bounded cognition
+alwaysApply: false
+---
+
+# Framework boundaries
+
+Contracts, policies, budgets and settlement remain framework-neutral. Temporal
+is the sole macro runtime; Deep Agents is bounded cognition. SDK objects stay in
+adapters. Checkpoints, traces and provider responses are evidence, not authority.
+
+Use exact admitted bindings. Unknown capabilities fail explicitly. Do not add
+silent provider fallbacks or competing schedulers. Validate library behavior
+against pinned official dependencies. Paid experiments need finite spending approval.

@@ -1,0 +1,9 @@
+{
+  "schema_version": "mc.skill_bundle.v1",
+  "name": "mc-cognition-cite-and-verify",
+  "version": "0.1.0",
+  "service_contract_range": ">=0.1.0,<0.2.0",
+  "files": {
+    "SKILL.md": "sha256:1ca73f7f5a2ea001ab9e9bc6c1c95a176d1236195d6222584507235e70cddc74"
+  }
+}

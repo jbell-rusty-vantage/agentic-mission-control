@@ -1,0 +1,639 @@
+{
+  "format": "belllabs.sprint-oc.release-bundle.v1",
+  "gate": "W0",
+  "workItem": "WI-24",
+  "linear": "OVE-168",
+  "status": "RELEASED WITH RECORDED LIMITATIONS 2026-10-28 (see RELEASE-BUNDLE section 8.2)",
+  "evidenceClasses": "real-installed (integrator remote runs), local (sprint-v-pg17: real installers and real executor composition), doubled (Supabase stub storage schema, local custody directory, scripted auditor), unrun",
+  "targets": {
+    "ai-engineer": {
+      "projectRef": "wkythqbofmckbuoothhn",
+      "projectLabel": "supabase-blue-ocean",
+      "mcInstallationId": "01a103c0-9a9e-70f3-9398-eb1573a98324",
+      "componentInstallationId": "7ebb2034-a3d6-41aa-893d-ab655a61593f",
+      "databaseUrlEnv": "MC_AI_ENGINEER_MIGRATION_DATABASE_URL",
+      "target": "deployments/ai-engineer/target.toml"
+    },
+    "biotech": {
+      "projectRef": "bxnetwiimwhtlrjlbtab",
+      "projectLabel": "biotech-research-ingestion",
+      "mcInstallationId": "01a103c0-9a9e-7a95-961b-29dda83c842b",
+      "componentInstallationId": "a34b1309-3f91-4ce1-9eed-3030fdd57b92",
+      "databaseUrlEnv": "MC_BIOTECH_MIGRATION_DATABASE_URL",
+      "target": "deployments/biotech/target.toml",
+      "graph": {
+        "provider": "neo4j-aura",
+        "instance": "8032ec07"
+      }
+    }
+  },
+  "components": {
+    "knowledgeVerification": {
+      "owner": "platform/knowledge-services packages/knowledge-db-contract",
+      "version": "2.5.0",
+      "componentDigest": "sha256:00550d59a2fe487a80e97d746d1897234e2f98c246091c06e5d2d5a07b108b88",
+      "k01PinnedSchema": {
+        "name": "knowledge-verification-2.5.0",
+        "version": "knowledge-verification.v2",
+        "digest": "sha256:728e4d8aa64a857185be19181886da22ad8952dcec6e4f8a3bf9bf0578d2fd18"
+      },
+      "installerProtocol": "knowledge-verification-sql/v1",
+      "migrations": [
+        {
+          "key": "0001_verification_foundation",
+          "sha256": "e17cd1ee0f9134d532aae3c5b1061625e5668a72b0c2be291b410537ad2acca2"
+        },
+        {
+          "key": "0002_observations_reports_and_custody",
+          "sha256": "eb15347345be901583c5d479247e7c8b8299a737a5209818e32b7588db457b69"
+        },
+        {
+          "key": "0003_admission_revocation_and_outbox",
+          "sha256": "adb0fce5968f2db6f725d5e508b1551d5cdc1bcd0964ee6f8a29d7615098ffae"
+        },
+        {
+          "key": "0004_operations",
+          "sha256": "984f4cabcadae30d069da8c6fbab8b318db4193f147ac3a01af91ed6ec2c9ed4"
+        },
+        {
+          "key": "0005_signatures_review_and_outbox",
+          "sha256": "cba1dfc79e670f9902425abd4f7188621c8d46ca5287069414b74055f54cc43e"
+        },
+        {
+          "key": "0006_credential_use_and_protocol_receipts",
+          "sha256": "0026c4891f1b48173a4fa8703ac7f417e02440cee8b866010350cf5012484ed5"
+        },
+        {
+          "key": "0007_server_clock_and_required_values_digest",
+          "sha256": "ec380a252b44ab7caa5d8e6bc71ac8b51d812de1ba80fa75f06b2f96d82f5f39"
+        },
+        {
+          "key": "0008_effect_dispatch_journal",
+          "sha256": "4eb2db00c39784d41bc43a9514fdc330ab09df67c222407e1828d7e6f3e46cdc"
+        }
+      ],
+      "source": "KS sprint-oc 9b52c08ff51a532d9d451db33865c7992488865c",
+      "previousPin": {
+        "version": "2.4.0",
+        "componentDigest": "sha256:309a8c9b8ac792a9f9cf1d6b9ff1070bba763f6c7113750847680d4c9c5c64c7"
+      }
+    },
+    "missionControlCommon": {
+      "owner": "platform/mission-control packages/mission-control-db-contract",
+      "releaseRoot": "packages/mission-control-db-contract/releases/1.7.0/component",
+      "version": "1.7.0",
+      "migrationCount": 53,
+      "firstMigration": "0001_foundation",
+      "lastMigration": "0060_hook_candidate_installs",
+      "unreleased": "0061 (WI-22, dormant)",
+      "manifestFileSha256": "sha256:6134aa4d2147b638c987762077ff3eacd245928b5cb656346526229e78355ef1",
+      "schemaFingerprint": "sha256:ee099c2994f6acc91aa5b91427c3ef1e5ff235abd4b00fc675e3b4193c3164ba",
+      "contractSchemaDigest": "sha256:f19e07852c730ce95cc4556cec99f7052877c79fab97c33db742062522d29feb",
+      "sourceRevision": "git:9a32a589148cfbfff7085ee401b7cb3b51da327e+inputs:sha256:536e14d98e89479f8e9ca7259cdbfee9d8bd1f5d34261b321c12a3ceedb1ef86",
+      "installerProtocol": "mission-control-sql/v2",
+      "readerWriter": "mission-control-runtime/1",
+      "runtimeRoles": [
+        "mission_control_runtime",
+        "mission_control_family_writer",
+        "mission_control_catalog_writer",
+        "mission_control_outbox_worker",
+        "mission_control_readonly",
+        "mission_control_ingress"
+      ],
+      "requiredExtensions": [
+        {
+          "name": "vector",
+          "required_by": [
+            "mission_control_search"
+          ],
+          "schema": "extensions"
+        },
+        {
+          "name": "pg_trgm",
+          "required_by": [
+            "mission_control_search"
+          ],
+          "schema": "extensions"
+        }
+      ],
+      "runtimeDescriptor": {
+        "path": "../runtime/descriptor.json",
+        "sha256": "b0330c546284548791dffae3c19452952db008fe5b32d36e8cc1a63488b93cfd"
+      },
+      "targetLocks": {
+        "ai-engineer": {
+          "path": "platform/mission-control/docs/specs/provider-consolidation-2026-10/sprint-oc/release/locks/ai-engineer/release.lock.json",
+          "fileSha256": "sha256:5dcfef94d7f1d32cfd2bbe2e59e9f1b31611ac077150e04350d77ba12ce402b0",
+          "writtenBy": "MC 5444f169"
+        },
+        "biotech": {
+          "path": "platform/mission-control/docs/specs/provider-consolidation-2026-10/sprint-oc/release/locks/biotech/release.lock.json",
+          "fileSha256": "sha256:d4c2a84ac43799cb11df7a7e263aa3c1a640adadf10e0098e143ed32b614b925",
+          "writtenBy": "MC 5444f169"
+        }
+      },
+      "deploymentLocks": "deployments/<app>/release.lock.json still name older releases; pass --lock explicitly"
+    },
+    "aiEngineerDomain": {
+      "owner": "aiengineer/ai-engineer-db-contract supabase/migrations",
+      "contractVersion": "0.5.0",
+      "head": "20261025010200",
+      "migrationCount": 186,
+      "headFile": "20261025010200_research_admission_values_required.sql",
+      "headFileSha256": "sha256:83085f4b775b91c00529791bf5e9da7169fea6fd9a3524c7825fc43574fd4849"
+    },
+    "biotechGraph": {
+      "owner": "biotech/biotech-knowledge-services schema/source",
+      "releaseId": "biotech-schema-v2.2.0",
+      "schemaReleaseDigest": "sha256:2df9d3bc0548b92d317fc27ee1e3283fb6326a15709f199457423b6d9b025a74",
+      "ddlDigest": "sha256:f0622dba117bd16236e575546764bd49444b604e95893eef665d1e796199ddb3"
+    },
+    "k01Protocol": {
+      "version": "ks.knowledge_operation.v2"
+    }
+  },
+  "installers": {
+    "ai-engineer": {
+      "repository": "aiengineer/ai-engineer-db-contract",
+      "script": "scripts/install-ai-engineer.mjs",
+      "commit": "1dbc810a7eebe00e7aa4a454d4ceea15d92056d9",
+      "steps": [
+        "preflight",
+        "component",
+        "domain-migrations",
+        "custody-grants",
+        "mission-control",
+        "receipt"
+      ]
+    },
+    "biotech": {
+      "repository": "biotech/biotech-knowledge-services",
+      "script": "scripts/install-biotech.mjs",
+      "commit": "6971fed202b6c619e4fd3be46e847e86d5e66005",
+      "steps": [
+        "preflight",
+        "component",
+        "mission-control",
+        "graph-release",
+        "executor-config",
+        "receipt"
+      ]
+    }
+  },
+  "sources": {
+    "mcSprintOc": "764e16fd",
+    "mcW0Finish": "branch sprint-oc-w0-finish (the commit adding this file)",
+    "ksSprintOc": "9b52c08ff51a532d9d451db33865c7992488865c",
+    "ksW0Finish": "e4589f0 (capture added in 9cbcfe1; review fixes N4-N6)",
+    "canonicalKsExecutorDist": "rebuilt at 2.5.0 by the integrator 2026-10-28: pnpm --config.verify-deps-before-run=false --workspace-concurrency=1 -r --filter \"@aiengineer/knowledge-verification-executor...\" run build"
+  },
+  "models": {
+    "pins": [
+      {
+        "role": "producer",
+        "profile": "producer.default",
+        "model": "claude-sonnet-5-5",
+        "probe": "succeeded"
+      },
+      {
+        "role": "producer fallback, auditor, child",
+        "profile": "producer.fallback, auditor.default, child.default",
+        "model": "claude-haiku-5-5",
+        "probe": "succeeded"
+      },
+      {
+        "role": "judge",
+        "profile": "judge.default",
+        "model": "gpt-5.6-terra",
+        "probe": "succeeded"
+      },
+      {
+        "role": "judge fallback, probes",
+        "profile": "judge.fallback",
+        "model": "gpt-5.6-luna",
+        "probe": "succeeded"
+      },
+      {
+        "role": "catalog embeddings",
+        "model": "text-embedding-3-small",
+        "probe": "succeeded"
+      }
+    ],
+    "probeCostUsd": "<0.001",
+    "probedBy": "integrator, 2026-10-28",
+    "w0AllocationUsd": 1
+  },
+  "schemaFit": {
+    "missionControl": {
+      "objects": [
+        "mission_control",
+        "mission_control_search",
+        "six NOLOGIN mission_control_* roles",
+        "extensions vector and pg_trgm in schema extensions"
+      ],
+      "delivering": [
+        "WI-01",
+        "WI-02",
+        "WI-03",
+        "WI-04",
+        "WI-05",
+        "WI-17"
+      ],
+      "state": "installed (integrator)"
+    },
+    "knowledgeVerification": {
+      "bindings": {
+        "ai-engineer": "aiengineer-postgres",
+        "biotech": "biotech-graph"
+      },
+      "delivering": [
+        "WI-03",
+        "WI-05"
+      ],
+      "state": "installed; the upgrade applied only 0008 (integrator)"
+    },
+    "aiEngineerDomain": {
+      "verified": "custody-grants: nine knowledge_verification_* grants, forced RLS on custody and four research tables, withdrawn objects absent",
+      "change": "none needed for W0",
+      "state": "installed (integrator)"
+    },
+    "biotechGraph": {
+      "verified": "KsReleaseMarker and writer DDL equal the pinned release",
+      "change": "none needed for W0",
+      "state": "installed (integrator)"
+    }
+  },
+  "remoteRuns": {
+    "wipe": {
+      "at": "2026-10-28T04:37Z (approximately)",
+      "fromCleanDryRun": true,
+      "biotech": {
+        "dropped": [
+          "capability_search",
+          "MC schemas",
+          "832 graph nodes"
+        ]
+      },
+      "ai-engineer": {
+        "dropped": [
+          "18 domain schemas",
+          "knowledge_service",
+          "MC schemas",
+          "41 public tables (86,960 disposable rows)",
+          "21 legacy relations allowed by name"
+        ],
+        "ledgerRowsDeleted": 228,
+        "storageObjectsKept": 34773
+      },
+      "receipts": {
+        "ai-engineer": {
+          "dryRun": "wipe/dry-run-wkythqbofmckbuoothhn-20261028T043641.452Z-e6a3.json",
+          "inventoryDigest": "sha256:0632a45aa1c88424e4ced629c05f88da5237ce480fe100b88ce340e595422ce4",
+          "wipe": "wipe/wipe-wkythqbofmckbuoothhn-20261028T043719.319Z-4949.json",
+          "status": "complete",
+          "changed": true
+        },
+        "biotech": {
+          "dryRun": "wipe/dry-run-bxnetwiimwhtlrjlbtab-20261028T043557.049Z-872b.json",
+          "inventoryDigest": "sha256:93250b690f32718f82c637b2c78a3a29c1fac1a7867697b2311e04e3aa513f00",
+          "wipe": "wipe/wipe-bxnetwiimwhtlrjlbtab-20261028T043617.894Z-12f2.json",
+          "status": "complete",
+          "changed": true
+        }
+      }
+    },
+    "freshInstall": {
+      "receipts": {
+        "ai-engineer": {
+          "journalStart": "2026-10-28T05:05:52.400Z",
+          "changed": true
+        },
+        "biotech": {
+          "journalStart": "2026-10-28T05:11:51.247Z",
+          "note": "component, mission-control, graph-release applied; refused EXECUTOR_CONFIG_MISSING; resumed 05:23:15Z changed:false",
+          "changed": null
+        }
+      }
+    },
+    "repeat": {
+      "changed": false,
+      "receipts": {
+        "ai-engineer": {
+          "journalStart": "2026-10-28T05:11:07.274Z",
+          "changed": false
+        },
+        "biotech": {
+          "journalStart": "2026-10-28T05:23:15.368Z",
+          "changed": false
+        }
+      }
+    },
+    "upgradeTo250": {
+      "applied": [
+        "0008_effect_dispatch_journal"
+      ],
+      "receipts": {
+        "ai-engineer": {
+          "journalStart": "2026-10-28T05:49:59.705Z",
+          "componentApplied": "0008_effect_dispatch_journal",
+          "changed": true
+        },
+        "biotech": {
+          "journalStart": "2026-10-28T05:50:52.875Z",
+          "componentApplied": "0008_effect_dispatch_journal",
+          "changed": true
+        }
+      }
+    },
+    "repeatAfterUpgrade": {
+      "changed": false,
+      "receipts": {
+        "ai-engineer": {
+          "journalStart": "2026-10-28T05:50:20.394Z",
+          "changed": false
+        },
+        "biotech": {
+          "journalStart": "2026-10-28T05:51:27.057Z",
+          "changed": false
+        }
+      }
+    }
+  },
+  "liveDescribe": {
+    "captureScript": "platform/knowledge-services apps/verification-executor/scripts/capture-live-describe.mjs (KS e4589f0)",
+    "checkScript": "platform/mission-control scripts/sprint_oc_describe_conformance.py",
+    "checks": [
+      "minimums_not_below_annex",
+      "describe_digest",
+      "binding_advertised",
+      "descriptor_parses",
+      "protocol_pinned",
+      "component_supported",
+      "pinned_schema",
+      "registration_equals_descriptors",
+      "describe_matches_descriptors",
+      "apply_contract_equals_native_contract",
+      "apply_served",
+      "storage_class",
+      "write_atomicity",
+      "readback_capability",
+      "describe_honesty"
+    ],
+    "local": {
+      "date": "2026-10-28",
+      "executor": "KS 740df8c build (tree equal to sprint-oc 9b52c08)",
+      "database": "sprint-v-pg17, component 2.5.0 for both bindings",
+      "ai-engineer": "15/15 passed",
+      "biotech": "15/15 passed",
+      "registrationsEqualOfflineDescriptors": true,
+      "auditorKind": "none"
+    },
+    "remote": {
+      "ai-engineer": {
+        "capture": "evidence/w0/live-describe.ai-engineer.json",
+        "describeDigest": "sha256:7a95593002342d255d4f7e04a0ce9fe30aab4240bcc6b6c24318513a5c8d2285",
+        "distSha256": "sha256:b2ac663e0240ac44c7c0d48f8de2eb9f6b9eae2453dad28dfe43073d3ec7965e",
+        "ksCommit": "8986048",
+        "operations": 13,
+        "conformance": "passed 15/15"
+      },
+      "biotech": {
+        "capture": "evidence/w0/live-describe.biotech.json",
+        "describeDigest": "sha256:a15f079a6d4edc2d66217efda6ceabeffa463beedd952f206da35263a1122a6e",
+        "distSha256": "sha256:b2ac663e0240ac44c7c0d48f8de2eb9f6b9eae2453dad28dfe43073d3ec7965e",
+        "ksCommit": "8986048",
+        "operations": 13,
+        "conformance": "passed 15/15",
+        "firstAttempt": "refused: permission denied to set role knowledge_verification_reader; fixed by BKS component-grants a43f325"
+      },
+      "descriptorsRefreshed": null,
+      "descriptorDiff": []
+    },
+    "expected": {
+      "component": "knowledge-verification-2.5.0",
+      "schemaDigest": "sha256:728e4d8aa64a857185be19181886da22ad8952dcec6e4f8a3bf9bf0578d2fd18",
+      "protocolVersions": [
+        "ks.knowledge_operation.v2"
+      ],
+      "descriptorsFile": "tests/conformance/applications/ks_backend_descriptors.json"
+    },
+    "refresh": "--refresh-descriptors writes atomically; refused when any check fails, and when the live registrations differ from the descriptors file unless --accept-descriptor-change; descriptorDiff reported either way"
+  },
+  "seedCustody": {
+    "partOfW0": true,
+    "citations": [
+      "docs/knowledge/capability-seeds.md (agent-skills 1.0.3: custody upload and apply are W0's)",
+      "MC cb7faf4a (OVE-201, R7)",
+      "Sprint V release bundle section 7 (seed bundles unrun)"
+    ],
+    "bundles": [
+      "packages/mission-control-db-contract/seeds/common",
+      "packages/mission-control-db-contract/seeds/<app>"
+    ],
+    "storageEnvNames": [
+      "SUPABASE_URL",
+      "CAPABILITY_BUNDLE_PUBLISHER_TOKEN",
+      "SUPABASE_PUBLISHABLE_KEY (optional)"
+    ],
+    "runtimeReaderEnvNames": [
+      "CAPABILITY_BUNDLE_BACKEND",
+      "CAPABILITY_BUNDLE_READER_TOKEN",
+      "CAPABILITY_BUNDLE_NAMESPACE"
+    ],
+    "bucket": "capability-bundles",
+    "gaps": [
+      "no tool mints the per-project publisher or reader JWT (claim mc_capability_role)",
+      "live storage.objects policy creation by the admin login is unqualified"
+    ],
+    "local": {
+      "seedPlanPending": 24,
+      "seedApply": "seeded",
+      "replanAllReplay": true,
+      "repeatApplyWroteNothing": true,
+      "bucket": "capability-bundles, private (Supabase stub: doubled)",
+      "custodyLocalDirectory": {
+        "ai-engineer": {
+          "uploads": 29,
+          "repeat": 0
+        },
+        "biotech": {
+          "uploads": 30,
+          "repeat": 0
+        }
+      }
+    },
+    "remote": {
+      "ai-engineer": {
+        "seedPlan": "24 pending, 0 conflicts",
+        "seedApply": "seeded",
+        "replan": "24/24 replay",
+        "custody": "29 bundles, 100 objects uploaded",
+        "custodyRepeat": "0 uploaded, 100 verified"
+      },
+      "biotech": {
+        "seedPlan": "23 pending, 0 conflicts",
+        "seedApply": "seeded",
+        "replan": "23/23 replay",
+        "custody": "30 bundles, 129 objects uploaded",
+        "custodyRepeat": "0 uploaded, 129 verified"
+      }
+    }
+  },
+  "refusals": {
+    "noWriteProof": "mission-db snapshot before and after plus compare (every non-MC schema with row content) and mission-db verify (MC grant-inclusive fingerprint)",
+    "expected": {
+      "wrongConfirm": [
+        "CONFIRM_TARGET_MISMATCH (installers)",
+        "BLOCKED confirmation (mission-db apply, seed-apply)"
+      ],
+      "wrongInstallation": [
+        "TARGET_IDENTITY_MISMATCH (installers)",
+        "VERIFY_HOLD identity differs (mission-db verify)"
+      ],
+      "wrongSystemIdentifier": [
+        "TARGET_SYSTEM_IDENTIFIER_MISMATCH, or TARGET_SYSTEM_IDENTIFIER_UNREADABLE when pg_control_system() is not readable"
+      ],
+      "tamperedLock": [
+        "MISSION_CONTROL_LOCK_PIN_MISMATCH (installers)",
+        "BLOCKED Release checksum mismatch (mission-db verify)"
+      ],
+      "grants": "no write-free remote refusal; remote evidence is custody-grants verified and runtime_roles_verified"
+    },
+    "local": {
+      "date": "2026-10-28",
+      "driver": "platform/mission-control scripts/sprint_oc_w0_local_proofs.mjs",
+      "passed": 28,
+      "failed": 0,
+      "evidence": "platform/mission-control/.scratch/sprint-oc/evidence/w0-finish-local/w0-local-proofs.json",
+      "evidenceSha256": "sha256:8d9ac8533187966d29ac113434ea527dca6cb3e3285f4afc22658185c77e00dd",
+      "ai-engineer": {
+        "interruptedAfter": "component",
+        "resumed": "changed true, journal starts [false, true]",
+        "repeat": "changed false",
+        "refusalsWroteNothing": {
+          "relations": 597,
+          "rows": 1057
+        },
+        "grantsDrift": "GRANTS_DRIFT after a local REVOKE; VERIFY_HOLD after a local GRANT; verify verified after restore"
+      },
+      "biotech": {
+        "interruptedAfter": "mission-control",
+        "resumed": "unrun locally (needs Neo4j for graph-release)",
+        "refusalsWroteNothing": {
+          "relations": 209,
+          "rows": 79
+        }
+      },
+      "custodyProofNote": "the recorded run counted uploaded lists; the driver now requires uploaded_objects > 0 then 0 and fails on a missing report (review S6)"
+    },
+    "remote": {
+      "ai-engineer": {
+        "wrongConfirm": "installer CONFIRM_TARGET_MISMATCH; mission-db apply BLOCKED; seed-apply BLOCKED (exit 2)",
+        "wrongInstallation": "installer TARGET_IDENTITY_UNPROVEN (evidence gate); R2b TARGET_IDENTITY_MISMATCH (live probe); verify VERIFY_HOLD",
+        "wrongSystemIdentifier": "TARGET_SYSTEM_IDENTIFIER_MISMATCH",
+        "tamperedLock": "installer MISSION_CONTROL_LOCK_PIN_MISMATCH; verify BLOCKED Release checksum mismatch",
+        "snapshotCompare": "identical, 0 differences; verify verified",
+        "interruptResume": "--interrupt-after component exit 1; rerun exit 0 resumedAfterInterruption true, changed:false"
+      },
+      "biotech": {
+        "wrongConfirm": "installer CONFIRM_TARGET_MISMATCH; mission-db apply BLOCKED; seed-apply BLOCKED (exit 2)",
+        "wrongInstallation": "installer TARGET_IDENTITY_UNPROVEN (evidence gate); R2b TARGET_IDENTITY_MISMATCH (live probe); verify VERIFY_HOLD",
+        "wrongSystemIdentifier": "TARGET_SYSTEM_IDENTIFIER_MISMATCH",
+        "tamperedLock": "installer MISSION_CONTROL_LOCK_PIN_MISMATCH; verify BLOCKED Release checksum mismatch",
+        "snapshotCompare": "identical, 0 differences; verify verified",
+        "interruptResume": "--interrupt-after mission-control exit 1; rerun exit 0 resumedAfterInterruption true, changed:false"
+      }
+    }
+  },
+  "evidenceMatrix": [
+    {
+      "evidence": "wipe, fresh, repeat, upgrade, repeat on both targets",
+      "class": "real-installed"
+    },
+    {
+      "evidence": "live describe against the Application Profiles",
+      "class": "local real composition; remote pending"
+    },
+    {
+      "evidence": "interrupted install, then resume",
+      "class": "local real installer; remote pending"
+    },
+    {
+      "evidence": "wrong confirm, installation, system_identifier and tampered-lock refusals",
+      "class": "local real installer and mission-db; remote pending"
+    },
+    {
+      "evidence": "wrong grants",
+      "class": "local only (deliberate drift)"
+    },
+    {
+      "evidence": "seed plan/apply and custody upload",
+      "class": "local doubled (stub storage schema, local custody); remote pending"
+    },
+    {
+      "evidence": "evaluator isolation, trusted ingress, saved-result settlement, native receipt recovery",
+      "class": "source and local service tests of WI-03/04/05; not on the remotes"
+    },
+    {
+      "evidence": "W0 negative rows of PROOFS section 2",
+      "class": "deterministic local suites of WI-01..05; not on the remotes"
+    },
+    {
+      "evidence": "scripted auditor",
+      "class": "doubled; disposable-only and unset for W1"
+    },
+    {
+      "evidence": "model behaviour beyond the availability probes",
+      "class": "unrun (W1)"
+    }
+  ],
+  "noTestPopulatedAuthority": "the remotes hold only rows the installers and the reviewed seed bundles write; no fixture, scripted auditor receipt or doubled native write was applied",
+  "w1Prerequisites": [
+    "independent auditor credential and its env name (owner, H2)",
+    "restricted logins MC_RUNTIME_DSN, MC_FAMILY_WRITER_DSN, MC_CHECKPOINTER_DSN per remote",
+    "saver schema via mission-db runtime-plan/runtime-apply before the MC_CHECKPOINTER_DSN login (section 8.1)",
+    "operator deployment file, binding digest, MISSION_CONTROL_RUNTIME_OPTIONS_FACTORY",
+    "bundle custody reader: CAPABILITY_BUNDLE_BACKEND, CAPABILITY_BUNDLE_READER_TOKEN, CAPABILITY_BUNDLE_NAMESPACE",
+    "publisher token for the custody upload",
+    "BKS_TARGET=production via --confirm-graph",
+    "optional dedicated knowledge_verification_outbox_worker login",
+    "Temporal queue collision (both profiles name biotech-research-ingestion)",
+    "RUNTIME-ENVIRONMENT section 6 unverified items (dispatch drain, Agent Server env, SET ROLE, one DSN, tenant agreement)"
+  ],
+  "review": {
+    "independentReviewer": "Claude Sonnet 5.5 independent reviewer subagent",
+    "verdict": "RELEASE WITH RECORDED LIMITATIONS",
+    "date": "2026-10-28"
+  },
+  "w1Done": [
+    "canonical KS executor rebuilt at 2.5.0 (integrator, 2026-10-28)",
+    "sprint-oc-w0-runtime-2 generator fixes (1cc7b40b) merged on sprint-oc in abdeefaf"
+  ],
+  "runtimeSaver": {
+    "descriptor": "packages/mission-control-db-contract/runtime/descriptor.json",
+    "descriptorSha256": "b0330c546284548791dffae3c19452952db008fe5b32d36e8cc1a63488b93cfd",
+    "boundInRelease": "1.7.0 manifest runtime_descriptor",
+    "commands": [
+      "mission-db runtime-plan --target <target.toml> --lock <sprint-oc lock> --release-root <1.7.0 component> --reader-version mission-control-runtime/1 --writer-version mission-control-runtime/1 --descriptor <descriptor>",
+      "mission-db runtime-apply <same> --confirm-target <project_ref>:<installation_id> --receipt-out <receipt.json>",
+      "mission-db runtime-plan <same> (expect complete); runtime-apply repeat (already_complete); mission-db verify"
+    ],
+    "order": "after install and seeds, before the MC_CHECKPOINTER_DSN login; runtime-apply creates the NOLOGIN mission_control_checkpointer role; MC_RUNTIME_DSN and MC_FAMILY_WRITER_DSN may come before or after",
+    "remote": {
+      "ai-engineer": {
+        "runtimePlanBefore": "pending, descriptor_bound_to_release true, no holds, descriptor sha256:b0330c546284548791dffae3c19452952db008fe5b32d36e8cc1a63488b93cfd",
+        "runtimeApplyReceipt": "evidence/w0/runtime-receipt.ai-engineer.json complete, 17 steps",
+        "replanCompleteRepeatAlreadyComplete": "complete; 17/17 already_complete",
+        "verifyAfter": "verified",
+        "checkpointerLoginAfterReplan": "W1 prerequisite (login tooling, WI-06)"
+      },
+      "biotech": {
+        "runtimePlanBefore": "pending, descriptor_bound_to_release true, no holds, descriptor sha256:b0330c546284548791dffae3c19452952db008fe5b32d36e8cc1a63488b93cfd",
+        "runtimeApplyReceipt": "evidence/w0/runtime-receipt.biotech.json complete, 17 steps",
+        "replanCompleteRepeatAlreadyComplete": "complete; 17/17 already_complete",
+        "verifyAfter": "verified",
+        "checkpointerLoginAfterReplan": "W1 prerequisite (login tooling, WI-06)"
+      }
+    }
+  }
+}

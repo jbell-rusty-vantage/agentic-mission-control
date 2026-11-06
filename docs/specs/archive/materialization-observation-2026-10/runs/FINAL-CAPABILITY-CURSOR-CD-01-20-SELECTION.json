@@ -1,0 +1,167 @@
+{
+  "source": "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\run2-final-main\\docs\\specs\\materialization-observation-2026-10\\research\\cursor-maturity.md",
+  "source_sha256": "7053abf7dd341e2af07466c1f1235294edb042f175aebb0341bea2ed4df95aed",
+  "rows": [
+    {
+      "id": "CD-01",
+      "profile": "both",
+      "drill": "Launch, observe and settle a one-turn task",
+      "criterion_verbatim": "`run.final` or `RunResult`; patch, outputs and usage recorded; lease released after custody",
+      "selection_boundary": "in-sprint applicable profile/placement; require exact prerequisite/budget and no paid replay",
+      "current_qualified": false
+    },
+    {
+      "id": "CD-02",
+      "profile": "cloud",
+      "drill": "Kill the worker mid-run; start a fresh worker",
+      "criterion_verbatim": "Reattach rehydrates; SSE resumes from `Last-Event-ID`; zero duplicate frames",
+      "selection_boundary": "in-sprint applicable profile/placement; require exact prerequisite/budget and no paid replay",
+      "current_qualified": false
+    },
+    {
+      "id": "CD-03",
+      "profile": "local",
+      "drill": "Same as CD-02, without and then with CM-05",
+      "criterion_verbatim": "Without: unit `in_doubt`, no resend. With: same live run observed to completion",
+      "selection_boundary": "in-sprint applicable profile/placement; require exact prerequisite/budget and no paid replay",
+      "current_qualified": false
+    },
+    {
+      "id": "CD-04",
+      "profile": "cloud",
+      "drill": "Read the stream after retention",
+      "criterion_verbatim": "One `stream.expired` frame; terminal truth from the run record; retention header value recorded",
+      "selection_boundary": "in-sprint applicable profile/placement; require exact prerequisite/budget and no paid replay",
+      "current_qualified": false
+    },
+    {
+      "id": "CD-05",
+      "profile": "cloud",
+      "drill": "Follow-up while a run is active",
+      "criterion_verbatim": "`409 agent_busy`, `busy` journaled, exactly one run after idle",
+      "selection_boundary": "in-sprint applicable profile/placement; require exact prerequisite/budget and no paid replay",
+      "current_qualified": false
+    },
+    {
+      "id": "CD-06",
+      "profile": "both",
+      "drill": "`interrupt_and_inject`",
+      "criterion_verbatim": "Old run `CANCELLED`; replacement run on the same agent carries the injected text; a fence that lands mid-drain prevents the replacement",
+      "selection_boundary": "in-sprint applicable profile/placement; require exact prerequisite/budget and no paid replay",
+      "current_qualified": false
+    },
+    {
+      "id": "CD-07",
+      "profile": "both",
+      "drill": "Immediate cancel",
+      "criterion_verbatim": "Four timestamps recorded; local Kernel Hook denies after the fence; cloud stops within one API round-trip",
+      "selection_boundary": "in-sprint applicable profile/placement; require exact prerequisite/budget and no paid replay",
+      "current_qualified": false
+    },
+    {
+      "id": "CD-08",
+      "profile": "both",
+      "drill": "Continuation (`request_continuation`)",
+      "criterion_verbatim": "New agent; staged prompt is turn 1; subagents and env present (CM-08); source agent archived",
+      "selection_boundary": "in-sprint applicable profile/placement; require exact prerequisite/budget and no paid replay",
+      "current_qualified": false
+    },
+    {
+      "id": "CD-09",
+      "profile": "both",
+      "drill": "Fork from snapshot",
+      "criterion_verbatim": "Workspace digests match; conversation export present (CM-07); local store-copy resume (CM-06) recorded either way",
+      "selection_boundary": "in-sprint snapshot/conversation export only; CM-06 store-copy part explicitly deferred; record excluded part rather than implementing it",
+      "current_qualified": false
+    },
+    {
+      "id": "CD-10",
+      "profile": "both",
+      "drill": "Usage and cost",
+      "criterion_verbatim": "Per-run tokens sum across replaced turns; cost re-read at +5 and +15 min converges; no zero-fill",
+      "selection_boundary": "in-sprint applicable profile/placement; require exact prerequisite/budget and no paid replay",
+      "current_qualified": false
+    },
+    {
+      "id": "CD-11",
+      "profile": "cloud",
+      "drill": "Declared outputs and artifacts",
+      "criterion_verbatim": "`outputs/` registered from the branch; `artifacts/` downloaded within 15 min; missing-output follow-up fires once",
+      "selection_boundary": "in-sprint applicable profile/placement; require exact prerequisite/budget and no paid replay",
+      "current_qualified": false
+    },
+    {
+      "id": "CD-12",
+      "profile": "cloud",
+      "drill": "`autoCreatePR` on a throwaway repo",
+      "criterion_verbatim": "PR URL attributed to the run and persisted before archiving",
+      "selection_boundary": "in-sprint applicable profile/placement; require exact prerequisite/budget and no paid replay",
+      "current_qualified": false
+    },
+    {
+      "id": "CD-13",
+      "profile": "both",
+      "drill": "Model params",
+      "criterion_verbatim": "`models.list()` choice applied; resolved model in closing facts; an invalid param refused before launch",
+      "selection_boundary": "deferred feature scope: CM-11 model params / CM-15 plan gate / CM-16 custom tools respectively; do not execute without explicit scope change",
+      "current_qualified": false
+    },
+    {
+      "id": "CD-14",
+      "profile": "both",
+      "drill": "Two parallel units in one run (CM-10)",
+      "criterion_verbatim": "Distinct leases and branches; no fence-out; both settle",
+      "selection_boundary": "in-sprint applicable profile/placement; require exact prerequisite/budget and no paid replay",
+      "current_qualified": false
+    },
+    {
+      "id": "CD-15",
+      "profile": "local",
+      "drill": "Windows worker in connect mode (CM-04)",
+      "criterion_verbatim": "Launch, observe, cancel, end on SelectorEventLoop; hooks fire through the resolved interpreter",
+      "selection_boundary": "CM-04 original Windows connect-mode acceptance; unproven; WSL success does not qualify Windows",
+      "current_qualified": false
+    },
+    {
+      "id": "CD-16",
+      "profile": "cloud",
+      "drill": "Idempotency",
+      "criterion_verbatim": "Replaying `agentId` gives `409 agent_id_conflict` and a reattach; `Idempotency-Key` replay window measured; whether `POST /runs` honours a key is recorded",
+      "selection_boundary": "in-sprint applicable profile/placement; require exact prerequisite/budget and no paid replay",
+      "current_qualified": false
+    },
+    {
+      "id": "CD-17",
+      "profile": "both",
+      "drill": "Plan gate (CM-15)",
+      "criterion_verbatim": "Plan turn, then Human Task, then agent turn; deny gives `not_accepted`",
+      "selection_boundary": "deferred feature scope: CM-11 model params / CM-15 plan gate / CM-16 custom tools respectively; do not execute without explicit scope change",
+      "current_qualified": false
+    },
+    {
+      "id": "CD-18",
+      "profile": "local",
+      "drill": "Custom-tool approval (CM-16)",
+      "criterion_verbatim": "Tool blocks; human answer returns; timeout gives a typed refusal",
+      "selection_boundary": "deferred feature scope: CM-11 model params / CM-15 plan gate / CM-16 custom tools respectively; do not execute without explicit scope change",
+      "current_qualified": false
+    },
+    {
+      "id": "CD-19",
+      "profile": "cloud",
+      "drill": "`429` (only if a rate limit is hit naturally)",
+      "criterion_verbatim": "`Retry-After` honoured by a Temporal timer; one create afterwards",
+      "selection_boundary": "only if429 occurs naturally; never spend to force throttling",
+      "current_qualified": false
+    },
+    {
+      "id": "CD-20",
+      "profile": "cloud",
+      "drill": "Headless hook matrix plus v0 interop (Q-C3)",
+      "criterion_verbatim": "Which of `beforeMCPExecution`, `preCompact` and `stop` fire is recorded; whether a v0 webhook agent accepts v1 runs and streams is recorded",
+      "selection_boundary": "in-sprint applicable profile/placement; require exact prerequisite/budget and no paid replay",
+      "current_qualified": false
+    }
+  ],
+  "note": "All20 preserved for navigation; deferred subcriteria remain deferred, not blanket execution scope or a claim all20 must be forced."
+}

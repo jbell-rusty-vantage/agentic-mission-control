@@ -1,0 +1,9 @@
+# claude_managed pack for AI Engineer (R30: checked-in pack files until the HL-21 projection).
+schema: mc.hosted_pack.claude_managed.v1
+pack: knowledge
+application: ai-engineer
+lane_profile: claude_managed
+placement: cloud
+data_class: internal
+# The queue the hosted lane worker serves (SPEC-11 section 2; providers.claude_managed.task_queue).
+task_queue: mc-ai-engineer-lane-hosted

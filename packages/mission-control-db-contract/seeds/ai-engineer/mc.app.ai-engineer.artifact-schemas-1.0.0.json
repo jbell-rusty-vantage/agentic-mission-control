@@ -1,0 +1,719 @@
+{
+  "actor_ref": "seed:mission-control-catalog",
+  "component_compatibility": ">=1.4.1 <2.0.0",
+  "depends_on": [],
+  "description": "AI Engineer SDLC diagnosis, patch and review report schemas (owner decision D5), additive to the common S0 schema; schema validity is not acceptance.",
+  "format": "mission-control-seed/v1",
+  "records": [
+    {
+      "fields": {
+        "asset_id": "definition:artifact_schema:schema.sdlc-diagnosis-report",
+        "contract": "mission-control.published-definition/1",
+        "kind": "schema",
+        "manifest": {
+          "definition": {
+            "description": "F1 diagnosis: reproduction, root cause, affected files; validation records evidence and unknowns; it is separate from acceptance.",
+            "json_schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "additionalProperties": false,
+              "if": {
+                "properties": {
+                  "disposition": {
+                    "enum": [
+                      "diagnosed"
+                    ]
+                  }
+                }
+              },
+              "properties": {
+                "affected_files": {
+                  "items": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "type": "array",
+                  "uniqueItems": true
+                },
+                "disposition": {
+                  "enum": [
+                    "diagnosed",
+                    "not_reproduced",
+                    "unknown",
+                    "unrun"
+                  ]
+                },
+                "evidence_refs": {
+                  "items": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "reproduction": {
+                  "additionalProperties": false,
+                  "if": {
+                    "properties": {
+                      "disposition": {
+                        "enum": [
+                          "observed",
+                          "failed"
+                        ]
+                      }
+                    }
+                  },
+                  "properties": {
+                    "commands": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "command": {
+                            "minLength": 1,
+                            "type": "string"
+                          },
+                          "exit_code": {
+                            "type": [
+                              "integer",
+                              "null"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "command",
+                          "exit_code"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "disposition": {
+                      "enum": [
+                        "observed",
+                        "failed",
+                        "unknown",
+                        "unrun"
+                      ]
+                    },
+                    "evidence_refs": {
+                      "items": {
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "disposition",
+                    "commands",
+                    "evidence_refs"
+                  ],
+                  "then": {
+                    "properties": {
+                      "commands": {
+                        "items": {
+                          "properties": {
+                            "exit_code": {
+                              "type": "integer"
+                            }
+                          }
+                        },
+                        "minItems": 1
+                      },
+                      "evidence_refs": {
+                        "minItems": 1
+                      }
+                    }
+                  },
+                  "type": "object"
+                },
+                "root_cause": {
+                  "additionalProperties": false,
+                  "if": {
+                    "properties": {
+                      "disposition": {
+                        "enum": [
+                          "identified"
+                        ]
+                      }
+                    }
+                  },
+                  "properties": {
+                    "disposition": {
+                      "enum": [
+                        "identified",
+                        "unknown",
+                        "unrun"
+                      ]
+                    },
+                    "summary": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "disposition",
+                    "summary"
+                  ],
+                  "then": {
+                    "properties": {
+                      "summary": {
+                        "minLength": 1
+                      }
+                    }
+                  },
+                  "type": "object"
+                },
+                "schema_version": {
+                  "const": "mc.sdlc_diagnosis_report.v1"
+                },
+                "subject": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "issue": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "source_ref": {
+                      "minLength": 1,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "issue",
+                    "source_ref"
+                  ],
+                  "type": "object"
+                }
+              },
+              "required": [
+                "schema_version",
+                "subject",
+                "reproduction",
+                "root_cause",
+                "affected_files",
+                "evidence_refs",
+                "disposition"
+              ],
+              "then": {
+                "properties": {
+                  "affected_files": {
+                    "minItems": 1
+                  },
+                  "evidence_refs": {
+                    "minItems": 1
+                  },
+                  "reproduction": {
+                    "properties": {
+                      "disposition": {
+                        "enum": [
+                          "observed",
+                          "failed"
+                        ]
+                      }
+                    }
+                  },
+                  "root_cause": {
+                    "properties": {
+                      "disposition": {
+                        "const": "identified"
+                      }
+                    }
+                  }
+                }
+              },
+              "type": "object"
+            },
+            "kind": "artifact_schema",
+            "logical_id": "schema.sdlc-diagnosis-report",
+            "schema_dialect": "https://json-schema.org/draft/2020-12/schema",
+            "schema_version": "1",
+            "title": "SDLC diagnosis report"
+          },
+          "published_at": "2026-10-18T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:83f0def6723b36422a148d86a38430b02d338e4ab61f71ec9ccf3c60edce6805",
+            "kind": "artifact_schema",
+            "lifecycle_status": "published",
+            "logical_id": "schema.sdlc-diagnosis-report",
+            "payload_ref": null,
+            "revision": 1,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:bdea0a7b28519171b153118cf87556b8fbf3bbaba44a1039f8e82b477939af28",
+        "manifest_ref": "mc-catalog://definition/artifact_schema/schema.sdlc-diagnosis-report/1",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "1"
+      },
+      "kind": "asset_version",
+      "logical_key": "artifact-schema:artifact-schema:schema.sdlc-diagnosis-report/1"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "artifact-schema:artifact-schema:schema.sdlc-diagnosis-report/1",
+        "decided_at": "2026-10-18T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "docs/specs/materialization-observation-2026-10/SPEC-01-environments.md",
+          "docs/specs/materialization-observation-2026-10/SPEC-02-cognition.md",
+          "docs/specs/materialization-observation-2026-10/RUN-2-CLAUDE-CODE-OPUS-INSTRUCTIONS-2026-10-18.md",
+          "docs/specs/materialization-observation-2026-10/RUN-2-EXECUTION-SEQUENCE-2026-10-18.md"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "artifact-schema:artifact-schema:schema.sdlc-diagnosis-report/1:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:artifact_schema:schema.sdlc-patch-report",
+        "contract": "mission-control.published-definition/1",
+        "kind": "schema",
+        "manifest": {
+          "definition": {
+            "description": "F1 patch: base, diff digest, changed files, tests, risks; validation records evidence and unknowns; it is separate from acceptance.",
+            "json_schema": {
+              "$defs": {
+                "test_run": {
+                  "additionalProperties": false,
+                  "else": {
+                    "properties": {
+                      "exit_code": {
+                        "type": "null"
+                      },
+                      "failed": {
+                        "type": "null"
+                      },
+                      "passed": {
+                        "type": "null"
+                      }
+                    }
+                  },
+                  "if": {
+                    "properties": {
+                      "disposition": {
+                        "enum": [
+                          "observed"
+                        ]
+                      }
+                    }
+                  },
+                  "properties": {
+                    "command": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "disposition": {
+                      "enum": [
+                        "observed",
+                        "unknown",
+                        "unrun"
+                      ]
+                    },
+                    "exit_code": {
+                      "type": [
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "failed": {
+                      "minimum": 0,
+                      "type": [
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "passed": {
+                      "minimum": 0,
+                      "type": [
+                        "integer",
+                        "null"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "command",
+                    "disposition",
+                    "exit_code",
+                    "passed",
+                    "failed"
+                  ],
+                  "then": {
+                    "properties": {
+                      "exit_code": {
+                        "type": "integer"
+                      },
+                      "failed": {
+                        "type": "integer"
+                      },
+                      "passed": {
+                        "type": "integer"
+                      }
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "additionalProperties": false,
+              "properties": {
+                "base_commit": {
+                  "maxLength": 64,
+                  "minLength": 7,
+                  "type": "string"
+                },
+                "changed_files": {
+                  "items": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "minItems": 1,
+                  "type": "array",
+                  "uniqueItems": true
+                },
+                "evidence_refs": {
+                  "items": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "head_or_diff_sha256": {
+                  "maxLength": 71,
+                  "minLength": 40,
+                  "type": "string"
+                },
+                "risks": {
+                  "items": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "schema_version": {
+                  "const": "mc.sdlc_patch_report.v1"
+                },
+                "summary": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "tests": {
+                  "items": {
+                    "$ref": "#/$defs/test_run"
+                  },
+                  "minItems": 1,
+                  "type": "array"
+                }
+              },
+              "required": [
+                "schema_version",
+                "base_commit",
+                "head_or_diff_sha256",
+                "changed_files",
+                "summary",
+                "tests",
+                "risks",
+                "evidence_refs"
+              ],
+              "type": "object"
+            },
+            "kind": "artifact_schema",
+            "logical_id": "schema.sdlc-patch-report",
+            "schema_dialect": "https://json-schema.org/draft/2020-12/schema",
+            "schema_version": "1",
+            "title": "SDLC patch report"
+          },
+          "published_at": "2026-10-18T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:427aa03c0bd34a0acaf63b0f10e85d967cf8e791efd8920a0d39acc01f07d3a8",
+            "kind": "artifact_schema",
+            "lifecycle_status": "published",
+            "logical_id": "schema.sdlc-patch-report",
+            "payload_ref": null,
+            "revision": 1,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:fe311287a06a6aaf49cabbb18a24bf503d9d1d25d5f0b92149b1105a1081d40d",
+        "manifest_ref": "mc-catalog://definition/artifact_schema/schema.sdlc-patch-report/1",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "1"
+      },
+      "kind": "asset_version",
+      "logical_key": "artifact-schema:artifact-schema:schema.sdlc-patch-report/1"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "artifact-schema:artifact-schema:schema.sdlc-patch-report/1",
+        "decided_at": "2026-10-18T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "docs/specs/materialization-observation-2026-10/SPEC-01-environments.md",
+          "docs/specs/materialization-observation-2026-10/SPEC-02-cognition.md",
+          "docs/specs/materialization-observation-2026-10/RUN-2-CLAUDE-CODE-OPUS-INSTRUCTIONS-2026-10-18.md",
+          "docs/specs/materialization-observation-2026-10/RUN-2-EXECUTION-SEQUENCE-2026-10-18.md"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "artifact-schema:artifact-schema:schema.sdlc-patch-report/1:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:artifact_schema:schema.sdlc-review-report",
+        "contract": "mission-control.published-definition/1",
+        "kind": "schema",
+        "manifest": {
+          "definition": {
+            "description": "F1 independent review: verdict, findings, rerun tests; validation records evidence and unknowns; it is separate from acceptance.",
+            "json_schema": {
+              "$defs": {
+                "test_run": {
+                  "additionalProperties": false,
+                  "else": {
+                    "properties": {
+                      "exit_code": {
+                        "type": "null"
+                      },
+                      "failed": {
+                        "type": "null"
+                      },
+                      "passed": {
+                        "type": "null"
+                      }
+                    }
+                  },
+                  "if": {
+                    "properties": {
+                      "disposition": {
+                        "enum": [
+                          "observed"
+                        ]
+                      }
+                    }
+                  },
+                  "properties": {
+                    "command": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "disposition": {
+                      "enum": [
+                        "observed",
+                        "unknown",
+                        "unrun"
+                      ]
+                    },
+                    "exit_code": {
+                      "type": [
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "failed": {
+                      "minimum": 0,
+                      "type": [
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "passed": {
+                      "minimum": 0,
+                      "type": [
+                        "integer",
+                        "null"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "command",
+                    "disposition",
+                    "exit_code",
+                    "passed",
+                    "failed"
+                  ],
+                  "then": {
+                    "properties": {
+                      "exit_code": {
+                        "type": "integer"
+                      },
+                      "failed": {
+                        "type": "integer"
+                      },
+                      "passed": {
+                        "type": "integer"
+                      }
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "additionalProperties": false,
+              "if": {
+                "properties": {
+                  "verdict": {
+                    "enum": [
+                      "changes_required"
+                    ]
+                  }
+                }
+              },
+              "properties": {
+                "evidence_refs": {
+                  "items": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "findings": {
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "correction": {
+                        "type": "string"
+                      },
+                      "file": {
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "line": {
+                        "minimum": 1,
+                        "type": [
+                          "integer",
+                          "null"
+                        ]
+                      },
+                      "severity": {
+                        "enum": [
+                          "defect",
+                          "missing_evidence",
+                          "suggestion"
+                        ]
+                      },
+                      "summary": {
+                        "minLength": 1,
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "severity",
+                      "file",
+                      "line",
+                      "summary",
+                      "correction"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "reviewed_diff_sha256": {
+                  "maxLength": 71,
+                  "minLength": 40,
+                  "type": "string"
+                },
+                "reviewer_role": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "schema_version": {
+                  "const": "mc.sdlc_review_report.v1"
+                },
+                "tests_rerun": {
+                  "items": {
+                    "$ref": "#/$defs/test_run"
+                  },
+                  "minItems": 1,
+                  "type": "array"
+                },
+                "verdict": {
+                  "enum": [
+                    "approve",
+                    "approve_with_nits",
+                    "changes_required"
+                  ]
+                }
+              },
+              "required": [
+                "schema_version",
+                "reviewed_diff_sha256",
+                "reviewer_role",
+                "verdict",
+                "findings",
+                "tests_rerun",
+                "evidence_refs"
+              ],
+              "then": {
+                "properties": {
+                  "findings": {
+                    "minItems": 1
+                  }
+                }
+              },
+              "type": "object"
+            },
+            "kind": "artifact_schema",
+            "logical_id": "schema.sdlc-review-report",
+            "schema_dialect": "https://json-schema.org/draft/2020-12/schema",
+            "schema_version": "1",
+            "title": "SDLC review report"
+          },
+          "published_at": "2026-10-18T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:8d9c995c60adb6aa63fef5c13716c62c2cd39db32a4ad798139c04ff905d1371",
+            "kind": "artifact_schema",
+            "lifecycle_status": "published",
+            "logical_id": "schema.sdlc-review-report",
+            "payload_ref": null,
+            "revision": 1,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:3a7a49a8a1033b98c781d7ce110c1371ae40b2b54ba71c4ce9312deab4794dbb",
+        "manifest_ref": "mc-catalog://definition/artifact_schema/schema.sdlc-review-report/1",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "1"
+      },
+      "kind": "asset_version",
+      "logical_key": "artifact-schema:artifact-schema:schema.sdlc-review-report/1"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "artifact-schema:artifact-schema:schema.sdlc-review-report/1",
+        "decided_at": "2026-10-18T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "docs/specs/materialization-observation-2026-10/SPEC-01-environments.md",
+          "docs/specs/materialization-observation-2026-10/SPEC-02-cognition.md",
+          "docs/specs/materialization-observation-2026-10/RUN-2-CLAUDE-CODE-OPUS-INSTRUCTIONS-2026-10-18.md",
+          "docs/specs/materialization-observation-2026-10/RUN-2-EXECUTION-SEQUENCE-2026-10-18.md"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "artifact-schema:artifact-schema:schema.sdlc-review-report/1:admit"
+    }
+  ],
+  "seed_key": "mc.app.ai-engineer.artifact-schemas",
+  "seed_version": "1.0.0"
+}

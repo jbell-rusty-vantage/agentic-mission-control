@@ -1,0 +1,17 @@
+{
+  "batch": {
+    "max_delay_seconds": 30,
+    "max_signals": 20
+  },
+  "flush": [],
+  "lane_profile": "codex_cloud",
+  "materialization": {
+    "files": [
+      "AGENTS.override.md"
+    ],
+    "skills": ".agents/skills"
+  },
+  "schema_version": "mc.signal_policy.v1",
+  "signals": {},
+  "stdout": {}
+}

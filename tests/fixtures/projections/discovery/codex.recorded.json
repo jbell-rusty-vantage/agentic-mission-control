@@ -1,0 +1,418 @@
+{
+  "answers": {
+    "config_read": {
+      "config": {
+        "mcp_servers": {
+          "mc-discovery-stub": {
+            "args": [
+              ".mission/discovery/mcp_stub.py"
+            ],
+            "command": "python",
+            "enabled": true,
+            "enabled_tools": [
+              "discovery_echo"
+            ],
+            "environment_id": "local",
+            "tool_timeout_sec": null
+          },
+          "repo-docs": {
+            "args": [],
+            "command": "repo-docs",
+            "enabled": true,
+            "environment_id": "local",
+            "tool_timeout_sec": null
+          }
+        }
+      },
+      "origins": {
+        "mcp_servers.mc-discovery-stub.args.0": {
+          "name": {
+            "dotCodexFolder": "<workspace>\\.codex",
+            "type": "project"
+          },
+          "version": "sha256:37454ead20cbd526c38abdd56d657a6de1631f7016682a6bd5d8b73669f55deb"
+        },
+        "mcp_servers.mc-discovery-stub.command": {
+          "name": {
+            "dotCodexFolder": "<workspace>\\.codex",
+            "type": "project"
+          },
+          "version": "sha256:37454ead20cbd526c38abdd56d657a6de1631f7016682a6bd5d8b73669f55deb"
+        },
+        "mcp_servers.mc-discovery-stub.enabled": {
+          "name": {
+            "dotCodexFolder": "<workspace>\\.codex",
+            "type": "project"
+          },
+          "version": "sha256:37454ead20cbd526c38abdd56d657a6de1631f7016682a6bd5d8b73669f55deb"
+        },
+        "mcp_servers.mc-discovery-stub.enabled_tools.0": {
+          "name": {
+            "dotCodexFolder": "<workspace>\\.codex",
+            "type": "project"
+          },
+          "version": "sha256:37454ead20cbd526c38abdd56d657a6de1631f7016682a6bd5d8b73669f55deb"
+        },
+        "mcp_servers.repo-docs.command": {
+          "name": {
+            "dotCodexFolder": "<workspace>\\.codex",
+            "type": "project"
+          },
+          "version": "sha256:37454ead20cbd526c38abdd56d657a6de1631f7016682a6bd5d8b73669f55deb"
+        }
+      }
+    },
+    "hooks_list": {
+      "data": [
+        {
+          "cwd": "<workspace>",
+          "errors": [],
+          "hooks": [
+            {
+              "additionalContextLimit": null,
+              "async": false,
+              "command": "python .mission/hooks/run.py hook.discovery-marker session_start",
+              "currentHash": "sha256:3c1dc8a48776ebf4230b7d88defbc97798fef97147b747b15c8e54c3d71014c0",
+              "displayOrder": 0,
+              "enabled": true,
+              "eventName": "sessionStart",
+              "handlerType": "command",
+              "isManaged": false,
+              "key": "<workspace>\\.codex\\hooks.json:session_start:0:0",
+              "matcher": null,
+              "pluginId": null,
+              "source": "project",
+              "sourcePath": "<workspace>\\.codex\\hooks.json",
+              "statusMessage": null,
+              "timeoutSec": 20,
+              "trustStatus": "trusted"
+            },
+            {
+              "additionalContextLimit": null,
+              "async": false,
+              "command": "python .mission/hooks/signal hook subagent_stop",
+              "currentHash": "sha256:1724c004bb1f3010ba0de5cb8a952898bdebcc45517a018cb68a54d75626984c",
+              "displayOrder": 1,
+              "enabled": true,
+              "eventName": "subagentStop",
+              "handlerType": "command",
+              "isManaged": false,
+              "key": "<workspace>\\.codex\\hooks.json:subagent_stop:0:0",
+              "matcher": null,
+              "pluginId": null,
+              "source": "project",
+              "sourcePath": "<workspace>\\.codex\\hooks.json",
+              "statusMessage": null,
+              "timeoutSec": 15,
+              "trustStatus": "trusted"
+            },
+            {
+              "additionalContextLimit": null,
+              "async": false,
+              "command": "python .mission/hooks/signal hook stop",
+              "currentHash": "sha256:d097234d91092a101a9755f06df431a70f60826cd4dd59dd5263d16ee335d2b3",
+              "displayOrder": 2,
+              "enabled": true,
+              "eventName": "stop",
+              "handlerType": "command",
+              "isManaged": false,
+              "key": "<workspace>\\.codex\\hooks.json:stop:0:0",
+              "matcher": null,
+              "pluginId": null,
+              "source": "project",
+              "sourcePath": "<workspace>\\.codex\\hooks.json",
+              "statusMessage": null,
+              "timeoutSec": 15,
+              "trustStatus": "trusted"
+            }
+          ],
+          "warnings": []
+        }
+      ]
+    },
+    "skills_list": {
+      "data": [
+        {
+          "cwd": "<workspace>",
+          "errors": [],
+          "skills": [
+            {
+              "description": "Drive a real browser with agent-browser.",
+              "enabled": true,
+              "name": "agent-browser",
+              "path": "<workspace>\\.agents\\skills\\agent-browser\\SKILL.md",
+              "pluginId": null,
+              "scope": "repo"
+            },
+            {
+              "description": "Report milestones, blockers, requests for input, ready artifacts and progress back to Mission Control from inside a mission workspace with mc-signal. Use whenever you finish a meaningful step, get stuck, need a human or another agent to act, or produce an artifact someone is waiting for; signals are the only channel back, so never write status, ledger or stop files instead.",
+              "enabled": true,
+              "name": "mc-signals",
+              "path": "<workspace>\\.agents\\skills\\mc-signals\\SKILL.md",
+              "pluginId": null,
+              "scope": "repo"
+            },
+            {
+              "description": "The repository's own note-taking skill.",
+              "enabled": true,
+              "name": "repo-notes",
+              "path": "<workspace>\\.agents\\skills\\repo-notes\\SKILL.md",
+              "pluginId": null,
+              "scope": "repo"
+            },
+            {
+              "description": "Generate or edit raster images when the task benefits from AI-created bitmap visuals such as photos, illustrations, textures, sprites, mockups, or transparent-background cutouts. Use when Codex should create a brand-new image, transform an existing image, or derive visual variants from references, and the output should be a bitmap asset rather than repo-native code or vector. Do not use when the task is better handled by editing existing SVG/vector/code-native assets, extending an established icon or logo system, or building the visual directly in HTML/CSS/canvas.",
+              "enabled": true,
+              "interface": {
+                "brandColor": null,
+                "defaultPrompt": "Use $imagegen to make or edit an image for this project.",
+                "displayName": "Image Gen",
+                "iconLarge": "<codex_home>\\skills\\.system\\imagegen\\assets\\imagegen.png",
+                "iconLargeUrl": null,
+                "iconSmall": "<codex_home>\\skills\\.system\\imagegen\\assets\\imagegen-small.svg",
+                "iconSmallUrl": null,
+                "shortDescription": "Generate or edit images for websites, games, and more"
+              },
+              "name": "imagegen",
+              "path": "<codex_home>\\skills\\.system\\imagegen\\SKILL.md",
+              "pluginId": null,
+              "scope": "system"
+            },
+            {
+              "description": "Use for Codex models/pricing, scheduled tasks, skills, settings, setup, troubleshooting, customization, automations, and self-knowledge\u2014including 'you,' 'your,' 'this app,' or 'this coding agent' when they refer to Codex\u2014and for OpenAI APIs/products and ChatGPT Work. Also use for model choice/migration, prompting, SDKs, Responses, Realtime, agents, evals, and Chat/Work/Codex comparisons. Do not use for generic app/software tasks that merely mention Codex.",
+              "enabled": true,
+              "interface": {
+                "brandColor": null,
+                "defaultPrompt": "Use OpenAI Docs for official docs lookup, questions about Codex itself or Codex surfaces, model selection, model migration, and prompt-upgrade work.",
+                "displayName": "OpenAI Docs",
+                "iconLarge": "<codex_home>\\skills\\.system\\openai-docs\\assets\\openai.png",
+                "iconLargeUrl": null,
+                "iconSmall": "<codex_home>\\skills\\.system\\openai-docs\\assets\\openai-small.svg",
+                "iconSmallUrl": null,
+                "shortDescription": "OpenAI and Codex docs for models, skills, tasks, and setup"
+              },
+              "name": "openai-docs",
+              "path": "<codex_home>\\skills\\.system\\openai-docs\\SKILL.md",
+              "pluginId": null,
+              "scope": "system",
+              "shortDescription": "Codex models/pricing, scheduled tasks, skills, settings, setup, troubleshooting, and self-knowledge; OpenAI APIs and ChatGPT Work. 'You'/'this app' means Codex only."
+            },
+            {
+              "description": "Perform a read-only, defect-first review of a specified code change and return every actionable finding. Use when another agent delegates review of uncommitted changes, a base-branch diff, a commit, or custom review instructions.",
+              "enabled": true,
+              "interface": {
+                "brandColor": null,
+                "defaultPrompt": "Use $review-agent to review the requested code changes and return actionable findings.",
+                "displayName": "Review Agent",
+                "iconLarge": null,
+                "iconLargeUrl": null,
+                "iconSmall": null,
+                "iconSmallUrl": null,
+                "shortDescription": "Find actionable bugs in code changes"
+              },
+              "name": "review-agent",
+              "path": "<codex_home>\\skills\\.system\\review-agent\\SKILL.md",
+              "pluginId": null,
+              "scope": "system"
+            },
+            {
+              "description": "Create or update a Codex skill with appropriately scoped instructions and any needed supporting resources.",
+              "enabled": true,
+              "interface": {
+                "brandColor": null,
+                "defaultPrompt": null,
+                "displayName": "Skill Creator",
+                "iconLarge": "<codex_home>\\skills\\.system\\skill-creator\\assets\\skill-creator.png",
+                "iconLargeUrl": null,
+                "iconSmall": "<codex_home>\\skills\\.system\\skill-creator\\assets\\skill-creator-small.svg",
+                "iconSmallUrl": null,
+                "shortDescription": "Create or update a skill"
+              },
+              "name": "skill-creator",
+              "path": "<codex_home>\\skills\\.system\\skill-creator\\SKILL.md",
+              "pluginId": null,
+              "scope": "system",
+              "shortDescription": "Create or update a skill"
+            },
+            {
+              "description": "Install Codex skills into $CODEX_HOME/skills from a curated list or a GitHub repo path. Use when a user asks to list installable skills, install a curated skill, or install a skill from another repo (including private repos).",
+              "enabled": true,
+              "interface": {
+                "brandColor": null,
+                "defaultPrompt": null,
+                "displayName": "Skill Installer",
+                "iconLarge": "<codex_home>\\skills\\.system\\skill-installer\\assets\\skill-installer.png",
+                "iconLargeUrl": null,
+                "iconSmall": "<codex_home>\\skills\\.system\\skill-installer\\assets\\skill-installer-small.svg",
+                "iconSmallUrl": null,
+                "shortDescription": "Install curated skills from openai/skills or other repos"
+              },
+              "name": "skill-installer",
+              "path": "<codex_home>\\skills\\.system\\skill-installer\\SKILL.md",
+              "pluginId": null,
+              "scope": "system",
+              "shortDescription": "Install curated skills from openai/skills or other repos"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "cli": {
+    "binary": "codex",
+    "version": "codex-cli 0.162.1"
+  },
+  "evidence": "local_cli_discovery",
+  "fixture": true,
+  "host": {
+    "os": "Windows",
+    "python": "3.12.7"
+  },
+  "lane_profile": "codex",
+  "layering": {
+    "conflicts": [],
+    "conflicts_policy": null,
+    "discovery": [
+      {
+        "kind": "instructions",
+        "name": "AGENTS.md",
+        "origin": "repo",
+        "path": "AGENTS.md"
+      },
+      {
+        "kind": "instructions",
+        "name": "mission overlay",
+        "origin": "mission",
+        "path": "developer_instructions"
+      },
+      {
+        "kind": "skill",
+        "name": "repo-notes",
+        "origin": "repo",
+        "path": ".agents/skills/repo-notes"
+      },
+      {
+        "kind": "skill",
+        "name": "agent-browser",
+        "origin": "mission",
+        "path": ".agents/skills/agent-browser"
+      },
+      {
+        "kind": "subagent",
+        "name": "discovery-reviewer",
+        "origin": "mission",
+        "path": ".codex/agents/discovery-reviewer.toml"
+      },
+      {
+        "kind": "hook",
+        "name": "SessionStart",
+        "origin": "mission",
+        "path": ".codex/hooks.json"
+      },
+      {
+        "kind": "hook",
+        "name": "Stop",
+        "origin": "mission",
+        "path": ".codex/hooks.json"
+      },
+      {
+        "kind": "hook",
+        "name": "SubagentStop",
+        "origin": "mission",
+        "path": ".codex/hooks.json"
+      },
+      {
+        "kind": "mcp_server",
+        "name": "repo-docs",
+        "origin": "repo",
+        "path": ".codex/config.toml"
+      },
+      {
+        "kind": "mcp_server",
+        "name": "mc-discovery-stub",
+        "origin": "mission",
+        "path": ".codex/config.toml"
+      }
+    ],
+    "lane_profile": "codex",
+    "merged": [
+      {
+        "format": "codex_config",
+        "kept_repo": [],
+        "mission_keys": [
+          "mcp_servers.mc-discovery-stub"
+        ],
+        "overridden": [],
+        "path": ".codex/config.toml",
+        "repo_keys": [
+          "model_reasoning_effort",
+          "mcp_servers.repo-docs"
+        ]
+      },
+      {
+        "format": "matcher_hooks",
+        "kept_repo": [],
+        "mission_keys": [
+          "hooks.SessionStart",
+          "hooks.Stop",
+          "hooks.SubagentStop"
+        ],
+        "overridden": [],
+        "path": ".codex/hooks.json",
+        "repo_keys": []
+      }
+    ],
+    "overflow": [],
+    "schema_version": "mc.layering_receipt.v1",
+    "skipped": []
+  },
+  "placed": {
+    ".agents/skills/agent-browser/SKILL.md": "sha256:7c06cbe7b0bdadcc704a721e93a87854a7303a17d4ea4c365ed9c3a2247ed252",
+    ".agents/skills/agent-browser/scripts/open.sh": "sha256:43e7eb20c9269f595cbff36a6f8b68b718e854459d90698bf26a5737a7f6da20",
+    ".agents/skills/mc-signals/SKILL.md": "sha256:2a85e1e290bd1ad196589a8f333c6fffb54a75d31d1b55f140abe088bc40507b",
+    ".codex/agents/discovery-reviewer.toml": "sha256:0fd1187f51e3b45e3af28a8aad8274ad4dee64b7efbbbe55e5ff6c9a2f515576",
+    ".codex/config.toml": "sha256:8aca241a56c8b19148a73d89b7543292de7ca9df5ebed30983ae05c167c1d971",
+    ".codex/hooks.json": "sha256:58466fc7af0dfde7763cc3e06be54b2594a267bd1cb87634252cf612e6bdd8c6",
+    ".mission/bin/mc-signal": "sha256:99bad6183326dd6fc423f81c3cb49843faa76ecd548c54ed8023b6afef65392e",
+    ".mission/hooks/hook.discovery-marker/hook.json": "sha256:1f2de5d24a289b5a2dae1f26c7f3ed71a643ed0c27c5656f3c9696f61c620e10",
+    ".mission/hooks/hook.discovery-marker/marker.py": "sha256:8d546a945abc9f0dcc5dfac7eaa517d3df51062fbb53a31abb9db4874b2dcae0",
+    ".mission/hooks/native_output.py": "sha256:7a3daa9599df2b071efc59546f7c858b54ad5ce5fb85205d990e9d60de76d087",
+    ".mission/hooks/run.py": "sha256:031fa16070fd9c86467e50338d272d47798ddd769abdfb6299eb8b6ca7d3d192",
+    ".mission/hooks/signal": "sha256:258abd55f231de8452b8aee85b14696aef5a1c6af23e2f658122f35f1fd05570",
+    ".mission/signal-policy.json": "sha256:44f495f42ae5be1a5a9fe8a9a31c05586c169fc804456a80dd0b54a9dc46727c"
+  },
+  "projected_paths": [
+    ".agents/skills/agent-browser/SKILL.md",
+    ".agents/skills/agent-browser/scripts/open.sh",
+    ".agents/skills/mc-signals/SKILL.md",
+    ".codex/agents/discovery-reviewer.toml",
+    ".codex/config.toml",
+    ".codex/hooks.json",
+    ".mission/bin/mc-signal",
+    ".mission/hooks/hook.discovery-marker/hook.json",
+    ".mission/hooks/hook.discovery-marker/marker.py",
+    ".mission/hooks/native_output.py",
+    ".mission/hooks/run.py",
+    ".mission/hooks/signal",
+    ".mission/signal-policy.json"
+  ],
+  "projection_digest": "sha256:06e90e5c410eaa7658615d25ca85f751065339865098c1000b2216217cd949bf",
+  "provider_call": "none: no login in the scratch CODEX_HOME, model provider http://127.0.0.1:9 (closed loopback port), no turn started; the process is stopped after config/read",
+  "recorded_on": "2026-10-27",
+  "repository": {
+    "byte_identical_after_restore": true,
+    "paths": [
+      ".agents/skills/repo-notes/SKILL.md",
+      ".codex/config.toml",
+      "AGENTS.md"
+    ]
+  },
+  "requests": [
+    "initialize",
+    "thread/start {cwd}",
+    "skills/list {cwds}",
+    "hooks/list {cwds}",
+    "config/read {cwd}"
+  ],
+  "schema_version": "mc.discovery_recording.v1"
+}

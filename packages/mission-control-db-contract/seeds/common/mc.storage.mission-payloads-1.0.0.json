@@ -1,0 +1,20 @@
+{
+  "actor_ref": "seed:mission-control-catalog",
+  "component_compatibility": ">=1.0.0 <2.0.0",
+  "depends_on": [],
+  "description": "Private mission-payloads bucket (50 MiB per object, any MIME type) for the content-addressed artifact and context payloads Mission Control stages through the S3-compatible Storage endpoint with service-role S3 keys. No storage.objects policy grants a client role any access. Targets without the Storage schema report this bundle blocked.",
+  "format": "mission-control-seed/v1",
+  "records": [
+    {
+      "fields": {
+        "bucket_id": "mission-payloads",
+        "file_size_limit": 52428800,
+        "public": false
+      },
+      "kind": "storage_bucket",
+      "logical_key": "storage:mission-payloads"
+    }
+  ],
+  "seed_key": "mc.storage.mission-payloads",
+  "seed_version": "1.0.0"
+}

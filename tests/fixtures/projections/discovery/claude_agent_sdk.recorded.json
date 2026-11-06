@@ -1,0 +1,233 @@
+{
+  "cli": {
+    "binary": "claude",
+    "version": "2.1.312 (Claude Code)"
+  },
+  "discovered": {
+    "agents": [
+      "Explore",
+      "Plan",
+      "claude",
+      "discovery-reviewer",
+      "general-purpose",
+      "statusline-setup"
+    ],
+    "mcp_servers": [
+      {
+        "name": "mc-discovery-stub",
+        "status": "connected"
+      }
+    ],
+    "mcp_tools": [
+      "mcp__mc-discovery-stub__discovery_echo"
+    ],
+    "skills": [
+      "agent-browser",
+      "batch",
+      "claude-api",
+      "code-review",
+      "dataviz",
+      "debug",
+      "deep-research",
+      "doctor",
+      "fewer-permission-prompts",
+      "loop",
+      "plugin-authoring",
+      "repo-notes",
+      "run",
+      "run-skill-generator",
+      "simplify",
+      "update-config",
+      "verify",
+      "workflow-authoring"
+    ],
+    "slash_commands": [
+      "__remote-workflow",
+      "agent-browser",
+      "agents",
+      "auto-mode-setup",
+      "autocompact",
+      "batch",
+      "claude-api",
+      "clear",
+      "code-review",
+      "color",
+      "compact",
+      "config",
+      "context",
+      "dataviz",
+      "debug",
+      "deep-research",
+      "doctor",
+      "effort",
+      "fast",
+      "fewer-permission-prompts",
+      "focus",
+      "goal",
+      "heapdump",
+      "init",
+      "insights",
+      "list-agents",
+      "loop",
+      "mcp",
+      "model",
+      "output-style",
+      "plugin-authoring",
+      "recap",
+      "reload-plugins",
+      "reload-skills",
+      "rename",
+      "repo-notes",
+      "run",
+      "run-skill-generator",
+      "security-review",
+      "simplify",
+      "team-onboarding",
+      "update-config",
+      "usage",
+      "verify",
+      "workflow-authoring",
+      "workflow-launch-exec"
+    ]
+  },
+  "evidence": "local_cli_discovery",
+  "fixture": true,
+  "hooks_fired": [
+    "fired-repo-session_start.json",
+    "fired-session_start.json"
+  ],
+  "host": {
+    "os": "Windows",
+    "python": "3.12.7"
+  },
+  "instructions_loaded": [],
+  "invocation": [
+    "claude",
+    "-p",
+    "<prompt>",
+    "--output-format",
+    "stream-json",
+    "--verbose",
+    "--setting-sources",
+    "project",
+    "--append-system-prompt",
+    "<mission overlay>",
+    "--max-turns",
+    "1"
+  ],
+  "lane_profile": "claude_agent_sdk",
+  "layering": {
+    "conflicts": [],
+    "conflicts_policy": null,
+    "discovery": [
+      {
+        "kind": "instructions",
+        "name": "AGENTS.md",
+        "origin": "repo",
+        "path": "AGENTS.md"
+      },
+      {
+        "kind": "instructions",
+        "name": "mission overlay",
+        "origin": "mission",
+        "path": "system_prompt.append"
+      },
+      {
+        "kind": "skill",
+        "name": "repo-notes",
+        "origin": "repo",
+        "path": ".claude/skills/repo-notes"
+      },
+      {
+        "kind": "skill",
+        "name": "agent-browser",
+        "origin": "mission",
+        "path": ".claude/skills/agent-browser"
+      },
+      {
+        "kind": "subagent",
+        "name": "discovery-reviewer",
+        "origin": "mission",
+        "path": ".claude/agents/discovery-reviewer.md"
+      },
+      {
+        "kind": "hook",
+        "name": "SessionStart",
+        "origin": "repo",
+        "path": ".claude/settings.json"
+      },
+      {
+        "kind": "hook",
+        "name": "InstructionsLoaded",
+        "origin": "repo",
+        "path": ".claude/settings.json"
+      },
+      {
+        "kind": "hook",
+        "name": "SessionStart",
+        "origin": "mission",
+        "path": ".claude/settings.json"
+      },
+      {
+        "kind": "mcp_server",
+        "name": "mc-discovery-stub",
+        "origin": "mission",
+        "path": ".mcp.json"
+      }
+    ],
+    "lane_profile": "claude_agent_sdk",
+    "merged": [
+      {
+        "format": "matcher_hooks",
+        "kept_repo": [],
+        "mission_keys": [
+          "hooks.SessionStart"
+        ],
+        "overridden": [],
+        "path": ".claude/settings.json",
+        "repo_keys": [
+          "hooks.SessionStart",
+          "hooks.InstructionsLoaded"
+        ]
+      },
+      {
+        "format": "mcp_json",
+        "kept_repo": [],
+        "mission_keys": [
+          "mcpServers.mc-discovery-stub"
+        ],
+        "overridden": [],
+        "path": ".mcp.json",
+        "repo_keys": []
+      }
+    ],
+    "overflow": [],
+    "schema_version": "mc.layering_receipt.v1",
+    "skipped": []
+  },
+  "projected_paths": [
+    ".claude/agents/discovery-reviewer.md",
+    ".claude/settings.json",
+    ".claude/skills/agent-browser/SKILL.md",
+    ".claude/skills/agent-browser/scripts/open.sh",
+    ".mcp.json",
+    ".mission/hooks/hook.discovery-marker/hook.json",
+    ".mission/hooks/hook.discovery-marker/marker.py",
+    ".mission/hooks/native_output.py",
+    ".mission/hooks/run.py"
+  ],
+  "projection_digest": "sha256:a9ad99c9d674b1c44dc38ef1a293266d8e0edb2c367b08f6f862b7bef9152845",
+  "provider_call": "none: ANTHROPIC_BASE_URL=http://127.0.0.1:9 (closed loopback port), placeholder API key, fresh CLAUDE_CONFIG_DIR; the process is stopped after system/init",
+  "recorded_on": "2026-10-27",
+  "repository": {
+    "byte_identical_after_restore": true,
+    "paths": [
+      ".claude/settings.json",
+      ".claude/skills/repo-notes/SKILL.md",
+      ".cursor/hooks.json",
+      ".repo-hooks/marker.py",
+      "AGENTS.md"
+    ]
+  },
+  "schema_version": "mc.discovery_recording.v1"
+}

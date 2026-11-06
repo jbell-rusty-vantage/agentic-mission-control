@@ -1,0 +1,33 @@
+# Checksummed artifacts: digests are computed over LF bytes, so Windows checkouts must not convert them.
+packages/mission-control-db-contract/component/** text eol=lf
+packages/mission-control-db-contract/runtime/** text eol=lf
+packages/mission-control-db-contract/releases/** text eol=lf
+packages/mission-control-db-contract/releases/*/component/migrations/0002_authoring.sql -text
+packages/mission-control-db-contract/releases/*/component/migrations/0004_capability_artifacts.sql -text
+packages/mission-control-db-contract/seeds/** text eol=lf
+deployments/*/release.lock.json text eol=lf
+# Hosted pack digests (the pack digest a saved agent is keyed by) hash LF bytes on every host.
+deployments/hosted-packs/** text eol=lf
+# skills-lock.json computedHash values hash the committed (upstream LF) skill bytes.
+.agents/skills/** text eol=lf
+# Environment Kit bundles: pinned by digest over LF bytes, and their scripts run under bash.
+envkits/** text eol=lf
+# Applied 1.0.0 migrations whose live receipts hash the original bytes (0002 CRLF, 0004 mixed):
+# keep them byte-exact; an edited applied migration is RECEIPT_DRIFT on every installed target.
+packages/mission-control-db-contract/component/migrations/0002_authoring.sql -text
+packages/mission-control-db-contract/component/migrations/0004_capability_artifacts.sql -text
+# Reviewed MCP tool snapshots: the promotion pins and catalog schema digests hash the CRLF
+# capture bytes, so they are stored byte-exact rather than normalized.
+integrations/biotech/src/biotech_mission_adapters/resources/reviewed_payloads/*.json -text
+# Shell run inside WSL: a CRLF checkout would break bash.
+scripts/wsl/*.sh text eol=lf
+
+# Archived applied skill bundles must preserve every byte across platforms.
+packages/mission-control-db-contract/bundle-sources/** -text
+
+# Historical SQL archive pins mixed original line endings byte-for-byte.
+src/mission_control/adapters/postgres/migrations/*.sql -text
+
+# Historical schema v1 digests identify original CRLF capture bytes on every host.
+integrations/biotech/src/biotech_mission_adapters/resources/schema-catalog/semantic-overlay.v1.json -text
+integrations/biotech/src/biotech_mission_adapters/resources/schema-catalog/source-reference.v1.json -text

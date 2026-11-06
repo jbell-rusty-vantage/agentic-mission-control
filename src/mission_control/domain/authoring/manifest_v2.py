@@ -1,0 +1,831 @@
+"""Mission Manifest v2 (``mc.mission_manifest.v2``): the multi-provider authoring surface.
+
+``mission/v2`` is ``mission/v1`` plus an explicit execution environment, authentication
+profile, workspace policy, continuation policy and required features on every Environment
+(multi-provider SPEC-02 "Proposed authoring fragment"), the environment additions of
+materialization SPEC-01 §3 (kit, variables, secrets, network, git, provider environment;
+:mod:`mission_environment`) and the mission's Data Class (materialization-observation
+SPEC-06 section 8). Every v1 key keeps its v1 meaning;
+v1 documents are parsed by :mod:`manifest` unchanged and never gain these keys. Both versions
+share one program-node tree and one inheritance algorithm (:func:`manifest.resolve_environments`
+works on either), so a v2 manifest lowers through the same immutable mission definitions.
+
+Pure: no catalog access, no compile, no persistence. Structural validity here is not launch
+readiness; resolving ``auth``/``execution_environment`` references to a sealed
+``mc.execution_binding.v2`` is the compile/launch service's job (MP-02/MP-03).
+"""
+
+from __future__ import annotations
+
+import json
+from collections.abc import Mapping
+from decimal import Decimal
+from typing import Annotated, Any, ClassVar, Final, Literal, get_args
+
+from pydantic import ConfigDict, Field, ValidationError, model_validator
+
+from mission_control.domain.agentic_components.layering import MaterializationPolicy
+from mission_control.domain.authoring.manifest import (
+    HOSTED_LANES,
+    MANIFEST_LITERAL,
+    AgentExecutorNode,
+    ChildMissionInvocationNode,
+    ChildSource,
+    ContextEntry,
+    DeterministicExecutorNode,
+    Environment,
+    EvaluatorOptimizerNode,
+    EventWaitNode,
+    GoalLoopNode,
+    HookEntry,
+    HumanGateNode,
+    Lane,
+    ManifestErrorCode,
+    ManifestIssue,
+    ManifestModel,
+    ManifestRejected,
+    MissionBlock,
+    MissionManifest,
+    ParallelSwarmNode,
+    ProfileId,
+    ProofGateNode,
+    RepositoryWorkspace,
+    StageGraphNode,
+    TimerNode,
+    Verifier,
+    WorkspaceSelection,
+    _issue,
+    issues_from_validation_error,
+    load_manifest_yaml,
+    parse_manifest,
+)
+from mission_control.domain.authoring.mission_environment import (
+    ENVIRONMENT_ADDITIONS,
+    EnvironmentAdditions,
+    environment_lane_issues,
+    environment_narrowing_issues,
+)
+from mission_control.domain.authoring.mission_watchers import ControlsV2
+from mission_control.domain.capabilities.gates import SignalGatePolicy
+from mission_control.domain.execution.bindings import REPOSITORY_BOUND_PROFILES
+from mission_control.domain.execution.data_class import DataClass
+from mission_control.domain.execution.lanes import (
+    DELIVERY_COMMANDS,
+    ApprovalMode,
+    ObservationFeature,
+)
+
+MANIFEST_V2_SCHEMA_ID: Final = "mc.mission_manifest.v2"
+MANIFEST_V2_LITERAL: Final = "mission/v2"
+MANIFEST_V2_SCHEMA_FILENAME: Final = f"{MANIFEST_V2_SCHEMA_ID}.json"
+
+# Which provider owns which hosted lane; `execution_environment.provider` must match.
+PROVIDER_OF_HOSTED_LANE: Final[dict[Lane, str]] = {
+    Lane.CURSOR_CLOUD: "cursor",
+    Lane.CLAUDE_CLOUD: "anthropic",
+    Lane.CODEX_CLOUD: "openai",
+    Lane.CLAUDE_MANAGED: "anthropic",
+    Lane.CODEX_AGENTS: "openai",
+}
+HostedProvider = Literal["cursor", "anthropic", "openai"]
+WorkspaceMode = Literal["managed_worktree", "provider_workspace", "shared_checkout"]
+WorkspaceReuse = Literal["none", "within_run", "within_session"]
+DirtyInputPolicy = Literal["reject", "snapshot"]
+CleanupPolicy = Literal["retain_until_artifacts_registered", "retain", "immediate"]
+NativeCompactionPolicy = Literal["preferred", "disabled", "required"]
+ContinuationFallback = Literal["sealed_checkpoint", "fail"]
+RequiredControl = Literal[
+    "queue_instruction",
+    "interrupt_and_inject",
+    "pause",
+    "hard_pause",
+    "resume",
+    "cancel",
+    "fork",
+    "request_continuation",
+]
+if set(get_args(RequiredControl)) != set(DELIVERY_COMMANDS):  # pragma: no cover
+    raise RuntimeError("manifest v2 required controls drifted from the lane delivery commands")
+
+
+class AuthSelection(ManifestModel):
+    """The authentication/billing route a node runs under; a profile reference, never a
+    credential. Local CLI sign-in, API credentials and provider cloud accounts are distinct
+    routes resolved by the deployment registry (SPEC-02 "Authentication")."""
+
+    profile: ProfileId
+
+
+class SetupSelection(ManifestModel):
+    pin: str = Field(min_length=1, max_length=512)
+
+
+class ExecutionEnvironmentSelection(ManifestModel):
+    """``local_workspace`` (a worker-hosted profile) or ``provider_hosted`` (a published
+    provider cloud environment). ``provider`` must match the lane; a local ``path`` is
+    invalid for hosted work (SPEC-02)."""
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "oneOf": [
+                {"properties": {"kind": {"const": "local_workspace"}}, "required": ["kind"]},
+                {
+                    "properties": {"kind": {"const": "provider_hosted"}},
+                    "required": ["kind", "provider", "environment_ref"],
+                },
+            ]
+        }
+    )
+
+    kind: Literal["local_workspace", "provider_hosted"]
+    profile: ProfileId | None = None
+    provider: HostedProvider | None = None
+    environment_ref: str | None = Field(default=None, min_length=1, max_length=512)
+    expected_revision: str | None = Field(default=None, min_length=1, max_length=512)
+    setup: SetupSelection | None = None
+
+    @model_validator(mode="after")
+    def _shape_by_kind(self) -> ExecutionEnvironmentSelection:
+        if self.kind == "local_workspace":
+            hosted_only = [
+                name
+                for name in ("provider", "environment_ref", "expected_revision", "setup")
+                if getattr(self, name) is not None
+            ]
+            if hosted_only:
+                raise ValueError(
+                    f"a local_workspace environment does not take {', '.join(hosted_only)}"
+                )
+        else:
+            if self.provider is None or self.environment_ref is None:
+                raise ValueError("a provider_hosted environment needs provider and environment_ref")
+            if self.profile is not None:
+                raise ValueError("a provider_hosted environment does not take a local profile")
+        return self
+
+
+class WorkspacePolicy(ManifestModel):
+    """Mission Control allocates the workspace; the agent does not choose whether isolation
+    exists (SPEC-02 "Worktrees and snapshots")."""
+
+    mode: WorkspaceMode = "managed_worktree"
+    reuse: WorkspaceReuse = "within_run"
+    dirty_input: DirtyInputPolicy = "reject"
+    cleanup: CleanupPolicy = "retain_until_artifacts_registered"
+
+
+class RepositoryWorkspaceV2(RepositoryWorkspace):
+    use: Literal["application_knowledge_repo"] | None = Field(
+        default=None, exclude_if=lambda v: v is None
+    )
+
+    @model_validator(mode="after")
+    def _url_or_path(self) -> RepositoryWorkspaceV2:
+        if self.use is not None:
+            if self.url is not None or self.path is not None:
+                raise ValueError("a named knowledge repository cannot also name url or path")
+            return self
+        if self.url is None and self.path is None:
+            raise ValueError("a repository needs url or path")
+        return self
+
+
+class WorkspaceOutputs(ManifestModel):
+    dir: str = Field(default="outputs/", pattern=r"^outputs/[A-Za-z0-9._/-]*$")
+    collect: tuple[Literal["artifact_upload", "branch_commit", "provider_artifacts"], ...] = (
+        "artifact_upload",
+    )
+    evidence_channel: Literal["artifact_upload", "branch_commit", "provider_artifacts"] | None = (
+        None
+    )
+
+    @model_validator(mode="after")
+    def _channels(self) -> WorkspaceOutputs:
+        if (
+            ".." in self.dir.split("/")
+            or not self.collect
+            or len(set(self.collect)) != len(self.collect)
+        ):
+            raise ValueError("workspace outputs require a safe directory and distinct channels")
+        if self.evidence_channel is not None and self.evidence_channel not in self.collect:
+            raise ValueError("the Completion Contract evidence channel must be collected")
+        return self
+
+
+class WorkspaceSelectionV2(WorkspaceSelection):
+    repo: RepositoryWorkspaceV2 | None = None
+    policy: WorkspacePolicy | None = None
+    kind: Literal["code", "knowledge", "mixed"] = Field(
+        default="code",
+        exclude_if=lambda v: v == "code",
+        json_schema_extra={"digest_omit_default": True},
+    )
+    outputs: WorkspaceOutputs | None = Field(
+        default=None,
+        exclude_if=lambda v: v is None,
+        json_schema_extra={"digest_omit_default": True},
+    )
+    inputs: tuple[ContextEntry, ...] | None = Field(
+        default=None,
+        exclude_if=lambda v: v is None,
+        json_schema_extra={"digest_omit_default": True},
+    )
+
+    @model_validator(mode="after")
+    def _inputs_use_existing_context_pipeline(self) -> WorkspaceSelectionV2:
+        if self.inputs is None:
+            return self
+        if any(item.artifact is None for item in self.inputs):
+            raise ValueError(
+                "workspace inputs name Artifact references; Knowledge Services queries "
+                "use an admitted MCP capability"
+            )
+        context = list(self.context or ())
+        context.extend(item for item in self.inputs if item not in context)
+        object.__setattr__(self, "context", tuple(context))
+        self.__pydantic_fields_set__.add("context")
+        return self
+
+
+class ContinuationPolicy(ManifestModel):
+    """Context pressure policy: soft/hard watermarks, native compaction preference and the
+    sealed-checkpoint fallback (SPEC-01 "Four independent progress mechanisms"). The
+    defaults are qualification tuning inputs, not provider guarantees."""
+
+    native_compaction: NativeCompactionPolicy = "preferred"
+    fallback: ContinuationFallback = "sealed_checkpoint"
+    soft_context_ratio: Decimal = Field(default=Decimal("0.70"), gt=0, le=1, decimal_places=4)
+    hard_context_ratio: Decimal = Field(default=Decimal("0.85"), gt=0, le=1, decimal_places=4)
+    reserve_ratio: Decimal = Field(default=Decimal("0.15"), ge=0, lt=1, decimal_places=4)
+    max_session_turns: int | None = Field(default=None, ge=1)
+    max_transfers: int | None = Field(default=None, ge=0)
+    max_compaction_failures: int = Field(default=2, ge=0)
+
+    @model_validator(mode="after")
+    def _ordered_watermarks(self) -> ContinuationPolicy:
+        if self.soft_context_ratio >= self.hard_context_ratio:
+            raise ValueError("soft_context_ratio must be below hard_context_ratio")
+        if self.hard_context_ratio + self.reserve_ratio > 1:
+            raise ValueError("hard_context_ratio plus reserve_ratio cannot exceed 1")
+        return self
+
+
+class RequiredFeatures(ManifestModel):
+    """What the workflow needs the lane to actually provide. Admission intersects these
+    with the lane's describe (:mod:`domain.execution.lane_requirements`); a required feature
+    the lane cannot provide is a pointed error, never a silent fallback (V01)."""
+
+    controls: tuple[RequiredControl, ...] = ()
+    approvals: tuple[ApprovalMode, ...] = ()
+    observation: tuple[ObservationFeature, ...] = ()
+    # Every write (shell, file, MCP, network) must be human-gated: admitted only on a lane that
+    # enforces the gate per write family (SPEC-03; `approvals_coverage.admit_gate_coverage`).
+    all_writes_gated: bool = False
+
+    @model_validator(mode="after")
+    def _unique(self) -> RequiredFeatures:
+        for name in ("controls", "approvals", "observation"):
+            values = getattr(self, name)
+            if len(set(values)) != len(values):
+                raise ValueError(f"requires.{name} must not repeat entries")
+        return self
+
+    def as_sets(self) -> dict[str, frozenset[str]]:
+        return {
+            "controls": frozenset(self.controls),
+            "approvals": frozenset(self.approvals),
+            "observation": frozenset(self.observation),
+        }
+
+
+class ObservationPolicy(ManifestModel):
+    in_environment: Literal["on", "off"] = "on"
+    gates: SignalGatePolicy | None = None
+
+    @model_validator(mode="after")
+    def gates_need_the_pack(self) -> ObservationPolicy:
+        if self.in_environment == "off" and self.gates is not None:
+            raise ValueError("synchronous gates require in_environment observation on")
+        return self
+
+
+class EnvironmentV2(Environment, EnvironmentAdditions):
+    """A v1 Environment plus the multi-provider selections and the environment additions.
+    Every field stays optional so a node can overlay any subset; the v2 lane rules apply to
+    the effective environment."""
+
+    auth: AuthSelection | None = None
+    execution_environment: ExecutionEnvironmentSelection | None = None
+    workspace: WorkspaceSelectionV2 | None = None
+    continuation: ContinuationPolicy | None = None
+    requires: RequiredFeatures | None = None
+    # SPEC-02 §4: how a repository entry and a Mission Control entry with the same key resolve.
+    materialization: MaterializationPolicy | None = None
+    observation: ObservationPolicy | None = None
+    placement: Literal["prefer_cloud", "cloud_only", "local_only"] | None = None
+    lanes: tuple[Lane, ...] = Field(default=(), max_length=4, exclude_if=lambda value: not value)
+    lane_environments: dict[Lane, EnvironmentV2] = Field(
+        default_factory=dict, exclude_if=lambda value: not value
+    )
+
+    @model_validator(mode="after")
+    def _placement_candidates(self) -> EnvironmentV2:
+        if self.placement is not None and not self.lanes:
+            raise ValueError("placement needs an explicit lanes preference list")
+        if len(set(self.lanes)) != len(self.lanes):
+            raise ValueError("lanes preference list must not repeat profiles")
+        if bool(self.lanes) != bool(self.lane_environments):
+            raise ValueError("lanes and lane_environments must be supplied together")
+        if self.lanes and set(self.lanes) != set(self.lane_environments):
+            raise ValueError("every preferred lane needs its exact lane_environment")
+        for lane, environment in self.lane_environments.items():
+            if environment.lane != lane or environment.lanes:
+                raise ValueError(
+                    "candidate environment names its lane and has no nested preferences"
+                )
+        return self
+
+    # v2 admits every lane profile in validation; whether the lane is registered, qualified
+    # and account-enabled is decided at compile/admission with evidence, not here.
+    reserved_lanes: ClassVar[frozenset[Lane]] = frozenset()
+    # Repository requirement per profile (SPEC-03 §4 correction): cursor_cloud may run repo-less.
+    repository_lanes: ClassVar[frozenset[Lane]] = frozenset(
+        Lane(profile) for profile in REPOSITORY_BOUND_PROFILES
+    )
+
+    def version_lane_issues(
+        self, env_pointer: str, *, mission_level: bool
+    ) -> tuple[list[ManifestIssue], list[ManifestIssue]]:
+        blockers: list[ManifestIssue] = []
+        lane = self.lane
+        if lane is None:
+            return blockers, []
+        hosted = lane in HOSTED_LANES
+        execution = self.execution_environment
+        if execution is not None:
+            if hosted and execution.kind != "provider_hosted":
+                blockers.append(
+                    _issue(
+                        f"{env_pointer}/execution_environment/kind",
+                        f"lane {lane.value} is provider-hosted and needs kind provider_hosted",
+                        "placement_mismatch",
+                        ManifestErrorCode.UNSUPPORTED_BEHAVIOR,
+                    )
+                )
+            if not hosted and execution.kind != "local_workspace":
+                blockers.append(
+                    _issue(
+                        f"{env_pointer}/execution_environment/kind",
+                        f"lane {lane.value} runs on a worker and needs kind local_workspace",
+                        "placement_mismatch",
+                        ManifestErrorCode.UNSUPPORTED_BEHAVIOR,
+                    )
+                )
+            expected_provider = PROVIDER_OF_HOSTED_LANE.get(lane)
+            if (
+                execution.kind == "provider_hosted"
+                and expected_provider is not None
+                and execution.provider != expected_provider
+            ):
+                blockers.append(
+                    _issue(
+                        f"{env_pointer}/execution_environment/provider",
+                        f"lane {lane.value} is hosted by {expected_provider}, "
+                        f"not {execution.provider}",
+                        "provider_mismatch",
+                        ManifestErrorCode.UNSUPPORTED_BEHAVIOR,
+                    )
+                )
+        elif lane is not Lane.DEEP_AGENTS:
+            # At mission level, and on a node that switches lane: a provider lane never runs
+            # on an implied placement (SPEC-02 "Environment profiles").
+            blockers.append(
+                _issue(
+                    f"{env_pointer}/execution_environment",
+                    f"a mission/v2 {lane.value} environment declares execution_environment",
+                    "missing_field",
+                )
+            )
+        del mission_level
+        workspace = self.workspace
+        if hosted and workspace is not None:
+            if workspace.repo is not None and workspace.repo.path is not None:
+                blockers.append(
+                    _issue(
+                        f"{env_pointer}/workspace/repo/path",
+                        "a local path is invalid for provider-hosted work; bind url and ref",
+                        "hosted_local_path",
+                        ManifestErrorCode.UNSUPPORTED_BEHAVIOR,
+                    )
+                )
+            if workspace.policy is not None and workspace.policy.mode == "managed_worktree":
+                blockers.append(
+                    _issue(
+                        f"{env_pointer}/workspace/policy/mode",
+                        "managed_worktree is not valid for a provider-hosted lane; "
+                        "use provider_workspace",
+                        "hosted_worktree",
+                        ManifestErrorCode.UNSUPPORTED_BEHAVIOR,
+                    )
+                )
+        if (
+            not hosted
+            and workspace is not None
+            and workspace.policy is not None
+            and workspace.policy.mode == "provider_workspace"
+        ):
+            blockers.append(
+                _issue(
+                    f"{env_pointer}/workspace/policy/mode",
+                    f"provider_workspace needs a provider-hosted lane, not {lane.value}",
+                    "local_provider_workspace",
+                    ManifestErrorCode.UNSUPPORTED_BEHAVIOR,
+                )
+            )
+        blockers.extend(self._addition_issues(env_pointer))
+        return blockers, []
+
+    def _addition_issues(self, env_pointer: str) -> list[ManifestIssue]:
+        execution = self.execution_environment
+        repo = self.workspace.repo if self.workspace is not None else None
+        return environment_lane_issues(
+            self,
+            self.lane,
+            env_pointer,
+            setup_pin=(
+                execution.setup.pin
+                if execution is not None and execution.setup is not None
+                else None
+            ),
+            workspace_repo_url=repo.url if repo is not None else None,
+        )
+
+    def version_narrowing_issues(
+        self, child: Environment, overlay: Environment, pointer: str
+    ) -> list[ManifestIssue]:
+        """A child cannot drop a parent's required features, weaken dirty-input handling,
+        widen its continuation transfer ceiling (SPEC-02 inheritance), widen the network, add
+        secrets beyond the parent's grant or relax git.write (SPEC-01 §3)."""
+
+        issues: list[ManifestIssue] = []
+        if not isinstance(child, EnvironmentV2) or not isinstance(overlay, EnvironmentV2):
+            return issues
+        if self.requires is not None and overlay.requires is not None:
+            parent_sets = self.requires.as_sets()
+            child_sets = (child.requires or RequiredFeatures()).as_sets()
+            for name, required in parent_sets.items():
+                dropped = sorted(required - child_sets[name])
+                if dropped:
+                    issues.append(
+                        _issue(
+                            f"{pointer}/requires/{name}",
+                            f"requires.{name} drops inherited {', '.join(dropped)}",
+                            "widens_authority",
+                        )
+                    )
+        parent_policy = self.workspace.policy if self.workspace is not None else None
+        overlay_policy = overlay.workspace.policy if overlay.workspace is not None else None
+        if (
+            parent_policy is not None
+            and overlay_policy is not None
+            and "dirty_input" in overlay_policy.model_fields_set
+            and parent_policy.dirty_input == "reject"
+            and overlay_policy.dirty_input != "reject"
+        ):
+            issues.append(
+                _issue(
+                    f"{pointer}/workspace/policy/dirty_input",
+                    "dirty_input cannot be weakened below the inherited reject",
+                    "widens_authority",
+                )
+            )
+        if (
+            self.continuation is not None
+            and overlay.continuation is not None
+            and "max_transfers" in overlay.continuation.model_fields_set
+            and self.continuation.max_transfers is not None
+            and overlay.continuation.max_transfers is not None
+            and overlay.continuation.max_transfers > self.continuation.max_transfers
+        ):
+            issues.append(
+                _issue(
+                    f"{pointer}/continuation/max_transfers",
+                    f"continuation.max_transfers {overlay.continuation.max_transfers} widens "
+                    f"the inherited limit {self.continuation.max_transfers}",
+                    "widens_authority",
+                )
+            )
+        if (
+            self.continuation is not None
+            and overlay.continuation is not None
+            and "max_session_turns" in overlay.continuation.model_fields_set
+            and self.continuation.max_session_turns is not None
+            and (
+                overlay.continuation.max_session_turns is None
+                or overlay.continuation.max_session_turns > self.continuation.max_session_turns
+            )
+        ):
+            issues.append(
+                _issue(
+                    f"{pointer}/continuation/max_session_turns",
+                    f"continuation.max_session_turns {overlay.continuation.max_session_turns} "
+                    f"widens the inherited limit {self.continuation.max_session_turns}",
+                    "widens_authority",
+                )
+            )
+        if (
+            self.requires is not None
+            and self.requires.all_writes_gated
+            and overlay.requires is not None
+            and "all_writes_gated" in overlay.requires.model_fields_set
+            and not overlay.requires.all_writes_gated
+        ):
+            issues.append(
+                _issue(
+                    f"{pointer}/requires/all_writes_gated",
+                    "requires.all_writes_gated cannot be cleared below the inherited gate",
+                    "widens_authority",
+                )
+            )
+        issues.extend(_egress_issues(self, overlay, pointer))
+        issues.extend(_mandatory_hook_issues(self, overlay, pointer))
+        issues.extend(environment_narrowing_issues(self, child, overlay, pointer))
+        # A node that keeps its lane gets no lane pass, so additions it overlays are checked
+        # here against the effective environment.
+        if overlay.lane is None and overlay.model_fields_set & {
+            *ENVIRONMENT_ADDITIONS,
+            "workspace",
+            "execution_environment",
+        }:
+            issues.extend(child._addition_issues(pointer))
+        return issues
+
+
+def _egress_issues(parent: Environment, overlay: Environment, pointer: str) -> list[ManifestIssue]:
+    """A child sandbox may only narrow the inherited egress aliases (SPEC-02 inheritance)."""
+
+    if parent.sandbox is None or parent.sandbox.egress is None:
+        return []
+    if overlay.sandbox is None or "egress" not in overlay.sandbox.model_fields_set:
+        return []
+    allowed = set(parent.sandbox.egress)
+    requested = overlay.sandbox.egress
+    if requested is None:
+        return [
+            _issue(
+                f"{pointer}/sandbox/egress",
+                "sandbox.egress cannot be unset below an inherited allowlist",
+                "widens_authority",
+            )
+        ]
+    return [
+        _issue(
+            f"{pointer}/sandbox/egress/{index}",
+            f"egress {alias} is not allowed by the parent environment",
+            "widens_authority",
+        )
+        for index, alias in enumerate(requested)
+        if alias not in allowed
+    ]
+
+
+def _hook_identity(hook: HookEntry) -> tuple[str | None, str | None, str | None]:
+    return (hook.pin, hook.search, hook.kind.value if hook.kind is not None else None)
+
+
+def _mandatory_hook_issues(
+    parent: Environment, overlay: Environment, pointer: str
+) -> list[ManifestIssue]:
+    """A fail-closed hook is mandatory policy: a child list (even an explicit empty one) may
+    clear optional hooks only, never a fail-closed one or its fail-closed flag (SPEC-02;
+    Kernel Hooks are never declared and are always present, ADR-0026)."""
+
+    if overlay.hooks is None or not parent.hooks:
+        return []
+    kept = {_hook_identity(hook) for hook in overlay.hooks if hook.fail_closed}
+    return [
+        _issue(
+            f"{pointer}/hooks",
+            f"the inherited fail-closed hook {hook.as_ or hook.pin or hook.search} "
+            "cannot be removed or made fail-open",
+            "removes_mandatory_policy",
+        )
+        for hook in parent.hooks
+        if hook.fail_closed and _hook_identity(hook) not in kept
+    ]
+
+
+# --- The v2 program tree: the v1 nodes with v2 Environments ------------------------------
+
+
+class VerifierV2(Verifier):
+    environment: EnvironmentV2 | None = None
+
+
+class StageGraphNodeV2(StageGraphNode):
+    environment: EnvironmentV2 | None = None
+    nodes: tuple[ProgramNodeV2, ...] = Field(min_length=1)
+
+
+class GoalLoopNodeV2(GoalLoopNode):
+    environment: EnvironmentV2 | None = None
+    verifier: VerifierV2 | None = None
+
+
+class ParallelSwarmNodeV2(ParallelSwarmNode):
+    environment: EnvironmentV2 | None = None
+
+
+class EvaluatorOptimizerNodeV2(EvaluatorOptimizerNode):
+    environment: EnvironmentV2 | None = None
+
+
+class AgentExecutorNodeV2(AgentExecutorNode):
+    environment: EnvironmentV2 | None = None
+
+
+class DeterministicExecutorNodeV2(DeterministicExecutorNode):
+    environment: EnvironmentV2 | None = None
+
+
+class HumanGateNodeV2(HumanGateNode):
+    environment: EnvironmentV2 | None = None
+
+
+class EventWaitNodeV2(EventWaitNode):
+    environment: EnvironmentV2 | None = None
+
+
+class TimerNodeV2(TimerNode):
+    environment: EnvironmentV2 | None = None
+
+
+class ProofGateNodeV2(ProofGateNode):
+    environment: EnvironmentV2 | None = None
+
+
+class ChildSourceV2(ChildSource):
+    inline: MissionBlockV2 | None = None
+
+
+class ChildMissionInvocationNodeV2(ChildMissionInvocationNode):
+    environment: EnvironmentV2 | None = None
+    child: ChildSourceV2
+
+
+ProgramNodeV2 = Annotated[
+    StageGraphNodeV2
+    | GoalLoopNodeV2
+    | ParallelSwarmNodeV2
+    | EvaluatorOptimizerNodeV2
+    | AgentExecutorNodeV2
+    | DeterministicExecutorNodeV2
+    | HumanGateNodeV2
+    | EventWaitNodeV2
+    | TimerNodeV2
+    | ProofGateNodeV2
+    | ChildMissionInvocationNodeV2,
+    Field(discriminator="behavior"),
+]
+
+
+class MissionBlockV2(MissionBlock):
+    """A v1 mission block with v2 Environments and its Data Class. Lanes that are not
+    ZDR-eligible admit a mission only by its declared class; a mission without one is
+    refused there (``domain/execution/data_class.py``), never assumed harmless. Its controls
+    add watchers and consumed notifications (SPEC-04 §5, :mod:`mission_watchers`)."""
+
+    environment: EnvironmentV2
+    program: ProgramNodeV2
+    data_class: DataClass | None = None
+    controls: ControlsV2 | None = None
+
+
+class MissionManifestV2(MissionManifest):
+    """``mc.mission_manifest.v2``: one mission or a chain, with v2 Environments."""
+
+    model_config = ConfigDict(
+        title="Mission Manifest v2",
+        json_schema_extra={
+            "oneOf": [
+                {"required": ["mission"], "not": {"required": ["links"]}},
+                {"required": ["missions", "links"]},
+            ]
+        },
+    )
+
+    # The one deliberate Literal narrowing-by-replacement: v2 is a different manifest version.
+    manifest: Literal["mission/v2"]  # type: ignore[assignment]
+    mission: MissionBlockV2 | None = None
+    missions: tuple[MissionBlockV2, ...] | None = Field(default=None, min_length=2)
+
+
+for _model in (StageGraphNodeV2, ChildSourceV2, ChildMissionInvocationNodeV2, MissionBlockV2):
+    _model.model_rebuild()
+
+
+# --- Parsing ------------------------------------------------------------------------------
+
+MANIFEST_VERSIONS: Final[dict[str, type[MissionManifest]]] = {
+    MANIFEST_LITERAL: MissionManifest,
+    MANIFEST_V2_LITERAL: MissionManifestV2,
+}
+
+
+def parse_manifest_any(document: Mapping[str, Any]) -> MissionManifest:
+    """Shape-validate a parsed document of any supported ``manifest`` version.
+
+    ``mission/v1`` documents go through the v1 model exactly as before (and so cannot carry
+    v2 keys); ``mission/v2`` documents go through :class:`MissionManifestV2`. An unknown
+    version is a pointed rejection at ``/manifest``.
+    """
+
+    version = document.get("manifest")
+    model = MANIFEST_VERSIONS.get(version) if isinstance(version, str) else None
+    if model is None:
+        raise ManifestRejected(
+            [
+                ManifestIssue(
+                    code=ManifestErrorCode.UNSUPPORTED_BEHAVIOR,
+                    pointer="/manifest",
+                    message=(
+                        f"unsupported manifest version {version!r}; "
+                        f"supported: {', '.join(sorted(MANIFEST_VERSIONS))}"
+                    ),
+                    reason="unsupported_manifest_version",
+                )
+            ]
+        )
+    try:
+        return model.model_validate(dict(document))
+    except ValidationError as error:
+        raise ManifestRejected(issues_from_validation_error(error)) from error
+
+
+def parse_manifest_yaml_any(text: str) -> tuple[MissionManifest, dict[str, Any]]:
+    """Load and shape-validate manifest YAML of any supported version."""
+
+    document = load_manifest_yaml(text)
+    return parse_manifest_any(document), document
+
+
+def parse_manifest_yaml_versioned(text: str) -> tuple[MissionManifest, dict[str, Any]]:
+    """The compile entry point: dispatch on the document's ``manifest`` literal.
+
+    ``mission/v2`` documents parse through :class:`MissionManifestV2`; every other document
+    takes the exact ``mission/v1`` path (:func:`manifest.parse_manifest`, the same function
+    :func:`manifest.parse_manifest_yaml` calls), so v1 results and rejections, including those
+    for an unknown version, are byte-identical to the v1-only parser.
+    """
+
+    document = load_manifest_yaml(text)
+    if document.get("manifest") == MANIFEST_V2_LITERAL:
+        return parse_manifest_any(document), document
+    return parse_manifest(document), document
+
+
+def is_v2(manifest: MissionManifest) -> bool:
+    return isinstance(manifest, MissionManifestV2)
+
+
+def manifest_v2_json_schema() -> dict[str, Any]:
+    """The JSON Schema exported to ``contracts/schemas/mc.mission_manifest.v2.json``."""
+
+    schema = MissionManifestV2.model_json_schema(by_alias=True, mode="validation")
+    return {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": f"https://mission-control.belllabs/schemas/{MANIFEST_V2_SCHEMA_FILENAME}",
+        "x-mc-schema-id": MANIFEST_V2_SCHEMA_ID,
+        **schema,
+    }
+
+
+def manifest_v2_json_schema_text() -> str:
+    return (
+        json.dumps(manifest_v2_json_schema(), indent=2, sort_keys=True, ensure_ascii=False) + "\n"
+    )
+
+
+__all__ = [
+    "MANIFEST_V2_LITERAL",
+    "MANIFEST_V2_SCHEMA_FILENAME",
+    "MANIFEST_V2_SCHEMA_ID",
+    "MANIFEST_VERSIONS",
+    "PROVIDER_OF_HOSTED_LANE",
+    "AuthSelection",
+    "ContinuationPolicy",
+    "EnvironmentV2",
+    "ExecutionEnvironmentSelection",
+    "MissionBlockV2",
+    "MissionManifestV2",
+    "RequiredFeatures",
+    "SetupSelection",
+    "WorkspacePolicy",
+    "WorkspaceSelectionV2",
+    "is_v2",
+    "manifest_v2_json_schema",
+    "manifest_v2_json_schema_text",
+    "parse_manifest_any",
+    "parse_manifest_yaml_any",
+    "parse_manifest_yaml_versioned",
+]

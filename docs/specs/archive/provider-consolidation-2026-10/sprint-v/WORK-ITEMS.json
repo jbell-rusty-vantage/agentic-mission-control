@@ -1,0 +1,1089 @@
+{
+  "schema": "sprint-v-workspace.v1",
+  "date": "2026-10-24",
+  "timezone": "America/New_York",
+  "specification_status": "accepted",
+  "acceptance_decision": "SV-D13",
+  "navigation": "START-HERE.md",
+  "operational_use_gate": {
+    "state": "closed",
+    "requires": [
+      "SV-18",
+      "all-four-workflows",
+      "output-contracts",
+      "context-transfer",
+      "deep-agents-full-provider-qualification"
+    ],
+    "test_data": "disposable"
+  },
+  "items": [
+    {
+      "id": "SV-01",
+      "owner": "mc-context",
+      "depends_on": [],
+      "state": "complete",
+      "claim": {
+        "agent": "mc-lead (Opus 5.5 subagent)",
+        "repository": "platform/mission-control",
+        "checkout": "main (single retained checkout)",
+        "branch": "main",
+        "base_commit": "df0a2a9e349284e0fd6aff5c70096a8183710405",
+        "started_at": "2026-10-24T20:40:00-04:00",
+        "paths": [
+          "src/mission_control/application/programs/",
+          "src/mission_control/application/authoring/manifest_launch_inputs.py",
+          "src/mission_control/domain/execution/",
+          "tests/unit/"
+        ]
+      },
+      "tracker_id": "OVE-151",
+      "proofs": [
+        {
+          "tier": "T0",
+          "command": ".venv/Scripts/pytest.exe tests/unit/orchestration/test_live_invocation_origin.py",
+          "result": "passed",
+          "count": "16 passed (2026-10-24, integrator re-ran within 83 passed)",
+          "notes": "shared helper domain/execution/live_invocation.py; both families, retry, generation, hosted/local; no manifest-template identity survives"
+        },
+        {
+          "tier": "review",
+          "command": "Checkpoint A second review (Opus 5.5, read-only) 2026-10-25; proofs rerun KS 23/48/8/3/5, MC 120",
+          "result": "complete-with-deviations",
+          "count": "see SPRINT-V-DESIGN.md section 10.1",
+          "notes": "deviations recorded in design 10.1; follow-ups assigned to SV-06/07/08/11/16/17",
+          "recorded_at": "2026-10-25T10:59:44-04:00"
+        },
+        {
+          "tier": "review",
+          "command": "Second review R2-MC (Sonnet 5.5, read-only) 2026-10-25; reruns 195 passed in 90 s, ruff clean, mypy 894 files clean, docs 7/7",
+          "result": "complete",
+          "count": "see reports/R2-review-mc.md",
+          "notes": "SV-01 continuation test covers StageGraph and GoalDirected; release 1.5.0 untouched, 1.6.0 byte-identical for 0001..0054 plus 0055; the 8 test_bundle_custody_composition.py failures are pre-existing at HEAD 3aabe91b.",
+          "recorded_at": "2026-10-25T16:00:33-04:00"
+        }
+      ],
+      "spec": "../SPRINT-V-PLAN.md#6-complete-local-work-item-map"
+    },
+    {
+      "id": "SV-02",
+      "owner": "ks-contracts",
+      "depends_on": [],
+      "state": "complete",
+      "claim": {
+        "agent": "integrator (Claude Fable 5.1)",
+        "repository": "platform/knowledge-services",
+        "checkout": "main (single retained checkout)",
+        "branch": "main",
+        "base_commit": "50caaa41e9302717f9cadc727027841ddec67797",
+        "started_at": "2026-10-24T20:40:00-04:00",
+        "paths": [
+          "packages/knowledge-operation-protocol/"
+        ]
+      },
+      "tracker_id": "OVE-153",
+      "proofs": [
+        {
+          "tier": "T0",
+          "command": "corepack pnpm --filter @aiengineer/knowledge-operation-protocol exec vitest run; biome lint; build",
+          "result": "passed",
+          "count": "23 passed; 13 JSON schemas + golden vectors generated",
+          "notes": "ks.knowledge_operation.v2; kop-canonical-json.v1"
+        },
+        {
+          "tier": "T0",
+          "command": ".venv/Scripts/pytest.exe tests/conformance/test_knowledge_protocol_golden.py (MC)",
+          "result": "passed",
+          "count": "9 passed",
+          "notes": "Python reproduces TS canonical bytes, origin/effect/envelope digests; schema validation of vectors"
+        },
+        {
+          "tier": "review",
+          "command": "Checkpoint A second review (Opus 5.5, read-only) 2026-10-25",
+          "result": "needs-change",
+          "count": "see SPRINT-V-DESIGN.md section 10.1",
+          "notes": "SV-02: effect-scoped recovery claim + Python model strictness (SV-16); SV-03: component 0004/0005 + AIDB superset check (SV-06/07/08); SV-05: atomic seal, auditor census, native admission (SV-06/07/08); SV-15: M03/M04 seam (SV-16)",
+          "recorded_at": "2026-10-25T10:59:45-04:00"
+        },
+        {
+          "tier": "review",
+          "command": "Second review R2-MC (Sonnet 5.5, read-only) 2026-10-25",
+          "result": "complete-with-deviations",
+          "count": "see reports/R2-review-mc.md",
+          "notes": "Invariants verified (domain pure, tools via the materializer path, credential never logged, access rebuilt per tool dispatch, journal before dispatch, same key other bytes refused, pending_dispatch settles only on delivery applied/revoked, outcome_basis distinguishes coverage from assessed, exact reads refuse non-exact revisions, failed repair blocks). Deviations: D1 exact-resolve/represent/deliver services not wired into a production path; D2 no production RecoveryGrant (authorized retry unit-proved only); O retry resends the same single-use token; O failed attempt skips reconcile/finalize. D1/D2/O fixes assigned to E-MC round 4; SV-02 Python models handwritten but rule-complete (accepted).",
+          "recorded_at": "2026-10-25T16:00:33-04:00"
+        }
+      ],
+      "spec": "../SPRINT-V-PLAN.md#6-complete-local-work-item-map"
+    },
+    {
+      "id": "SV-03",
+      "owner": "schema",
+      "depends_on": [
+        "SV-02",
+        "SV-04"
+      ],
+      "state": "complete",
+      "claim": {
+        "agent": "integrator (Claude Fable 5.1)",
+        "repository": "platform/knowledge-services + aiengineer/ai-engineer-db-contract",
+        "checkout": "main (single retained checkout)",
+        "branch": "main",
+        "base_commit": "50caaa41e9302717f9cadc727027841ddec67797 / c809a11a96268f6e1c673e8e03766afcb2ca0dab",
+        "started_at": "2026-10-24T20:40:00-04:00",
+        "paths": [
+          "packages/knowledge-db-contract/",
+          "supabase/migrations/20261024010000_knowledge_component_binding.sql"
+        ]
+      },
+      "tracker_id": "OVE-155",
+      "proofs": [
+        {
+          "tier": "T1-KS",
+          "command": "KNOWLEDGE_DB_CONTRACT_ADMIN_DSN=<loopback> corepack pnpm --filter @aiengineer/knowledge-db-contract exec vitest run",
+          "result": "passed",
+          "count": "8 passed (two disposable installs kvc_ai_engineer_*, kvc_biotech_*; idempotent repeat; MIGRATION_BYTES_DIFFER; SCHEMA_WITHOUT_RECEIPTS; RLS; bind_effect; seal_run CAS; admit_exact_use; receipts; outbox)",
+          "notes": "component knowledge_verification 2.0.0; AIDB binding migration 20261024010000 authored, UNRUN (needs local Supabase stack)"
+        },
+        {
+          "tier": "review",
+          "command": "Checkpoint A second review (Opus 5.5, read-only) 2026-10-25",
+          "result": "needs-change",
+          "count": "see SPRINT-V-DESIGN.md section 10.1",
+          "notes": "SV-02: effect-scoped recovery claim + Python model strictness (SV-16); SV-03: component 0004/0005 + AIDB superset check (SV-06/07/08); SV-05: atomic seal, auditor census, native admission (SV-06/07/08); SV-15: M03/M04 seam (SV-16)",
+          "recorded_at": "2026-10-25T10:59:46-04:00"
+        },
+        {
+          "tier": "closure",
+          "command": "integrator closure",
+          "result": "complete",
+          "count": "-",
+          "notes": "Closed 2026-10-25 by the integrator: second-reviewed; the fixes requested by the reviews were applied and re-proven by the implementing helpers (counts in PROOFS) but not independently re-reviewed; deviations recorded in SPRINT-V-DESIGN 10.1-10.3 and the bundle matrix.",
+          "recorded_at": "2026-10-25T17:54:19-04:00"
+        }
+      ],
+      "spec": "../SPRINT-V-PLAN.md#6-complete-local-work-item-map"
+    },
+    {
+      "id": "SV-04",
+      "owner": "ks-core",
+      "depends_on": [
+        "SV-02"
+      ],
+      "state": "complete",
+      "claim": {
+        "agent": "ks-core (Opus 5.5 subagent, after K01 pin)",
+        "repository": "platform/knowledge-services",
+        "checkout": "main (single retained checkout)",
+        "branch": "main",
+        "base_commit": "50caaa41e9302717f9cadc727027841ddec67797",
+        "started_at": "2026-10-24T20:40:00-04:00",
+        "paths": [
+          "packages/research-core/"
+        ]
+      },
+      "tracker_id": "OVE-154",
+      "proofs": [
+        {
+          "tier": "T0",
+          "command": "corepack pnpm --filter @aiengineer/knowledge-research-core exec vitest run; typecheck; build; biome lint (0 diagnostics)",
+          "result": "passed",
+          "count": "48 tests / 8 files (support-sets 10, final-census 11, records 6, run-manifest 6, use-decision 7, invalidation 3, derive 3, aggregate 2)",
+          "notes": "content-addressed records (no self ref); occurrence binds body artifact; obligation weights in basis points; profiles engineering/scientific/education; producer-only coverage holds (E03); open questions OQ1..5 recorded in PROOFS"
+        },
+        {
+          "tier": "review",
+          "command": "Checkpoint A second review (Opus 5.5, read-only) 2026-10-25; proofs rerun KS 23/48/8/3/5, MC 120",
+          "result": "complete-with-deviations",
+          "count": "see SPRINT-V-DESIGN.md section 10.1",
+          "notes": "deviations recorded in design 10.1; follow-ups assigned to SV-06/07/08/11/16/17",
+          "recorded_at": "2026-10-25T10:59:44-04:00"
+        }
+      ],
+      "spec": "../SPRINT-V-PLAN.md#6-complete-local-work-item-map"
+    },
+    {
+      "id": "SV-05",
+      "owner": "ks-core",
+      "depends_on": [
+        "SV-03",
+        "SV-04"
+      ],
+      "state": "complete",
+      "claim": {
+        "agent": "integrator (Claude Fable 5.1)",
+        "repository": "platform/knowledge-services",
+        "checkout": "main (single retained checkout)",
+        "branch": "main",
+        "base_commit": "50caaa41e9302717f9cadc727027841ddec67797",
+        "started_at": "2026-10-24T23:30:00-04:00",
+        "paths": [
+          "packages/application/src/research/",
+          "packages/bindings/aiengineer-postgres/"
+        ]
+      },
+      "tracker_id": "OVE-159",
+      "proofs": [
+        {
+          "tier": "T0",
+          "command": "corepack pnpm --filter @aiengineer/knowledge-application exec vitest run src/research",
+          "result": "passed",
+          "count": "5 passed",
+          "notes": "ResearchCoordinator over InMemoryResearchBinding: producer-only coverage holds; sealed run refuses observations; assertion use admitted from judge observation; exact digest mismatch rejects; stale epoch holds; invalidated rejects"
+        },
+        {
+          "tier": "T1-KS",
+          "command": "KNOWLEDGE_DB_CONTRACT_ADMIN_DSN=<loopback> corepack pnpm --filter @aiengineer/knowledge-binding-aiengineer-postgres exec vitest run",
+          "result": "passed",
+          "count": "3 passed",
+          "notes": "complete fixture on a fresh disposable database: open run -> evidence -> report (frozen bytes verified in custody) -> producer+judge observations -> verification_snapshot seal (head CAS) -> assertion use decision -> bind_effect + admit_exact_use + effect receipt (Checkpoint A correction 2026-10-25: admitExactUse opened its own transaction, research-binding.ts:394-401; atomic native admission is SV-08 scope) -> receipt lookup; edited bytes refused"
+        },
+        {
+          "tier": "review",
+          "command": "Checkpoint A second review (Opus 5.5, read-only) 2026-10-25",
+          "result": "needs-change",
+          "count": "see SPRINT-V-DESIGN.md section 10.1",
+          "notes": "SV-02: effect-scoped recovery claim + Python model strictness (SV-16); SV-03: component 0004/0005 + AIDB superset check (SV-06/07/08); SV-05: atomic seal, auditor census, native admission (SV-06/07/08); SV-15: M03/M04 seam (SV-16)",
+          "recorded_at": "2026-10-25T10:59:46-04:00"
+        },
+        {
+          "tier": "closure",
+          "command": "integrator closure",
+          "result": "complete",
+          "count": "-",
+          "notes": "Closed 2026-10-25 by the integrator: second-reviewed; the fixes requested by the reviews were applied and re-proven by the implementing helpers (counts in PROOFS) but not independently re-reviewed; deviations recorded in SPRINT-V-DESIGN 10.1-10.3 and the bundle matrix.",
+          "recorded_at": "2026-10-25T17:54:19-04:00"
+        }
+      ],
+      "spec": "../SPRINT-V-PLAN.md#6-complete-local-work-item-map"
+    },
+    {
+      "id": "SV-06",
+      "owner": "ks-reports",
+      "depends_on": [
+        "SV-04",
+        "SV-05"
+      ],
+      "state": "complete",
+      "claim": {
+        "agent": "ks-reports (Opus 5.5 subagent B1a, session 2026-10-25)",
+        "repository": "platform/knowledge-services",
+        "checkout": "main (single retained checkout)",
+        "branch": "main",
+        "base_commit": "ae5934104bca3e8f3497148c557633da5b6e9878",
+        "started_at": "2026-10-25T11:05:00-04:00",
+        "paths": [
+          "packages/research-core/src/report/",
+          "packages/research-core/src/verification/",
+          "packages/application/src/research/",
+          "catalog/research/",
+          "packages/knowledge-db-contract/ (component 0004 if needed)",
+          "packages/bindings/aiengineer-postgres/src/research-binding.ts"
+        ]
+      },
+      "tracker_id": null,
+      "proofs": [
+        {
+          "tier": "T0",
+          "command": "research-core final-census.test.ts (11) + coordinator.test.ts report registration",
+          "result": "partial",
+          "count": "report v2 render/freeze/ledger/structural census/reconciliation and post-observation aggregation built and tested; the independent auditor discovery pass, the two report-kind catalogue entries (evidence_report, study_appraisal) as K08 data and the executor-hosted assess operation are NOT built",
+          "notes": "remaining SV-06 scope is listed in PROOFS.md"
+        },
+        {
+          "tier": "T0+T1-KS",
+          "command": "corepack pnpm --filter research-core/application(src/research)/knowledge-db-contract/binding-aiengineer-postgres exec vitest run (KNOWLEDGE_DB_CONTRACT_ADMIN_DSN loopback)",
+          "result": "passed",
+          "count": "research-core 60, application src/research 22, knowledge-db-contract 9 (2.0.0 -> 2.1.0 upgrade applies only 0004), binding 11; biome 0 new diagnostics; agent-docs clean",
+          "notes": "B1a 2026-10-25: AuditorDiscovery port + scripted fake; census derived from the recorded auditor observation only (caller census input removed); report kinds evidence_report/study_appraisal as K08 data with loader and registerReport validation; ReportAssessmentService start/status/cancel/run with K01 handles; component 2.1.0 0004_operations (operation table + CAS transitions, report_revision kind columns, report_assessment, occurrence key per revision); atomic deterministic seal with failure-injection and concurrent-seal tests; weights sum 10000; unmet holds, contradiction/L0 rejects; L0 not overridable. One unrelated application-suite failure (verification-benchmark-registered-replay SEALED_CHECKPOINT_MISSING) to be checked against HEAD. Proof logs .scratch/sprint-v/proofs/SV-06/B1a-final",
+          "recorded_at": "2026-10-25T11:16:03-04:00"
+        },
+        {
+          "tier": "review",
+          "command": "Second review R1 (Sonnet 5.5, read-only) 2026-10-25; reruns research-core 75, application research 36, knowledge-db-contract 12, aiengineer-postgres 22, biotech-graph 24, knowledge-db ingestion 365 (+21 Supabase-only skipped), BKS 381 passed / 1 pre-existing",
+          "result": "complete-with-deviations",
+          "count": "see reports/R1-review-ks-aidb-bks.md findings F1-F15",
+          "notes": "Invariants verified: L0 not overridable (set/assertion/fragment targets), census from auditor observations only, seal signature on write and load, admission in the native transaction with receipt before commit, no Neo4j driver in KS, graph apply + marker atomic, sealed history immutable. Fixes assigned before closure: F2 digest never null + 0007, F3 support-vs-partial dispute holds, F4 report-targeted integrity failure, F5 unable_to_screen, F7 single key-revocation authority, F9 official-use intents require exactUse, F15 server clock (B1b); F12 force RLS on research.* (F1). Recorded follow-ups before SV-18: F10 non-selected-set contradiction at assertion level, F11 retrieval.history_claim_authorized rechecks current eligibility.",
+          "recorded_at": "2026-10-25T15:08:31-04:00"
+        },
+        {
+          "tier": "closure",
+          "command": "integrator closure",
+          "result": "complete",
+          "count": "-",
+          "notes": "Closed 2026-10-25 by the integrator: second-reviewed; the fixes requested by the reviews were applied and re-proven by the implementing helpers (counts in PROOFS) but not independently re-reviewed; deviations recorded in SPRINT-V-DESIGN 10.1-10.3 and the bundle matrix.",
+          "recorded_at": "2026-10-25T17:54:20-04:00"
+        }
+      ],
+      "spec": "../SPRINT-V-PLAN.md#6-complete-local-work-item-map"
+    },
+    {
+      "id": "SV-07",
+      "owner": "ks-verification",
+      "depends_on": [
+        "SV-04",
+        "SV-05"
+      ],
+      "state": "complete",
+      "claim": {
+        "agent": "ks-verification (Opus 5.5 subagent B1b, session 2026-10-25); also carries the SV-08 KS half and component 0005",
+        "repository": "platform/knowledge-services",
+        "checkout": "main (single retained checkout)",
+        "branch": "main",
+        "base_commit": "ae5934104bca3e8f3497148c557633da5b6e9878 + uncommitted SV-06",
+        "started_at": "2026-10-25T12:35:00-04:00",
+        "paths": [
+          "packages/research-core/src/",
+          "packages/application/src/research/",
+          "catalog/research/",
+          "packages/knowledge-db-contract/ (0005)",
+          "packages/bindings/aiengineer-postgres/src/",
+          "packages/knowledge-db/src/ingestion/"
+        ]
+      },
+      "tracker_id": null,
+      "proofs": [
+        {
+          "tier": "T0+T1-KS",
+          "command": "corepack pnpm vitest: research-core, application src/research, knowledge-db-contract, binding-aiengineer-postgres (KNOWLEDGE_DB_CONTRACT_ADMIN_DSN loopback)",
+          "result": "passed",
+          "count": "research-core 73, application research 34 (full suite 476 passed / 1 pre-existing failure verification-benchmark-registered-replay, reproduced at HEAD), knowledge-db-contract 10 (2.0.0 and 2.1.0 upgrades apply only missing migrations), binding 21; typecheck/build pass; biome clean; lint ratchet 4384 baseline; agent-docs clean",
+          "notes": "B1b 2026-10-25: AuthorityChallengeService (verified vs proposed origin families, pinned source-authority rules in catalog/research/source-authority, on-demand Crossref adapter with recorded fake); aggregation gates authority_missing/authority_adverse/challenge_missing/challenge_unresolved for critical and scientific official/consequential use; forecast/recommendation never cover official obligations (OQ4); study appraisal domains as scientific qualifiers; EvidenceSynthesisAssessment requires human reviewer and all certainty domains. Ed25519 detached seal signatures verified before seal write and on every load (tamper, key swap, unknown key, importer replay, cross-run replay refused; concurrent seals one head); public keys pinned in a component key table. Review: grants scoped by use/audience/report kind; adjudication binds exact digests and produces a signed successor decision; approval cannot waive mechanics or census holds; revoked grant withdraws approval; cancel during waiting_review leaves decision held. recordCorrection advances epoch, invalidates dependents, rechecks closure via signed correction snapshot. Component 0005 -> 2.2.0 (digest sha256:29bf068a...): nullable qualifiers_digest, normalized_values + digest, adjudication subject + grant scope checks, invalidated = rejected, signature columns + key table, seal_run families per snapshot kind, outbox columns + enqueue_dispatch (only path) + settle_dispatch + claim_dispatches(target_binding) + stored ack + check_use_eligibility. Deviations: intent exactUse carries normalized-values digest, effect key, origin; signature stored inline; adjudication/successor decision/successor seal are three transactions (retryable, not atomic). Open: review rules as K08 policy data (recorded for IQ-07).",
+          "recorded_at": "2026-10-25T12:33:21-04:00"
+        },
+        {
+          "tier": "T0+T1-KS (SV-09 fixes)",
+          "command": "research-core / application research / binding vitest; SV-09 harness run.ts --mode t0 --run t0-b1b-sv09fix",
+          "result": "passed",
+          "count": "research-core 75, application research 36, binding 22; T0 harness passed: evidence_report rejected on the grounded contradiction with census holds unexplained_auditor_only + uncovered_factual_unit (4 effects admitted), study_appraisal admitted 7/7, ai-engineer installation without projection refuses AIDB_GUARD_REQUIRED, exact reads 4/4",
+          "notes": "B1b round 3 2026-10-25: disagreement/ungrounded contradiction holds with disputed_verdict (only a contradiction grounded in the support set contrary fragments or an L0 failure rejects); framing sections declared in both report kinds and excluded from the factual census with recorded reasons; derive mapping accepts camelCase and projects study appraisal domains/judgments; identical re-registration idempotent (same ref), different bytes typed conflict. SV-09 corpus re-locked (26 files, sha256:c5285484...). No paid calls.",
+          "recorded_at": "2026-10-25T13:59:14-04:00"
+        },
+        {
+          "tier": "T1-KS (idempotency)",
+          "command": "binding vitest, application research vitest, E-KS postgres.integration.test.ts on sprint-v-pg17",
+          "result": "passed",
+          "count": "binding 22 (5 files), application research 36, E-KS postgres integration 1/1",
+          "notes": "B1b follow-up 3 2026-10-25: identical assertion/support set re-registration returns the same ref; same id different bytes -> ASSERTION_CONFLICT / SUPPORT_SET_CONFLICT; same bytes different id -> *_DIGEST_EXISTS.",
+          "recorded_at": "2026-10-25T14:05:12-04:00"
+        },
+        {
+          "tier": "review",
+          "command": "Second review R1 (Sonnet 5.5, read-only) 2026-10-25; reruns research-core 75, application research 36, knowledge-db-contract 12, aiengineer-postgres 22, biotech-graph 24, knowledge-db ingestion 365 (+21 Supabase-only skipped), BKS 381 passed / 1 pre-existing",
+          "result": "complete-with-deviations",
+          "count": "see reports/R1-review-ks-aidb-bks.md findings F1-F15",
+          "notes": "Invariants verified: L0 not overridable (set/assertion/fragment targets), census from auditor observations only, seal signature on write and load, admission in the native transaction with receipt before commit, no Neo4j driver in KS, graph apply + marker atomic, sealed history immutable. Fixes assigned before closure: F2 digest never null + 0007, F3 support-vs-partial dispute holds, F4 report-targeted integrity failure, F5 unable_to_screen, F7 single key-revocation authority, F9 official-use intents require exactUse, F15 server clock (B1b); F12 force RLS on research.* (F1). Recorded follow-ups before SV-18: F10 non-selected-set contradiction at assertion level, F11 retrieval.history_claim_authorized rechecks current eligibility.",
+          "recorded_at": "2026-10-25T15:08:31-04:00"
+        },
+        {
+          "tier": "T0+T1-KS (R1 fixes, component 2.4.0)",
+          "command": "research-core, knowledge-db-contract, knowledge-db ingestion, application research, binding vitest on sprint-v-pg17; SV-09 T0 harness t0-b1b-fu4",
+          "result": "passed",
+          "count": "research-core 78; knowledge-db-contract 13 (2.3.0 -> 0007 upgrade); knowledge-db ingestion 368 + 21 skipped; application research 36; binding 24; T0 harness passed",
+          "notes": "B1b follow-up 4 2026-10-25: F3 distinct-evaluator disagreement -> disputed (held); F4 integrity failure against the report voids obligations; F5 unable_to_screen; F7 SQL key registry authoritative for revocation (SEAL_INVALID); F9 use-class registry catalog/research/use-classes.json + intent declaredUse + executor useClasses (official use without exactUse -> REVIEW_REQUIRED); F2 0007 admit_exact_use raises NORMALIZED_VALUES_REQUIRED on null digest with values; F15 server clock. Component 2.4.0 (component/UPGRADE-2.4.0.md). Leftovers handed to F2 (executor tests/context/apply declaredUse, biotech-graph digest required, agent-docs rebuild). Paid SV-09 receipts predate F3.",
+          "recorded_at": "2026-10-25T15:35:12-04:00"
+        },
+        {
+          "tier": "closure",
+          "command": "integrator closure",
+          "result": "complete",
+          "count": "-",
+          "notes": "Closed 2026-10-25 by the integrator: second-reviewed; the fixes requested by the reviews were applied and re-proven by the implementing helpers (counts in PROOFS) but not independently re-reviewed; deviations recorded in SPRINT-V-DESIGN 10.1-10.3 and the bundle matrix.",
+          "recorded_at": "2026-10-25T17:54:20-04:00"
+        }
+      ],
+      "spec": "../SPRINT-V-PLAN.md#6-complete-local-work-item-map"
+    },
+    {
+      "id": "SV-08",
+      "owner": "aiengineer",
+      "depends_on": [
+        "SV-03",
+        "SV-06",
+        "SV-07"
+      ],
+      "state": "complete",
+      "claim": {
+        "agent": "aidb (Opus 5.5 subagent B2, session 2026-10-25) for the AIDB half; KS half follows with B1b",
+        "repository": "aiengineer/ai-engineer-db-contract + platform/knowledge-services",
+        "checkout": "main (single retained checkout)",
+        "branch": "main",
+        "base_commit": "25f82ede69474b2229e7eb9f1b27a88d01ec97ec / ae5934104bca3e8f3497148c557633da5b6e9878",
+        "started_at": "2026-10-25T11:40:00-04:00",
+        "paths": [
+          "supabase/migrations/ (new)",
+          "supabase/tests/",
+          "src/database.generated.ts",
+          "workspace/ (generated)",
+          "packages/knowledge-db/src/ingestion/",
+          "packages/bindings/aiengineer-postgres/src/"
+        ]
+      },
+      "tracker_id": null,
+      "proofs": [
+        {
+          "tier": "T1-AIDB",
+          "command": "disposable Supabase db (project disposable-sv08-aidb, separate workdir): knowledge-db install --application ai-engineer (2.0.0 then 2.1.0 upgrade, then fresh 2.1.0) -> supabase migration up (181/182) -> supabase/tests/knowledge_component_binding.sql + research_report_v2_projection.sql + research_report_v2_concurrency.mjs",
+          "result": "passed",
+          "count": "component receipts sha256:0dc1dbc4... (2.0.0) / sha256:0c860e16... (2.1.0); binding + projection SQL suites passed on 3 runs; concurrency one receipt (x2); typecheck, npm test 15/15, workspace:validate 91, types:check:native passed; workspace:build blocked by search_index_bytes budget (follow-up in progress)",
+          "notes": "B2 2026-10-25: 20261024010000 edited in place (UNRUN/unpublished) to superset keys + major 2; new 20261024010100_research_report_v2_projection.sql: research projection tables, admission record, research.read_report_package, research.assert_admitted_use(...), receipt decision/digest columns, commit-time ADMISSION_REQUIRED check, SQLSTATE KSA01..KSA07; E09 justified no-change; SV-17 inventory of legacy AIDB verification tables in report; CI contract.yml will fail until the cutover installer installs the component; receipts .scratch/sprint-v/proofs/SV-08/run{A,B,C}",
+          "recorded_at": "2026-10-25T11:31:35-04:00"
+        },
+        {
+          "tier": "T1-KS (+AIDB)",
+          "command": "knowledge-db ingestion vitest on sprint-v-pg17 (component-only path, stand-in domain table) and on a disposable AIDB Supabase database with component 2.2.0 + 182 AIDB migrations",
+          "result": "passed",
+          "count": "knowledge-db ingestion 365 passed + 21 skipped without Supabase; AIDB executor tests 14 passed (admitted; rollback on stale epoch, unknown decision, edited effect; one receipt under concurrency; recovery after lost commit response); B2 guard observed to run on every admitted apply",
+          "notes": "B1b 2026-10-25: exact-use-admission.ts is the single admission path; executor applyOnce admits on its own connection inside temporal.begin_batch/commit_batch, runs research.assert_admitted_use on ai-engineer installations, sets receipt decision fields, maps KSA01..07, writes effect receipt before commit; PostgreSQL binding delegates. FOLLOW-UP: AIDB supabase/tests/research_report_v2_projection.sql calls the pre-0005 9-arg seal_run and the guard must forward the normalized-values digest (component/UPGRADE-2.2.0.md lists the fixture changes).",
+          "recorded_at": "2026-10-25T12:33:22-04:00"
+        },
+        {
+          "tier": "T1-AIDB (component 2.2.0)",
+          "command": "fresh disposable Supabase db: knowledge-db install 2.2.0 -> 183 AIDB migrations (head 20261024010200) -> knowledge_component_binding.sql + research_report_v2_projection.sql (25 blocks) + concurrency script -> repeat install",
+          "result": "passed",
+          "count": "component receipt sha256:29bf068aece03ea5facbd7ebf054a0d7343b17e5c092db64d21d9c631ffe1bb7 (matches the KS receipt); repeat install applied none; both SQL suites 0 errors; concurrency one receipt; typecheck, npm test 15/15, workspace build/check/validate passed (index 534,338 of 720,896 bytes)",
+          "notes": "B2 follow-up 2026-10-25: 20261024010200_research_admission_normalized_values.sql: 5-argument guard forwarding the normalized-values digest, mismatch -> EFFECT_CONFLICT (KSA03), admission key includes the digest; fixtures seal with the 2.2.0 12-argument seal_run and real Ed25519 signatures (research_report_v2_seal_fixture.mjs); new cases: matching/mismatched digest, superseded review decision, approved successor, revoked grant, out-of-scope reviewer, unpinned key. KS exact-use-admission.ts must look up the 5-argument guard (follow-up sent to B1b).",
+          "recorded_at": "2026-10-25T13:03:50-04:00"
+        },
+        {
+          "tier": "T1-KS+AIDB (guard rerun)",
+          "command": "knowledge-db AIDB executor tests on a fresh disposable Supabase volume (component 2.2.0 + 183 AIDB migrations); binding suite on sprint-v-pg17",
+          "result": "passed",
+          "count": "AIDB executor 14/14 (3 admission rows carrying the digest, 3 admission-requiring receipts, 3 effect receipts); binding 21/21 incl. component-only path and ai-engineer-without-guard refusal; knowledge-db ingestion 365 passed + 21 Supabase-only skipped",
+          "notes": "B1b follow-up 2026-10-25: exact-use-admission.ts calls research.assert_admitted_use(uuid,text,text,bigint,text) with the normalized-values digest; ai-engineer installation without the guard refuses AIDB_GUARD_REQUIRED (no silent fallback); other installations record guard_path=component_only; effect bound with the plan payload digest. Lint ratchet 4385 vs 4384 baseline caused by an unused import in E-KS untracked conformance.test.ts (E-KS to clear).",
+          "recorded_at": "2026-10-25T13:11:06-04:00"
+        },
+        {
+          "tier": "review",
+          "command": "Second review R1 (Sonnet 5.5, read-only) 2026-10-25; reruns research-core 75, application research 36, knowledge-db-contract 12, aiengineer-postgres 22, biotech-graph 24, knowledge-db ingestion 365 (+21 Supabase-only skipped), BKS 381 passed / 1 pre-existing",
+          "result": "complete-with-deviations",
+          "count": "see reports/R1-review-ks-aidb-bks.md findings F1-F15",
+          "notes": "Invariants verified: L0 not overridable (set/assertion/fragment targets), census from auditor observations only, seal signature on write and load, admission in the native transaction with receipt before commit, no Neo4j driver in KS, graph apply + marker atomic, sealed history immutable. Fixes assigned before closure: F2 digest never null + 0007, F3 support-vs-partial dispute holds, F4 report-targeted integrity failure, F5 unable_to_screen, F7 single key-revocation authority, F9 official-use intents require exactUse, F15 server clock (B1b); F12 force RLS on research.* (F1). Recorded follow-ups before SV-18: F10 non-selected-set contradiction at assertion level, F11 retrieval.history_claim_authorized rechecks current eligibility.",
+          "recorded_at": "2026-10-25T15:08:31-04:00"
+        },
+        {
+          "tier": "closure",
+          "command": "integrator closure",
+          "result": "complete",
+          "count": "-",
+          "notes": "Closed 2026-10-25 by the integrator: second-reviewed; the fixes requested by the reviews were applied and re-proven by the implementing helpers (counts in PROOFS) but not independently re-reviewed; deviations recorded in SPRINT-V-DESIGN 10.1-10.3 and the bundle matrix.",
+          "recorded_at": "2026-10-25T17:54:20-04:00"
+        }
+      ],
+      "spec": "../SPRINT-V-PLAN.md#6-complete-local-work-item-map"
+    },
+    {
+      "id": "SV-09",
+      "owner": "integration",
+      "depends_on": [
+        "SV-08"
+      ],
+      "state": "complete",
+      "claim": {
+        "agent": "integration (Opus 5.5 subagent C, session 2026-10-25)",
+        "repository": "platform/knowledge-services",
+        "checkout": "main (single retained checkout)",
+        "branch": "main",
+        "base_commit": "ae5934104bca3e8f3497148c557633da5b6e9878 + uncommitted SV-06/07/08/11",
+        "started_at": "2026-10-25T15:30:00-04:00",
+        "paths": [
+          "scripts/experiments/sprint-v/",
+          "catalog/research/fixtures/"
+        ],
+        "paid_ceiling_usd": 6.0
+      },
+      "tracker_id": null,
+      "proofs": [
+        {
+          "tier": "T0 + T2-control",
+          "command": "KS scripts/experiments/sprint-v run.ts: T0 deterministic (t0-final4) on sprint-v-pg17, then paid-2 with pinned routes (producer gpt-6-sol, judge gpt-6-luna, second family + auditor claude-sonnet-5-5; discovered by authenticated models/list); meter reservation before each call",
+          "result": "passed (control slice; no quality claim)",
+          "count": "spend USD 0.15 (0.149489) of the 6.00 ceiling, 39 metered calls, 0 blocked; T0: evidence_report rejected on the planted contradiction + census hold on the uncited heading (4 assertion decisions admitted, 1 refused, 1 skipped), study_appraisal admitted 7/7 on the component-only path, ai-engineer database without projection refused 11/11 AIDB_GUARD_REQUIRED; paid: all four report-level decisions held/rejected (census differences, 2 unsupported, 1 contradicted, 1 unmet optional), 19 assertion-level admissions with receipts, 4/4 exact reads; census recall 6/6 and 6/6 on the locked reference bodies; judge vs second-family agreement 4/5 and 0/6; median latency producer 14.4 s, judges 2-3.6 s, auditor 7.5 s",
+          "notes": "C 2026-10-25: 26 locked fixture files (corpus sha256:146077b2...), 7 synthetic sources with planted contradiction/negations/table/caption, two frozen tasks (6 obligations each), labels, provenance per fixture; harness {run,fixtures,manifest,meter,analysis,providers}.ts drives ResearchCoordinator + PostgreSQL binding (no MC): register -> judge -> recorded authority/challenge -> report.assess with auditor census -> signed seal -> derive -> decisions -> native admission + receipt -> exact read; analysis preregistered; paid mode refuses without a T0 pass on identical bytes. Deviations: native write to a stand-in table inside the admission tx (not IngestionExecutor); installation id sv09-harness for the full chain; derive before decisions; component 2.3.0 (0006 landed mid-session). Defects found -> B1b follow-up: judge disagreement rejects instead of holding; framing text counted as factual inventory; derive mapping lowercase-only; identical re-registration duplicate key. INDEPENDENCE_UNPROVEN recorded; real-work gate closed.",
+          "recorded_at": "2026-10-25T13:48:11-04:00"
+        },
+        {
+          "tier": "review",
+          "command": "Second review R1 (Sonnet 5.5, read-only) 2026-10-25; reruns research-core 75, application research 36, knowledge-db-contract 12, aiengineer-postgres 22, biotech-graph 24, knowledge-db ingestion 365 (+21 Supabase-only skipped), BKS 381 passed / 1 pre-existing",
+          "result": "complete-with-deviations",
+          "count": "see reports/R1-review-ks-aidb-bks.md findings F1-F15",
+          "notes": "Invariants verified: L0 not overridable (set/assertion/fragment targets), census from auditor observations only, seal signature on write and load, admission in the native transaction with receipt before commit, no Neo4j driver in KS, graph apply + marker atomic, sealed history immutable. Fixes assigned before closure: F2 digest never null + 0007, F3 support-vs-partial dispute holds, F4 report-targeted integrity failure, F5 unable_to_screen, F7 single key-revocation authority, F9 official-use intents require exactUse, F15 server clock (B1b); F12 force RLS on research.* (F1). Recorded follow-ups before SV-18: F10 non-selected-set contradiction at assertion level, F11 retrieval.history_claim_authorized rechecks current eligibility.",
+          "recorded_at": "2026-10-25T15:08:31-04:00"
+        },
+        {
+          "tier": "closure",
+          "command": "integrator closure",
+          "result": "complete",
+          "count": "-",
+          "notes": "Closed 2026-10-25 by the integrator: second-reviewed; the fixes requested by the reviews were applied and re-proven by the implementing helpers (counts in PROOFS) but not independently re-reviewed; deviations recorded in SPRINT-V-DESIGN 10.1-10.3 and the bundle matrix.",
+          "recorded_at": "2026-10-25T17:54:20-04:00"
+        }
+      ],
+      "spec": "../SPRINT-V-PLAN.md#6-complete-local-work-item-map"
+    },
+    {
+      "id": "SV-10",
+      "owner": "biotech-schema",
+      "depends_on": [
+        "SV-02",
+        "SV-04"
+      ],
+      "state": "complete",
+      "claim": {
+        "agent": "biotech-lead (Opus 5.5 subagent)",
+        "repository": "biotech/biotech-knowledge-services",
+        "checkout": "main (single retained checkout)",
+        "branch": "main",
+        "base_commit": "d042678cb06de3c3c8b8f85e8ff9dff99858ad84",
+        "started_at": "2026-10-24T20:40:00-04:00",
+        "paths": [
+          "schema/source/",
+          "scripts/release/",
+          "schema/pinned/ (generated)",
+          "workspace/ (generated)"
+        ]
+      },
+      "tracker_id": "OVE-156",
+      "proofs": [
+        {
+          "tier": "T0",
+          "command": "node scripts/release/generate.mjs (--check); verify.mjs; pnpm schema:pin -- --check; pnpm build; pnpm workspace:build && pnpm workspace:verify; pnpm api:generate && pnpm api:check; pnpm test",
+          "result": "passed",
+          "count": "unit 356 passed, 1 failed test + 2 test files failing to load (all absent ../biotech-meta, pre-existing; count corrected by Checkpoint A 2026-10-25), 78 skipped; integration against fresh test Neo4j 155 passed / 1 failed (same biotech-meta test) when files run sequentially",
+          "notes": "PIN biotech-schema-v2.1.0 schemaDigest sha256:fe5c5992655fb31f7bde175538d3f9b361e3cfa06b2a4921b55f36bcacd41b97 schemaReleaseDigest sha256:29e118247d725ad4f416911173eb2363488bc97cedebe5e93843eb53a4e661a7; provenance names BKS schema/source; EXPLAIN evidence inherited from v2.0.2 (no query source changed); DDL identical (572 statements); ingest skill examples/benchmarks still name v2.0.2"
+        },
+        {
+          "tier": "review",
+          "command": "Checkpoint A second review (Opus 5.5, read-only) 2026-10-25; proofs rerun KS 23/48/8/3/5, MC 120",
+          "result": "complete-with-deviations",
+          "count": "see SPRINT-V-DESIGN.md section 10.1",
+          "notes": "deviations recorded in design 10.1; follow-ups assigned to SV-06/07/08/11/16/17",
+          "recorded_at": "2026-10-25T10:59:45-04:00"
+        },
+        {
+          "tier": "T0",
+          "command": "BKS schema:release generate/verify/pin for schema/source/biotech-schema-v2.2.0 (by D1 under SV-11)",
+          "result": "passed",
+          "count": "pinned biotech-schema-v2.2.0; schemaReleaseDigest sha256:2df9d3bc...25a74, schemaDigest sha256:de8ab942...6576, ddlDigest sha256:f0622dba...ddb3",
+          "notes": "Schema conformed to the system per PROCESS 1.5: STUDY_APPRAISAL report kind, useDecisionDigest, marker indexes. 2.1.0 remains the reviewed SV-10 baseline; 2.2.0 is the SV-11 release.",
+          "recorded_at": "2026-10-25T11:50:10-04:00"
+        }
+      ],
+      "spec": "../SPRINT-V-PLAN.md#6-complete-local-work-item-map"
+    },
+    {
+      "id": "SV-11",
+      "owner": "biotech-binding",
+      "depends_on": [
+        "SV-08",
+        "SV-09",
+        "SV-10"
+      ],
+      "state": "complete",
+      "claim": {
+        "agent": "biotech-lead (Opus 5.5 subagent D1, session 2026-10-25)",
+        "repository": "biotech/biotech-knowledge-services (BKS half); KS bindings/biotech-graph follows as D2",
+        "checkout": "main (single retained checkout)",
+        "branch": "main",
+        "base_commit": "3ea014882b13a6b45f7bf7c6b70052cba2ebe9b5",
+        "started_at": "2026-10-25T11:05:00-04:00",
+        "paths": [
+          "packages/contracts/src/",
+          "packages/kg-ops/src/admission/",
+          "packages/kg-ops/src/read/",
+          "apps/executor/src/modules/",
+          "schema/source/ (new release only if the SDL lacks a required field)"
+        ],
+        "note": "Scaffolding overlap allowed by NEXT-SESSION section 3 (contract dependencies SV-02/04/10 reviewed); completion still requires SV-08/SV-09 proof."
+      },
+      "tracker_id": null,
+      "proofs": [
+        {
+          "tier": "T0+T1 (BKS half)",
+          "command": "BKS: pnpm build && pnpm test; BKS_INTEGRATION=1 vitest --project kg-ops (sequential) against disposable Neo4j 5.26 (scripts/neo4j-test.sh) + throwaway Biotech PostgreSQL with component 2.1.0 installed on sprint-v-pg17",
+          "result": "passed",
+          "count": "stub 15, contracts 3 (bound-effect digest vector byte-identical to KS), executor 2, python 91; graph+PostgreSQL proof 9/9 (both report kinds, duplicate, reordered, revoked in transit, invalidated, lost ack, graph down then retry, rollback before marker, official reads eligible/revoked-excluded/authority-down-held); full unit 376 passed / 1 failed / 87 skipped and integration 178 passed / 1 failed / 12 skipped, failures = the three pre-existing absent biotech-meta files; read-enterprise unrun (no Enterprise container)",
+          "notes": "D1 2026-10-25: contracts biotech-knowledge-admission.v1 (+ack, consume request/report, JSON Schemas, Python models), read v3 with eligibility block; DispatchConsumer writes effect + KsIntentMarker in one Neo4j tx via applyAdmittedV2; POST /kg/admission/dispatch/consume (service principal, grant admission.dispatch) and bks admission consume --once; official reads recheck PostgreSQL authority and hold when unreachable. New SDL release biotech-schema-v2.2.0 pinned (ReportKind.STUDY_APPRAISAL, useDecisionDigest on Activity/Assessment, marker lookup indexes): schemaReleaseDigest sha256:2df9d3bc...25a74, schemaDigest sha256:de8ab942...6576. Deviations: revoked rows settled via fail_dispatch long retry until component settle_dispatch exists (requested in 0005); eligibility recheck uses the full admit_exact_use rule; edits outside listed paths (apply.ts, write/proposals.ts, cli.ts, release ddl.mjs, kg-ops package.json adds pg). Pending: NAVIGATION.md/AGENTS.md still say v2.1.0 (SV-17); KS binding half (D2) and SV-12 faults. Env names BKS_VERIFICATION_DSN, BKS_VERIFICATION_TENANTS, BKS_VERIFICATION_READ_DSN, BKS_EXECUTOR_TOKENS.",
+          "recorded_at": "2026-10-25T11:50:09-04:00"
+        },
+        {
+          "tier": "T0+T1-KS (KS half)",
+          "command": "corepack pnpm --filter @aiengineer/knowledge-binding-biotech-graph exec vitest run (stub consumer; then with KNOWLEDGE_DB_CONTRACT_ADMIN_DSN against component 2.2.0 on sprint-v-pg17)",
+          "result": "passed",
+          "count": "stub 13; stub+component 24/24 (x4): both report kinds end to end, nine fault cases; typecheck/build/biome/ratchet/agent-docs clean",
+          "notes": "D2 2026-10-25: packages/bindings/biotech-graph reuses the K05 PostgreSQL stores under binding biotech-graph (no Neo4j driver in KS); admitExactUse in one PostgreSQL tx: bind effect, inline admission payload in artifact_custody, enqueue_dispatch (scheme ks-intent-marker.v1), receipt pending_dispatch; receipt applied only after verified ack (component row + recomputed expected digest + v3 marker read agree); official reads via v3 officialUse with digest recheck. BKS change: revoked-at-recheck uses settle_dispatch (16/16 dispatch tests).",
+          "recorded_at": "2026-10-25T12:37:47-04:00"
+        },
+        {
+          "tier": "review",
+          "command": "Second review R1 (Sonnet 5.5) 2026-10-25",
+          "result": "needs-change",
+          "count": "F1, F8, F13, F14",
+          "notes": "F1 BKS evaluateDecision omits review/grant liveness (use check_use_eligibility); F8 only report/assertion/marker official reads are eligibility-checked, other v3 operations served unchecked and not held when the authority is down; F13 refused dispatches parked not settled, consumer claims every target binding; F14 applied derives from the marker read, the PostgreSQL ack must equal the expected digest. Assigned to D2.",
+          "recorded_at": "2026-10-25T15:08:32-04:00"
+        },
+        {
+          "tier": "T0+T1 (R1 fixes)",
+          "command": "BKS dispatch/read unit tests; executor dispatch tests; pnpm build && pnpm test; sv12-harness.sh attempt-152040 against the real executor + disposable Neo4j + throwaway Biotech PostgreSQL",
+          "result": "passed",
+          "count": "dispatch/read 91 passed / 1 skipped; executor dispatch 2/2; full 385 passed / 1 pre-existing biotech-meta / 89 skipped; real run 9/11 passed, 2 skipped (lost ack after commit, native rollback: no HTTP fault hook; D1 in-process test covers both, 11/11)",
+          "notes": "D2 round 3 2026-10-25: F1 every decision rechecked via the component check_use_eligibility (official reads and pre-apply); missing function -> hold; revoked grant -> official read excludes (REVIEW_REQUIRED) and pending dispatch settled revoked. F8 every official v3 operation checks rows carrying a decision ref; unreferenced rows served as graph context; authority down -> whole official read held. F13 permanent refusals settled refused; consumer claims only biotech-graph rows; ack contract componentState gains refused (schemas regenerated, python 91). F14 applied only after a PostgreSQL ack whose digest equals the expected marker digest, else deferred (graph fields confirmation only).",
+          "recorded_at": "2026-10-25T15:28:23-04:00"
+        },
+        {
+          "tier": "closure",
+          "command": "integrator closure",
+          "result": "complete",
+          "count": "-",
+          "notes": "Closed 2026-10-25 by the integrator: second-reviewed; the fixes requested by the reviews were applied and re-proven by the implementing helpers (counts in PROOFS) but not independently re-reviewed; deviations recorded in SPRINT-V-DESIGN 10.1-10.3 and the bundle matrix.",
+          "recorded_at": "2026-10-25T17:54:21-04:00"
+        }
+      ],
+      "spec": "../SPRINT-V-PLAN.md#6-complete-local-work-item-map"
+    },
+    {
+      "id": "SV-12",
+      "owner": "integration",
+      "depends_on": [
+        "SV-09",
+        "SV-11"
+      ],
+      "state": "complete",
+      "claim": {
+        "agent": "integration (Opus 5.5 subagent D2, session 2026-10-25)",
+        "repository": "platform/knowledge-services + biotech/biotech-knowledge-services (tests + dispatch ack patch)",
+        "checkout": "main (single retained checkout)",
+        "branch": "main",
+        "base_commit": "ae5934104bca3e8f3497148c557633da5b6e9878 / 3ea014882b13a6b45f7bf7c6b70052cba2ebe9b5",
+        "started_at": "2026-10-25T14:10:00-04:00",
+        "paths": [
+          "packages/bindings/biotech-graph/",
+          "packages/kg-ops/src/admission/ (ack patch)",
+          "packages/kg-ops integration tests"
+        ]
+      },
+      "tracker_id": null,
+      "proofs": [
+        {
+          "tier": "T1 cross-store (first run)",
+          "command": "KS .scratch/sprint-v/proofs/SV-12/sv12-harness.sh: real BKS executor + disposable Neo4j 5.26 + throwaway Biotech PostgreSQL (component 2.2.0)",
+          "result": "partial",
+          "count": "3 of 11 passed (held/rejected writes nothing; stop-dispatch; revoked in transit incl. official read excluding applied reports); graph-unavailable correct up to ack; 6 failed at acknowledgment with MARKER_MISMATCH (BKS acked with its own marker digest, component 2.2.0 expects the row digest or an ack record); 2 skipped (native rollback, lost ack after commit: not injectable over HTTP; covered by D1 in-process proof)",
+          "notes": "D2 2026-10-25 first run; integrator approved the BKS dispatch.ts/verification.ts acknowledgment patch and the repair of the D1 integration seed (direct insert + pre-2.2.0 seal_run); rerun pending. Six effects reached the graph without PostgreSQL acknowledgment and every receipt correctly stayed pending_dispatch.",
+          "recorded_at": "2026-10-25T12:37:47-04:00"
+        },
+        {
+          "tier": "T1 cross-store (round 2)",
+          "command": "KS .scratch/sprint-v/proofs/SV-12/sv12-harness.sh attempt-124237: real BKS executor + disposable Neo4j 5.26 + throwaway Biotech PostgreSQL (component 2.2.0); BKS pnpm build && pnpm test; kg-ops dispatch tests; D1 integration 9/9",
+          "result": "passed",
+          "count": "9 of 11 passed, 0 failed, 2 skipped (lost ack after graph commit, native rollback: need an in-process fault hook, covered by the D1 in-process test which passed in the same run); 8 outbox rows acknowledged with the expected digest, 2 revoked; BKS unit 381 passed / 1 pre-existing biotech-meta failure / 87 skipped; consumer dispatch 20/20, executor dispatch 2/2; KS biotech-graph stub+component 24/24",
+          "notes": "D2 round 2 2026-10-25: BKS acknowledges ks-intent-marker.v1 rows with the recomputed component expected digest (nothing acked if it does not recompute); BKS marker digest kept on the marker node and in the stored ack record; 2.1.0 rows ack the old way. D1 integration seed repaired to 2.2.0 seal (registered Ed25519 key, real signature) and enqueue_dispatch. Decision invalidated in transit now yields DISPATCH_REVOKED (2.2.0 trigger revokes before recheck). Both report kinds end to end incl. official read; duplicate/reordered, lost consume response, graph unavailable then retry, stop-dispatch, revoked in transit pass. PostgreSQL and Neo4j never share a transaction.",
+          "recorded_at": "2026-10-25T12:50:22-04:00"
+        },
+        {
+          "tier": "review",
+          "command": "Second review R1 (Sonnet 5.5, read-only) 2026-10-25; reruns research-core 75, application research 36, knowledge-db-contract 12, aiengineer-postgres 22, biotech-graph 24, knowledge-db ingestion 365 (+21 Supabase-only skipped), BKS 381 passed / 1 pre-existing",
+          "result": "complete-with-deviations",
+          "count": "see reports/R1-review-ks-aidb-bks.md findings F1-F15",
+          "notes": "Invariants verified: L0 not overridable (set/assertion/fragment targets), census from auditor observations only, seal signature on write and load, admission in the native transaction with receipt before commit, no Neo4j driver in KS, graph apply + marker atomic, sealed history immutable. Fixes assigned before closure: F2 digest never null + 0007, F3 support-vs-partial dispute holds, F4 report-targeted integrity failure, F5 unable_to_screen, F7 single key-revocation authority, F9 official-use intents require exactUse, F15 server clock (B1b); F12 force RLS on research.* (F1). Recorded follow-ups before SV-18: F10 non-selected-set contradiction at assertion level, F11 retrieval.history_claim_authorized rechecks current eligibility.",
+          "recorded_at": "2026-10-25T15:08:32-04:00"
+        },
+        {
+          "tier": "closure",
+          "command": "integrator closure",
+          "result": "complete",
+          "count": "-",
+          "notes": "Closed 2026-10-25 by the integrator: second-reviewed; the fixes requested by the reviews were applied and re-proven by the implementing helpers (counts in PROOFS) but not independently re-reviewed; deviations recorded in SPRINT-V-DESIGN 10.1-10.3 and the bundle matrix.",
+          "recorded_at": "2026-10-25T17:54:21-04:00"
+        }
+      ],
+      "spec": "../SPRINT-V-PLAN.md#6-complete-local-work-item-map"
+    },
+    {
+      "id": "SV-13",
+      "owner": "mc-schema",
+      "depends_on": [
+        "SV-02"
+      ],
+      "state": "complete",
+      "claim": {
+        "agent": "mc-lead (Opus 5.5 subagent)",
+        "repository": "platform/mission-control",
+        "checkout": "main (single retained checkout)",
+        "branch": "main",
+        "base_commit": "df0a2a9e349284e0fd6aff5c70096a8183710405",
+        "started_at": "2026-10-24T20:40:00-04:00",
+        "paths": [
+          "packages/mission-control-db-contract/releases/",
+          "scripts/prepare_release_*.py",
+          "tests/integration/postgres/test_sprint_v_release_*.py"
+        ]
+      },
+      "tracker_id": "OVE-152",
+      "proofs": [
+        {
+          "tier": "T1-MC",
+          "command": "mission-db release-build --component-root packages/mission-control-db-contract/releases/1.5.0/component (disposable PG17 127.0.0.1:55433); pytest -m common_db tests/integration/postgres/test_sprint_v_release_150.py",
+          "result": "passed",
+          "count": "4 passed; fingerprint sha256:e18dc014f5c1b3a22d661da44356156ff1e2c0c24fae89275ab7ab96003d79d4",
+          "notes": "1.5.0 from the complete 1.4.4 prefix (never 1.4.0 root); 0050..0054; EFFECT_CONFLICT MCE01, SUBMISSION_CONFLICT MCE02; live locks untouched"
+        },
+        {
+          "tier": "review",
+          "command": "Checkpoint A second review (Opus 5.5, read-only) 2026-10-25; proofs rerun KS 23/48/8/3/5, MC 120",
+          "result": "complete-with-deviations",
+          "count": "see SPRINT-V-DESIGN.md section 10.1",
+          "notes": "deviations recorded in design 10.1; follow-ups assigned to SV-06/07/08/11/16/17",
+          "recorded_at": "2026-10-25T10:59:45-04:00"
+        },
+        {
+          "tier": "review",
+          "command": "Second review R2-MC (Sonnet 5.5, read-only) 2026-10-25; reruns 195 passed in 90 s, ruff clean, mypy 894 files clean, docs 7/7",
+          "result": "complete",
+          "count": "see reports/R2-review-mc.md",
+          "notes": "SV-01 continuation test covers StageGraph and GoalDirected; release 1.5.0 untouched, 1.6.0 byte-identical for 0001..0054 plus 0055; the 8 test_bundle_custody_composition.py failures are pre-existing at HEAD 3aabe91b.",
+          "recorded_at": "2026-10-25T16:00:33-04:00"
+        }
+      ],
+      "spec": "../SPRINT-V-PLAN.md#6-complete-local-work-item-map"
+    },
+    {
+      "id": "SV-14",
+      "owner": "mc-gateway",
+      "depends_on": [
+        "SV-01",
+        "SV-05",
+        "SV-13"
+      ],
+      "state": "complete",
+      "claim": {
+        "agent": "mc-lead-2 (Opus 5.5 subagent)",
+        "repository": "platform/mission-control",
+        "checkout": "main (single retained checkout)",
+        "branch": "main",
+        "base_commit": "df0a2a9e349284e0fd6aff5c70096a8183710405 + uncommitted SV-01/SV-13",
+        "started_at": "2026-10-24T22:10:00-04:00",
+        "paths": [
+          "src/mission_control/application/ports/knowledge.py",
+          "src/mission_control/application/knowledge/",
+          "src/mission_control/application/outputs/",
+          "src/mission_control/adapters/postgres/knowledge/",
+          "src/mission_control/contracts/knowledge_protocol_results.py",
+          "tests/unit/knowledge/",
+          "tests/integration/postgres/test_knowledge_gateway_postgres.py"
+        ]
+      },
+      "tracker_id": "OVE-157",
+      "proofs": [
+        {
+          "tier": "T0+T1-MC",
+          "command": "MISSION_CONTROL_TEST_ADMIN_DSN=<loopback> .venv/Scripts/pytest.exe tests/unit/knowledge tests/integration/postgres/test_knowledge_gateway_postgres.py tests/architecture",
+          "result": "passed",
+          "count": "17 unit + 4 integration (within 120 passed MC selection)",
+          "notes": "host side only: ports, gateway, journal adapter over 1.5.0, submission service; real HTTP binding client, issuer-backed minter and bootstrap wiring are SV-16"
+        },
+        {
+          "tier": "review",
+          "command": "Checkpoint A second review (Opus 5.5, read-only) 2026-10-25; proofs rerun KS 23/48/8/3/5, MC 120",
+          "result": "complete-with-deviations",
+          "count": "see SPRINT-V-DESIGN.md section 10.1",
+          "notes": "deviations recorded in design 10.1; follow-ups assigned to SV-06/07/08/11/16/17",
+          "recorded_at": "2026-10-25T10:59:45-04:00"
+        },
+        {
+          "tier": "review",
+          "command": "Second review R2-MC (Sonnet 5.5, read-only) 2026-10-25",
+          "result": "complete-with-deviations",
+          "count": "see reports/R2-review-mc.md",
+          "notes": "Invariants verified (domain pure, tools via the materializer path, credential never logged, access rebuilt per tool dispatch, journal before dispatch, same key other bytes refused, pending_dispatch settles only on delivery applied/revoked, outcome_basis distinguishes coverage from assessed, exact reads refuse non-exact revisions, failed repair blocks). Deviations: D1 exact-resolve/represent/deliver services not wired into a production path; D2 no production RecoveryGrant (authorized retry unit-proved only); O retry resends the same single-use token; O failed attempt skips reconcile/finalize. D1/D2/O fixes assigned to E-MC round 4; SV-02 Python models handwritten but rule-complete (accepted).",
+          "recorded_at": "2026-10-25T16:00:33-04:00"
+        }
+      ],
+      "spec": "../SPRINT-V-PLAN.md#6-complete-local-work-item-map"
+    },
+    {
+      "id": "SV-15",
+      "owner": "mc-output",
+      "depends_on": [
+        "SV-06",
+        "SV-14"
+      ],
+      "state": "complete",
+      "claim": {
+        "agent": "mc-lead-2 (Opus 5.5 subagent)",
+        "repository": "platform/mission-control",
+        "checkout": "main (single retained checkout)",
+        "branch": "main",
+        "base_commit": "df0a2a9e349284e0fd6aff5c70096a8183710405 + uncommitted SV-01/SV-13",
+        "started_at": "2026-10-24T22:10:00-04:00",
+        "paths": [
+          "src/mission_control/application/ports/knowledge.py",
+          "src/mission_control/application/knowledge/",
+          "src/mission_control/application/outputs/",
+          "src/mission_control/adapters/postgres/knowledge/",
+          "src/mission_control/contracts/knowledge_protocol_results.py",
+          "tests/unit/knowledge/",
+          "tests/integration/postgres/test_knowledge_gateway_postgres.py"
+        ]
+      },
+      "tracker_id": "OVE-158",
+      "proofs": [
+        {
+          "tier": "T0+T1-MC",
+          "command": "MISSION_CONTROL_TEST_ADMIN_DSN=<loopback> .venv/Scripts/pytest.exe tests/unit/knowledge tests/integration/postgres/test_knowledge_gateway_postgres.py tests/architecture",
+          "result": "passed",
+          "count": "17 unit + 4 integration (within 120 passed MC selection)",
+          "notes": "host side only: ports, gateway, journal adapter over 1.5.0, submission service; real HTTP binding client, issuer-backed minter and bootstrap wiring are SV-16"
+        },
+        {
+          "tier": "review",
+          "command": "Checkpoint A second review (Opus 5.5, read-only) 2026-10-25",
+          "result": "needs-change",
+          "count": "see SPRINT-V-DESIGN.md section 10.1",
+          "notes": "SV-02: effect-scoped recovery claim + Python model strictness (SV-16); SV-03: component 0004/0005 + AIDB superset check (SV-06/07/08); SV-05: atomic seal, auditor census, native admission (SV-06/07/08); SV-15: M03/M04 seam (SV-16)",
+          "recorded_at": "2026-10-25T10:59:46-04:00"
+        },
+        {
+          "tier": "review",
+          "command": "Second review R2-MC (Sonnet 5.5, read-only) 2026-10-25",
+          "result": "complete-with-deviations",
+          "count": "see reports/R2-review-mc.md",
+          "notes": "Invariants verified (domain pure, tools via the materializer path, credential never logged, access rebuilt per tool dispatch, journal before dispatch, same key other bytes refused, pending_dispatch settles only on delivery applied/revoked, outcome_basis distinguishes coverage from assessed, exact reads refuse non-exact revisions, failed repair blocks). Deviations: D1 exact-resolve/represent/deliver services not wired into a production path; D2 no production RecoveryGrant (authorized retry unit-proved only); O retry resends the same single-use token; O failed attempt skips reconcile/finalize. D1/D2/O fixes assigned to E-MC round 4; SV-02 Python models handwritten but rule-complete (accepted).",
+          "recorded_at": "2026-10-25T16:00:34-04:00"
+        },
+        {
+          "tier": "closure",
+          "command": "integrator closure",
+          "result": "complete",
+          "count": "-",
+          "notes": "Closed 2026-10-25 by the integrator: second-reviewed; the fixes requested by the reviews were applied and re-proven by the implementing helpers (counts in PROOFS) but not independently re-reviewed; deviations recorded in SPRINT-V-DESIGN 10.1-10.3 and the bundle matrix.",
+          "recorded_at": "2026-10-25T17:54:21-04:00"
+        }
+      ],
+      "spec": "../SPRINT-V-PLAN.md#6-complete-local-work-item-map"
+    },
+    {
+      "id": "SV-16",
+      "owner": "integration",
+      "depends_on": [
+        "SV-12",
+        "SV-15"
+      ],
+      "state": "complete",
+      "claim": {
+        "agent": "integration (Opus 5.5 subagents E-MC now, E-KS after SV-07)",
+        "repository": "platform/mission-control (E-MC) + platform/knowledge-services apps/verification-executor (E-KS)",
+        "checkout": "main (single retained checkout)",
+        "branch": "main",
+        "base_commit": "3aabe91ba92895ef09309a0d23c4325bf2dfe519 / ae5934104bca3e8f3497148c557633da5b6e9878",
+        "started_at": "2026-10-25T13:20:00-04:00",
+        "paths": [
+          "src/mission_control/application/{knowledge,outputs,context,ports}",
+          "src/mission_control/adapters/{knowledge,postgres/knowledge,deep_agents}",
+          "src/mission_control/bootstrap/{composition,settings}.py",
+          "src/mission_control/contracts/knowledge_protocol*.py",
+          "packages/mission-control-db-contract/releases/1.6.0 (new)",
+          "tests/",
+          "apps/verification-executor/src/ (E-KS)",
+          "packages/knowledge-operation-protocol/ (E-KS, K01 recovery grant)"
+        ],
+        "note": "MC half starts before SV-12 completes: scaffolding overlap per NEXT-SESSION section 3; acceptance against the real executor and both bindings closes the item."
+      },
+      "tracker_id": null,
+      "proofs": [
+        {
+          "tier": "T0+T1-KS (KS half, round 1)",
+          "command": "KS: knowledge-operation-protocol vitest; verification-executor knowledge-operation vitest (over-the-wire conformance + PostgreSQL on sprint-v-pg17); full executor suite; MC real minter + HTTP client against the executor on 127.0.0.1:4310",
+          "result": "passed",
+          "count": "K01 26; executor knowledge-operation 20 (16 wire conformance, 3 native-port, 1 PostgreSQL: register, two concurrent duplicates one receipt, assess to held, receipt.get, restart keeps status/receipt/read); full executor 259 passed / 40 skipped / 0 failed; MC conformance 51 passed on the byte-identical copied vectors; MC client end-to-end register -> retry with effect grant -> assess held -> receipt found",
+          "notes": "E-KS 2026-10-25: routes POST /knowledge-operation/v2/invoke, GET operations/{id} (+Retry-After), POST operations/{id}/cancel, GET receipts/{effectKey}, GET describe, GET artifacts/{id}?digest= (M04 exact bytes); MCP mirrors with X-Knowledge-Operation-Credential; K07 auth.ts: EdDSA/ES256 allowlist, pinned issuer, cached JWKS with retiring key, unknown kid fails closed, exp/nbf 30 s skew, audience, single-use jti, installation/tenant/binding/grant/dispatch checks, ORIGIN_MISMATCH; K01 recovery grant {scope read_only|effect, authorityRef, effectKey, boundEffectDigest}, lone surrogates refused, four new golden vectors copied byte-for-byte to MC. Wired: report.register, report.assess, operation.get/cancel, knowledge.read, receipt.get, verify.claims. Gaps (follow-up sent): knowledge.apply real path untested over the wire and receipts not stored as K01 docs; report.derive SCHEMA_UNSUPPORTED; biotech binding not wired into the factory; replay/dispatch caches in memory. Env names KS_KNOWLEDGE_ISSUER/AUDIENCE/JWKS_FILE|URL/BINDINGS_JSON, KS_KNOWLEDGE_AUDITOR_SCRIPT_FILE, KS_KNOWLEDGE_SEAL_KEY_ID/FILE; issuer keys under KS .scratch/sprint-v/proofs/SV-16/issuer/.",
+          "recorded_at": "2026-10-25T13:19:26-04:00"
+        },
+        {
+          "tier": "T0+T1-MC (MC half, round 1, fake binding)",
+          "command": "MC knowledge-scoped pytest selection; ruff; mypy (892 files); docs check; tests/acceptance/mission_control/test_knowledge_gateway_runtime.py on local Temporal (cached dev server) + PostgreSQL 1.6.0",
+          "result": "passed (fake binding); real executor unrun",
+          "count": "222 passed, 0 skipped (incl. release 1.6.0 x5, PostgreSQL gateway x7, SV-01 continuation x2, 42 negative/vector conformance; 51 conformance total on the copied K01 vectors); acceptance: StageGraph 2 stages, GoalDirected 4 operations, StageGraph with assessment held in review; full unit run 36 failed of ~5900 (22 PowerShell-on-PATH, 7 dirty BKS pinned schema, 7 unexplained in files without diff: to be checked at HEAD)",
+          "notes": "E-MC 2026-10-25: adapters/knowledge/http_client.py (httpx, strict K01 models), adapters/knowledge/credentials.py (joserfc Ed25519, active/retiring rotation, JWKS publisher, verifier); Python K01 models enforce the TS rules; host checks iss; retry sends the effect-scoped recovery claim with the new attempt as caller. compose_knowledge_lane reads KNOWLEDGE_BINDING_URL/AUDIENCE, KNOWLEDGE_ISSUER(+KEY_FILE/KEY_ID/RETIRING_*), KNOWLEDGE_BINDING_IDS, KNOWLEDGE_GATEWAY_REQUIRED; fails closed; describe digest in the startup receipt. Six tools as Deep Agents tool components (access rebuilt per call, typed refusals, submit_output keyed by tool-call id); node end hands selected reports to report.assess and reconciles uncertain effects; attempt stop cancels open handles. M03 pending->assessing->assessed/held/rejected with outcome_basis; M04 context/{resolution,representation,delivery}.py exact read, three read-only files, one repair then block. Release 1.6.0 built (0055: durable handle table, assessment columns, outcome_basis, delivery attempts + readiness guard; fingerprint sha256:57a1abee...); locks unchanged. Defect fixed: mint_effect_key ignored the run (effects.py). Not done: run-level stop of assessments open after node end; lineage facts not persisted; retry with fresh origin proved in unit tests only; manifests cannot yet put the tools into bindings; parity run against the real executor and biotech-graph. Deep Agents binding carries no mission/activation id: mission id = run id, activation id = UUIDv5(run, operation) (deviation).",
+          "recorded_at": "2026-10-25T13:30:25-04:00"
+        },
+        {
+          "tier": "T0+T1-KS+T1-AIDB (KS half, round 2)",
+          "command": "KS executor knowledge-operation vitest over the wire on sprint-v-pg17 (component 2.3.0) and on disposable Supabase disposable-sv16-eks (2.3.0 + 183 AIDB migrations); installer tests; full executor suite; live interop with MC minter+client against kvop_serve_sv16",
+          "result": "passed",
+          "count": "knowledge-operation 23 (AIDB apply 2/2 on Supabase); full executor 261 passed / 0 failed; K01 26; installer 12 (2.2.0 -> 0006 upgrade; three concurrent uses of one credential, one accepted); bindings 21 and 24 on 2.3.0; AIDB SQL suites pass on 2.3.0 without AIDB edits; interop: register applied, retry without grant ORIGIN_MISMATCH, retry with grant same receipt, assess held, receipt.get found live and via recovery",
+          "notes": "E-KS round 2 2026-10-25: component 2.3.0 (0006 credential_use single-use across restarts + protocol_receipt with bound-digest check); knowledge.apply returns operation-receipt.v2 with plan-level bound effect digest; K01 outcome pending_dispatch; biotech-graph wired into the factory (apply = admission + enqueue in one tx -> pending_dispatch; stub consumer acknowledged); real AIDB apply over the wire (admitted on the guard path, duplicate same receipt, STALE_DECISION, EFFECT_CONFLICT); report.derive exposed (research-report-derive/v1, independent observations only); registration reuse -> EFFECT_CONFLICT. Limitations: apply protocol receipt written after the native commit (not inside); pending_dispatch not updated after BKS ack (round 3 composes delivery state into receipt lookup). Section saved as reports/E-KS-sv16-round2.md.",
+          "recorded_at": "2026-10-25T13:57:07-04:00"
+        },
+        {
+          "tier": "T0+T1-KS (KS half, round 3)",
+          "command": "K01 vitest; executor knowledge-operation vitest on sprint-v-pg17 incl. biotech.integration.test.ts with the D2 stub consumer; full executor suite",
+          "result": "passed except one case blocked on the binding idempotency fix",
+          "count": "K01 27; knowledge-operation 22 passed / 1 failed (identical re-registration until assertions are idempotent; B1b fixing) / 2 skipped (AIDB file needs Supabase); full executor 261 passed / 0 failed; MC conformance 51 passed / 1 skipped (new vector replay pending in E-MC)",
+          "notes": "E-KS round 3 2026-10-25: receipt-lookup.v2 optional delivery block composed at read time from the component outbox row (applied only when the ack digest equals the expected marker digest; revoked/refused -> revoked; failed read -> unresolved); stored protocol receipts immutable; golden vector added and copied to MC. Executor stopped; kvop_serve_sv16 at 2.3.0 retained for the MC parity run.",
+          "recorded_at": "2026-10-25T14:02:57-04:00"
+        },
+        {
+          "tier": "T1-MC real executor (MC half, round 2)",
+          "command": "tests/acceptance/mission_control/test_knowledge_gateway_runtime.py in real mode (KNOWLEDGE_BINDING_URL -> KS executor on 127.0.0.1:4310, kvop_serve_sv16 at 2.3.0, MC issuer key) on local Temporal + PostgreSQL 1.6.0; biotech parity harness (scratchpad emc/parity) driving the real MC gateway + HTTP client against the executor K01 surface over a throwaway 2.3.0 install; MC full unit run; knowledge/seed PG suites; ruff; mypy",
+          "result": "passed (two wire cases blocked, round 3 in progress)",
+          "count": "acceptance real mode: StageGraph and GoalDirected on aiengineer-postgres (register applied, report.assess held with the scripted auditor, finalization unfulfilled on an assessed basis); biotech-graph harness 10/10 (apply -> pending_dispatch -> stub consumer -> receipt.get applied -> settled; bound digest MC = KS); conformance 52 (receipt-lookup delivery vector replayed); knowledge PG 13, seed PG 12; full unit 39 failures = 36 known (7 pre-existing at HEAD, 22 PowerShell-on-PATH, 7 BKS SDL mismatch) + 3 ours fixed; blocked on the real executor: stop during review, receipt attribution (both pass on the fake)",
+          "notes": "E-MC round 2 2026-10-25: run-level stop cancels open assessments behind the stop fence; lineage facts written to content_lineage (0051); six knowledge tools are catalog tool rows a manifest can name and bind; 7 unexplained unit failures reproduced at HEAD; M04 exact read uses artifacts/{id}?digest=; Python models carry pending_dispatch + delivery; pending_dispatch stays uncertain until delivery applied (-> applied) or revoked (-> rejected); apply effect digest computed over the intent the decision binds; startup describe no longer compares signingIssuer with the credential issuer (recorded instead). Not proven: biotech-graph through Temporal (control routes for judge/seal/consume); agent-facing knowledge_apply for Biotech (round 3). Side effect: three owner manifests compile with ambiguous_search warnings (round 3 filters by capability kind). Evidence MC .scratch/sprint-v/proofs/SV-16/E-MC-t1/.",
+          "recorded_at": "2026-10-25T14:59:08-04:00"
+        },
+        {
+          "tier": "T1-MC real executor (MC half, round 3)",
+          "command": "acceptance test real mode against a KS executor built from current source (component 2.4.0) on 127.0.0.1:4311; Biotech toolset harness on 4312; ruff; mypy; docs check; knowledge suites; authoring/manifest suites",
+          "result": "passed with recorded caveats",
+          "count": "acceptance fake + real passed; Biotech path through the toolset 12/12; receipt attribution over the wire 6/6 (originating origin and calling invocation equal the journal live attempt; journal receipt ref matches); knowledge suites 390; authoring/manifest 415 passed / 8 failures in test_bundle_custody_composition.py (fail in the test skill-revision setup, not verified at HEAD); ruff, mypy, docs 7/7",
+          "notes": "E-MC round 3 2026-10-25: manifest search filtered by declared capability kind (goldens regenerated; three same-kind ambiguity warnings pre-existing); knowledge_apply takes only a decision handle, the host supplies exactUse and the native contract per binding (biotech-knowledge-apply/v1 with local digest recheck -> EFFECT_CONFLICT on mismatch; ingestion intent for aiengineer-postgres); pending_dispatch at node end: bounded receipt lookup with backoff, finalization blocked while unresolved, a later settle call records once. CAVEATS: the executor never puts report.assess into waiting_review itself (review is carried by the use decision as REVIEW_REQUIRED), so stop-during-review was proven with a test-double trigger in a throwaway component database (MC cancel -> operation.cancel -> both ends cancelled with the stop request id, no decision admitted); decision handles live in an in-process store (durable store is a runtime-sprint schema item); nothing schedules the post-run settle call yet; real AIDB apply through MC not run (needs the AI Engineer knowledge database).",
+          "recorded_at": "2026-10-25T15:47:31-04:00"
+        },
+        {
+          "tier": "review",
+          "command": "Second review R2-MC (Sonnet 5.5, read-only) 2026-10-25",
+          "result": "complete-with-deviations",
+          "count": "see reports/R2-review-mc.md",
+          "notes": "Invariants verified (domain pure, tools via the materializer path, credential never logged, access rebuilt per tool dispatch, journal before dispatch, same key other bytes refused, pending_dispatch settles only on delivery applied/revoked, outcome_basis distinguishes coverage from assessed, exact reads refuse non-exact revisions, failed repair blocks). Deviations: D1 exact-resolve/represent/deliver services not wired into a production path; D2 no production RecoveryGrant (authorized retry unit-proved only); O retry resends the same single-use token; O failed attempt skips reconcile/finalize. D1/D2/O fixes assigned to E-MC round 4; SV-02 Python models handwritten but rule-complete (accepted).",
+          "recorded_at": "2026-10-25T16:00:34-04:00"
+        },
+        {
+          "tier": "T1-MC real executor (MC half, round 4: R2 fixes)",
+          "command": "acceptance test fake + real mode against a KS executor from current source (component 2.4.0) on 127.0.0.1:4311; Postgres suites; full unit run; ruff; mypy; docs check; bundle lock verification by the integrator",
+          "result": "passed",
+          "count": "acceptance fake + real passed; D1: stage 2 started only after stage 1 report delivered and digest-checked (3/3 files), tampered bytes in the executor database -> stage 2 never started (run failed, context_delivery_blocked); D2: attempt 1 uncertain -> attempt 2 without grant refused before sending, with the host-minted effect-scoped recovery grant same receipt; Postgres suites 20; full unit 5855 passed / 36 known pre-existing or environment failures (none new); ruff, mypy, docs 7/7; integrator check: both bundle locks match the 1.6.0 release bytes (52 files, 0 mismatches)",
+          "notes": "E-MC round 4 2026-10-25: exact resolve/represent/deliver wired into the production path before a dependent invocation starts (same verified path as the context packet; receipts with attempt/outcome; one repair then block; operation fails context_delivery_blocked, run inspection lists the blocked unit); RecoveryGrant minted per uncertain effect at attempt 2+ (journal records it); every transmission mints a fresh single-use credential; failed attempt reconciles open effects and records finalization basis attempt_failed. Release 1.6.0 rebuilt in place before the freeze (fingerprint sha256:7eddd430...; locks re-verified). Open: blocked reason text only in the settlement result manifest/worker log; linked missions get no delivery yet (same-run dependents only); O2-O4, O6-O8 recorded.",
+          "recorded_at": "2026-10-25T17:17:30-04:00"
+        },
+        {
+          "tier": "T0+T1-KS (KS half, round 4)",
+          "command": "K01 vitest; executor knowledge-operation vitest on sprint-v-pg17; full executor suite; host suite; typecheck/build; depcruise; format:check; agent-docs",
+          "result": "passed",
+          "count": "K01 28; executor knowledge-operation 23 passed / 2 skipped; full executor 112 passed / 6 skipped (legacy tests retired); host 52; boundaries 0 new / 106 known; format:check 1231 files; lint 2552 vs 2553 baseline",
+          "notes": "E-KS round 4 2026-10-25: K01 envelope optional use/audience (effectful only, both or neither; vector apply-envelope-declared-use copied to MC); apply declared use from the envelope else the intent, no silent default, SCHEMA_UNSUPPORTED without a declared use under policy, REVIEW_REQUIRED for official use without exactUse; register envelope use must match the task; K01 service/K07 auth/backends moved to packages/host/src/knowledge-operation (export @aiengineer/knowledge-host/knowledge-operation), executor keeps HTTP/MCP adapters; plan.ts formatted. MC Python envelope update in E-MC round 5.",
+          "recorded_at": "2026-10-25T17:30:15-04:00"
+        },
+        {
+          "tier": "review",
+          "command": "Final review R3 (Sonnet 5.5, read-only) 2026-10-25; reruns K01 28, host 52, executor 114 passed / 4 skipped, MC unit+conformance 289; format:check 1231, lint 2552/2553, typecheck 47/47, depcruise 0 new / 106 known, agent-docs clean",
+          "result": "complete-with-deviations",
+          "count": "see reports/R3-review-final.md",
+          "notes": "Every named K01/K07 case has a test incl. replay surviving an executor restart. Gaps assigned: register use-match rule untested and run after bindEffect (E-KS); O5 defect: _fresh re-mints the token but reuses the dispatch id so a retry would be refused dispatch_reused (E-MC); D1 closed with deviations (delivery not DAG-scoped, only for invocations using the knowledge tools, fail-open if unwired -> fail closed when required); D2 and O1 closed.",
+          "recorded_at": "2026-10-25T17:43:23-04:00"
+        },
+        {
+          "tier": "T0+T1-KS (KS half, round 4b)",
+          "command": "host vitest; executor knowledge-operation vitest on sprint-v-pg17",
+          "result": "passed",
+          "count": "host 52; executor knowledge-operation 24 passed / 2 skipped",
+          "notes": "E-KS R3 fix 2026-10-25: report.register validates envelope use/audience against the task (plus scope, maxItems, kind) before bindEffect; mismatch -> SCHEMA_UNSUPPORTED with no effect row; match -> applied.",
+          "recorded_at": "2026-10-25T17:44:55-04:00"
+        },
+        {
+          "tier": "T1-MC real executor (MC half, round 5: envelope use/audience, R3 O5/D1)",
+          "command": "knowledge + conformance suites; ruff; mypy; docs check; acceptance fake + real mode against an executor built from current KS source (host + executor) on 127.0.0.1:4311 with a throwaway component 2.4.0 database",
+          "result": "passed",
+          "count": "knowledge + conformance 291 (incl. 2 new negative envelope cases; 202 conformance); acceptance fake + real passed; real executor: two tokens sharing one dispatch id refused dispatch_reused, a cancel whose first answer was lost is retried and accepted; ruff, mypy, docs 7/7",
+          "notes": "E-MC round 5 2026-10-25: Python OperationEnvelope use/audience with the KS rules (off the wire when absent; digests unchanged); knowledge.apply declares the recorded decision use/audience, report.register the task; every transmission of operation.get/cancel/receipt.get mints a new jti and dispatch id (unit test decodes two tokens); delivery fails closed under KNOWLEDGE_GATEWAY_REQUIRED (composition refuses a lane without a delivery service; unwired lane blocks the dependent invocation context_delivery_unwired). Runtime-sprint items: lookup/cancel dispatch ids not recorded on journal transitions (1.7.0 / 0056); delivery not DAG-scoped and only for invocations using the knowledge tools; linked missions excluded. Release 1.6.0 untouched (sha256:7eddd430...).",
+          "recorded_at": "2026-10-25T17:52:54-04:00"
+        },
+        {
+          "tier": "closure",
+          "command": "integrator closure",
+          "result": "complete",
+          "count": "-",
+          "notes": "Closed 2026-10-25 by the integrator: second-reviewed; the fixes requested by the reviews were applied and re-proven by the implementing helpers (counts in PROOFS) but not independently re-reviewed; deviations recorded in SPRINT-V-DESIGN 10.1-10.3 and the bundle matrix.",
+          "recorded_at": "2026-10-25T17:54:21-04:00"
+        }
+      ],
+      "spec": "../SPRINT-V-PLAN.md#6-complete-local-work-item-map"
+    },
+    {
+      "id": "SV-17",
+      "owner": "release",
+      "depends_on": [
+        "SV-16"
+      ],
+      "state": "complete",
+      "claim": {
+        "agent": "release (Opus 5.5 subagents F1: AIDB+BKS+bundle+MC release source; F2: KS retirements, docs, fresh-install proofs)",
+        "repository": "all four",
+        "checkout": "main (single retained checkout each)",
+        "branch": "main",
+        "base_commit": "MC 3aabe91b / KS ae593410 / AIDB 25f82ede / BKS 3ea01488 + this session uncommitted work",
+        "started_at": "2026-10-25T18:10:00-04:00",
+        "paths": [
+          "AIDB supabase/migrations (drop legacy verification), scripts/install-ai-engineer.mjs",
+          "BKS docs/NAVIGATION.md, AGENTS.md, skill examples (v2.2.0 references)",
+          "MC packages/mission-control-db-contract/component (D0), deployments/*/release.lock.json (target plan), docs/specs/.../sprint-v/release/",
+          "KS apps/verification-executor (store, intents, evidence-oracle), apps/worker sealer, docs (F2)"
+        ]
+      },
+      "tracker_id": null,
+      "proofs": [
+        {
+          "tier": "T1 (part 1: AIDB, BKS, installers, bundle)",
+          "command": "AIDB: fresh disposable Supabase db with component 2.3.0 first -> 184 migrations incl. 20261025010000 withdrawal -> both SQL suites + concurrency + withdrawal test; scripts/install-ai-engineer.mjs (interrupt after component; external kill at migration 70/184; rerun; repeat); BKS scripts/install-biotech.mjs on throwaway PostgreSQL + Neo4j (interrupt during graph schema; rerun; repeat); BKS pnpm build && pnpm test; workspace:verify; api:check; skill examples 10/10",
+          "result": "passed",
+          "count": "AIDB: 22 tables + 1 view + 1 column + 22 functions dropped, grants removed, three kept functions tightened, v1 report packages closed (REPORT_V1_WITHDRAWN), contract 0.5.0; SQL suites pass; 6 SQL tests fail identically before and after (pre-existing); typecheck, npm test 15/15, workspace build/check/validate pass. Installers: both complete after interruption and apply nothing on repeat. BKS 381 passed / 1 pre-existing. New 1.6.0 locks in release/locks: ai-engineer 508d0415... -> 7269ccdf..., biotech baf54ed0... -> d5b2a74b...",
+          "notes": "F1 2026-10-25: orchestration.verification_artifact_metadata kept (22 retained functions read it); CI contract.yml runs the installer against a throwaway workdir (needs KS_COMPONENT_REF variable and KS_READ_TOKEN secret; unrun); MC releases/<version>/component is the only release authority, root component/ retired input kept for byte tests; installers do not apply MC seeds/runtime descriptor; a kill inside the MC apply not tried. KS still pins AIDB types 0.4.16 and calls withdrawn tables: part 2 retires that code and refreshes the vendored types to 0.5.0.",
+          "recorded_at": "2026-10-25T14:56:26-04:00"
+        },
+        {
+          "tier": "T1 (part 1 follow-up: F12, 2.4.0 pins)",
+          "command": "AIDB fresh disposable db with component 2.4.0 first -> 186 migrations (incl. 20261025010100_research_force_rls, 20261025010200_research_admission_values_required) -> five SQL suites + concurrency + withdrawal W6; scripts/install-ai-engineer.mjs fresh then repeat; BKS scripts/install-biotech.mjs fresh then repeat; MC docs check",
+          "result": "passed",
+          "count": "AIDB install fresh changed:true (186 migrations, MC 1.6.0 verified) then repeat changed:false; Biotech fresh then repeat changed:false; SQL suites pass (11 admitted-decision cases now pass the digest, new no-digest case); typecheck, 15/15 tests, workspace build/check/validate; docs 7/7",
+          "notes": "F1 follow-up 2026-10-25: RLS forced on the four research.* tables (owner functions rely on BYPASSRLS of postgres on Supabase); component 2.4.0 pinned by the installed working-tree digest sha256:309a8c9b...64c7 (B1b published no receipt digest); MC 1.6.0 had been rebuilt in place by E-MC (0055 edit) so the first 2.4.0 install refused on checksum mismatch: both target locks rewritten (ai-engineer ce8f69d8..., biotech 3677fa00...) and installers/bundle pins updated; NORMALIZED_VALUES_REQUIRED (22004) mapped to KSA04 UNRESOLVED_EFFECT by the AIDB guard (recorded; EFFECT_CONFLICT may fit better: runtime-sprint item). Receipts AIDB run-4/, BKS F1/biotech-run-240/.",
+          "recorded_at": "2026-10-25T16:56:24-04:00"
+        },
+        {
+          "tier": "T1 (part 2: KS retirements, docs, fresh installs from the bundle, both domain paths)",
+          "command": "KS build (26 tasks), typecheck (47), lint, agent-docs, skills check, examples, sandbox pack, full test run; install-ai-engineer.mjs on a throwaway Supabase (fresh 186 migrations, repeat, interrupted at component step and at migration 20/186 then resumed); executor + persistence suites on the installed database; SV-09 T0 harness; install-biotech.mjs fresh/repeat/interrupted; SV-12 KS T1 suite against the real BKS executors on the installed database",
+          "result": "passed",
+          "count": "346 tracked files removed (94,550 lines; backups under .scratch/sprint-v/proofs/SV-17/F2/removed/); lint baseline 4384 -> 2553; boundaries 262 -> 106 known + 28 new (27 in the K01 executor files, 1 in context.ts: being fixed); full test run 46/48 tasks, 2 pre-existing failures; AI Engineer: executor 116 passed (all K01 integration + 18 conformance), persistence 242, T0 harness passed; Biotech: SV-12 9 passed / 2 skipped (no HTTP fault hook)",
+          "notes": "F2 2026-10-25: executor file store no longer holds verification results (capture/artifact tools kept); worker sealer, legacy ReportIntent, evidence oracle and the AIDB-table readers removed; ingestion admits a claim only with an exactUse binding (exact-use-oracle.ts); vendored AIDB pin 0.5.0; retired settings fail at startup; apps expect 2.4.0; use classes wired (official use without exactUse -> REVIEW_REQUIRED); Biotech normalized-values digest required; agent-docs rebuilt. verify.claims refuses typed (legacy verification retired; judge hosting is a runtime-sprint provider decision: capability unsupported). Declared use defaulted from the intent (K01 envelope use/audience added in E-KS round 4). Pre-existing failures: contracts golden line endings, benchmark replay checkpoint not in git, 3 knowledge-db PROMOTION_SELECTION_REQUIRED fixtures. Docs: KS verification README/INTEGRATION-GUIDE/current-state/admission + recovery concepts/executor README; MC MISSION_CONTROL_LOCAL_API (KNOWLEDGE_* settings, K01 annex), REMOVAL_GUIDE retirement section; RELEASE-BUNDLE sections 6-7 + release-bundle.json part2; real-work gate CLOSED.",
+          "recorded_at": "2026-10-25T17:19:48-04:00"
+        },
+        {
+          "tier": "review",
+          "command": "Final review R3 (Sonnet 5.5, read-only) 2026-10-25",
+          "result": "needs-change (narrow)",
+          "count": "see reports/R3-review-final.md",
+          "notes": "Pins match the files (component 2.4.0 digest 309a8c9b... + 7 migration hashes, MC 1.6.0 manifest/fingerprint/contract, 52/52 lock hashes per app, BKS PIN v2.2.0, AIDB head 20261025010200, vendored 0.5.0) except the K01 golden digest (stale). No KS code reads the withdrawn AIDB objects; file store non-authoritative; sealers/ReportIntent gone; component DDL only in the component. Narrow fixes assigned to F2: K01 golden digest, stale matrix rows (declared-use degraded row obsolete, SV-12 HTTP cases unrun-over-HTTP, part-1 vs part-2 reconciliation, MC lane rows), dead script scripts/.verification-remote-persistence-*.ts, Eve attestation modules, SURFACE-REFERENCE/OPERATOR-RUNBOOK, AIDB runner decision (dev-only), lint baseline, unverified pre-existing label for 3 knowledge-db failures.",
+          "recorded_at": "2026-10-25T17:43:23-04:00"
+        },
+        {
+          "tier": "T0 (R3 narrow fixes)",
+          "command": "KS build 26/26, typecheck 47/47, lint at baseline 2526, agent-docs (KS, AIDB), MC check_docs 7/7, MCP tests, executor suite",
+          "result": "passed",
+          "count": "MCP 183; executor 115 passed / 4 skipped (AIDB-gated suites skipped without Supabase); removals now 350 files / 95,951 lines",
+          "notes": "F2 narrow fixes 2026-10-25: K01 golden digest re-recorded sha256:7bdeb2b1...cb19d (verified by the integrator against the file; MC copy byte-identical); matrix corrected (declared use supported with no default, SV-12 HTTP fault cases unrun-over-HTTP/proven in-process, MC lane rows: delivery gating supported, real AIDB apply from MC unrun, verify_claims unsupported; part 1 reconciled to 2.4.0/186 migrations/0.5.0 and labelled historical); dead persistence-proof script and Eve attestation modules deleted; SURFACE-REFERENCE and OPERATOR-RUNBOOK refreshed; AIDB root installer is the only release path (db:start/db:migrate/apply-disposable-migration.mjs are disposable dev tools); three knowledge-db PROMOTION_SELECTION_REQUIRED failures relabelled unverified pre-existing.",
+          "recorded_at": "2026-10-25T17:54:19-04:00"
+        },
+        {
+          "tier": "closure",
+          "command": "integrator closure",
+          "result": "complete",
+          "count": "-",
+          "notes": "Closed 2026-10-25 by the integrator: second-reviewed; the fixes requested by the reviews were applied and re-proven by the implementing helpers (counts in PROOFS) but not independently re-reviewed; deviations recorded in SPRINT-V-DESIGN 10.1-10.3 and the bundle matrix.",
+          "recorded_at": "2026-10-25T17:54:22-04:00"
+        }
+      ],
+      "spec": "../SPRINT-V-PLAN.md#6-complete-local-work-item-map"
+    },
+    {
+      "id": "SV-18",
+      "owner": "downstream-workflows",
+      "depends_on": [
+        "SV-17"
+      ],
+      "state": "specified",
+      "claim": null,
+      "tracker_id": null,
+      "proofs": [],
+      "spec": "../SPRINT-V-PLAN.md#6-complete-local-work-item-map"
+    }
+  ],
+  "tracker_parent": "OVE-150",
+  "claims_updated": "2026-10-25T17:54:22-04:00"
+}

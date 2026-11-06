@@ -1,0 +1,446 @@
+{
+  "schema": "run2.execution_evidence.v1",
+  "utc": "2026-10-16T14:48:17.666024+00:00",
+  "canonical": "C:\\Users\\Pinda\\Proyectos\\BellLabs\\platform\\mission-control",
+  "implementation_checkout": "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\run2-completion-offline",
+  "branch": {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\run2-completion-offline",
+      "branch",
+      "--show-current"
+    ],
+    "exit": 0,
+    "stdout": "mo/run2-completion-offline-20261016\n",
+    "stderr": ""
+  },
+  "head": {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\run2-completion-offline",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exit": 0,
+    "stdout": "a8d69c5b48506c6babcd7f3f74f0b92716423091\n",
+    "stderr": ""
+  },
+  "assessment_baseline_utc": "2026-10-16T13:06:46.6753401Z",
+  "canonical_tracked_checked": 3980,
+  "canonical_tracked_drift_from_assessment": [],
+  "worktree_listing": {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "C:\\Users\\Pinda\\Proyectos\\BellLabs\\platform\\mission-control",
+      "worktree",
+      "list",
+      "--porcelain"
+    ],
+    "exit": 0,
+    "stdout": "worktree C:/Users/Pinda/Proyectos/BellLabs/platform/mission-control\nHEAD a8d69c5b48506c6babcd7f3f74f0b92716423091\nbranch refs/heads/mo/run2-integration\n\nworktree C:/Users/Pinda/Documents/Codex/2026-10-16/task/run2-completion-offline\nHEAD a8d69c5b48506c6babcd7f3f74f0b92716423091\nbranch refs/heads/mo/run2-completion-offline-20261016\n\nworktree C:/Users/Pinda/Proyectos/BellLabs/platform/.worktrees/run2-admission-failure\nHEAD 1c018ff010fcec2c04f64d007eb0d9a2a4b8fd2c\nbranch refs/heads/mo/run2-admission-failure\n\nworktree C:/Users/Pinda/Proyectos/BellLabs/platform/.worktrees/run2-claude-host-proof\nHEAD ee3e1953a47c51ac19d8c06179f7951419ce80fb\nbranch refs/heads/mo/run2-claude-host-proof\n\nworktree C:/Users/Pinda/Proyectos/BellLabs/platform/.worktrees/run2-cli\nHEAD 5b03afc4f214d335b5ef5dc96ba33100f1fb4d67\nbranch refs/heads/mo/run2-cli\n\nworktree C:/Users/Pinda/Proyectos/BellLabs/platform/.worktrees/run2-closed-workflow-recovery\nHEAD 7a96c511252c643a0fdea12e5ab11fec26eae1f9\nbranch refs/heads/mo/run2-closed-workflow-recovery\n\nworktree C:/Users/Pinda/Proyectos/BellLabs/platform/.worktrees/run2-cursor\nHEAD 5b03afc4f214d335b5ef5dc96ba33100f1fb4d67\nbranch refs/heads/mo/run2-cursor\n\nworktree C:/Users/Pinda/Proyectos/BellLabs/platform/.worktrees/run2-cursor-c9\nHEAD 9f62c18645536888754f60c1dfed9ee55d79d131\nbranch refs/heads/mo/run2-cursor-c9\n\nworktree C:/Users/Pinda/Proyectos/BellLabs/platform/.worktrees/run2-events\nHEAD 5b03afc4f214d335b5ef5dc96ba33100f1fb4d67\nbranch refs/heads/mo/run2-events\n\nworktree C:/Users/Pinda/Proyectos/BellLabs/platform/.worktrees/run2-human-control-budget\nHEAD 94eb433e165615baa4296b3e1cad4e705e2776b3\nbranch refs/heads/mo/run2-human-control-budget\n\n",
+    "stderr": ""
+  },
+  "worktrees": [
+    {
+      "metadata": {
+        "worktree": "C:/Users/Pinda/Proyectos/BellLabs/platform/mission-control",
+        "HEAD": "a8d69c5b48506c6babcd7f3f74f0b92716423091",
+        "branch": "refs/heads/mo/run2-integration"
+      },
+      "status": {
+        "command": [
+          "git",
+          "--no-optional-locks",
+          "-C",
+          "C:\\Users\\Pinda\\Proyectos\\BellLabs\\platform\\mission-control",
+          "status",
+          "--porcelain=v1",
+          "--untracked-files=normal"
+        ],
+        "exit": 0,
+        "stdout": " M docs/knowledge/index.md\n M docs/specs/materialization-observation-2026-10/runs/RUN-2-REPORT.md\n?? docs/specs/materialization-observation-2026-10/issues/bash.exe.stackdump\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-ASSESSMENT-EVIDENCE-2026-10-16.json\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-COMPLETION-ASSESSMENT-2026-10-16.md\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-COMPLETION-FINDINGS-2026-10-16.md\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-COMPLETION-PLAN-2026-10-16.md\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-SOL-EXECUTION-2026-10-16.md\n",
+        "stderr": ""
+      },
+      "locks_present": []
+    },
+    {
+      "metadata": {
+        "worktree": "C:/Users/Pinda/Documents/Codex/2026-10-16/task/run2-completion-offline",
+        "HEAD": "a8d69c5b48506c6babcd7f3f74f0b92716423091",
+        "branch": "refs/heads/mo/run2-completion-offline-20261016"
+      },
+      "status": {
+        "command": [
+          "git",
+          "--no-optional-locks",
+          "-C",
+          "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\run2-completion-offline",
+          "status",
+          "--porcelain=v1",
+          "--untracked-files=normal"
+        ],
+        "exit": 0,
+        "stdout": " M docs/specs/materialization-observation-2026-10/runs/RUN-2-REPORT.md\n M src/mission_control/adapters/cursor/cloud.py\n M src/mission_control/adapters/cursor/frames.py\n M src/mission_control/application/execution/harness/cursor_usage.py\n M src/mission_control/application/execution/harness/describe.py\n M src/mission_control/application/execution/harness/lane_turns.py\n M tests/unit/cursor/test_cloud_usage_unknown.py\n M tests/unit/runtime/test_run2_cursor_usage.py\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-ASSESSMENT-EVIDENCE-2026-10-16.json\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-COMPLETION-ASSESSMENT-2026-10-16.md\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-COMPLETION-FINDINGS-2026-10-16.md\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-COMPLETION-PLAN-2026-10-16.md\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-EXECUTION-LEDGER-2026-10-16.md\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-REMAINING-GATES-2026-10-16.md\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-SOL-EXECUTION-2026-10-16.md\n?? tests/unit/subscriptions/test_run2_caller_identity.py\n?? tests/unit/temporal/test_run2_managed_budget_composition.py\n",
+        "stderr": ""
+      },
+      "locks_present": []
+    },
+    {
+      "metadata": {
+        "worktree": "C:/Users/Pinda/Proyectos/BellLabs/platform/.worktrees/run2-admission-failure",
+        "HEAD": "1c018ff010fcec2c04f64d007eb0d9a2a4b8fd2c",
+        "branch": "refs/heads/mo/run2-admission-failure"
+      },
+      "status": {
+        "command": [
+          "git",
+          "--no-optional-locks",
+          "-C",
+          "C:\\Users\\Pinda\\Proyectos\\BellLabs\\platform\\.worktrees\\run2-admission-failure",
+          "status",
+          "--porcelain=v1",
+          "--untracked-files=normal"
+        ],
+        "exit": 0,
+        "stdout": "?? .ty-run2-worktree.toml\n",
+        "stderr": ""
+      },
+      "locks_present": []
+    },
+    {
+      "metadata": {
+        "worktree": "C:/Users/Pinda/Proyectos/BellLabs/platform/.worktrees/run2-claude-host-proof",
+        "HEAD": "ee3e1953a47c51ac19d8c06179f7951419ce80fb",
+        "branch": "refs/heads/mo/run2-claude-host-proof"
+      },
+      "status": {
+        "command": [
+          "git",
+          "--no-optional-locks",
+          "-C",
+          "C:\\Users\\Pinda\\Proyectos\\BellLabs\\platform\\.worktrees\\run2-claude-host-proof",
+          "status",
+          "--porcelain=v1",
+          "--untracked-files=normal"
+        ],
+        "exit": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      "locks_present": []
+    },
+    {
+      "metadata": {
+        "worktree": "C:/Users/Pinda/Proyectos/BellLabs/platform/.worktrees/run2-cli",
+        "HEAD": "5b03afc4f214d335b5ef5dc96ba33100f1fb4d67",
+        "branch": "refs/heads/mo/run2-cli"
+      },
+      "status": {
+        "command": [
+          "git",
+          "--no-optional-locks",
+          "-C",
+          "C:\\Users\\Pinda\\Proyectos\\BellLabs\\platform\\.worktrees\\run2-cli",
+          "status",
+          "--porcelain=v1",
+          "--untracked-files=normal"
+        ],
+        "exit": 0,
+        "stdout": " M docs/knowledge/capabilities.md\n M docs/knowledge/cursor-lane.md\n M docs/knowledge/lanes-and-harness.md\n M docs/qualification/release/multi-provider-2026-10.md\n M skills/mission-control-author/references/manifest-cheatsheet.md\n M skills/mission-control-observe/SKILL.md\n M src/mission_control/adapters/codex/compose.py\n M src/mission_control/adapters/codex/harness.py\n M src/mission_control/adapters/codex/launcher.py\n M src/mission_control/adapters/codex/protocol.py\n M src/mission_control/application/execution/harness/describe.py\n M tests/fixtures/local_lane_workspaces.py\n M tests/unit/codex/fixture_app_server.py\n M tests/unit/codex/support.py\n M tests/unit/codex/test_harness.py\n M tests/unit/codex/test_launcher.py\n M tests/unit/codex/test_schema_pin.py\n M tests/unit/harness/test_local_lane_child_environments.py\n?? .agents/skills/claude-code-headless/\n?? .agents/skills/codex-exec/\n?? .agents/skills/coding-cli-jobs/\n?? .agents/skills/cursor-agent-headless/\n?? docs/specs/materialization-observation-2026-10/runs/CODEX-OWNER-AUTH.md\n?? scripts/codex_schema_refresh.py\n?? src/mission_control/adapters/codex/auth_preflight.py\n?? tests/fixtures/provider_frames/codex/schema-0.162.1/\n?? tests/unit/codex/test_auth_preflight.py\n",
+        "stderr": ""
+      },
+      "locks_present": []
+    },
+    {
+      "metadata": {
+        "worktree": "C:/Users/Pinda/Proyectos/BellLabs/platform/.worktrees/run2-closed-workflow-recovery",
+        "HEAD": "7a96c511252c643a0fdea12e5ab11fec26eae1f9",
+        "branch": "refs/heads/mo/run2-closed-workflow-recovery"
+      },
+      "status": {
+        "command": [
+          "git",
+          "--no-optional-locks",
+          "-C",
+          "C:\\Users\\Pinda\\Proyectos\\BellLabs\\platform\\.worktrees\\run2-closed-workflow-recovery",
+          "status",
+          "--porcelain=v1",
+          "--untracked-files=normal"
+        ],
+        "exit": 0,
+        "stdout": "?? .ty-run2-worktree.toml\n",
+        "stderr": ""
+      },
+      "locks_present": []
+    },
+    {
+      "metadata": {
+        "worktree": "C:/Users/Pinda/Proyectos/BellLabs/platform/.worktrees/run2-cursor",
+        "HEAD": "5b03afc4f214d335b5ef5dc96ba33100f1fb4d67",
+        "branch": "refs/heads/mo/run2-cursor"
+      },
+      "status": {
+        "command": [
+          "git",
+          "--no-optional-locks",
+          "-C",
+          "C:\\Users\\Pinda\\Proyectos\\BellLabs\\platform\\.worktrees\\run2-cursor",
+          "status",
+          "--porcelain=v1",
+          "--untracked-files=normal"
+        ],
+        "exit": 0,
+        "stdout": " M src/mission_control/adapters/cursor/bridge.py\n M src/mission_control/adapters/cursor/bridge_spawn.py\n M src/mission_control/adapters/cursor/cloud.py\n M src/mission_control/adapters/cursor/cloud_api.py\n M src/mission_control/adapters/cursor/controls.py\n M src/mission_control/adapters/cursor/frames.py\n M src/mission_control/adapters/cursor/local.py\n M src/mission_control/adapters/postgres/frames/repository.py\n M src/mission_control/application/execution/harness/lane_turns.py\n M src/mission_control/application/frames/sink.py\n M src/mission_control/domain/execution/lanes.py\n M tests/fixtures/cursor_cloud.py\n M tests/unit/cursor/support.py\n M tests/unit/cursor/test_cloud_reconcile.py\n M tests/unit/cursor/test_cloud_usage_unknown.py\n M tests/unit/harness/test_cursor_cloud.py\n M tests/unit/harness/test_cursor_local.py\n M tests/unit/harness/test_describe_honesty.py\n M tests/unit/harness/test_lane_qualification_fixtures.py\n M tests/unit/harness/test_local_lane_child_environments.py\n M tests/unit/remote_session/test_cursor_cloud_client.py\n?? src/mission_control/adapters/cursor/conversation.py\n?? src/mission_control/adapters/cursor/cost.py\n?? src/mission_control/application/execution/harness/cursor_usage.py\n?? tests/unit/cursor/test_run2_bridge.py\n?? tests/unit/cursor/test_run2_conversation.py\n?? tests/unit/cursor/test_run2_cost.py\n?? tests/unit/cursor/test_run2_cursor.py\n?? tests/unit/runtime/test_run2_cursor_usage.py\n",
+        "stderr": ""
+      },
+      "locks_present": []
+    },
+    {
+      "metadata": {
+        "worktree": "C:/Users/Pinda/Proyectos/BellLabs/platform/.worktrees/run2-cursor-c9",
+        "HEAD": "9f62c18645536888754f60c1dfed9ee55d79d131",
+        "branch": "refs/heads/mo/run2-cursor-c9"
+      },
+      "status": {
+        "command": [
+          "git",
+          "--no-optional-locks",
+          "-C",
+          "C:\\Users\\Pinda\\Proyectos\\BellLabs\\platform\\.worktrees\\run2-cursor-c9",
+          "status",
+          "--porcelain=v1",
+          "--untracked-files=normal"
+        ],
+        "exit": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      "locks_present": []
+    },
+    {
+      "metadata": {
+        "worktree": "C:/Users/Pinda/Proyectos/BellLabs/platform/.worktrees/run2-events",
+        "HEAD": "5b03afc4f214d335b5ef5dc96ba33100f1fb4d67",
+        "branch": "refs/heads/mo/run2-events"
+      },
+      "status": {
+        "command": [
+          "git",
+          "--no-optional-locks",
+          "-C",
+          "C:\\Users\\Pinda\\Proyectos\\BellLabs\\platform\\.worktrees\\run2-events",
+          "status",
+          "--porcelain=v1",
+          "--untracked-files=normal"
+        ],
+        "exit": 0,
+        "stdout": " M src/mission_control/adapters/temporal/workflows/operation.py\n?? src/mission_control/adapters/postgres/cursor_costs.py\n?? src/mission_control/adapters/postgres/ingress_drainer.py\n?? src/mission_control/adapters/supabase_storage/ingress.py\n?? src/mission_control/adapters/temporal/activities/cursor_costs.py\n?? src/mission_control/adapters/temporal/workflows/cursor_costs.py\n?? src/mission_control/application/execution/harness/cursor_costs.py\n?? src/mission_control/application/signals/artifacts.py\n?? src/mission_control/application/signals/drainer.py\n?? src/mission_control/application/signals/launch.py\n?? src/mission_control/bootstrap/ingress_drainer.py\n?? src/mission_control/bootstrap/worker_ingress.py\n?? tests/integration/postgres/test_run2_ingress_drainer_postgres.py\n?? tests/integration/test_run2_cursor_costs_postgres.py\n?? tests/unit/runtime/test_run2_cursor_costs.py\n?? tests/unit/runtime/test_run2_ingress_composition.py\n?? tests/unit/runtime/test_run2_ingress_wake.py\n?? tests/unit/signals/test_artifact_custody.py\n?? tests/unit/signals/test_drainer.py\n?? tests/unit/signals/test_remote_launch.py\n",
+        "stderr": ""
+      },
+      "locks_present": []
+    },
+    {
+      "metadata": {
+        "worktree": "C:/Users/Pinda/Proyectos/BellLabs/platform/.worktrees/run2-human-control-budget",
+        "HEAD": "94eb433e165615baa4296b3e1cad4e705e2776b3",
+        "branch": "refs/heads/mo/run2-human-control-budget"
+      },
+      "status": {
+        "command": [
+          "git",
+          "--no-optional-locks",
+          "-C",
+          "C:\\Users\\Pinda\\Proyectos\\BellLabs\\platform\\.worktrees\\run2-human-control-budget",
+          "status",
+          "--porcelain=v1",
+          "--untracked-files=normal"
+        ],
+        "exit": 0,
+        "stdout": "?? .ty-run2-worktree.toml\n",
+        "stderr": ""
+      },
+      "locks_present": []
+    }
+  ],
+  "tracked_patch": {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\run2-completion-offline",
+      "diff",
+      "HEAD",
+      "--",
+      "src/mission_control/application/execution/harness/cursor_usage.py",
+      "src/mission_control/adapters/cursor/frames.py",
+      "src/mission_control/adapters/cursor/cloud.py",
+      "src/mission_control/application/execution/harness/lane_turns.py",
+      "src/mission_control/application/execution/harness/describe.py",
+      "tests/unit/runtime/test_run2_cursor_usage.py",
+      "tests/unit/cursor/test_cloud_usage_unknown.py"
+    ],
+    "exit": 0,
+    "stdout": "diff --git a/src/mission_control/adapters/cursor/cloud.py b/src/mission_control/adapters/cursor/cloud.py\nindex 5b9d5b27..637f8d8a 100644\n--- a/src/mission_control/adapters/cursor/cloud.py\n+++ b/src/mission_control/adapters/cursor/cloud.py\n@@ -138,7 +138,6 @@ from mission_control.adapters.remote_session.lane import (\n )\n from mission_control.adapters.remote_session.sse import SseEvent\n from mission_control.adapters.remote_session.stream import STREAM_START, StreamOpened\n-from mission_control.adapters.remote_session.usage import TokenFields, reported_usage\n from mission_control.application.agentic_components.layering import (\n     MATERIALIZATION_CONFLICT,\n     LayeredProjection,\n@@ -162,6 +161,7 @@ from mission_control.application.environments.provider_environments import (\n     ProviderEnvironmentRefused,\n )\n from mission_control.application.execution.harness.controls import SessionHandover\n+from mission_control.application.execution.harness.cursor_usage import cursor_token_usage\n from mission_control.application.execution.harness.describe import CURSOR_CLOUD_DESCRIBE\n from mission_control.application.execution.harness.dispatch import DispatchLookup, DispatchRecord\n from mission_control.application.execution.harness.lane_turns import LaneExecutionIdentity\n@@ -261,7 +261,6 @@ DEFAULT_BRANCH_REF: Final = \"HEAD\"\n _NAMES: Final = ObservationNames(\n     record_source=\"run_record\", final_kind=\"run.final\", status_key=\"run-status\"\n )\n-_CLOUD_TOKENS: Final = TokenFields(input=\"inputTokens\", output=\"outputTokens\", total=\"totalTokens\")\n _ANCHOR_DETAILS: Final = AnchorDetails(\n     unanchored=\"no acknowledged run anchors this agent; the lost send cannot be told apart \"\n     \"from an earlier turn\",\n@@ -1197,15 +1196,11 @@ class CursorCloudHarness(RemoteSessionLane[_CloudSession]):\n         tokens = _run_tokens(usage, run_id)\n         if tokens is None or not all(key in tokens for key in (\"inputTokens\", \"outputTokens\")):\n             return UsageReport(disposition=\"unknown\", cost_micros_usd=cost)\n-        report = reported_usage(tokens, fields=_CLOUD_TOKENS, cost_micros_usd=cost)\n+        report = cursor_token_usage(tokens)\n         return report.model_copy(\n             update={\n-                \"cache_read_tokens\": int(tokens[\"cacheReadTokens\"])\n-                if \"cacheReadTokens\" in tokens\n-                else None,\n-                \"cache_write_tokens\": int(tokens[\"cacheWriteTokens\"])\n-                if \"cacheWriteTokens\" in tokens\n-                else None,\n+                \"disposition\": \"settled\" if report.disposition != \"unknown\" else \"unknown\",\n+                \"cost_micros_usd\": cost,\n             }\n         )\n \ndiff --git a/src/mission_control/adapters/cursor/frames.py b/src/mission_control/adapters/cursor/frames.py\nindex adeed6e3..f961c7e3 100644\n--- a/src/mission_control/adapters/cursor/frames.py\n+++ b/src/mission_control/adapters/cursor/frames.py\n@@ -19,6 +19,7 @@ from dataclasses import dataclass\n from typing import Any\n \n from mission_control.adapters.cursor.bridge import BridgeEvent, RunState\n+from mission_control.application.execution.harness.cursor_usage import cursor_token_usage\n from mission_control.application.frames.kinds import cursor_local_key\n from mission_control.domain.authoring.canonical import sha256_digest\n from mission_control.domain.execution.lane_turns import (\n@@ -189,21 +190,7 @@ def native_status(value: Any) -> NativeStatus:\n \n \n def _usage(body: Mapping[str, Any]) -> UsageReport:\n-    usage = _mapping(body.get(\"usage\"))\n-    if not usage:\n-        return UsageReport(disposition=\"unknown\")\n-    input_tokens = int(first(usage, \"input_tokens\", \"inputTokens\") or 0)\n-    output_tokens = int(first(usage, \"output_tokens\", \"outputTokens\") or 0)\n-    total = int(first(usage, \"total_tokens\", \"totalTokens\") or input_tokens + output_tokens)\n-    # Stream tokens are what the provider reported for the run; cost is not yet settled.\n-    return UsageReport(\n-        disposition=\"estimated\",\n-        input_tokens=input_tokens,\n-        output_tokens=output_tokens,\n-        total_tokens=total,\n-        cache_read_tokens=first(usage, \"cache_read_tokens\", \"cacheReadTokens\"),\n-        cache_write_tokens=first(usage, \"cache_write_tokens\", \"cacheWriteTokens\"),\n-    )\n+    return cursor_token_usage(_mapping(body.get(\"usage\")))\n \n \n def git_branches(body: Mapping[str, Any]) -> tuple[LaneGitBranch, ...]:\ndiff --git a/src/mission_control/application/execution/harness/cursor_usage.py b/src/mission_control/application/execution/harness/cursor_usage.py\nindex 2959382f..2aad7d53 100644\n--- a/src/mission_control/application/execution/harness/cursor_usage.py\n+++ b/src/mission_control/application/execution/harness/cursor_usage.py\n@@ -22,6 +22,36 @@ def _counter(body: Mapping[str, Any], snake: str, camel: str) -> int | None:\n     return value if isinstance(value, int) and not isinstance(value, bool) and value >= 0 else None\n \n \n+def cursor_token_usage(usage: Mapping[str, Any]) -> UsageReport:\n+    \"\"\"Cursor SDK token semantics, shared by run frames and exact usage reads.\n+\n+    Total includes both caches; reasoning is already a subset of output.\n+    Missing dimensions cannot be inferred as zero. An explicit vendor total,\n+    including zero, is authoritative and does not require reported cache fields.\n+    \"\"\"\n+    inputs = _counter(usage, \"input_tokens\", \"inputTokens\")\n+    outputs = _counter(usage, \"output_tokens\", \"outputTokens\")\n+    read = _counter(usage, \"cache_read_tokens\", \"cacheReadTokens\")\n+    write = _counter(usage, \"cache_write_tokens\", \"cacheWriteTokens\")\n+    total = _counter(usage, \"total_tokens\", \"totalTokens\")\n+    if inputs is None or outputs is None:\n+        return UsageReport(disposition=\"unknown\", cache_read_tokens=read, cache_write_tokens=write)\n+    if total is None:\n+        if read is None or write is None:\n+            return UsageReport(\n+                disposition=\"unknown\", cache_read_tokens=read, cache_write_tokens=write\n+            )\n+        total = inputs + outputs + read + write\n+    return UsageReport(\n+        disposition=\"estimated\",\n+        input_tokens=inputs,\n+        output_tokens=outputs,\n+        total_tokens=total,\n+        cache_read_tokens=read,\n+        cache_write_tokens=write,\n+    )\n+\n+\n def observed_usage(frames: Iterable[ProviderFrame]) -> dict[NativeRun, UsageReport]:\n     \"\"\"Choose one attributable complete token observation per native session/run.\"\"\"\n     reports: dict[NativeRun, UsageReport] = {}\n@@ -34,27 +64,18 @@ def observed_usage(frames: Iterable[ProviderFrame]) -> dict[NativeRun, UsageRepo\n             continue\n         key = (frame.native_session_ref, frame.native_turn_ref)\n         reports.setdefault(key, UsageReport(disposition=\"unknown\"))\n-        if frame.kind not in {FrameKind.TURN_ENDED, FrameKind.USAGE, FrameKind.RUN_RESULT}:\n+        # SDK 1.0.37 usage/turn-ended events are per model turn; native_turn_ref\n+        # identifies the entire send/run. Without complete stable turn identities,\n+        # those events cannot attest the run total, even when replayed identically.\n+        if frame.kind != FrameKind.RUN_RESULT:\n             continue\n         body = frame_body_object(frame.body_excerpt, frame.body_bytes, frame.lifecycle_body)\n         usage = body.get(\"usage\") if isinstance(body, dict) else None\n         if not isinstance(usage, dict):\n             continue\n-        inputs = _counter(usage, \"input_tokens\", \"inputTokens\")\n-        outputs = _counter(usage, \"output_tokens\", \"outputTokens\")\n-        if inputs is None or outputs is None:\n-            continue\n-        read = _counter(usage, \"cache_read_tokens\", \"cacheReadTokens\")\n-        write = _counter(usage, \"cache_write_tokens\", \"cacheWriteTokens\")\n-        total = _counter(usage, \"total_tokens\", \"totalTokens\")\n-        reports[key] = UsageReport(\n-            disposition=\"estimated\",\n-            input_tokens=inputs,\n-            output_tokens=outputs,\n-            total_tokens=total if total is not None else inputs + outputs,\n-            cache_read_tokens=read,\n-            cache_write_tokens=write,\n-        )\n+        report = cursor_token_usage(usage)\n+        if report.disposition != \"unknown\":\n+            reports[key] = report\n     return reports\n \n \ndiff --git a/src/mission_control/application/execution/harness/describe.py b/src/mission_control/application/execution/harness/describe.py\nindex 2c0202ca..6e09f9ce 100644\n--- a/src/mission_control/application/execution/harness/describe.py\n+++ b/src/mission_control/application/execution/harness/describe.py\n@@ -653,10 +653,11 @@ _MANAGED_NATIVE: Final = FeatureEvidence(\n # Kernel Hooks become Mission Control custom tools. HL-08 implements the session lifecycle\n # (`adapters/anthropic_managed/harness.py`): prepare from the pack, a budgeted session, sends\n # gated on idle, the stream-then-history observe, native reattach, interrupt, usage settled from\n-# `list_cost`, and end as interrupt, archive, then deletion after retention. The budget-gate\n-# pause exists on the harness (`hold_budget`) but no workflow control calls it yet, so `pause`\n-# stays boundary-only; approvals and Mission Control tools (HL-09), snapshot, fork and\n-# continuation are not built. Nothing is qualified before the HL-24 drill.\n+# `list_cost`, and end as interrupt, archive, then deletion after retention. Opt-in managed\n+# budget controls are wired through BudgetControlService and the StageGraph/GoalDirected\n+# callers; native boundary/resume enforcement still needs the HL-24 drill. Legacy pause\n+# remains unsupported. The declarations below distinguish implemented emulation and\n+# unqualified native controls; this wiring does not qualify the hosted lane.\n CLAUDE_MANAGED_DESCRIBE: Final = LaneDescribe(\n     schema_version=LANE_DESCRIBE_SCHEMA_V2,\n     lane=\"claude\",\ndiff --git a/src/mission_control/application/execution/harness/lane_turns.py b/src/mission_control/application/execution/harness/lane_turns.py\nindex 82f5c2fb..86fa6464 100644\n--- a/src/mission_control/application/execution/harness/lane_turns.py\n+++ b/src/mission_control/application/execution/harness/lane_turns.py\n@@ -2080,7 +2080,7 @@ class LaneTurnService:\n     async def _turn_usage(\n         self, identity: LaneExecutionIdentity, generation: int, turn_ref: str | None\n     ) -> UsageReport:\n-        \"\"\"The cancelled turn's usage from its last `TurnEndedUpdate` (`estimated`).\"\"\"\n+        \"\"\"Attributed cancellation usage; Cursor requires a cumulative native run result.\"\"\"\n \n         frames = await self._frames_of(identity, generation)\n         if identity.lane_profile in {\"cursor_local\", \"cursor_cloud\"}:\ndiff --git a/tests/unit/cursor/test_cloud_usage_unknown.py b/tests/unit/cursor/test_cloud_usage_unknown.py\nindex 535ef5b7..a6096f34 100644\n--- a/tests/unit/cursor/test_cloud_usage_unknown.py\n+++ b/tests/unit/cursor/test_cloud_usage_unknown.py\n@@ -61,3 +61,56 @@ async def test_reported_usage_settles_and_the_agent_total_is_never_attributed_to\n     assert for_run.disposition == \"unknown\"\n     for_agent = await stack.harness.usage(UsageRequest(**fields, session=session, turn=None))\n     assert for_agent.disposition == \"settled\" and for_agent.total_tokens == 2780\n+\n+\n+@pytest.mark.parametrize(\n+    (\"shape\", \"expected\", \"disposition\"),\n+    [(\"cache\", 39, \"settled\"), (\"missing\", 0, \"unknown\"), (\"zero\", 0, \"settled\")],\n+)\n+async def test_exact_cloud_usage_uses_cursor_cache_total_policy(shape, expected, disposition):\n+    import httpx\n+    from pydantic import SecretStr\n+\n+    from mission_control.adapters.cursor.cloud import CursorCloudHarness\n+    from mission_control.adapters.cursor.cloud_api import CloudAgentsClient\n+    from tests.fixtures.lane_turns import cursor_operation\n+\n+    tokens = {\"inputTokens\": 10, \"outputTokens\": 5}\n+    if shape == \"cache\":\n+        tokens.update(cacheReadTokens=20, cacheWriteTokens=4, reasoningTokens=2)\n+    if shape == \"zero\":\n+        tokens[\"totalTokens\"] = 0\n+\n+    def respond(request):\n+        assert request.method == \"GET\" and request.url.params[\"runId\"] == \"run\"\n+        return httpx.Response(200, json={\"runs\": [{\"id\": \"run\", \"usage\": tokens}]})\n+\n+    client = CloudAgentsClient(SecretStr(\"fixture-only\"), transport=httpx.MockTransport(respond))\n+\n+    async def cost_reader(agent, run):\n+        assert (agent, run) == (\"agent\", \"run\")\n+        return 19\n+\n+    harness = CursorCloudHarness(\n+        client=client, publisher=None, projections=None, artifacts=None, cost_reader=cost_reader\n+    )\n+    operation = cursor_operation(PROFILE)\n+    from mission_control.application.execution.harness.lane_turns import LaneExecutionIdentity\n+\n+    heid = str(LaneExecutionIdentity.of(operation, PROFILE, 1).harness_execution_id)\n+    harness.stage(heid, operation)\n+    session = SessionHandle(\n+        lane_profile=PROFILE, harness_execution_id=heid, generation=1, native_session_ref=\"agent\"\n+    )\n+    try:\n+        report = await harness.usage(\n+            UsageRequest(\n+                **harness_fields(operation, heid, PROFILE),\n+                session=session,\n+                turn=TurnHandle(session=session, turn_no=1, native_turn_ref=\"run\"),\n+            )\n+        )\n+        assert (report.total_tokens, report.disposition) == (expected, disposition)\n+        assert report.cost_micros_usd == 19\n+    finally:\n+        await client.aclose()\ndiff --git a/tests/unit/runtime/test_run2_cursor_usage.py b/tests/unit/runtime/test_run2_cursor_usage.py\nindex 8698f956..675cba16 100644\n--- a/tests/unit/runtime/test_run2_cursor_usage.py\n+++ b/tests/unit/runtime/test_run2_cursor_usage.py\n@@ -37,6 +37,7 @@ def test_dual_sse_replay_and_cancelled_continuation_runs_count_once():\n     frames = [\n         _frame(\"source\", \"cancelled\", FrameKind.TURN_ENDED, usage),\n         _frame(\"source\", \"cancelled\", FrameKind.USAGE, usage),\n+        _frame(\"source\", \"cancelled\", FrameKind.RUN_RESULT, usage),\n         _frame(\"source\", \"replacement\", FrameKind.RUN_RESULT, usage),\n         _frame(\"target\", \"continuation\", FrameKind.RUN_RESULT, usage),\n     ]\n@@ -312,3 +313,138 @@ async def test_known_cost_can_coexist_with_unknown_tokens_without_zero_fill():\n     assert summary.report.disposition == \"unknown\"\n     assert summary.report.cost_micros_usd == 19 and summary.cost_disposition == \"settled\"\n     assert summary.unknown_runs == ((\"a\", \"run\"),)\n+\n+\n+@pytest.mark.parametrize(\"reverse\", [False, True])\n+def test_cumulative_result_beats_per_turn_usage_in_either_order(reverse):\n+    cumulative = {\n+        \"inputTokens\": 10,\n+        \"outputTokens\": 5,\n+        \"cacheReadTokens\": 20,\n+        \"cacheWriteTokens\": 4,\n+        \"totalTokens\": 39,\n+    }\n+    frames = [\n+        _frame(\"a\", \"r\", FrameKind.RUN_RESULT, cumulative),\n+        _frame(\"a\", \"r\", FrameKind.USAGE, {\"inputTokens\": 2, \"outputTokens\": 1, \"totalTokens\": 3}),\n+    ]\n+    if reverse:\n+        frames.reverse()\n+    assert observed_usage(frames + frames)[(\"a\", \"r\")].total_tokens == 39\n+\n+\n+@pytest.mark.parametrize(\"kind\", [FrameKind.USAGE, FrameKind.TURN_ENDED])\n+def test_per_turn_only_evidence_cannot_attest_native_run_total(kind):\n+    report = observed_usage(\n+        [_frame(\"a\", \"r\", kind, {\"inputTokens\": 2, \"outputTokens\": 1, \"totalTokens\": 3})]\n+    )[(\"a\", \"r\")]\n+    assert report.disposition == \"unknown\"\n+\n+\n+@pytest.mark.parametrize(\n+    (\"usage\", \"total\", \"disposition\"),\n+    [\n+        (\n+            {\n+                \"inputTokens\": 10,\n+                \"outputTokens\": 5,\n+                \"cacheReadTokens\": 20,\n+                \"cacheWriteTokens\": 4,\n+                \"reasoningTokens\": 2,\n+            },\n+            39,\n+            \"estimated\",\n+        ),\n+        ({\"inputTokens\": 10, \"outputTokens\": 5}, 0, \"unknown\"),\n+        ({\"inputTokens\": 10, \"outputTokens\": 5, \"totalTokens\": 0}, 0, \"estimated\"),\n+        ({\"inputTokens\": 10, \"totalTokens\": 12}, 0, \"unknown\"),\n+    ],\n+)\n+def test_run_total_requires_explicit_total_or_all_cursor_dimensions(usage, total, disposition):\n+    from mission_control.adapters.cursor.frames import closing_facts\n+\n+    frame = _frame(\"a\", \"r\", FrameKind.RUN_RESULT, usage)\n+    observed = observed_usage([frame])[(\"a\", \"r\")]\n+    closing = closing_facts({\"status\": \"finished\", \"usage\": usage}).usage\n+    assert (observed.total_tokens, observed.disposition) == (total, disposition)\n+    assert (closing.total_tokens, closing.disposition) == (total, disposition)\n+\n+\n+@pytest.mark.parametrize(\n+    (\"authority\", \"expected\", \"disposition\"),\n+    [(\"failure\", 39, \"estimated\"), (\"known\", 50, \"settled\"), (\"unknown\", 0, \"unknown\")],\n+)\n+async def test_cancelled_run_observation_and_authoritative_read_policy(\n+    authority, expected, disposition\n+):\n+    from mission_control.application.execution.harness.lane_turns import (\n+        LaneExecutionIdentity,\n+        execution_start,\n+    )\n+    from mission_control.application.frames.writer import FrameWriter\n+    from mission_control.domain.execution.lane_turns import ClosingFacts\n+    from mission_control.domain.execution.lanes import SessionHandle, TurnHandle\n+    from mission_control.domain.frames.contracts import FrameObservation\n+    from tests.fixtures.cursor_controls import harness_fields\n+    from tests.fixtures.lane_turns import cursor_operation, lane_stack\n+\n+    operation = cursor_operation(\"cursor_cloud\")\n+    stack = lane_stack(operation=operation)\n+    identity = LaneExecutionIdentity.of(operation, \"cursor_cloud\", 1)\n+    handle = await stack.frames.open_execution(execution_start(operation, identity, 1, \"agent\"))\n+    writer = FrameWriter(stack.frames, handle)\n+    for key, kind, usage in [\n+        (\n+            \"final\",\n+            FrameKind.RUN_RESULT,\n+            {\n+                \"inputTokens\": 10,\n+                \"outputTokens\": 5,\n+                \"cacheReadTokens\": 20,\n+                \"cacheWriteTokens\": 4,\n+                \"totalTokens\": 39,\n+            },\n+        ),\n+        (\"late-turn\", FrameKind.USAGE, {\"inputTokens\": 2, \"outputTokens\": 1, \"totalTokens\": 3}),\n+    ]:\n+        await writer.write(\n+            [\n+                FrameObservation(\n+                    provider_key=key,\n+                    raw_kind=\"result\" if key == \"final\" else \"usage\",\n+                    kind=kind,\n+                    native_turn_ref=\"run\",\n+                    native_session_ref=\"agent\",\n+                    body={\"usage\": usage},\n+                )\n+            ]\n+        )\n+    cancelled = await stack.service._turn_usage(identity, 1, \"run\")\n+    assert cancelled.total_tokens == 39\n+\n+    class Harness:\n+        async def usage(self, request):\n+            if authority == \"failure\":\n+                raise RuntimeError(\"fixture unavailable\")\n+            if authority == \"unknown\":\n+                return UsageReport(disposition=\"unknown\")\n+            return UsageReport(\n+                disposition=\"settled\", input_tokens=40, output_tokens=10, total_tokens=50\n+            )\n+\n+    session = SessionHandle(\n+        lane_profile=\"cursor_cloud\",\n+        harness_execution_id=str(identity.harness_execution_id),\n+        generation=1,\n+        native_session_ref=\"agent\",\n+    )\n+    facts = await stack.service._settled_usage(\n+        Harness(),\n+        harness_fields(operation, str(identity.harness_execution_id), \"cursor_cloud\"),\n+        TurnHandle(session=session, turn_no=1, native_turn_ref=\"run\"),\n+        ClosingFacts(native_status=\"cancelled\"),\n+        identity=identity,\n+        semantic_attempt_key=operation.identity.semantic_key,\n+        binding_digest=operation.cursor_binding.binding_digest,\n+    )\n+    assert (facts.usage.total_tokens, facts.usage.disposition) == (expected, disposition)\n",
+    "stderr": ""
+  },
+  "original_helper_pins": [
+    {
+      "source": "C:\\Users\\Pinda\\Proyectos\\BellLabs\\platform\\mission-control\\.scratch\\materialization-observation-2026-10\\run2\\resumed\\cursor-next-preparation\\a8d69-successor-preparation\\identity-recovery-preparation\\recovery-v3\\controller\\control_cursor_a8.py",
+      "copy": "controller/control_cursor_a8.py",
+      "sha256": "82981f0ae544eca63b216756ed819635d078f29f572732f02b065a34397ecc3c",
+      "original_current_sha256": "82981f0ae544eca63b216756ed819635d078f29f572732f02b065a34397ecc3c",
+      "original_unchanged": true,
+      "candidate_sha256": "64151be3577ab099a1eb0e580269e464c13a136aeb662a1129c45c9ed79b6773"
+    },
+    {
+      "source": "C:\\Users\\Pinda\\Proyectos\\BellLabs\\platform\\mission-control\\.scratch\\materialization-observation-2026-10\\run2\\resumed\\cursor-next-preparation\\a8d69-successor-preparation\\identity-recovery-preparation\\controller-lifecycle-repair-preparation\\controller\\controller_guards.py",
+      "copy": "controller/controller_guards.py",
+      "sha256": "25b4b955896cbe8bdc48dca47eeef65b4ad61ff7d8194387a75d30601c613b3d",
+      "original_current_sha256": "25b4b955896cbe8bdc48dca47eeef65b4ad61ff7d8194387a75d30601c613b3d",
+      "original_unchanged": true,
+      "candidate_sha256": "25b4b955896cbe8bdc48dca47eeef65b4ad61ff7d8194387a75d30601c613b3d"
+    },
+    {
+      "source": "C:\\Users\\Pinda\\Proyectos\\BellLabs\\platform\\mission-control\\.scratch\\materialization-observation-2026-10\\run2\\resumed\\cursor-next-preparation\\a8d69-successor-preparation\\identity-recovery-preparation\\observer\\bridge_ownership.py",
+      "copy": "observer/bridge_ownership.py",
+      "sha256": "591da1cfe1d47b06cb120853c427a86874b3cb56087ba2919150649d26a7def9",
+      "original_current_sha256": "591da1cfe1d47b06cb120853c427a86874b3cb56087ba2919150649d26a7def9",
+      "original_unchanged": true,
+      "candidate_sha256": "8ec79f60058c3f64d3be9efb0d7a7dba7b4fc43f9f10ac4623297c5f84863fab"
+    }
+  ],
+  "protected_global_fence_sha256": "c30215e853a393b9e0f48a3b2e7ac1e97a98cb6b415766cdb9b28430b98dab37",
+  "release": {
+    "component_version": "1.4.2",
+    "locked_count": 41,
+    "mismatches": [],
+    "installed_state_observed": false
+  },
+  "owned_file_sha256": {
+    ".scratch/run2-completion-20261016/review/REVIEW.md": "4a364d6de6774b536694d8fdbfb4ecc2e3126eee208520a56fc477f8c66e2bdc",
+    ".scratch/run2-completion-20261016/w1/README.md": "91d79bd2f0727a6343061fee50b73fcfcf6718d5dbb2095fcdc1c0aef27e725f",
+    ".scratch/run2-completion-20261016/w1/changes.patch": "52a9cadf662b5985045dc97ce6f872591ec28d1b0546bc4d62a18002e01d8273",
+    ".scratch/run2-completion-20261016/w1/controller/control_cursor_a8.py": "64151be3577ab099a1eb0e580269e464c13a136aeb662a1129c45c9ed79b6773",
+    ".scratch/run2-completion-20261016/w1/final-tests.txt": "1d4f855f2251bcd79bedd068bb4da29bc0851349d9dbf7bc38dde0e336555a5f",
+    ".scratch/run2-completion-20261016/w1/green.txt": "a515d3b0a99a4f94035558a92cd363aa02cbbfa20090d4cc921e3d6cd9545bb4",
+    ".scratch/run2-completion-20261016/w1/observer/bridge_ownership.py": "8ec79f60058c3f64d3be9efb0d7a7dba7b4fc43f9f10ac4623297c5f84863fab",
+    ".scratch/run2-completion-20261016/w1/red.txt": "59657f3c4fe5a093da01123833f21a95fec93ff7a292dd3857e79ffac80d0b80",
+    ".scratch/run2-completion-20261016/w1/test_safety.py": "10cb16641cd7b763c85ecdd0e7f05d59de4cd1a9a5731e4e2e7b4cf8f66b5679",
+    ".scratch/run2-completion-20261016/w10/architecture.txt": "234b0bc56515f8d0065ad7f10ed6d74c1b483c72ec8771d0edfbaa415a239dff",
+    ".scratch/run2-completion-20261016/w10/docs-index.txt": "24bebe6e3584a82fbc0280ea4cfbca87a5f30727034feaf97d45f48a52aef6de",
+    ".scratch/run2-completion-20261016/w10/docs-links.txt": "5f5b502b025b065d99cb5d3f4e7efb92c8ce859625db8e0170eaada0951d4fae",
+    ".scratch/run2-completion-20261016/w10/docs-okf.txt": "3ad1284662870ef7810661af009f2d4b72f85daf7d611a5189863dcbe5be7786",
+    ".scratch/run2-completion-20261016/w10/final-format.txt": "64dc14e868f32c562c84cd5472d78b7a583d2ed217cc61e995f4527cbec78263",
+    ".scratch/run2-completion-20261016/w10/final-mypy.txt": "385953f1ef64c4c524baf3b874509ca98e0edce5b268c34a3e907fce6e354fec",
+    ".scratch/run2-completion-20261016/w10/final-ruff.txt": "44b3a0b223b5d90aa85613cea37113de7672ea1aa43c2e605ca6ce3d2a6b44f7",
+    ".scratch/run2-completion-20261016/w10/integrated-tracked.patch": "8c6cc5ea70983ec74afebf8ec787cd104720845872a3f76bc10cbcba577f3fe7",
+    ".scratch/run2-completion-20261016/w2/final-format.txt": "e0cc280fafdd20e9b3974a968cc39d662516aa2e26f852ef71ac3fc3b76585e6",
+    ".scratch/run2-completion-20261016/w2/final-ruff.txt": "dc3caa5943bdd27fde969930cb055bb0aac43a0099693dcd8f4a375b47b4e712",
+    ".scratch/run2-completion-20261016/w2/final-tests.txt": "5b41078cc50bc665e112dfa32d2793a76550903c38a9067060ba7cc84fbd15c0",
+    ".scratch/run2-completion-20261016/w2/green-all-no-git.txt": "2a2dbc90f6e831e672cbe48814486f74a91c3f7a27526ef2d60e75d0696f57e3",
+    ".scratch/run2-completion-20261016/w2/green-dimensions.txt": "0e9792658801d8d6c747472711a5a2a730b28cfd0375b72f2e011753f8e2a0ea",
+    ".scratch/run2-completion-20261016/w2/green-precedence.txt": "be5aca33b324988e1feeba16474391e419f894159d18fc7c54a9c8fe1c1fddbb",
+    ".scratch/run2-completion-20261016/w2/quality-0.txt": "0f06f4a9aff8b73a94ae92025b6399251c777b8b901f8f188d4120d83d6f9a35",
+    ".scratch/run2-completion-20261016/w2/quality-1.txt": "2d6a0b29a389bdae2f3f7faec8721ea6d1be3047da5a4299bdf833cfdb7ff8f2",
+    ".scratch/run2-completion-20261016/w2/quality-2.txt": "4be68a0a288308063ba4893957b41e6647a5751beaa8c481bf443d8182a343e2",
+    ".scratch/run2-completion-20261016/w2/quality-3.txt": "cb06b93ad46a118ec8ce7997d0ccd9ba24dc6088125b934a68a662daeb05a600",
+    ".scratch/run2-completion-20261016/w2/receipt.json": "983fcda3a57790eb0dee0177d447b968bc54ec78f0335a85ab36bec12d107681",
+    ".scratch/run2-completion-20261016/w2/red-cloud-direct.txt": "3cdeb107f16dd95087a7a5df927d3ccf732a0763ba2f7bb51505c4fab2309ca2",
+    ".scratch/run2-completion-20261016/w2/red-cloud.txt": "30a9319639bf7087aee1a2ce7fe251955b6d4421e4bf7850793e7462e2a1395d",
+    ".scratch/run2-completion-20261016/w2/red-dimensions.txt": "e2779509e4aefea042f690a89ea8074f8f1a46d169d9a6ddde0ae1b7c59cb2b1",
+    ".scratch/run2-completion-20261016/w2/red-precedence.txt": "adf1d7ca71aa7d263412b05b425bd3c025622f5e05dd57823da8f11a76067d18",
+    ".scratch/run2-completion-20261016/w2/tmp-final-tests.txt": null,
+    ".scratch/run2-completion-20261016/w2/tmp-red-cloud-bounded.txt": null,
+    ".scratch/run2-completion-20261016/w3-caller/completed-format.txt": "da12cc3f89b99c50e1cabfdc5c27787a185071181312cf8fd90091e660a93aa0",
+    ".scratch/run2-completion-20261016/w3-caller/completed-mypy.txt": "fe21cd5504dd71c1b9fe07fa87289781721026b1af85ec91546d7cef57ed1947",
+    ".scratch/run2-completion-20261016/w3-caller/completed-ruff.txt": "dc3caa5943bdd27fde969930cb055bb0aac43a0099693dcd8f4a375b47b4e712",
+    ".scratch/run2-completion-20261016/w3-caller/final-format.txt": "da12cc3f89b99c50e1cabfdc5c27787a185071181312cf8fd90091e660a93aa0",
+    ".scratch/run2-completion-20261016/w3-caller/final-mypy.txt": "0e93bdadb9e39d68107570b946e570a4f3394e3d4b937c1a4c7e244c0916ce71",
+    ".scratch/run2-completion-20261016/w3-caller/final-ruff-fix.txt": "0e6f9853efa782e9a43636703ad2fae86991c0f63f4a7e288f20bdc42a7671c1",
+    ".scratch/run2-completion-20261016/w3-caller/final-ruff.txt": "dc3caa5943bdd27fde969930cb055bb0aac43a0099693dcd8f4a375b47b4e712",
+    ".scratch/run2-completion-20261016/w3-caller/final-tests.txt": "85fb5021c8f8626aadaa7c0531b046b4bbf813d7cc2f80689063483836e44606",
+    ".scratch/run2-completion-20261016/w3-caller/final-typed-tests.txt": "e091e1034c992f4a4d313a77c0fb178700fcb346ef966b158011c9728bb77650",
+    ".scratch/run2-completion-20261016/w3-caller/first-join.txt": "b9af4211a00b33952cb4e22f4a97129461150a6e53498afad09b223c8d1dcfa7",
+    ".scratch/run2-completion-20261016/w3-caller/receipt.json": "71735b4e72039f3377bdfe06f099fd5fbf15c52affac0c70159a096c89376197",
+    ".scratch/run2-completion-20261016/w3/final-format.txt": "7932918477617419a117795a418a99630adbebfd28a37b9a490041ad60b4a243",
+    ".scratch/run2-completion-20261016/w3/final-mypy.txt": "fe21cd5504dd71c1b9fe07fa87289781721026b1af85ec91546d7cef57ed1947",
+    ".scratch/run2-completion-20261016/w3/final-ruff-fix.txt": "dc3caa5943bdd27fde969930cb055bb0aac43a0099693dcd8f4a375b47b4e712",
+    ".scratch/run2-completion-20261016/w3/final-ruff.txt": "dc3caa5943bdd27fde969930cb055bb0aac43a0099693dcd8f4a375b47b4e712",
+    ".scratch/run2-completion-20261016/w3/final-tests.txt": "e4e6a475673ff5555ae5a6bad03014a91a7fb7632772ee9ef7e1df712cef8c6d",
+    ".scratch/run2-completion-20261016/w3/final-typed-tests.txt": "86df187df22f2792ecc065b4b9e13f521d66d7370d6be8a912ae4db2c4cd41dc",
+    ".scratch/run2-completion-20261016/w3/first-new-join.txt": "a33ad8f179a83efdc7cef3fc67c43ee77e1979ae645397992a8e9b76a1dede44",
+    ".scratch/run2-completion-20261016/w3/format.txt": "da12cc3f89b99c50e1cabfdc5c27787a185071181312cf8fd90091e660a93aa0",
+    ".scratch/run2-completion-20261016/w3/mypy.txt": "63c33fcccd41a9fd4617d984ea4375eeab4bc2713c128af09691942c193a029a",
+    ".scratch/run2-completion-20261016/w3/receipt.json": "7f3dd485aa7fa26553a21680ca8f469e4a8e99d39e53759a07840684c1e3a16d",
+    ".scratch/run2-completion-20261016/w3/ruff-fix.txt": "c691b75902df101fb45b2fdb2044f385c6d35bb3c7511c4413c4e4d251768b47",
+    ".scratch/run2-completion-20261016/w3/ruff.txt": "dc3caa5943bdd27fde969930cb055bb0aac43a0099693dcd8f4a375b47b4e712",
+    ".scratch/run2-completion-20261016/w3/shared-gates-escalated.txt": "e26d5d6283ff9f4d5ac09667d9817963774de11eb307e474137466c59ee200ec",
+    ".scratch/run2-completion-20261016/w3/tests.txt": "f670f2c396e10173368d27f2b20e1bdc5e5fc729f6ec333352df81577b594055",
+    ".scratch/run2-completion-20261016/w3/tmp-final-tests.txt": null,
+    ".scratch/run2-completion-20261016/w4/offline-gates.txt": "f7e9f653d631380165a2bc5f98d45a1092832c7a2c47fb7b64aa4cfa14c3fb5e",
+    ".scratch/run2-completion-20261016/w5/fake-cli.txt": "8c63def634e2acb413098781f7eaf07637321b6198f4339b8f902d97663fc046",
+    "docs/specs/materialization-observation-2026-10/runs/RUN-2-ASSESSMENT-EVIDENCE-2026-10-16.json": "4bf84fd0102ef4e1c27c880f3212fe70a1ae43622a2c49f9885abc6ee479477d",
+    "docs/specs/materialization-observation-2026-10/runs/RUN-2-COMPLETION-ASSESSMENT-2026-10-16.md": "37c89585b645afdc1ff04a72d42b3a899342571e76d9c3e2dfd08adc559873c9",
+    "docs/specs/materialization-observation-2026-10/runs/RUN-2-COMPLETION-FINDINGS-2026-10-16.md": "e98e1e08c63e0b35702a35022f116b2938a42ca22210013f6c9d83bc4682fe60",
+    "docs/specs/materialization-observation-2026-10/runs/RUN-2-COMPLETION-PLAN-2026-10-16.md": "29e882363d2969f5b6fc7ff95538d62f9d8995a72ebc1d39ba60ddafa66a1493",
+    "docs/specs/materialization-observation-2026-10/runs/RUN-2-EXECUTION-LEDGER-2026-10-16.md": "5e899f40ecbf14cbb34e0c0da862f818f67e38f86198829cf61dbe97ac6f9b6e",
+    "docs/specs/materialization-observation-2026-10/runs/RUN-2-REMAINING-GATES-2026-10-16.md": "d3e1cda7c9e563e3dcca0e5db3cbaf6e1f3235c3a1ad6c5de75c56dceb7dd1e9",
+    "docs/specs/materialization-observation-2026-10/runs/RUN-2-SOL-EXECUTION-2026-10-16.md": "b2ce3655f44fcdb1c0965c491c21ec857d283419792aeebf6a137b207e6ac0b6",
+    "src/mission_control/adapters/cursor/cloud.py": "ae3298440bd90e17230dc1876500ed8a86c82abd8b66d64b3c0565199c100b6d",
+    "src/mission_control/adapters/cursor/frames.py": "1e0444fb52d76486cb4dee1848de4fbf8a7ee9f5f1bafca5f69457483f610ded",
+    "src/mission_control/application/execution/harness/cursor_usage.py": "6b02127c653bd9728db64ecd361336195cc90f9d0e3e026ea1266bc3dfe0872a",
+    "src/mission_control/application/execution/harness/describe.py": "3232e359f2fec8da885dbec5cc9b37f96ebb1c341b57db017cda6310741d3125",
+    "src/mission_control/application/execution/harness/lane_turns.py": "8cd91773b4cfd9b1e16bbc81a0dbaff774df3cb59071b04e90178419aa8b5f30",
+    "tests/unit/cursor/test_cloud_usage_unknown.py": "8071f1f81be1fa4e28ff3549114d3cdfd8da0e098fb048a64da00eac5139430f",
+    "tests/unit/runtime/test_run2_cursor_usage.py": "2dfa6f4138a3af890f60c277c7d7a98cfee7462a35d776cfd3e824758c3408fa",
+    "tests/unit/subscriptions/test_run2_caller_identity.py": "978a7da7647292d5d4c04d6a91adc5986d2a1f3326b1d62d998d52afd186fc66",
+    "tests/unit/temporal/test_run2_managed_budget_composition.py": "bdcfe996b41f8563ded08a6e4faeef08cc7e052b41fa1ce538350b1755b8413a"
+  },
+  "owned_python_trailing_whitespace": {},
+  "owned_diff_check": {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\run2-completion-offline",
+      "diff",
+      "--check",
+      "--",
+      "src/mission_control/application/execution/harness/cursor_usage.py",
+      "src/mission_control/adapters/cursor/frames.py",
+      "src/mission_control/adapters/cursor/cloud.py",
+      "src/mission_control/application/execution/harness/lane_turns.py",
+      "src/mission_control/application/execution/harness/describe.py",
+      "tests/unit/runtime/test_run2_cursor_usage.py",
+      "tests/unit/cursor/test_cloud_usage_unknown.py"
+    ],
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "limits": [
+    "No live/provider/shared-data observation, release qualification or authority is conferred.",
+    "Application repository is uncommitted at the inspected base; disposable fake CLI repositories have fixture commits only.",
+    "Original RUN-2-REPORT whitespace is preserved and excluded from owned patch validation.",
+    "Independent review and test selections are separate non-additive evidence; ignored preparations remain unqualified."
+  ],
+  "post_capture": {
+    "utc": "2026-10-16T14:49:40.593459+00:00",
+    "owned_hash_drift": [],
+    "isolated_status_including_this_evidence_file": " M docs/specs/materialization-observation-2026-10/runs/RUN-2-REPORT.md\n M src/mission_control/adapters/cursor/cloud.py\n M src/mission_control/adapters/cursor/frames.py\n M src/mission_control/application/execution/harness/cursor_usage.py\n M src/mission_control/application/execution/harness/describe.py\n M src/mission_control/application/execution/harness/lane_turns.py\n M tests/unit/cursor/test_cloud_usage_unknown.py\n M tests/unit/runtime/test_run2_cursor_usage.py\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-ASSESSMENT-EVIDENCE-2026-10-16.json\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-COMPLETION-ASSESSMENT-2026-10-16.md\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-COMPLETION-FINDINGS-2026-10-16.md\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-COMPLETION-PLAN-2026-10-16.md\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-EXECUTION-EVIDENCE-2026-10-16.json\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-EXECUTION-LEDGER-2026-10-16.md\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-REMAINING-GATES-2026-10-16.md\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-SOL-EXECUTION-2026-10-16.md\n?? tests/unit/subscriptions/test_run2_caller_identity.py\n?? tests/unit/temporal/test_run2_managed_budget_composition.py\n",
+    "resource_sample": {
+      "observed_utc": "2026-10-16T14:48:20.6874792Z",
+      "owned_check_count": 0,
+      "owned_check_pids": [],
+      "total_visible_kib": 16056316,
+      "free_physical_kib": 5069956
+    },
+    "resource_sample_sha256": "035b4dc6a31b8c1ec9187d6d8f7e74c87fb96f1946ed2067a7cfdcfc5e8de5e6"
+  }
+}

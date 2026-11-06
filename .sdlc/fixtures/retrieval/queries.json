@@ -1,0 +1,997 @@
+{
+  "schema": "mc.retrieval-fixtures.v1",
+  "created": "2026-11-01",
+  "note": "Cases are written from the owner goal, the retrieval audit misses and the task shapes; none was tuned against search output. Concept slugs are the post-refactor names (docs/knowledge/<slug>.md); a slug that did not exist before the refactor simply cannot be found there.",
+  "cases": [
+    {
+      "id": "S01",
+      "kind": "query",
+      "partition": "screening",
+      "query": "how does a stage graph release and join parallel stages",
+      "expect": {
+        "concepts": [
+          "stage-graph",
+          "workflow-systems"
+        ],
+        "modules": [],
+        "research": [],
+        "facts": []
+      },
+      "critical": true
+    },
+    {
+      "id": "S02",
+      "kind": "query",
+      "partition": "screening",
+      "query": "goal loop target model versus what GoalDirected builds today",
+      "expect": {
+        "concepts": [
+          "goal-loop"
+        ],
+        "modules": [],
+        "research": [],
+        "facts": []
+      },
+      "critical": true
+    },
+    {
+      "id": "S03",
+      "kind": "query",
+      "partition": "screening",
+      "query": "is parallel swarm a separate workflow system",
+      "expect": {
+        "concepts": [
+          "parallel-swarm",
+          "workflow-systems"
+        ],
+        "modules": [],
+        "research": [],
+        "facts": []
+      },
+      "critical": true
+    },
+    {
+      "id": "S04",
+      "kind": "query",
+      "partition": "screening",
+      "query": "how does evaluator optimizer reuse goal loop machinery",
+      "expect": {
+        "concepts": [
+          "evaluator-optimizer",
+          "goal-loop"
+        ],
+        "modules": [],
+        "research": [],
+        "facts": []
+      },
+      "critical": false
+    },
+    {
+      "id": "S05",
+      "kind": "query",
+      "partition": "screening",
+      "query": "linked workflows where one mission releases the next",
+      "expect": {
+        "concepts": [
+          "mission-chains"
+        ],
+        "modules": [],
+        "research": [],
+        "facts": []
+      },
+      "critical": true
+    },
+    {
+      "id": "S06",
+      "kind": "query",
+      "partition": "screening",
+      "query": "how are output obligations submitted and fulfilled",
+      "expect": {
+        "concepts": [
+          "output-contracts"
+        ],
+        "modules": [],
+        "research": [],
+        "facts": []
+      },
+      "critical": true
+    },
+    {
+      "id": "S07",
+      "kind": "query",
+      "partition": "screening",
+      "query": "how does an accepted output reach the next stage exactly",
+      "expect": {
+        "concepts": [
+          "output-contracts",
+          "context-and-continuation"
+        ],
+        "modules": [],
+        "research": [],
+        "facts": []
+      },
+      "critical": true
+    },
+    {
+      "id": "S08",
+      "kind": "query",
+      "partition": "screening",
+      "query": "queue or inject a message into a running mission",
+      "expect": {
+        "concepts": [
+          "interventions"
+        ],
+        "modules": [],
+        "research": [],
+        "facts": []
+      },
+      "critical": false
+    },
+    {
+      "id": "S09",
+      "kind": "query",
+      "partition": "screening",
+      "query": "fork a mission from a recorded point in its history",
+      "expect": {
+        "concepts": [
+          "precise-fork",
+          "recovery"
+        ],
+        "modules": [],
+        "research": [],
+        "facts": []
+      },
+      "critical": false
+    },
+    {
+      "id": "S10",
+      "kind": "query",
+      "partition": "screening",
+      "query": "which Deep Agents features and model tools can a manifest select",
+      "expect": {
+        "concepts": [
+          "agent-configuration",
+          "deep-agents-lane"
+        ],
+        "modules": [],
+        "research": [],
+        "facts": []
+      },
+      "critical": true
+    },
+    {
+      "id": "S11",
+      "kind": "query",
+      "partition": "screening",
+      "query": "how are model routes resolved from the catalog",
+      "expect": {
+        "concepts": [
+          "model-catalog"
+        ],
+        "modules": [],
+        "research": [],
+        "facts": []
+      },
+      "critical": false
+    },
+    {
+      "id": "S12",
+      "kind": "query",
+      "partition": "screening",
+      "query": "how does Temporal wrap a provider lifecycle over mission state snapshots",
+      "expect": {
+        "concepts": [
+          "temporal-synthesis"
+        ],
+        "modules": [],
+        "research": [],
+        "facts": []
+      },
+      "critical": false
+    },
+    {
+      "id": "S13",
+      "kind": "query",
+      "partition": "screening",
+      "query": "deep agents async subagent sealed binding",
+      "expect": {
+        "concepts": [
+          "deep-agents-children"
+        ],
+        "modules": [],
+        "research": [],
+        "facts": []
+      },
+      "critical": false
+    },
+    {
+      "id": "S14",
+      "kind": "query",
+      "partition": "screening",
+      "query": "provider batch API a workflow waits on the batch output",
+      "expect": {
+        "concepts": [
+          "provider-batch"
+        ],
+        "modules": [],
+        "research": [
+          "provider-batch/batch-apis"
+        ],
+        "facts": []
+      },
+      "critical": false
+    },
+    {
+      "id": "S15",
+      "kind": "query",
+      "partition": "screening",
+      "query": "human review loop reject with feedback and redo",
+      "expect": {
+        "concepts": [
+          "human-gates",
+          "goals"
+        ],
+        "modules": [],
+        "research": [],
+        "facts": []
+      },
+      "critical": true
+    },
+    {
+      "id": "S16",
+      "kind": "query",
+      "partition": "screening",
+      "query": "which release of the common database component is installed in each application",
+      "expect": {
+        "concepts": [
+          "database-component",
+          "persistence"
+        ],
+        "modules": [],
+        "research": [],
+        "facts": []
+      },
+      "critical": false
+    },
+    {
+      "id": "S17",
+      "kind": "query",
+      "partition": "screening",
+      "query": "how do clients follow a mission over Redis and Socket.IO",
+      "expect": {
+        "concepts": [
+          "mission-stream"
+        ],
+        "modules": [],
+        "research": [],
+        "facts": []
+      },
+      "critical": false
+    },
+    {
+      "id": "S18",
+      "kind": "query",
+      "partition": "screening",
+      "query": "keyword semantic and navigation search over workflows and providers",
+      "expect": {
+        "concepts": [
+          "selection-workspace"
+        ],
+        "modules": [],
+        "research": [],
+        "facts": []
+      },
+      "critical": false
+    },
+    {
+      "id": "S19",
+      "kind": "query",
+      "partition": "screening",
+      "query": "What is the paid model spend ceiling for Sprint OC?",
+      "expect": {
+        "concepts": [
+          "budgets-and-usage",
+          "decisions"
+        ],
+        "modules": [],
+        "research": [],
+        "facts": []
+      },
+      "critical": true
+    },
+    {
+      "id": "S20",
+      "kind": "query",
+      "partition": "screening",
+      "query": "Which Aura graph does Biotech ingestion write to?",
+      "expect": {
+        "concepts": [
+          "applications",
+          "knowledge-services",
+          "persistence"
+        ],
+        "modules": [],
+        "research": [],
+        "facts": []
+      },
+      "critical": true
+    },
+    {
+      "id": "S21",
+      "kind": "query",
+      "partition": "screening",
+      "query": "How do I run the unit tests and type checks?",
+      "expect": {
+        "concepts": [
+          "qualification",
+          "operations"
+        ],
+        "modules": [
+          "tests"
+        ],
+        "research": [],
+        "facts": []
+      },
+      "critical": true
+    },
+    {
+      "id": "S22",
+      "kind": "query",
+      "partition": "screening",
+      "query": "What are the open provider consolidation decisions D1-D9?",
+      "expect": {
+        "concepts": [
+          "decisions"
+        ],
+        "modules": [],
+        "research": [],
+        "facts": []
+      },
+      "critical": false
+    },
+    {
+      "id": "S23",
+      "kind": "query",
+      "partition": "screening",
+      "query": "KnowledgeReadIntentPort",
+      "expect": {
+        "concepts": [
+          "knowledge-services"
+        ],
+        "modules": [],
+        "research": [],
+        "facts": []
+      },
+      "critical": false
+    },
+    {
+      "id": "H01",
+      "kind": "query",
+      "partition": "heldout",
+      "query": "when does a stage graph hold with route exhausted",
+      "expect": {
+        "concepts": [
+          "stage-graph"
+        ],
+        "modules": [],
+        "research": [],
+        "facts": []
+      },
+      "critical": false
+    },
+    {
+      "id": "H02",
+      "kind": "query",
+      "partition": "heldout",
+      "query": "can a goal loop sit inside a stage and return its result",
+      "expect": {
+        "concepts": [
+          "recursive-composition",
+          "goal-loop"
+        ],
+        "modules": [],
+        "research": [],
+        "facts": []
+      },
+      "critical": false
+    },
+    {
+      "id": "H03",
+      "kind": "query",
+      "partition": "heldout",
+      "query": "execution finished but the mission was not accepted",
+      "expect": {
+        "concepts": [
+          "completion"
+        ],
+        "modules": [],
+        "research": [],
+        "facts": []
+      },
+      "critical": false
+    },
+    {
+      "id": "H04",
+      "kind": "query",
+      "partition": "heldout",
+      "query": "how do secrets reach a lane without entering prompts or git",
+      "expect": {
+        "concepts": [
+          "secret-broker"
+        ],
+        "modules": [],
+        "research": [],
+        "facts": []
+      },
+      "critical": false
+    },
+    {
+      "id": "H05",
+      "kind": "query",
+      "partition": "heldout",
+      "query": "which files could the agent see when an attempt settled",
+      "expect": {
+        "concepts": [
+          "workspace-closure"
+        ],
+        "modules": [],
+        "research": [],
+        "facts": []
+      },
+      "critical": false
+    },
+    {
+      "id": "H06",
+      "kind": "query",
+      "partition": "heldout",
+      "query": "which sandbox backends does Deep Agents have and is Daytona wired",
+      "expect": {
+        "concepts": [
+          "deep-agents-lane"
+        ],
+        "modules": [
+          "src/mission_control/adapters/deep_agents"
+        ],
+        "research": [
+          "deep-agents/sandbox-providers",
+          "daytona/sandbox-tiers"
+        ],
+        "facts": []
+      },
+      "critical": true
+    },
+    {
+      "id": "H07",
+      "kind": "query",
+      "partition": "heldout",
+      "query": "how is an orchestrating agent woken when a child mission finishes",
+      "expect": {
+        "concepts": [
+          "wake-channels",
+          "coordinator-attention"
+        ],
+        "modules": [],
+        "research": [],
+        "facts": []
+      },
+      "critical": false
+    },
+    {
+      "id": "H08",
+      "kind": "query",
+      "partition": "heldout",
+      "query": "dispatch journal capacity wait and session fencing",
+      "expect": {
+        "concepts": [
+          "session-ownership-and-dispatch"
+        ],
+        "modules": [],
+        "research": [],
+        "facts": []
+      },
+      "critical": false
+    },
+    {
+      "id": "H09",
+      "kind": "query",
+      "partition": "heldout",
+      "query": "how does a manifest YAML compile into an immutable definition",
+      "expect": {
+        "concepts": [
+          "mission-manifest"
+        ],
+        "modules": [],
+        "research": [],
+        "facts": []
+      },
+      "critical": false
+    },
+    {
+      "id": "H10",
+      "kind": "query",
+      "partition": "heldout",
+      "query": "change a running workflow mid-run according to policy",
+      "expect": {
+        "concepts": [
+          "revisions",
+          "goals"
+        ],
+        "modules": [],
+        "research": [],
+        "facts": []
+      },
+      "critical": false
+    },
+    {
+      "id": "H11",
+      "kind": "query",
+      "partition": "heldout",
+      "query": "run local and cloud in one session across providers",
+      "expect": {
+        "concepts": [
+          "goals",
+          "deployment"
+        ],
+        "modules": [],
+        "research": [],
+        "facts": []
+      },
+      "critical": false
+    },
+    {
+      "id": "H12",
+      "kind": "query",
+      "partition": "heldout",
+      "query": "durable timer, event wait and human task as workflow nodes",
+      "expect": {
+        "concepts": [
+          "durable-controls",
+          "human-gates"
+        ],
+        "modules": [],
+        "research": [],
+        "facts": []
+      },
+      "critical": false
+    },
+    {
+      "id": "H13",
+      "kind": "query",
+      "partition": "heldout",
+      "query": "compiled deterministic watcher descriptors",
+      "expect": {
+        "concepts": [
+          "watchers"
+        ],
+        "modules": [],
+        "research": [],
+        "facts": []
+      },
+      "critical": false
+    },
+    {
+      "id": "H14",
+      "kind": "query",
+      "partition": "heldout",
+      "query": "hook script adds context at a safe boundary",
+      "expect": {
+        "concepts": [
+          "hook-contributions",
+          "interventions"
+        ],
+        "modules": [],
+        "research": [],
+        "facts": []
+      },
+      "critical": false
+    },
+    {
+      "id": "H15",
+      "kind": "query",
+      "partition": "heldout",
+      "query": "what is the harness protocol every lane follows",
+      "expect": {
+        "concepts": [
+          "lanes-and-harness"
+        ],
+        "modules": [],
+        "research": [],
+        "facts": []
+      },
+      "critical": false
+    },
+    {
+      "id": "H16",
+      "kind": "query",
+      "partition": "heldout",
+      "query": "which Cursor SDK version is pinned and what do its facts say",
+      "expect": {
+        "concepts": [
+          "cursor-lane"
+        ],
+        "modules": [],
+        "research": [
+          "cursor/sdk-facts"
+        ],
+        "facts": []
+      },
+      "critical": false
+    },
+    {
+      "id": "N01",
+      "kind": "query",
+      "partition": "negative",
+      "query": "style React checkout buttons",
+      "expect": {
+        "concepts": [],
+        "modules": [],
+        "research": [],
+        "facts": []
+      },
+      "critical": false
+    },
+    {
+      "id": "N02",
+      "kind": "query",
+      "partition": "negative",
+      "query": "carbonara pasta recipe with guanciale",
+      "expect": {
+        "concepts": [],
+        "modules": [],
+        "research": [],
+        "facts": []
+      },
+      "critical": false
+    },
+    {
+      "id": "N03",
+      "kind": "query",
+      "partition": "negative",
+      "query": "nginx ingress annotations for kubernetes helm chart",
+      "expect": {
+        "concepts": [],
+        "modules": [],
+        "research": [],
+        "facts": []
+      },
+      "critical": false
+    },
+    {
+      "id": "T001",
+      "kind": "task",
+      "partition": "screening",
+      "task": "Add a new sandbox provider configuration to deep agents and make sure it works across all active workflow types",
+      "expect": {
+        "concepts": [
+          "deep-agents-lane",
+          "agent-configuration",
+          "environments",
+          "workspace-closure",
+          "deep-agents-children",
+          "selection-workspace",
+          "workflow-systems"
+        ],
+        "modules": [
+          "src/mission_control/adapters/deep_agents",
+          "src/mission_control/domain/execution",
+          "src/mission_control/application/authoring",
+          "src/mission_control/application/environments"
+        ],
+        "research": [
+          "deep-agents/sandbox-providers"
+        ],
+        "facts": [
+          "daytona admitted by contract but no materializer factory",
+          "active systems: StageGraph, GoalDirected"
+        ]
+      },
+      "fact_probes": {
+        "daytona admitted by contract but no materializer factory": [
+          "daytona",
+          "factory"
+        ],
+        "active systems: StageGraph, GoalDirected": [
+          "StageGraph",
+          "GoalDirected",
+          "active"
+        ]
+      },
+      "gate": {
+        "concepts_recall_at_10": 0.7,
+        "modules_recall_at_10": 0.75,
+        "facts": "all"
+      },
+      "critical": true,
+      "note": "T001 verbatim from TASK-FIXTURE-T001-SANDBOX-PROVIDER.md except that the concept async-children is written by its post-refactor name deep-agents-children (RENAMES.md) and the research slug follows docs/research/."
+    },
+    {
+      "id": "T002",
+      "kind": "task",
+      "partition": "screening",
+      "task": "Add a new output obligation to a workflow stage so that the next stage receives the accepted output",
+      "expect": {
+        "concepts": [
+          "output-contracts",
+          "stage-graph",
+          "context-and-continuation",
+          "completion",
+          "mission-manifest"
+        ],
+        "modules": [
+          "src/mission_control/domain/programs",
+          "src/mission_control/application/programs",
+          "src/mission_control/domain/authoring"
+        ],
+        "research": [],
+        "facts": [
+          "obligations are fulfilled through one submission act"
+        ]
+      },
+      "fact_probes": {
+        "obligations are fulfilled through one submission act": [
+          "submission",
+          "obligation"
+        ]
+      },
+      "gate": {
+        "concepts_recall_at_10": 0.6,
+        "modules_recall_at_10": 0.5,
+        "facts": "all"
+      },
+      "critical": true
+    },
+    {
+      "id": "T003",
+      "kind": "task",
+      "partition": "screening",
+      "task": "Inject extra context into a running Goal Loop mission without restarting it",
+      "expect": {
+        "concepts": [
+          "interventions",
+          "goal-loop",
+          "context-and-continuation",
+          "hook-contributions",
+          "deep-agents-lane"
+        ],
+        "modules": [
+          "src/mission_control/application/recovery",
+          "src/mission_control/adapters/temporal",
+          "src/mission_control/adapters/deep_agents"
+        ],
+        "research": [],
+        "facts": [
+          "inject is delivered at a safe boundary"
+        ]
+      },
+      "fact_probes": {
+        "inject is delivered at a safe boundary": [
+          "inject",
+          "boundary"
+        ]
+      },
+      "gate": {
+        "concepts_recall_at_10": 0.6,
+        "modules_recall_at_10": 0.5,
+        "facts": "all"
+      },
+      "critical": true
+    },
+    {
+      "id": "T004",
+      "kind": "task",
+      "partition": "screening",
+      "task": "Fork a Stage Graph mission at a recorded point and continue it with different instructions",
+      "expect": {
+        "concepts": [
+          "precise-fork",
+          "recovery",
+          "interventions",
+          "stage-graph",
+          "provider-frames-and-transcript"
+        ],
+        "modules": [
+          "src/mission_control/application/recovery",
+          "src/mission_control/domain/programs"
+        ],
+        "research": [],
+        "facts": [
+          "a fork is a snapshot plus a context packet plus a conversation seed"
+        ]
+      },
+      "fact_probes": {
+        "a fork is a snapshot plus a context packet plus a conversation seed": [
+          "fork",
+          "seed"
+        ]
+      },
+      "gate": {
+        "concepts_recall_at_10": 0.6,
+        "modules_recall_at_10": 0.5,
+        "facts": "all"
+      },
+      "critical": false
+    },
+    {
+      "id": "T005",
+      "kind": "task",
+      "partition": "heldout",
+      "task": "Add a model route so a Deep Agents node can use a new model",
+      "expect": {
+        "concepts": [
+          "model-catalog",
+          "agent-configuration",
+          "deep-agents-lane",
+          "application-profile",
+          "capabilities"
+        ],
+        "modules": [
+          "src/mission_control/adapters/deep_agents",
+          "src/mission_control/application",
+          "packages/mission-control-db-contract"
+        ],
+        "research": [
+          "deep-agents/surface-0.7.5"
+        ],
+        "facts": [
+          "routes resolve through one resolution seam over declared registries"
+        ]
+      },
+      "fact_probes": {
+        "routes resolve through one resolution seam over declared registries": [
+          "resolution",
+          "registr"
+        ]
+      },
+      "gate": {
+        "concepts_recall_at_10": 0.6,
+        "modules_recall_at_10": 0.5,
+        "facts": "all"
+      },
+      "critical": false
+    },
+    {
+      "id": "T006",
+      "kind": "task",
+      "partition": "heldout",
+      "task": "Wire a new lane adapter for another agent provider following the Deep Agents adapter shape",
+      "expect": {
+        "concepts": [
+          "lanes-and-harness",
+          "provider-lanes",
+          "deep-agents-lane",
+          "hosted-api-lanes",
+          "session-ownership-and-dispatch"
+        ],
+        "modules": [
+          "src/mission_control/adapters",
+          "src/mission_control/adapters/deep_agents",
+          "src/mission_control/application"
+        ],
+        "research": [],
+        "facts": [
+          "every lane follows the harness protocol"
+        ]
+      },
+      "fact_probes": {
+        "every lane follows the harness protocol": [
+          "harness",
+          "lane"
+        ]
+      },
+      "gate": {
+        "concepts_recall_at_10": 0.6,
+        "modules_recall_at_10": 0.5,
+        "facts": "all"
+      },
+      "critical": false
+    },
+    {
+      "id": "T007",
+      "kind": "task",
+      "partition": "heldout",
+      "task": "Make a workflow wait for a provider batch job to finish and continue with its output",
+      "expect": {
+        "concepts": [
+          "provider-batch",
+          "durable-controls",
+          "temporal-synthesis",
+          "goals"
+        ],
+        "modules": [
+          "src/mission_control/adapters/temporal"
+        ],
+        "research": [
+          "provider-batch/batch-apis"
+        ],
+        "facts": [
+          "provider batch inference is a goal, not built"
+        ]
+      },
+      "fact_probes": {
+        "provider batch inference is a goal, not built": [
+          "batch",
+          "not built"
+        ]
+      },
+      "gate": {
+        "concepts_recall_at_10": 0.5,
+        "modules_recall_at_10": 0.5,
+        "facts": "all"
+      },
+      "critical": false
+    },
+    {
+      "id": "T008",
+      "kind": "task",
+      "partition": "heldout",
+      "task": "Install the Mission Control schemas into a new application database",
+      "expect": {
+        "concepts": [
+          "database-component",
+          "persistence",
+          "application-profile",
+          "applications"
+        ],
+        "modules": [
+          "packages/mission-control-db-contract",
+          "src/mission_control/bootstrap"
+        ],
+        "research": [],
+        "facts": [
+          "the common SQL lives only in the db-contract package"
+        ]
+      },
+      "fact_probes": {
+        "the common SQL lives only in the db-contract package": [
+          "db-contract",
+          "common"
+        ]
+      },
+      "gate": {
+        "concepts_recall_at_10": 0.5,
+        "modules_recall_at_10": 0.5,
+        "facts": "all"
+      },
+      "critical": false
+    },
+    {
+      "id": "T009",
+      "kind": "task",
+      "partition": "heldout",
+      "task": "A sandboxed agent must pick a lane and Workflow Type for a research Goal Loop by reading the Catalog Workspace",
+      "expect": {
+        "concepts": [
+          "selection-workspace",
+          "goals",
+          "goal-loop",
+          "workflow-systems",
+          "lanes-and-harness"
+        ],
+        "modules": [
+          "src/mission_control/application/selection"
+        ],
+        "research": [],
+        "facts": [
+          "the Catalog Workspace is not built",
+          "missionctl search posts to the API"
+        ]
+      },
+      "fact_probes": {
+        "the Catalog Workspace is not built": [
+          "Catalog Workspace",
+          "not built"
+        ],
+        "missionctl search posts to the API": [
+          "missionctl search",
+          "HTTP"
+        ]
+      },
+      "gate": {
+        "concepts_recall_at_10": 0.6,
+        "modules_recall_at_10": 0.5,
+        "facts": "all"
+      },
+      "critical": false
+    }
+  ]
+}

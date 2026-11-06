@@ -1,0 +1,192 @@
+{
+  "actor_ref": "seed:mission-control-catalog",
+  "component_compatibility": ">=1.0.0 <2.0.0",
+  "depends_on": [
+    {
+      "seed_key": "mc.app.ai-engineer.agent-skills",
+      "seed_version": "1.0.3"
+    }
+  ],
+  "description": "The application's knowledge charter skill in 'ai-engineer': skill.ai-engineer-knowledge-charter. A new skill id starts at revision 1; all earlier 1.0.0, 1.0.1, 1.0.2, 1.0.3 records and custody bytes are preserved.",
+  "format": "mission-control-seed/v1",
+  "records": [
+    {
+      "fields": {
+        "asset_id": "definition:skill:skill.ai-engineer-knowledge-charter",
+        "contract": "mission-control.published-definition/1",
+        "host_support": {
+          "profiles": {
+            "claude_agent_sdk": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "codex": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "cursor_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "cursor_local": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "deep_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            }
+          },
+          "schema_version": "mc.capability_host_support.v1"
+        },
+        "kind": "skill_bundle",
+        "manifest": {
+          "definition": {
+            "attachment_targets": [
+              "agent.main"
+            ],
+            "body_summary": "The AI Engineer knowledge charter - what the proprietary AI-industry knowledge base holds, its 36 entity kinds and endpoint-typed relationship kinds, the taxonomy rule, the evidence bar and the intent-only write path. Use before researching, verifying or ingesting AI Engineer knowledge, when choosing an entity or relationship kind, or when an aieng_ingest preview refuses.",
+            "bundle_ref": {
+              "digest": "sha256:6a405551483b64e5c185f3bef14f271ceff9147f14b473dd38fb801fe8078bf3",
+              "media_type": "application/vnd.mc.capability-bundle+json",
+              "size_bytes": 12421,
+              "uri": "capability-bundles://ai-engineer/skill_bundle/skill.ai-engineer-knowledge-charter/0.1.0/6a405551483b64e5c185f3bef14f271ceff9147f14b473dd38fb801fe8078bf3"
+            },
+            "compatibility": {
+              "executables": [],
+              "network_capabilities": [],
+              "runtimes": [],
+              "workspace_capabilities": []
+            },
+            "compatible_compiler_versions": [
+              "control-plane-definitions/1"
+            ],
+            "conflicts_with": [],
+            "description": "The AI Engineer knowledge charter - what the proprietary AI-industry knowledge base holds, its 36 entity kinds and endpoint-typed relationship kinds, the taxonomy rule, the evidence bar and the intent-only write path. Use before researching, verifying or ingesting AI Engineer knowledge, when choosing an entity or relationship kind, or when an aieng_ingest preview refuses.",
+            "file_manifest": [
+              {
+                "digest": "sha256:11dc322d48407c79d9d8cc91c8c376f15f18690306f9244640e5e0731fef5b59",
+                "executable": false,
+                "path": "SKILL.md",
+                "size_bytes": 6303
+              },
+              {
+                "digest": "sha256:1b2719f99ef252541188ba74436f5e8553e2e782eef7326dec7e91e4aa12bc8a",
+                "executable": false,
+                "path": "manifest.json",
+                "size_bytes": 491
+              },
+              {
+                "digest": "sha256:a43ddd43afabeb01a680ad18a69395e2ec159006d25f8051bbefc7216059fdf6",
+                "executable": false,
+                "path": "references/ingestion-guide.md",
+                "size_bytes": 3522
+              },
+              {
+                "digest": "sha256:07140685fc9a93af658796c82e87f83de2fe35085daad4f66414a16e65f0cdde",
+                "executable": false,
+                "path": "references/research-procedure.md",
+                "size_bytes": 2105
+              }
+            ],
+            "frontmatter": {
+              "description": "The AI Engineer knowledge charter - what the proprietary AI-industry knowledge base holds, its 36 entity kinds and endpoint-typed relationship kinds, the taxonomy rule, the evidence bar and the intent-only write path. Use before researching, verifying or ingesting AI Engineer knowledge, when choosing an entity or relationship kind, or when an aieng_ingest preview refuses.",
+              "name": "ai-engineer-knowledge-charter"
+            },
+            "host_support": {
+              "profiles": {
+                "claude_agent_sdk": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "codex": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "cursor_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "cursor_local": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "deep_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                }
+              },
+              "schema_version": "mc.capability_host_support.v1"
+            },
+            "kind": "skill",
+            "logical_id": "skill.ai-engineer-knowledge-charter",
+            "manifest_digest": "sha256:6a405551483b64e5c185f3bef14f271ceff9147f14b473dd38fb801fe8078bf3",
+            "maturity": "experimental",
+            "required_capabilities": [],
+            "review_status": "approved",
+            "schema_version": "1",
+            "skill_name": "ai-engineer-knowledge-charter",
+            "source_provenance": {
+              "commit_digest": null,
+              "license": "proprietary",
+              "locator": "repo://skills/ai-engineer-knowledge-charter",
+              "source": "local",
+              "upstream_identity": "skill.ai-engineer-knowledge-charter",
+              "upstream_version": "0.1.0"
+            },
+            "title": "ai-engineer-knowledge-charter"
+          },
+          "published_at": "2026-10-14T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:327649f1980497084b095c4a5f7f68e6abfaa6498a597cc591d61fd9f23aa41d",
+            "kind": "skill",
+            "lifecycle_status": "published",
+            "logical_id": "skill.ai-engineer-knowledge-charter",
+            "payload_ref": null,
+            "revision": 1,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:e4c71446866f0298fbc2a2466cf58d4ce783cb8312dfc62e335bb49717a5e020",
+        "manifest_ref": "mc-catalog://definition/skill/skill.ai-engineer-knowledge-charter/1",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "1"
+      },
+      "kind": "asset_version",
+      "logical_key": "agent-skill:skill:skill.ai-engineer-knowledge-charter/1"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "agent-skill:skill:skill.ai-engineer-knowledge-charter/1",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/agent_skills.py",
+          "skills/ai-engineer-knowledge-charter"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "agent-skill:skill:skill.ai-engineer-knowledge-charter/1:admit"
+    }
+  ],
+  "seed_key": "mc.app.ai-engineer.agent-skills",
+  "seed_version": "1.0.4"
+}

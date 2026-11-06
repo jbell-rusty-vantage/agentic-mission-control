@@ -1,0 +1,7 @@
+architecture.md -> mission-control.md (boundaries: what Mission Control owns and refuses absorbs source ownership; A3)
+async-children.md -> deep-agents-children.md (renamed and expanded with sync children and SyncSubagentProfile; A2)
+deep-agents-turn-stops.md -> deep-agents-lane.md (absorbed: turn stops and capture bounds section; A2)
+execution.md -> temporal-synthesis.md (replaced: Stage Graph/GoalDirected execution, settlement waits and failure paths merged into the new Temporal synthesis concept; A2)
+transcript-projection.md -> provider-frames-and-transcript.md (merged: one transcript concept; A3)
+release-and-qualification.md -> qualification.md (merged, keyed to W0-W5; A3)
+continuation-checkpoint.md -> context-and-continuation.md (merged: continuation checkpoint, governors and the MP-12 phase machine now sections of the context concept)

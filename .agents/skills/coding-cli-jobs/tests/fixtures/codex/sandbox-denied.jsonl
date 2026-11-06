@@ -1,0 +1,7 @@
+{"type":"thread.started","thread_id":"0199a213-81c0-7800-8aa1-bbab2a035a55"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"command_execution","command":"git push origin HEAD","aggregated_output":"","exit_code":null,"status":"declined"}}
+{"type":"item.completed","item":{"id":"item_1","type":"error","message":"command was not run: sandbox policy (synthetic)"}}
+{"type":"item.completed","item":{"id":"item_2","type":"agent_message","text":"I could not push; leaving changes in the worktree.\n```json\n{\"status\":\"blocked\",\"summary\":\"push not permitted\",\"handoff\":\"run git push manually\",\"blockers\":[\"sandbox denied git push\"]}\n```"}}
+{"type":"turn.completed","usage":{"input_tokens":8000,"cached_input_tokens":0,"cache_write_input_tokens":0,"output_tokens":90,"reasoning_output_tokens":0}}
+{"__fake__":{"exit":0}}

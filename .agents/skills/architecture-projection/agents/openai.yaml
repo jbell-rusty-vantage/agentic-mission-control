@@ -1,0 +1,3 @@
+interface:
+  display_name: "Architecture Projection"
+  short_description: "Modules, signatures, file tree and dependency chain before the code"

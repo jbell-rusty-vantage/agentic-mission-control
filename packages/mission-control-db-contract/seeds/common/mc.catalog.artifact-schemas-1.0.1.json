@@ -1,0 +1,252 @@
+{
+  "actor_ref": "seed:mission-control-catalog",
+  "component_compatibility": ">=1.4.1 <2.0.0",
+  "depends_on": [
+    {
+      "seed_key": "mc.catalog.artifact-schemas",
+      "seed_version": "1.0.0"
+    }
+  ],
+  "description": "Successor of mc.catalog.artifact-schemas@1.0.0 (applied bytes untouched): the Sprint OC W2 graph-variant schemas schema.w2-triage-verdict@1, schema.w2-scan-flag@1 and schema.w2-critique-verdict@1 (WI-08 route and Revisit Region facts); schema validity is not acceptance.",
+  "format": "mission-control-seed/v1",
+  "records": [
+    {
+      "fields": {
+        "asset_id": "definition:artifact_schema:schema.w2-triage-verdict",
+        "contract": "mission-control.published-definition/1",
+        "kind": "schema",
+        "manifest": {
+          "definition": {
+            "description": "First-match route facts severity and source_count; facts are read by the host from accepted validated bytes; validity is not acceptance",
+            "json_schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "additionalProperties": false,
+              "properties": {
+                "rationale": {
+                  "maxLength": 2000,
+                  "type": "string"
+                },
+                "severity": {
+                  "enum": [
+                    "high",
+                    "normal"
+                  ]
+                },
+                "source_count": {
+                  "maximum": 1000,
+                  "minimum": 0,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "severity",
+                "source_count"
+              ],
+              "type": "object"
+            },
+            "kind": "artifact_schema",
+            "logical_id": "schema.w2-triage-verdict",
+            "schema_dialect": "https://json-schema.org/draft/2020-12/schema",
+            "schema_version": "1",
+            "title": "W2 triage verdict"
+          },
+          "published_at": "2026-10-29T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:2e25e79f392c1b1fd6e598f785d1663a5aa59a435216db0fe1af3c8cfe54c6e7",
+            "kind": "artifact_schema",
+            "lifecycle_status": "published",
+            "logical_id": "schema.w2-triage-verdict",
+            "payload_ref": null,
+            "revision": 1,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:27c638e4471ff793823d90bb833f7b9234e71557b958ffba4ab9c26eefe5ca35",
+        "manifest_ref": "mc-catalog://definition/artifact_schema/schema.w2-triage-verdict/1",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "1"
+      },
+      "kind": "asset_version",
+      "logical_key": "artifact-schema:artifact-schema:schema.w2-triage-verdict/1"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "artifact-schema:artifact-schema:schema.w2-triage-verdict/1",
+        "decided_at": "2026-10-29T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "mission-control-general/general-mission-control/OUTPUT-CONTRACTS.md",
+          "mission-control-general/workflow-types/01-STAGE_GRAPH.md",
+          "docs/specs/provider-consolidation-2026-10/sprint-oc/PROOFS.md"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "artifact-schema:artifact-schema:schema.w2-triage-verdict/1:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:artifact_schema:schema.w2-scan-flag",
+        "contract": "mission-control.published-definition/1",
+        "kind": "schema",
+        "manifest": {
+          "definition": {
+            "description": "All-matching route fact flagged; facts are read by the host from accepted validated bytes; validity is not acceptance",
+            "json_schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "additionalProperties": false,
+              "properties": {
+                "flagged": {
+                  "type": "boolean"
+                },
+                "note": {
+                  "maxLength": 2000,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "flagged"
+              ],
+              "type": "object"
+            },
+            "kind": "artifact_schema",
+            "logical_id": "schema.w2-scan-flag",
+            "schema_dialect": "https://json-schema.org/draft/2020-12/schema",
+            "schema_version": "1",
+            "title": "W2 scan flag"
+          },
+          "published_at": "2026-10-29T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:796173279e5b445ca3900e5b99871c6f7c03daa410a2c5331b7674a65f9a290f",
+            "kind": "artifact_schema",
+            "lifecycle_status": "published",
+            "logical_id": "schema.w2-scan-flag",
+            "payload_ref": null,
+            "revision": 1,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:bb47073823a4a0cc24c57909b939fb48f3a7676b101f9b59bc0de5499f292220",
+        "manifest_ref": "mc-catalog://definition/artifact_schema/schema.w2-scan-flag/1",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "1"
+      },
+      "kind": "asset_version",
+      "logical_key": "artifact-schema:artifact-schema:schema.w2-scan-flag/1"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "artifact-schema:artifact-schema:schema.w2-scan-flag/1",
+        "decided_at": "2026-10-29T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "mission-control-general/general-mission-control/OUTPUT-CONTRACTS.md",
+          "mission-control-general/workflow-types/01-STAGE_GRAPH.md",
+          "docs/specs/provider-consolidation-2026-10/sprint-oc/PROOFS.md"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "artifact-schema:artifact-schema:schema.w2-scan-flag/1:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:artifact_schema:schema.w2-critique-verdict",
+        "contract": "mission-control.published-definition/1",
+        "kind": "schema",
+        "manifest": {
+          "definition": {
+            "description": "Revisit Region stop fact approved and progress fact score; facts are read by the host from accepted validated bytes; validity is not acceptance",
+            "json_schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "additionalProperties": false,
+              "properties": {
+                "approved": {
+                  "type": "boolean"
+                },
+                "findings": {
+                  "items": {
+                    "maxLength": 1000,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "maxItems": 32,
+                  "type": "array"
+                },
+                "score": {
+                  "maximum": 100,
+                  "minimum": 0,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "approved",
+                "score"
+              ],
+              "type": "object"
+            },
+            "kind": "artifact_schema",
+            "logical_id": "schema.w2-critique-verdict",
+            "schema_dialect": "https://json-schema.org/draft/2020-12/schema",
+            "schema_version": "1",
+            "title": "W2 critique verdict"
+          },
+          "published_at": "2026-10-29T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:01923c55a9cae16bcc9e86096ce43c81ef45432e34a34feed60c353829b29bf0",
+            "kind": "artifact_schema",
+            "lifecycle_status": "published",
+            "logical_id": "schema.w2-critique-verdict",
+            "payload_ref": null,
+            "revision": 1,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:c6b147aa2b3b468325cc51c26892677f1faaecce521d41480dbd1deaf68f6b4f",
+        "manifest_ref": "mc-catalog://definition/artifact_schema/schema.w2-critique-verdict/1",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "1"
+      },
+      "kind": "asset_version",
+      "logical_key": "artifact-schema:artifact-schema:schema.w2-critique-verdict/1"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "artifact-schema:artifact-schema:schema.w2-critique-verdict/1",
+        "decided_at": "2026-10-29T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "mission-control-general/general-mission-control/OUTPUT-CONTRACTS.md",
+          "mission-control-general/workflow-types/01-STAGE_GRAPH.md",
+          "docs/specs/provider-consolidation-2026-10/sprint-oc/PROOFS.md"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "artifact-schema:artifact-schema:schema.w2-critique-verdict/1:admit"
+    }
+  ],
+  "seed_key": "mc.catalog.artifact-schemas",
+  "seed_version": "1.0.1"
+}

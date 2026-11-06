@@ -1,0 +1,96 @@
+# yaml-language-server: $schema=../../../../src/mission_control/contracts/schemas/mc.mission_manifest.v1.json
+# Sprint OC W5 (OVE-176 / WI-13), Biotech: a Stage Graph as a Goal Loop's executor phase.
+#
+# Each iteration of `refine` runs its executor body `pass` recursively as its own child run: a
+# two-stage subgraph (`draft` registers the report, `check` reads exactly that revision and
+# records its verdict). Only `pass.report` (exported from `draft.report`) reaches the loop's
+# independent verifier; the subgraph's internal `check.verdict` stays internal. The loop's own
+# governors (iterations, patience) and the subgraph's are distinct scopes.
+# Placeholders the driver replaces before compile: __PACK__, __MODEL__.
+# KNOWN START REFUSAL (OVE-169; compile reports it in `start_blockers`, `startable: false`):
+# the nested body `pass` inherits the parent goal's human criterion (nested_lowering.py
+# `nested_definition` copies served criteria) and no stage inside a Stage Graph body can
+# evaluate human acceptance, so start refuses `completion_evaluator_unavailable` at the
+# body. Used for lowering proofs only until nested criterion inheritance is decided.
+manifest: mission/v1
+mission:
+  key: w5-qualia-mind-label-graph-iteration
+  title: W5 Stage Graph executor body in a Goal Loop (frozen W1 label excerpt)
+  application: biotech
+  description: >
+    Sprint OC W5 recursive composition. Each Goal Loop iteration executes a nested Stage Graph;
+    the independent verifier assesses only what the subgraph exports.
+  goals:
+    - key: verified_report
+      description: Produce a label report from the frozen excerpt that the independent verifier accepts
+      objectives:
+        - key: deliver_report
+          description: Iterate until the exported report is accepted
+        - key: draft_report
+          description: Register a label report built only from the frozen excerpt
+          parent: deliver_report
+        - key: check_report
+          description: Read the drafted revision and record whether each claim cites its fragment
+          parent: deliver_report
+      criteria:
+        - key: report_accepted
+          description: The exported report revision is independently verified against the frozen excerpt
+          evidence: [report]
+          acceptance: { human: review_accept }
+  environment:
+    lane: deep_agents
+    model: { profile: __MODEL__ }
+    sandbox: { profile: research.standard }
+    capabilities:
+      - { pin: "tool.knowledge-report-register@1#sha256:69e840eb7606d45285d5ebeb3ffe8a759353d4a3b7e495dfb2eb9c994b0474d2", kind: tool, as: report_register }
+      - { pin: "tool.knowledge-read@1#sha256:4d3e11e5d12ee6bb8bfa6e6c79cde3a8e42f199e2de14839c6363d86df6ebe8e", kind: tool, as: knowledge_read }
+      - { pin: "tool.knowledge-submit-output@2#sha256:f1fa75f1e3fa49e9061746cbe89f53a828e502fb93e142d3b34d8a854a2a64dd", kind: tool, as: submit_output }
+    budget: { usd: 2.0, tokens: 500000, wall_clock: 60m, tool_calls: 40 }
+    governors: { depth: 2, fan_out: 1, iterations: 2, patience: 1 }
+    side_effects: [read_only, workspace_write, external_write_reversible]
+  program:
+    key: refine
+    behavior: goal_loop
+    objectives: [deliver_report]
+    objective: deliver_report
+    # The executor body node, not its objectives (full compile: unresolved_action_space).
+    action_space: [pass]
+    verifier: { independent: true }
+    outputs:
+      - name: report
+        form: reference
+        enforcement: required
+        requirements:
+          - { key: assessed, validator: "knowledge.report.assess@1" }
+    nodes:
+      - key: pass
+        behavior: stage_graph
+        objectives: [draft_report, check_report]
+        outputs:
+          - { name: report, form: reference, enforcement: required }
+        exports:
+          - { output: report, from: draft.report }
+        nodes:
+          - key: draft
+            behavior: agent_executor
+            objectives: [draft_report]
+            instruction: |
+              Register one report from the frozen pack (FROZEN PACK below) with report_register; on a
+              refusal fix only the named fields and call once more. submit_output obligation
+              "draft.report": [{"kind":"handle","ref":<report handle>,"digest":<digest>}].
+              FROZEN PACK: __PACK__
+            outputs:
+              - { name: report, form: reference, enforcement: required }
+          - key: check
+            behavior: agent_executor
+            objectives: [check_report]
+            inputs:
+              - { name: report, from: draft.report, expand: reference }
+            instruction: |
+              Read the report revision under binding "report" in /.mission/inputs.json ONCE with
+              knowledge_read. submit_output obligation "check.verdict": inline text, one line per claim:
+              its id and whether it cites a fragment of the pack.
+            outputs:
+              - { name: verdict, form: text, enforcement: required, media_type: text/plain }
+  controls:
+    commands_allowed: [pause, resume, cancel]

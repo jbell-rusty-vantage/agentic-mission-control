@@ -1,0 +1,95 @@
+# AI Engineer knowledge pack for the `codex_agents` lane (SPEC-06 section 5.1; DECISIONS R30).
+# Read by `mission_control.adapters.openai_agents.pack`. Credential values are never written
+# here: each vault credential names the worker environment variable its value is read from at
+# sync time.
+schema_version: mc.hosted_pack.codex_agents.v1
+application: ai-engineer
+lane_profile: codex_agents
+tool_placement: openai_hosted
+data_class: internal
+task_queue: mc-ai-engineer-lane-hosted
+
+agent:
+  name: mc-ai-engineer-knowledge
+  model: gpt-6-luna
+  reasoning_effort: medium
+  instructions: instructions.md
+  # Inlined because a turn answered before the hosted environment connects does not see
+  # /workspace/AGENTS.md (Q-O2, research/provider-smoke-2026-10.md section 1).
+  repo_rules:
+    - repo-rules.md
+  multi_agent: false
+  function_tools:
+    - name: mc_signal
+      description: >-
+        Report a Mission Control lifecycle signal, such as findings.ready.
+        Returns 'ok' once Mission Control has recorded it.
+      parameters:
+        type: object
+        properties:
+          name:
+            type: string
+            description: The signal name, for example findings.ready.
+          detail:
+            type: string
+            description: One short sentence of context for the operator.
+        required: [name]
+        additionalProperties: false
+    - name: mc_request_approval
+      description: >-
+        Ask a human to approve an action before you take it. Returns the decision and any
+        message from the reviewer.
+      parameters:
+        type: object
+        properties:
+          action:
+            type: string
+            description: What you want to do, in one sentence.
+          reason:
+            type: string
+            description: Why the action is needed.
+        required: [action, reason]
+        additionalProperties: false
+    - name: mc_upload_artifact
+      description: >-
+        Hand a file under /workspace/outputs to Mission Control as a mission artifact. Returns
+        the artifact reference.
+      parameters:
+        type: object
+        properties:
+          path:
+            type: string
+            description: The absolute path of the file, under /workspace/outputs.
+          title:
+            type: string
+            description: A short human-readable title.
+        required: [path, title]
+        additionalProperties: false
+
+environment:
+  container_size: small
+  network:
+    access: restricted
+    allowed_domains:
+      - api.github.com
+      - pypi.org
+      - files.pythonhosted.org
+  packages:
+    python: []
+    system: []
+    npm: []
+  setup_commands:
+    - command: mkdir -p /workspace/outputs
+      cwd: /workspace
+  env:
+    MC_APPLICATION: ai-engineer
+    MC_DATA_CLASS: internal
+  skills: skills
+
+vault:
+  credentials:
+    # A read-only fine-grained GitHub token (owner prerequisite MA4). The sandbox sees only a
+    # placeholder that the egress proxy substitutes for api.github.com.
+    - name: GITHUB_TOKEN
+      source_env: MC_AI_ENGINEER_GITHUB_READONLY_TOKEN
+      allowed_hosts: [api.github.com]
