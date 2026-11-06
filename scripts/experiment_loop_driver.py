@@ -64,8 +64,17 @@ SELF_ACTED = frozenset({"queue_instruction", "interrupt_and_inject", "cancel"})
 # --- pure parts (unit-tested without network) -----------------------------------------------
 
 
-def render(text: str, *, pack: Any | None, producer: str, consumer: str) -> str:
-    """Substitute the fixture placeholders; refuse anything left unresolved."""
+TITLE_LINE = re.compile(r"^(\s*(?:-\s+)?title:\s*)(.+?)\s*$", re.MULTILINE)
+
+
+def render(
+    text: str, *, pack: Any | None, producer: str, consumer: str, salt: str | None = None
+) -> str:
+    """Substitute the fixture placeholders; refuse anything left unresolved.
+
+    `salt` (L2-06, driver side) appends ` [salt]` to every mission title so an otherwise
+    unchanged manifest compiles to a new digest and the rerun gets a fresh run.
+    """
 
     if "__PACK__" in text:
         if pack is None:
@@ -75,6 +84,8 @@ def render(text: str, *, pack: Any | None, producer: str, consumer: str) -> str:
     unresolved = sorted(set(PLACEHOLDER.findall(text)))
     if unresolved:
         raise ValueError(f"unresolved fixture placeholders: {unresolved}")
+    if salt:
+        text = TITLE_LINE.sub(lambda match: f"{match.group(1)}{match.group(2)} [{salt}]", text)
     return text
 
 
@@ -227,6 +238,7 @@ class Driver:
             pack=pack,
             producer=options.producer,
             consumer=options.consumer,
+            salt=options.run_salt,
         )
         self.document = load_manifest_yaml(self.text)
         problems = check_plan(steps, self.document)
@@ -503,6 +515,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--producer", default="producer.fallback")
     parser.add_argument("--consumer", default="producer.fallback")
     parser.add_argument("--token-file")
+    parser.add_argument("--run-salt", help="append [SALT] to every mission title (fresh run)")
     parser.add_argument("--http-timeout", type=float, default=120.0)
     parser.add_argument("--poll", type=float, default=10.0)
     parser.add_argument("--queue-instruction", action="append", metavar="STAGE:TEXT")

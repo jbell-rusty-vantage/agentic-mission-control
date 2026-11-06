@@ -59,7 +59,7 @@ def managed_binding(
 ) -> ProviderExecutionBinding:
     fields: dict[str, Any] = {
         "lane_profile": PROFILE,
-        "model": {"profile": "hosted.default", "model_id": "claude-sonnet-5-5"},
+        "model": {"profile": "hosted.default", "model_id": "claude-haiku-5-5"},
         "auth": {"profile": "claude_managed.api", "billing_mode": "api"},
         "environment": {
             "kind": "provider_hosted",

@@ -147,8 +147,17 @@ class PostgresLaneExecutionStateStore:
     ) -> None:
         async with self._pool.acquire() as connection, connection.transaction():
             args, row = await self._locked(connection, request_scope, harness_execution_id)
-            if row["generation"] != owner.generation or row["lifecycle"] != "live":
-                raise ValueError("history close execution is no longer live")
+            # Loop iter-3 F2: the turn's own `run_result` frame, persisted while the turn was
+            # pumped, already set this generation's execution `ended` (frames/identity.py), so
+            # a hosted (history-reconciliation) lane's close always met `ended`. Closing the
+            # holder's own turn window of the same generation stays valid after that; another
+            # generation or any other lifecycle is still refused.
+            if row["generation"] != owner.generation or row["lifecycle"] not in {"live", "ended"}:
+                raise ValueError(
+                    "history close execution is no longer live "
+                    f"(row generation {row['generation']}, lifecycle {row['lifecycle']}; "
+                    f"owner generation {owner.generation})"
+                )
             state = close_history_window_state(
                 _state(harness_execution_id, row),
                 owner=owner,

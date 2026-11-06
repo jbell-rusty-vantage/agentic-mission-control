@@ -87,6 +87,11 @@ EXTRA_PERMISSIONS = frozenset(
         # `workflow_run.admin` (`domain/policies/stop_fence.immediate_cancel_permissions`).
         # This is the disposable sprint's only operator, so it holds it.
         "workflow_run.admin",
+        # Loop iter-3 F1: snapshot, fork and the derived run's admission (`run fork --point`,
+        # application/recovery/run_forks.py FORK/SNAPSHOT/ADMIT_PERMISSION).
+        "workflow_run.snapshot",
+        "workflow_run.fork",
+        "workflow_run.admit",
     }
 )
 

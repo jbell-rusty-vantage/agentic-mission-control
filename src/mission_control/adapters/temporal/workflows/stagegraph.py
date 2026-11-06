@@ -142,6 +142,10 @@ UNREACHABLE_WAIT_PATCH = "tracing-s3-stagegraph-skip-unreachable-wait"
 # exhausted route or region. Only blueprints with routes or a region ever reach them.
 REVISIT_REGION_PATCH = "oc-wi08-stagegraph-revisit-region"
 EXHAUSTION_HOLD_PATCH = "oc-wi08-stagegraph-exhaustion-hold"
+# Loop iter-2 L2-01: a sibling admission refused `stale_run_version` retries at once on the
+# live run version the refusal now returns (before, only a grown family version retried, so
+# parallel stages serialized). Histories recorded before it replay the old wait.
+STALE_SIBLING_RETRY_PATCH = "oc-l2-01-stagegraph-retry-stale-sibling-admission"
 # OVE-176: `NESTED_BODY_PATCH` (imported from workflows/nested_body.py) guards a stage hosting a
 # nested family body, which runs as a child run instead of an operation child; the parent's
 # cancel, pause and resume reach it through the child's run control. Only blueprints with nested
@@ -674,6 +678,15 @@ class StageGraphWorkflow:
                     not admitted.accepted
                     and workflow.patched(ADMISSION_FAILURE_PATCH)
                     and admitted.projection.family_version > projection.family_version
+                ):
+                    projection = admitted.projection
+                    continue
+                if (
+                    not admitted.accepted
+                    and admitted.reason_code == "stale_run_version"
+                    and admitted.projection.family_version == projection.family_version
+                    and admitted.projection.run_version > projection.run_version
+                    and workflow.patched(STALE_SIBLING_RETRY_PATCH)
                 ):
                     projection = admitted.projection
                     continue

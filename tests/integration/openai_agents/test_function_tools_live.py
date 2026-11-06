@@ -173,7 +173,7 @@ def drill_pack(tmp_path: Path, stamp: str):
         "task_queue": "hl13-live-" + stamp,
         "agent": {
             "name": "mc-hl13-live-" + stamp,
-            "model": "gpt-6-luna",
+            "model": "gpt-6.1-sol",
             "reasoning_effort": "low",
             "instructions": "instructions.md",
             "multi_agent": False,
@@ -216,7 +216,7 @@ async def test_live_function_review_survives_worker_restart(
     )
     pool = await common_db.pool("mission_control_runtime")
     record = {
-        "model": "gpt-6-luna",
+        "model": "gpt-6.1-sol",
         "cost_disposition": "unknown",
         "vaults": 0,
         "network_hosts": [],

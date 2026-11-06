@@ -43,7 +43,7 @@ async def test_the_first_sync_creates_every_resource_with_the_pack_bodies() -> N
     assert prepared.credentials_written == ("GITHUB_TOKEN",)
     assert (prepared.task_queue, prepared.data_class) == ("mc-ai-engineer-lane-hosted", "internal")
     [agent] = api.agents.values()
-    assert agent["model"] == "gpt-6-luna"
+    assert agent["model"] == "gpt-6.1-sol"
     assert agent["instructions"] == pack.instructions
     assert agent["multi_agent"] == {"enabled": False}
     assert agent["metadata"] == {"mc_app": "ai-engineer", "mc_pack": pack.digest, **LABELS}

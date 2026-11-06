@@ -285,3 +285,20 @@ def test_stage_started_triggers_from_the_transcript_node_filter(
     assert driver.event_holds("stage-started:collect_a", seen) is expected
     (query,) = [params for path, params in asked if path.endswith("/runs/run-1/transcript")]
     assert query["node"] == "collect_a" and query["format"] == "json"
+
+
+def test_run_salt_retitles_every_mission_so_a_rerun_gets_a_fresh_run() -> None:
+    """L2-06 (driver side): an unchanged manifest re-submitted reuses its old run; a salt
+    changes each mission title (and nothing else) so the compiled digest and run differ."""
+
+    for name in ("e2-stagegraph-fanout-join.mission.yml", "e4-linked-chain.mission.yml"):
+        text = (LOOP / name).read_text(encoding="utf-8")
+        plain = driver.render(text, pack={}, producer="p", consumer="c")
+        salted = driver.render(text, pack={}, producer="p", consumer="c", salt="iter3-a")
+        missions_plain = load_manifest_yaml(plain)
+        missions_salted = load_manifest_yaml(salted)
+        assert missions_plain != missions_salted
+        titles = [line for line in salted.splitlines() if line.strip().startswith("title:")]
+        assert titles and all(line.rstrip().endswith("[iter3-a]") for line in titles)
+        assert salted.replace(" [iter3-a]", "") == plain
+    assert options("--run-salt", "x").run_salt == "x"

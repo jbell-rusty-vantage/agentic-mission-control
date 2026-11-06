@@ -255,7 +255,7 @@ def agents_stack(
     artifacts, deletions = MemoryArtifacts(), RecordingDeletionScheduler()
     binding = ProviderExecutionBinding.sealed(
         lane_profile="codex_agents",
-        model={"profile": "hosted.default", "model_id": "gpt-6-luna"},
+        model={"profile": "hosted.default", "model_id": "gpt-6.1-sol"},
         auth={"profile": "codex_agents.api", "billing_mode": "api"},
         environment={
             "kind": "provider_hosted",

@@ -184,7 +184,10 @@ async def test_stale_admission_is_not_converted_to_candidate_failure():
     assert advanced.status.value == "accepted"
     refused = await StageGraphDecisionService(control, repository).admit_operation(candidate)
     assert refused.reason_code == "stale_run_version"
-    assert refused.projection == candidate.projection
+    # L2-01: the refusal carries the live run version; nothing semantic changed.
+    assert refused.projection == replace(
+        candidate.projection, run_version=advanced.resulting_run_version
+    )
     assert (
         await repository.get_family_head(
             candidate.request_scope, candidate.run_id, "stagegraph", StageGraphDecisionMutation

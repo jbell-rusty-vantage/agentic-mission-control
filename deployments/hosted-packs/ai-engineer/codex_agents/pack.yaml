@@ -11,7 +11,7 @@ task_queue: mc-ai-engineer-lane-hosted
 
 agent:
   name: mc-ai-engineer-knowledge
-  model: gpt-6-luna
+  model: gpt-6.1-sol
   reasoning_effort: medium
   instructions: instructions.md
   # Inlined because a turn answered before the hosted environment connects does not see

@@ -42,7 +42,7 @@ def test_the_shipped_ai_engineer_pack_is_an_internal_codex_agents_pack() -> None
         "openai_hosted",
     )
     assert (document.data_class, document.task_queue) == ("internal", "mc-ai-engineer-lane-hosted")
-    assert pack.agent_config["model"] == "gpt-6-luna"
+    assert pack.agent_config["model"] == "gpt-6.1-sol"  # owner model choice 2026-11-06
     assert pack.agent_config["multi_agent"] == {"enabled": False}
     tools = pack.agent_config["tools"]
     assert tools and all(tool["type"] == "function" for tool in tools)

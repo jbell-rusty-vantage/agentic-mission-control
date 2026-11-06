@@ -207,3 +207,40 @@ async def test_a_true_duplicate_with_other_intent_still_conflicts_and_names_its_
     assert "collect_a" in message
     assert first.operation.operation.runtime_unit is not None
     assert first.operation.operation.runtime_unit.unit_key in message
+
+
+@pytest.mark.asyncio
+async def test_l2_01_refused_admission_returns_the_live_run_version_for_the_retry() -> None:
+    """Loop iter-2 L2-01 (E2 d0a16126): the refusal returned the caller's projection unchanged,
+    so the workflow (which retried only when `family_version` grew) never retried and the
+    parallel collectors ran one after the other. The refusal now carries the run's live
+    version (the family head is unchanged, so the semantic projection and digest are too) and
+    re-admitting with exactly that projection succeeds."""
+
+    control, interpreter, projection, bindings, activities, run_id = await harness()
+    first = await activities.admit_operation(admission(run_id, interpreter, projection, NOW))
+    assert first.accepted
+    projection = first.projection
+    moved = await control.execute(
+        command(
+            run_id,
+            projection.run_version,
+            "sibling-fact",
+            ReserveBudgetAction(reservation_id="sibling", amounts={"tokens.total": 1}),
+        )
+    )
+    assert moved.status == CommandStatus.ACCEPTED
+
+    refused = await activities.admit_operation(
+        admission(run_id, interpreter, projection, NOW + timedelta(seconds=10))
+    )
+    assert not refused.accepted and refused.reason_code == "stale_run_version"
+    assert refused.projection.run_version == moved.resulting_run_version
+    assert refused.projection.family_version == projection.family_version
+    assert refused.projection.digest == projection.digest
+
+    retried = await activities.admit_operation(
+        admission(run_id, interpreter, refused.projection, NOW + timedelta(seconds=11))
+    )
+    assert retried.accepted and retried.operation is not None
+    assert len(bindings._bindings) == 2

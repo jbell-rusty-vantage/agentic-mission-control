@@ -745,9 +745,15 @@ class StageGraphDecisionService:
                 reserve_command, mutation, transient_version_conflict=True
             )
         except (RunVersionConflict, AuthorityStateConflict):
+            # Loop iter-2 L2-01: return the run's live version so the workflow can retry this
+            # sibling now rather than after the running one completes. The family head did not
+            # move, so the semantic projection (and its digest, which excludes run_version) is
+            # the caller's.
+            run = await self._run_control.get_run(request.request_scope, request.run_id)
+            live_version = max(run.version, request.projection.run_version)
             return StageGraphAdmissionActivityResult(
                 accepted=False,
-                projection=request.projection,
+                projection=replace(request.projection, run_version=live_version),
                 operation=None,
                 reason_code="stale_run_version",
             )

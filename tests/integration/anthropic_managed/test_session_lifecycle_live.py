@@ -115,7 +115,7 @@ DRILL_PACK: Final = {
     ),
     "agent.yaml": (
         "name: mc-hl08-lifecycle-drill\n"
-        "model: claude-sonnet-5-5\n"
+        "model: claude-haiku-5-5\n"
         "system: system.md\n"
         "tools:\n"
         "  read: always_allow\n"

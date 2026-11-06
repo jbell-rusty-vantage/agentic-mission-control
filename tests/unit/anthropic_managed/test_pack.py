@@ -58,7 +58,7 @@ def test_the_ai_engineer_pack_is_internal_knowledge_on_the_hosted_queue() -> Non
     assert pack.pack_id == "ai-engineer/knowledge"
     assert pack.identity.data_class == "internal"
     assert pack.identity.task_queue == "mc-ai-engineer-lane-hosted"
-    assert pack.agent.model == "claude-sonnet-5-5"
+    assert pack.agent.model == "claude-haiku-5-5"  # owner model choice 2026-11-06
     assert {name for name, policy in pack.agent.tools.items() if policy == "always_ask"} == {
         "bash",
         "write",
