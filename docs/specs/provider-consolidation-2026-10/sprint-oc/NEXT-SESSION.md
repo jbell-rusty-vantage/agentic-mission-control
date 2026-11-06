@@ -112,7 +112,13 @@ Order: recovery/integration front, W1, W2 and collections (WI-07, then WI-09, WI
 
 ## Source custody
 
-Paths are relative to BellLabs; recheck live Git. **Branch consolidation 2026-11-05:** MC and KS `main` were fast-forwarded to
+Paths are relative to BellLabs; recheck live Git. **Clean-slate move 2026-11-06 (supersedes the custody detail below):** MC
+history restarts at a single root commit on the jbell-rusty-vantage account. Its tree equals pre-move `main` `ee34bb55`, and only
+`main` exists. The `sprint-oc` alias, the archive tags, the recovery refs and the old stash were removed from the repository, so
+the commit IDs and tags below exist only in the owner's private local history bundle ([repository history](../../../REPOSITORY-HISTORY.md)).
+The rejected `wi14`/`wi15` designs remain described by ADR-0068. KS and the other repositories move one at a time later.
+
+**Branch consolidation 2026-11-05:** MC and KS `main` were fast-forwarded to
 `sprint-oc` (MC `1d73eeab`, KS `77c6f35`) and pushed; work now lands on `main` (`sprint-oc` is kept equal to `main` as an alias until
 retired). Origin holds only `main` and `sprint-oc`. 62 merged local branches and the merged `sprint-oc-selection-workspace` worktree
 were removed; every checkout is a single primary. Pre-change refs are in each repository's

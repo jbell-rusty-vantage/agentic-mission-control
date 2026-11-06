@@ -21,9 +21,10 @@ budget and the models at session start (§6).
 
 ## 1. State at start (2026-11-06)
 
-- Mission Control `main` at `0d2cc6b5` (pushed to `origin` = `git@github-legacy:Overton77/mission-control.git`; the
-  jbell-rusty-vantage mirror the owner plans is not created yet; the Overton77 account's connector problem blocks cloud
-  development environments, not this local work). Working tree clean. Linear OVE-224 In Progress.
+- Mission Control `main` was at `0d2cc6b5` when this was written. **Update 2026-11-06:** the repository moved to the
+  jbell-rusty-vantage account as a clean slate, so that ID and the others below are pre-move labels and are not in this history
+  ([repository history](../../../../REPOSITORY-HISTORY.md)). The source is unchanged. Push to the new `origin`; the Overton77
+  remote is legacy. Linear OVE-224 In Progress.
 - Every session lane now writes one `mc.cognition_point.v1` row per step boundary at `lane.turn` settlement, reads
   `state-as-of` and seeds forks at its declared level: `cursor_local`/`cursor_cloud` R2, `claude_agent_sdk` R3, `codex` R3,
   `claude_managed` R1, `codex_agents` R1. Steering is implemented (Codex `turn/steer`, Managed Agents and the Agents API by a
@@ -160,9 +161,8 @@ session. If the owner prefers Cursor strictly first, do steps 1-3 and spend the 
 4. **Declare steering** (`cooperative_inject`) on `codex_agents`/`claude_managed` after a live steer proof, or keep
    `cancel_and_replace`? Recommendation: keep `cancel_and_replace` this session; prove the steer path live, then flip with
    the conformance pin change in a reviewed change.
-5. **GitHub**: keep pushing to Overton77 (works over SSH) or create the jbell-rusty-vantage repos first? Recommendation:
-   push to Overton77 for this session; the mirror is a separate task (history secret scan first, see
-   `github-account-migration` notes).
+5. **GitHub**: decided 2026-11-06. Mission Control lives on jbell-rusty-vantage as a clean-slate, `main`-only repository;
+   do not push to Overton77 ([repository history](../../../../REPOSITORY-HISTORY.md)).
 
 ## 7. Pre-existing failures (reproduced on a detached HEAD worktree 2026-11-06; not caused by 0d2cc6b5)
 

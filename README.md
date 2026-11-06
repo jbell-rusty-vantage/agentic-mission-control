@@ -15,6 +15,12 @@ remotes at 1.8.0 (see [database component](docs/knowledge/database-component.md)
 installed where). The October 2026 two-project rollout plan and its evidence are archived under
 `docs/specs/archive/mc-surfaces-2026-10/`.
 
+## Repository history
+
+This repository starts at a clean-slate baseline (2026-11-06), made when Mission Control moved to the jbell-rusty-vantage GitHub
+account. It has one root commit whose tree equals the last pre-move `main`, and only `main` is published. Commit IDs cited in older
+docs are not in this history; see [repository history](docs/REPOSITORY-HISTORY.md).
+
 ## Source and architecture
 
 One Python distribution imports `mission_control` from `src/mission_control`.
