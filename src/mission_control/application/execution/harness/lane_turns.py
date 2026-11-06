@@ -343,6 +343,13 @@ class LaneNotSessionDriven(TypeError):
     """The lane is governed by the operation boundary's bounded execute path (Deep Agents)."""
 
 
+class LaneStartStalled(RuntimeError):
+    """F3-G1: prepare, start and the first send did not finish within the segment's duration.
+
+    Nothing settles: the activity fails with this type, and its retry reconciles the
+    dispatch journal (a create or send the provider accepted is found, never re-sent)."""
+
+
 def _utc_now() -> datetime:
     return datetime.now(UTC)
 
@@ -777,7 +784,13 @@ class LaneTurnService:
                 owner=owner,
             )
         if not sent and (request.phase == "start" or journaled):
-            started = await self._start_and_send(request, harness, identity, fields, owner)
+            started = await self._beating(
+                request,
+                identity,
+                owner,
+                signals,
+                self._start_and_send(request, harness, identity, fields, owner),
+            )
             if isinstance(started, LaneTurnResult):
                 return started
             session, turn, reconciled = started
@@ -899,6 +912,51 @@ class LaneTurnService:
             if prompt is not None:
                 harness.stage_turn(str(identity.harness_execution_id), ref, prompt)
         return request.model_copy(update={"instruction_ref": ref})
+
+    async def _beating[T](
+        self,
+        request: LaneTurnRequest,
+        identity: LaneExecutionIdentity,
+        owner: SessionOwner,
+        signals: TurnSignals,
+        body: Awaitable[T],
+    ) -> T:
+        """F3-G1: heartbeat and renew the owner's lease while the lane prepares, starts and
+        sends, as observation does.
+
+        A hosted prepare (resource sync with readback polling) can outlast the heartbeat
+        timeout. Unbeaten, Temporal times the attempt out and starts the next one beside it on
+        the same worker; the two race the dispatch journal and the unit parks `in_doubt`
+        before anything is sent. The beat carries the prior attempt's cursor hint, so a loss
+        here never erases it. The phase is bounded by the segment duration: a start that
+        never reaches its send fails as `LaneStartStalled` instead of beating forever."""
+
+        bounds = request.segment
+        progress = _SegmentProgress(owner=owner, cursor=signals.prior_cursor() or request.cursor)
+
+        async def renew() -> None:
+            await self._renew(identity, progress, bounds.heartbeat_timeout_s)
+
+        ticker = asyncio.create_task(
+            _heartbeat_ticker(
+                signals, lambda: (progress.cursor, 0), bounds.heartbeat_timeout_s, renew=renew
+            )
+        )
+        deadline = asyncio.timeout(bounds.max_duration_s)
+        try:
+            async with deadline:
+                return await body
+        except TimeoutError as error:
+            if not deadline.expired():
+                raise
+            raise LaneStartStalled(
+                f"{request.lane_profile} did not prepare, start and send within "
+                f"{bounds.max_duration_s}s"
+            ) from error
+        finally:
+            ticker.cancel()
+            with suppress(asyncio.CancelledError):
+                await ticker
 
     async def _start_and_send(
         self,
@@ -3784,6 +3842,7 @@ __all__ = [
     "LaneBoundary",
     "LaneExecutionIdentity",
     "LaneNotSessionDriven",
+    "LaneStartStalled",
     "LaneTurnService",
     "TurnSignals",
     "execution_start",

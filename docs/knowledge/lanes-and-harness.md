@@ -86,7 +86,10 @@ and sends the turn, recording the native session and turn on the harness executi
 sends again, because a lost native turn makes the unit `in_doubt`. Every observed [Provider
 Frame](../../GLOSSARY.md) is persisted through the FrameSink before the provider cursor is
 heartbeated, so persisted frames are the resume truth and the throttled heartbeat only a hint
-([events-and-commands](events-and-commands.md)). A segment ends at its bound or at a terminal frame
+([events-and-commands](events-and-commands.md)). Prepare, start and the first send heartbeat
+and renew the lease on the same ticker (carrying the prior cursor hint), so a slow hosted prepare
+is never timed out into a second, journal-racing attempt; that phase is bounded by the segment's
+`max_duration_s` and otherwise fails as `LaneStartStalled` (F3-G1). A segment ends at its bound or at a terminal frame
 whose closing facts end the session and settle the operation once. The activities are
 `adapters/temporal/activities/lane_turn.py`, registered on the `-agent-cognitive` queue beside
 `operation.execute` and `operation.cancel`. Each segment also claims fenced session ownership,

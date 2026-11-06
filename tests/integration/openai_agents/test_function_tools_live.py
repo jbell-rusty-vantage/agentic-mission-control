@@ -158,6 +158,26 @@ class TrackedHarness(CodexAgentsHarness):
             raise
 
 
+async def lane_progress(handle) -> dict[str, object]:
+    """What the workflow knows of the unit's `lane.turn`: its attempt, its last typed failure
+    and an `in_doubt` park, so the drill fails on them instead of waiting out its bound (F3-G1)."""
+
+    progress: dict[str, object] = {}
+    described = await handle.describe()
+    for pending in described.raw_description.pending_activities:
+        progress["attempt"] = pending.attempt
+        if pending.HasField("last_failure"):
+            progress["last_failure"] = pending.last_failure.message[:300]
+    history = await handle.fetch_history()
+    for event in history.events:
+        if event.HasField("activity_task_completed_event_attributes"):
+            payloads = event.activity_task_completed_event_attributes.result.payloads
+            facts = json.loads(payloads[0].data).get("closing_facts") if payloads else None
+            if isinstance(facts, dict) and facts.get("native_status") == "in_doubt":
+                progress["parked"] = facts.get("error_code")
+    return progress
+
+
 def drill_pack(tmp_path: Path, stamp: str):
     instructions = (
         "Call mc_request_approval exactly once with action bounded-live-proof. "
@@ -332,6 +352,10 @@ async def test_live_function_review_survives_worker_restart(
                     )
                     if pending:
                         break
+                    if poll % 100 == 0:
+                        record["lane_progress"] = await lane_progress(handle)
+                        parked = record["lane_progress"].get("parked")
+                        assert parked is None, f"the unit parked in_doubt ({parked})"
                     if api.created_sessions and poll % 100 == 0:
                         state = await api.retrieve_session(api.created_sessions[-1])
                         record["pending_native_state"] = {
@@ -354,7 +378,7 @@ async def test_live_function_review_survives_worker_restart(
             await human.resolve(
                 pending[0].human_task_id, answer(pending[0]), ActorContext(actor_id="owner")
             )
-            resolved = await tasks.get(identity.request_scope, pending[0].human_task_id)
+            resolved = await tasks.get_task(identity.request_scope, pending[0].human_task_id)
             assert resolved is not None and resolved.lifecycle == "resolved"
             assert resolved.resolution is not None and resolved.resolution.decision == "approve"
             async with _activity_worker(
