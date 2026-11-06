@@ -132,6 +132,8 @@ class ScriptedSessionLane:
     cost_micros: int | None = None
     never_terminal: bool = False
     cancel_delay_s: float = 0.0
+    # F3-G1: a provider prepare (hosted resource sync) that outlasts the heartbeat timeout.
+    prepare_delay_s: float = 0.0
     fail_at: int | None = None
     calls: list[str] = field(default_factory=list)
     staged: dict[str, OperationExecutionRequest] = field(default_factory=dict)
@@ -149,6 +151,8 @@ class ScriptedSessionLane:
 
     async def prepare(self, request: PrepareRequest) -> PreparedSession:
         self.calls.append("prepare")
+        if self.prepare_delay_s:
+            await asyncio.sleep(self.prepare_delay_s)
         return PreparedSession(
             lane_profile=request.lane_profile,
             harness_execution_id=request.harness_execution_id,

@@ -109,6 +109,31 @@ cooperative steering only with its actual race semantics"), the conformance suit
 | integration (`tests/integration/openai_agents`) | n/a | 1 failed, 3 skipped (paid opt-in) before and after this work; the failure is the worker-loss reattach raising `history close execution is no longer live` (`adapters/postgres/lanes/execution_state.py:151`), a baseline defect outside this lane | | baseline failure to triage |
 | paid qualification | no | none (not authorized) | no | steer race, seeded fork, per-item usage absence confirmed live |
 
+## 6a. F3-G1: the first turn was never sent (2026-11-06)
+
+Live HL-13 (`tests/integration/openai_agents/test_function_tools_live.py`, segment heartbeat
+timeout 5 s) created templates, two agents and a session, then never sent input. Cause, from
+timestamped request logs and the workflow history: this lane's prepare (template create,
+readback polling, agent create, readback polling) takes about 5 to 9 s, and `lane.turn` sent no
+heartbeat until observation began. Temporal timed attempt 1 out (`activity Heartbeat timeout`)
+and ran attempt 2 (in one rerun also attempt 3) beside it on the same worker, under the same
+owner ref. The attempts synced the pack twice (the second agent) and raced the dispatch journal:
+the later attempt reconciled the earlier attempt's create (or send) while it was still in flight,
+found nothing, and parked the unit `in_doubt` (`create_dispatch_ambiguous`, or
+`send_dispatch_ambiguous`). The workflow then waited for an operator `reconcile_unit` hint,
+which the drill never read. Managed Agents passes the same drill because its prepare finishes
+inside the heartbeat timeout.
+
+Fix (kernel, every Session Lane): `LaneTurnService._beating` heartbeats (prior cursor hint)
+and renews the session lease through prepare, start and the first send, and bounds that phase
+by `max_duration_s`; past it the attempt fails as `LaneStartStalled` and the retry reconciles
+the journal. Regression tests: `tests/unit/harness/test_lane_turn_service.py`
+(`test_a_slow_prepare_heartbeats_before_the_first_send`, failed before the fix;
+`test_a_start_that_never_sends_fails_typed_within_the_segment_duration`). The drill now reads
+the workflow each 5 s and fails at once on an `in_doubt` park, recording `lane_progress`
+(attempt, last failure, park code) in its evidence. Not fixed here: two attempts of one
+activity on one worker still share an owner ref, so only the heartbeat keeps them apart.
+
 ## 7. Composition for Agent A and kernel requests
 
 Composition: section 7 of the [claude_managed document](../anthropic_managed/CONTROL-ARCHITECTURE.md)

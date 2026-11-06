@@ -12,7 +12,10 @@ import asyncio
 import pytest
 
 from mission_control.application.execution.harness.describe import DECLARED_LANE_MATRICES
-from mission_control.application.execution.harness.lane_turns import LaneExecutionIdentity
+from mission_control.application.execution.harness.lane_turns import (
+    LaneExecutionIdentity,
+    LaneStartStalled,
+)
 from mission_control.application.resolution.registries import LaneNotQualified, LaneRegistry
 from mission_control.domain.execution.contracts import OperationExecutionResult
 from mission_control.domain.execution.lane_turns import (
@@ -124,6 +127,34 @@ async def test_a_silent_provider_ends_the_segment_at_its_duration() -> None:
     result = await stack.service.turn(_turn(segment=bounds), RecordingSignals(stack.frames, heid))
     assert not result.done and result.cursor == "2"
     assert stack.lane.cancels == [], "a segment bound never cancels the provider"
+
+
+async def test_a_slow_prepare_heartbeats_before_the_first_send() -> None:
+    """F3-G1: a hosted lane's prepare (resource sync, readback polling) can outlast the
+    heartbeat timeout. Without a heartbeat Temporal times the attempt out and starts a
+    second one beside it, and the two race the dispatch journal so nothing is ever sent."""
+
+    lane = ScriptedSessionLane(frames=scripted_frames(), prepare_delay_s=1.2)
+    stack = lane_stack(lane)
+    heid = _identity().harness_execution_id
+    signals = RecordingSignals(stack.frames, heid, prior="7")
+    bounds = LaneSegmentBounds(heartbeat_timeout_s=1)
+    result = await stack.service.turn(_turn(segment=bounds), signals)
+
+    assert result.done and stack.lane.sends == [f"{heid}:1:turn:1"]
+    before_any_frame = [beat for beat in signals.beats if beat[2] == 0]
+    # The start phase beats the prior attempt's cursor hint, never erasing it.
+    assert before_any_frame and before_any_frame[0][:2] == ("7", 0)
+
+
+async def test_a_start_that_never_sends_fails_typed_within_the_segment_duration() -> None:
+    lane = ScriptedSessionLane(frames=scripted_frames(), prepare_delay_s=3)
+    stack = lane_stack(lane)
+    signals = RecordingSignals(stack.frames, _identity().harness_execution_id)
+    bounds = LaneSegmentBounds(max_duration_s=1, start_to_close_s=5, heartbeat_timeout_s=3)
+    with pytest.raises(LaneStartStalled, match="within 1s"):
+        await stack.service.turn(_turn(segment=bounds), signals)
+    assert stack.lane.sends == [] and "start" not in stack.lane.calls
 
 
 async def test_busy_send_waits_and_sends_nothing() -> None:
