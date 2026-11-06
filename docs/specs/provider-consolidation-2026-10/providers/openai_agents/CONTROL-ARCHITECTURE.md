@@ -131,7 +131,13 @@ the journal. Regression tests: `tests/unit/harness/test_lane_turn_service.py`
 (`test_a_slow_prepare_heartbeats_before_the_first_send`, failed before the fix;
 `test_a_start_that_never_sends_fails_typed_within_the_segment_duration`). The drill now reads
 the workflow each 5 s and fails at once on an `in_doubt` park, recording `lane_progress`
-(attempt, last failure, park code) in its evidence. Not fixed here: two attempts of one
+(attempt, last failure, park code) in its evidence. Live rerun after the fix (2026-11-06,
+`gpt-6.1-sol`): **passed** in 62 s on one attempt, one agent and one session: one input
+message, the function approval reached a Human Task, the turn resumed on a restarted worker
+and completed (`disposition completed`, 25 frames, 0 duplicate keys, one tool result
+`allow`), usage 17,814 input (16,833 cached) and 62 output tokens, cost not reported by the
+API (`unknown`), every resource deleted. (The drill's resolved-task read also had to call
+`get_task`.) Not fixed here: two attempts of one
 activity on one worker still share an owner ref, so only the heartbeat keeps them apart.
 
 ## 7. Composition for Agent A and kernel requests

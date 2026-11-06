@@ -378,7 +378,7 @@ async def test_live_function_review_survives_worker_restart(
             await human.resolve(
                 pending[0].human_task_id, answer(pending[0]), ActorContext(actor_id="owner")
             )
-            resolved = await tasks.get(identity.request_scope, pending[0].human_task_id)
+            resolved = await tasks.get_task(identity.request_scope, pending[0].human_task_id)
             assert resolved is not None and resolved.lifecycle == "resolved"
             assert resolved.resolution is not None and resolved.resolution.decision == "approve"
             async with _activity_worker(
