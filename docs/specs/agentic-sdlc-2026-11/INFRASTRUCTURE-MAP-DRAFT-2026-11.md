@@ -9,6 +9,13 @@ status: draft
 
 # Infrastructure map draft (2026-11-01)
 
+> **Update 2026-11-06 (GitHub home):** the `git@github-legacy:Overton77/<repo>.git` remotes below are superseded for the
+> repositories that moved to `jbell-rusty-vantage` as clean slates (`main` only, HTTPS through the `gh` credential helper, no
+> pre-move commit IDs): Mission Control → `agentic-mission-control`, Knowledge Services → `agent-knowledge-services`, AI Engineer
+> DB contract → `agent-engineer-db-contract` (its `contract.yml` now checks out `agent-knowledge-services`), Agentic SDLC →
+> `agentic-sdlc`. All four are public. Biotech KS and the other rows still name their Overton77 remotes until they move. Current
+> status: [worktree routing](../../../../../docs/navigation/WORKTREES.md#github-move-and-clean-slate-2026-11-06).
+
 Input to sitting II, Q11 and Q12 (`INTERVIEW-NAVIGATION-AND-KNOWLEDGE-2026-11-02.md:41-46`,
 `:122-130`). Table shape: `AGENTS-MD-GRAMMAR-DRAFT-2026-11-01.md:97-114`. Seed registry:
 `docs/navigation/DATA-PLANES-AND-CREDENTIALS.md` (cited below as **DPC**). Paths are relative to
