@@ -282,9 +282,9 @@ async def test_reuse_resolver_fails_closed_on_every_inconsistency() -> None:
     assert isinstance(forks.store, InMemoryForkMaterializationStore)
 
 
-async def _forked_harness() -> tuple[Any, Any, Any, Any]:
+async def _forked_harness(**service_options: Any) -> tuple[Any, Any, Any, Any]:
     resolver = LateResolver()
-    harness = await recovery_harness(fork_reuse=resolver)
+    harness = await recovery_harness(fork_reuse=resolver, service_options=service_options or None)
     source_draft = stage_recovery_unit(harness.run_id, "draft")
     assert (await harness.run(await harness.request(source_draft))).status == "completed"
     sources = FakeForkSourceReader(
@@ -494,3 +494,53 @@ async def test_reused_unit_records_a_reused_point_naming_the_source_result_point
         )
     ).entries == source_rows
     assert reused_point.attempt is not None and reused_point.attempt.activity_attempt == 1
+
+
+class RecordingCarry:
+    """F1-G4: the reused-output carry port as the operation boundary sees it."""
+
+    def __init__(self, error: Exception | None = None) -> None:
+        self.calls: list[tuple[Any, Any]] = []
+        self.error = error
+
+    async def carry(self, binding: Any, reused: Any) -> Any:
+        self.calls.append((binding, reused))
+        if self.error is not None:
+            raise self.error
+        return ()
+
+
+@pytest.mark.asyncio
+async def test_a_reused_unit_carries_its_accepted_outputs_before_it_settles() -> None:
+    carry = RecordingCarry()
+    harness, _forks, receipt, derived_draft = await _forked_harness(reused_outputs=carry)
+    calls = len(harness.model.calls)
+    reused = await harness.run(await harness.request(derived_draft))
+    assert reused.status == "completed" and len(harness.model.calls) == calls
+    ((binding, ref),) = carry.calls
+    assert binding.run_id == receipt.target_run_id
+    assert binding.runtime_unit.unit_key == derived_draft.unit_key
+    assert ref.fork_request_id == receipt.request_id
+
+
+@pytest.mark.asyncio
+async def test_a_terminally_uncarriable_reuse_settles_failed_typed() -> None:
+    from mission_control.domain.policies.forks import ForkOutputsNotCarried
+
+    carry = RecordingCarry(ForkOutputsNotCarried("adoption_source_not_accepted", "gone"))
+    harness, _forks, _receipt, derived_draft = await _forked_harness(reused_outputs=carry)
+    await _assert_terminated_cleanly(harness, derived_draft, "fork_outputs_not_carried")
+
+
+@pytest.mark.asyncio
+async def test_a_transient_carry_error_is_retried_not_settled() -> None:
+    carry = RecordingCarry(ConnectionError("database unavailable"))
+    harness, _forks, _receipt, derived_draft = await _forked_harness(reused_outputs=carry)
+    request = await harness.request(derived_draft)
+    with pytest.raises(ConnectionError):
+        await harness.run(request)
+    # Nothing settled: the Activity retries the same attempt and the carry runs again.
+    assert (SCOPE, derived_draft.unit_key, 1) not in harness.lineage.results
+    carry.error = None
+    retried = await harness.service.execute(request, harness.attempt(request))
+    assert retried.status == "completed" and len(carry.calls) == 2

@@ -9,7 +9,7 @@ from contextlib import suppress
 from contextvars import ContextVar
 from copy import deepcopy
 from datetime import UTC, datetime, timedelta
-from typing import Final, Literal, Protocol, runtime_checkable
+from typing import Any, Final, Literal, Protocol, runtime_checkable
 
 from pydantic import TypeAdapter
 
@@ -123,7 +123,7 @@ from mission_control.domain.policies.contracts import (
     UnitReconciliationDecision,
 )
 from mission_control.domain.policies.errors import IdempotencyConflict
-from mission_control.domain.policies.forks import ForkRejected
+from mission_control.domain.policies.forks import ForkOutputsNotCarried, ForkRejected
 from mission_control.domain.policies.stop_fence import run_fence_generation
 from mission_control.domain.programs.contracts import (
     StageExecutionIdentity,
@@ -1021,6 +1021,14 @@ class ForkReusePort(Protocol):
     ) -> ReusedSourceResult | None: ...
 
 
+class ReusedOutputCarryPort(Protocol):
+    """F1-G4: carries a reused unit's accepted named outputs into the derived run before it
+    settles (``application/recovery/fork_outputs.py``). Raises an error with ``code`` and
+    ``message`` when the carry is terminally impossible; other errors are retried."""
+
+    async def carry(self, binding: OperationExecutionBinding, reused: ReusedResultRef) -> Any: ...
+
+
 class OperationExecutionService:
     """Binds immutable intent before invoking any semantic provider side effect."""
 
@@ -1040,6 +1048,7 @@ class OperationExecutionService:
         journal_claimed_by: str = "operation-runtime",
         lineage: CheckpointLineageService | None = None,
         fork_reuse: ForkReusePort | None = None,
+        reused_outputs: ReusedOutputCarryPort | None = None,
         children: AsyncChildCancellationPort | None = None,
         stop_fences: StopFenceRepository | None = None,
         mailbox: MailboxDeliveryService | None = None,
@@ -1087,6 +1096,7 @@ class OperationExecutionService:
         self._journal_claimed_by = journal_claimed_by
         self._lineage = lineage
         self._fork_reuse = fork_reuse
+        self._reused_outputs = reused_outputs
         self._children = children
 
     async def execute(
@@ -3318,6 +3328,22 @@ class OperationExecutionService:
         reused: ReusedSourceResult,
     ) -> OperationExecutionResult:
         source = reused.source_settlement
+        if self._reused_outputs is not None:
+            # F1-G4: under output contracts the source's outputs are accepted obligation
+            # revisions of the source run (`output_refs` is empty); they are carried, still
+            # accepted, into the derived run before the unit settles, so its consumers resolve.
+            # Any other error is transient: the Activity retries and the carry is idempotent.
+            try:
+                await self._reused_outputs.carry(binding, reused.ref)
+            except ForkOutputsNotCarried as error:
+                return await self._settle(
+                    binding,
+                    claim,
+                    _failed_settlement(binding, failure_code=error.code, message=error.message),
+                    started_at=datetime.now(UTC),
+                    attempt=admitted.attempt,
+                    admitted=admitted,
+                )
         settled_at = datetime.now(UTC)
         settlement = OperationSettlement(
             settlement_id=stable_id("operation-settlement", binding.binding_id),

@@ -10,7 +10,7 @@ questions:
   - What is a cognition point and how do I read the state at one?
   - Why does a fork never copy the source mailbox or children?
   - How are local workspace leases kept, cleaned and continued?
-updated: 2026-11-01
+updated: 2026-11-06
 ---
 
 # Snapshots forks and reconciliation
@@ -81,6 +81,13 @@ receipt, so a seeded fork without its seed refuses to launch (`fork_seed_pending
 Positions, frontier closure, `start_position`, the Goal Directed rules, trusted manifest-provenance admission and the typed refusals are in [the precise fork](precise-fork.md). A fork without
 `--baseline-reservation` holds the source run's admitted baseline. The kernel route `POST /run-control/v1/runs/{id}/forks` records the closure honestly and refuses a `message`; `state-as-of` for a
 point whose saver state is gone is `404 point_state_missing`.
+
+A reused unit's settlement copies the source result; under output contracts its outputs are
+accepted obligation revisions of the source run, so the operation boundary first carries them,
+still accepted, into the derived run (`application/recovery/fork_outputs.py`); a derived run of a
+manifest Stage Graph starts through `missions:start` from its source's submission, and a concluded
+Stage Graph failure names its rejected and dependency-starved stages in `run inspect`
+`unit_failures` (all in [the precise fork](precise-fork.md), 2026-11-06).
 
 ## Local workspace custody and cleanup
 

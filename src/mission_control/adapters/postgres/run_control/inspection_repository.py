@@ -167,6 +167,11 @@ class PostgresUnitFailureReader:
       the root's terminal transition records (`family-failure-cause:<cause>`): a unit that
       failed in Temporal with no settlement (a refused, exhausted `operation.execute`) is
       otherwise visible only in Temporal history.
+    - F1-G5: a Stage Graph that concluded failed. Each stage whose latest result the family
+      rejected (`stage/<id>`, its matched veto and validation reason codes; a completed
+      settlement is not a failure, the family decision is), and each stage its completion
+      skipped because a dependency can never resolve (`dependency_unresolved`, naming the
+      producer's rejected dependency), read from the family admission journal.
     """
 
     def __init__(self, pool: asyncpg.Pool) -> None:
@@ -226,6 +231,7 @@ class PostgresUnitFailureReader:
                 *args,
                 run_id,
             )
+            stage_graph = await _stage_graph_failures(connection, args, run_id)
         failures: list[UnitFailureView] = []
         for row in blocked:
             code = str(row["failure_code"])
@@ -237,6 +243,7 @@ class PostgresUnitFailureReader:
                 )
             )
         failures.extend(_family_failures(terminal))
+        failures.extend(stage_graph)
         for row in rows:
             body = row["body"]
             if isinstance(body, str):
@@ -253,6 +260,97 @@ class PostgresUnitFailureReader:
                 )
             )
         return tuple(failures)
+
+
+async def _stage_graph_failures(
+    connection: asyncpg.Connection, args: tuple[Any, ...], run_id: str
+) -> list[UnitFailureView]:
+    """F1-G5: the typed causes of a concluded Stage Graph failure (rejected stages and the
+    stages skipped because a dependency never resolves), from the family admission journal."""
+
+    try:
+        async with connection.transaction():  # a savepoint: a role without the grant reads none
+            rows = await connection.fetch(
+                f"""
+                SELECT j.mutation
+                FROM mission_control.family_admission_journal j
+                WHERE {scoped("j")}
+                  AND j.run_key = $4 AND j.family_kind = 'stagegraph'
+                  AND j.mutation->>'decision_kind' IN ('result_decided', 'completion_proposed')
+                ORDER BY j.family_version
+                """,
+                *args,
+                run_id,
+            )
+    except asyncpg.InsufficientPrivilegeError:
+        return []
+    return stage_graph_failure_views(row["mutation"] for row in rows)
+
+
+def stage_graph_failure_views(mutations: Any) -> list[UnitFailureView]:
+    """Pure: the failure views of recorded Stage Graph ``result_decided`` and
+    ``completion_proposed`` mutations, in journal order."""
+
+    latest: dict[str, tuple[str, dict[str, Any], dict[str, Any]]] = {}
+    completion: dict[str, Any] | None = None
+    for raw in mutations:
+        mutation = json.loads(raw) if isinstance(raw, str) else dict(raw)
+        payload = mutation.get("decision_payload") or {}
+        if mutation.get("decision_kind") == "completion_proposed":
+            proposed = payload.get("completion") or {}
+            completion = proposed if proposed.get("failed") else None
+            continue
+        proposal = payload.get("proposal") or {}
+        candidate = (proposal.get("identity") or {}).get("candidate") or {}
+        stage = candidate.get("stage_id")
+        if not stage:
+            continue
+        validation = payload.get("completion_validation") or {}
+        # The stage's latest decision stands (a later cycle's admit supersedes a reject).
+        latest[str(stage)] = (str(stage), proposal, validation)
+    if completion is None:
+        return []
+    failures: list[UnitFailureView] = []
+    negative: dict[str, str] = {}
+    for stage, proposal, validation in latest.values():
+        if proposal.get("decision") != "reject":
+            continue
+        veto = str(proposal.get("matched_veto") or "stage_rejected")
+        reasons = [str(item) for item in validation.get("reason_codes") or ()]
+        detail = f":{','.join(reasons)}" if reasons else ""
+        failures.append(
+            UnitFailureView(
+                unit=f"stage/{stage}",
+                reason=veto,
+                failure_ref=f"stage_rejected:{stage}:{veto}{detail}"[:2048],
+            )
+        )
+        for dependency, disposition in (proposal.get("dependency_dispositions") or {}).items():
+            if disposition not in {"fulfilled", "degraded", "omitted"}:
+                negative[str(dependency)] = str(disposition)
+    for stage in completion.get("skipped_stage_ids") or ():
+        into = sorted(
+            f"{dependency}={disposition}"
+            for dependency, disposition in negative.items()
+            if dependency.endswith(f":to:{stage}") or f":to:{stage}:" in dependency
+        )
+        cause = ",".join(into) if into else "producer_skipped"
+        failures.append(
+            UnitFailureView(
+                unit=f"stage/{stage}",
+                reason="dependency_unresolved",
+                failure_ref=f"dependency_unresolved:{stage}:{cause}"[:2048],
+            )
+        )
+    for reason in completion.get("unmet_reasons") or ():
+        failures.append(
+            UnitFailureView(
+                unit="family/stagegraph",
+                reason=str(reason).split(":", 1)[0],
+                failure_ref=str(reason),
+            )
+        )
+    return failures
 
 
 def _family_failures(rows: Any) -> list[UnitFailureView]:

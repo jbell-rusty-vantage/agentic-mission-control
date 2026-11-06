@@ -11,7 +11,7 @@ questions:
   - How is the invalidation frontier closed?
   - What does a Goal Directed fork refuse?
   - Who may admit a derived run's fork configuration?
-updated: 2026-11-01
+updated: 2026-11-06
 ---
 
 # The precise fork
@@ -64,6 +64,23 @@ frontier or the invalidate-all marker is its own closure.
   follows the last reused unit; its session generation comes from the seed point
   (`at.session_generation` defaults to it and may not name another).
 
+## Starting a derived manifest run, and its reused named outputs
+
+A fork admits the derived run with a run-request definition, not a `MissionDefinition@1`.
+`missions:start {"run_id": <derived>}` resolves the fork (`StoredForkSources`) and starts from the
+**source** run's submission (F1-G2): `ManifestLaunchInputAuthor.fork_family_input` prepares the
+Stage Graph input for the derived admission (source's human gates and authored inputs, the fork's
+binding) and the governed launch derives the templates from the source's binding. Typed 409
+`ManifestStartRefused` codes, never a 500: `fork_start_unavailable`, `not_a_manifest_run`,
+`fork_source_not_manifest`, `fork_family_input_derived`, `fork_start_unsupported` (Goal Directed:
+use `/runs/{id}/launch`), `definition_unreadable`.
+A reused unit carries the source's **accepted** revisions of its stage's promises before it settles
+(F1-G4, `application/recovery/fork_outputs.py`): one host invocation of the derived unit (lane
+`fork_reuse`) adopts them (adopter lineage `fork_reuse:<fork request>`), finalizes without an
+assessment handoff and promotes them, so they are never judged again; the consumer's plan then
+resolves them like any accepted head. A terminal refusal settles `fork_outputs_not_carried`.
+Stage Graph only; assessments of requirement-bearing promises are not carried (they then wait).
+
 ## The seed head
 
 `CognitiveSeedService.resolve` admits a seed only for a recorded, `seedable` checkpoint point of
@@ -98,6 +115,8 @@ fork, then the launch.
 | Strict frontier too narrow | 422 `frontier_not_closed` |
 | No blueprint for a strict frontier | 503 `frontier_closure_unavailable` |
 | `state-as-of` for a point whose saver state is gone | 404 `point_state_missing` (`interfaces/http/cognition_points.py`) |
+| `missions:start` of a derived run it cannot derive | 409 with the `ManifestStartRefused` code (above) |
+| A Stage Graph concluded failed (a rejected producer, dependency-starved stages) | `run inspect` `unit_failures`: `stage_rejected:<stage>:<veto>[:<reason codes>]`, `dependency_unresolved:<stage>:<dependency>=<disposition>` (or `producer_skipped`), read from the family journal (`PostgresUnitFailureReader`, F1-G5) |
 
 The saver locator digest (`saver_locator_digest` in `adapters/deep_agents/persistence.py`) names
 where a saver lives: host (loopback aliases are one host), port, database and schema, never the
@@ -115,7 +134,7 @@ A fork without `--baseline-reservation DIMENSION=AMOUNT` holds the source run's 
 baseline; each flag overrides one dimension (`_baseline_reservations`). A replay of a fork
 reserved earlier keeps the baseline that fork recorded.
 
-Built / specified / goal: built; integrated and live paid (Qualia fork05 and AI Engineer forks, `NEXT-SESSION.md:32-98`); a `cognitive_seed` may name any lane's point (`CognitivePointSeed`) and is admitted at the lane's declared fork level R1 to R3 since 2026-11-05 ([cross-provider control](cross-provider-control.md), tested, not live); `--at` and `--frontier` tested only; Stage Graph and Goal Directed positions
+Built / specified / goal: built; integrated and live paid (Qualia fork05 and AI Engineer forks, `NEXT-SESSION.md:32-98`); a `cognitive_seed` may name any lane's point (`CognitivePointSeed`) and is admitted at the lane's declared fork level R1 to R3 since 2026-11-05 ([cross-provider control](cross-provider-control.md), tested, not live); `--at` and `--frontier` tested only; the fork-derived `missions:start`, the reused-output carry and the typed concluded-failure causes (2026-11-06, ITER-3 F1-G2/G4/G5) tested on PostgreSQL and in unit tests, not yet live; Stage Graph and Goal Directed positions
 only. Forking across lane placements (local to cloud) and forking a *workflow* mid-run by policy are goals ([lanes and harness](lanes-and-harness.md), [revisions](revisions.md)).
 
 ## Citations
@@ -124,6 +143,9 @@ only. Forking across lane placements (local to cloud) and forking a *workflow* m
   [cognitive seed](../../src/mission_control/application/recovery/cognitive_seed.py),
   [fork policy and contracts](../../src/mission_control/domain/policies/forks.py),
   [closure](../../src/mission_control/domain/programs/dependencies.py).
+- [Fork-derived start](../../src/mission_control/application/authoring/manifest_submit.py),
+  [reused-output carry](../../src/mission_control/application/recovery/fork_outputs.py),
+  [proof on PostgreSQL](../../tests/integration/postgres/test_fork_completion_postgres.py).
 - [Launch guard](../../src/mission_control/application/execution/run_launch.py),
   [Deep Agents time travel](../../src/mission_control/adapters/deep_agents/time_travel.py),
   [seed activity](../../src/mission_control/adapters/temporal/activities/fork_seed.py).

@@ -109,6 +109,19 @@ class ManifestStartUnavailable(Exception):
     code = "start_unavailable"
 
 
+class ManifestStartRefused(Exception):
+    """A typed refusal of ``start`` (F1-G2): the run cannot be started by this route as it
+    stands; nothing was registered or launched."""
+
+    def __init__(self, code: str, message: str) -> None:
+        super().__init__(message)
+        self.code = code
+        self.message = message
+
+
+RUN_REQUEST_DEFINITION = "mc.run-request-definition/1"
+
+
 class SubmitContract(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
@@ -192,6 +205,9 @@ class ManifestStartReceipt(SubmitContract):
     environment_readiness: tuple[ReadinessRequirement, ...] = ()
     # SPEC-04 §5: the run's `mc.watchers.v1` evaluator, when its definition declares watchers.
     watchers_workflow_id: str | None = None
+    # F1-G2: a fork-derived run starts from its source run's manifest submission.
+    forked_from_run_id: str | None = None
+    fork_request_id: str | None = None
 
 
 class SubmissionRepository(Protocol):
@@ -233,6 +249,60 @@ class LaunchTemplatesPort(Protocol):
         *,
         family: Literal["StageGraph", "GoalDirected"],
     ) -> Mapping[str, OperationExecutionRequest]: ...
+
+
+@dataclass(frozen=True)
+class ForkStartSource:
+    """The fork that admitted a derived run: its request and the source run it forked."""
+
+    fork_request_id: str
+    source_run_id: str
+
+
+class ForkSourcePort(Protocol):
+    """F1-G2: the fork a run was derived by (``None``: the run is no fork-derived run)."""
+
+    async def fork_source(self, request_scope: str, run_id: str) -> ForkStartSource | None: ...
+
+
+@runtime_checkable
+class ForkLaunchInputPort(Protocol):
+    """A launch input author that also derives a fork-derived run's family input from its
+    source run's manifest submission (``ManifestLaunchInputAuthor``). Returns the input and the
+    source run's semantic input binding, whose frozen templates the fork derives from."""
+
+    async def fork_family_input(
+        self,
+        *,
+        request_scope: str,
+        run_id: str,
+        source_run_id: str,
+        fork_request_id: str,
+        family: Literal["StageGraph", "GoalDirected"],
+    ) -> tuple[dict[str, Any], str]: ...
+
+    async def frozen_templates(
+        self, request_scope: str, semantic_input_binding_ref: str
+    ) -> Mapping[str, OperationExecutionRequest]: ...
+
+
+class StoredForkSources:
+    """``ForkSourcePort`` over the fork materialization store and fork request repository."""
+
+    def __init__(self, materializations: Any, forks: Any) -> None:
+        self._materializations = materializations
+        self._forks = forks
+
+    async def fork_source(self, request_scope: str, run_id: str) -> ForkStartSource | None:
+        fork = await self._materializations.fork_of_run(request_scope, run_id)
+        if fork is None:
+            return None
+        request = await self._forks.get_request(request_scope, fork.fork_request_id)
+        if request is None:
+            return None
+        return ForkStartSource(
+            fork_request_id=fork.fork_request_id, source_run_id=request.source_run_id
+        )
 
 
 class SubscriptionPort(Protocol):
@@ -298,8 +368,10 @@ class ManifestSubmitService:
         subscriptions: SubscriptionPort | None = None,
         watchers: WatcherStartPort | None = None,
         prerequisites: PrerequisitePreflight | None = None,
+        fork_sources: ForkSourcePort | None = None,
         clock: Any = None,
     ) -> None:
+        self._fork_sources = fork_sources
         self._compiler = compiler
         self._programs = programs
         self._run_control = run_control
@@ -463,7 +535,24 @@ class ManifestSubmitService:
         info = await self._submissions.run_subscriptions(self._scope, run_id)
         if info is None:
             raise ManifestStartUnavailable(f"run {run_id} was not submitted from a manifest")
-        definition = MissionDefinition.model_validate(info["definition"])
+        fork = await self._fork_of(run_id, info["definition"])
+        body = info["definition"]
+        if fork is not None:
+            source = await self._submissions.run_subscriptions(self._scope, fork.source_run_id)
+            if source is None or _run_request_definition(source["definition"]):
+                raise ManifestStartRefused(
+                    "fork_source_not_manifest",
+                    f"run {run_id} was forked from {fork.source_run_id}, which was not "
+                    "submitted from a manifest; start it with the governed launch",
+                )
+            body = source["definition"]
+        try:
+            definition = MissionDefinition.model_validate(body)
+        except ValueError as error:
+            raise ManifestStartRefused(
+                "definition_unreadable",
+                f"run {run_id} names no readable MissionDefinition@1: {error}"[:500],
+            ) from error
         if self._prerequisites is not None:
             await self._prerequisites.require(self._scope, definition)
         if definition.policies.watchers and self._watchers is None:
@@ -473,7 +562,34 @@ class ManifestSubmitService:
             )
         lowered = lower_mission(definition)
         templates: Mapping[str, OperationExecutionRequest] | None = None
-        if family_input is None:
+        source_binding: str | None = None
+        if fork is not None and lowered.family != "StageGraph":
+            # A Goal Directed fork carries the fork's minted Goal Revision, which this route
+            # does not derive yet; the governed launch takes it explicitly.
+            raise ManifestStartRefused(
+                "fork_start_unsupported",
+                f"run {run_id} is a fork of a {lowered.family} manifest run; start it with the "
+                "governed launch (POST /runs/{id}/launch)",
+            )
+        if fork is not None:
+            if family_input is not None:
+                raise ManifestStartRefused(
+                    "fork_family_input_derived",
+                    "a fork-derived run's family input is derived from its source; omit it",
+                )
+            if not isinstance(self._launch_inputs, ForkLaunchInputPort):
+                raise ManifestStartRefused(
+                    "fork_start_unavailable",
+                    "no launch input author that derives a fork's input is composed",
+                )
+            family_input, source_binding = await self._launch_inputs.fork_family_input(
+                request_scope=self._scope,
+                run_id=run_id,
+                source_run_id=fork.source_run_id,
+                fork_request_id=fork.fork_request_id,
+                family=lowered.family,
+            )
+        elif family_input is None:
             if self._launch_inputs is None:
                 raise ManifestStartUnavailable(
                     "no launch input author is composed: pass the family input, or compose a "
@@ -511,9 +627,15 @@ class ManifestSubmitService:
                 stagegraph=family_input if lowered.family == "StageGraph" else None,
                 goal_directed=family_input if lowered.family == "GoalDirected" else None,
                 mission_id=str(info["mission_id"]),
+                source_semantic_input_binding_ref=source_binding,
             ),
             launch_actor,
         )
+        if fork is not None and isinstance(self._launch_inputs, ForkLaunchInputPort):
+            # The derived templates the launch just froze under the fork's binding.
+            templates = await self._launch_inputs.frozen_templates(
+                self._scope, receipt.semantic_input_binding_ref
+            )
         return ManifestStartReceipt(
             run_id=run_id,
             mission_id=info["mission_id"],
@@ -526,7 +648,29 @@ class ManifestSubmitService:
             pending_subscriptions=pending,
             environment_readiness=readiness_requirements(definition, templates=templates),
             watchers_workflow_id=watchers,
+            forked_from_run_id=None if fork is None else fork.source_run_id,
+            fork_request_id=None if fork is None else fork.fork_request_id,
         )
+
+    async def _fork_of(self, run_id: str, body: Any) -> ForkStartSource | None:
+        """F1-G2: the fork of a derived run. A fork admits the derived run with a run-request
+        definition, never a MissionDefinition; its manifest is its source run's."""
+
+        if not _run_request_definition(body):
+            return None
+        if self._fork_sources is None:
+            raise ManifestStartRefused(
+                "fork_start_unavailable",
+                f"run {run_id} holds a run-request definition and no fork source is composed",
+            )
+        fork = await self._fork_sources.fork_source(self._scope, run_id)
+        if fork is None:
+            raise ManifestStartRefused(
+                "not_a_manifest_run",
+                f"run {run_id} was admitted as a run request, not from a manifest or a fork of "
+                "one; start it with the governed launch",
+            )
+        return fork
 
     async def _register_subscriptions(
         self, definition: MissionDefinition, run_uuid: UUID, actor: ActorContext
@@ -588,6 +732,10 @@ def _channel(
     return WebhookChannel(url=webhook, secret_ref=secret_ref)
 
 
+def _run_request_definition(body: Any) -> bool:
+    return isinstance(body, dict) and body.get("contract") == RUN_REQUEST_DEFINITION
+
+
 def _autostart(definition: MissionDefinition) -> bool:
     value = definition.policies.chain_autostart
     return True if value is None else value
@@ -626,8 +774,10 @@ __all__ = [
     "ManifestIdempotencyConflict",
     "ManifestPermissionDenied",
     "ManifestStartReceipt",
+    "ManifestStartRefused",
     "ManifestStartUnavailable",
     "ManifestSubmitService",
+    "StoredForkSources",
     "SubmitRequest",
     "register_manifest_admission_policies",
 ]

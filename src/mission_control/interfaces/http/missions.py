@@ -31,6 +31,7 @@ from mission_control.application.authoring.manifest_service import (
 from mission_control.application.authoring.manifest_submit import (
     ManifestBlocked,
     ManifestIdempotencyConflict,
+    ManifestStartRefused,
     ManifestStartUnavailable,
     SubmitRequest,
     TenantNotProvisioned,
@@ -306,6 +307,11 @@ async def _start(
     except ManifestStartUnavailable as error:
         raise HTTPException(
             status_code=409, detail={"code": "start_unavailable", "message": str(error)}
+        ) from None
+    except ManifestStartRefused as error:
+        # F1-G2: typed, never a 500 (a fork-derived run, a run-request run, ...).
+        raise HTTPException(
+            status_code=409, detail={"code": error.code, "message": error.message}
         ) from None
     except RunLaunchRejected as error:
         raise HTTPException(
