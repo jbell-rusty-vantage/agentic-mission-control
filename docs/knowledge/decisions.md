@@ -129,11 +129,11 @@ records show:
   contracts; [goals](goals.md)); startup delivery mode: break things and move fast, migrate disposable targets in-session, commit verified work
   without a separate approval round; never commit secrets or PHI, never write the AI Engineer Aura graph `4773dc72`, report implemented versus
   tested versus qualified truthfully, keep paid spend within the stated ceiling.
-- **2026-11-02** Sprint OC resumes beside the Agentic SDLC passes ("knock two birds with one stone": real work doubles as the
-  navigation experiment); the owner approved the disposable remote rollout W1 needed (release 1.13.0, seeds, custody, deployment
-  files on the AI Engineer remote), which the board had listed as owner-gated.
+- **2026-11-02** Sprint OC resumes beside the Agentic SDLC passes (real work doubles as the navigation experiment); the owner
+  approved W1's disposable remote rollout (release 1.13.0, seeds, custody, deployment files on the AI Engineer remote).
 - **2026-11-05** cross-provider control: the Deep Agents control (inspection, forking, queueing, steering) on every other lane, Cursor first,
   then Managed Agents, Agents API, Codex, Claude Code; fixtures where credentials allow, faithful records otherwise ([design](../specs/provider-consolidation-2026-10/providers/cross-provider-control/DESIGN.md), ADR-0069, OVE-224).
+- **2026-11-06** provider-native macro scheduler, queue and steer with context ([goals](goals.md#goal-provider-native-macro-scheduler)).
 - **2026-11-06** GitHub home is jbell-rusty-vantage. Repositories move one at a time as clean slates: one root commit, `main` only, no old history ([repository history](../REPOSITORY-HISTORY.md)).
 - **Standing rules** (owner, 2026-10-27): commit when an issue's work is complete and verified, push at gate release and session end; no live
   destructive migration, volume deletion, deployment or paid experiment outside an accepted packet's disposable targets and budget.

@@ -43,6 +43,24 @@ mission state snapshots with fork, queue, inject, interrupt ([interventions](int
 ([coordinator surface](coordinator-surface.md)); evidence-backed output contracts ([output contracts](output-contracts.md)).
 Built: the scheduling, control and output machinery for Deep Agents, integrated on disposable targets; qualified: W0 only.
 
+## Goal: provider-native macro scheduler
+
+Owner, 2026-11-06: Mission Control uses each agent framework's own mechanics inside a Temporal macro scheduler so that more
+agents do more together; for Deep Agents that means LangGraph checkpoints give the fine-grained state inside each scheduled
+turn. Direct provider APIs (Cursor local and cloud, Anthropic Managed Agents, the OpenAI Agents API, later Codex and Claude Code)
+go into Mission Control **without degrading them, and should be enhanced by it**. The mechanics built for those lanes on
+2026-11-05 are to be critiqued against that bar. The product exists when four things work as envisioned on every lane:
+**lifecycle control, inspection, context transfer and output obligation fulfillment**.
+
+Interventions (owner, same day) are two, maybe three, kinds, each carrying **context**: a combination of text, images, MCP
+servers, agent skills and sandbox materializations, where text can reference a file loaded into the sandbox.
+- **Queue context:** delivered at the next boundary.
+- **Steer with context:** into the running turn; a gentle injection is preferred over interrupt and inject, and either is
+  acceptable.
+
+Evidence: [iteration 3](../specs/provider-consolidation-2026-10/sprint-oc/experiments/ITER-3-2026-11-06.md),
+[interventions](interventions.md), [cross-provider control](cross-provider-control.md).
+
 ## Goal: Knowledge Services service
 
 The shared knowledge capability Mission Control is "fed by" and feeds: evidence-backed reports whose assertions carry source
