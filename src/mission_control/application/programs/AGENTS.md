@@ -12,7 +12,7 @@ Entrypoints:
 - nested_launch.py — Production composition of recursive composition: the launcher and its adapters
 - nested_bodies.py — Recursive composition use cases: activate, settle and control nested bodies
 - artifact_validation.py — Bounded, offline validation of captured output bytes against frozen schemas
-Also: completion_validation.py, orchestration_routing.py, named_outputs.py, route_facts.py, orchestration_binding_repository.py, control_admission.py, stage_inputs.py
+Also: completion_validation.py, orchestration_routing.py, named_outputs.py, route_facts.py, control_admission.py, orchestration_binding_repository.py, stage_inputs.py
 Tests: tests/unit/orchestration, tests/unit/run_control, tests/unit/outputs, tests/integration/postgres
 Explained by (docs/knowledge): goal-loop, stage-graph, completion, evaluator-optimizer, human-gates, mission-chains
 Decided by (docs/adr): ADR-0010, ADR-0004, ADR-0029, ADR-0034, ADR-0038

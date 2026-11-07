@@ -44,7 +44,7 @@ Entrypoints:
 - lane.py — Deep Agents lane adapter: a compiled node configuration → the Deep Agents exact…
 - binding.py — The Deep Agents lane's own bytes: seal, unseal, template and rebind
 - describe.py — The Deep Agents lane's declared describe matrix and declaration
-Also: harness.py, adapter.py, materializer.py, docker_sandbox.py, hooks.py, budget.py, async_subagents.py, time_travel.py, routes.py, frames.py, evaluators.py, cognition_points.py, compaction.py, features/, workspace_closure.py, child_binding.py, output_format.py, hook_contributions.py (+14)
+Also: harness.py, adapter.py, materializer.py, docker_sandbox.py, hooks.py, budget.py, async_subagents.py, time_travel.py, routes.py, frames.py, evaluators.py, cognition_points.py, compaction.py, features/, workspace_closure.py, child_binding.py, output_format.py, hook_contributions.py (+15)
 Tests: tests/unit/deep_agents, tests/integration/deep_agents, tests/conformance/lanes
 Invariants:
 - Never choose a model, tool or skill the binding did not name; refuse mismatches.

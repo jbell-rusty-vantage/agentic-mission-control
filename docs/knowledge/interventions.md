@@ -50,15 +50,15 @@ the operation finalizes (`_queued_follow_up`, `application/execution/harness/inj
 and a stable native message key keeps a replay from appending the same input twice (Qualia bounded queued turns, `0eccfa2d`).
 
 **Interrupt and inject** (FT-F2, `application/execution/harness/inject.py`). By the lane's
-declared semantics: `cooperative_inject` (no first-wave lane), `cancel_and_replace` (Deep Agents
-and both Cursor profiles: cancel the running turn, settle uncertain effects within a grace
+declared semantics: `cooperative_inject` (Deep Agents since 2026-11-06: the steer joins the next model call, below), `cancel_and_replace`
+(both Cursor profiles and the other session lanes: cancel the running turn, settle uncertain effects within a grace
 period or park the unit `in_doubt` with an incident and run no replacement, then run a
 replacement turn on the same session from a `follow_up_turn` packet), or `unsupported` (typed
 rejection, the turn continues). Since MP-06, `resolve_interrupt_mode` picks exactly one mode: the
 per-profile `LANE_COMMAND_SEMANTICS` and the lane describe must agree, and `cooperative_inject`
 also needs a lane implementing `SteeringLane` (a `stale_target` answer returns the entry to
-`queued` for the next boundary); any disagreement is `unsupported`, never a fallback. No profile
-declares `cooperative_inject` and no production lane steers. The replacement send is journaled
+`queued` for the next boundary); any disagreement is `unsupported`, never a fallback. Deep Agents steers in-process: `inject()` queues the segment,
+`OperatorSteerMiddleware` (`adapters/deep_agents/steering.py`) adds it to the next model call and the checkpointed thread in one step, and a steer the turn never drained runs as its next turn. The replacement send is journaled
 and Stop-Fence admitted like every native dispatch, and a cancel already requested starts no
 steer or replacement ([session ownership and dispatch](session-ownership-and-dispatch.md)).
 Since Run 2 P5b (`aeeda4a4`), the turn that an applied inject interrupted no longer settles the
@@ -130,7 +130,7 @@ For Session Lanes the MP-12 phase machine then seals and transfers it; on Deep A
 A `lane.cancel` whose journaled dispatch is ambiguous and has no recorded turn now returns
 `in_doubt` instead of settling "never sent".
 
-Built / specified / goal: queue, add context, interrupt-and-inject (`cancel_and_replace` on every lane; native steering implemented on Codex, Managed Agents and the Agents API but not yet declared, [cross-provider control](cross-provider-control.md)), immediate cancel with Stop Fence and fork built, tested on PostgreSQL and Temporal, integrated live (Run 2 inject; Qualia queued turn and inject, `NEXT-SESSION.md:88-98`); `cooperative_inject` has no lane; per-policy mutation is a goal.
+Built / specified / goal: queue, add context, interrupt-and-inject (Deep Agents `cooperative_inject`, release 1.15.0; `cancel_and_replace` on the other lanes; native steering implemented on Codex, Managed Agents and the Agents API but not yet declared, [cross-provider control](cross-provider-control.md)), immediate cancel with Stop Fence and fork built, tested on PostgreSQL and Temporal, integrated live (Run 2 inject; Qualia queued turn and inject; iteration 3 fork with an operator instruction, 2026-11-06). Since 2026-11-06 queued and injected operator text renders as the packet's final Operator instructions section (`ContextTrust.OPERATOR_INSTRUCTION`), not as data. Per-policy mutation is a goal.
 
 # Citations
 

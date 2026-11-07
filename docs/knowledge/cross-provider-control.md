@@ -61,8 +61,8 @@ point form for non-checkpoint points.
 
 ## Interventions
 
-Queueing and the Stop Fence are unchanged per lane ([interventions](interventions.md)). Every profile still declares
-`interrupt_and_inject: cancel_and_replace`; the interrupted turn's last point carries `interrupted` and the replacement's first
+Queueing and the Stop Fence are unchanged per lane ([interventions](interventions.md)). Every session lane still declares
+`interrupt_and_inject: cancel_and_replace` (Deep Agents steers cooperatively since 2026-11-06); the interrupted turn's last point carries `interrupted` and the replacement's first
 `replacement_start`. Native steering (`SteeringLane.steer`) is implemented on Codex (`turn/steer`), Managed Agents and the Agents
 API (a message during the turn) and `LaneTurnService._steer` now stages the text before steering, but no lane declares
 `cooperative_inject` until the conformance suite's interrupt expectation covers it and a drill proves the provider race rules.

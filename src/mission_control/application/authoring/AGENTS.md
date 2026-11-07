@@ -6,9 +6,9 @@ Entrypoints:
 - manifest_service.py — Mission Manifest compile
 - manifest_v2_admission.py — mission/v2 compile admission
 - provider_launch.py — Deployment launch bindings of the local provider lanes
+- manifest_submit.py — Mission Manifest submit and start
 - service.py
 - cursor_launch.py — Deployment launch bindings of the Cursor lanes
-- manifest_submit.py — Mission Manifest submit and start
 - subagent_discriminator.py — Compile-time subagent discriminator: one profile, every lane it may run on, a…
 - control_plane_repository.py
 - goal_verifier_objective.py — The Goal Loop verifier's own objective, derived from the authored goal

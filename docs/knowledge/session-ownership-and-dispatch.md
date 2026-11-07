@@ -77,7 +77,7 @@ Only Codex implements `SteeringLane` (`turn/steer` with `expectedTurnId`).
 `resolve_interrupt_mode` (`application/execution/harness/inject.py`)
 runs `interrupt_and_inject` in exactly one mode: the frozen per-profile `LANE_COMMAND_SEMANTICS`
 and the describe must agree, and `cooperative_inject` needs a `SteeringLane`; otherwise
-`unsupported`, with no fallback. No profile declares `cooperative_inject` today.
+`unsupported`, with no fallback. Only Deep Agents declares `cooperative_inject` (2026-11-06, in-process, not a `SteeringLane`).
 
 ## Capacity waits
 

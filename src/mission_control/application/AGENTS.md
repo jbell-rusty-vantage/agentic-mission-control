@@ -36,7 +36,7 @@ Entrypoints:
 - subscriptions/
 - environments/ — Execution-environment resolution, preparation attestation and network projection…
 - missions/ — Mission Control application handlers over the durable runtime authority
-Also: resolution/, agentic_components/, recovery/, workspaces/, reactions/, capabilities/, streams/, chains/, signals/, subordinates/, coordinator/, prerequisites/, selection/, watchers/, human_tasks/, artifacts/, secrets/, ports/, effects/, installations/
+Also: resolution/, recovery/, agentic_components/, workspaces/, reactions/, capabilities/, streams/, chains/, signals/, subordinates/, coordinator/, prerequisites/, selection/, watchers/, human_tasks/, artifacts/, secrets/, ports/, effects/, installations/
 Tests: tests/unit/run_control, tests/integration/postgres/test_mission_control_lifecycle_postgres.py, tests/integration/postgres/test_mission_control_composition_postgres.py
 Invariants:
 - Never choose a provider fallback or install a permissive policy because a binding is missing.

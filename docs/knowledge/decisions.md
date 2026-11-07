@@ -48,7 +48,7 @@ worker-hosted first, cloud a second profile; [0030](../adr/0030-cursor-lane-two-
 [0050](../adr/0050-nine-lane-profiles-claude-managed-and-codex-agents-and-the-mission-data-class.md) Nine Lane Profiles: claude_managed and codex_agents join (built, accepted per AS-D36);
 [0052](../adr/0052-remote-session-lane-base-shared-machinery-for-provider-session-apis.md) Remote Session Lane base for provider session APIs (built, accepted per AS-D36);
 [0053](../adr/0053-effect-gating-on-closed-hosted-harnesses.md) Effect gating on closed hosted harnesses (held);
-[0069](../adr/0069-cross-provider-control-cognition-points-time-travel-and-intervention-on-every-lane.md) Cross-provider control on every lane (proposed 2026-11-05, OVE-224).
+[0069](../adr/0069-cross-provider-control-cognition-points-time-travel-and-intervention-on-every-lane.md) Cross-provider control on every lane (proposed 2026-11-05, OVE-224). [0070](../adr/0070-operator-instructions-and-the-deep-agents-gentle-steer.md) Operator instructions are followed; Deep Agents steers gently (accepted 2026-11-06).
 
 **Workflows and authoring.** [0022](../adr/0022-mission-manifest-yaml-authoring-surface.md) Mission Manifest YAML compiles to the typed Mission Definition;
 [0029](../adr/0029-mission-chains-compile-to-linked-missions-released-by-outbox.md) Mission chains compile to linked missions released by outbox;
