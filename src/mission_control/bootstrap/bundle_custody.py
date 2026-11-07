@@ -41,7 +41,7 @@ def compose_bundle_materializer(settings: Settings) -> BundleMaterializer | None
             return None
         http = httpx.Client(timeout=STORAGE_TIMEOUT_SECONDS, follow_redirects=False)
         store = configured_supabase_bundle_custody(settings, http_client=http, credential="reader")
-        origin = settings.supabase_url or ""
+        origin = settings.db.url or ""
         return BundleMaterializer(store, SignedUrlBundleFetcher(http, origin=origin))
     if settings.capability_bundle_local_root is None:
         return None

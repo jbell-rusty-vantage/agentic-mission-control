@@ -171,7 +171,7 @@ def test_a_named_repository_still_needs_its_reviewed_commit(
 ) -> None:
     def with_repository(document: dict[str, Any]) -> None:
         document["mission"]["environment"]["workspace"]["repo"] = {
-            "url": "https://github.com/Overton77/mission-control-fixture",
+            "url": "https://github.com/jbell-rusty-vantage/mission-control-fixtures",
             "ref": "main",
         }
 

@@ -15,12 +15,12 @@ compared, nothing is ever overwritten. A second run uploads nothing. Registratio
         --env-file .scratch/sprint-oc/runtime/ai-engineer/bundle-publisher.env
 
 ``--storage supabase`` uses the deployment's publisher credential
-(``CAPABILITY_BUNDLE_PUBLISHER_TOKEN``, never the service key) against ``SUPABASE_URL``;
+(``CAPABILITY_BUNDLE_PUBLISHER_TOKEN``, never the service key) against ``MC_<PLANE>_DB_URL``;
 it is the live path and needs an owner-approved target. It requires ``--env-file``: the
 generated operator file ``bundle-publisher.env`` of that application (``sprint_oc_runtime_env.py``;
 the runtime ``mission-control.env`` carries no publisher token), applied
 over the process environment, so the MC ``.env`` (which names the Biotech project) never
-selects the project. ``SUPABASE_URL`` must be exactly ``https://<project_ref>.supabase.co`` of
+selects the project. ``MC_<PLANE>_DB_URL`` must be exactly ``https://<project_ref>.supabase.co`` of
 ``deployments/<target>/target.toml``, or the script refuses before any request. ``--check``
 only verifies the seed JSON against the sources. Output is one JSON report; exit 0 on success,
 1 on any drift.
@@ -172,15 +172,26 @@ def target_settings(target: str, env_file: Path | None) -> Any:
         raise SystemExit(f"--env-file {env_file} does not exist")
     values = {key: value for key, value in dotenv_values(env_file).items() if value is not None}
     os.environ.update(values)
+    from pydantic import ValidationError
+
     from mission_control.bootstrap.settings import Settings
 
-    settings = Settings()
+    # The generated env file is the only source (its own blanks replace what a `.env` would add).
+    try:
+        settings = Settings(_env_file=None, mission_control_application=target)  # type: ignore[call-arg]
+    except ValidationError as error:  # e.g. the project ref disagrees with the URL (rule 3)
+        detail = "; ".join(str(item["msg"]) for item in error.errors())
+        raise SystemExit(
+            f"the database variables do not name the {target} project; refusing to publish: "
+            f"{detail}"
+        ) from None
     target_toml = ROOT / "deployments" / target / "target.toml"
     ref = tomllib.loads(target_toml.read_text(encoding="utf-8"))["target"]["project_ref"]
-    host = (urlsplit(settings.supabase_url or "").hostname or "").lower()
+    host = (urlsplit(settings.db.url or "").hostname or "").lower()
     if host != f"{ref}.supabase.co":
         raise SystemExit(
-            f"SUPABASE_URL does not name the {target} project ({ref}); refusing to publish"
+            f"{settings.db.env_name('url')} does not name the {target} project ({ref}); "
+            "refusing to publish"
         )
     return settings
 

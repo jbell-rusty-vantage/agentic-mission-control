@@ -27,7 +27,7 @@ mission:
       provider: cursor
       environment_ref: cursor-cloud.default
     workspace:
-      repo: { url: "https://github.com/Overton77/mission-control-fixture", ref: main }
+      repo: { url: "https://github.com/jbell-rusty-vantage/mission-control-fixtures", ref: main }
       policy: { mode: provider_workspace, reuse: within_session, dirty_input: reject, cleanup: retain_until_artifacts_registered }
     requires:
       controls: [cancel]

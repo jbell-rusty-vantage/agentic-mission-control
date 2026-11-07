@@ -358,7 +358,7 @@ async def run_aieng(
                 from dataclasses import asdict
 
                 assert stack.database is not None
-                checkpoint_dsn = stack.settings.langgraph_checkpoint_database_direct
+                checkpoint_dsn = stack.settings.db.checkpoint_dsn
                 assert checkpoint_dsn is not None
                 # Local disposable credentials stay in the ignored evidence directory only.
                 recovery = destination / "runtime-recovery.private.json"

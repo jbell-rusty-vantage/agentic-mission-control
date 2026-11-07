@@ -77,7 +77,7 @@ class _FakeRepository:
 async def test_launch_idempotency_uses_one_workflow_identity(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    monkeypatch.setenv("APPLICATION_DATABASE_DIRECT", "postgresql://offline.invalid/experiment")
+    monkeypatch.setenv("MC_LOCAL_DB_RUNTIME_DSN", "postgresql://offline.invalid/experiment")
     settings = load_settings(require_openai=False)
     repository = _FakeRepository()
     temporal = _FakeTemporal()
@@ -100,8 +100,8 @@ async def test_launch_idempotency_uses_one_workflow_identity(
 def _opted_in_settings(dsn: str, monkeypatch: pytest.MonkeyPatch) -> ExperimentSettings:
     """Use the explicitly opted-in disposable database, never the developer .env database."""
 
-    monkeypatch.setenv("APPLICATION_DATABASE_DIRECT", dsn)
-    monkeypatch.setenv("APPLICATION_MIGRATION_DATABASE_DIRECT", dsn)
+    monkeypatch.setenv("MC_LOCAL_DB_RUNTIME_DSN", dsn)
+    monkeypatch.setenv("MC_LOCAL_DB_ADMIN_DSN", dsn)
     return load_settings(require_openai=False)
 
 

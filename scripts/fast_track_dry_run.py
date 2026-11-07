@@ -289,7 +289,7 @@ class DryRun:
             ],
             {
                 **self.base_env,
-                "DATABASE_DIRECT": logins["runtime"],
+                "MC_LOCAL_DB_ADMIN_DSN": logins["runtime"],
                 "MISSION_CONTROL_CATALOG_SCOPE": catalog_scope,
             },
         )

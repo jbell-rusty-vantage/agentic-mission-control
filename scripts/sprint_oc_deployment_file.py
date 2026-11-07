@@ -4,8 +4,8 @@
 derived, never a secret:
 
 * the sealed ``ApplicationBinding`` (``bootstrap/api.py``): ``deployments/<app>/target.toml``'s
-  ``installation_id`` and ``project_ref``, ``database_secret_ref = MC_<APP>_RUNTIME_DSN``,
-  ``family_writer_secret_ref = MC_<APP>_FAMILY_WRITER_DSN`` (the generator fills both names from
+  ``installation_id`` and ``project_ref``, ``database_secret_ref = MC_<PLANE>_DB_RUNTIME_DSN``,
+  ``family_writer_secret_ref = MC_<PLANE>_DB_FAMILY_WRITER_DSN`` (the generator fills both from
   the integrator's restricted logins), the operator issuer and audience, and the installed common
   component version (``--component-version``);
 * the operator's own EdDSA issuer: a minted Ed25519 key whose private JWK stays owner-only in the
@@ -199,7 +199,7 @@ def deployment_document(
         installation_id=target["installation_id"],
         binding_version=f"sprint-oc-w1/{component_version}",
         supabase_project_ref=target["project_ref"],
-        database_secret_ref=f"MC_{upper}_RUNTIME_DSN",
+        database_secret_ref=gen.db_name(app, "RUNTIME_DSN"),
         accepted_issuers={issuer(app)},
         accepted_audiences={audience(app)},
         required_component_version=component_version,
@@ -237,7 +237,7 @@ def deployment_document(
                         },
                     ],
                 },
-                "family_writer_secret_ref": f"MC_{upper}_FAMILY_WRITER_DSN",
+                "family_writer_secret_ref": gen.db_name(app, "FAMILY_WRITER_DSN"),
                 # Loop iter-3: the restricted signal-ingress login (mission-db login-apply
                 # `MC_INGRESS_DSN`) the worker needs to compose the hosted lanes.
                 **(

@@ -1,7 +1,7 @@
 """A present-but-empty credential setting reads as unset (Sprint OC W0 runtime environment).
 
 An environment variable that is present, even empty, wins over the `.env` file, so the runtime
-env generator blanks credentials on purpose. A blank `APPLICATION_DATABASE_URL` arrives as
+env generator blanks credentials on purpose. A blank `MC_LOCAL_DB_RUNTIME_DSN` arrives as
 `SecretStr("")`; it must not count as a configured database (the Agent Server's
 `http_app.py` would otherwise try to build a DSN from it).
 """
@@ -32,15 +32,23 @@ def test_configured_treats_blank_and_whitespace_as_unset() -> None:
 
 
 def test_blank_application_database_is_not_present() -> None:
-    settings = isolated_settings(application_database_direct=BLANK, application_database_url=BLANK)
+    settings = isolated_settings(mc_local_db_runtime_dsn=BLANK)
     assert settings.has_application_postgres is False
-    with pytest.raises(ValueError, match="APPLICATION_DATABASE_DIRECT"):
+    with pytest.raises(ValueError, match="MC_LOCAL_DB_RUNTIME_DSN"):
         _ = settings.application_postgres_dsn
 
 
-def test_a_blank_direct_dsn_falls_through_to_the_url() -> None:
+def test_the_selected_plane_alone_is_read() -> None:
     settings = isolated_settings(
-        application_database_direct=BLANK, application_database_url=SecretStr(DSN)
+        mission_control_application="biotech",
+        mc_local_db_runtime_dsn=SecretStr(DSN),
+        mc_aieng_db_runtime_dsn=SecretStr(DSN),
+    )
+    assert settings.has_application_postgres is False  # BIOTECH holds none
+    with pytest.raises(ValueError, match="MC_BIOTECH_DB_RUNTIME_DSN"):
+        _ = settings.application_postgres_dsn
+    settings = isolated_settings(
+        mission_control_application="ai-engineer", mc_aieng_db_runtime_dsn=SecretStr(DSN)
     )
     assert settings.has_application_postgres is True
     assert settings.application_postgres_dsn == DSN
@@ -49,9 +57,9 @@ def test_a_blank_direct_dsn_falls_through_to_the_url() -> None:
 @pytest.mark.parametrize(
     ("field", "reader"),
     [
-        ("application_migration_database_direct", "application_migration_postgres_dsn"),
-        ("application_backfill_database_direct", "application_backfill_postgres_dsn"),
-        ("application_family_writer_database_direct", "application_family_writer_postgres_dsn"),
+        ("mc_local_db_admin_dsn", "application_migration_postgres_dsn"),
+        ("mc_local_db_backfill_dsn", "application_backfill_postgres_dsn"),
+        ("mc_local_db_family_writer_dsn", "application_family_writer_postgres_dsn"),
     ],
 )
 def test_blank_role_dsns_are_refused_as_missing(field: str, reader: str) -> None:
@@ -61,11 +69,9 @@ def test_blank_role_dsns_are_refused_as_missing(field: str, reader: str) -> None
 
 
 def test_blank_family_writer_and_common_dsns() -> None:
-    settings = isolated_settings(
-        application_family_writer_database_direct=BLANK, database_direct=BLANK, database_url=BLANK
-    )
+    settings = isolated_settings(mc_local_db_family_writer_dsn=BLANK, mc_local_db_admin_dsn=BLANK)
     assert settings.has_application_family_writer_postgres is False
-    with pytest.raises(ValueError, match="DATABASE_DIRECT or DATABASE_URL"):
+    with pytest.raises(ValueError, match="MC_LOCAL_DB_ADMIN_DSN"):
         _ = settings.postgres_dsn
 
 

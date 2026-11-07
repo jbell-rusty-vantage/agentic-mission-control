@@ -6,9 +6,10 @@ from mission_control.bootstrap.settings import Settings
 
 
 class BiotechSettings(Settings):
-    neo4j_uri: str | None = None
-    neo4j_aura_username: str | None = None
-    neo4j_aura_password: SecretStr | None = None
+    # The Biotech graph login (`MC_BIOTECH_GRAPH_*`; Aura biotech-graph).
+    mc_biotech_graph_uri: str | None = None
+    mc_biotech_graph_username: str | None = None
+    mc_biotech_graph_password: SecretStr | None = None
     schema_deployment_issuer_authority_ref: str = "issue-12:graph-schema-deployment-service"
     schema_workspace_issuer_authority_ref: str = "issue-13:schema-workspace-materialization-service"
     graph_capability_authority_ref: str = "graph-authority:read-capability-service"

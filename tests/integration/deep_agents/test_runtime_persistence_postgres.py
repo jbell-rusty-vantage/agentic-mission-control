@@ -270,7 +270,7 @@ def test_interrupted_concurrent_index_is_held_never_recorded_and_fails_readiness
 
 def test_readiness_fails_closed_when_public_checkpoints_could_shadow_runtime() -> None:
     async def scenario(database: CommonDatabase, owner: asyncpg.Connection, login: str) -> None:
-        settings = isolated_settings(langgraph_checkpoint_database_direct=SecretStr(login))
+        settings = isolated_settings(mc_local_db_checkpoint_dsn=SecretStr(login))
         await inspect_checkpoint_binding(settings, database.name)
         await owner.execute("CREATE TABLE public.checkpoints (thread_id text)")
         reasons = await _reasons(runtime_checkpoint_conninfo(login), database.name)
@@ -285,9 +285,7 @@ def test_readiness_fails_closed_when_public_checkpoints_could_shadow_runtime() -
         with pytest.raises(InstallationUnavailable, match="must not carry libpq options"):
             await inspect_checkpoint_binding(
                 isolated_settings(
-                    langgraph_checkpoint_database_direct=SecretStr(
-                        login + "?options=-c%20work_mem%3D4MB"
-                    )
+                    mc_local_db_checkpoint_dsn=SecretStr(login + "?options=-c%20work_mem%3D4MB")
                 ),
                 database.name,
             )

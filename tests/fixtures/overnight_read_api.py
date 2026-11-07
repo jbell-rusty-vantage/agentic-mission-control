@@ -13,6 +13,7 @@ from unittest.mock import patch
 import httpx
 from joserfc import jwt
 from joserfc.jwk import RSAKey
+from tests.fixtures.db_env import db_env_name
 from tests.fixtures.mission_control_common_db import COMPONENT_VERSION
 from tests.fixtures.rrm009_production_stack import technical_admission_policies
 
@@ -47,7 +48,7 @@ async def overnight_read_api(stack: Any) -> AsyncIterator[httpx.AsyncClient]:
         installation_id=database.installation_id,
         binding_version="1",
         supabase_project_ref=database.project_ref,
-        database_secret_ref="APPLICATION_DATABASE_DIRECT",
+        database_secret_ref=db_env_name(application_id, "RUNTIME_DSN"),
         accepted_issuers={issuer},
         accepted_audiences={"mission-control"},
         required_component_version=COMPONENT_VERSION,

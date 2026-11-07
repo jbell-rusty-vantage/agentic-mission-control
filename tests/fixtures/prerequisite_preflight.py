@@ -9,6 +9,7 @@ from datetime import UTC, datetime, timedelta
 
 import asyncpg
 import pytest
+from tests.fixtures.db_env import db_env_name
 from tests.fixtures.mission_control_common_db import COMPONENT_VERSION, CommonDatabase
 
 from mission_control.application.installations.registry import ApplicationBinding
@@ -72,7 +73,7 @@ def bind_disposable_prerequisites(
         installation_id=database.installation_id,
         binding_version="1",
         supabase_project_ref=database.project_ref,
-        database_secret_ref="APPLICATION_DATABASE_DIRECT",
+        database_secret_ref=db_env_name(database.application_id, "RUNTIME_DSN"),
         accepted_issuers={"https://local-qualification.invalid"},
         accepted_audiences={"mission-control"},
         required_component_version=component_version,

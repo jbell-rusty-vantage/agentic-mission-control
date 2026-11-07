@@ -197,9 +197,9 @@ inherited. A failed check refuses with `SECRET_FILE_PERMISSIONS`.
 | `KS_KNOWLEDGE_AUDIENCE` | constant `knowledge-services-executor.<app>` | Must equal MC `KNOWLEDGE_BINDING_AUDIENCE`; a K01 `Name` too |
 | `KS_KNOWLEDGE_JWKS_FILE` | minted | `knowledge-issuer.jwks.json`: the public half of MC's issuer key. MC serves no JWKS endpoint, so the KS executor reads the file |
 | `KS_KNOWLEDGE_BINDINGS_JSON` | derived | See the format below |
-| `KS_BIOTECH_COMPONENT_DSN` (biotech) | owner: MC `.env` `DATABASE_DIRECT` | The binding's `databaseUrlEnv`. The login must be able to `SET ROLE knowledge_verification_writer/reader` |
-| `KS_AI_ENGINEER_COMPONENT_DSN` (ai-engineer) | owner: AIE `.env` `POSTGRES_URL_NON_POOLING` | Required for `aiengineer-postgres` (startup throws without it) |
-| `KNOWLEDGE_DB_URL` (ai-engineer) | owner: AIE `.env` `POSTGRES_URL_NON_POOLING` | The co-hosted knowledge database the AIDB native `knowledge.apply` port uses. Without it, apply answers `SCHEMA_UNSUPPORTED` |
+| `KS_BIOTECH_DB_COMPONENT_DSN` (biotech) | owner: MC `.env` `MC_BIOTECH_DB_ADMIN_DSN` | The binding's `databaseUrlEnv`. The login must be able to `SET ROLE knowledge_verification_writer/reader` |
+| `KS_AIENG_DB_COMPONENT_DSN` (ai-engineer) | owner: AIE `.env` `AIENG_DB_ADMIN_DSN` | Required for `aiengineer-postgres` (startup throws without it) |
+| `KS_AIENG_DB_RUNTIME_DSN` (ai-engineer) | owner: AIE `.env` `AIENG_DB_ADMIN_DSN` | The co-hosted knowledge database the AIDB native `knowledge.apply` port uses. Without it, apply answers `SCHEMA_UNSUPPORTED` |
 | `KS_KNOWLEDGE_SEAL_KEY_ID`, `KS_KNOWLEDGE_SEAL_KEY_FILE` | minted | `ks-seal.pem`, Ed25519 PKCS#8. Without them `report.seal` refuses. The key id must also be registered (public half) in `knowledge_verification.seal_signing_key` by the root installer's `seal-key` step; until then `report.seal` refuses `CAPABILITY_UNAVAILABLE` / `seal_key_unregistered` naming the id (OVE-169 W1 D25) |
 | `KS_KNOWLEDGE_SEAL_ISSUER` | constant `knowledge-services` | The descriptor `signingIssuer`; the installer registers the key under the same issuer |
 | `KS_BIOTECH_EXECUTOR_URL` (biotech) | constant `http://127.0.0.1:4020` | |
@@ -218,14 +218,14 @@ unset every retired name (`VERIFY_JUDGE_MODEL`, `VERIFY_CROSS_FAMILY_JUDGE_MODEL
 
 ```json
 [{"application":"biotech","binding":"biotech-graph","installationId":"<component installation id>",
-  "databaseUrlEnv":"KS_BIOTECH_COMPONENT_DSN","tenants":["<knowledge_verification tenant uuid>"]}]
+  "databaseUrlEnv":"KS_BIOTECH_DB_COMPONENT_DSN","tenants":["<knowledge_verification tenant uuid>"]}]
 ```
 
 - `application` matches `^[a-z][a-z0-9_.-]{0,119}$` and `binding` matches `^[a-z][a-z0-9-]{0,63}$`.
 - `databaseUrlEnv` is the **name** of the variable that holds the DSN.
 - The `installationId` of the biotech entry must equal the installer's `--component-installation-id`
   (`EXECUTOR_INSTALLATION_MISMATCH`). The ai-engineer entry is
-  `{"application":"ai-engineer","binding":"aiengineer-postgres",...,"databaseUrlEnv":"KS_AI_ENGINEER_COMPONENT_DSN"}`
+  `{"application":"ai-engineer","binding":"aiengineer-postgres",...,"databaseUrlEnv":"KS_AIENG_DB_COMPONENT_DSN"}`
   and carries no `tenants`.
 - MC's `KNOWLEDGE_COMPONENT_INSTALLATION_ID` carries the same component installation id (W1 D6): KS
   authorizes the K01 origin's `installationId` against this entry, so MC sends the component id, not
@@ -237,19 +237,19 @@ unset every retired name (`VERIFY_JUDGE_MODEL`, `VERIFY_CROSS_FAMILY_JUDGE_MODEL
 | --- | --- | --- |
 | `BKS_NO_ENV_FILE` | constant `1` | |
 | `EXECUTOR_PORT` | constant `4020` | Firewall it (section 1) |
-| `NEO4J_URI` | owner: BKS `.env` `NEO4J_URI`, **only when confirmed** | See the graph rules below |
-| `NEO4J_USERNAME`, `NEO4J_PASSWORD` | owner: BKS `.env` `NEO4J_AURA_USERNAME`, `NEO4J_AURA_PASSWORD`, **only when confirmed** | |
+| `NEO4J_URI` | owner: MC `.env` `MC_BIOTECH_GRAPH_URI`, **only when confirmed** | See the graph rules below |
+| `NEO4J_USERNAME`, `NEO4J_PASSWORD` | owner: MC `.env` `MC_BIOTECH_GRAPH_USERNAME`, `MC_BIOTECH_GRAPH_PASSWORD`, **only when confirmed** | |
 | `BKS_TARGET` | constant `production`, only when confirmed | The executor exits with code 78 on an Aura URI unless `BKS_TARGET=production` |
 | `BKS_EXECUTOR_TOKENS` | derived from the minted KS tokens and the tenant | See the format below |
-| `BKS_VERIFICATION_DSN` | integrator `BKS_VERIFICATION_DSN`. Fallback: owner MC `.env` `DATABASE_DIRECT` **only with `--allow-admin-verification-dsn`** (disposable W0) | A login that holds `knowledge_verification_outbox_worker`. It calls `claim_dispatches`, `acknowledge_dispatch`, `fail_dispatch` and `settle_dispatch`. Without either source the name is missing. The manifest records the choice as `choices.verificationDsn`: `integrator`, `admin-allowed (disposable W0)` or `missing` |
+| `BKS_VERIFICATION_DSN` | integrator `BKS_VERIFICATION_DSN`. Fallback: owner MC `.env` `MC_BIOTECH_DB_ADMIN_DSN` **only with `--allow-admin-verification-dsn`** (disposable W0) | A login that holds `knowledge_verification_outbox_worker`. It calls `claim_dispatches`, `acknowledge_dispatch`, `fail_dispatch` and `settle_dispatch`. Without either source the name is missing. The manifest records the choice as `choices.verificationDsn`: `integrator`, `admin-allowed (disposable W0)` or `missing` |
 | `BKS_VERIFICATION_TENANTS` | minted tenant (or `--verification-tenant-id`) | Exactly one tenant UUID, with no prefix. The dispatch `tenantId` must equal both this value and the service principal's `tenantId` |
 
 **Graph rules.**
 
 - `deployments/biotech/graph.toml` pins the expected Aura instance `8032ec07` (host
   `8032ec07.databases.neo4j.io`) and refuses the AI Engineer Aura instance `4773dc72`.
-- The generator refuses (`GRAPH_HOST_MISMATCH` / `GRAPH_HOST_REFUSED`) when the BKS `.env`
-  `NEO4J_URI` names any other host.
+- The generator refuses (`GRAPH_HOST_MISMATCH` / `GRAPH_HOST_REFUSED`) when the MC `.env`
+  `MC_BIOTECH_GRAPH_URI` names any other host.
 - It refuses (`GRAPH_CONFIRMATION_MISMATCH` / `GRAPH_HOST_REFUSED`) when `--confirm-graph` names
   anything but the pinned host.
 - `NEO4J_URI`, `NEO4J_USERNAME`, `NEO4J_PASSWORD` and `BKS_TARGET` are written blank and listed as

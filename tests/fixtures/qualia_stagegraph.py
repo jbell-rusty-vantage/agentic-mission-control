@@ -321,12 +321,12 @@ async def knowledge_host(root: Path, *, module: str = "qualia-fixture-host.ts") 
     from dotenv import dotenv_values
 
     biotech = dotenv_values(ROOT / ".env")
-    if biotech.get("NEO4J_URI") != "neo4j+s://8032ec07.databases.neo4j.io":
+    if biotech.get("MC_BIOTECH_GRAPH_URI") != "neo4j+s://8032ec07.databases.neo4j.io":
         raise ValueError("Registered biotech Aura target changed")
     for name, source in {
-        "NEO4J_URI": "NEO4J_URI",
-        "NEO4J_USERNAME": "NEO4J_AURA_USERNAME",
-        "NEO4J_PASSWORD": "NEO4J_AURA_PASSWORD",
+        "NEO4J_URI": "MC_BIOTECH_GRAPH_URI",
+        "NEO4J_USERNAME": "MC_BIOTECH_GRAPH_USERNAME",
+        "NEO4J_PASSWORD": "MC_BIOTECH_GRAPH_PASSWORD",
     }.items():
         value = biotech.get(source)
         if not value:
@@ -518,7 +518,7 @@ async def run_pilot(
                 },
             ) as stack:
                 assert stack.database is not None
-                checkpoint_dsn = stack.settings.langgraph_checkpoint_database_direct
+                checkpoint_dsn = stack.settings.db.checkpoint_dsn
                 assert checkpoint_dsn is not None
                 # Local disposable credentials, like the adjacent private JWK, stay in the
                 # ignored evidence directory. Never include this file in reports or commits.

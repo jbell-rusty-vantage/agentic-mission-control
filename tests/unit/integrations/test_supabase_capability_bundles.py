@@ -100,16 +100,17 @@ def test_remote_registry_requires_admitted_reader() -> None:
 def _custody_settings(**update: object) -> Settings:
     from pydantic import SecretStr
 
-    from mission_control.bootstrap.settings import get_settings
+    from tests.fixtures.isolated_settings import isolated_settings
 
     base = {
-        "supabase_url": "https://storage.example",
-        "supabase_secret_key": SecretStr("service-key-must-not-be-used"),
+        "mission_control_application": "ai-engineer",
+        "mc_aieng_db_url": "https://storage.example",
+        "mc_aieng_db_secret_key": SecretStr("service-key-must-not-be-used"),
         "capability_bundle_namespace": "app-fixture",
         "capability_bundle_reader_token": SecretStr("reader-token"),
         "mission_control_catalog_scope": "mc/fixture/app-fixture/catalog",
     }
-    return get_settings().model_copy(update={**base, **update})
+    return isolated_settings().model_copy(update={**base, **update})
 
 
 def test_configured_store_reads_with_the_reader_token_never_the_service_key() -> None:
@@ -139,7 +140,7 @@ def test_worker_skill_reader_composes_with_only_the_reader_token() -> None:
         supabase_skill_bundle_reader,
     )
 
-    settings = _custody_settings(supabase_secret_key=None)
+    settings = _custody_settings(mc_aieng_db_secret_key=None)
     seen: list[str] = []
 
     def handle(request: httpx.Request) -> httpx.Response:

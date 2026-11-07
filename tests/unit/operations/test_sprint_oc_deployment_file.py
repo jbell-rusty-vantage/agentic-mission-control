@@ -63,8 +63,8 @@ def _run(world: dict[str, Path], *extra: str) -> tuple[int, dict]:
 def test_deployment_loads_and_the_operator_bearer_authenticates(world: dict[str, Path]) -> None:
     code, summary = _run(world, "--component-version", "1.7.0")
     assert code == 0, summary
-    assert summary["database_secret_ref"] == "MC_BIOTECH_RUNTIME_DSN"
-    assert summary["family_writer_secret_ref"] == "MC_BIOTECH_FAMILY_WRITER_DSN"
+    assert summary["database_secret_ref"] == "MC_BIOTECH_DB_RUNTIME_DSN"
+    assert summary["family_writer_secret_ref"] == "MC_BIOTECH_DB_FAMILY_WRITER_DSN"
     assert summary["temporal"]["namespace"] == "mc-biotech"
     assert summary["installation_id"] == "01a103c0-9a9e-7a95-961b-29dda83c842b"
     deployment = load_deployment(world["out"] / "deployment.json")
@@ -177,7 +177,7 @@ def test_reviewer_grant_prints_the_ks_command_naming_no_secret(world: dict[str, 
     assert argv[1].endswith("ks-executor.env") and argv[3] == "grant-reviewer"
     flags = dict(zip(argv[4::2], argv[5::2], strict=True))
     assert flags == {
-        "--database-url-env": "KS_BIOTECH_COMPONENT_DSN",
+        "--database-url-env": "KS_BIOTECH_DB_COMPONENT_DSN",
         "--tenant": TENANT,
         "--reviewer": script.REVIEWER_ACTOR,
         "--granted-by": script.OPERATOR_ACTOR,

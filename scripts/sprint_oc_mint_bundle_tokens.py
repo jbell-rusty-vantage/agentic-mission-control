@@ -11,11 +11,12 @@ Two Supabase Auth JWTs for one application's project, the shape the storage poli
 
 Signing material, one of:
 - `--secret-env-file <dotenv> --secret-env <NAME>`: the project's legacy HS256 JWT secret
-  (AI Engineer: `aiengineer/.env` `SUPABASE_JWT_SECRET`);
+  (AI Engineer: `aiengineer/.env` `AIENG_DB_LEGACY_JWT_SECRET`);
 - `--es256-key-file <PKCS#8 PEM> --kid <kid>`: a P-256 key imported into the project as a standby
   signing key (Biotech has no usable signing material yet: ESCALATION H2).
 
-The project is proven, not assumed: `SUPABASE_URL` (`--url-env`) in the env file (`--url-env-file`,
+The project is proven, not assumed: the plane URL (`--url-env`; default `AIENG_DB_URL` for
+ai-engineer, `MC_BIOTECH_DB_URL` for biotech) in the env file (`--url-env-file`,
 default the secret env file) must be exactly `https://<project_ref>.supabase.co` of
 `deployments/<app>/target.toml`, or the script refuses. Nothing goes on the network.
 
@@ -24,7 +25,7 @@ and owner-only exactly like the runtime env files (`sprint_oc_runtime_env.py` re
 `mission-control.env`). stdout carries names, `exp` and the unsigned header and claims only.
 
   uv run --no-sync python scripts/sprint_oc_mint_bundle_tokens.py --app ai-engineer \\
-    --secret-env-file ../../aiengineer/.env --secret-env SUPABASE_JWT_SECRET \\
+    --secret-env-file ../../aiengineer/.env --secret-env AIENG_DB_LEGACY_JWT_SECRET \\
     [--publisher-ttl 24h] [--reader-ttl 7d] [--mc-root <dir>] [--out-dir <dir>]
 
 Exit: 0 written, 2 refused (nothing written).
@@ -53,6 +54,8 @@ import sprint_oc_runtime_env as runtime  # type: ignore[import-not-found]
 
 Refused = runtime.Refused
 CLAIM = "mc_capability_role"
+# The project URL variable of each application's owner env file.
+DEFAULT_URL_ENV = {"ai-engineer": "AIENG_DB_URL", "biotech": "MC_BIOTECH_DB_URL"}
 TOKENS = {
     "publisher": "CAPABILITY_BUNDLE_PUBLISHER_TOKEN",
     "reader": "CAPABILITY_BUNDLE_READER_TOKEN",
@@ -122,11 +125,12 @@ def mint(args: argparse.Namespace, now: int | None = None) -> tuple[dict[str, st
     ref = tomllib.loads(target_file.read_text(encoding="utf-8"))["target"]["project_ref"]
     url_file = args.url_env_file or args.secret_env_file
     if url_file is None:
-        raise Refused("PROJECT_URL_REQUIRED", "--url-env-file naming SUPABASE_URL")
-    url = runtime.read_env(url_file).get(args.url_env, "")
+        raise Refused("PROJECT_URL_REQUIRED", "--url-env-file naming the plane URL variable")
+    url_env = args.url_env or DEFAULT_URL_ENV[args.app]
+    url = runtime.read_env(url_file).get(url_env, "")
     if project_url_ref(url) != ref:
         raise Refused(
-            "PROJECT_REF_MISMATCH", f"{args.url_env} is not https://{ref}.supabase.co ({args.app})"
+            "PROJECT_REF_MISMATCH", f"{url_env} is not https://{ref}.supabase.co ({args.app})"
         )
     key, header = signing_key(args)
     issued = int(time.time()) if now is None else now
@@ -162,7 +166,7 @@ def run(argv: list[str] | None = None) -> tuple[int, dict[str, Any]]:
     parser.add_argument("--es256-key-file", type=Path)
     parser.add_argument("--kid")
     parser.add_argument("--url-env-file", type=Path)
-    parser.add_argument("--url-env", default="SUPABASE_URL")
+    parser.add_argument("--url-env", default=None)
     parser.add_argument("--publisher-ttl", default="24h")
     parser.add_argument("--reader-ttl", default="7d")
     parser.add_argument("--mc-root", type=Path)

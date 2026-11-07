@@ -1,6 +1,7 @@
 """Operator-only: stage a reviewed directory, verify bytes, and register its exact pin.
 
-Uses only ``--env-file`` (the generated ``bundle-publisher.env``): SUPABASE_URL of the application's
+Uses only ``--env-file`` (the generated ``bundle-publisher.env``): the plane URL
+(MC_<PLANE>_DB_URL) of the application's
 own project (refused otherwise), the publisher credential CAPABILITY_BUNDLE_PUBLISHER_TOKEN (never
 the service key), CAPABILITY_BUNDLE_NAMESPACE, MISSION_CONTROL_CATALOG_SCOPE and the application
 PostgreSQL settings. Does not apply migrations, amend deployment pins,
@@ -28,7 +29,7 @@ from mission_control.domain.authoring.contracts import DefinitionKind
 
 def operator_settings(env_file: Path) -> Settings:
     """Settings from the application's generated `bundle-publisher.env`, refused unless its
-    SUPABASE_URL is the project of the application it names (`seeds_publish_bundles.py`)."""
+    plane URL is the project of the application it names (`seeds_publish_bundles.py`)."""
 
     from dotenv import dotenv_values
 

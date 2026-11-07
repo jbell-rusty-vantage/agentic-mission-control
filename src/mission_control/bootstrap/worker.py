@@ -170,6 +170,7 @@ from mission_control.bootstrap.settings import (
     InstallationDefaultUnavailable,
     Settings,
     get_settings,
+    plane_for_application,
 )
 from mission_control.bootstrap.signals import compose_signal_ingress, verify_signal_ingress_pool
 from mission_control.bootstrap.watch_sources import RegisteredWatchSources, SourceWatchRegistration
@@ -300,7 +301,7 @@ def _settings_for_application(settings: Settings, item: ApplicationDeployment) -
     if not runtime_dsn:
         raise InstallationUnavailable("configured runtime database reference is unavailable")
     if settings.mission_control_worker_role == "base":
-        checkpoint = settings.langgraph_checkpoint_database_direct
+        checkpoint = settings.db.checkpoint_dsn
         if checkpoint is None:
             raise InstallationUnavailable(
                 "an explicit LangGraph checkpoint database binding is required"
@@ -322,10 +323,12 @@ def _settings_for_application(settings: Settings, item: ApplicationDeployment) -
         raise InstallationUnavailable(
             "lane-only worker requires an explicit matching build id and lane queues"
         )
+    plane = plane_for_application(binding.application_id).lower()
     return settings.model_copy(
         update={
-            "application_database_direct": SecretStr(runtime_dsn),
-            "application_database_url": None,
+            # The binding's plane carries the runtime login; select it when none was selected.
+            "mission_control_application": binding.application_id,
+            f"mc_{plane}_db_runtime_dsn": SecretStr(runtime_dsn),
             "mission_control_catalog_scope": (
                 f"mc/{binding.installation_id}/{binding.application_id}/catalog"
             ),

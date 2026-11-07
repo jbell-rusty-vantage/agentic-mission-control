@@ -48,7 +48,7 @@ def _work(lease: WorkspaceLease, name: str = "change.txt") -> tuple[Path, str]:
 def _credential_fill(path: Path) -> str:
     completed = subprocess.run(
         ["git", "credential", "fill"],
-        input=b"protocol=https\nhost=github.com\npath=Overton77/mission-control\n\n",
+        input=b"protocol=https\nhost=github.com\npath=jbell-rusty-vantage/mission-control\n\n",
         cwd=path,
         capture_output=True,
         env={**os.environ, "GIT_TERMINAL_PROMPT": "0"},

@@ -241,7 +241,7 @@ async def claude_managed_scenario(scratch: Path) -> Scenario:
 async def codex_agents_scenario() -> Scenario:
     api, pack = FakeAgentsApi(), load_agents_pack(SHIPPED_PACK)
     worker = WorkerEnvironmentSource(
-        {"MC_AI_ENGINEER_GITHUB_READONLY_TOKEN": "github-readonly-test-value-7f3a"}
+        {"MC_GITHUB_READONLY_TOKEN": "github-readonly-test-value-7f3a"}
     )
     synced = await CodexAgentsPreparer(api.client(), worker).sync(pack)
     return Scenario(

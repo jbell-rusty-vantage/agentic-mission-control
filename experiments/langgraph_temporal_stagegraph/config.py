@@ -24,15 +24,14 @@ def load_settings(*, require_openai: bool = True) -> ExperimentSettings:
     load_dotenv(project_root / ".env", override=False)
     if require_openai and not os.getenv("OPENAI_API_KEY"):
         raise RuntimeError("OPENAI_API_KEY is required; add it to .env or the worker environment")
-    application_dsn = os.getenv("APPLICATION_DATABASE_DIRECT") or os.getenv(
-        "APPLICATION_DATABASE_URL"
-    )
+    # Standalone experiment: always the local Docker plane (MC_LOCAL_DB_*).
+    application_dsn = os.getenv("MC_LOCAL_DB_RUNTIME_DSN")
     if not application_dsn:
-        raise RuntimeError("APPLICATION_DATABASE_DIRECT or APPLICATION_DATABASE_URL is required")
+        raise RuntimeError("MC_LOCAL_DB_RUNTIME_DSN is required")
     return ExperimentSettings(
         application_database_dsn=application_dsn,
         application_migration_database_dsn=(
-            os.getenv("APPLICATION_MIGRATION_DATABASE_DIRECT") or application_dsn
+            os.getenv("MC_LOCAL_DB_ADMIN_DSN") or application_dsn
         ),
         temporal_address=os.getenv("TEMPORAL_ADDRESS", "localhost:7233"),
         temporal_namespace=os.getenv("TEMPORAL_NAMESPACE", "default"),

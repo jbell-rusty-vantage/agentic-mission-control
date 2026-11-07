@@ -20,9 +20,10 @@ database_name = "postgres"
 database_user = "postgres.wkythqbofmckbuoothhn"
 # Supavisor maps the project-bound pooler login to this database session user.
 database_session_user = "postgres"
-# NAME of the secret-manager-provided environment variable; never the value.
-database_url_env = "MC_AI_ENGINEER_MIGRATION_DATABASE_URL"
+# NAME of the installer's (ai-engineer-db-contract) admin-login variable; never the value.
+# Mission Control's own tooling passes the same login from MC_AIENG_DB_ADMIN_DSN.
+database_url_env = "AIENG_DB_ADMIN_DSN"
 
 [approval]
 approved_by = "project owner, Claude Code session 2026-10-03 (approved LIVE_PLAN.md)"
-identity_evidence = "docs/qualification/two-project/supabase-blue-ocean/g0-readonly-20261003/identity.json; route host/login carry project ref; credential source .env POSTGRES_URL_NON_POOLING (aiengineer apps)"
+identity_evidence = "docs/qualification/two-project/supabase-blue-ocean/g0-readonly-20261003/identity.json; route host/login carry project ref; credential source AIENG_DB_ADMIN_DSN (.secrets/aieng-db.env)"

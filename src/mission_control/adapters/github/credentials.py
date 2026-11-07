@@ -6,10 +6,10 @@
   and `metadata: read`. Tokens are cached per repository until five minutes before expiry.
   Configuration is by name only: `MC_GITHUB_APP_ID`, `MC_GITHUB_APP_INSTALLATION_ID` and
   `MC_GITHUB_APP_PRIVATE_KEY_PATH` (a `.pem` outside every repository).
-- **Owner `gh` login** (owner-attested fallback until the App lands). It always selects the
-  account explicitly (`gh auth token --hostname github.com --user Overton77`): the active `gh`
-  account on the owner's machine is another one, and an ambient `GH_TOKEN`/`GITHUB_TOKEN`
-  would override the selection, so those are removed from the child environment.
+- **Owner `gh` login** (owner-attested fallback). It always selects the account explicitly
+  (`gh auth token --hostname github.com --user jbell-rusty-vantage`): the active `gh` account
+  on the owner's machine may be another one, and an ambient `GH_TOKEN`/`GITHUB_TOKEN` would
+  override the selection, so those are removed from the child environment.
 
 `github_credentials` refuses an incomplete App configuration and never falls back to `gh`
 unless the caller passes the owner's attestation. The Secret Broker (MO-11) replaces the
@@ -46,7 +46,7 @@ APP_INSTALLATION_ID_ENV: Final = "MC_GITHUB_APP_INSTALLATION_ID"
 APP_PRIVATE_KEY_PATH_ENV: Final = "MC_GITHUB_APP_PRIVATE_KEY_PATH"
 APP_ENVIRONMENT: Final = (APP_ID_ENV, APP_INSTALLATION_ID_ENV, APP_PRIVATE_KEY_PATH_ENV)
 # DECISIONS R26: the owner's GitHub account for the `gh` fallback.
-OWNER_GH_ACCOUNT: Final = "Overton77"
+OWNER_GH_ACCOUNT: Final = "jbell-rusty-vantage"
 INSTALLATION_PERMISSIONS: Final = {
     "contents": "write",
     "pull_requests": "write",

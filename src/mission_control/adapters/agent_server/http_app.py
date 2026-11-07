@@ -12,6 +12,7 @@ from mission_control.adapters.agent_server.async_subagents.sealed import (
     close_default_sealed_child_factory,
     sealed_child_served_identity,
 )
+from mission_control.adapters.agent_server.auth import configure_plane_url_provider
 from mission_control.adapters.agent_server.context import AgentPrincipal
 from mission_control.adapters.agent_server.deployment import (
     SEALED_CHILD_GRAPH,
@@ -38,6 +39,8 @@ from mission_control.interfaces.http.graph_runtime_schemas import (
 )
 
 configure_agent_server_tracing()
+# The selected plane's project URL comes from bootstrap settings, never the raw environment.
+configure_plane_url_provider(lambda: get_settings().db.url)
 
 
 @asynccontextmanager

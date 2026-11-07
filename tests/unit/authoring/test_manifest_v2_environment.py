@@ -84,8 +84,8 @@ from tests.unit.authoring.test_manifest_v2_launch import (
 ROOT = Path(__file__).resolve().parents[3]
 SCHEMAS = ROOT / "src/mission_control/contracts/schemas"
 AT = datetime(2026, 10, 13, tzinfo=UTC)
-REPO = "https://github.com/Overton77/mission-control-fixture"
-DEPENDENCY = "https://github.com/Overton77/mission-control-dependency"
+REPO = "https://github.com/jbell-rusty-vantage/mission-control-fixtures"
+DEPENDENCY = "https://github.com/jbell-rusty-vantage/mission-control-dependency"
 KIT_PIN = "envkit.python-uv-node@3#sha256:" + "1" * 64
 OTHER_KIT_PIN = "envkit.python-uv@2#sha256:" + "2" * 64
 CONFIG = {"knowledge_services.public_url": "https://knowledge.example.org"}

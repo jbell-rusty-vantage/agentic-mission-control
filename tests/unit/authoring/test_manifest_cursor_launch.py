@@ -219,7 +219,8 @@ def test_each_cursor_example_authors_sealed_cursor_bindings(path: Path) -> None:
             assert (binding.budgets.wall_clock_s, binding.budgets.max_turns) == (3600, 12)
         else:
             assert (
-                binding.workspace.repo_url == "https://github.com/Overton77/mission-control-fixture"
+                binding.workspace.repo_url
+                == "https://github.com/jbell-rusty-vantage/mission-control-fixtures"
             )
             assert binding.cloud == lane.environments["cursor-cloud.default"].options  # type: ignore[union-attr]
             assert binding.hook_callback is None and binding.workspace.policy is None

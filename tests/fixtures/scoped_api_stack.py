@@ -34,6 +34,7 @@ from psycopg.conninfo import conninfo_to_dict, make_conninfo
 from temporalio.client import Client
 from temporalio.worker import Worker
 from tests.fixtures import rrm009_production_stack as technical
+from tests.fixtures.db_env import db_env_name
 from tests.fixtures.mission_control_common_db import (
     COMPONENT_VERSION,
     CommonDatabase,
@@ -210,13 +211,13 @@ async def _scoped_stack(
     environment = {
         "MC_SCOPED_RUNTIME_DSN": runtime_dsn,
         "MC_SCOPED_WRITER_DSN": writer_dsn,
-        "APPLICATION_DATABASE_DIRECT": runtime_dsn,
-        "APPLICATION_MIGRATION_DATABASE_DIRECT": owner_dsn,
-        "APPLICATION_FAMILY_WRITER_DATABASE_DIRECT": writer_dsn,
+        db_env_name(app, "RUNTIME_DSN"): runtime_dsn,
+        db_env_name(app, "ADMIN_DSN"): owner_dsn,
+        db_env_name(app, "FAMILY_WRITER_DSN"): writer_dsn,
         "MISSION_CONTROL_CATALOG_SCOPE": f"mc/{installation}/{app}/catalog",
         # OC-R4: the installation's application selects its profile (capability owner).
         "MISSION_CONTROL_APPLICATION": app,
-        "LANGGRAPH_CHECKPOINT_DATABASE_DIRECT": checkpoint_dsn,
+        db_env_name(app, "CHECKPOINT_DSN"): checkpoint_dsn,
         "LANGGRAPH_CHECKPOINT_SCHEMA": technical.LANGGRAPH_SCHEMA,
         "TEMPORAL_ADDRESS": f"127.0.0.1:{PORT}",
         "TEMPORAL_NAMESPACE": "default",

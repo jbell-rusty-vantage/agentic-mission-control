@@ -1,7 +1,8 @@
 """MO-14 push credentials: the Mission Control GitHub App installation token restricted to
 the target repository (a FIXTURE App key and an `httpx.MockTransport` GitHub), the owner `gh`
-fallback that always selects Overton77 (a FIXTURE command runner; `gh` is never executed) and
-the configuration refusals (DECISIONS R26). No token is real and no request leaves the machine.
+fallback that always selects jbell-rusty-vantage (a FIXTURE command runner; `gh` is never
+executed) and the configuration refusals (DECISIONS R26). No token is real and no request
+leaves the machine.
 """
 
 from __future__ import annotations
@@ -91,7 +92,7 @@ async def test_a_wrong_app_or_an_unrestricted_grant_is_refused(tmp_path: Path) -
     with pytest.raises(GitHubCredentialError):
         await impostor.credential(REPOSITORY)
     with pytest.raises(GitHubError):
-        await impostor.credential("https://gitlab.com/Overton77/mission-control")
+        await impostor.credential("https://gitlab.com/jbell-rusty-vantage/mission-control")
 
 
 class RecordingRunner:
@@ -115,15 +116,23 @@ async def test_the_gh_fallback_selects_overton77_and_ignores_ambient_tokens(
     credential = await OwnerGhCredentials(runner=runner).credential(REPOSITORY)
 
     [(argv, env)] = runner.calls
-    assert argv == ("gh", "auth", "token", "--hostname", "github.com", "--user", "Overton77")
+    assert argv == (
+        "gh",
+        "auth",
+        "token",
+        "--hostname",
+        "github.com",
+        "--user",
+        "jbell-rusty-vantage",
+    )
     assert "GH_TOKEN" not in env and "GITHUB_TOKEN" not in env
-    assert credential.source == "owner_gh" and credential.username == "Overton77"
+    assert credential.source == "owner_gh" and credential.username == "jbell-rusty-vantage"
     assert credential.secret.get_secret_value() == "gho_fixture_owner_token"
 
 
 async def test_a_missing_gh_login_is_refused_without_echoing_output() -> None:
     runner = RecordingRunner(returncode=1, stdout=b"")
-    with pytest.raises(GitHubCredentialError, match="no login for Overton77"):
+    with pytest.raises(GitHubCredentialError, match="no login for jbell-rusty-vantage"):
         await OwnerGhCredentials(runner=runner).credential(REPOSITORY)
 
 
@@ -154,10 +163,10 @@ def test_the_factory_prefers_the_app_and_never_falls_back_silently(tmp_path: Pat
 @pytest.mark.parametrize(
     "url",
     [
-        "https://github.com/Overton77/mission-control",
-        "https://github.com/Overton77/mission-control.git",
-        "git@github.com:Overton77/mission-control.git",
+        "https://github.com/jbell-rusty-vantage/mission-control",
+        "https://github.com/jbell-rusty-vantage/mission-control.git",
+        "git@github.com:jbell-rusty-vantage/mission-control.git",
     ],
 )
 def test_github_repository_urls_parse_to_owner_and_name(url: str) -> None:
-    assert GitHubRepository.parse(url) == GitHubRepository("Overton77", "mission-control")
+    assert GitHubRepository.parse(url) == GitHubRepository("jbell-rusty-vantage", "mission-control")

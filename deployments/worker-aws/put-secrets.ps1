@@ -6,7 +6,7 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 if (-not $OwnerExecution) { throw 'Owner-run secret write requires -OwnerExecution; no values are read.' }
-$allowed = @('MC_AI_ENGINEER_RUNTIME_DSN','MC_AI_ENGINEER_FAMILY_DSN','LANGGRAPH_CHECKPOINT_DATABASE_DIRECT','TEMPORAL_CLOUD_API_KEY','ANTHROPIC_API_KEY','OPENAI_API_KEY','CURSOR_API_KEY')
+$allowed = @('MC_AIENG_DB_RUNTIME_DSN','MC_AIENG_DB_FAMILY_WRITER_DSN','MC_AIENG_DB_CHECKPOINT_DSN','TEMPORAL_CLOUD_API_KEY','ANTHROPIC_API_KEY','OPENAI_API_KEY','CURSOR_API_KEY')
 if (@($Names | Where-Object { $_ -notin $allowed }).Count) { throw 'Unapproved secret name' }
 $identity = aws sts get-caller-identity --region $Region --output json | ConvertFrom-Json
 if ($LASTEXITCODE -ne 0 -or $identity.Account -ne '298199649527') { throw 'AWS account mismatch' }

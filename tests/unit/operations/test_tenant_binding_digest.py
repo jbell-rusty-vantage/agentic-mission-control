@@ -37,7 +37,7 @@ def _seal(**extra: object) -> dict[str, object]:
         installation_id=uuid4(),
         binding_version="sprint-oc-w1/1.8.0",
         supabase_project_ref="wkythqbofmckbuoothhn",
-        database_secret_ref="MC_AI_ENGINEER_RUNTIME_DSN",
+        database_secret_ref="MC_AIENG_DB_RUNTIME_DSN",
         accepted_issuers={"mission-control-operator/ai-engineer", "z-issuer", "a-issuer"},
         accepted_audiences={"mission-control/ai-engineer"},
         required_component_version="1.8.0",

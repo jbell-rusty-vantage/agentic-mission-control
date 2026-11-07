@@ -5,10 +5,10 @@ import os
 from decimal import Decimal
 from functools import lru_cache
 from pathlib import Path
-from typing import Literal, get_args
+from typing import Any, Literal, get_args
 from urllib.parse import urlsplit
 
-from pydantic import Field, SecretStr, model_validator
+from pydantic import BaseModel, ConfigDict, Field, SecretStr, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from mission_control.bootstrap.application_profiles import (
@@ -58,6 +58,80 @@ def _placement_limits() -> dict[LaneProfileName, PlacementLimit]:
     }
 
 
+DbPlane = Literal["AIENG", "BIOTECH", "LOCAL"]
+_APPLICATION_PLANES: dict[str, DbPlane] = {"ai-engineer": "AIENG", "biotech": "BIOTECH"}
+_DSN_ROLES = ("admin_dsn", "runtime_dsn", "family_writer_dsn", "backfill_dsn", "checkpoint_dsn")
+
+
+def plane_for_application(application: str | None) -> DbPlane:
+    """``ai-engineer`` is AIENG, ``biotech`` is BIOTECH, unset is the local Docker database."""
+
+    if application is None:
+        return "LOCAL"
+    plane = _APPLICATION_PLANES.get(application)
+    if plane is None:
+        raise IntegrationConfigurationError(
+            f"MISSION_CONTROL_APPLICATION={application} selects no database plane "
+            "(ai-engineer, biotech, or unset for the local Docker database)"
+        )
+    return plane
+
+
+class PlaneDatabase(BaseModel):
+    """The database variables of one plane, resolved once. Secrets stay ``SecretStr``."""
+
+    model_config = ConfigDict(frozen=True, arbitrary_types_allowed=True)
+
+    plane: DbPlane
+    project_ref: str | None = None
+    url: str | None = None
+    publishable_key: SecretStr | None = None
+    secret_key: SecretStr | None = None
+    legacy_jwt_secret: SecretStr | None = None
+    admin_dsn: SecretStr | None = None
+    runtime_dsn: SecretStr | None = None
+    family_writer_dsn: SecretStr | None = None
+    backfill_dsn: SecretStr | None = None
+    checkpoint_dsn: SecretStr | None = None
+
+    def env_name(self, role: str) -> str:
+        """The environment variable name of ``role`` on this plane, e.g. ``MC_AIENG_DB_URL``."""
+
+        return f"MC_{self.plane}_DB_{role.upper()}"
+
+    def required_dsn(self, role: str, purpose: str) -> str:
+        value: SecretStr | None = getattr(self, role)
+        if value is None:
+            raise ValueError(f"{self.env_name(role)} is required for {purpose}")
+        return value.get_secret_value()
+
+    def check_project_ref(self) -> None:
+        """Refuse when ``PROJECT_REF`` is absent from a sibling's host or login (names the plane,
+        ref, variable and host only; never a credential)."""
+
+        ref = (self.project_ref or "").lower()
+        if self.plane == "LOCAL" or not ref:
+            return
+        siblings: list[tuple[str, str]] = []
+        if self.url:
+            siblings.append(("url", self.url))
+        for dsn_role in _DSN_ROLES:
+            secret: SecretStr | None = getattr(self, dsn_role)
+            if secret is not None:
+                siblings.append((dsn_role, secret.get_secret_value()))
+        for role, location in siblings:
+            try:
+                parts = urlsplit(location)
+                host, login = (parts.hostname or "").lower(), (parts.username or "").lower()
+            except ValueError:
+                host, login = "", ""
+            if ref not in host and ref not in login:
+                raise ValueError(
+                    f"{self.env_name('project_ref')} ({ref}) is not in the host or login of "
+                    f"{self.env_name(role)} (plane {self.plane}, host {host or 'unparsed'})"
+                )
+
+
 class Settings(BaseSettings):
     """Deployment settings; optional integrations validate credentials when selected."""
 
@@ -68,23 +142,41 @@ class Settings(BaseSettings):
         case_sensitive=False,
     )
 
-    database_direct: SecretStr | None = None
     mission_control_placement_limits: dict[LaneProfileName, PlacementLimit] = Field(
         default_factory=_placement_limits
     )
     mission_control_source_watches: list[dict[str, object]] = Field(
         default_factory=list, max_length=16
     )
-    database_url: SecretStr | None = None
-    application_database_direct: SecretStr | None = None
-    application_database_url: SecretStr | None = None
-    application_migration_database_direct: SecretStr | None = None
-    application_backfill_database_direct: SecretStr | None = None
-    application_family_writer_database_direct: SecretStr | None = None
-
-    supabase_url: str | None = None
-    supabase_publishable_key: SecretStr | None = None
-    supabase_secret_key: SecretStr | None = None
+    # Database variables (docs/ENVIRONMENT.md, config/env.registry.yaml). One block per plane;
+    # `MISSION_CONTROL_APPLICATION` selects which one this process reads (`Settings.db`).
+    # No other database variable name is read, and there are no aliases.
+    mc_aieng_db_project_ref: str | None = None
+    mc_aieng_db_url: str | None = None
+    mc_aieng_db_publishable_key: SecretStr | None = None
+    mc_aieng_db_secret_key: SecretStr | None = None
+    mc_aieng_db_legacy_jwt_secret: SecretStr | None = None
+    mc_aieng_db_admin_dsn: SecretStr | None = None
+    mc_aieng_db_runtime_dsn: SecretStr | None = None
+    mc_aieng_db_family_writer_dsn: SecretStr | None = None
+    mc_aieng_db_backfill_dsn: SecretStr | None = None
+    mc_aieng_db_checkpoint_dsn: SecretStr | None = None
+    mc_biotech_db_project_ref: str | None = None
+    mc_biotech_db_url: str | None = None
+    mc_biotech_db_publishable_key: SecretStr | None = None
+    mc_biotech_db_secret_key: SecretStr | None = None
+    mc_biotech_db_legacy_jwt_secret: SecretStr | None = None
+    mc_biotech_db_admin_dsn: SecretStr | None = None
+    mc_biotech_db_runtime_dsn: SecretStr | None = None
+    mc_biotech_db_family_writer_dsn: SecretStr | None = None
+    mc_biotech_db_backfill_dsn: SecretStr | None = None
+    mc_biotech_db_checkpoint_dsn: SecretStr | None = None
+    mc_local_db_admin_dsn: SecretStr | None = None
+    mc_local_db_runtime_dsn: SecretStr | None = None
+    mc_local_db_family_writer_dsn: SecretStr | None = None
+    mc_local_db_backfill_dsn: SecretStr | None = None
+    mc_local_db_checkpoint_dsn: SecretStr | None = None
+    mc_local_db_port: int = 55432  # read by docker-compose and the Makefile
     ingress_drainer_enabled: bool = False
     ingress_manifest_paths: dict[str, Path] = Field(default_factory=dict)
     ingress_quarantine_bucket: str | None = None
@@ -245,7 +337,6 @@ class Settings(BaseSettings):
     # `mission-db runtime-apply` (packages/mission-control-db-contract/runtime). There is no
     # fallback to `belllabs_langgraph` or `public`. `setup` is a TEST-ONLY vendor setup()
     # switch for disposable schemas; it is refused for the runtime schema and in production.
-    langgraph_checkpoint_database_direct: SecretStr | None = None
     langgraph_checkpoint_schema: str = Field(
         default=RUNTIME_CHECKPOINT_SCHEMA, pattern=r"^[a-z_][a-z0-9_]{0,62}$"
     )
@@ -530,55 +621,74 @@ class Settings(BaseSettings):
     socketio_cors_origins: str = "http://localhost:3000,http://127.0.0.1:3000"
 
     @property
+    def db_plane(self) -> DbPlane:
+        """The database plane this process reads, from ``MISSION_CONTROL_APPLICATION``."""
+
+        return plane_for_application(self.mission_control_application)
+
+    @property
+    def db(self) -> PlaneDatabase:
+        """The resolved database variables of the selected plane (the only reader of them)."""
+
+        plane = self.db_plane
+        prefix = f"mc_{plane.lower()}_db_"
+
+        def get(role: str) -> Any:
+            return getattr(self, prefix + role, None)
+
+        def text(role: str) -> str | None:
+            value = get(role)
+            return (value.strip() or None) if isinstance(value, str) else None
+
+        def secret(role: str) -> SecretStr | None:
+            return configured(get(role))
+
+        return PlaneDatabase(
+            plane=plane,
+            project_ref=text("project_ref"),
+            url=text("url"),
+            publishable_key=secret("publishable_key"),
+            secret_key=secret("secret_key"),
+            legacy_jwt_secret=secret("legacy_jwt_secret"),
+            admin_dsn=secret("admin_dsn"),
+            runtime_dsn=secret("runtime_dsn"),
+            family_writer_dsn=secret("family_writer_dsn"),
+            backfill_dsn=secret("backfill_dsn"),
+            checkpoint_dsn=secret("checkpoint_dsn"),
+        )
+
+    @property
     def postgres_dsn(self) -> str:
-        value = configured(self.database_direct) or configured(self.database_url)
-        if value is None:
-            raise ValueError("DATABASE_DIRECT or DATABASE_URL is required")
-        return value.get_secret_value()
+        """The common-database connection: the plane's schema-owner (admin) login."""
+
+        return self.db.required_dsn("admin_dsn", "the common database connection")
 
     @property
     def application_postgres_dsn(self) -> str:
-        value = configured(self.application_database_direct) or configured(
-            self.application_database_url
-        )
-        if value is None:
-            raise ValueError("APPLICATION_DATABASE_DIRECT or APPLICATION_DATABASE_URL is required")
-        return value.get_secret_value()
+        """The restricted runtime login (never the admin login)."""
+
+        return self.db.required_dsn("runtime_dsn", "the runtime pool")
 
     @property
     def has_application_postgres(self) -> bool:
-        return (
-            configured(self.application_database_direct) is not None
-            or configured(self.application_database_url) is not None
-        )
+        return self.db.runtime_dsn is not None
 
     @property
     def application_migration_postgres_dsn(self) -> str:
-        # Migration authority is never inferred from the restricted runtime credential.
-        value = configured(self.application_migration_database_direct)
-        if value is None:
-            raise ValueError("APPLICATION_MIGRATION_DATABASE_DIRECT is required for migrations")
-        return value.get_secret_value()
+        # Migration authority is the admin login, never inferred from the runtime credential.
+        return self.db.required_dsn("admin_dsn", "migrations")
 
     @property
     def application_backfill_postgres_dsn(self) -> str:
-        value = configured(self.application_backfill_database_direct)
-        if value is None:
-            raise ValueError("APPLICATION_BACKFILL_DATABASE_DIRECT is required for backfill")
-        return value.get_secret_value()
+        return self.db.required_dsn("backfill_dsn", "backfill")
 
     @property
     def has_application_family_writer_postgres(self) -> bool:
-        return configured(self.application_family_writer_database_direct) is not None
+        return self.db.family_writer_dsn is not None
 
     @property
     def application_family_writer_postgres_dsn(self) -> str:
-        value = configured(self.application_family_writer_database_direct)
-        if value is None:
-            raise ValueError(
-                "APPLICATION_FAMILY_WRITER_DATABASE_DIRECT is required for atomic family admission"
-            )
-        return value.get_secret_value()
+        return self.db.required_dsn("family_writer_dsn", "atomic family admission")
 
     @property
     def cors_origins(self) -> list[str]:
@@ -590,15 +700,17 @@ class Settings(BaseSettings):
     def coordinator_jwt_issuer(self) -> str:
         if self.coordinator_mcp_jwt_issuer and self.coordinator_mcp_jwt_issuer.strip():
             return self.coordinator_mcp_jwt_issuer
-        if self.supabase_url and self.supabase_url.strip():
-            return f"{self.supabase_url.rstrip('/')}/auth/v1"
+        url = self.db.url
+        if url:
+            return f"{url.rstrip('/')}/auth/v1"
         raise IntegrationConfigurationError(
-            "COORDINATOR_MCP_JWT_ISSUER or SUPABASE_URL is required for coordinator authentication"
+            "COORDINATOR_MCP_JWT_ISSUER or "
+            f"{self.db.env_name('url')} is required for coordinator authentication"
         )
 
     @property
     def checkpoint_signing_key(self) -> bytes:
-        secret = self.runtime_checkpoint_signing_key or self.supabase_secret_key
+        secret = self.runtime_checkpoint_signing_key or self.db.secret_key
         if secret is None or not secret.get_secret_value().strip():
             raise IntegrationConfigurationError(
                 "RUNTIME_CHECKPOINT_SIGNING_KEY is required for checkpoint signing "
@@ -644,6 +756,18 @@ class Settings(BaseSettings):
                 and configured(value) is None
             ):
                 setattr(self, name, None)
+        return self
+
+    @model_validator(mode="after")
+    def _db_project_ref_matches_siblings(self) -> Settings:
+        """Rule 3 of the database contract: the selected Supabase plane's ``PROJECT_REF`` appears in
+        the host or login of every sibling URL/DSN that is set. LOCAL has no project."""
+
+        try:
+            view = self.db
+        except IntegrationConfigurationError:
+            return self  # an unknown application fails where the plane is first needed
+        view.check_project_ref()
         return self
 
     @model_validator(mode="after")
@@ -747,7 +871,7 @@ class Settings(BaseSettings):
             runtime_checkpoint_conninfo,
         )
 
-        checkpoint = configured(self.langgraph_checkpoint_database_direct)
+        checkpoint = self.db.checkpoint_dsn
         value = (
             checkpoint.get_secret_value()
             if checkpoint is not None

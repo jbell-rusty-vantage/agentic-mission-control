@@ -23,15 +23,18 @@ os.environ.setdefault("LANGCHAIN_TRACING_V2", "false")
 # import. Supply non-routable placeholders for the required fields only in that case;
 # explicit environment values always win, and service/provider tests keep their own opt-ins.
 _OFFLINE_SETTINGS_PLACEHOLDERS = {
-    "SUPABASE_URL": "https://offline-placeholder.invalid",
-    "SUPABASE_PUBLISHABLE_KEY": "offline-placeholder",
-    "SUPABASE_SECRET_KEY": "offline-placeholder",
+    "MC_AIENG_DB_URL": "https://offline-placeholder.invalid",
+    "MC_AIENG_DB_PUBLISHABLE_KEY": "offline-placeholder",
+    "MC_AIENG_DB_SECRET_KEY": "offline-placeholder",
+    "MC_BIOTECH_DB_URL": "https://offline-placeholder.invalid",
+    "MC_BIOTECH_DB_PUBLISHABLE_KEY": "offline-placeholder",
+    "MC_BIOTECH_DB_SECRET_KEY": "offline-placeholder",
     "OPENAI_API_KEY": "offline-placeholder",
-    "NEO4J_URI": "neo4j://offline-placeholder.invalid:7687",
-    "NEO4J_AURA_USERNAME": "offline-placeholder",
-    "NEO4J_AURA_PASSWORD": "offline-placeholder",
-    "DATABASE_URL": "postgresql://offline-placeholder.invalid:5432/offline",
-    "APPLICATION_DATABASE_URL": "postgresql://offline-placeholder.invalid:5432/offline",
+    "MC_BIOTECH_GRAPH_URI": "neo4j://offline-placeholder.invalid:7687",
+    "MC_BIOTECH_GRAPH_USERNAME": "offline-placeholder",
+    "MC_BIOTECH_GRAPH_PASSWORD": "offline-placeholder",
+    "MC_LOCAL_DB_ADMIN_DSN": "postgresql://offline-placeholder.invalid:5432/offline",
+    "MC_LOCAL_DB_RUNTIME_DSN": "postgresql://offline-placeholder.invalid:5432/offline",
 }
 if not (PROJECT_ROOT / ".env").exists():
     for _name, _value in _OFFLINE_SETTINGS_PLACEHOLDERS.items():

@@ -31,11 +31,12 @@ def core_settings(monkeypatch):
 
 
 def test_empty_environment_constructs_core_and_local_component_registry(core_settings):
-    assert core_settings.supabase_url is None
-    assert core_settings.supabase_secret_key is None
-    assert core_settings.supabase_publishable_key is None
+    assert core_settings.db.plane == "LOCAL"
+    assert core_settings.db.url is None
+    assert core_settings.db.secret_key is None
+    assert core_settings.db.publishable_key is None
     assert core_settings.openai_api_key is None
-    assert "neo4j_uri" not in Settings.model_fields
+    assert "mc_biotech_graph_uri" not in Settings.model_fields
     registry = build_deployment_capability_registry(
         core_settings, CapabilityPins(), saver=InMemorySaver(), store=InMemoryStore()
     )
@@ -52,18 +53,19 @@ async def test_selected_supabase_requires_its_key_without_client_creation(
         "mission_control.adapters.supabase_storage.client.acreate_client",
         lambda *args: pytest.fail("client must not be created"),
     )
-    key_name = "SUPABASE_SECRET_KEY" if privileged else "SUPABASE_PUBLISHABLE_KEY"
+    key_name = "MC_AIENG_DB_SECRET_KEY" if privileged else "MC_AIENG_DB_PUBLISHABLE_KEY"
+    plane = core_settings.model_copy(update={"mission_control_application": "ai-engineer"})
     with pytest.raises(IntegrationConfigurationError, match=key_name):
-        await create_supabase(core_settings, privileged=privileged)
+        await create_supabase(plane, privileged=privileged)
     # A secret/service key must never substitute for a missing publishable key.
-    configured = core_settings.model_copy(
+    configured = plane.model_copy(
         update={
-            "supabase_url": "https://offline.invalid",
-            "supabase_secret_key": SecretStr("fixture"),
+            "mc_aieng_db_url": "https://offline.invalid",
+            "mc_aieng_db_secret_key": SecretStr("fixture"),
         }
     )
     if not privileged:
-        with pytest.raises(IntegrationConfigurationError, match="SUPABASE_PUBLISHABLE_KEY"):
+        with pytest.raises(IntegrationConfigurationError, match="MC_AIENG_DB_PUBLISHABLE_KEY"):
             await create_supabase(configured)
 
 

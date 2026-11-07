@@ -19,7 +19,7 @@ async def test_neo4j_missing_config_fails_before_driver_creation(core_settings, 
         "biotech_mission_adapters.adapters.infrastructure.neo4j.AsyncGraphDatabase.driver",
         lambda *args, **kwargs: pytest.fail("driver must not be created"),
     )
-    with pytest.raises(IntegrationConfigurationError, match="NEO4J_URI"):
+    with pytest.raises(IntegrationConfigurationError, match="MC_BIOTECH_GRAPH_URI"):
         await create_neo4j(core_settings)
 
 
@@ -27,9 +27,9 @@ async def test_neo4j_missing_config_fails_before_driver_creation(core_settings, 
 async def test_blank_neo4j_secret_is_not_configuration(core_settings):
     settings = core_settings.model_copy(
         update={
-            "neo4j_uri": "neo4j://offline.invalid",
-            "neo4j_aura_username": "operator",
-            "neo4j_aura_password": SecretStr("   "),
+            "mc_biotech_graph_uri": "neo4j://offline.invalid",
+            "mc_biotech_graph_username": "operator",
+            "mc_biotech_graph_password": SecretStr("   "),
         }
     )
     with pytest.raises(IntegrationConfigurationError):

@@ -49,7 +49,8 @@ def repo(tmp_path: Path) -> Path:
 def _env_file(tmp_path: Path, *, ref: str = AIE_REF, secret: str = SECRET) -> Path:
     path = tmp_path / "aie.env"
     path.write_text(
-        f"SUPABASE_URL=https://{ref}.supabase.co\nSUPABASE_JWT_SECRET={secret}\n", encoding="utf-8"
+        f"AIENG_DB_URL=https://{ref}.supabase.co\nAIENG_DB_LEGACY_JWT_SECRET={secret}\n",
+        encoding="utf-8",
     )
     return path
 
@@ -66,7 +67,9 @@ def _tokens(repo: Path, app: str = "ai-engineer") -> dict[str, str]:
 
 def test_hs256_tokens_carry_the_policy_claims(repo: Path, tmp_path: Path) -> None:
     env = _env_file(tmp_path)
-    code, summary = _run(repo, "--secret-env-file", str(env), "--secret-env", "SUPABASE_JWT_SECRET")
+    code, summary = _run(
+        repo, "--secret-env-file", str(env), "--secret-env", "AIENG_DB_LEGACY_JWT_SECRET"
+    )
     assert code == 0, summary
     tokens = _tokens(repo)
     key = OctKey.import_key(SECRET)
@@ -99,7 +102,7 @@ def test_es256_standby_key_signs_with_its_kid(repo: Path, tmp_path: Path) -> Non
     pem = tmp_path / "standby.pem"
     pem.write_bytes(key.as_pem(private=True))
     env = tmp_path / "bio.env"
-    env.write_text(f"SUPABASE_URL=https://{BIOTECH_REF}.supabase.co\n", encoding="utf-8")
+    env.write_text(f"MC_BIOTECH_DB_URL=https://{BIOTECH_REF}.supabase.co\n", encoding="utf-8")
     code, summary = _run(
         repo,
         "--es256-key-file",
@@ -147,7 +150,7 @@ def test_an_unusable_es256_key_file_refuses_cleanly(repo: Path, tmp_path: Path, 
     key_file = tmp_path / "standby.pem"
     key_file.write_bytes(pem)
     env = tmp_path / "bio.env"
-    env.write_text(f"SUPABASE_URL=https://{BIOTECH_REF}.supabase.co\n", encoding="utf-8")
+    env.write_text(f"MC_BIOTECH_DB_URL=https://{BIOTECH_REF}.supabase.co\n", encoding="utf-8")
     code, summary = _run(
         repo,
         "--es256-key-file",
@@ -170,10 +173,12 @@ def test_the_secret_is_read_literally_without_interpolation(
     monkeypatch.setenv("X", "substituted")
     env = tmp_path / "aie.env"
     env.write_text(
-        f"SUPABASE_URL=https://{AIE_REF}.supabase.co\nSUPABASE_JWT_SECRET={secret}\n",
+        f"AIENG_DB_URL=https://{AIE_REF}.supabase.co\nAIENG_DB_LEGACY_JWT_SECRET={secret}\n",
         encoding="utf-8",
     )
-    code, summary = _run(repo, "--secret-env-file", str(env), "--secret-env", "SUPABASE_JWT_SECRET")
+    code, summary = _run(
+        repo, "--secret-env-file", str(env), "--secret-env", "AIENG_DB_LEGACY_JWT_SECRET"
+    )
     assert code == 0, summary
     token = _tokens(repo)["CAPABILITY_BUNDLE_READER_TOKEN"]
     assert jwt.decode(token, OctKey.import_key(secret)).claims["mc_capability_role"] == "reader"
@@ -183,7 +188,9 @@ def test_the_secret_is_read_literally_without_interpolation(
 
 def test_a_project_other_than_the_target_refuses(repo: Path, tmp_path: Path) -> None:
     env = _env_file(tmp_path, ref=BIOTECH_REF)
-    code, summary = _run(repo, "--secret-env-file", str(env), "--secret-env", "SUPABASE_JWT_SECRET")
+    code, summary = _run(
+        repo, "--secret-env-file", str(env), "--secret-env", "AIENG_DB_LEGACY_JWT_SECRET"
+    )
     assert (code, summary["code"]) == (2, "PROJECT_REF_MISMATCH")
     assert not (repo / "runtime").exists()
 
@@ -192,10 +199,10 @@ def test_a_project_other_than_the_target_refuses(repo: Path, tmp_path: Path) -> 
     ("extra", "code"),
     [
         ((), "SIGNING_MATERIAL_REQUIRED"),
-        (("--secret-env", "SUPABASE_JWT_SECRET", "--kid", "x"), "SIGNING_MATERIAL_REQUIRED"),
+        (("--secret-env", "AIENG_DB_LEGACY_JWT_SECRET", "--kid", "x"), "SIGNING_MATERIAL_REQUIRED"),
         (("--secret-env", "MISSING_NAME"), "SECRET_MISSING"),
-        (("--secret-env", "SUPABASE_JWT_SECRET", "--reader-ttl", "90d"), "TTL_TOO_LONG"),
-        (("--secret-env", "SUPABASE_JWT_SECRET", "--publisher-ttl", "soon"), "TTL_INVALID"),
+        (("--secret-env", "AIENG_DB_LEGACY_JWT_SECRET", "--reader-ttl", "90d"), "TTL_TOO_LONG"),
+        (("--secret-env", "AIENG_DB_LEGACY_JWT_SECRET", "--publisher-ttl", "soon"), "TTL_INVALID"),
     ],
 )
 def test_refusals(repo: Path, tmp_path: Path, extra: tuple[str, ...], code: str) -> None:
@@ -218,7 +225,7 @@ def test_output_must_be_ignored(repo: Path, tmp_path: Path) -> None:
             "--secret-env-file",
             str(env),
             "--secret-env",
-            "SUPABASE_JWT_SECRET",
+            "AIENG_DB_LEGACY_JWT_SECRET",
         ]
     )
     assert (code, summary["code"]) == (2, "OUTPUT_NOT_IGNORED")
@@ -226,7 +233,10 @@ def test_output_must_be_ignored(repo: Path, tmp_path: Path) -> None:
 
 def test_custody_file_is_owner_only(repo: Path, tmp_path: Path) -> None:
     env = _env_file(tmp_path)
-    assert _run(repo, "--secret-env-file", str(env), "--secret-env", "SUPABASE_JWT_SECRET")[0] == 0
+    assert (
+        _run(repo, "--secret-env-file", str(env), "--secret-env", "AIENG_DB_LEGACY_JWT_SECRET")[0]
+        == 0
+    )
     path = repo / "runtime" / "ai-engineer" / "bundle-custody.env"
     if os.name == "nt":
         principals = mint.runtime.acl_principals(path)
@@ -257,7 +267,7 @@ def test_seed_publisher_requires_an_env_file(restore_environ: None) -> None:
 
 def test_seed_publisher_refuses_another_project(tmp_path: Path, restore_environ: None) -> None:
     env = tmp_path / "mission-control.env"
-    env.write_text(f"SUPABASE_URL=https://{BIOTECH_REF}.supabase.co\n", encoding="utf-8")
+    env.write_text(f"MC_AIENG_DB_URL=https://{BIOTECH_REF}.supabase.co\n", encoding="utf-8")
     with pytest.raises(SystemExit, match="does not name the ai-engineer project"):
         seeds.target_settings("ai-engineer", env)
 
@@ -267,11 +277,11 @@ def test_seed_publisher_takes_the_target_project_from_the_env_file(
 ) -> None:
     env = tmp_path / "mission-control.env"
     env.write_text(
-        f"SUPABASE_URL=https://{AIE_REF}.supabase.co\nCAPABILITY_BUNDLE_PUBLISHER_TOKEN=fake\n",
+        f"MC_AIENG_DB_URL=https://{AIE_REF}.supabase.co\nCAPABILITY_BUNDLE_PUBLISHER_TOKEN=fake\n",
         encoding="utf-8",
     )
     settings = seeds.target_settings("ai-engineer", env)
-    assert settings.supabase_url == f"https://{AIE_REF}.supabase.co"
+    assert settings.db.url == f"https://{AIE_REF}.supabase.co"
     assert settings.capability_bundle_publisher_token.get_secret_value() == "fake"
 
 
@@ -285,7 +295,7 @@ def test_skill_registration_refuses_a_file_without_an_application(
     tmp_path: Path, restore_environ: None
 ) -> None:
     env = tmp_path / "bundle-publisher.env"
-    env.write_text(f"SUPABASE_URL=https://{AIE_REF}.supabase.co\n", encoding="utf-8")
+    env.write_text(f"MC_AIENG_DB_URL=https://{AIE_REF}.supabase.co\n", encoding="utf-8")
     with pytest.raises(SystemExit, match="MISSION_CONTROL_APPLICATION"):
         register.operator_settings(env)
 
@@ -293,7 +303,7 @@ def test_skill_registration_refuses_a_file_without_an_application(
 def test_skill_registration_refuses_another_project(tmp_path: Path, restore_environ: None) -> None:
     env = tmp_path / "bundle-publisher.env"
     env.write_text(
-        f"MISSION_CONTROL_APPLICATION=ai-engineer\nSUPABASE_URL=https://{BIOTECH_REF}.supabase.co\n",
+        f"MISSION_CONTROL_APPLICATION=ai-engineer\nMC_AIENG_DB_URL=https://{BIOTECH_REF}.supabase.co\n",
         encoding="utf-8",
     )
     with pytest.raises(SystemExit, match="does not name the ai-engineer project"):

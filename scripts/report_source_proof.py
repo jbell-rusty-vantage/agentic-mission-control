@@ -40,8 +40,10 @@ def run(out: Path, dsn_variable: str, timeout: int = 420) -> int:
                 "API_KEY",
                 "SUPABASE",
                 "NEO4J",
-                "DATABASE_URL",
-                "DIRECT_URL",
+                "BIOTECH_GRAPH_",
+                "AIENG_DB_",
+                "BIOTECH_DB_",
+                "LOCAL_DB_",
                 "POSTGRES_URL",
             )
         )

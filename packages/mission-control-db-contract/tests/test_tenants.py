@@ -42,7 +42,7 @@ def deployment(path: Path, target: dict[str, str], tenants: list[str], **binding
                         "application_id": target["application_id"],
                         "installation_id": target["installation_id"],
                         "supabase_project_ref": target["project_ref"],
-                        "database_secret_ref": "MC_RUNTIME_DSN",
+                        "database_secret_ref": "MC_BIOTECH_DB_RUNTIME_DSN",
                         "accepted_issuers": ["mission-control-operator/biotech"],
                         "accepted_audiences": ["mission-control/biotech"],
                         **binding,
@@ -115,7 +115,7 @@ def test_plan_apply_repeat_and_receipt(installed, release, tmp_path):
     assert receipt["changed"] is True
     assert [entry["action"] for entry in receipt["tenants"]] == ["created", "created"]
     assert receipt["deployment_digest"].startswith("sha256:")
-    assert "MC_RUNTIME_DSN" not in json.dumps(receipt)
+    assert "MC_BIOTECH_DB_RUNTIME_DSN" not in json.dumps(receipt)
     for tenant in tenants:
         rows = run(_runtime_sees(db, target, tenant))
         assert [tuple(row) for row in rows] == [

@@ -27,7 +27,7 @@ MCP_PORT    ?= 8010
 MCP_PATH    ?= /mcp
 
 # --- Infrastructure (host-side ports; see docker-compose.yml) ---------------------------
-APPLICATION_POSTGRES_PORT ?= 55432
+MC_LOCAL_DB_PORT ?= 55432
 REDIS_PORT                ?= 16379
 TEMPORAL_UI_PORT          ?= 8080
 WAIT_TIMEOUT              ?= 300

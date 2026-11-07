@@ -145,8 +145,8 @@ def build_parser(prog: str = "mission-db") -> argparse.ArgumentParser:
                 "--out-env",
                 type=Path,
                 required=True,
-                help="ignored owner-only env file receiving MC_RUNTIME_DSN, "
-                "MC_FAMILY_WRITER_DSN, MC_CHECKPOINTER_DSN",
+                help="ignored owner-only env file receiving MC_<PLANE>_DB_RUNTIME_DSN, "
+                "_FAMILY_WRITER_DSN, _CHECKPOINT_DSN (PLANE: AIENG or BIOTECH)",
             )
             p.add_argument("--ca-file", type=Path, help="CA PEM for sslmode=verify-full")
             p.add_argument("--sslmode", choices=("verify-full", "disable"), default="verify-full")

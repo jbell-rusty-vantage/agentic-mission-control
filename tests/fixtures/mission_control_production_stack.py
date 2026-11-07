@@ -28,6 +28,7 @@ import asyncpg
 import httpx
 import pytest
 from temporalio.testing import WorkflowEnvironment
+from tests.fixtures.db_env import db_env_name
 from tests.fixtures.mission_control_common_db import (
     COMPONENT_VERSION,
     CommonDatabase,
@@ -98,7 +99,7 @@ def _application_binding(database: CommonDatabase) -> ApplicationBinding:
         installation_id=database.installation_id,
         binding_version="1",
         supabase_project_ref=database.project_ref,
-        database_secret_ref="APPLICATION_DATABASE_DIRECT",
+        database_secret_ref=db_env_name(database.application_id, "RUNTIME_DSN"),
         accepted_issuers={"https://overnight-evidence.invalid"},
         accepted_audiences={"mission-control"},
         required_component_version=COMPONENT_VERSION,
@@ -199,15 +200,17 @@ async def open_postgres_production_stack(
         payload_root = root / "payloads"
         temporal_db = root / "temporal.sqlite"
         environment = {
-            "APPLICATION_DATABASE_DIRECT": database.dsn("mission_control_runtime"),
-            "APPLICATION_MIGRATION_DATABASE_DIRECT": dsn,
-            "APPLICATION_FAMILY_WRITER_DATABASE_DIRECT": database.dsn(
+            db_env_name(database.application_id, "RUNTIME_DSN"): database.dsn(
+                "mission_control_runtime"
+            ),
+            db_env_name(database.application_id, "ADMIN_DSN"): dsn,
+            db_env_name(database.application_id, "FAMILY_WRITER_DSN"): database.dsn(
                 "mission_control_family_writer"
             ),
             "MISSION_CONTROL_CATALOG_SCOPE": catalog_scope(database.application_id),
             # OC-R4: the installation's application selects its profile (capability owner).
             "MISSION_CONTROL_APPLICATION": database.application_id,
-            "LANGGRAPH_CHECKPOINT_DATABASE_DIRECT": checkpoint_dsn,
+            db_env_name(database.application_id, "CHECKPOINT_DSN"): checkpoint_dsn,
             "LANGGRAPH_CHECKPOINT_SCHEMA": LANGGRAPH_SCHEMA,
             "TEMPORAL_ADDRESS": f"127.0.0.1:{temporal_port}",
             "TEMPORAL_NAMESPACE": "default",

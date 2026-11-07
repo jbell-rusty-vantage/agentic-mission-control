@@ -83,7 +83,7 @@ binding = ApplicationBinding.seal(
     installation_id=UUID("11111111-1111-4111-8111-111111111111"),
     binding_version="1",
     supabase_project_ref="VERIFIED_PROJECT_REF",  # equals target.toml project_ref
-    database_secret_ref="MC_BIOTECH_RUNTIME_DSN",
+    database_secret_ref="MC_BIOTECH_DB_RUNTIME_DSN",
     accepted_issuers={"https://YOUR_PROJECT.supabase.co/auth/v1"},
     accepted_audiences={"authenticated"},
     required_component_version="1.0.0",
@@ -193,7 +193,7 @@ database_host = "<direct or session host>"
 database_port = 5432
 database_name = "postgres"
 database_user = "<approved migration login>"
-database_url_env = "MC_BIOTECH_MIGRATION_DATABASE_URL"   # NAME only
+database_url_env = "BIOTECH_DB_ADMIN_DSN"   # NAME only (the installer's admin login)
 
 [approval]
 approved_by = "<approver reference>"
@@ -311,7 +311,7 @@ disposable tests or after the access-expansion approval:
 | `mission_control_catalog_writer` | catalog admission and projection writes | tenant business writes |
 | `mission_control_outbox_worker` | outbox/projection claims and acknowledgement | mission state mutation |
 | `mission_control_readonly` | inspection | any write |
-| `mission_control_checkpointer` | `mission_control_runtime` schema only (`LANGGRAPH_CHECKPOINT_DATABASE_DIRECT`) | any `mission_control` access |
+| `mission_control_checkpointer` | `mission_control_runtime` schema only (`MC_<PLANE>_DB_CHECKPOINT_DSN`) | any `mission_control` access |
 
 Startup asserts NOSUPERUSER, NOBYPASSRLS, the expected single membership and no
 ownership of component objects. The installation identity row is written by
@@ -397,7 +397,7 @@ Provide these environment settings through the operator configuration/secret man
 - `MISSION_CONTROL_DEPLOYMENT_FILE`, `MISSION_CONTROL_WORKER_APPLICATION_ID`, and
   `MISSION_CONTROL_WORKER_BINDING_DIGEST` (the exact sealed binding digest).
 - `COORDINATOR_LAUNCH_ENABLED=true`.
-- `LANGGRAPH_CHECKPOINT_DATABASE_DIRECT`: a dedicated login in
+- `MC_<PLANE>_DB_CHECKPOINT_DSN`: a dedicated login in
   `mission_control_checkpointer` to the same selected installation database, distinct
   from runtime/family authority.
 - `LANGGRAPH_CHECKPOINT_SCHEMA=mission_control_runtime` (the default; `public`, the
@@ -1057,7 +1057,7 @@ auditable rejection, permitting closure without acknowledgment or wake. Neither 
 nor a wake accepts the mission or sends a new provider turn. Live qualification is unrun.
 
 Artifact custody additionally needs `INGRESS_QUARANTINE_BUCKET`, `INGRESS_CUSTODY_BUCKET`,
-`INGRESS_STORAGE_CREDENTIAL` and `SUPABASE_URL`, with separate buckets. Upload completion
+`INGRESS_STORAGE_CREDENTIAL` and the plane URL (`MC_<PLANE>_DB_URL`), with separate buckets. Upload completion
 does not establish custody: the worker checks bytes, digest, size, scope and expiry before
 normal immutable registration. Review/publication retain their separate authority.
 

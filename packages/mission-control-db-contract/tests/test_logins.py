@@ -114,9 +114,9 @@ def test_fresh_apply_repeat_and_rotate(installed, release, tmp_path, prefix):
     assert [e["action"] for e in first["logins"]] == ["created"] * len(LOGINS) and first["changed"]
     values = read_env_file(out_env)
     assert set(values) == {
-        "MC_RUNTIME_DSN",
-        "MC_FAMILY_WRITER_DSN",
-        "MC_CHECKPOINTER_DSN",
+        "MC_BIOTECH_DB_RUNTIME_DSN",
+        "MC_BIOTECH_DB_FAMILY_WRITER_DSN",
+        "MC_BIOTECH_DB_CHECKPOINT_DSN",
         "MC_INGRESS_DSN",
     }
     passwords = {name: dsn.split("@", 1)[0].rsplit(":", 1)[1] for name, dsn in values.items()}
@@ -156,7 +156,7 @@ def test_fresh_apply_repeat_and_rotate(installed, release, tmp_path, prefix):
     for spec in LOGINS:
         held = run(
             _as_login(
-                values[spec.dsn_name],
+                values[spec.dsn_name(target)],
                 "SELECT array_agg(rolname ORDER BY rolname) FROM pg_roles "
                 "WHERE rolname = ANY($1::text[]) AND pg_has_role(current_user, oid, 'MEMBER')",
                 capabilities + ["mission_control_outbox_worker", "mission_control_readonly"],
@@ -165,7 +165,7 @@ def test_fresh_apply_repeat_and_rotate(installed, release, tmp_path, prefix):
         assert held == [spec.capability]
     assert run(
         _as_login(
-            values["MC_RUNTIME_DSN"],
+            values["MC_BIOTECH_DB_RUNTIME_DSN"],
             "SELECT has_table_privilege('mission_control.mission', 'SELECT')",
         )
     )
@@ -189,7 +189,7 @@ def test_fresh_apply_repeat_and_rotate(installed, release, tmp_path, prefix):
     new_values = read_env_file(out_env)
     assert all(new_values[n] != values[n] for n in values)
     with pytest.raises(asyncpg.InvalidPasswordError):
-        run(_as_login(values["MC_RUNTIME_DSN"], "SELECT 1"))
+        run(_as_login(values["MC_BIOTECH_DB_RUNTIME_DSN"], "SELECT 1"))
 
 
 def test_other_env_names_are_preserved_and_lost_secret_refuses(

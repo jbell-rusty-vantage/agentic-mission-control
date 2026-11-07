@@ -104,7 +104,7 @@ def test_builder_rejects_fallback_or_invalid_schemas(schema: str) -> None:
 
 def test_settings_default_to_the_private_runtime_schema() -> None:
     settings = isolated_settings(
-        langgraph_checkpoint_database_direct=SecretStr("postgresql://ckpt:pw@127.0.0.1/app"),
+        mc_local_db_checkpoint_dsn=SecretStr("postgresql://ckpt:pw@127.0.0.1/app"),
     )
     assert RUNTIME_CHECKPOINT_SCHEMA == RUNTIME_SCHEMA == "mission_control_runtime"
     assert settings.langgraph_checkpoint_schema == RUNTIME_SCHEMA
@@ -113,7 +113,7 @@ def test_settings_default_to_the_private_runtime_schema() -> None:
 
 def test_settings_reject_a_checkpoint_dsn_that_carries_options() -> None:
     settings = isolated_settings(
-        langgraph_checkpoint_database_direct=SecretStr(
+        mc_local_db_checkpoint_dsn=SecretStr(
             "postgresql://ckpt:pw@127.0.0.1/app?options=-c%20search_path%3Dpublic"
         ),
     )

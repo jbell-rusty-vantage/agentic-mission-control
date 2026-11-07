@@ -26,7 +26,7 @@ mission:
     auth: { profile: claude-sdk-owner-subscription }
     execution_environment: { kind: local_workspace, profile: worker.linux.default }
     workspace:
-      repo: { url: "https://github.com/Overton77/mission-control-fixture", ref: main }
+      repo: { url: "https://github.com/jbell-rusty-vantage/mission-control-fixtures", ref: main }
       policy: { mode: managed_worktree, reuse: within_run, dirty_input: reject, cleanup: retain_until_artifacts_registered }
     continuation: { native_compaction: preferred, fallback: sealed_checkpoint, max_session_turns: 12, max_transfers: 2 }
     # Mission-wide requirements every lane of this mission admits (Deep Agents included).

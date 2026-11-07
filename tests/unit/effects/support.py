@@ -25,7 +25,7 @@ from mission_control.adapters.workspaces.git_write import PUBLISH_REMOTE, Worktr
 from mission_control.application.effects.ports import GitCredential
 from tests.unit.workspaces.workspace_fixtures import commit, request, stack
 
-OWNER = "Overton77"
+OWNER = "jbell-rusty-vantage"
 NAME = "mission-control"
 REPOSITORY = f"https://github.com/{OWNER}/{NAME}"
 APP_ID = "424242"

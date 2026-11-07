@@ -6,7 +6,9 @@ from tests.fixtures.isolated_settings import isolated_settings
 
 
 def test_preemptive_settings_contract() -> None:
-    settings = isolated_settings(database_url=SecretStr("postgresql://settings.invalid:5432/db"))
+    settings = isolated_settings(
+        mc_local_db_admin_dsn=SecretStr("postgresql://settings.invalid:5432/db")
+    )
     # OC-R6: models come from deployments/<app>/models.toml, never from settings.
     assert not hasattr(settings, "openai_model") and not hasattr(settings, "anthropic_model")
     assert settings.firecrawl_api_key is None or settings.firecrawl_api_key.get_secret_value()

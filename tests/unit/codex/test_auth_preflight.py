@@ -39,7 +39,7 @@ async def test_selected_home_probe_scrubs_keys_without_reading_credentials(
             "OPENAI_API_KEY": "sentinel",
             "CODEX_API_KEY": "sentinel2",
             "CODEX_HOME": "wrong",
-            "DATABASE_URL": "private",
+            "MC_BIOTECH_DB_ADMIN_DSN": "private",
         },
     )
     assert result.ready and result.home == str(tmp_path)

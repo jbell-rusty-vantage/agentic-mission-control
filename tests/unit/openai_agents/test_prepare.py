@@ -25,7 +25,7 @@ from mission_control.application.secrets.broker import SecretUnavailable
 from tests.unit.openai_agents.support import API_KEY, SHIPPED_PACK, FakeAgentsApi, copy_pack
 
 TOKEN = "github-readonly-test-value-7f3a"
-WORKER = {"MC_AI_ENGINEER_GITHUB_READONLY_TOKEN": TOKEN}
+WORKER = {"MC_GITHUB_READONLY_TOKEN": TOKEN}
 LABELS = {"mc_run": "run1-HL-11"}
 
 
@@ -154,7 +154,7 @@ async def test_a_missing_worker_variable_refuses_before_anything_is_written() ->
     with pytest.raises(SecretUnavailable) as refused:
         await _preparer(api, worker={}).sync(load_pack(SHIPPED_PACK))
 
-    assert "MC_AI_ENGINEER_GITHUB_READONLY_TOKEN" in str(refused.value)
+    assert "MC_GITHUB_READONLY_TOKEN" in str(refused.value)
     assert api.creates() == []
 
 

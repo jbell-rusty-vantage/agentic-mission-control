@@ -302,9 +302,7 @@ def agents_harness(
         client=client,
         preparer=CodexAgentsPreparer(
             client,
-            WorkerEnvironmentSource(
-                {"MC_AI_ENGINEER_GITHUB_READONLY_TOKEN": "test-readonly-token"}
-            ),
+            WorkerEnvironmentSource({"MC_GITHUB_READONLY_TOKEN": "test-readonly-token"}),
         ),
         pack=load_pack(SHIPPED_PACK),
         artifacts=artifacts,

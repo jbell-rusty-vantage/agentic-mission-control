@@ -1,6 +1,6 @@
 """Sprint OC W0 (WI-24, OVE-168): compose the local W1 runtime environment of one application.
 
-Reads the owner's existing `.env` files (MC, BKS, AI Engineer; parsed by python-dotenv, as MC's
+Reads the owner's existing `.env` files (MC, AI Engineer; parsed by python-dotenv, as MC's
 own settings loader does), the tracked `deployments/<app>` target, Application Profile and (biotech)
 graph pin, and an install receipt. Writes one IGNORED env file per process under `<out-dir>/<app>/`
 (default `.scratch/sprint-oc/runtime/<app>/` in this repository):
@@ -17,9 +17,10 @@ graph pin, and an install receipt. Writes one IGNORED env file per process under
 
 Owner `.env` isolation: MC settings always layer `<MISSION_CONTROL_HOME or cwd>/.env` beneath the
 process environment, and an environment variable that is present, even empty, wins. So
-`mission-control.env` names every database, storage, bucket, vault and credential setting MC
-reads: an explicit value, or an explicit blank (fail closed) for the ones this topology must not
-inherit. A missing required name is also written blank, never left to the `.env`.
+`mission-control.env` names every database (`MC_{AIENG,BIOTECH,LOCAL}_DB_*`), storage, bucket,
+vault and credential setting MC reads: an explicit value, or an explicit blank (fail closed) for
+the ones this topology must not inherit. A missing required name is also written blank, never
+left to the `.env`.
 
 Remote PostgreSQL DSNs are rewritten to `sslmode=verify-full&sslrootcert=<CA>` (the Supabase
 public root, `--ca-file`, always parsed as an X.509 PEM). Each DSN must name the target project
@@ -27,8 +28,8 @@ exactly (`db.<ref>.supabase.co`, or a pooler login `<role>.<ref>`). The `knowled
 tenant is minted once (or `--verification-tenant-id`, one only); the W1 operator grants must use it.
 Neo4j credentials are written only when `--confirm-graph` names the host pinned in
 `deployments/biotech/graph.toml`. `BKS_VERIFICATION_DSN` is a restricted integrator login; the
-Biotech admin DSN is used only with `--allow-admin-verification-dsn` (disposable W0), recorded in
-the manifest.
+Biotech admin DSN (`MC_BIOTECH_DB_ADMIN_DSN`) is used only with `--allow-admin-verification-dsn`
+(disposable W0), recorded in the manifest.
 
 Values are never printed: stdout carries names, sources and the missing list only. Every output
 path must be ignored (and untracked) by its Git repository. Secret files are created owner-only
@@ -86,8 +87,9 @@ BARE = re.compile(r"^[A-Za-z0-9_./:@,+=%-]*$")
 PROJECT_REF = re.compile(r"^[a-z0-9]{20}$")
 
 # Owner `.env` files, relative to the BellLabs root (H2: the names already present there).
+# The Biotech graph login comes from the MC `.env` (`MC_BIOTECH_GRAPH_*`, the same Aura login
+# BKS holds as `BKS_BIOTECH_GRAPH_*`); no BKS `.env` is read.
 MC_ENV = "platform/mission-control/.env"
-BKS_ENV = "biotech/biotech-knowledge-services/.env"
 AIE_ENV = "aiengineer/.env"
 
 # Loopback ports of the local W1 topology; distinct per application so both can run at once.
@@ -103,20 +105,56 @@ AUDITOR_KEY = "MC_AUDITOR_ANTHROPIC_API_KEY"
 
 # Per application: the KS component binding entry and the DSN its `databaseUrlEnv` names.
 COMPONENT_DSN = {
-    "biotech": ("KS_BIOTECH_COMPONENT_DSN", MC_ENV, "DATABASE_DIRECT"),
-    "ai-engineer": ("KS_AI_ENGINEER_COMPONENT_DSN", AIE_ENV, "POSTGRES_URL_NON_POOLING"),
+    "biotech": ("KS_BIOTECH_DB_COMPONENT_DSN", MC_ENV, "MC_BIOTECH_DB_ADMIN_DSN"),
+    "ai-engineer": ("KS_AIENG_DB_COMPONENT_DSN", AIE_ENV, "AIENG_DB_ADMIN_DSN"),
 }
 RECEIPT_FORMAT = {
     "biotech": "biotech-install-receipt.v1",
     "ai-engineer": "ai-engineer-install-receipt.v1",
 }
-# Integrator-supplied names (`--integrator-env`): restricted logins no owner `.env` holds.
-INTEGRATOR_NAMES = (
-    "MC_RUNTIME_DSN",
-    "MC_FAMILY_WRITER_DSN",
-    "MC_CHECKPOINTER_DSN",
-    "BKS_VERIFICATION_DSN",
+# The database plane token of each application (`Settings.db_plane`).
+PLANE = {"ai-engineer": "AIENG", "biotech": "BIOTECH"}
+# Every MC database variable (`MC_{AIENG,BIOTECH,LOCAL}_DB_*`, secret or not, except the local port)
+# is written explicitly by the generator or blanked, so an owner `.env` cannot be inherited.
+_DB_ROLES = (
+    "PROJECT_REF",
+    "URL",
+    "PUBLISHABLE_KEY",
+    "SECRET_KEY",
+    "LEGACY_JWT_SECRET",
+    "ADMIN_DSN",
+    "RUNTIME_DSN",
+    "FAMILY_WRITER_DSN",
+    "BACKFILL_DSN",
+    "CHECKPOINT_DSN",
 )
+MC_DB_BLANKED = tuple(
+    f"MC_{plane}_DB_{role}"
+    for plane in ("AIENG", "BIOTECH", "LOCAL")
+    for role in _DB_ROLES
+    if plane != "LOCAL"
+    or role not in {"PROJECT_REF", "URL", "PUBLISHABLE_KEY", "SECRET_KEY", "LEGACY_JWT_SECRET"}
+)
+
+
+def db_name(app: str, role: str) -> str:
+    """The selected plane's variable, e.g. ``MC_AIENG_DB_RUNTIME_DSN``."""
+
+    return f"MC_{PLANE[app]}_DB_{role}"
+
+
+def integrator_names(app: str) -> tuple[str, ...]:
+    """Integrator-supplied names (`--integrator-env`): restricted logins no owner `.env` holds
+    (the names ``mission-db login-apply`` writes for the application's plane)."""
+
+    return (
+        db_name(app, "RUNTIME_DSN"),
+        db_name(app, "FAMILY_WRITER_DSN"),
+        db_name(app, "CHECKPOINT_DSN"),
+        "BKS_VERIFICATION_DSN",
+    )
+
+
 MINTED_TOKENS = (
     "KS_BIOTECH_EXECUTOR_TOKEN",
     "KS_BIOTECH_EXECUTOR_READ_TOKEN",
@@ -128,14 +166,6 @@ MINTED_TOKENS = (
 # Written as explicit blanks; their consumers treat an empty value as unconfigured (fail closed).
 # A unit test checks this set against every `SecretStr` field of the real `Settings`.
 MC_BLANKED = (
-    "DATABASE_DIRECT",
-    "DATABASE_URL",
-    "APPLICATION_DATABASE_URL",
-    "APPLICATION_MIGRATION_DATABASE_DIRECT",
-    "APPLICATION_BACKFILL_DATABASE_DIRECT",
-    "SUPABASE_URL",
-    "SUPABASE_PUBLISHABLE_KEY",
-    "SUPABASE_SECRET_KEY",
     "S3_BUCKET",
     "S3_ENDPOINT_URL",
     "S3_REGION",
@@ -591,7 +621,7 @@ def tls_dsn(dsn: str, ca_file: Path) -> str:
 
 
 def is_dsn(name: str) -> bool:
-    return name.endswith(("_DSN", "DATABASE_DIRECT")) or name == "KNOWLEDGE_DB_URL"
+    return name.endswith("_DSN")
 
 
 def dsn_project_ref(dsn: str) -> str | None:
@@ -738,8 +768,9 @@ def ks_executor(ctx: Context) -> list[Entry]:
         constant("KS_KNOWLEDGE_SEAL_ISSUER", SEAL_ISSUER),
     ]
     if app == "ai-engineer":
-        # The co-hosted knowledge database the AIDB native apply port uses (KNOWLEDGE_DB_URL).
-        entries.append(owner(ctx, AIE_ENV, "POSTGRES_URL_NON_POOLING", "KNOWLEDGE_DB_URL"))
+        # The co-hosted knowledge database the AIDB native apply port uses (KS reads it as
+        # `KS_AIENG_DB_RUNTIME_DSN`, its only knowledge-pool name).
+        entries.append(owner(ctx, AIE_ENV, "AIENG_DB_ADMIN_DSN", "KS_AIENG_DB_RUNTIME_DSN"))
     else:
         entries += [
             constant("KS_BIOTECH_EXECUTOR_URL", f"http://127.0.0.1:{ports['bks_executor']}"),
@@ -789,25 +820,28 @@ def bks_tokens(ctx: Context) -> str:
 
 
 def graph_entries(ctx: Context) -> list[Entry]:
-    """Neo4j names only for the pinned, confirmed Aura host; any other host refuses."""
+    """Neo4j names only for the pinned, confirmed Aura host; any other host refuses. The login is
+    read from the MC `.env` (`MC_BIOTECH_GRAPH_*`) and written under the names BKS reads."""
 
     pin = ctx.graph_pin or load_graph_pin(ctx.mc_root)
-    uri = ctx.owner.get(BKS_ENV, {}).get("NEO4J_URI") or ""
+    uri = ctx.owner.get(MC_ENV, {}).get("MC_BIOTECH_GRAPH_URI") or ""
     host = (urlsplit(uri).hostname or "").lower() if uri else ""
     for candidate in (host, (ctx.confirm_graph or "").lower()):
         if candidate and candidate.split(".")[0] in pin["refused"]:
             raise Refused("GRAPH_HOST_REFUSED", f"{candidate} is a refused Aura instance")
     if host and host != pin["host"]:
-        raise Refused("GRAPH_HOST_MISMATCH", f"BKS .env NEO4J_URI is not the {GRAPH_PIN} host")
+        raise Refused(
+            "GRAPH_HOST_MISMATCH", f"MC .env MC_BIOTECH_GRAPH_URI is not the {GRAPH_PIN} host"
+        )
     if ctx.confirm_graph and ctx.confirm_graph.lower() != pin["host"]:
         raise Refused("GRAPH_CONFIRMATION_MISMATCH", f"--confirm-graph is not the {GRAPH_PIN} host")
     confirmed = bool(ctx.confirm_graph) and host == pin["host"]
     ctx.choices["graph"] = "confirmed" if confirmed else "unconfirmed"
     needs = f"integrator: --confirm-graph {pin['host']} (pinned in {GRAPH_PIN})"
     entries = [
-        owner(ctx, BKS_ENV, "NEO4J_URI"),
-        owner(ctx, BKS_ENV, "NEO4J_AURA_USERNAME", "NEO4J_USERNAME"),
-        owner(ctx, BKS_ENV, "NEO4J_AURA_PASSWORD", "NEO4J_PASSWORD"),
+        owner(ctx, MC_ENV, "MC_BIOTECH_GRAPH_URI", "NEO4J_URI"),
+        owner(ctx, MC_ENV, "MC_BIOTECH_GRAPH_USERNAME", "NEO4J_USERNAME"),
+        owner(ctx, MC_ENV, "MC_BIOTECH_GRAPH_PASSWORD", "NEO4J_PASSWORD"),
         constant("BKS_TARGET", "production"),
     ]
     if confirmed:
@@ -821,7 +855,7 @@ def verification_dsn(ctx: Context) -> Entry:
         return integrator(ctx, "BKS_VERIFICATION_DSN", "BKS_VERIFICATION_DSN", "outbox worker")
     if ctx.allow_admin_verification_dsn:
         ctx.choices["verificationDsn"] = "admin-allowed (disposable W0)"
-        entry = owner(ctx, MC_ENV, "DATABASE_DIRECT", "BKS_VERIFICATION_DSN")
+        entry = owner(ctx, MC_ENV, "MC_BIOTECH_DB_ADMIN_DSN", "BKS_VERIFICATION_DSN")
         return replace(entry, source=f"{entry.source} (--allow-admin-verification-dsn)")
     ctx.choices["verificationDsn"] = "missing"
     return Entry(
@@ -853,10 +887,11 @@ def checkpoint_dsn(ctx: Context) -> Entry:
     """The saver login. Blank, MC falls back to the application (runtime) DSN, which is not the
     checkpointer role; that is allowed only with `--allow-checkpoint-fallback`."""
 
+    name = db_name(ctx.app, "CHECKPOINT_DSN")
     entry = integrator(
         ctx,
-        "MC_CHECKPOINTER_DSN",
-        "LANGGRAPH_CHECKPOINT_DATABASE_DIRECT",
+        name,
+        name,
         "restricted login holding mission_control_checkpointer",
     )
     if entry.value is not None:
@@ -865,15 +900,15 @@ def checkpoint_dsn(ctx: Context) -> Entry:
     if ctx.allow_checkpoint_fallback:
         ctx.choices["checkpointDsn"] = "application-dsn-fallback (--allow-checkpoint-fallback)"
         ctx.warnings.append(
-            "LANGGRAPH_CHECKPOINT_DATABASE_DIRECT is blank: the saver uses the application "
+            f"{name} is blank: the saver uses the application "
             "(runtime) DSN, not the mission_control_checkpointer role"
         )
         return replace(entry, required=False)
     ctx.choices["checkpointDsn"] = "missing"
     ctx.warnings.append(
-        "LANGGRAPH_CHECKPOINT_DATABASE_DIRECT is missing: mission-control.env is held as "
-        ".incomplete (a blank would fall back to the application DSN); pass MC_CHECKPOINTER_DSN "
-        "or --allow-checkpoint-fallback"
+        f"{name} is missing: mission-control.env is held as "
+        f".incomplete (a blank would fall back to the application DSN); pass {name} "
+        "in --integrator-env or --allow-checkpoint-fallback"
     )
     return entry
 
@@ -881,7 +916,6 @@ def checkpoint_dsn(ctx: Context) -> Entry:
 def mission_control(ctx: Context) -> list[Entry]:
     app, installation = ctx.app, ctx.mc_installation_id
     profile = ctx.profile["installation"]
-    upper = app.upper().replace("-", "_")
     workspace = (
         ctx.bellabs / "platform" / "mission-control" / profile["capability_workspace_root"]
     ).resolve()
@@ -979,24 +1013,27 @@ def mission_control(ctx: Context) -> list[Entry]:
         constant("RUN_CONTROL_TEMPORAL_ENABLED", "true"),
         constant("COORDINATOR_LAUNCH_ENABLED", "true"),
         # Pinned off: with COORDINATOR_MCP_JWT_ISSUER blank, `Settings.coordinator_jwt_issuer`
-        # falls back to SUPABASE_URL, which bundle custody writes. The coordinator MCP surface
+        # falls back to the plane URL (MC_<PLANE>_DB_URL), which bundle custody writes. The
+        # coordinator MCP surface
         # (and its Supabase JWT verifier) must not switch on because custody did.
         constant("COORDINATOR_MCP_ENABLED", "false"),
         # Loop iter-1 L1-04: the worker relays released chain links (`mc.chain.start_run`);
         # without it a released consumer stays `pending` forever. The worker then requires
         # MANIFEST_LAUNCH_BINDINGS_PATH, which the W1 launcher sets (MC_UNMANAGED).
         constant("CHAIN_RELAY_ENABLED", "1"),
-        integrator(ctx, "MC_RUNTIME_DSN", "APPLICATION_DATABASE_DIRECT", runtime),
+        # One name each: the runtime and family-writer variables are also the operator
+        # deployment's `database_secret_ref` / `family_writer_secret_ref`.
+        derived(db_name(app, "PROJECT_REF"), ctx.project_ref, "target.toml project_ref"),
         integrator(
-            ctx, "MC_RUNTIME_DSN", f"MC_{upper}_RUNTIME_DSN", f"{runtime}; database_secret_ref"
-        ),
-        integrator(
-            ctx, "MC_FAMILY_WRITER_DSN", "APPLICATION_FAMILY_WRITER_DATABASE_DIRECT", writer
+            ctx,
+            db_name(app, "RUNTIME_DSN"),
+            db_name(app, "RUNTIME_DSN"),
+            f"{runtime}; database_secret_ref",
         ),
         integrator(
             ctx,
-            "MC_FAMILY_WRITER_DSN",
-            f"MC_{upper}_FAMILY_WRITER_DSN",
+            db_name(app, "FAMILY_WRITER_DSN"),
+            db_name(app, "FAMILY_WRITER_DSN"),
             f"{writer}; family_writer_secret_ref",
         ),
         checkpoint_dsn(ctx),
@@ -1043,11 +1080,16 @@ def mission_control(ctx: Context) -> list[Entry]:
     ]
     entries += bundle_custody(ctx)
     named = {entry.name for entry in entries}
-    return entries + [blank(name) for name in MC_BLANKED if name not in named]
+    return entries + [blank(name) for name in (*MC_DB_BLANKED, *MC_BLANKED) if name not in named]
 
 
 # The application's own Supabase project (never the MC `.env` for ai-engineer: it names biotech).
 APP_SUPABASE = {"biotech": MC_ENV, "ai-engineer": AIE_ENV}
+# The names those owner files hold (MC `.env`: plane-prefixed; `aiengineer/.env`: `AIENG_DB_*`).
+OWNER_URL = {
+    "biotech": ("MC_BIOTECH_DB_URL", "MC_BIOTECH_DB_PUBLISHABLE_KEY"),
+    "ai-engineer": ("AIENG_DB_URL", "AIENG_DB_PUBLISHABLE_KEY"),
+}
 CUSTODY_TOKENS = {
     "CAPABILITY_BUNDLE_PUBLISHER_TOKEN": "publisher",
     "CAPABILITY_BUNDLE_READER_TOKEN": "reader",
@@ -1090,12 +1132,11 @@ def bundle_custody(ctx: Context) -> list[Entry]:
         if expires <= int(time.time()) + 300:
             raise Refused("BUNDLE_CUSTODY_EXPIRED", f"{name} expires within 5 minutes; re-mint")
     source = APP_SUPABASE[ctx.app]
-    url = ctx.owner.get(source, {}).get("SUPABASE_URL", "")
+    url_name, key_name = OWNER_URL[ctx.app]
+    url = ctx.owner.get(source, {}).get(url_name, "")
     host = (urlsplit(url).hostname or "").lower() if url else ""
     if host != f"{ctx.project_ref}.supabase.co":
-        raise Refused(
-            "SUPABASE_URL_MISMATCH", f"{source} SUPABASE_URL is not the {ctx.app} project"
-        )
+        raise Refused("DB_URL_MISMATCH", f"{source} {url_name} is not the {ctx.app} project")
     ctx.choices["bundleCustody"] = "supabase (bundle-custody.env)"
     # The runtime (API, worker) reads with the reader token only; the publisher token is an
     # operator credential (`bundle-publisher.env`, seed upload and skill registration).
@@ -1113,21 +1154,21 @@ def bundle_custody(ctx: Context) -> list[Entry]:
             tokens["CAPABILITY_BUNDLE_READER_TOKEN"],
             f"minted:{path.name}",
         ),
-        owner(ctx, source, "SUPABASE_URL"),
-        owner(ctx, source, "SUPABASE_PUBLISHABLE_KEY"),
+        owner(ctx, source, url_name, db_name(ctx.app, "URL")),
+        owner(ctx, source, key_name, db_name(ctx.app, "PUBLISHABLE_KEY")),
     ]
 
 
 # The Agent Server keeps today's local W1 auth: the worker reaches it with `bl1.` scope claims
-# (BELLABS_ASYNC_SUBAGENT_SERVER_TOKEN, `deployment_auth.py`). A SUPABASE_URL (or an explicit
-# BELL_LABS_AGENT_AUTH_ISSUER) would make `agent_server/auth.py` derive an issuer and verify every
+# (BELLABS_ASYNC_SUBAGENT_SERVER_TOKEN, `deployment_auth.py`). A plane URL (MC_<PLANE>_DB_URL, or an
+# explicit BELL_LABS_AGENT_AUTH_ISSUER) would make `agent_server/auth.py` derive an issuer and
+# verify every
 # other bearer as an RS256 Supabase JWT; it has no use for the custody names either.
 AGENT_SERVER_WITHHELD = (
     # The evaluators run in the worker only (least privilege for the Agent Server).
     "MC_JUDGE_OPENAI_API_KEY",
     "MC_AUDITOR_ANTHROPIC_API_KEY",
-    "SUPABASE_URL",
-    "SUPABASE_PUBLISHABLE_KEY",
+    *(f"MC_{plane}_DB_{role}" for plane in PLANE.values() for role in ("URL", "PUBLISHABLE_KEY")),
     "CAPABILITY_BUNDLE_READER_TOKEN",
     "CAPABILITY_BUNDLE_PUBLISHER_TOKEN",
     "BELL_LABS_AGENT_AUTH_ISSUER",
@@ -1141,11 +1182,13 @@ PUBLISHER_NAMES = {
     "MISSION_CONTROL_DEPLOYMENTS_ROOT",
     "MISSION_CONTROL_WORKSPACE_ROOT",
     "MISSION_CONTROL_CATALOG_SCOPE",
-    "APPLICATION_DATABASE_DIRECT",
+    *(
+        f"MC_{plane}_DB_{role}"
+        for plane in PLANE.values()
+        for role in ("PROJECT_REF", "RUNTIME_DSN", "URL", "PUBLISHABLE_KEY")
+    ),
     "CAPABILITY_BUNDLE_BACKEND",
     "CAPABILITY_BUNDLE_NAMESPACE",
-    "SUPABASE_URL",
-    "SUPABASE_PUBLISHABLE_KEY",
     "REDIS_URL",
     *MC_BLANKED,
     *MC_DEFAULTS,
@@ -1166,7 +1209,11 @@ def bundle_publisher(ctx: Context, entries: list[Entry]) -> list[Entry] | None:
         return None
     withheld = {ctx.publisher.name, *PUBLISHER_WITHHELD}
     kept = [entry for entry in entries if entry.name in PUBLISHER_NAMES - withheld]
-    return [*kept, *(blank(name) for name in PUBLISHER_WITHHELD), ctx.publisher]
+    held = {entry.name for entry in kept}
+    # Every other database variable is an explicit blank (least privilege: no admin, family
+    # writer or checkpoint login in the operator file).
+    blanks = [blank(name) for name in MC_DB_BLANKED if name not in held]
+    return [*kept, *blanks, *(blank(name) for name in PUBLISHER_WITHHELD), ctx.publisher]
 
 
 def compose(ctx: Context) -> dict[str, list[Entry]]:
@@ -1299,7 +1346,7 @@ def build_context(args: argparse.Namespace) -> Context:
             raise Refused("INTEGRATOR_ENV_MISSING", str(path))
         assert_ignored(path)
         raw = read_env(path)
-        unknown = sorted(set(raw) - set(INTEGRATOR_NAMES))
+        unknown = sorted(set(raw) - set(integrator_names(app)))
         if unknown:
             raise Refused("INTEGRATOR_ENV_UNKNOWN_NAMES", ",".join(unknown))
         integrator_values = {key: value for key, value in raw.items() if value}
@@ -1307,7 +1354,7 @@ def build_context(args: argparse.Namespace) -> Context:
     deployment_file = args.deployment_file.resolve() if args.deployment_file else None
     digest = binding_digest_from(deployment_file, app, mc_id) if deployment_file else None
     namespace = temporal_namespace_from(deployment_file, app) if deployment_file else "default"
-    owner_files = {name: read_env(bellabs / name) for name in (MC_ENV, BKS_ENV, AIE_ENV)}
+    owner_files = {name: read_env(bellabs / name) for name in (MC_ENV, AIE_ENV)}
     producer_key = owner_files[MC_ENV].get("ANTHROPIC_API_KEY")
     if producer_key and owner_files[MC_ENV].get("SECOND_ANTHROPIC_API_KEY") == producer_key:
         # A second name over the same key is not an independent auditor credential.

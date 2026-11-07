@@ -125,7 +125,7 @@ async def start_worker_ingress(
     credential = getattr(settings, "ingress_storage_credential", None)
     if any((quarantine_bucket, custody_bucket, credential)):
         if (
-            not all((quarantine_bucket, custody_bucket, credential, settings.supabase_url))
+            not all((quarantine_bucket, custody_bucket, credential, settings.db.url))
             or quarantine_bucket == custody_bucket
         ):
             raise RuntimeError(
@@ -133,17 +133,19 @@ async def start_worker_ingress(
             )
         assert quarantine_bucket is not None and custody_bucket is not None
         assert credential is not None
+        project_url = settings.db.url
+        assert project_url is not None
         http = await stack.enter_async_context(httpx.AsyncClient(timeout=30))
         quarantine = SupabaseQuarantineStore(
             http,
-            project_url=settings.supabase_url,
+            project_url=project_url,
             bucket=quarantine_bucket,
             credential=credential.get_secret_value(),
         )
         payloads = SupabaseArtifactPayloadStore(
             SupabaseQuarantineStore(
                 http,
-                project_url=settings.supabase_url,
+                project_url=project_url,
                 bucket=custody_bucket,
                 credential=credential.get_secret_value(),
             ),

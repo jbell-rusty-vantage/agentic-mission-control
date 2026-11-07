@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+from collections.abc import Callable
 from functools import lru_cache
 from typing import Any
 
@@ -39,12 +40,27 @@ class ProceduralMemoryStoreValue(BaseModel):
     expires_at: AwareDatetime | None = None
 
 
+_plane_url_provider: Callable[[], str | None] | None = None
+
+
+def configure_plane_url_provider(provider: Callable[[], str | None] | None) -> None:
+    """Inject how the selected plane's project URL (``MC_<PLANE>_DB_URL``) is read.
+
+    Bootstrap settings own the database variables; this adapter never reads the environment for
+    them. The hosting app registers the provider; without one no issuer is derived.
+    """
+
+    global _plane_url_provider
+    _plane_url_provider = provider
+    _verifier.cache_clear()
+
+
 @lru_cache(maxsize=1)
 def _verifier() -> JWTVerifier:
     issuer = _configured_issuer()
     audience = os.environ.get("BELL_LABS_AGENT_AUTH_AUDIENCE", "authenticated")
     if not issuer:
-        raise RuntimeError("BELL_LABS_AGENT_AUTH_ISSUER or SUPABASE_URL is required")
+        raise RuntimeError("BELL_LABS_AGENT_AUTH_ISSUER or the plane database URL is required")
     from mission_control.adapters.agent_server.block_c_qualification.auth import (
         resolve_public_key_pem,
     )
@@ -69,8 +85,9 @@ def _configured_issuer() -> str:
     explicit = os.environ.get("BELL_LABS_AGENT_AUTH_ISSUER", "").strip()
     if explicit:
         return explicit.rstrip("/")
-    supabase_url = os.environ.get("SUPABASE_URL", "").strip().rstrip("/")
-    return f"{supabase_url}/auth/v1" if supabase_url else ""
+    plane_url = ((_plane_url_provider() if _plane_url_provider else None) or "").strip()
+    plane_url = plane_url.rstrip("/")
+    return f"{plane_url}/auth/v1" if plane_url else ""
 
 
 async def authenticate(headers: dict[bytes, bytes]) -> Auth.types.MinimalUserDict:

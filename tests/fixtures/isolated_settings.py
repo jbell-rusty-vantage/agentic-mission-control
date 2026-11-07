@@ -17,9 +17,13 @@ from pydantic_settings import BaseSettings, PydanticBaseSettingsSource
 from mission_control.bootstrap.settings import Settings
 
 _REQUIRED: dict[str, Any] = {
-    "supabase_url": "https://settings.invalid",
-    "supabase_publishable_key": SecretStr("publishable"),
-    "supabase_secret_key": SecretStr("secret"),
+    # Both Supabase planes carry fake project values, so any selected application resolves them.
+    "mc_aieng_db_url": "https://settings.invalid",
+    "mc_aieng_db_publishable_key": SecretStr("publishable"),
+    "mc_aieng_db_secret_key": SecretStr("secret"),
+    "mc_biotech_db_url": "https://settings.invalid",
+    "mc_biotech_db_publishable_key": SecretStr("publishable"),
+    "mc_biotech_db_secret_key": SecretStr("secret"),
     "openai_api_key": SecretStr("sk-test"),
 }
 

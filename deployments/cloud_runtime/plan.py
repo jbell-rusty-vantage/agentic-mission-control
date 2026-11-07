@@ -66,8 +66,10 @@ class Task(Strict):
     role: Literal["api", "worker"]
     application_id: Literal["biotech", "ai-engineer"] | None = None
     binding_digest: str | None = Field(default=None, pattern=DIGEST)
-    runtime_dsn_env: str = Field(pattern=r"^[A-Z][A-Z0-9_]*$")
-    family_dsn_env: str | None = Field(default=None, pattern=r"^[A-Z][A-Z0-9_]*$")
+    runtime_dsn_env: str = Field(pattern=r"^MC_(AIENG|BIOTECH)_DB_RUNTIME_DSN$")
+    family_dsn_env: str | None = Field(
+        default=None, pattern=r"^MC_(AIENG|BIOTECH)_DB_FAMILY_WRITER_DSN$"
+    )
     deployment_file: str = Field(pattern=r"^/etc/mission-control/[a-zA-Z0-9_./-]+\.json$")
     # Pin the separately reviewed public configuration baked into the image.
     configuration_digest: str = Field(pattern=DIGEST)
@@ -104,7 +106,8 @@ class Task(Strict):
         if self.role == "worker":
             if not self.application_id or not self.binding_digest or not self.family_dsn_env:
                 raise ValueError("worker needs exact application, binding, and family writer")
-            required.update({self.family_dsn_env, "LANGGRAPH_CHECKPOINT_DATABASE_DIRECT"})
+            checkpoint_env = self.runtime_dsn_env.removesuffix("RUNTIME_DSN") + "CHECKPOINT_DSN"
+            required.update({self.family_dsn_env, checkpoint_env})
             if not self.environment.get("CAPABILITY_PINS_PATH"):
                 raise ValueError("worker requires explicit reviewed capability pins")
         elif self.application_id is not None or self.binding_digest is not None:

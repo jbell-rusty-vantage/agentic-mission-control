@@ -370,7 +370,10 @@ def test_every_v2_example_authors_sealed_provider_bindings(profile: str, form: s
             assert binding.pins == lane.pins
             assert binding.requirements.describe_digest == declared_matrix(profile).digest
             assert binding.workspace_policy.mode == "managed_worktree"
-            assert binding.repo_url == "https://github.com/Overton77/mission-control-fixture"
+            assert (
+                binding.repo_url
+                == "https://github.com/jbell-rusty-vantage/mission-control-fixtures"
+            )
             assert binding.auth.profile in lane.auth_profiles
             assert binding.environment.host_profile in lane.host_profiles
             assert template.secret_refs == ()
@@ -695,7 +698,7 @@ def binding_of(application: str, widened: dict[str, frozenset[str]] | None) -> A
         installation_id=UUID("00000000-0000-0000-0000-000000000001"),
         binding_version="1",
         supabase_project_ref=f"{application}-project",
-        database_secret_ref="APPLICATION_DATABASE_URL",
+        database_secret_ref="TEST_RUNTIME_DSN",
         accepted_issuers=frozenset({"https://issuer.invalid/auth/v1"}),
         accepted_audiences=frozenset({"authenticated"}),
         required_component_version="1.4.0",

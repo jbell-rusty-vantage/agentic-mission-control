@@ -23,7 +23,7 @@ missions:
       auth: { profile: codex-owner-chatgpt }
       execution_environment: { kind: local_workspace, profile: worker.linux.wsl }
       workspace:
-        repo: { url: "https://github.com/Overton77/mission-control-fixture", ref: main }
+        repo: { url: "https://github.com/jbell-rusty-vantage/mission-control-fixtures", ref: main }
         policy: { mode: managed_worktree, reuse: within_run }
       requires:
         controls: [cancel]
@@ -58,7 +58,7 @@ missions:
       auth: { profile: codex-owner-chatgpt }
       execution_environment: { kind: local_workspace, profile: worker.linux.wsl }
       workspace:
-        repo: { url: "https://github.com/Overton77/mission-control-fixture", ref: main }
+        repo: { url: "https://github.com/jbell-rusty-vantage/mission-control-fixtures", ref: main }
         policy: { mode: managed_worktree, reuse: within_run }
       requires:
         controls: [cancel]

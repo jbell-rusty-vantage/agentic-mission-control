@@ -12,7 +12,7 @@ security_group_ids = ["OWNER-SELECT: approved security group"]
 [[tasks]]
 name = "mission-control-api"
 role = "api"
-runtime_dsn_env = "MC_BIOTECH_RUNTIME_DSN"
+runtime_dsn_env = "MC_BIOTECH_DB_RUNTIME_DSN"
 deployment_file = "/etc/mission-control/deployment.json"
 configuration_digest = "OWNER-SELECT: reviewed configuration digest"
 execution_role_arn = "OWNER-SELECT: approved ECS execution role ARN"
@@ -25,7 +25,7 @@ TEMPORAL_ADDRESS = "OWNER-SELECT: existing namespace endpoint"
 TEMPORAL_NAMESPACE = "OWNER-SELECT: existing namespace"
 S3_BUCKET = "OWNER-SELECT: approved private durable payload bucket"
 [tasks.secrets]
-MC_BIOTECH_RUNTIME_DSN = "OWNER-SELECT: existing restricted runtime secret ARN"
+MC_BIOTECH_DB_RUNTIME_DSN = "OWNER-SELECT: existing restricted runtime secret ARN"
 TEMPORAL_CLOUD_API_KEY = "OWNER-SELECT: existing Temporal secret ARN"
 
 [[tasks]]
@@ -33,8 +33,8 @@ name = "mission-control-biotech-worker"
 role = "worker"
 application_id = "biotech"
 binding_digest = "OWNER-SELECT: exact sealed application binding digest"
-runtime_dsn_env = "MC_BIOTECH_RUNTIME_DSN"
-family_dsn_env = "MC_BIOTECH_FAMILY_DSN"
+runtime_dsn_env = "MC_BIOTECH_DB_RUNTIME_DSN"
+family_dsn_env = "MC_BIOTECH_DB_FAMILY_WRITER_DSN"
 deployment_file = "/etc/mission-control/biotech-deployment.json"
 configuration_digest = "OWNER-SELECT: reviewed configuration digest"
 execution_role_arn = "OWNER-SELECT: approved ECS execution role ARN"
@@ -54,9 +54,9 @@ S3_BUCKET = "OWNER-SELECT: approved private durable payload bucket"
 # S3_FORCE_PATH_STYLE = "true"
 # S3_REGION = "OWNER-SELECT: the project region"
 [tasks.secrets]
-MC_BIOTECH_RUNTIME_DSN = "OWNER-SELECT: existing restricted runtime secret ARN"
-MC_BIOTECH_FAMILY_DSN = "OWNER-SELECT: existing restricted family secret ARN"
-LANGGRAPH_CHECKPOINT_DATABASE_DIRECT = "OWNER-SELECT: existing restricted saver/store secret ARN"
+MC_BIOTECH_DB_RUNTIME_DSN = "OWNER-SELECT: existing restricted runtime secret ARN"
+MC_BIOTECH_DB_FAMILY_WRITER_DSN = "OWNER-SELECT: existing restricted family secret ARN"
+MC_BIOTECH_DB_CHECKPOINT_DSN = "OWNER-SELECT: existing restricted saver/store secret ARN"
 TEMPORAL_CLOUD_API_KEY = "OWNER-SELECT: existing Temporal secret ARN"
 # Add only provider/auth/tracing secrets needed by admitted lanes. Never copy .env.
 # Add a separate ai-engineer worker with its own binding, config, roles and secrets.

@@ -25,7 +25,7 @@ def fixture() -> dict:
     task = {
         "name": "mc-api",
         "role": "api",
-        "runtime_dsn_env": "MC_RUNTIME_DSN",
+        "runtime_dsn_env": "MC_BIOTECH_DB_RUNTIME_DSN",
         "deployment_file": "/etc/mission-control/deployment.json",
         "configuration_digest": "sha256:" + "a" * 64,
         "execution_role_arn": role,
@@ -36,7 +36,7 @@ def fixture() -> dict:
             "TEMPORAL_NAMESPACE": "example",
             "CAPABILITY_PINS_PATH": "/etc/mission-control/pins.json",
         },
-        "secrets": {"MC_RUNTIME_DSN": reference, "TEMPORAL_CLOUD_API_KEY": reference},
+        "secrets": {"MC_BIOTECH_DB_RUNTIME_DSN": reference, "TEMPORAL_CLOUD_API_KEY": reference},
     }
     worker = copy.deepcopy(task)
     worker.update(
@@ -45,13 +45,13 @@ def fixture() -> dict:
             "role": "worker",
             "application_id": "biotech",
             "binding_digest": "sha256:" + "b" * 64,
-            "family_dsn_env": "MC_FAMILY_DSN",
+            "family_dsn_env": "MC_BIOTECH_DB_FAMILY_WRITER_DSN",
         }
     )
     worker["secrets"].update(
         {
-            "MC_FAMILY_DSN": reference,
-            "LANGGRAPH_CHECKPOINT_DATABASE_DIRECT": reference,
+            "MC_BIOTECH_DB_FAMILY_WRITER_DSN": reference,
+            "MC_BIOTECH_DB_CHECKPOINT_DSN": reference,
         }
     )
     return {
@@ -81,7 +81,7 @@ def test_render_is_private_inert_and_application_scoped() -> None:
     assert env["MISSION_CONTROL_WORKER_APPLICATION_ID"] == "biotech"
     assert env["LANGGRAPH_CHECKPOINT_SETUP"] == "false"
     assert env["TEMPORAL_TARGET"] == "cloud"
-    assert "MC_RUNTIME_DSN" not in env
+    assert "MC_BIOTECH_DB_RUNTIME_DSN" not in env
     assert worker["user"] == "10001:10001"
 
 
@@ -94,13 +94,13 @@ def test_render_is_private_inert_and_application_scoped() -> None:
             AGENT_SERVER_ENDPOINT="https://user:pw@host"
         ),
         lambda data: data["tasks"][0]["secrets"].update(
-            MC_RUNTIME_DSN="postgresql://user:pw@host/db"
+            MC_BIOTECH_DB_RUNTIME_DSN="postgresql://user:pw@host/db"
         ),
         lambda data: data["tasks"][1].update(binding_digest=None),
-        lambda data: data["tasks"][1]["secrets"].pop("LANGGRAPH_CHECKPOINT_DATABASE_DIRECT"),
+        lambda data: data["tasks"][1]["secrets"].pop("MC_BIOTECH_DB_CHECKPOINT_DSN"),
         lambda data: data["tasks"][1].update(cpu=1024, memory=512),
         lambda data: data["tasks"][0]["secrets"].update(
-            TEMPORAL_TARGET=data["tasks"][0]["secrets"]["MC_RUNTIME_DSN"]
+            TEMPORAL_TARGET=data["tasks"][0]["secrets"]["MC_BIOTECH_DB_RUNTIME_DSN"]
         ),
         lambda data: data["tasks"][0]["environment"].update(
             TEMPORAL_ADDRESS="OWNER-SELECT: endpoint"

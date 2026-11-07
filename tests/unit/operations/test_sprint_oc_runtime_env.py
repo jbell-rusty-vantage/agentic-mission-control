@@ -74,27 +74,34 @@ def _certificate(path: Path) -> None:
     path.write_bytes(cert.public_bytes(serialization.Encoding.PEM))
 
 
-def _owner_files(bellabs: Path, *, mc: str | None = None, bks: str | None = None) -> None:
-    files = {
-        gen.MC_ENV: mc
+def _owner_files(bellabs: Path, *, mc: str | None = None, graph: str | None = None) -> None:
+    """The fake owner `.env` files; ``graph`` is the MC `.env` Biotech graph block."""
+
+    mc_text = (
+        mc
         if mc is not None
         else (
             "# owner MC env (fake)\n"
-            f"DATABASE_DIRECT={BIO_DSN}\n"
+            f"MC_BIOTECH_DB_ADMIN_DSN={BIO_DSN}\n"
             'export ANTHROPIC_API_KEY="fake-anthropic\\tkey"\n'
             "OPENAI_API_KEY='fake-openai-key'\n"
             "SECOND_ANTHROPIC_API_KEY=fake-auditor-key\n"
             "TEMPORAL_TASK_QUEUE=wrong-queue\n"
-        ),
-        gen.BKS_ENV: bks
-        if bks is not None
+        )
+    )
+    graph_text = (
+        graph
+        if graph is not None
         else (
-            f"NEO4J_URI=neo4j+s://{GRAPH_HOST}\n"
-            "NEO4J_AURA_USERNAME=fake-aura-user # trailing comment\n"
-            "NEO4J_AURA_PASSWORD=stale\n"
-            "NEO4J_AURA_PASSWORD=fake-aura-pw\n"
-        ),
-        gen.AIE_ENV: f"POSTGRES_URL_NON_POOLING={AIE_DSN}\n",
+            f"MC_BIOTECH_GRAPH_URI=neo4j+s://{GRAPH_HOST}\n"
+            "MC_BIOTECH_GRAPH_USERNAME=fake-aura-user # trailing comment\n"
+            "MC_BIOTECH_GRAPH_PASSWORD=stale\n"
+            "MC_BIOTECH_GRAPH_PASSWORD=fake-aura-pw\n"
+        )
+    )
+    files = {
+        gen.MC_ENV: mc_text + graph_text,
+        gen.AIE_ENV: f"AIENG_DB_ADMIN_DSN={AIE_DSN}\n",
     }
     for relative, text in files.items():
         path = bellabs / relative
@@ -177,12 +184,12 @@ def test_biotech_files_carry_owner_minted_and_derived_values(world: dict[str, Pa
             "application": "biotech",
             "binding": "biotech-graph",
             "installationId": COMPONENT,
-            "databaseUrlEnv": "KS_BIOTECH_COMPONENT_DSN",
+            "databaseUrlEnv": "KS_BIOTECH_DB_COMPONENT_DSN",
             "tenants": [TENANT],
         }
     ]
-    assert ks["KS_BIOTECH_COMPONENT_DSN"] == tls(world, BIO_DSN)
-    assert "sslmode=verify-full&sslrootcert=" in ks["KS_BIOTECH_COMPONENT_DSN"]
+    assert ks["KS_BIOTECH_DB_COMPONENT_DSN"] == tls(world, BIO_DSN)
+    assert "sslmode=verify-full&sslrootcert=" in ks["KS_BIOTECH_DB_COMPONENT_DSN"]
     assert ks["KS_KNOWLEDGE_ISSUER"] == mc["KNOWLEDGE_ISSUER"] == "mission-control.biotech"
     assert ks["KS_KNOWLEDGE_AUDIENCE"] == mc["KNOWLEDGE_BINDING_AUDIENCE"]
     assert mc["KNOWLEDGE_BINDING_AUDIENCE"] == "knowledge-services-executor.biotech"
@@ -237,7 +244,7 @@ def test_biotech_files_carry_owner_minted_and_derived_values(world: dict[str, Pa
         "BKS_EXECUTOR_TOKENS",
         "BKS_VERIFICATION_DSN",
         "BKS_VERIFICATION_TENANTS",
-        "KS_BIOTECH_COMPONENT_DSN",
+        "KS_BIOTECH_DB_COMPONENT_DSN",
         # OVE-169 W1 D25: the installer's seal-key step.
         "KS_KNOWLEDGE_SEAL_KEY_ID",
         "KS_KNOWLEDGE_SEAL_KEY_FILE",
@@ -257,7 +264,7 @@ def test_biotech_files_carry_owner_minted_and_derived_values(world: dict[str, Pa
     }
     missing = {item["name"] for item in summary["missing"]}
     assert {
-        "APPLICATION_DATABASE_DIRECT",
+        "MC_BIOTECH_DB_RUNTIME_DSN",
         "MISSION_CONTROL_DEPLOYMENT_FILE",
     } <= missing
     # Names and sources only: no value reaches the summary or the manifest.
@@ -270,11 +277,16 @@ def test_mission_control_file_blanks_every_inheritable_setting(world: dict[str, 
     assert _run(world, "--component-installation-id", COMPONENT)[0] == 0
     text = (world["out"] / "biotech" / "mission-control.env").read_text(encoding="utf-8")
     written = {line.split("=", 1)[0] for line in text.splitlines() if line and line[0] != "#"}
-    assert set(gen.MC_BLANKED) <= written
+    assert {*gen.MC_BLANKED, *gen.MC_DB_BLANKED} <= written
     mc = _env(world["out"] / "biotech" / "mission-control.env")
     assert all(mc[name] == "" for name in gen.MC_BLANKED)
+    # Every database variable of the other planes is blank; the selected plane names its project.
+    assert all(
+        mc[name] == "" for name in gen.MC_DB_BLANKED if not name.startswith("MC_BIOTECH_DB_")
+    )
+    assert mc["MC_BIOTECH_DB_PROJECT_REF"] == BIOTECH_REF
     # A missing required name is an explicit blank too, never left to the owner `.env`.
-    assert mc["APPLICATION_DATABASE_DIRECT"] == ""
+    assert mc["MC_BIOTECH_DB_RUNTIME_DSN"] == ""
     assert mc["REDIS_URL"] == gen.LOCAL_REDIS
 
 
@@ -321,8 +333,8 @@ SETTINGS_PROBE = textwrap.dedent(
     for key in generated:
         if key != "MISSION_CONTROL_HOME":
             os.environ.pop(key, None)
-    (home / ".env").write_text("DATABASE_DIRECT=poison-control\\n", encoding="utf-8")
-    control = value(module.Settings(), "database_direct") == "poison-control"
+    (home / ".env").write_text("MC_LOCAL_DB_ADMIN_DSN=poison-control\\n", encoding="utf-8")
+    control = value(module.Settings(), "mc_local_db_admin_dsn") == "poison-control"
 
     (home / ".env").write_text(
         "".join(f"{n.upper()}={p}\\n" for n, p in poisoned.items()), encoding="utf-8"
@@ -390,7 +402,7 @@ def test_real_settings_loader_takes_nothing_unlisted_from_an_owner_env(
     # The explicit defaults are the real Settings defaults.
     for name, default in gen.MC_DEFAULTS.items():
         assert generated[name] == default == result["defaults"][name], name
-    # A blank APPLICATION_DATABASE_URL is not a configured database (http_app.py).
+    # A blank runtime DSN is not a configured database (http_app.py).
     assert result["has_application_postgres"] is False
     assert result["knowledge"] == {
         "issuer": "mission-control.ai-engineer",
@@ -402,7 +414,7 @@ def test_real_settings_loader_takes_nothing_unlisted_from_an_owner_env(
 def test_owner_env_setting_an_unmanaged_name_refuses(world: dict[str, Path]) -> None:
     _owner_files(
         world["bellabs"],
-        mc=f"DATABASE_DIRECT={BIO_DSN}\nmanifest_launch_bindings_path=C:/owner/bindings.json\n",
+        mc=f"MC_BIOTECH_DB_ADMIN_DSN={BIO_DSN}\nmanifest_launch_bindings_path=C:/owner/bindings.json\n",
     )
     code, summary = _run(world, "--component-installation-id", COMPONENT)
     assert (code, summary["code"]) == (2, "OWNER_ENV_SETS_UNMANAGED")
@@ -448,9 +460,13 @@ def test_graph_credentials_need_the_pinned_confirmed_host(world: dict[str, Path]
 
 
 def test_owner_graph_other_than_the_pin_refuses(world: dict[str, Path]) -> None:
-    _owner_files(world["bellabs"], bks="NEO4J_URI=neo4j+s://4773dc72.databases.neo4j.io\n")
+    _owner_files(
+        world["bellabs"], graph="MC_BIOTECH_GRAPH_URI=neo4j+s://4773dc72.databases.neo4j.io\n"
+    )
     assert _run(world, "--component-installation-id", COMPONENT)[1]["code"] == "GRAPH_HOST_REFUSED"
-    _owner_files(world["bellabs"], bks="NEO4J_URI=neo4j+s://other1.databases.neo4j.io\n")
+    _owner_files(
+        world["bellabs"], graph="MC_BIOTECH_GRAPH_URI=neo4j+s://other1.databases.neo4j.io\n"
+    )
     assert _run(world, "--component-installation-id", COMPONENT)[1]["code"] == "GRAPH_HOST_MISMATCH"
 
 
@@ -648,7 +664,8 @@ def test_output_must_be_ignored_and_untracked(world: dict[str, Path]) -> None:
 )
 def test_dsn_must_name_the_target_project_exactly(world: dict[str, Path], host: str) -> None:
     _owner_files(
-        world["bellabs"], mc=f"DATABASE_DIRECT=postgresql://postgres:fake@{host}:5432/postgres\n"
+        world["bellabs"],
+        mc=f"MC_BIOTECH_DB_ADMIN_DSN=postgresql://postgres:fake@{host}:5432/postgres\n",
     )
     code, summary = _run(world, "--component-installation-id", COMPONENT)
     assert (code, summary["code"]) == (2, "TARGET_IDENTITY_MISMATCH")
@@ -689,12 +706,12 @@ def test_integrator_env_fills_restricted_logins(world: dict[str, Path]) -> None:
     runtime = (
         f"postgresql://mc_runtime_login.{AIE_REF}:fake-rt@aws-1.pooler.supabase.com:5432/postgres"
     )
-    secrets_file.write_text(f"MC_RUNTIME_DSN={runtime}\n", encoding="utf-8")
+    secrets_file.write_text(f"MC_AIENG_DB_RUNTIME_DSN={runtime}\n", encoding="utf-8")
     args = ("--component-installation-id", COMPONENT, "--integrator-env", str(secrets_file))
     assert _run(world, *args, app="ai-engineer")[0] == 0
     mc = _env(world["out"] / "ai-engineer" / "mission-control.env")
-    assert mc["APPLICATION_DATABASE_DIRECT"] == tls(world, runtime)
-    assert mc["MC_AI_ENGINEER_RUNTIME_DSN"] == tls(world, runtime)
+    assert mc["MC_AIENG_DB_RUNTIME_DSN"] == tls(world, runtime)
+    assert mc["MC_AIENG_DB_PROJECT_REF"] == AIE_REF
     secrets_file.write_text("SOMETHING_ELSE=x\n", encoding="utf-8")
     assert _run(world, *args, app="ai-engineer")[1]["code"] == "INTEGRATOR_ENV_UNKNOWN_NAMES"
 
@@ -714,9 +731,9 @@ def test_ai_engineer_has_no_graph_executor(world: dict[str, Path]) -> None:
     }
     assert install == {name: ks[name] for name in install}
     assert install["KS_KNOWLEDGE_SEAL_KEY_FILE"] == (out / "ks-seal.pem").as_posix()
-    assert ks["KS_AI_ENGINEER_COMPONENT_DSN"] == tls(world, AIE_DSN)
-    assert ks["KNOWLEDGE_DB_URL"] == tls(world, AIE_DSN)
-    assert "sslmode=require" not in ks["KNOWLEDGE_DB_URL"]
+    assert ks["KS_AIENG_DB_COMPONENT_DSN"] == tls(world, AIE_DSN)
+    assert ks["KS_AIENG_DB_RUNTIME_DSN"] == tls(world, AIE_DSN)
+    assert "sslmode=require" not in ks["KS_AIENG_DB_RUNTIME_DSN"]
     binding = json.loads(ks["KS_KNOWLEDGE_BINDINGS_JSON"])[0]
     assert binding["binding"] == "aiengineer-postgres"
     assert "tenants" not in binding
@@ -766,7 +783,7 @@ def test_a_missing_checkpoint_dsn_is_never_a_silent_fallback(world: dict[str, Pa
 def test_an_integrator_checkpoint_dsn_needs_no_fallback(world: dict[str, Path]) -> None:
     secrets_file = world["repo"] / "secrets.env"
     saver = f"postgresql://mc_saver_login.{AIE_REF}:fake-cp@aws-1.pooler.supabase.com:5432/postgres"
-    secrets_file.write_text(f"MC_CHECKPOINTER_DSN={saver}\n", encoding="utf-8")
+    secrets_file.write_text(f"MC_AIENG_DB_CHECKPOINT_DSN={saver}\n", encoding="utf-8")
     code, summary = _run(
         world,
         "--component-installation-id",
@@ -779,7 +796,7 @@ def test_an_integrator_checkpoint_dsn_needs_no_fallback(world: dict[str, Path]) 
     assert code == 0, summary
     assert summary["choices"]["checkpointDsn"] == "integrator"
     mc = _env(world["out"] / "ai-engineer" / "mission-control.env")
-    assert mc["LANGGRAPH_CHECKPOINT_DATABASE_DIRECT"] == tls(world, saver)
+    assert mc["MC_AIENG_DB_CHECKPOINT_DSN"] == tls(world, saver)
 
 
 # ------------------------------------------------------------------------- bundle custody
@@ -813,13 +830,13 @@ def _custody(world: dict[str, Path], app: str, **claims: object) -> None:
 def test_bundle_custody_tokens_pass_into_mission_control_env(world: dict[str, Path]) -> None:
     _owner_files(
         world["bellabs"],
-        mc=f"DATABASE_DIRECT={BIO_DSN}\nSUPABASE_URL=https://{BIOTECH_REF}.supabase.co\n"
-        "SUPABASE_PUBLISHABLE_KEY=fake-biotech-publishable\n",
+        mc=f"MC_BIOTECH_DB_ADMIN_DSN={BIO_DSN}\nMC_BIOTECH_DB_URL=https://{BIOTECH_REF}.supabase.co\n"
+        "MC_BIOTECH_DB_PUBLISHABLE_KEY=fake-biotech-publishable\n",
     )
     aie = world["bellabs"] / gen.AIE_ENV
     aie.write_text(
-        f"POSTGRES_URL_NON_POOLING={AIE_DSN}\nSUPABASE_URL=https://{AIE_REF}.supabase.co\n"
-        "SUPABASE_PUBLISHABLE_KEY=fake-aie-publishable\n",
+        f"AIENG_DB_ADMIN_DSN={AIE_DSN}\nAIENG_DB_URL=https://{AIE_REF}.supabase.co\n"
+        "AIENG_DB_PUBLISHABLE_KEY=fake-aie-publishable\n",
         encoding="utf-8",
     )
     _custody(world, "ai-engineer")
@@ -831,8 +848,8 @@ def test_bundle_custody_tokens_pass_into_mission_control_env(world: dict[str, Pa
     assert mc["CAPABILITY_BUNDLE_NAMESPACE"] == "ai-engineer"
     assert mc["CAPABILITY_BUNDLE_READER_TOKEN"] == custody["CAPABILITY_BUNDLE_READER_TOKEN"]
     # The application's own project, never the MC `.env` (which names biotech).
-    assert mc["SUPABASE_URL"] == f"https://{AIE_REF}.supabase.co"
-    assert mc["SUPABASE_PUBLISHABLE_KEY"] == "fake-aie-publishable"
+    assert mc["MC_AIENG_DB_URL"] == f"https://{AIE_REF}.supabase.co"
+    assert mc["MC_AIENG_DB_PUBLISHABLE_KEY"] == "fake-aie-publishable"
     assert summary["choices"]["bundleCustody"].startswith("supabase")
     assert "fake-signature" not in json.dumps(summary)
 
@@ -840,8 +857,8 @@ def test_bundle_custody_tokens_pass_into_mission_control_env(world: dict[str, Pa
 def test_the_publisher_token_never_reaches_a_runtime_env(world: dict[str, Path]) -> None:
     aie = world["bellabs"] / gen.AIE_ENV
     aie.write_text(
-        f"POSTGRES_URL_NON_POOLING={AIE_DSN}\nSUPABASE_URL=https://{AIE_REF}.supabase.co\n"
-        "SUPABASE_PUBLISHABLE_KEY=fake-aie-publishable\n",
+        f"AIENG_DB_ADMIN_DSN={AIE_DSN}\nAIENG_DB_URL=https://{AIE_REF}.supabase.co\n"
+        "AIENG_DB_PUBLISHABLE_KEY=fake-aie-publishable\n",
         encoding="utf-8",
     )
     _custody(world, "ai-engineer")
@@ -854,11 +871,19 @@ def test_the_publisher_token_never_reaches_a_runtime_env(world: dict[str, Path])
         assert _env(out / runtime).get("CAPABILITY_BUNDLE_PUBLISHER_TOKEN", "") == "", runtime
     publisher = _env(out / "bundle-publisher.env")
     assert publisher["CAPABILITY_BUNDLE_PUBLISHER_TOKEN"] == publisher_token
-    assert publisher["SUPABASE_URL"] == f"https://{AIE_REF}.supabase.co"
-    assert publisher["SUPABASE_PUBLISHABLE_KEY"] == "fake-aie-publishable"
+    assert publisher["MC_AIENG_DB_URL"] == f"https://{AIE_REF}.supabase.co"
+    assert publisher["MC_AIENG_DB_PUBLISHABLE_KEY"] == "fake-aie-publishable"
     assert publisher["CAPABILITY_BUNDLE_NAMESPACE"] == "ai-engineer"
     assert publisher["MISSION_CONTROL_APPLICATION"] == "ai-engineer"
-    assert all(publisher[name] == "" for name in ("DATABASE_DIRECT", "SUPABASE_SECRET_KEY"))
+    assert all(
+        publisher[name] == ""
+        for name in (
+            "MC_AIENG_DB_ADMIN_DSN",
+            "MC_AIENG_DB_SECRET_KEY",
+            "MC_AIENG_DB_FAMILY_WRITER_DSN",
+            "MC_AIENG_DB_CHECKPOINT_DSN",
+        )
+    )
     assert "ANTHROPIC_API_KEY" not in publisher
     # The runtime reader token is not an operator credential either.
     reader_token = _env(out / "bundle-custody.env")["CAPABILITY_BUNDLE_READER_TOKEN"]
@@ -876,19 +901,24 @@ def test_agent_server_env_keeps_supabase_auth_off(
 ) -> None:
     """The real `agent_server/auth.py` loader: the generated Agent Server env derives no issuer,
     so the worker's `bl1.` scope claims stay the only Agent Server credential (today's local W1);
-    `mission-control.env` (API, worker) does carry SUPABASE_URL for the custody reader."""
+    `mission-control.env` (API, worker) does carry MC_AIENG_DB_URL for the custody reader."""
 
     from mission_control.adapters.agent_server import auth
 
     aie = world["bellabs"] / gen.AIE_ENV
     aie.write_text(
-        f"POSTGRES_URL_NON_POOLING={AIE_DSN}\nSUPABASE_URL=https://{AIE_REF}.supabase.co\n"
-        "SUPABASE_PUBLISHABLE_KEY=fake-aie-publishable\n",
+        f"AIENG_DB_ADMIN_DSN={AIE_DSN}\nAIENG_DB_URL=https://{AIE_REF}.supabase.co\n"
+        "AIENG_DB_PUBLISHABLE_KEY=fake-aie-publishable\n",
         encoding="utf-8",
     )
     _custody(world, "ai-engineer")
     assert _run(world, "--component-installation-id", COMPONENT, app="ai-engineer")[0] == 0
     out = world["out"] / "ai-engineer"
+
+    from mission_control.bootstrap.settings import Settings
+
+    # The hosting app injects how the plane URL is read (settings, never the raw environment).
+    auth.configure_plane_url_provider(lambda: Settings(_env_file=None).db.url)  # type: ignore[call-arg]
 
     def configured(env_file: str) -> bool:
         for name, value in _env(out / env_file).items():
@@ -896,18 +926,19 @@ def test_agent_server_env_keeps_supabase_auth_off(
         return auth.authentication_is_configured()
 
     agent = _env(out / "agent-server.env")
-    assert agent["SUPABASE_URL"] == agent["BELL_LABS_AGENT_AUTH_ISSUER"] == ""
+    assert agent["MC_AIENG_DB_URL"] == agent["BELL_LABS_AGENT_AUTH_ISSUER"] == ""
     assert agent["BELLABS_ASYNC_SUBAGENT_SERVER_TOKEN"]
     assert configured("agent-server.env") is False
     assert configured("mission-control.env") is True
     assert configured("agent-server.env") is False
+    auth.configure_plane_url_provider(None)
 
 
 def test_without_custody_the_backend_is_local_and_tokens_blank(world: dict[str, Path]) -> None:
     assert _run(world, "--component-installation-id", COMPONENT)[0] == 0
     mc = _env(world["out"] / "biotech" / "mission-control.env")
     assert mc["CAPABILITY_BUNDLE_BACKEND"] == "local"
-    assert mc["CAPABILITY_BUNDLE_READER_TOKEN"] == mc["SUPABASE_URL"] == ""
+    assert mc["CAPABILITY_BUNDLE_READER_TOKEN"] == mc["MC_BIOTECH_DB_URL"] == ""
 
 
 @pytest.mark.parametrize(
@@ -929,20 +960,20 @@ def test_custody_tokens_for_another_project_or_expired_refuse(
 
 
 def test_custody_needs_the_application_project_url(world: dict[str, Path]) -> None:
-    # aiengineer/.env names no SUPABASE_URL; the MC `.env` (biotech) must not stand in.
+    # aiengineer/.env names no AIENG_DB_URL; the MC `.env` (biotech) must not stand in.
     _owner_files(
         world["bellabs"],
-        mc=f"DATABASE_DIRECT={BIO_DSN}\nSUPABASE_URL=https://{BIOTECH_REF}.supabase.co\n",
+        mc=f"MC_BIOTECH_DB_ADMIN_DSN={BIO_DSN}\nMC_BIOTECH_DB_URL=https://{BIOTECH_REF}.supabase.co\n",
     )
     _custody(world, "ai-engineer")
     result = _run(world, "--component-installation-id", COMPONENT, app="ai-engineer")
-    assert (result[0], result[1]["code"]) == (2, "SUPABASE_URL_MISMATCH")
+    assert (result[0], result[1]["code"]) == (2, "DB_URL_MISMATCH")
 
 
 def _aie_project_env(world: dict[str, Path]) -> None:
     (world["bellabs"] / gen.AIE_ENV).write_text(
-        f"POSTGRES_URL_NON_POOLING={AIE_DSN}\nSUPABASE_URL=https://{AIE_REF}.supabase.co\n"
-        "SUPABASE_PUBLISHABLE_KEY=fake-aie-publishable\n",
+        f"AIENG_DB_ADMIN_DSN={AIE_DSN}\nAIENG_DB_URL=https://{AIE_REF}.supabase.co\n"
+        "AIENG_DB_PUBLISHABLE_KEY=fake-aie-publishable\n",
         encoding="utf-8",
     )
 
@@ -988,7 +1019,7 @@ def test_a_held_mission_control_env_holds_the_agent_server_env(world: dict[str, 
 def test_custody_leaves_coordinator_auth_unchanged(
     world: dict[str, Path], monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """Custody writes SUPABASE_URL; `Settings.coordinator_jwt_issuer` falls back to it when
+    """Custody writes the plane URL; `Settings.coordinator_jwt_issuer` falls back to it when
     COORDINATOR_MCP_JWT_ISSUER is blank. The generated file pins the coordinator MCP surface off
     in both modes, so custody cannot switch Supabase JWT auth on for it."""
 
@@ -1001,7 +1032,7 @@ def test_custody_leaves_coordinator_auth_unchanged(
     _custody(world, "ai-engineer")
     assert _run(world, "--component-installation-id", COMPONENT, app="ai-engineer")[0] == 0
     custody = _env(out / "mission-control.env")
-    assert local["SUPABASE_URL"] == "" and custody["SUPABASE_URL"]
+    assert local["MC_AIENG_DB_URL"] == "" and custody["MC_AIENG_DB_URL"]
     coordinator = sorted(name for name in local if name.startswith("COORDINATOR_"))
     assert [custody[name] for name in coordinator] == [local[name] for name in coordinator]
     assert custody["COORDINATOR_MCP_ENABLED"] == "false"
@@ -1020,7 +1051,7 @@ def test_a_shared_auditor_key_and_the_deployment_namespace(world: dict[str, Path
     _owner_files(
         world["bellabs"],
         mc=(
-            f"DATABASE_DIRECT={BIO_DSN}\n"
+            f"MC_BIOTECH_DB_ADMIN_DSN={BIO_DSN}\n"
             "ANTHROPIC_API_KEY=fake-anthropic-same\n"
             "SECOND_ANTHROPIC_API_KEY=fake-anthropic-same\n"
             "OPENAI_API_KEY=fake-openai-key\n"

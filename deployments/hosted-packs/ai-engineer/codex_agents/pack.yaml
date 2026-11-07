@@ -91,5 +91,5 @@ vault:
     # A read-only fine-grained GitHub token (owner prerequisite MA4). The sandbox sees only a
     # placeholder that the egress proxy substitutes for api.github.com.
     - name: GITHUB_TOKEN
-      source_env: MC_AI_ENGINEER_GITHUB_READONLY_TOKEN
+      source_env: MC_GITHUB_READONLY_TOKEN
       allowed_hosts: [api.github.com]

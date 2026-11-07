@@ -68,7 +68,7 @@ def _deployment(application_id: str, temporal: TemporalDeployment | None) -> Mis
         installation_id=UUID("00000000-0000-7000-8000-000000000001"),
         binding_version="v1",
         supabase_project_ref="project",
-        database_secret_ref="MC_RUNTIME_DSN",
+        database_secret_ref="MC_BIOTECH_DB_RUNTIME_DSN",
         accepted_issuers={"https://issuer.invalid"},
         accepted_audiences={"aud"},
         required_component_version="1.7.0",
@@ -176,7 +176,7 @@ def test_the_workspace_root_reads_the_env_file(
     env_file = tmp_path / ".env"
     env_file.write_text(f"MISSION_CONTROL_WORKSPACE_ROOT={tmp_path / 'assets'}\n", "utf-8")
 
-    settings = Settings(_env_file=env_file, supabase_secret_key=SecretStr("x"))  # type: ignore[call-arg]
+    settings = Settings(_env_file=env_file, mc_local_db_runtime_dsn=SecretStr("x"))  # type: ignore[call-arg]
 
     assert settings.workspace_root == (tmp_path / "assets").resolve()
     tools = settings.workspace_root / ".tools"

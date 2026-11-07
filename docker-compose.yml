@@ -18,7 +18,7 @@ services:
       timeout: 5s
       retries: 30
     ports:
-      - "127.0.0.1:${APPLICATION_POSTGRES_PORT:-55432}:5432"
+      - "127.0.0.1:${MC_LOCAL_DB_PORT:-55432}:5432"
     volumes:
       - application-postgres-data:/var/lib/postgresql/data
       - ./infra/application-postgres/init:/docker-entrypoint-initdb.d:ro

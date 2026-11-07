@@ -26,8 +26,8 @@ Entrypoints:
 - api.py — Configured scoped API: uvicorn mission_control.bootstrap.api:create_app --factory…
 - realtime.py — Public API plus the /missions Socket.IO namespace
 - preflight.py — Read-only validation of the configured Mission Control installation
-- composition.py — Concrete per-installation PostgreSQL composition over the common component
 - settings.py
+- composition.py — Concrete per-installation PostgreSQL composition over the common component
 - manifests.py — Composition of the Mission Manifest service
 Also: common_installation.py, subscriptions.py, worker.py, ingress_drainer.py, owner_probe.py, technical_api.py, trusted_judgment.py, application_profiles.py, provider_auth.py, hosted_readonly.py, resolution.py, model_profiles.py, selection.py, session_time_travel.py, host_preflight.py, runners/ (+23)
 Tests: tests/unit/mission_control, tests/unit/prerequisites, tests/integration/postgres/test_mission_control_composition_postgres.py

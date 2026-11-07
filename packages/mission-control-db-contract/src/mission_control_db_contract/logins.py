@@ -7,13 +7,15 @@ and never ``SET ROLE`` (``adapters/postgres/connections.py``, ``bootstrap/common
 ``adapters/deep_agents/runtime_persistence_verifier.py``):
 
 =============  ==============================  =======================
-login          capability role                 integrator DSN name
-=============  ==============================  =======================
-runtime        mission_control_runtime         ``MC_RUNTIME_DSN``
-family writer  mission_control_family_writer   ``MC_FAMILY_WRITER_DSN``
-checkpointer   mission_control_checkpointer    ``MC_CHECKPOINTER_DSN``
-ingress        mission_control_ingress         ``MC_INGRESS_DSN``
-=============  ==============================  =======================
+login          capability role                 integrator DSN name (plane P = AIENG | BIOTECH)
+=============  ==============================  ==============================================
+runtime        mission_control_runtime         ``MC_P_DB_RUNTIME_DSN``
+family writer  mission_control_family_writer   ``MC_P_DB_FAMILY_WRITER_DSN``
+checkpointer   mission_control_checkpointer    ``MC_P_DB_CHECKPOINT_DSN``
+ingress        mission_control_ingress         ``MC_INGRESS_DSN`` (Vercel; not a plane variable)
+=============  ==============================  ==============================================
+
+The plane is the target's application (``ai-engineer`` is AIENG, ``biotech`` is BIOTECH).
 
 Each login is ``LOGIN NOSUPERUSER NOBYPASSRLS NOCREATEDB NOCREATEROLE NOREPLICATION`` and holds its
 one membership ``WITH INHERIT TRUE, SET FALSE`` (PostgreSQL 16+ grant options; admin option
@@ -69,21 +71,37 @@ SCRAM_ITERATIONS = 4096
 class LoginSpec:
     key: str
     capability: str
-    dsn_name: str
+    # `MC_<PLANE>_DB_<dsn_suffix>`; ``None``: the fixed name in ``fixed_dsn_name``.
+    dsn_suffix: str | None
+    fixed_dsn_name: str | None = None
 
     def role(self, prefix: str) -> str:
         return f"{prefix}_{self.key}"
 
+    def dsn_name(self, target: dict[str, str]) -> str:
+        if self.fixed_dsn_name is not None:
+            return self.fixed_dsn_name
+        return f"MC_{_PLANE_TOKENS.get(target['application_id'], '')}_DB_{self.dsn_suffix}"
+
+
+# The application a target serves selects the plane token of its generated DSN names.
+_PLANE_TOKENS = {"ai-engineer": "AIENG", "biotech": "BIOTECH"}
+
 
 LOGINS = (
-    LoginSpec("runtime", "mission_control_runtime", "MC_RUNTIME_DSN"),
-    LoginSpec("family_writer", "mission_control_family_writer", "MC_FAMILY_WRITER_DSN"),
-    LoginSpec("checkpointer", "mission_control_checkpointer", "MC_CHECKPOINTER_DSN"),
+    LoginSpec("runtime", "mission_control_runtime", "RUNTIME_DSN"),
+    LoginSpec("family_writer", "mission_control_family_writer", "FAMILY_WRITER_DSN"),
+    LoginSpec("checkpointer", "mission_control_checkpointer", "CHECKPOINT_DSN"),
     # Loop iter-3 (hosted lanes): the restricted signal-ingress edge login the worker needs to
     # compose `claude_managed`/`codex_agents` (`bootstrap/signals.py::verify_signal_ingress_pool`).
-    LoginSpec("ingress", "mission_control_ingress", "MC_INGRESS_DSN"),
+    LoginSpec("ingress", "mission_control_ingress", None, "MC_INGRESS_DSN"),
 )
-DSN_NAMES = tuple(spec.dsn_name for spec in LOGINS)
+
+
+def dsn_names(target: dict[str, str]) -> tuple[str, ...]:
+    return tuple(spec.dsn_name(target) for spec in LOGINS)
+
+
 _FORBIDDEN_ATTRIBUTES = (
     "rolsuper",
     "rolbypassrls",
@@ -305,7 +323,9 @@ def _drift(state: dict[str, Any], capability: str) -> list[str]:
     return reasons
 
 
-async def _inspect(connection: Any, descriptor: dict[str, Any], prefix: str) -> dict[str, Any]:
+async def _inspect(
+    connection: Any, descriptor: dict[str, Any], prefix: str, target: dict[str, str]
+) -> dict[str, Any]:
     await connection.execute(
         "SELECT set_config('search_path', $1, false)", descriptor["session"]["search_path"]
     )
@@ -326,7 +346,7 @@ async def _inspect(connection: Any, descriptor: dict[str, Any], prefix: str) -> 
         entry: dict[str, Any] = {
             "login": role,
             "capability": spec.capability,
-            "dsn_name": spec.dsn_name,
+            "dsn_name": spec.dsn_name(target),
         }
         capability = capabilities.get(spec.capability)
         if capability is None or capability["rolcanlogin"]:
@@ -400,7 +420,7 @@ async def login_plan(
     connection = await connect(target, readonly=True)
     try:
         await _verified_common(connection, target, release, reader_version, writer_version)
-        inspection = await _inspect(connection, descriptor, prefix)
+        inspection = await _inspect(connection, descriptor, prefix, target)
     except ContractError:
         raise
     except Exception as exc:
@@ -485,16 +505,16 @@ async def login_apply(
     committed = False
     try:
         await _verified_common(connection, target, release, reader_version, writer_version)
-        before = await _inspect(connection, descriptor, prefix)
+        before = await _inspect(connection, descriptor, prefix, target)
         if before["holds"]:
             raise ContractError("; ".join(before["holds"]), code="LOGIN_HOLD")
         passwords: dict[str, str] = {}
         actions: dict[str, str] = {}
         for item in before["logins"]:
-            spec = next(s for s in LOGINS if s.dsn_name == item["dsn_name"])
+            spec = next(s for s in LOGINS if s.dsn_name(target) == item["dsn_name"])
             role = spec.role(prefix)
             user = login_user(target, role)
-            known = existing_env.get(spec.dsn_name)
+            known = existing_env.get(spec.dsn_name(target))
             password = None if rotate or known is None else _dsn_password(known, target, user)
             if item["status"] == "absent":
                 actions[role] = "created"
@@ -511,7 +531,7 @@ async def login_apply(
         values = dict(existing_env)
         for spec in LOGINS:
             role = spec.role(prefix)
-            values[spec.dsn_name] = build_dsn(
+            values[spec.dsn_name(target)] = build_dsn(
                 target, login_user(target, role), passwords[role], sslmode=sslmode, ca_file=ca_file
             )
         changed = any(action != "verified" for action in actions.values())
@@ -519,7 +539,7 @@ async def login_apply(
             write_env_file(pending, values)
         async with connection.transaction():
             await connection.execute(XACT_LOCK_SQL)
-            again = await _inspect(connection, descriptor, prefix)
+            again = await _inspect(connection, descriptor, prefix, target)
             if [e["status"] for e in again["logins"]] != [e["status"] for e in before["logins"]]:
                 raise ContractError("logins changed concurrently; rerun", code="LOGIN_CONCURRENT")
             for spec in LOGINS:
@@ -552,7 +572,7 @@ async def login_apply(
                             verifier,
                         )
                     )
-            after = await _inspect(connection, descriptor, prefix)
+            after = await _inspect(connection, descriptor, prefix, target)
             if after["holds"] or any(e["status"] != "present" for e in after["logins"]):
                 raise ContractError(
                     "; ".join(after["holds"]) or "a login does not verify after apply",
@@ -569,7 +589,7 @@ async def login_apply(
                     "login": role,
                     "user": login_user(target, role),
                     "capability": spec.capability,
-                    "dsn_name": spec.dsn_name,
+                    "dsn_name": spec.dsn_name(target),
                     "action": actions[role],
                 }
             )
@@ -616,10 +636,11 @@ async def _probe(values: dict[str, str], target: dict[str, str]) -> list[dict[st
     results = []
     for spec in LOGINS:
         try:
-            connection = await asyncpg.connect(values[spec.dsn_name], timeout=10)
+            connection = await asyncpg.connect(values[spec.dsn_name(target)], timeout=10)
         except Exception as exc:
             raise ContractError(
-                f"Login probe of {spec.dsn_name} could not connect (SQLSTATE {sqlstate(exc)})",
+                f"Login probe of {spec.dsn_name(target)} could not connect "
+                f"(SQLSTATE {sqlstate(exc)})",
                 code="LOGIN_PROBE_FAILED",
             ) from None
         try:
@@ -633,12 +654,12 @@ async def _probe(values: dict[str, str], target: dict[str, str]) -> list[dict[st
             await connection.close()
         if row is None or row["database"] != target["database_name"] or not row["member"]:
             raise ContractError(
-                f"Login probe of {spec.dsn_name} is not a member of {spec.capability}",
+                f"Login probe of {spec.dsn_name(target)} is not a member of {spec.capability}",
                 code="LOGIN_PROBE_FAILED",
             )
         results.append(
             {
-                "dsn_name": spec.dsn_name,
+                "dsn_name": spec.dsn_name(target),
                 "session_user": row["session_user"],
                 "member": True,
                 "can_set_role": bool(row["can_set"]),
@@ -648,7 +669,7 @@ async def _probe(values: dict[str, str], target: dict[str, str]) -> list[dict[st
 
 
 __all__ = [
-    "DSN_NAMES",
+    "dsn_names",
     "LOGINS",
     "build_dsn",
     "login_apply",

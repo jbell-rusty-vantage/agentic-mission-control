@@ -166,9 +166,10 @@ def configured_supabase_bundle_store(
     application prefix); an operator stages with the publisher credential (INSERT + SELECT).
     Deployment-only construction; no destination or credential from a mission.
     """
-    endpoint = urlsplit(settings.supabase_url or "")
+    project_url = settings.db.url
+    endpoint = urlsplit(project_url or "")
     local = endpoint.scheme == "http" and endpoint.hostname in {"127.0.0.1", "localhost", "::1"}
-    if settings.supabase_url and (
+    if project_url and (
         not endpoint.hostname
         or (endpoint.scheme != "https" and not local)
         or endpoint.username
@@ -451,21 +452,22 @@ def configured_supabase_bundle_custody(
         if credential == "publisher"
         else settings.capability_bundle_reader_token
     )
-    if not settings.supabase_url or token is None or not token.get_secret_value().strip():
+    db = settings.db
+    if not db.url or token is None or not token.get_secret_value().strip():
         raise IntegrationConfigurationError(
-            f"SUPABASE_URL and the capability bundle {credential} token are required"
+            f"{db.env_name('url')} and the capability bundle {credential} token are required"
         )
     if http_client.follow_redirects:
         raise BundleError("Supabase bundle transport must disable redirects")
-    origin = urlsplit(settings.supabase_url)
+    origin = urlsplit(db.url)
     if not origin.hostname:
         raise BundleError("Supabase bundle origin must name a host")
-    anon = settings.supabase_publishable_key
+    anon = db.publishable_key
     headers = {"Authorization": "Bearer " + token.get_secret_value()}
     if anon is not None and anon.get_secret_value().strip():
         headers["apikey"] = anon.get_secret_value()
     client = SyncStorageClient(
-        settings.supabase_url.rstrip("/") + "/storage/v1/", headers, http_client=http_client
+        db.url.rstrip("/") + "/storage/v1/", headers, http_client=http_client
     )
     tus = None
     if credential == "publisher":

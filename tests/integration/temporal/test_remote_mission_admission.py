@@ -53,6 +53,7 @@ from mission_control.domain.authoring.extensions import ExtensionRegistry
 from mission_control.domain.authoring.manifest import canonical_manifest_bytes, load_manifest_yaml
 from mission_control.interfaces.http.ingress import create_ingress_app
 from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog, publish_output_schemas
+from tests.fixtures.db_env import db_env_name
 from tests.fixtures.manifest_runtime import AUTHOR, ChainScript, chain_components
 from tests.fixtures.mission_control_common_db import catalog_scope, ingress_login
 from tests.fixtures.mission_control_production_stack import open_postgres_production_stack
@@ -144,7 +145,7 @@ async def test_remote_admission_crash_replay_and_current_authority(
             installation_id=database.installation_id,
             binding_version="1",
             supabase_project_ref=database.project_ref,
-            database_secret_ref="APPLICATION_DATABASE_DIRECT",
+            database_secret_ref=db_env_name(database.application_id, "RUNTIME_DSN"),
             accepted_issuers={"https://fixture.invalid"},
             accepted_audiences={"mission-control"},
             required_component_version="1.4.2",

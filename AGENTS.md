@@ -11,6 +11,11 @@ Data planes, credentials, MCP servers: [workspace registry](../../docs/navigatio
 `make dev` (compose up, healthy) · `make check` (fast gate) · `make preflight` (read-only installation check).
 <!-- END:sdlc-infra -->
 
+## Environment
+Database variables are `MC_{AIENG,BIOTECH,LOCAL}_DB_*`, one plane per process chosen by `MISSION_CONTROL_APPLICATION`, read only through `Settings.db`; no aliases.
+Names, readers and what breaks when unset: [ENVIRONMENT](docs/ENVIRONMENT.md) and `config/env.registry.yaml` (`make env-check` keeps them in step).
+The runtime DSN must be the restricted `mission_control_runtime` login from the generated runtime env, not a development placeholder.
+
 ## Invariants
 - Authority: code: what runs · ADRs: what was decided · concepts explain both · programs are working. Report a conflict; dated specs and `docs/specs/archive` are provenance.
 - Temporal alone schedules missions. Deep Agents is bounded operation cognition. Reducers own lifecycle and settlement.

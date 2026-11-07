@@ -28,7 +28,8 @@ def settings(**overrides: object) -> Settings:
     values: dict[str, object] = {
         "capability_bundle_local_root": None,
         "capability_bundle_reader_token": None,
-        "supabase_url": None,
+        "mission_control_application": "ai-engineer",
+        "mc_aieng_db_url": None,
     }
     return Settings(_env_file=None, **(values | overrides))  # type: ignore[call-arg]
 
@@ -47,7 +48,7 @@ def test_supabase_custody_reads_with_the_reader_credential_and_signed_urls() -> 
     bundles = compose_bundle_materializer(
         settings(
             capability_bundle_backend="supabase",
-            supabase_url="https://ref.supabase.co",
+            mc_aieng_db_url="https://ref.supabase.co",
             capability_bundle_reader_token="reader-jwt",
         )
     )
@@ -61,7 +62,7 @@ def test_supabase_custody_reads_with_the_reader_credential_and_signed_urls() -> 
     "overrides",
     [
         {},
-        {"capability_bundle_backend": "supabase", "supabase_url": "https://ref.supabase.co"},
+        {"capability_bundle_backend": "supabase", "mc_aieng_db_url": "https://ref.supabase.co"},
     ],
     ids=["local-without-root", "supabase-without-reader"],
 )
@@ -70,7 +71,7 @@ def test_without_a_custody_source_there_is_no_custody(overrides: dict[str, objec
 
 
 def test_a_reader_credential_without_its_supabase_origin_fails_at_composition() -> None:
-    with pytest.raises(IntegrationConfigurationError, match="SUPABASE_URL"):
+    with pytest.raises(IntegrationConfigurationError, match="MC_AIENG_DB_URL"):
         compose_bundle_materializer(
             settings(capability_bundle_backend="supabase", capability_bundle_reader_token="jwt")
         )

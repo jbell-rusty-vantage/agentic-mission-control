@@ -544,12 +544,12 @@
         "protocol": "sdk.v1"
       },
       "repositories": {
-        "https://github.com/Overton77/mission-control-fixture": {
+        "https://github.com/jbell-rusty-vantage/mission-control-fixtures": {
           "base_refs": [
             "main"
           ],
           "branch_prefix": "mc/",
-          "repo_url": "https://github.com/Overton77/mission-control-fixture"
+          "repo_url": "https://github.com/jbell-rusty-vantage/mission-control-fixtures"
         }
       },
       "sensitive_data_policy_ref": "OWNER-SELECT:sensitive-data policy reference",

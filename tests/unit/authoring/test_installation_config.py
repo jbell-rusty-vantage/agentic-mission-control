@@ -333,7 +333,7 @@ def _binding(application_id: str) -> ApplicationBinding:
         installation_id=UUID(int=1),
         binding_version="1",
         supabase_project_ref="fixture",
-        database_secret_ref="DATABASE_URL",
+        database_secret_ref="TEST_RUNTIME_DSN",
         accepted_issuers=frozenset({"https://issuer.example"}),
         accepted_audiences=frozenset({"mission-control"}),
         required_component_version="1",

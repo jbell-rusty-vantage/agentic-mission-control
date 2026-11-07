@@ -133,7 +133,7 @@ def test_org_key_source_ref_is_rejected_before_resolution():
         provider="openai",
         environment_ref="reviewed",
         expected_revision="v1",
-        secret_refs=("MC_AI_ENGINEER_GITHUB_READONLY_TOKEN=environment:OPENAI_API_KEY",),
+        secret_refs=("MC_GITHUB_READONLY_TOKEN=environment:OPENAI_API_KEY",),
     )
     with pytest.raises(ValueError, match="organization and publication"):
         project(

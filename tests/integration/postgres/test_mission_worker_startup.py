@@ -108,7 +108,7 @@ async def _worker_proof(database, checkpoint_dsn, tmp_path, poll_workers) -> Non
         # Agrees with the installation's queue base (re-review 3: a differing one refuses).
         temporal_task_queue="worker",
         coordinator_launch_enabled=True,
-        langgraph_checkpoint_database_direct=SecretStr(checkpoint_dsn),
+        mc_biotech_db_checkpoint_dsn=SecretStr(checkpoint_dsn),
         langgraph_checkpoint_schema="mission_control_runtime",
         langgraph_checkpoint_setup=False,
     )
@@ -156,7 +156,7 @@ async def _worker_proof(database, checkpoint_dsn, tmp_path, poll_workers) -> Non
                 **inputs,
                 "settings": settings.model_copy(
                     update={
-                        "langgraph_checkpoint_database_direct": SecretStr(
+                        "mc_biotech_db_checkpoint_dsn": SecretStr(
                             database.dsn("mission_control_runtime")
                             + "?options=-c%20search_path%3Dmission_control_runtime%2Cpg_temp"
                         )

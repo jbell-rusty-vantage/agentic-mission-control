@@ -16,6 +16,7 @@ from mission_control.adapters.operations.runtime_ports import FilesystemArtifact
 from mission_control.adapters.temporal.registration.task_queues import maintenance_task_queue
 from mission_control.adapters.temporal.workflows.fork_seed import ForkSeedWorkflow
 from tests.fixtures import qualia_control_api as fixture
+from tests.fixtures.db_env import db_env_name
 from tests.fixtures.manifest_runtime import AUTHOR
 
 
@@ -88,7 +89,9 @@ async def test_companion_has_ordinary_control_grants_and_only_missing_seed_worke
         "workflow_run.start",
     } <= grant.permissions
     assert deployment.temporal.address == stack.settings.temporal_address
-    assert deployment.family_writer_secret_ref == "APPLICATION_FAMILY_WRITER_DATABASE_DIRECT"
+    assert deployment.family_writer_secret_ref == db_env_name(
+        stack.database.application_id, "FAMILY_WRITER_DSN"
+    )
     assert len(observed["workers"]) == (0 if already_served else 1)
     if not already_served:
         client, configuration = observed["workers"][0]

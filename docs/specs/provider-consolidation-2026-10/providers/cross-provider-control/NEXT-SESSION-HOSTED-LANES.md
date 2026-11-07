@@ -53,26 +53,23 @@ MA4, M1, M2, M3 and M4. Requiring repository and publication items for a mission
 
 ## 3. Owner actions (can be done now)
 
-### 3.1 GitHub on jbell-rusty-vantage (paid Pro)
+### 3.1 GitHub on jbell-rusty-vantage (paid Pro): done 2026-11-07
 
-1. **Repository.** Create a private repository `jbell-rusty-vantage/mission-control-fixture`. The name matches the Cursor
-   fixture manifest's repository, which only needs its owner changed. Two ways:
-   - you create it empty;
-   - or you approve it in the next session and an agent creates and seeds it with `gh repo create`: a tiny Python
-     package with one failing parser test (for code missions) and a `knowledge/` folder (for knowledge publication).
-2. **Read-only token** (MA4; also the Agents API pack's sandbox `GITHUB_TOKEN`). A fine-grained token:
-   - Repository access: only `mission-control-fixture`.
-   - Permissions: Contents read, Metadata read.
-   - Store it in `.scratch/sprint-oc/runtime/ai-engineer/mission-control.env` as `MC_AI_ENGINEER_GITHUB_READONLY_TOKEN`
-     (the name the pack reads). Never paste it in chat or commit it.
-3. **Publication credential** (M2; code work only). Either:
-   - **(a) preferred: a GitHub App** on `jbell-rusty-vantage` installed on that repository, with Contents read/write,
-     Pull requests read/write and Metadata read. Set `MC_GITHUB_APP_ID`, `MC_GITHUB_APP_INSTALLATION_ID` and
-     `MC_GITHUB_APP_PRIVATE_KEY_PATH` (a `.pem` outside every repository).
-   - **(b) interim:** `gh auth login` as `jbell-rusty-vantage`. The code currently hardcodes `--user Overton77`
-     (`adapters/github/credentials.py`), which §4.1 changes.
-4. **Move the fixture references** off `Overton77`: `tests/fixtures/manifests/multi-provider/cursor-local.stage-graph.mission.yml`
-   and the Cursor/Codex/Claude cloud fixtures (an agent does this).
+1. **Repository.** `jbell-rusty-vantage/mission-control-fixtures` (plural; private) exists. The Cursor fixture
+   manifests and the Cursor/Codex/Claude cloud fixtures name it.
+2. **Read-only token** (MA4; also the Agents API pack's sandbox `GITHUB_TOKEN`). A fine-grained token created
+   2026-11-07: repository access only `mission-control-fixtures`, Contents read and Metadata read. Its name is
+   `MC_GITHUB_READONLY_TOKEN` (the name the pack reads), held in `BellLabs/.secrets/github.env` and the MC `.env`.
+   Never paste it in chat or commit it.
+3. **Publication credential** (M2; code work only). The GitHub App `agentic-mission-control-app` exists on
+   `jbell-rusty-vantage`, installed on that repository with Contents read/write, Pull requests read/write and Metadata
+   read. Its names are `MC_GITHUB_APP_ID`, `MC_GITHUB_APP_INSTALLATION_ID` and `MC_GITHUB_APP_PRIVATE_KEY_PATH` (a
+   `.pem` outside every repository), in the same two files. Its installation-token exchange was verified on
+   2026-11-07. The `gh` fallback in `adapters/github/credentials.py` now expects the `jbell-rusty-vantage` account.
+4. The fixture references have moved off `Overton77` (dated evidence records keep their original names).
+
+Provider cloud agents (Cursor cloud, Codex cloud, Claude Code web) reach repositories through their own GitHub app
+installs on the account, not through these environment values. Names and readers: [ENVIRONMENT](../../../../ENVIRONMENT.md#github).
 
 ### 3.2 Webhook on the Vercel signal ingress
 
@@ -121,7 +118,8 @@ Agent tool's own isolation branched from the pushed `origin/main`); `git config 
    - webhook items (MA2, OA2) only when the deployment selects webhook observation;
    - MA5 only when OAuth MCP servers are selected.
 
-   Same commit: replace the hardcoded `gh --user Overton77` with a configured owner account (`jbell-rusty-vantage`).
+   (Done 2026-11-07: the `gh` fallback account is now `jbell-rusty-vantage`, `OWNER_GH_ACCOUNT` in
+   `adapters/github/credentials.py`.)
    Prove it: a repository-less F2 compiles **and starts** with only MA1, M1 and M4 satisfied.
 2. **Named outputs on hosted lanes (F2-G3)**, the core gap. Give both hosted lanes Mission Control's submission act as a
    provider tool: a Managed `custom_tools` entry and an Agents API function tool, `mc_submit_output(obligation, item)`.

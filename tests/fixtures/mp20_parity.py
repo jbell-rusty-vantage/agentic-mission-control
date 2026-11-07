@@ -178,7 +178,7 @@ from mission_control.domain.authoring.manifest import canonical_manifest_bytes
 LOCAL_PROFILES = ("deep_agents", "claude_agent_sdk", "codex")
 SESSION_PROFILES = ("claude_agent_sdk", "codex")
 CURSOR_PROFILES = ("cursor_local", "cursor_cloud")
-REPO = {"url": "https://github.com/Overton77/mission-control-fixture", "ref": "main"}
+REPO = {"url": "https://github.com/jbell-rusty-vantage/mission-control-fixtures", "ref": "main"}
 SECRET_MARKERS = tuple(
     value for key, value in FIXTURE_ENVIRON.items() if key not in {"PATH", "HOME"}
 )

@@ -4,6 +4,11 @@ Informational by default: many example names have defaults in Settings, so a mis
 name is reported but exits 0. ``--strict`` exits 1 on any missing name. A missing .env
 always exits 1.
 
+The database scope is also checked in code, independent of ``.env``: the database names in
+``config/env.registry.yaml`` must equal the database fields of ``Settings`` and the database
+block of ``.env.example``; a difference exits 1 (see ``database_registry_problems``). The
+registry's other entries (GitHub, Biotech graph) must each appear in ``.env.example``.
+
 Usage::
 
     uv run python scripts/dev/env_check.py [--strict] [--example .env.example] [--env .env]
@@ -13,10 +18,51 @@ from __future__ import annotations
 
 import argparse
 import re
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 NAME = re.compile(r"^\s*(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)\s*=")
+DB_NAME = re.compile(r"^MC_(AIENG|BIOTECH|LOCAL)_DB_[A-Z_]+$")
+REGISTRY = "config/env.registry.yaml"
+
+
+def registry_names(path: Path) -> set[str]:
+    """Every variable name the registry lists (names only)."""
+
+    import yaml
+
+    document = yaml.safe_load(path.read_text(encoding="utf-8"))
+    return {entry["name"] for entry in document["variables"]}
+
+
+def registry_database_names(path: Path) -> set[str]:
+    """The database variable names the registry lists (names only)."""
+
+    return {name for name in registry_names(path) if DB_NAME.match(name)}
+
+
+def settings_database_names() -> set[str]:
+    """The ``MC_<PLANE>_DB_*`` environment names of the ``Settings`` fields."""
+
+    sys.path.insert(0, str(ROOT / "src"))
+    from mission_control.bootstrap.settings import Settings
+
+    return {name.upper() for name in Settings.model_fields if DB_NAME.match(name.upper())}
+
+
+def database_registry_problems(
+    registry: set[str], settings: set[str], example: set[str]
+) -> list[str]:
+    """Differences between the registry, the Settings fields and the .env.example block."""
+
+    problems = []
+    for label, other in (("Settings fields", settings), (".env.example", example)):
+        for name in sorted(registry - other):
+            problems.append(f"{name}: in the registry, not in {label}")
+        for name in sorted(other - registry):
+            problems.append(f"{name}: in {label}, not in the registry")
+    return problems
 
 
 def names(path: Path) -> set[str]:
@@ -45,6 +91,25 @@ def main() -> int:
         return 1
 
     expected = names(example)
+    registry_path = ROOT / REGISTRY
+    problems: list[str] = []
+    if registry_path.exists():
+        problems = database_registry_problems(
+            registry_database_names(registry_path),
+            settings_database_names(),
+            {name for name in expected if DB_NAME.match(name)},
+        )
+        problems += [
+            f"{name}: in the registry, not in {args.example}"
+            for name in sorted(registry_names(registry_path) - expected)
+            if not DB_NAME.match(name)
+        ]
+        print(f"database registry: {len(problems)} difference(s)")
+        for problem in problems:
+            print(f"  {problem}")
+    else:
+        problems = [f"{REGISTRY} not found"]
+        print(f"error: {REGISTRY} not found")
     present = names(env)
     missing = sorted(expected - present)
     extra = sorted(present - expected)
@@ -59,7 +124,7 @@ def main() -> int:
             print(f"  {name}")
     if not missing:
         print("ok: every example name is present")
-    return 1 if (missing and args.strict) else 0
+    return 1 if (problems or (missing and args.strict)) else 0
 
 
 if __name__ == "__main__":
