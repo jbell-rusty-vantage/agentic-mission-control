@@ -197,6 +197,9 @@ from mission_control.adapters.postgres.runtime.run_forks import (
     PostgresForkMaterializationStore,
     PostgresRunSnapshotRepository,
 )
+from mission_control.adapters.postgres.runtime.stage3_kernel_repository import (
+    PostgresForkRepository,
+)
 from mission_control.adapters.postgres.workspace_candidate_contents import (
     PostgresWorkspaceCandidateContents,
 )
@@ -275,6 +278,7 @@ from mission_control.application.artifacts.workspace_materialization import (
     WorkspaceMaterializationService,
 )
 from mission_control.application.authoring.manifest_launch_inputs import ServedModel
+from mission_control.application.authoring.manifest_submit import StoredForkSources
 from mission_control.application.authoring.service import ControlPlaneService
 from mission_control.application.capabilities.bundle_custody import BundleMaterializer
 from mission_control.application.context.fork_context import ForkContextReader
@@ -1873,6 +1877,10 @@ class ProductionWorkerActivityCompositionFactory:
                     control_plane,
                     run_control,
                     PostgresStageGraphOperationTemplateRepository(postgres_pool),
+                    fork_sources=StoredForkSources(
+                        PostgresForkMaterializationStore(postgres_pool),
+                        PostgresForkRepository(postgres_pool),
+                    ),
                 ),
                 operation_heartbeats=heartbeats,
                 context_packs=context_packs,

@@ -146,6 +146,10 @@ EXHAUSTION_HOLD_PATCH = "oc-wi08-stagegraph-exhaustion-hold"
 # live run version the refusal now returns (before, only a grown family version retried, so
 # parallel stages serialized). Histories recorded before it replay the old wait.
 STALE_SIBLING_RETRY_PATCH = "oc-l2-01-stagegraph-retry-stale-sibling-admission"
+# Loop iter-3 (live 2d5dc74f): a fork-derived manifest run's human gates are noncognitive
+# control admissions too; before it they reserved a cognitive slot whose liability never
+# closed, so the family failed `stagegraph_blocked` after the review was approved.
+FORK_NONCOGNITIVE_GATE_PATCH = "oc-iter3-fork-noncognitive-human-gates"
 # OVE-176: `NESTED_BODY_PATCH` (imported from workflows/nested_body.py) guards a stage hosting a
 # nested family body, which runs as a child run instead of an operation child; the parent's
 # cancel, pause and resume reach it through the child's run control. Only blueprints with nested
@@ -345,7 +349,14 @@ class StageGraphWorkflow:
         human_gates = _human_gates(run_input, blueprint)
         nested_bodies = {body.host_id: body for body in blueprint.nested_bodies}
         control_gate_keys = _noncognitive_gate_keys(
-            run_input, human_gates, enabled=workflow.patched(NONCOGNITIVE_GATE_PATCH)
+            run_input,
+            human_gates,
+            enabled=workflow.patched(NONCOGNITIVE_GATE_PATCH),
+            forks=(
+                bool(human_gates)
+                and run_input.semantic_input_binding_ref.startswith("semantic-input:fork:")
+                and workflow.patched(FORK_NONCOGNITIVE_GATE_PATCH)
+            ),
         )
         interpreter = StageGraphInterpreter(
             blueprint,
@@ -1660,14 +1671,19 @@ class StageGraphWorkflow:
 
 
 def _noncognitive_gate_keys(
-    run_input: StageGraphRunInput, gates: dict[str, HumanGateSpec], *, enabled: bool
+    run_input: StageGraphRunInput,
+    gates: dict[str, HumanGateSpec],
+    *,
+    enabled: bool,
+    forks: bool = False,
 ) -> frozenset[str]:
-    # Fork templates retain their prior guarded reservation path. Only a normal manifest
-    # run can use the new provider's committed-definition/template verification boundary.
-    if (
-        enabled
-        and run_input.semantic_input_binding_ref == f"semantic-input:manifest:{run_input.run_id}"
-    ):
+    # A manifest run, and (patched, loop iter-3) a fork-derived manifest run whose provider
+    # verifies the gates against the fork binding and the source's committed definition.
+    # Other runs keep the prior guarded reservation path.
+    manifest = run_input.semantic_input_binding_ref == (
+        f"semantic-input:manifest:{run_input.run_id}"
+    )
+    if enabled and (manifest or forks):
         return frozenset(gates)
     return frozenset()
 
