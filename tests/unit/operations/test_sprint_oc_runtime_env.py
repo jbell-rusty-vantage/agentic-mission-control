@@ -199,14 +199,18 @@ def test_biotech_files_carry_owner_minted_and_derived_values(world: dict[str, Pa
     assert mc["KNOWLEDGE_BINDING_URL"] == f"http://127.0.0.1:{ks['VERIFY_PORT']}"
     assert ks["KS_BIOTECH_EXECUTOR_URL"] == f"http://127.0.0.1:{bks['EXECUTOR_PORT']}"
 
-    assert (bks["NEO4J_URI"], bks["NEO4J_USERNAME"], bks["NEO4J_PASSWORD"]) == (
+    assert (
+        bks["BKS_BIOTECH_GRAPH_URI"],
+        bks["BKS_BIOTECH_GRAPH_USERNAME"],
+        bks["BKS_BIOTECH_GRAPH_PASSWORD"],
+    ) == (
         f"neo4j+s://{GRAPH_HOST}",
         "fake-aura-user",
         "fake-aura-pw",
     )
     assert bks["BKS_TARGET"] == "production"
     assert bks["BKS_NO_ENV_FILE"] == "1"
-    assert bks["BKS_VERIFICATION_DSN"] == tls(world, BIO_DSN)
+    assert bks["BKS_BIOTECH_DB_VERIFICATION_DSN"] == tls(world, BIO_DSN)
     assert bks["BKS_VERIFICATION_TENANTS"] == TENANT
     by_role = {entry["role"]: entry for entry in json.loads(bks["BKS_EXECUTOR_TOKENS"])}
     for role, name in (
@@ -238,11 +242,11 @@ def test_biotech_files_carry_owner_minted_and_derived_values(world: dict[str, Pa
         "KS_BIOTECH_EXECUTOR_URL",
         "KS_BIOTECH_EXECUTOR_TOKEN",
         "KS_BIOTECH_EXECUTOR_READ_TOKEN",
-        "NEO4J_URI",
-        "NEO4J_USERNAME",
-        "NEO4J_PASSWORD",
+        "BKS_BIOTECH_GRAPH_URI",
+        "BKS_BIOTECH_GRAPH_USERNAME",
+        "BKS_BIOTECH_GRAPH_PASSWORD",
         "BKS_EXECUTOR_TOKENS",
-        "BKS_VERIFICATION_DSN",
+        "BKS_BIOTECH_DB_VERIFICATION_DSN",
         "BKS_VERIFICATION_TENANTS",
         "KS_BIOTECH_DB_COMPONENT_DSN",
         # OVE-169 W1 D25: the installer's seal-key step.
@@ -441,8 +445,15 @@ def test_graph_credentials_need_the_pinned_confirmed_host(world: dict[str, Path]
     code, summary = _run(world, "--component-installation-id", COMPONENT)
     assert code == 0
     bks = _env(world["out"] / "biotech" / "bks-executor.env")
-    assert bks["NEO4J_USERNAME"] == bks["NEO4J_PASSWORD"] == bks["NEO4J_URI"] == ""
-    assert {"NEO4J_PASSWORD", "BKS_TARGET"} <= {item["name"] for item in summary["missing"]}
+    assert (
+        bks["BKS_BIOTECH_GRAPH_USERNAME"]
+        == bks["BKS_BIOTECH_GRAPH_PASSWORD"]
+        == bks["BKS_BIOTECH_GRAPH_URI"]
+        == ""
+    )
+    assert {"BKS_BIOTECH_GRAPH_PASSWORD", "BKS_TARGET"} <= {
+        item["name"] for item in summary["missing"]
+    }
     assert "fake-aura" not in (world["out"] / "biotech" / "install.env").read_text(encoding="utf-8")
 
     wrong = _run(
@@ -488,8 +499,8 @@ def test_verification_dsn_is_missing_without_an_explicit_choice(world: dict[str,
     )
     assert code == 0
     bks = _env(world["out"] / "biotech" / "bks-executor.env")
-    assert bks["BKS_VERIFICATION_DSN"] == ""
-    assert "BKS_VERIFICATION_DSN" in {item["name"] for item in summary["missing"]}
+    assert bks["BKS_BIOTECH_DB_VERIFICATION_DSN"] == ""
+    assert "BKS_BIOTECH_DB_VERIFICATION_DSN" in {item["name"] for item in summary["missing"]}
     assert summary["choices"]["verificationDsn"] == "missing"
 
 

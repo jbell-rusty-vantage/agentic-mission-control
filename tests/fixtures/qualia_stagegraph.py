@@ -324,9 +324,9 @@ async def knowledge_host(root: Path, *, module: str = "qualia-fixture-host.ts") 
     if biotech.get("MC_BIOTECH_GRAPH_URI") != "neo4j+s://8032ec07.databases.neo4j.io":
         raise ValueError("Registered biotech Aura target changed")
     for name, source in {
-        "NEO4J_URI": "MC_BIOTECH_GRAPH_URI",
-        "NEO4J_USERNAME": "MC_BIOTECH_GRAPH_USERNAME",
-        "NEO4J_PASSWORD": "MC_BIOTECH_GRAPH_PASSWORD",
+        "BKS_BIOTECH_GRAPH_URI": "MC_BIOTECH_GRAPH_URI",
+        "BKS_BIOTECH_GRAPH_USERNAME": "MC_BIOTECH_GRAPH_USERNAME",
+        "BKS_BIOTECH_GRAPH_PASSWORD": "MC_BIOTECH_GRAPH_PASSWORD",
     }.items():
         value = biotech.get(source)
         if not value:

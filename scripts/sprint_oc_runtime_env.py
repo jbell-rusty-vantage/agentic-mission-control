@@ -27,7 +27,8 @@ public root, `--ca-file`, always parsed as an X.509 PEM). Each DSN must name the
 exactly (`db.<ref>.supabase.co`, or a pooler login `<role>.<ref>`). The `knowledge_verification`
 tenant is minted once (or `--verification-tenant-id`, one only); the W1 operator grants must use it.
 Neo4j credentials are written only when `--confirm-graph` names the host pinned in
-`deployments/biotech/graph.toml`. `BKS_VERIFICATION_DSN` is a restricted integrator login; the
+`deployments/biotech/graph.toml`. `BKS_BIOTECH_DB_VERIFICATION_DSN` is a restricted integrator
+login; the
 Biotech admin DSN (`MC_BIOTECH_DB_ADMIN_DSN`) is used only with `--allow-admin-verification-dsn`
 (disposable W0), recorded in the manifest.
 
@@ -151,7 +152,7 @@ def integrator_names(app: str) -> tuple[str, ...]:
         db_name(app, "RUNTIME_DSN"),
         db_name(app, "FAMILY_WRITER_DSN"),
         db_name(app, "CHECKPOINT_DSN"),
-        "BKS_VERIFICATION_DSN",
+        "BKS_BIOTECH_DB_VERIFICATION_DSN",
     )
 
 
@@ -839,9 +840,9 @@ def graph_entries(ctx: Context) -> list[Entry]:
     ctx.choices["graph"] = "confirmed" if confirmed else "unconfirmed"
     needs = f"integrator: --confirm-graph {pin['host']} (pinned in {GRAPH_PIN})"
     entries = [
-        owner(ctx, MC_ENV, "MC_BIOTECH_GRAPH_URI", "NEO4J_URI"),
-        owner(ctx, MC_ENV, "MC_BIOTECH_GRAPH_USERNAME", "NEO4J_USERNAME"),
-        owner(ctx, MC_ENV, "MC_BIOTECH_GRAPH_PASSWORD", "NEO4J_PASSWORD"),
+        owner(ctx, MC_ENV, "MC_BIOTECH_GRAPH_URI", "BKS_BIOTECH_GRAPH_URI"),
+        owner(ctx, MC_ENV, "MC_BIOTECH_GRAPH_USERNAME", "BKS_BIOTECH_GRAPH_USERNAME"),
+        owner(ctx, MC_ENV, "MC_BIOTECH_GRAPH_PASSWORD", "BKS_BIOTECH_GRAPH_PASSWORD"),
         constant("BKS_TARGET", "production"),
     ]
     if confirmed:
@@ -850,19 +851,24 @@ def graph_entries(ctx: Context) -> list[Entry]:
 
 
 def verification_dsn(ctx: Context) -> Entry:
-    if ctx.integrator.get("BKS_VERIFICATION_DSN"):
+    if ctx.integrator.get("BKS_BIOTECH_DB_VERIFICATION_DSN"):
         ctx.choices["verificationDsn"] = "integrator"
-        return integrator(ctx, "BKS_VERIFICATION_DSN", "BKS_VERIFICATION_DSN", "outbox worker")
+        return integrator(
+            ctx,
+            "BKS_BIOTECH_DB_VERIFICATION_DSN",
+            "BKS_BIOTECH_DB_VERIFICATION_DSN",
+            "outbox worker",
+        )
     if ctx.allow_admin_verification_dsn:
         ctx.choices["verificationDsn"] = "admin-allowed (disposable W0)"
-        entry = owner(ctx, MC_ENV, "MC_BIOTECH_DB_ADMIN_DSN", "BKS_VERIFICATION_DSN")
+        entry = owner(ctx, MC_ENV, "MC_BIOTECH_DB_ADMIN_DSN", "BKS_BIOTECH_DB_VERIFICATION_DSN")
         return replace(entry, source=f"{entry.source} (--allow-admin-verification-dsn)")
     ctx.choices["verificationDsn"] = "missing"
     return Entry(
-        "BKS_VERIFICATION_DSN",
+        "BKS_BIOTECH_DB_VERIFICATION_DSN",
         None,
-        "integrator:BKS_VERIFICATION_DSN",
-        "integrator: BKS_VERIFICATION_DSN (a restricted login holding "
+        "integrator:BKS_BIOTECH_DB_VERIFICATION_DSN",
+        "integrator: BKS_BIOTECH_DB_VERIFICATION_DSN (a restricted login holding "
         "knowledge_verification_outbox_worker), or --allow-admin-verification-dsn "
         "for disposable W0",
     )
