@@ -9,6 +9,9 @@ date: 2026-11-06
 
 # Next session: real workflow fixtures on three lanes, Deep Agents frontier intact
 
+**Superseded for the hosted lanes (2026-11-06):** start at [NEXT-SESSION-HOSTED-LANES](NEXT-SESSION-HOSTED-LANES.md). The ingress
+login in §4.2.1 is provisioned and F3-G1 is fixed; the prerequisite list there is corrected (Managed Agents needs no GitHub).
+
 **Owner (2026-11-06):** "I am most concerned with running real workflow fixtures with cursor local sdk, anthropic
 managed agents and openai agents. I also do not want to lose where we were at with deep agents." Read this file, then
 [DESIGN](DESIGN.md) §1-§5, the [concept](../../../../knowledge/cross-provider-control.md), the three lane records
