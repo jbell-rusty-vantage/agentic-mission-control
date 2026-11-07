@@ -23,6 +23,15 @@ refuses to write a path that is not ignored or is tracked.
 W0 used the generator to install Biotech, and the `executor-config` step verified. The review found
 items to fix before W1; this revision makes those fixes. No W1 process has been started.
 
+**Environment names (2026-11-07).** This page uses the current names: MC reads its database only as
+`MC_{AIENG,BIOTECH,LOCAL}_DB_*` (plane chosen by `MISSION_CONTROL_APPLICATION`; `<PLANE>` below is
+`AIENG` for ai-engineer and `BIOTECH` for biotech), KS as `KS_{AIENG,BIOTECH}_DB_*`, BKS as
+`BKS_BIOTECH_DB_*` / `BKS_BIOTECH_GRAPH_*` ([ENVIRONMENT](../../../../ENVIRONMENT.md)). Env files
+generated under `.scratch/sprint-oc/runtime/<app>/` before that rename still carry the retired names
+(`DATABASE_DIRECT`, `APPLICATION_*_DATABASE_*`, `SUPABASE_*`, `NEO4J_*`, ...), which no process
+reads any more. **Regenerate them** with the commands in [section 5](#5-generator) before any process
+starts; the integrator inputs they need are listed there.
+
 ## 1. Processes and ports
 
 | Process | Repository, start command (from that repository's root) | Listens | Env file |
@@ -77,9 +86,10 @@ setting that MC reads, and nothing is inherited:
   value as unconfigured and fail closed.
 - **Missing required name:** also written as a blank, with a `# MISSING` comment.
 
-The blanked names are `DATABASE_DIRECT`, `DATABASE_URL`, `APPLICATION_DATABASE_URL`,
-`APPLICATION_MIGRATION_DATABASE_DIRECT`, `APPLICATION_BACKFILL_DATABASE_DIRECT`, `SUPABASE_URL`,
-`SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`, `S3_BUCKET`, `S3_ENDPOINT_URL`, `S3_REGION`,
+The blanked names are every Mission Control database variable the generator does not set itself
+(`MC_DB_BLANKED`: all ten `MC_AIENG_DB_*` and `MC_BIOTECH_DB_*` roles, and the five
+`MC_LOCAL_DB_*` DSNs), so the other plane, the admin, backfill and secret-key logins are never
+inherited, and `S3_BUCKET`, `S3_ENDPOINT_URL`, `S3_REGION`,
 `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, `INGRESS_QUARANTINE_BUCKET`,
 `INGRESS_CUSTODY_BUCKET`, `INGRESS_STORAGE_CREDENTIAL`, `INGRESS_LISTEN_SECRET_REF`,
 `MISSION_CONTROL_SECRET_VAULT_DSN`, `CAPABILITY_BUNDLE_PUBLISHER_TOKEN`,
@@ -87,8 +97,8 @@ The blanked names are `DATABASE_DIRECT`, `DATABASE_URL`, `APPLICATION_DATABASE_U
 `BELL_LABS_AGENT_AUTH_PUBLIC_KEY`, `TEMPORAL_CLOUD_API_KEY` and `CURSOR_API_KEY`.
 
 When `bundle-custody.env` exists (see "Bundle custody" in section 3), the **reader** token,
-`CAPABILITY_BUNDLE_NAMESPACE`, `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` are written from it
-and from the application's own project instead of being blanked. The publisher token is never in a
+`CAPABILITY_BUNDLE_NAMESPACE`, `MC_<PLANE>_DB_URL` and `MC_<PLANE>_DB_PUBLISHABLE_KEY` are written
+from it and from the application's own project instead of being blanked. The publisher token is never in a
 runtime file; it goes only to the operator file `bundle-publisher.env`.
 
 The same blank treatment covers `str | None` settings whose readers treat a blank as unset:
@@ -107,8 +117,7 @@ check holds. Readers that rely on this:
 
 On top of that, `settings.configured()` is applied in the DSN properties,
 `has_application_postgres`, the checkpoint DSN, the inspection cursor key and the Supabase Vault
-DSN. A blank `APPLICATION_DATABASE_URL` is therefore not a configured database, so the Agent
-Server's `http_app.py` does not try to build a DSN from it. `INGRESS_LISTEN_SECRET_REF` (a
+DSN. A blank `MC_<PLANE>_DB_RUNTIME_DSN` is therefore not a configured database. `INGRESS_LISTEN_SECRET_REF` (a
 `str`) and `INGRESS_STORAGE_CREDENTIAL` are read by truthiness. Unit tests blank each of these
 settings.
 
@@ -237,11 +246,11 @@ unset every retired name (`VERIFY_JUDGE_MODEL`, `VERIFY_CROSS_FAMILY_JUDGE_MODEL
 | --- | --- | --- |
 | `BKS_NO_ENV_FILE` | constant `1` | |
 | `EXECUTOR_PORT` | constant `4020` | Firewall it (section 1) |
-| `NEO4J_URI` | owner: MC `.env` `MC_BIOTECH_GRAPH_URI`, **only when confirmed** | See the graph rules below |
-| `NEO4J_USERNAME`, `NEO4J_PASSWORD` | owner: MC `.env` `MC_BIOTECH_GRAPH_USERNAME`, `MC_BIOTECH_GRAPH_PASSWORD`, **only when confirmed** | |
+| `BKS_BIOTECH_GRAPH_URI` | owner: MC `.env` `MC_BIOTECH_GRAPH_URI`, **only when confirmed** | See the graph rules below |
+| `BKS_BIOTECH_GRAPH_USERNAME`, `BKS_BIOTECH_GRAPH_PASSWORD` | owner: MC `.env` `MC_BIOTECH_GRAPH_USERNAME`, `MC_BIOTECH_GRAPH_PASSWORD`, **only when confirmed** | |
 | `BKS_TARGET` | constant `production`, only when confirmed | The executor exits with code 78 on an Aura URI unless `BKS_TARGET=production` |
 | `BKS_EXECUTOR_TOKENS` | derived from the minted KS tokens and the tenant | See the format below |
-| `BKS_VERIFICATION_DSN` | integrator `BKS_VERIFICATION_DSN`. Fallback: owner MC `.env` `MC_BIOTECH_DB_ADMIN_DSN` **only with `--allow-admin-verification-dsn`** (disposable W0) | A login that holds `knowledge_verification_outbox_worker`. It calls `claim_dispatches`, `acknowledge_dispatch`, `fail_dispatch` and `settle_dispatch`. Without either source the name is missing. The manifest records the choice as `choices.verificationDsn`: `integrator`, `admin-allowed (disposable W0)` or `missing` |
+| `BKS_BIOTECH_DB_VERIFICATION_DSN` | integrator `BKS_BIOTECH_DB_VERIFICATION_DSN`. Fallback: owner MC `.env` `MC_BIOTECH_DB_ADMIN_DSN` **only with `--allow-admin-verification-dsn`** (disposable W0) | A login that holds `knowledge_verification_outbox_worker`. It calls `claim_dispatches`, `acknowledge_dispatch`, `fail_dispatch` and `settle_dispatch`. Without either source the name is missing. The manifest records the choice as `choices.verificationDsn`: `integrator`, `admin-allowed (disposable W0)` or `missing` |
 | `BKS_VERIFICATION_TENANTS` | minted tenant (or `--verification-tenant-id`) | Exactly one tenant UUID, with no prefix. The dispatch `tenantId` must equal both this value and the service principal's `tenantId` |
 
 **Graph rules.**
@@ -252,12 +261,12 @@ unset every retired name (`VERIFY_JUDGE_MODEL`, `VERIFY_CROSS_FAMILY_JUDGE_MODEL
   `MC_BIOTECH_GRAPH_URI` names any other host.
 - It refuses (`GRAPH_CONFIRMATION_MISMATCH` / `GRAPH_HOST_REFUSED`) when `--confirm-graph` names
   anything but the pinned host.
-- `NEO4J_URI`, `NEO4J_USERNAME`, `NEO4J_PASSWORD` and `BKS_TARGET` are written blank and listed as
-  missing until `--confirm-graph 8032ec07.databases.neo4j.io` is given.
+- `BKS_BIOTECH_GRAPH_URI`, `BKS_BIOTECH_GRAPH_USERNAME`, `BKS_BIOTECH_GRAPH_PASSWORD` and
+  `BKS_TARGET` are written blank and listed as missing until `--confirm-graph 8032ec07.databases.neo4j.io` is given.
 - `--confirm-graph` is refused for ai-engineer (`CONFIRM_GRAPH_NOT_APPLICABLE`).
 
 The executor does not read `BKS_RUNS_DIR` (CLI only; custody is `BKS_RELEASE_RUNS_DIR`).
-`BKS_VERIFICATION_DSN` and `BKS_VERIFICATION_TENANTS` must both be set, or the admission-dispatch
+`BKS_BIOTECH_DB_VERIFICATION_DSN` and `BKS_VERIFICATION_TENANTS` must both be set, or the admission-dispatch
 module is silently not mounted.
 
 `BKS_EXECUTOR_TOKENS` is a JSON array (BKS `apps/executor/src/auth.ts`). The executor stores hashes
@@ -290,13 +299,14 @@ these three names; for biotech they are part of the union below.
 ### Installer executor-config step (`install.env`, biotech)
 
 `install-biotech.mjs` checks, by name in its own process, `KS_KNOWLEDGE_BINDINGS_JSON`,
-`KS_BIOTECH_EXECUTOR_URL`, `KS_BIOTECH_EXECUTOR_TOKEN`, `KS_BIOTECH_EXECUTOR_READ_TOKEN`, `NEO4J_URI`,
-`NEO4J_USERNAME`, `NEO4J_PASSWORD`, `BKS_EXECUTOR_TOKENS`, `BKS_VERIFICATION_DSN`,
-`BKS_VERIFICATION_TENANTS` and the binding's `databaseUrlEnv`. `install.env` is the union of the
+`KS_BIOTECH_EXECUTOR_URL`, `KS_BIOTECH_EXECUTOR_TOKEN`, `KS_BIOTECH_EXECUTOR_READ_TOKEN`,
+`BKS_BIOTECH_GRAPH_URI`, `BKS_BIOTECH_GRAPH_USERNAME`, `BKS_BIOTECH_GRAPH_PASSWORD`,
+`BKS_EXECUTOR_TOKENS`, `BKS_BIOTECH_DB_VERIFICATION_DSN`, `BKS_VERIFICATION_TENANTS` and the
+binding's `databaseUrlEnv`. `install.env` is the union of the
 KS-executor and BKS-executor files. It is complete only with `--confirm-graph` and a verification
 DSN choice.
 
-In `--remote-reinstall` mode, the host of `NEO4J_URI` must equal the installer's
+In `--remote-reinstall` mode, the host of `BKS_BIOTECH_GRAPH_URI` must equal the installer's
 `--confirm-graph`. In disposable mode, the step refuses an Aura URI
 (`EXECUTOR_TARGET_NOT_DISPOSABLE`).
 
@@ -307,7 +317,7 @@ In `--remote-reinstall` mode, the host of `NEO4J_URI` must equal the installer's
 | `MISSION_CONTROL_APPLICATION`, `MISSION_CONTROL_WORKER_APPLICATION_ID` | constant `<app>` | Selects `deployments/<app>/application.toml` and `models.toml`. A mismatch with the binding stops startup |
 | `MISSION_CONTROL_DEPLOYMENTS_ROOT` | derived | This checkout's `deployments/` |
 | `MISSION_CONTROL_WORKSPACE_ROOT` | derived | The profile's `capability_workspace_root` resolved against canonical MC: `BellLabs/biotech` |
-| `MISSION_CONTROL_DEPLOYMENT_FILE`, `MISSION_CONTROL_WORKER_BINDING_DIGEST` | integrator `--deployment-file` | The operator `MissionDeployment` JSON written by `scripts/sprint_oc_deployment_file.py` (sealed binding with the target's `installation_id`, `project_ref`, `database_secret_ref = MC_<APP>_RUNTIME_DSN`, `family_writer_secret_ref = MC_<APP>_FAMILY_WRITER_DSN`, the installed component version; an operator EdDSA issuer `mission-control-operator/<app>` with its public JWKS; one operator grant on the minted tenant, including `knowledge.review` (W1 D2), and a second grant for the separate reviewer principal `sprint-oc-reviewer` / `reviewer:sprint-oc` (`knowledge.review`, `workflow_run.read`, `mission.read`; no launch). The launcher never reviews its own run's KS decision (`unauthorized_review`), so W1 reviews with `token --role reviewer` (`reviewer-token.txt`); KS also needs a live reviewer grant for `reviewer:sprint-oc`, provisioned by `sprint_oc_deployment_file.py --app <app> reviewer-grant [--pack <frozen pack.json>] [--uses U --audiences A --report-kinds K] [--allow-wildcard] [--run]` (it prints, or runs, KS `knowledge-verify grant-reviewer` with `node --env-file=<out>/ks-executor.env`, naming the component DSN variable only; KS writes the grant as `knowledge_verification_reviewer` in the tenant's RLS context with `granted_at` = the database `now()`, and reports an identical live grant as `existing`). Least privilege: the scope defaults to the W1 fixture task's exact use, audience and report kind (ai-engineer `engineering_reference.model_facts`/`internal`/`evidence_report`, biotech `label_reference.ingredients`/`internal`/`evidence_report`; `--pack` reads the task's use and audience from the frozen pack); `*` is refused by both MC and KS unless `--allow-wildcard`. Without the grant the review fails closed (`unauthorized_review`, KS `reviewer_not_qualified`). Reviewer independence is enforced twice: KS refuses the run's producer at review time even when it holds a grant (`assertIndependent` reads the producer from the decision's stored run context: `INDEPENDENCE_UNPROVEN / reviewer_is_producer`), and the MC route refuses the launcher, revision authors, producer and evaluators before sending; Temporal queues and namespace). The generator reads `binding_digest` from it |
+| `MISSION_CONTROL_DEPLOYMENT_FILE`, `MISSION_CONTROL_WORKER_BINDING_DIGEST` | integrator `--deployment-file` | The operator `MissionDeployment` JSON written by `scripts/sprint_oc_deployment_file.py` (sealed binding with the target's `installation_id`, `project_ref`, `database_secret_ref = MC_<PLANE>_DB_RUNTIME_DSN`, `family_writer_secret_ref = MC_<PLANE>_DB_FAMILY_WRITER_DSN`, the installed component version; an operator EdDSA issuer `mission-control-operator/<app>` with its public JWKS; one operator grant on the minted tenant, including `knowledge.review` (W1 D2), and a second grant for the separate reviewer principal `sprint-oc-reviewer` / `reviewer:sprint-oc` (`knowledge.review`, `workflow_run.read`, `mission.read`; no launch). The launcher never reviews its own run's KS decision (`unauthorized_review`), so W1 reviews with `token --role reviewer` (`reviewer-token.txt`); KS also needs a live reviewer grant for `reviewer:sprint-oc`, provisioned by `sprint_oc_deployment_file.py --app <app> reviewer-grant [--pack <frozen pack.json>] [--uses U --audiences A --report-kinds K] [--allow-wildcard] [--run]` (it prints, or runs, KS `knowledge-verify grant-reviewer` with `node --env-file=<out>/ks-executor.env`, naming the component DSN variable only; KS writes the grant as `knowledge_verification_reviewer` in the tenant's RLS context with `granted_at` = the database `now()`, and reports an identical live grant as `existing`). Least privilege: the scope defaults to the W1 fixture task's exact use, audience and report kind (ai-engineer `engineering_reference.model_facts`/`internal`/`evidence_report`, biotech `label_reference.ingredients`/`internal`/`evidence_report`; `--pack` reads the task's use and audience from the frozen pack); `*` is refused by both MC and KS unless `--allow-wildcard`. Without the grant the review fails closed (`unauthorized_review`, KS `reviewer_not_qualified`). Reviewer independence is enforced twice: KS refuses the run's producer at review time even when it holds a grant (`assertIndependent` reads the producer from the decision's stored run context: `INDEPENDENCE_UNPROVEN / reviewer_is_producer`), and the MC route refuses the launcher, revision authors, producer and evaluators before sending; Temporal queues and namespace). The generator reads `binding_digest` from it |
 | `MISSION_CONTROL_RUNTIME_OPTIONS_FACTORY` | derived with `--deployment-file` | `mission_control.bootstrap.local_operator:runtime_options`: the GoalDirected/StageGraph family admissions and the filesystem artifact payload reader (no S3 bucket) |
 | `MISSION_CONTROL_CATALOG_SCOPE` | derived `mc/<target installation_id>/<app>/catalog` | |
 | `TEMPORAL_TARGET`, `TEMPORAL_ADDRESS` | constant `local`, `127.0.0.1:7233` | |
@@ -316,9 +326,10 @@ In `--remote-reinstall` mode, the host of `NEO4J_URI` must equal the installer's
 | `LANGSMITH_PROJECT`, `AGENT_SERVER_LANGSMITH_PROJECT` | derived: `application.toml` | |
 | `RUN_CONTROL_TEMPORAL_ENABLED`, `COORDINATOR_LAUNCH_ENABLED` | constant `true` | |
 | `COORDINATOR_MCP_ENABLED` | constant `false` | The settings default, pinned so neither an owner `.env` nor bundle custody turns the coordinator MCP surface on (see "Why the coordinator MCP stays off") |
-| `APPLICATION_DATABASE_DIRECT`, `MC_<APP>_RUNTIME_DSN` | integrator `MC_RUNTIME_DSN` (written by `mission-db login-apply`) | Login `mcl_runtime`, a member of exactly `mission_control_runtime` (NOSUPERUSER, NOBYPASSRLS, INHERIT TRUE, SET FALSE). Startup refuses the admin DSN. Blank until supplied |
-| `APPLICATION_FAMILY_WRITER_DATABASE_DIRECT`, `MC_<APP>_FAMILY_WRITER_DSN` | integrator `MC_FAMILY_WRITER_DSN` (`login-apply`) | Login `mcl_family_writer`, holding `mission_control_family_writer`. Blank until supplied |
-| `LANGGRAPH_CHECKPOINT_DATABASE_DIRECT` | integrator `MC_CHECKPOINTER_DSN` (`login-apply`) | Login `mcl_checkpointer`, holding `mission_control_checkpointer`. The saver schema is in the app's remote PostgreSQL (§4 item 6) after `mission-db runtime-apply`. When blank, MC falls back to the application (runtime) DSN, which is **not** the checkpointer role. So without it, `mission-control.env` is held as `.incomplete` (exit 3) unless `--allow-checkpoint-fallback` is given; the flag is recorded in `choices.checkpointDsn` and as a manifest warning |
+| `MC_<PLANE>_DB_PROJECT_REF` | derived: `target.toml` `project_ref` | Checked at startup against every set URL/DSN of the plane |
+| `MC_<PLANE>_DB_RUNTIME_DSN` | integrator `MC_<PLANE>_DB_RUNTIME_DSN` (written by `mission-db login-apply`) | Login `mcl_runtime`, a member of exactly `mission_control_runtime` (NOSUPERUSER, NOBYPASSRLS, INHERIT TRUE, SET FALSE). Startup refuses the admin DSN. Blank until supplied |
+| `MC_<PLANE>_DB_FAMILY_WRITER_DSN` | integrator `MC_<PLANE>_DB_FAMILY_WRITER_DSN` (`login-apply`) | Login `mcl_family_writer`, holding `mission_control_family_writer`. Blank until supplied |
+| `MC_<PLANE>_DB_CHECKPOINT_DSN` | integrator `MC_<PLANE>_DB_CHECKPOINT_DSN` (`login-apply`) | Login `mcl_checkpointer`, holding `mission_control_checkpointer`. The saver schema is in the app's remote PostgreSQL (§4 item 6) after `mission-db runtime-apply`. When blank, MC falls back to the application (runtime) DSN, which is **not** the checkpointer role. So without it, `mission-control.env` is held as `.incomplete` (exit 3) unless `--allow-checkpoint-fallback` is given; the flag is recorded in `choices.checkpointDsn` and as a manifest warning |
 | `LANGGRAPH_CHECKPOINT_SCHEMA`, `LANGGRAPH_CHECKPOINT_SETUP` | constant `mission_control_runtime`, `false` | |
 | `ARTIFACT_PAYLOAD_ROOT`, `DEEP_AGENT_SANDBOX_WORKSPACE_ROOT` | derived `<out>/payloads`, `<out>/workspaces` | No S3 bucket is configured (`S3_BUCKET` is blank). The S3-compatible endpoint settings (`S3_ENDPOINT_URL`, `S3_REGION`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, OVE-204) are blanked too; a Supabase Storage payload bucket (`mission-payloads`, seed `mc.storage.mission-payloads`) is selected by setting all four with `S3_BUCKET` and `S3_FORCE_PATH_STYLE=true` |
 | `REDIS_URL` | constant `redis://127.0.0.1:16379/0` | The compose Redis (the settings default); never the owner's |
@@ -328,7 +339,7 @@ In `--remote-reinstall` mode, the host of `NEO4J_URI` must equal the installer's
 | `KNOWLEDGE_ISSUER_KEY_FILE`, `KNOWLEDGE_ISSUER_KEY_ID` | minted | `knowledge-issuer.jwk.json`: an Ed25519 private JWK with `kid`, the format `load_signing_key` reads. Both the worker and the **API process** hold it: the API composes the operator review route (W1 D2) and mints the K01 credential of each review itself (a `human_reviewer` evaluation grant for the authenticated reviewer, operation `review/<decision id>`). Treat the API host as holding the KS issuer key |
 | `KNOWLEDGE_DESCRIBE_TENANT` | minted tenant | |
 | `KNOWLEDGE_COMPONENT_INSTALLATION_ID` | derived: install receipt / `--component-installation-id` | W1 D6: the KS component installation every K01 origin names (equal to the `KS_KNOWLEDGE_BINDINGS_JSON` `installationId`). Required with `KNOWLEDGE_GATEWAY_REQUIRED`; the describe preflight under another id is refused `SCOPE_DENIED` |
-| `RUNTIME_CHECKPOINT_SIGNING_KEY` | minted | Otherwise MC falls back to `SUPABASE_SECRET_KEY`, which is blanked here |
+| `RUNTIME_CHECKPOINT_SIGNING_KEY` | minted | Otherwise MC falls back to `MC_<PLANE>_DB_SECRET_KEY`, which is blanked here |
 | `BELLABS_ASYNC_SUBAGENT_SERVER_TOKEN` | minted | One HMAC secret shared by the worker (parent) and the Agent Server |
 | `MISSION_CONTROL_AGENT_SERVER_PROFILE` | constant `runtime` | |
 | `ANTHROPIC_API_KEY` | owner: MC `.env` | Producer `claude-sonnet-5-5`, auditor and children `claude-haiku-5-5` (PROOFS §6). The Agent Server child needs it too |
@@ -356,15 +367,16 @@ with `joserfc`. Each is a Supabase Auth JWT with:
 | `CAPABILITY_BUNDLE_READER_TOKEN` | `reader` | SELECT, same prefix | 7d (`--reader-ttl`, at most 30d) |
 
 **Signing material.**
-- **ai-engineer:** HS256 with `aiengineer/.env` `SUPABASE_JWT_SECRET`
-  (`--secret-env-file ../../aiengineer/.env --secret-env SUPABASE_JWT_SECRET`).
+- **ai-engineer:** HS256 with `aiengineer/.env` `AIENG_DB_LEGACY_JWT_SECRET`
+  (`--secret-env-file ../../aiengineer/.env --secret-env AIENG_DB_LEGACY_JWT_SECRET`).
 - **biotech:** no usable signing material; the project uses asymmetric keys. **Blocked on the owner
   (H2).** It needs a P-256 key imported into the project as a standby signing key, then
   `--es256-key-file <pem> --kid <kid> --url-env-file <MC .env>`.
 
 **The script refuses:**
-- when `SUPABASE_URL` in the env file is not exactly `https://<project_ref>.supabase.co` of
-  `deployments/<app>/target.toml`;
+- when the plane URL in the env file (`--url-env`; default `AIENG_DB_URL` for ai-engineer,
+  `MC_BIOTECH_DB_URL` for biotech) is not exactly `https://<project_ref>.supabase.co` of
+  `deployments/<app>/target.toml` (`PROJECT_REF_MISMATCH`);
 - when the signing material is missing, ambiguous or too short;
 - when `--es256-key-file` is unreadable or not a P-256 private key (`KEY_INVALID`, also for a
   malformed PEM or a key of another type);
@@ -383,16 +395,16 @@ non-numeric `exp` refuses with `BUNDLE_CUSTODY_INVALID`). It then writes three f
 
 | File | Loaded by | Custody names |
 | --- | --- | --- |
-| `mission-control.env` | MC API and worker | `CAPABILITY_BUNDLE_BACKEND=supabase`, the **reader** token, `CAPABILITY_BUNDLE_NAMESPACE=<app>`, `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY`; the publisher token is an explicit blank |
-| `agent-server.env` | Agent Server | none: `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, both tokens and `BELL_LABS_AGENT_AUTH_ISSUER`/`_JWKS_URI` are explicit blanks |
-| `bundle-publisher.env` | the operator scripts `seeds_publish_bundles.py` and `register_supabase_skill_bundle.py` | the **publisher** token, `SUPABASE_URL`, the publishable key, the namespace, `MISSION_CONTROL_APPLICATION`, the catalog scope and `APPLICATION_DATABASE_DIRECT`, with the same blanks as the runtime file; the reader token is an explicit blank; no model keys |
+| `mission-control.env` | MC API and worker | `CAPABILITY_BUNDLE_BACKEND=supabase`, the **reader** token, `CAPABILITY_BUNDLE_NAMESPACE=<app>`, `MC_<PLANE>_DB_URL` and `MC_<PLANE>_DB_PUBLISHABLE_KEY`; the publisher token is an explicit blank |
+| `agent-server.env` | Agent Server | none: both planes' `MC_<PLANE>_DB_URL` and `_PUBLISHABLE_KEY`, both tokens, the two evaluator keys and `BELL_LABS_AGENT_AUTH_ISSUER`/`_JWKS_URI` are explicit blanks |
+| `bundle-publisher.env` | the operator scripts `seeds_publish_bundles.py` and `register_supabase_skill_bundle.py` | the **publisher** token, `MC_<PLANE>_DB_URL`, `MC_<PLANE>_DB_PUBLISHABLE_KEY`, `MC_<PLANE>_DB_PROJECT_REF`, the namespace, `MISSION_CONTROL_APPLICATION`, the catalog scope and `MC_<PLANE>_DB_RUNTIME_DSN`; every other database variable and the runtime file's blanks are explicit blanks; the reader token is an explicit blank; no model keys |
 
-`SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` are those of the application's own project:
-`aiengineer/.env` for ai-engineer (never the MC `.env`, which names biotech), and the MC `.env` for
-biotech.
+The plane URL and publishable key are those of the application's own project, copied from
+`aiengineer/.env` `AIENG_DB_URL` / `AIENG_DB_PUBLISHABLE_KEY` for ai-engineer (never the MC `.env`
+for this) and from the MC `.env` `MC_BIOTECH_DB_URL` / `MC_BIOTECH_DB_PUBLISHABLE_KEY` for biotech.
 
-**Why the Agent Server gets no `SUPABASE_URL`.** `agent_server/auth.py` derives an auth issuer from
-`BELL_LABS_AGENT_AUTH_ISSUER`, or failing that from `SUPABASE_URL`. That makes
+**Why the Agent Server gets no plane URL.** `adapters/agent_server/auth.py` derives an auth issuer
+from `BELL_LABS_AGENT_AUTH_ISSUER`, or failing that from `MC_<PLANE>_DB_URL`. That makes
 `authentication_is_configured()` true and verifies every bearer that is not a `bl1.` claim as an
 RS256 Supabase JWT. The worker reaches the Agent Server only with `bl1.` scope claims, signed
 with `BELLABS_ASYNC_SUBAGENT_SERVER_TOKEN` and routed to the subordinate verifier first in
@@ -401,11 +413,11 @@ checks this with the real loader: `authentication_is_configured()` is `False` fo
 `agent-server.env` and `True` for `mission-control.env`.
 
 **Why the coordinator MCP stays off.** `Settings.coordinator_jwt_issuer` (`bootstrap/settings.py`)
-uses `COORDINATOR_MCP_JWT_ISSUER`, or failing that `<SUPABASE_URL>/auth/v1`; it is read only when
+uses `COORDINATOR_MCP_JWT_ISSUER`, or failing that `<MC_<PLANE>_DB_URL>/auth/v1`; it is read only when
 `COORDINATOR_MCP_ENABLED` mounts the coordinator MCP surface (`technical_api._mount_coordinator`),
-whose `JWTVerifier` then accepts Supabase JWTs of that issuer. Before custody `SUPABASE_URL` was
+whose `JWTVerifier` then accepts Supabase JWTs of that issuer. Before custody the plane URL was
 blank, so an enabled coordinator surface failed startup instead. Custody now writes
-`SUPABASE_URL` to `mission-control.env`, so the generator pins `COORDINATOR_MCP_ENABLED=false`
+`MC_<PLANE>_DB_URL` to `mission-control.env`, so the generator pins `COORDINATOR_MCP_ENABLED=false`
 (the settings default) and keeps `COORDINATOR_MCP_JWT_ISSUER` blank in both modes: enabling
 custody changes no coordinator auth. W1 does not use the coordinator MCP surface; a run that
 needs it must set an explicit issuer and enable it deliberately. The settings fallback itself is
@@ -413,8 +425,8 @@ unchanged. A test loads the real `Settings` from the custody file with an inheri
 `COORDINATOR_MCP_ENABLED=true` and finds it off.
 
 The namespace is the application id because the storage policies scope every object to the
-application id as its first folder. Any other `SUPABASE_URL` refuses
-(`SUPABASE_URL_MISMATCH`). Without the file, `CAPABILITY_BUNDLE_BACKEND=local` and the names stay
+application id as its first folder. A plane URL that is not the target project refuses
+(`DB_URL_MISMATCH`). Without the file, `CAPABILITY_BUNDLE_BACKEND=local` and the names stay
 blank.
 
 **Mission Control consumers.**
@@ -425,8 +437,8 @@ blank.
   publisher credential.
 - `scripts/seeds_publish_bundles.py --storage supabase --env-file <bundle-publisher.env>` uploads
   the seeds.
-- Both refuse before any request when `SUPABASE_URL` is not the project of the target
-  application.
+- Both refuse before any request when the plane URL (`MC_<PLANE>_DB_URL`) is not the project of
+  the target application.
 
 The models come from `deployments/<app>/models.toml` (`producer.default`, `judge.default`,
 `auditor.default`, `child.default`, with `*.fallback` rows). No model is set in the environment;
@@ -437,10 +449,10 @@ The models come from `deployments/<app>/models.toml` (`producer.default`, `judge
 | Value | Who | Effect until supplied |
 | --- | --- | --- |
 | **KS executor build with the evaluation-context read and the dispatch drain** (KS `sprint-oc-wi06`: `knowledge.read` `evaluation-context-read/v1`, biotech dispatch drain). Read-only; no component schema change (2.5.0 stays) | integrator: merge KS `sprint-oc-wi06`, rebuild the executor dist | An older executor refuses the context read: the settlement waits `evaluator_unavailable`, nothing is spent |
-| Restricted login DSNs `MC_RUNTIME_DSN`, `MC_FAMILY_WRITER_DSN`, `MC_CHECKPOINTER_DSN` for each remote | integrator: `mission-db login-apply` (section 5) on each disposable target, then `--integrator-env` | The names are blank; MC API and worker fail closed |
-| `BKS_VERIFICATION_DSN` as a restricted `knowledge_verification_outbox_worker` login | integrator. For disposable W0 only, `--allow-admin-verification-dsn` (recorded in the manifest) | The name is missing; the dispatch consumer is not mounted |
+| Restricted login DSNs `MC_<PLANE>_DB_RUNTIME_DSN`, `MC_<PLANE>_DB_FAMILY_WRITER_DSN`, `MC_<PLANE>_DB_CHECKPOINT_DSN` for each remote | integrator: `mission-db login-apply` (section 5) on each disposable target, then `--integrator-env` | The names are blank; MC API and worker fail closed |
+| `BKS_BIOTECH_DB_VERIFICATION_DSN` as a restricted `knowledge_verification_outbox_worker` login | integrator. For disposable W0 only, `--allow-admin-verification-dsn` (recorded in the manifest) | The name is missing; the dispatch consumer is not mounted |
 | Operator deployment file (`scripts/sprint_oc_deployment_file.py`, section 5) | integrator | API is inspection-only; the worker refuses |
-| `--confirm-graph 8032ec07.databases.neo4j.io` | integrator (the same host as the installer's `--confirm-graph`) | Neo4j names and `BKS_TARGET` are blank |
+| `--confirm-graph 8032ec07.databases.neo4j.io` | integrator (the same host as the installer's `--confirm-graph`) | `BKS_BIOTECH_GRAPH_*` and `BKS_TARGET` are blank |
 | Firewall rule for TCP 4020 | integrator before W1 | The BKS executor is reachable from the network |
 | Biotech bundle-custody signing material: a P-256 standby key imported into the project | owner (H2) | No Biotech `bundle-custody.env`; Biotech custody stays local |
 
@@ -471,6 +483,36 @@ sources, choices and the missing list, never a value. Exit codes:
 
 Without `--require-complete`, missing names are written as blanks, never left to an owner `.env`.
 
+**Regenerating after the 2026-11-07 rename.** The files under `.scratch/sprint-oc/runtime/<app>/`
+predate the rename and must be rewritten before any process starts. The generator (commit
+`006b6516` or later) needs, per application:
+
+| Input | Flag | Where it comes from |
+| --- | --- | --- |
+| Component installation id | `--component-installation-id <uuid>`, or `--receipt <install-receipt.json>`, or `installation-ids.json` (read automatically from `<out>/<app>/` when present) | the W0 install (section 4 lists both ids) |
+| Restricted logins | `--integrator-env .scratch/sprint-oc/runtime/<app>/logins.env` | `mission-db login-apply` (W1 order, step 1). The file must carry `MC_<PLANE>_DB_RUNTIME_DSN`, `MC_<PLANE>_DB_FAMILY_WRITER_DSN`, `MC_<PLANE>_DB_CHECKPOINT_DSN` (the integrator's files were renamed on 2026-11-07) and, for biotech, `BKS_BIOTECH_DB_VERIFICATION_DSN` (added by the integrator: a restricted `knowledge_verification_outbox_worker` login). A `login-apply` rerun against a file that still holds the old names refuses `LOGIN_SECRET_UNKNOWN`: rename the names (values unchanged) or rerun with `--rotate` |
+| Operator deployment file | `--deployment-file .scratch/sprint-oc/runtime/<app>/deployment.json` | `scripts/sprint_oc_deployment_file.py --app <app> --component-version <installed MC component>` (step 2; the [control board](../NEXT-SESSION.md#versions-and-remote-install-state) records ai-engineer 1.13.0, biotech 1.9.0), rerun so its secret refs are the plane names |
+| Graph confirmation (biotech) | `--confirm-graph 8032ec07.databases.neo4j.io` | the host pinned in `deployments/biotech/graph.toml` |
+| Owner `.env` names | none (read by name) | MC `.env`: `MC_<PLANE>_DB_*` (biotech), `MC_BIOTECH_GRAPH_*`, the model keys and `SECOND_ANTHROPIC_API_KEY`; `aiengineer/.env`: `AIENG_DB_ADMIN_DSN`, and with custody `AIENG_DB_URL`, `AIENG_DB_PUBLISHABLE_KEY`; values from `BellLabs/.secrets/*.env` |
+| Bundle custody (optional) | none (`<out>/<app>/bundle-custody.env`) | rerun `scripts/sprint_oc_mint_bundle_tokens.py` only when the tokens expire |
+
+```powershell
+# AI Engineer
+uv run --no-sync python scripts/sprint_oc_runtime_env.py --app ai-engineer `
+  --component-installation-id 7ebb2034-a3d6-41aa-893d-ab655a61593f `
+  --integrator-env .scratch/sprint-oc/runtime/ai-engineer/logins.env `
+  --deployment-file .scratch/sprint-oc/runtime/ai-engineer/deployment.json --require-complete
+# Biotech
+uv run --no-sync python scripts/sprint_oc_runtime_env.py --app biotech `
+  --component-installation-id a34b1309-3f91-4ce1-9eed-3030fdd57b92 `
+  --integrator-env .scratch/sprint-oc/runtime/biotech/logins.env `
+  --deployment-file .scratch/sprint-oc/runtime/biotech/deployment.json `
+  --confirm-graph 8032ec07.databases.neo4j.io --require-complete
+```
+
+Check the printed `manifest.json` missing list is empty and that `grep -c "DATABASE_DIRECT\|SUPABASE_\|NEO4J_"`
+over the written files is 0 (names only; never print the files).
+
 ```powershell
 # Biotech, the W0 installer's executor-config step (disposable W0 may use the admin verification DSN).
 uv run --no-sync python scripts/sprint_oc_runtime_env.py --app biotech `
@@ -488,12 +530,13 @@ uv run --no-sync python scripts/sprint_oc_runtime_env.py --app ai-engineer `
 
 # For W1: restricted logins, the deployment file, nothing missing, nothing runnable otherwise.
 uv run --no-sync python scripts/sprint_oc_runtime_env.py --app <app> `
-  --integrator-env <ignored file: MC_RUNTIME_DSN, MC_FAMILY_WRITER_DSN, MC_CHECKPOINTER_DSN[, BKS_VERIFICATION_DSN]> `
+  --integrator-env <ignored file: MC_<PLANE>_DB_RUNTIME_DSN, MC_<PLANE>_DB_FAMILY_WRITER_DSN, MC_<PLANE>_DB_CHECKPOINT_DSN[, BKS_BIOTECH_DB_VERIFICATION_DSN]> `
   --deployment-file <operator deployment.json> [--confirm-graph 8032ec07.databases.neo4j.io] --require-complete
 ```
 
 **W1 order (OVE-169).** Per application, from the canonical checkout, with the admin DSN only in
-the installer's own process (`MC_<APP>_MIGRATION_DATABASE_URL`, the `target.toml` name):
+the installer's own process (the `target.toml` `database_url_env` name: `AIENG_DB_ADMIN_DSN` or
+`BIOTECH_DB_ADMIN_DSN`; MC's own tooling takes the same login as `MC_<PLANE>_DB_ADMIN_DSN`):
 
 ```powershell
 # 1. Restricted logins (after runtime-apply). Read-only plan first, then apply with a probe.
@@ -509,7 +552,7 @@ uv run --no-sync --group dbcontract mission-db login-apply --deployment-dir depl
   --receipt-out .scratch/sprint-oc/evidence/<app>-login-receipt.json
 # 2. Operator deployment file (needs minted.env from an earlier generator run).
 uv run --no-sync python scripts/sprint_oc_deployment_file.py --app <app> --component-version 1.7.0
-# 3. Complete environment (biotech adds --confirm-graph; BKS_VERIFICATION_DSN goes in the same file).
+# 3. Complete environment (biotech adds --confirm-graph; BKS_BIOTECH_DB_VERIFICATION_DSN goes in the same file).
 uv run --no-sync python scripts/sprint_oc_runtime_env.py --app <app> `
   --integrator-env .scratch/sprint-oc/runtime/<app>/logins.env `
   --deployment-file .scratch/sprint-oc/runtime/<app>/deployment.json --require-complete
@@ -528,7 +571,7 @@ process starts until W1.
 ```powershell
 # Bundle custody (ai-engineer), then rerun the generator so mission-control.env carries it.
 uv run --no-sync python scripts/sprint_oc_mint_bundle_tokens.py --app ai-engineer `
-  --secret-env-file ../../aiengineer/.env --secret-env SUPABASE_JWT_SECRET
+  --secret-env-file ../../aiengineer/.env --secret-env AIENG_DB_LEGACY_JWT_SECRET
 uv run --no-sync python scripts/seeds_publish_bundles.py --target ai-engineer --storage supabase `
   --env-file .scratch/sprint-oc/runtime/ai-engineer/bundle-publisher.env
 ```
@@ -544,7 +587,7 @@ cannot quote unambiguously (`VALUE_UNQUOTABLE`).
 
 - **Bundle custody smoke checks (W1, before the first seed upload):**
   1. *HS256 on a project with asymmetric keys.* Confirm that Storage still accepts a token signed
-     with the legacy `SUPABASE_JWT_SECRET`. If the project has rotated to asymmetric signing keys,
+     with the legacy JWT secret (`AIENG_DB_LEGACY_JWT_SECRET`). If the project has rotated to asymmetric signing keys,
      the legacy secret may no longer be accepted.
   2. *A `sub` not in `auth.users`.* The `sub` is a stable `uuid5`, not a real user. Confirm that
      Storage RLS evaluates the `mc_capability_role` claim without an `auth.users` row, and that
@@ -570,7 +613,7 @@ cannot quote unambiguously (`VALUE_UNQUOTABLE`).
 - **Login role for the component DSNs.** That the Supabase admin login can `SET ROLE` to the
   `knowledge_verification_*` roles is inferred from Sprint V; it was not checked on these remotes.
 - **One DSN for two jobs.** That one DSN can serve both the component and the AIDB knowledge schema
-  (`KNOWLEDGE_DB_URL`) is not verified.
+  (`KS_AIENG_DB_RUNTIME_DSN`) is not verified.
 - **Tenant agreement.** The W1 operator grants (`app_metadata.tenant_id`) must use the tenant in
   `minted.env` (`KNOWLEDGE_VERIFICATION_TENANT_ID`). Otherwise the dispatch tenant check fails.
 - **Graph host as identity.** A host name is not identity on its own (H3). The installer's graph

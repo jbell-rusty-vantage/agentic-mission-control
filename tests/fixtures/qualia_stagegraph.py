@@ -316,7 +316,7 @@ async def knowledge_host(root: Path, *, module: str = "qualia-fixture-host.ts") 
         encoding="utf-8",
     )
     environment = dict(os.environ)
-    environment["KNOWLEDGE_DB_CONTRACT_ADMIN_DSN"] = environment["MISSION_CONTROL_TEST_ADMIN_DSN"]
+    environment["KS_AIENG_DB_ADMIN_DSN"] = environment["MISSION_CONTROL_TEST_ADMIN_DSN"]
     # Named, registered biotech credentials only. Do not load KS's AI Engineer env.
     from dotenv import dotenv_values
 

@@ -532,7 +532,7 @@ async def _run_goal_case(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, scenar
         encoding="utf-8",
     )
     environment = dict(os.environ)
-    environment["KNOWLEDGE_DB_CONTRACT_ADMIN_DSN"] = environment["MISSION_CONTROL_TEST_ADMIN_DSN"]
+    environment["KS_AIENG_DB_ADMIN_DSN"] = environment["MISSION_CONTROL_TEST_ADMIN_DSN"]
     log = (evidence / "knowledge-host.log").open("wb")
     process = await asyncio.to_thread(
         subprocess.Popen,

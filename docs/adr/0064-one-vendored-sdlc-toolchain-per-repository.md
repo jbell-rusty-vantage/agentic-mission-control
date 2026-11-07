@@ -28,7 +28,7 @@ One contract, one implementation. The contract (concepts with nine categories, A
 generated AGENTS.md blocks at root and module level, program ledgers, retrieval fixtures) is
 enforced by one CLI, a single dependency-free Node file vendored into every repository under
 `.sdlc/` and pinned by `.sdlc/lock.json`; the skills are vendored under `.agents/skills/` and
-pinned by `skills-lock.json`. `platform/agentic-sdlc` (GitHub `Overton77/belllabs-agentic-sdlc`)
+pinned by `skills-lock.json`. `platform/agentic-sdlc` (GitHub `jbell-rusty-vantage/agentic-sdlc` since 2026-11-06)
 is the upstream of the CLI, the skills, the hook templates and the ideas workspace; no hook, check,
 search or build reaches outside the repository. Updates are pulled by decision with `update`.
 

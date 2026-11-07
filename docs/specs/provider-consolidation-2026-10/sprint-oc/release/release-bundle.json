@@ -11,7 +11,7 @@
       "projectLabel": "supabase-blue-ocean",
       "mcInstallationId": "01a103c0-9a9e-70f3-9398-eb1573a98324",
       "componentInstallationId": "7ebb2034-a3d6-41aa-893d-ab655a61593f",
-      "databaseUrlEnv": "MC_AI_ENGINEER_MIGRATION_DATABASE_URL",
+      "databaseUrlEnv": "AIENG_DB_ADMIN_DSN",
       "target": "deployments/ai-engineer/target.toml"
     },
     "biotech": {
@@ -19,7 +19,7 @@
       "projectLabel": "biotech-research-ingestion",
       "mcInstallationId": "01a103c0-9a9e-7a95-961b-29dda83c842b",
       "componentInstallationId": "a34b1309-3f91-4ce1-9eed-3030fdd57b92",
-      "databaseUrlEnv": "MC_BIOTECH_MIGRATION_DATABASE_URL",
+      "databaseUrlEnv": "BIOTECH_DB_ADMIN_DSN",
       "target": "deployments/biotech/target.toml",
       "graph": {
         "provider": "neo4j-aura",
@@ -431,9 +431,9 @@
       "packages/mission-control-db-contract/seeds/<app>"
     ],
     "storageEnvNames": [
-      "SUPABASE_URL",
+      "MC_<PLANE>_DB_URL",
       "CAPABILITY_BUNDLE_PUBLISHER_TOKEN",
-      "SUPABASE_PUBLISHABLE_KEY (optional)"
+      "MC_<PLANE>_DB_PUBLISHABLE_KEY (optional)"
     ],
     "runtimeReaderEnvNames": [
       "CAPABILITY_BUNDLE_BACKEND",

@@ -248,12 +248,12 @@
       "computedHash": "b8d55851a2909e26c2dbb2e8563719c87b3b700559f604e4df344f8c27e21047"
     },
     "sdlc-docs": {
-      "source": "Overton77/belllabs-agentic-sdlc",
+      "source": "jbell-rusty-vantage/agentic-sdlc",
       "sourceType": "github",
       "skillPath": "skills/sdlc-docs/SKILL.md",
       "ref": "a1da6e6",
       "computedHash": "b6716a2671f1bef55ccfeab00321bca76f03ced6e2007f0b4f50b80be4904c3f",
-      "note": "vendored by copy (private upstream; npx skills cannot fetch it with the current gh account); hash = sha256 over sorted file names and contents"
+      "note": "vendored by copy; ref a1da6e6 is a pre-2026-11-06 commit label of the old upstream, not in the clean-slate repository; hash = sha256 over sorted file names and contents"
     },
     "setup-matt-pocock-skills": {
       "source": "mattpocock/skills",

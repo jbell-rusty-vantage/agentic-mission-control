@@ -379,7 +379,7 @@ async def _run_linked_case(tmp_path: Any, monkeypatch: Any, scenario: str) -> No
         encoding="utf-8",
     )
     environment = dict(os.environ)
-    environment["KNOWLEDGE_DB_CONTRACT_ADMIN_DSN"] = environment["MISSION_CONTROL_TEST_ADMIN_DSN"]
+    environment["KS_AIENG_DB_ADMIN_DSN"] = environment["MISSION_CONTROL_TEST_ADMIN_DSN"]
     host_log = (destination / "knowledge-host.log").open("wb")
     process = await asyncio.to_thread(
         subprocess.Popen,

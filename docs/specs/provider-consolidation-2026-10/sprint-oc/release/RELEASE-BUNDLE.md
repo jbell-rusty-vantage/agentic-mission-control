@@ -9,6 +9,12 @@ date: 2026-10-28
 
 # Sprint OC W0 release bundle (WI-24, OVE-168)
 
+Environment names (2026-11-07): the commands and prerequisite rows below use the current names
+(`MC_<PLANE>_DB_*`, `BKS_BIOTECH_GRAPH_*`, `BKS_BIOTECH_DB_VERIFICATION_DSN`, the `target.toml` installer
+names `AIENG_DB_ADMIN_DSN` / `BIOTECH_DB_ADMIN_DSN`; [ENVIRONMENT](../../../../ENVIRONMENT.md)). The dated
+result rows keep the names in force when they ran. Regenerate runtime env files as in
+[RUNTIME-ENVIRONMENT §5](RUNTIME-ENVIRONMENT.md#5-generator).
+
 Machine-readable twin: [release-bundle.json](release-bundle.json). Target locks:
 [locks/ai-engineer](locks/ai-engineer/release.lock.json), [locks/biotech](locks/biotech/release.lock.json).
 Runtime environment (names only): [RUNTIME-ENVIRONMENT.md](RUNTIME-ENVIRONMENT.md). Format follows the Sprint V
@@ -187,7 +193,7 @@ The check first refuses (exit 2, `CAPTURE_SHAPE`) a capture whose keys or value 
 `BACKEND.describe()` equals its `ks_backend_descriptors.json` entry exactly, or `--descriptors-file`),
 `describe_matches_descriptors` (live `writeAtomicity` and `nativeCancellation` guarantees, protocol versions and
 `knowledge.apply` agree with that entry), `apply_contract_equals_native_contract`, `apply_served` (`knowledge.apply`
-is listed; for AI Engineer this needs `KNOWLEDGE_DB_URL` in the env file), `storage_class`, `write_atomicity`
+is listed; for AI Engineer this needs `KS_AIENG_DB_RUNTIME_DSN` in the env file), `storage_class`, `write_atomicity`
 (profile, registry and live guarantee), `readback_capability` and `describe_honesty`. Exit 0 means every check
 passed; exit 1 means a check failed or a refresh was refused; exit 2 means an input was refused.
 
@@ -227,30 +233,28 @@ cd $MC\.claude\worktrees\w0-finish   # or $MC after merge; the seeds and locks a
 $mdb = "$MC\.venv\Scripts\mission-db.exe"
 $v = @("--reader-version","mission-control-runtime/1","--writer-version","mission-control-runtime/1")
 $rr = "packages\mission-control-db-contract\releases\1.7.0\component"
-# ai-engineer (DSN variable MC_AI_ENGINEER_MIGRATION_DATABASE_URL, named by target.toml)
+# ai-engineer (DSN variable AIENG_DB_ADMIN_DSN, named by target.toml database_url_env)
 $a = @("--target","deployments\ai-engineer\target.toml","--lock","docs\specs\provider-consolidation-2026-10\sprint-oc\release\locks\ai-engineer\release.lock.json","--release-root",$rr) + $v + @("--bundle","packages\mission-control-db-contract\seeds\common","--bundle","packages\mission-control-db-contract\seeds\ai-engineer")
 & $mdb seed-plan @a > $EV\seed-plan.ai-engineer.json
 & $mdb seed-apply @a --confirm-target wkythqbofmckbuoothhn:01a103c0-9a9e-70f3-9398-eb1573a98324 > $EV\seed-apply.ai-engineer.json
 & $mdb seed-plan @a > $EV\seed-replan.ai-engineer.json       # expect every bundle "replay"
-# biotech (DSN variable MC_BIOTECH_MIGRATION_DATABASE_URL)
+# biotech (DSN variable BIOTECH_DB_ADMIN_DSN, named by target.toml database_url_env)
 $b = @("--target","deployments\biotech\target.toml","--lock","docs\specs\provider-consolidation-2026-10\sprint-oc\release\locks\biotech\release.lock.json","--release-root",$rr) + $v + @("--bundle","packages\mission-control-db-contract\seeds\common","--bundle","packages\mission-control-db-contract\seeds\biotech")
 & $mdb seed-plan @b > $EV\seed-plan.biotech.json
 & $mdb seed-apply @b --confirm-target bxnetwiimwhtlrjlbtab:01a103c0-9a9e-7a95-961b-29dda83c842b > $EV\seed-apply.biotech.json
 & $mdb seed-plan @b > $EV\seed-replan.biotech.json
 
 # Custody upload, one project at a time; the second run must upload nothing (it re-reads and compares).
-$env:PYTHONPATH = "$PWD\src"
-$env:SUPABASE_URL = "https://wkythqbofmckbuoothhn.supabase.co"
-$env:CAPABILITY_BUNDLE_PUBLISHER_TOKEN = <publisher JWT for this project>   # name only here; see the gap below
-$env:SUPABASE_PUBLISHABLE_KEY = <this project's publishable key>          # optional apikey header
-& $MC\.venv\Scripts\python.exe scripts\seeds_publish_bundles.py --target ai-engineer --storage supabase > $EV\custody.ai-engineer.json
-& $MC\.venv\Scripts\python.exe scripts\seeds_publish_bundles.py --target ai-engineer --storage supabase > $EV\custody.ai-engineer.repeat.json
-# then the same three variables for https://bxnetwiimwhtlrjlbtab.supabase.co and --target biotech
+# --env-file is required: the generated bundle-publisher.env (RUNTIME-ENVIRONMENT section 3, "Bundle custody").
+$pub = "$MC\.scratch\sprint-oc\runtime\ai-engineer\bundle-publisher.env"
+& $MC\.venv\Scripts\python.exe scripts\seeds_publish_bundles.py --target ai-engineer --storage supabase --env-file $pub > $EV\custody.ai-engineer.json
+& $MC\.venv\Scripts\python.exe scripts\seeds_publish_bundles.py --target ai-engineer --storage supabase --env-file $pub > $EV\custody.ai-engineer.repeat.json
+# then the same with runtime\biotech\bundle-publisher.env and --target biotech
 ```
 
-Storage credentials, by name: `SUPABASE_URL`, `CAPABILITY_BUNDLE_PUBLISHER_TOKEN` (publisher) and optionally
-`SUPABASE_PUBLISHABLE_KEY`. They are read through MC `Settings`, so the process value wins over `.env`. The script
-refuses the service key. The runtime reader at W1 uses `CAPABILITY_BUNDLE_BACKEND=supabase`,
+Storage credentials, by name: `MC_<PLANE>_DB_URL`, `CAPABILITY_BUNDLE_PUBLISHER_TOKEN` (publisher) and optionally
+`MC_<PLANE>_DB_PUBLISHABLE_KEY`, read from that file only (`Settings(_env_file=None)`, plane from `--target`). The
+script refuses the service key and a plane URL that is not the target project. The runtime reader at W1 uses `CAPABILITY_BUNDLE_BACKEND=supabase`,
 `CAPABILITY_BUNDLE_READER_TOKEN` and `CAPABILITY_BUNDLE_NAMESPACE`. The bucket is `capability-bundles`, and its
 policies confine each role to the `<application_id>/` prefix through the JWT claim `mc_capability_role`.
 
@@ -297,7 +301,7 @@ $id = [guid]::NewGuid().ToString()
 
 # R1 wrong --confirm-target -> CONFIRM_TARGET_MISMATCH (checked before connecting)
 cd $AIDB; node scripts/install-ai-engineer.mjs --remote-reinstall --target $T_A --confirm-target "wkythqbofmckbuoothhn:$id" --component-installation-id 7ebb2034-a3d6-41aa-893d-ab655a61593f --state-dir $EV\r1-a
-cd $BKS;  node scripts/install-biotech.mjs --remote-reinstall --target $T_B --confirm-target "bxnetwiimwhtlrjlbtab:$id" --neo4j-uri $env:NEO4J_URI --neo4j-password-env NEO4J_PASSWORD --confirm-graph 8032ec07.databases.neo4j.io --component-installation-id a34b1309-3f91-4ce1-9eed-3030fdd57b92 --state-dir $EV\r1-b
+cd $BKS;  node scripts/install-biotech.mjs --remote-reinstall --target $T_B --confirm-target "bxnetwiimwhtlrjlbtab:$id" --neo4j-uri $env:BKS_BIOTECH_GRAPH_URI --neo4j-password-env BKS_BIOTECH_GRAPH_PASSWORD --confirm-graph 8032ec07.databases.neo4j.io --component-installation-id a34b1309-3f91-4ce1-9eed-3030fdd57b92 --state-dir $EV\r1-b
 & $mdb apply --target $T_A --lock $L_A --release-root "$MC\$rr" @v --confirm-target "wkythqbofmckbuoothhn:$id" --expected-plan-digest sha256:0   # BLOCKED, no connection
 & $mdb seed-apply --target $T_A --lock $L_A --release-root "$MC\$rr" @v --bundle "$MC\packages\mission-control-db-contract\seeds\common" --confirm-target "wkythqbofmckbuoothhn:$id"   # BLOCKED, no connection
 
@@ -305,7 +309,7 @@ cd $BKS;  node scripts/install-biotech.mjs --remote-reinstall --target $T_B --co
 node -e "const f=require('fs');f.writeFileSync(process.argv[2],f.readFileSync(process.argv[1],'utf8').split(process.argv[3]).join(process.argv[4]))" $T_A $EV\target.wrong.ai-engineer.toml 01a103c0-9a9e-70f3-9398-eb1573a98324 $id
 node -e "const f=require('fs');f.writeFileSync(process.argv[2],f.readFileSync(process.argv[1],'utf8').split(process.argv[3]).join(process.argv[4]))" $T_B $EV\target.wrong.biotech.toml 01a103c0-9a9e-7a95-961b-29dda83c842b $id
 cd $AIDB; node scripts/install-ai-engineer.mjs --remote-reinstall --target $EV\target.wrong.ai-engineer.toml --confirm-target "wkythqbofmckbuoothhn:$id" --component-installation-id 7ebb2034-a3d6-41aa-893d-ab655a61593f --state-dir $EV\r2-a
-cd $BKS;  node scripts/install-biotech.mjs --remote-reinstall --target $EV\target.wrong.biotech.toml --confirm-target "bxnetwiimwhtlrjlbtab:$id" --neo4j-uri $env:NEO4J_URI --neo4j-password-env NEO4J_PASSWORD --confirm-graph 8032ec07.databases.neo4j.io --component-installation-id a34b1309-3f91-4ce1-9eed-3030fdd57b92 --state-dir $EV\r2-b
+cd $BKS;  node scripts/install-biotech.mjs --remote-reinstall --target $EV\target.wrong.biotech.toml --confirm-target "bxnetwiimwhtlrjlbtab:$id" --neo4j-uri $env:BKS_BIOTECH_GRAPH_URI --neo4j-password-env BKS_BIOTECH_GRAPH_PASSWORD --confirm-graph 8032ec07.databases.neo4j.io --component-installation-id a34b1309-3f91-4ce1-9eed-3030fdd57b92 --state-dir $EV\r2-b
 & $mdb verify --target $EV\target.wrong.ai-engineer.toml --lock $L_A --release-root "$MC\$rr" @v   # VERIFY_HOLD "Database installation identity differs"
 
 # R3 identity evidence with a wrong system_identifier -> TARGET_SYSTEM_IDENTIFIER_MISMATCH
@@ -315,13 +319,13 @@ $now = (Get-Date).ToUniversalTime().ToString("o")
 @{source="management-api";project_ref="wkythqbofmckbuoothhn";name="supabase-blue-ocean";region="us-east-1";installation_id="01a103c0-9a9e-70f3-9398-eb1573a98324";system_identifier="1";observed_at=$now} | ConvertTo-Json | Out-File -Encoding ascii $EV\evidence.wrong.ai-engineer.json
 @{source="management-api";project_ref="bxnetwiimwhtlrjlbtab";name="biotech-research-ingestion";region="us-east-1";installation_id="01a103c0-9a9e-7a95-961b-29dda83c842b";system_identifier="1";observed_at=$now} | ConvertTo-Json | Out-File -Encoding ascii $EV\evidence.wrong.biotech.json
 cd $AIDB; node scripts/install-ai-engineer.mjs --remote-reinstall --target $T_A --confirm-target $C_A --identity-evidence $EV\evidence.wrong.ai-engineer.json --component-installation-id 7ebb2034-a3d6-41aa-893d-ab655a61593f --state-dir $EV\r3-a
-cd $BKS;  node scripts/install-biotech.mjs --remote-reinstall --target $T_B --confirm-target $C_B --identity-evidence $EV\evidence.wrong.biotech.json --neo4j-uri $env:NEO4J_URI --neo4j-password-env NEO4J_PASSWORD --confirm-graph 8032ec07.databases.neo4j.io --component-installation-id a34b1309-3f91-4ce1-9eed-3030fdd57b92 --state-dir $EV\r3-b
+cd $BKS;  node scripts/install-biotech.mjs --remote-reinstall --target $T_B --confirm-target $C_B --identity-evidence $EV\evidence.wrong.biotech.json --neo4j-uri $env:BKS_BIOTECH_GRAPH_URI --neo4j-password-env BKS_BIOTECH_GRAPH_PASSWORD --confirm-graph 8032ec07.databases.neo4j.io --component-installation-id a34b1309-3f91-4ce1-9eed-3030fdd57b92 --state-dir $EV\r3-b
 
 # R4 tampered lock copy (one checksum digit changed) -> MISSION_CONTROL_LOCK_PIN_MISMATCH (preflight, before the component step)
 $tamper = "const f=require('fs');const l=JSON.parse(f.readFileSync(process.argv[1],'utf8'));const k=Object.keys(l.files).sort()[0];l.files[k]=(l.files[k][0]==='0'?'1':'0')+l.files[k].slice(1);f.writeFileSync(process.argv[2],JSON.stringify(l,null,2)+'\n')"
 node -e $tamper $L_A $EV\lock.tampered.ai-engineer.json; node -e $tamper $L_B $EV\lock.tampered.biotech.json
 cd $AIDB; node scripts/install-ai-engineer.mjs --remote-reinstall --target $T_A --confirm-target $C_A --mc-lock $EV\lock.tampered.ai-engineer.json --component-installation-id 7ebb2034-a3d6-41aa-893d-ab655a61593f --state-dir $EV\r4-a
-cd $BKS;  node scripts/install-biotech.mjs --remote-reinstall --target $T_B --confirm-target $C_B --mc-lock $EV\lock.tampered.biotech.json --neo4j-uri $env:NEO4J_URI --neo4j-password-env NEO4J_PASSWORD --confirm-graph 8032ec07.databases.neo4j.io --component-installation-id a34b1309-3f91-4ce1-9eed-3030fdd57b92 --state-dir $EV\r4-b
+cd $BKS;  node scripts/install-biotech.mjs --remote-reinstall --target $T_B --confirm-target $C_B --mc-lock $EV\lock.tampered.biotech.json --neo4j-uri $env:BKS_BIOTECH_GRAPH_URI --neo4j-password-env BKS_BIOTECH_GRAPH_PASSWORD --confirm-graph 8032ec07.databases.neo4j.io --component-installation-id a34b1309-3f91-4ce1-9eed-3030fdd57b92 --state-dir $EV\r4-b
 & $mdb verify --target $T_A --lock $EV\lock.tampered.ai-engineer.json --release-root "$MC\$rr" @v   # BLOCKED "Release checksum mismatch"
 
 # After (read-only): no difference, and MC still verifies.
@@ -331,7 +335,7 @@ cd $BKS;  node scripts/install-biotech.mjs --remote-reinstall --target $T_B --co
 ```
 
 `$v`, `$rr` and `$mdb` are as in section 5.2; every path here is absolute, so the `cd` between commands does not matter. For
-Biotech, `NEO4J_URI` and `NEO4J_PASSWORD` are the names in `install.env`. `--confirm-graph` names the Aura host pinned in
+Biotech, `BKS_BIOTECH_GRAPH_URI` and `BKS_BIOTECH_GRAPH_PASSWORD` are the names in `install.env`. `--confirm-graph` names the Aura host pinned in
 `deployments/biotech/graph.toml` on `sprint-oc` (`8032ec07.databases.neo4j.io`, merged in `abdeefaf`). The refusals
 stop before the graph step, so they never connect to the graph.
 
@@ -347,13 +351,13 @@ cd $AIDB
 node scripts/install-ai-engineer.mjs --remote-reinstall --target $T_A --confirm-target $C_A --component-installation-id 7ebb2034-a3d6-41aa-893d-ab655a61593f --interrupt-after component    # exit 1, lock left
 node scripts/install-ai-engineer.mjs --remote-reinstall --target $T_A --confirm-target $C_A --component-installation-id 7ebb2034-a3d6-41aa-893d-ab655a61593f                              # resumes
 cd $BKS
-node --env-file=$MC\.scratch\sprint-oc\runtime\biotech\install.env scripts/install-biotech.mjs --remote-reinstall --target $T_B --confirm-target $C_B --neo4j-uri $env:NEO4J_URI --neo4j-password-env NEO4J_PASSWORD --confirm-graph 8032ec07.databases.neo4j.io --component-installation-id a34b1309-3f91-4ce1-9eed-3030fdd57b92 --interrupt-after mission-control
-node --env-file=$MC\.scratch\sprint-oc\runtime\biotech\install.env scripts/install-biotech.mjs --remote-reinstall --target $T_B --confirm-target $C_B --neo4j-uri $env:NEO4J_URI --neo4j-password-env NEO4J_PASSWORD --confirm-graph 8032ec07.databases.neo4j.io --component-installation-id a34b1309-3f91-4ce1-9eed-3030fdd57b92
+node --env-file=$MC\.scratch\sprint-oc\runtime\biotech\install.env scripts/install-biotech.mjs --remote-reinstall --target $T_B --confirm-target $C_B --neo4j-uri $env:BKS_BIOTECH_GRAPH_URI --neo4j-password-env BKS_BIOTECH_GRAPH_PASSWORD --confirm-graph 8032ec07.databases.neo4j.io --component-installation-id a34b1309-3f91-4ce1-9eed-3030fdd57b92 --interrupt-after mission-control
+node --env-file=$MC\.scratch\sprint-oc\runtime\biotech\install.env scripts/install-biotech.mjs --remote-reinstall --target $T_B --confirm-target $C_B --neo4j-uri $env:BKS_BIOTECH_GRAPH_URI --neo4j-password-env BKS_BIOTECH_GRAPH_PASSWORD --confirm-graph 8032ec07.databases.neo4j.io --component-installation-id a34b1309-3f91-4ce1-9eed-3030fdd57b92
 # check progress.jsonl in the default state dir: two "start" events, resumedAfterInterruption false then true
 ```
 
 These use the default `--state-dir` (`<repo>/.scratch/sprint-oc/evidence/install-state/<project_ref>`), so the
-receipts land beside the earlier ones. If `NEO4J_URI` comes only from `install.env`, `$env:NEO4J_URI` must be set in
+receipts land beside the earlier ones. If `BKS_BIOTECH_GRAPH_URI` comes only from `install.env`, `$env:BKS_BIOTECH_GRAPH_URI` must be set in
 the PowerShell session too, because it is expanded on the command line.
 
 | Result | ai-engineer | biotech |
@@ -408,16 +412,16 @@ repeat install (expect `GRANTS_DRIFT`), `grant knowledge_verification_reader to 
 | Prerequisite | Owner | State |
 | --- | --- | --- |
 | Independent auditor credential (a second Anthropic key; `EVALUATOR_CREDENTIAL_SHARED` otherwise) and its env name (WI-06) | owner (H2) | missing; the live describe shows `auditorKind: none` |
-| Restricted logins `MC_RUNTIME_DSN`, `MC_FAMILY_WRITER_DSN`, `MC_CHECKPOINTER_DSN` per remote (`mission-db apply` creates only NOLOGIN roles) | integrator | W1: identity-gated login tooling in progress (WI-06, `sprint-oc-wi06`); not a W0 criterion |
-| Saver schema `mission_control_runtime`: `mission-db runtime-plan` / `runtime-apply` (section 8.1), before the `MC_CHECKPOINTER_DSN` login | integrator | done on both remotes 2026-10-28 (section 8.1), after a local rehearsal |
+| Restricted logins `MC_<PLANE>_DB_RUNTIME_DSN`, `MC_<PLANE>_DB_FAMILY_WRITER_DSN`, `MC_<PLANE>_DB_CHECKPOINT_DSN` per remote (`mission-db apply` creates only NOLOGIN roles) | integrator | W1: identity-gated login tooling in progress (WI-06, `sprint-oc-wi06`); not a W0 criterion |
+| Saver schema `mission_control_runtime`: `mission-db runtime-plan` / `runtime-apply` (section 8.1), before the `MC_<PLANE>_DB_CHECKPOINT_DSN` login | integrator | done on both remotes 2026-10-28 (section 8.1), after a local rehearsal |
 | Operator deployment file, its binding digest, and `MISSION_CONTROL_RUNTIME_OPTIONS_FACTORY` | integrator / W1 harness | missing |
 | Bundle custody reader: `CAPABILITY_BUNDLE_BACKEND=supabase`, `CAPABILITY_BUNDLE_READER_TOKEN`, `CAPABILITY_BUNDLE_NAMESPACE` (absent from the generated `mission-control.env`) | integrator, after section 5.2 | missing |
 | Publisher token for the custody upload (section 5.2) | integrator (H2) | missing |
 | `BKS_TARGET=production` via `--confirm-graph` for the Aura graph | integrator | generator option |
-| Dedicated `knowledge_verification_outbox_worker` login for `BKS_VERIFICATION_DSN` | optional | the admin login is used |
+| Dedicated `knowledge_verification_outbox_worker` login for `BKS_BIOTECH_DB_VERIFICATION_DSN` | optional | the admin login is used |
 | Canonical KS executor rebuilt at 2.5.0 (section 5.1) | integrator | done 2026-10-28 (`pnpm --config.verify-deps-before-run=false … run build`) |
 | Temporal queue collision: both profiles name `biotech-research-ingestion`; run one application's workers at a time or separate namespaces | W1 | open |
-| Biotech dispatch drain (what triggers `POST /kg/admission/dispatch/consume`), Agent Server env passthrough, `SET ROLE` of the component login on the remotes, one DSN for component and `KNOWLEDGE_DB_URL`, tenant agreement | W1 | unverified (RUNTIME-ENVIRONMENT §6) |
+| Biotech dispatch drain (what triggers `POST /kg/admission/dispatch/consume`), Agent Server env passthrough, `SET ROLE` of the component login on the remotes, one DSN for component and `KS_AIENG_DB_RUNTIME_DSN`, tenant agreement | W1 | unverified (RUNTIME-ENVIRONMENT §6) |
 | Generator fixes of `sprint-oc-w0-runtime-2` (`1cc7b40b`: blank-as-unset settings, full owner `.env` probe) | integrator | done: merged on `sprint-oc` in `abdeefaf` |
 
 ### 8.1 Saver schema `mission_control_runtime` (integrator)
@@ -429,10 +433,10 @@ common component first, holds the session advisory lock, and writes a per-step r
 NOLOGIN role `mission_control_checkpointer` and the schema; it aborts if a same-named role already exists with
 elevated attributes or memberships.
 
-**Order.** Run it after the install and seed steps (section 5.2) and **before** creating the `MC_CHECKPOINTER_DSN`
+**Order.** Run it after the install and seed steps (section 5.2) and **before** creating the `MC_<PLANE>_DB_CHECKPOINT_DSN`
 login. Do not create a role named `mission_control_checkpointer` yourself. Create the checkpointer login and grant it
-membership in `mission_control_checkpointer` only after the re-plan reports `complete`. `MC_RUNTIME_DSN` and
-`MC_FAMILY_WRITER_DSN` depend only on roles `mission-db apply` already created, so they may be created before or
+membership in `mission_control_checkpointer` only after the re-plan reports `complete`. `MC_<PLANE>_DB_RUNTIME_DSN` and
+`MC_<PLANE>_DB_FAMILY_WRITER_DSN` depend only on roles `mission-db apply` already created, so they may be created before or
 after. The worker's readiness check (`inspect_checkpoint_binding`) then verifies the checkpointer login.
 
 ```powershell
@@ -445,21 +449,21 @@ $L_A = "docs\specs\provider-consolidation-2026-10\sprint-oc\release\locks\ai-eng
 $L_B = "docs\specs\provider-consolidation-2026-10\sprint-oc\release\locks\biotech\release.lock.json"
 $C_A = "wkythqbofmckbuoothhn:01a103c0-9a9e-70f3-9398-eb1573a98324"
 $C_B = "bxnetwiimwhtlrjlbtab:01a103c0-9a9e-7a95-961b-29dda83c842b"
-# ai-engineer (DSN variable MC_AI_ENGINEER_MIGRATION_DATABASE_URL)
+# ai-engineer (DSN variable AIENG_DB_ADMIN_DSN, named by target.toml)
 $ra = @("--target","deployments\ai-engineer\target.toml","--lock",$L_A,"--release-root",$rr) + $v + @("--descriptor",$desc)
 & $mdb runtime-plan @ra > $EV\runtime-plan.ai-engineer.json        # expect "pending", descriptor_bound_to_release true, no holds
 & $mdb runtime-apply @ra --confirm-target $C_A --receipt-out $EV\runtime-apply.ai-engineer.json
 & $mdb runtime-plan @ra > $EV\runtime-replan.ai-engineer.json      # expect "complete"
 & $mdb runtime-apply @ra --confirm-target $C_A --receipt-out $EV\runtime-apply.ai-engineer.repeat.json   # every step "already_complete"
 & $mdb verify --target deployments\ai-engineer\target.toml --lock $L_A --release-root $rr @v   # still "verified"
-# biotech (DSN variable MC_BIOTECH_MIGRATION_DATABASE_URL)
+# biotech (DSN variable BIOTECH_DB_ADMIN_DSN, named by target.toml)
 $rb = @("--target","deployments\biotech\target.toml","--lock",$L_B,"--release-root",$rr) + $v + @("--descriptor",$desc)
 & $mdb runtime-plan @rb > $EV\runtime-plan.biotech.json
 & $mdb runtime-apply @rb --confirm-target $C_B --receipt-out $EV\runtime-apply.biotech.json
 & $mdb runtime-plan @rb > $EV\runtime-replan.biotech.json
 & $mdb runtime-apply @rb --confirm-target $C_B --receipt-out $EV\runtime-apply.biotech.repeat.json
 & $mdb verify --target deployments\biotech\target.toml --lock $L_B --release-root $rr @v
-# Only now: create the MC_CHECKPOINTER_DSN login per target (member of mission_control_checkpointer only),
+# Only now: create the MC_<PLANE>_DB_CHECKPOINT_DSN login per target (member of mission_control_checkpointer only),
 # then re-plan once more (expect "complete").
 ```
 

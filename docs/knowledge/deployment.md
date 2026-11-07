@@ -75,7 +75,8 @@ AWS hosting, hosted Agent Server and sandboxes are proposals; local-to-cloud ses
 - Reports: [deployment options](../DEPLOYMENT_OPTIONS_2026-10-12.md),
   [cloud environments roadmap](../specs/provider-consolidation-2026-10/sprint-oc/CLOUD-ENVIRONMENTS-AND-DEEP-AGENTS-DEPLOYMENT-2026-10-31.md),
   [Deep Agents topology note](../specs/provider-consolidation-2026-10/providers/deep_agents/TOPOLOGY-NOTE.md),
-  [infrastructure map](../specs/agentic-sdlc-2026-11/INFRASTRUCTURE-MAP-DRAFT-2026-11.md).
+  [infrastructure map](../specs/agentic-sdlc-2026-11/INFRASTRUCTURE-MAP-DRAFT-2026-11.md) (2026-11-01 draft; current
+  variable names are in [ENVIRONMENT](../ENVIRONMENT.md)).
 - ADR: [0006](../adr/0006-agent-server-required-execution-host-not-scheduler.md),
   [0017](../adr/0017-agent-server-runtime-persistence-separate-database.md),
   [0004](../adr/0004-temporal-sole-scheduler-transactional-outbox.md).

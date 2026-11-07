@@ -94,6 +94,11 @@ Order: recovery/integration front, W1, W2 and collections (WI-07, then WI-09, WI
 
 ## Open proofs and owner-gated items
 
+- **Runtime env regeneration (2026-11-07):** MC, KS and BKS now read only plane-qualified names (`MC_<PLANE>_DB_*`,
+  `KS_<PLANE>_DB_*`, `BKS_BIOTECH_*`). The generated files under `.scratch/sprint-oc/runtime/<app>/` predate that and must be
+  rewritten before W1 or iteration 3 restarts a process: commands and integrator inputs (component installation id or
+  receipt, `logins.env`, the operator deployment file, `--confirm-graph` for biotech) in
+  [RUNTIME-ENVIRONMENT §5](release/RUNTIME-ENVIRONMENT.md#5-generator).
 - **Cross-provider control (OVE-224, ADR-0069, 2026-11-05):** every session lane now writes cognition points, reads state as of a point and seeds
   forks at its declared level (release 1.14.0 / 0073 built locally, not installed remotely). Open: a Cursor, Codex or Claude unit through
   `OperationWorkflow` with the Postgres lineage, `run fork --point` on real services, declared steering, the paid drills

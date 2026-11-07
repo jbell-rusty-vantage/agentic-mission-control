@@ -25,45 +25,53 @@ Companion: [RUNTIME-ENVIRONMENT](RUNTIME-ENVIRONMENT.md) (process/port detail an
 | Temporal | local dev server / Python SDK test server | `127.0.0.1:7233` (dev), `7341` (test server) | workflow histories | W1 runtime (dev), integration tests (test server) |
 | Agent Server | local LangGraph Agent Server | `127.0.0.1:2024` (`TOY_AGENT_SERVER_URL`) | runtime persistence | W1 runtime |
 | Redis | local | `127.0.0.1:16379` (`REDIS_URL`) | stream fan-out | W1 runtime (local) |
-| Other external services in owner `.env` files | MongoDB `biohack…`, Upstash Redis/Vector, LangSmith, Unstructured, third Aura `9c6755c0` (`NEO4J_AURA_QUERY_API`), Aura `e40f2c21` (agents_dashboard) | — | — | Not part of Sprint OC (LangSmith only for tracing) |
+| Other external services in owner `.env` files | MongoDB `biohack…`, Upstash Redis/Vector, LangSmith, Unstructured, third Aura `9c6755c0`, Aura `e40f2c21` (agents_dashboard) | — | — | Not part of Sprint OC (LangSmith only for tracing) |
 
 The Supabase org is a **Vercel Marketplace** organization (`vercel_icfg_SIEqFciu9zf7npelC0RqFUee`): open the
 dashboard from Vercel (Storage/Integrations → Supabase → open), not via GitHub sign-in.
 
 ## 2. Owner `.env` files: which database each one points at
 
-| File | Points at | Key names (all → that system) | Watch out |
-| --- | --- | --- | --- |
-| `platform/mission-control/.env` | **Biotech** Supabase + **Biotech** Aura | `DATABASE_DIRECT`, `DATABASE_URL`, `DIRECT_URL`, `SUPABASE_URL`, `SUPABASE_JWKS_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`, `NEO4J_URI`, `NEO4J_AURA_*`; model keys `ANTHROPIC_API_KEY`, `SECOND_ANTHROPIC_API_KEY` (independent auditor), `OPENAI_API_KEY`; `LANGSMITH_*` | `APPLICATION_DATABASE_DIRECT` / `APPLICATION_MIGRATION_DATABASE_DIRECT` → **local 55432**, not a Supabase project. `NEO4J_AURA_QUERY_API` → a different Aura (`9c6755c0`). MC itself layers this file under every process, so the generated runtime env blanks everything MC should not inherit (RUNTIME-ENVIRONMENT). Lacks `MISSION_CONTROL_APPLICATION`; its `TEMPORAL_TASK_QUEUE` differs from the profiles. |
-| `biotech/biotech-knowledge-services/.env` | **Biotech** Supabase + **Biotech** Aura | same names as MC's (`DATABASE_DIRECT`, `NEO4J_URI`, `NEO4J_AURA_USERNAME`, `NEO4J_AURA_PASSWORD`, …) | Same local-55432 `APPLICATION_*` and third-Aura caveats. |
-| `aiengineer/.env` (and `aiengineer/{agents_dashboard,internal,research_starter_pre_research_agent,ai-engineer-industry-cloud-automated-research}/.env`) | **AI Engineer** Supabase + **AI Engineer** Aura | `POSTGRES_URL_NON_POOLING` (admin, used by installers), `POSTGRES_URL`, `POSTGRES_PRISMA_URL`, `SUPABASE_URL`, `SUPABASE_JWT_SECRET` (legacy HS256, **still trusted**: probe 2026-10-28 returned 200), `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `NEO4J_AURA_URI` (= `4773dc72`, not a target) | `agents_dashboard` also names Aura `e40f2c21`. |
-| `platform/knowledge-services/.env` | **AI Engineer** Supabase + **AI Engineer** Aura | `POSTGRES_URL*`, `SUPABASE_URL`, `NEO4J_AURA_URI`, `KNOWLEDGE_API_URL` (local 4100) | **Never use it for Biotech.** The KS executor for Sprint OC takes its config from the generated `ks-executor.env`, not this file. |
+Names as of 2026-11-07 (the plane-qualified rename); values come from `BellLabs/.secrets/*.env`
+([data planes and credentials](../../../../../../../docs/navigation/DATA-PLANES-AND-CREDENTIALS.md)). Each file
+names its plane in the variable itself; no file relies on an unqualified `DATABASE_*`, `SUPABASE_*`,
+`POSTGRES_URL*` or `NEO4J_*` name any more.
 
-Rule: **a database name in a `.env` key never tells you the project** (`DATABASE_DIRECT` is Biotech in the MC file;
-`POSTGRES_URL_NON_POOLING` is AI Engineer). Trust the host/login project ref, which every installer and the generator check.
+| File | Points at | Database and graph names | Watch out |
+| --- | --- | --- | --- |
+| `platform/mission-control/.env` | both Supabase planes, local Docker, **Biotech** Aura | `MC_AIENG_DB_*`, `MC_BIOTECH_DB_*` (`PROJECT_REF`, `URL`, `PUBLISHABLE_KEY`, `SECRET_KEY`, `LEGACY_JWT_SECRET`, `ADMIN_DSN`, `RUNTIME_DSN`), `MC_LOCAL_DB_*`, `MC_BIOTECH_GRAPH_{URI,USERNAME,PASSWORD}`; model keys `ANTHROPIC_API_KEY`, `SECOND_ANTHROPIC_API_KEY` (independent auditor), `OPENAI_API_KEY`; `LANGSMITH_*`; `MC_GITHUB_*` | `MISSION_CONTROL_APPLICATION` selects which plane a process reads ([ENVIRONMENT](../../../../ENVIRONMENT.md)). MC layers this file under every process, so the generated runtime env blanks every database name it does not set (RUNTIME-ENVIRONMENT). The `RUNTIME_DSN` values here are development placeholders, not the restricted `mission_control_runtime` login. `MC_BIOTECH_GRAPH_INSTANCE_ID` is present but read by nothing |
+| `biotech/biotech-knowledge-services/.env` | **Biotech** Supabase + **Biotech** Aura | `BKS_BIOTECH_DB_*`, `BKS_BIOTECH_GRAPH_*` | The generator reads no BKS `.env`; it writes the BKS executor's names itself |
+| `aiengineer/.env` | **AI Engineer** Supabase | `AIENG_DB_{PROJECT_REF,URL,PUBLISHABLE_KEY,SECRET_KEY,LEGACY_JWT_SECRET,ADMIN_DSN,RUNTIME_DSN}` | `AIENG_DB_ADMIN_DSN` is the installer's admin login (`deployments/ai-engineer/target.toml` `database_url_env`); `AIENG_DB_LEGACY_JWT_SECRET` signs the AI Engineer custody tokens |
+| `platform/knowledge-services/.env` | both Supabase planes | `KS_AIENG_DB_*`, `KS_BIOTECH_DB_*` | The KS executor for Sprint OC takes its config from the generated `ks-executor.env`, not this file |
+
+Rule: **trust the host/login project ref, not a name.** Every installer and the generator check the ref against
+`deployments/<app>/target.toml`.
 
 ## 3. What each Sprint OC tool reads
 
 | Tool / process | Reads | Target |
 | --- | --- | --- |
-| AIDB installer `aiengineer/ai-engineer-db-contract/scripts/install-ai-engineer.mjs` | `MC_AI_ENGINEER_MIGRATION_DATABASE_URL` (= `deployments/ai-engineer/target.toml` `database_url_env`), filled by runner from `aiengineer/.env` `POSTGRES_URL_NON_POOLING` + `sslmode=verify-full&sslrootcert=<Supabase CA>` | AI Engineer Supabase |
-| BKS installer `biotech/biotech-knowledge-services/scripts/install-biotech.mjs` | `MC_BIOTECH_MIGRATION_DATABASE_URL` (from MC `.env` `DATABASE_DIRECT` + verify-full), `NEO4J_URI`, the Aura password via `--neo4j-password-env`, `BKS_TARGET=production`, and the generated `runtime/biotech/install.env` | Biotech Supabase + Biotech Aura |
-| Runners (MC `.scratch/sprint-oc/runners/run_{aidb,bks}_{wipe,install}.py`) | load the above from the owner `.env` files into the child process only; assert host/login; scrub output | — |
-| `mission-db` (MC `.venv/Scripts/mission-db.exe`) | admin DSN via `--admin-dsn-env NAME` (name only) | whichever DSN the name holds |
-| Runtime env generator `scripts/sprint_oc_runtime_env.py` | owner `.env` files (MC, BKS, aiengineer), `deployments/<app>/*.toml`, install receipts / `--component-installation-id` | writes ignored files below |
-| Bundle token mint `scripts/sprint_oc_mint_bundle_tokens.py` (branch `sprint-oc-w0-custody`) | `--secret-env-file aiengineer/.env --secret-env SUPABASE_JWT_SECRET` (AI Engineer), or the Biotech ES256 key (§5) | writes `runtime/<app>/bundle-custody.env` |
+| AIDB installer `aiengineer/ai-engineer-db-contract/scripts/install-ai-engineer.mjs` | `AIENG_DB_ADMIN_DSN` (= `deployments/ai-engineer/target.toml` `database_url_env`) with `sslmode=verify-full&sslrootcert=<Supabase CA>` | AI Engineer Supabase |
+| BKS installer `biotech/biotech-knowledge-services/scripts/install-biotech.mjs` | `BIOTECH_DB_ADMIN_DSN` (= `deployments/biotech/target.toml` `database_url_env`, the same login as MC `MC_BIOTECH_DB_ADMIN_DSN`) with verify-full, `--neo4j-uri` / `--neo4j-password-env` (pass `BKS_BIOTECH_GRAPH_URI` / `BKS_BIOTECH_GRAPH_PASSWORD`), `--confirm-graph`, and the generated `runtime/biotech/install.env` | Biotech Supabase + Biotech Aura |
+| Runners (MC `.scratch/sprint-oc/runners/run_{aidb,bks}_{wipe,install}.py`) | load the above from the owner `.env` files into the child process only; assert host/login; scrub output. They predate the rename: check their names before reuse | — |
+| `mission-db` (MC `.venv/Scripts/mission-db.exe`) | the `target.toml` `database_url_env` name, or `--admin-dsn-env NAME` (name only) | whichever DSN the name holds |
+| Runtime env generator `scripts/sprint_oc_runtime_env.py` | MC `.env` and `aiengineer/.env` by name, `deployments/<app>/*.toml`, install receipts / `--component-installation-id`, `--integrator-env logins.env` | writes ignored files below |
+| Bundle token mint `scripts/sprint_oc_mint_bundle_tokens.py` | `--secret-env-file aiengineer/.env --secret-env AIENG_DB_LEGACY_JWT_SECRET` (AI Engineer; URL check on `AIENG_DB_URL`), or for Biotech the owner's legacy secret file / an ES256 key (§5) with `MC_BIOTECH_DB_URL` | writes `runtime/<app>/bundle-custody.env` |
 | Model probes `.scratch/sprint-oc/runners/model_probes.py` | MC `.env` `ANTHROPIC_API_KEY`, `OPENAI_API_KEY` | vendor APIs |
 
 ## 4. Generated runtime env files (ignored; `platform/mission-control/.scratch/sprint-oc/runtime/<app>/`)
 
+Files generated before 2026-11-07 hold the retired names and must be regenerated
+([RUNTIME-ENVIRONMENT §5](RUNTIME-ENVIRONMENT.md#5-generator)).
+
 | File | Loaded by | Contains (names) |
 | --- | --- | --- |
-| `install.env` | BKS installer `executor-config` step | `KS_KNOWLEDGE_BINDINGS_JSON`, `KS_BIOTECH_EXECUTOR_URL/TOKEN/READ_TOKEN`, `NEO4J_*`, `BKS_EXECUTOR_TOKENS`, `BKS_VERIFICATION_DSN`, `BKS_VERIFICATION_TENANTS` |
-| `ks-executor.env` | KS `verification-executor serve` (one per app, ports 4310 ai-engineer / 4311 biotech) and the live-describe capture | issuer/audience, JWKS file, bindings JSON, component DSN, seal key |
-| `bks-executor.env` | BKS executor (biotech, port 4020; firewall it) | Aura URI/user/password, executor tokens, verification DSN/tenant |
-| `mission-control.env` | MC API and MC worker | application id, task queue, knowledge gateway, DSNs (runtime/family-writer/checkpointer — integrator logins still missing, so written as `.incomplete` + exit 3), reader bundle token, blanks for everything MC must not inherit |
-| `agent-server.env` | Agent Server | as `mission-control.env` without `SUPABASE_URL`/bundle tokens (keeps Agent Server auth off) |
-| `bundle-publisher.env` | `seeds_publish_bundles.py --env-file`, `register_supabase_skill_bundle.py --env-file` only | publisher bundle token, that app's `SUPABASE_URL` + publishable key |
+| `install.env` | root installers' `seal-key` and (biotech) `executor-config` steps | `KS_KNOWLEDGE_SEAL_KEY_ID/_FILE/_ISSUER`; biotech adds `KS_KNOWLEDGE_BINDINGS_JSON`, `KS_BIOTECH_EXECUTOR_URL/TOKEN/READ_TOKEN`, `BKS_BIOTECH_GRAPH_*`, `BKS_EXECUTOR_TOKENS`, `BKS_BIOTECH_DB_VERIFICATION_DSN`, `BKS_VERIFICATION_TENANTS` |
+| `ks-executor.env` | KS `verification-executor serve` (one per app, ports 4310 ai-engineer / 4311 biotech) and the live-describe capture | issuer/audience, JWKS file, bindings JSON, `KS_<PLANE>_DB_COMPONENT_DSN`, `KS_AIENG_DB_RUNTIME_DSN` (ai-engineer), seal key |
+| `bks-executor.env` | BKS executor (biotech, port 4020; firewall it) | `BKS_BIOTECH_GRAPH_*`, executor tokens, `BKS_BIOTECH_DB_VERIFICATION_DSN`, tenant |
+| `mission-control.env` | MC API and MC worker | application id, task queue, knowledge gateway, `MC_<PLANE>_DB_PROJECT_REF`, `MC_<PLANE>_DB_{RUNTIME,FAMILY_WRITER,CHECKPOINT}_DSN` (integrator logins; without them written as `.incomplete` + exit 3), reader bundle token, blanks for every other database name and everything MC must not inherit |
+| `agent-server.env` | Agent Server | as `mission-control.env` without the plane URL/publishable key, bundle tokens and evaluator keys (keeps Agent Server auth off) |
+| `bundle-publisher.env` | `seeds_publish_bundles.py --env-file`, `register_supabase_skill_bundle.py --env-file` only | publisher bundle token, that app's `MC_<PLANE>_DB_URL` + publishable key |
 | `bundle-custody.env` | generator input | minted publisher/reader tokens |
 | `minted.env`, `knowledge-issuer.jwk.json`, `ks-seal.pem` | generator (reused across runs) | minted service tokens and keys |
 | `manifest.json` | humans | which names were set, from where, and what is missing |

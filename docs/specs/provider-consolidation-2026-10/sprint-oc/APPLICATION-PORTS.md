@@ -34,7 +34,7 @@ PostgreSQL database does not make them one authority or imply foreign keys betwe
 
 The owner's temporary topology is AI Engineer saver in application PostgreSQL and Biotech saver in
 Docker. Source supports that arrangement, but this audit did not inspect running processes or live
-databases. `LANGGRAPH_CHECKPOINT_DATABASE_DIRECT` overrides the application DSN; without it, the
+databases. `MC_<PLANE>_DB_CHECKPOINT_DSN` overrides the application (runtime) DSN; without it, the
 standalone saver uses application PostgreSQL. Do not infer placement from the worker's host. Agent
 Server's durable edition requires its own app-bound database; it is not this standalone schema.
 Temporal has a separate history store. See the [older detailed topology map](../../archive/provider-consolidation-2026-10/sprint-v/START-HERE.md)

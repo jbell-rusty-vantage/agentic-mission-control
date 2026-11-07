@@ -198,9 +198,9 @@ def test_other_env_names_are_preserved_and_lost_secret_refuses(
     _db, target, descriptor = installed
     _runtime(target, release, descriptor, tmp_path)
     out_env = tmp_path / "logins.env"
-    out_env.write_text("BKS_VERIFICATION_DSN='postgresql://kept'\n", encoding="utf-8")
+    out_env.write_text("BKS_BIOTECH_DB_VERIFICATION_DSN='postgresql://kept'\n", encoding="utf-8")
     _apply(target, release, descriptor, out_env, prefix)
-    assert read_env_file(out_env)["BKS_VERIFICATION_DSN"] == "postgresql://kept"
+    assert read_env_file(out_env)["BKS_BIOTECH_DB_VERIFICATION_DSN"] == "postgresql://kept"
     with pytest.raises(ContractError) as refused:
         _apply(target, release, descriptor, tmp_path / "other.env", prefix)
     assert refused.value.code == "LOGIN_SECRET_UNKNOWN"

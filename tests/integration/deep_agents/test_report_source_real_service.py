@@ -162,7 +162,7 @@ async def _run_report_source_fixture(tmp_path, application, *, capture_mode=Fals
             encoding="utf-8",
         )
         env = dict(os.environ)
-        env["KNOWLEDGE_DB_CONTRACT_ADMIN_DSN"] = env["MISSION_CONTROL_TEST_ADMIN_DSN"]
+        env["KS_AIENG_DB_ADMIN_DSN"] = env["MISSION_CONTROL_TEST_ADMIN_DSN"]
         process = await asyncio.to_thread(
             subprocess.Popen,
             ["node", "--import", "tsx", HOST, str(config)],

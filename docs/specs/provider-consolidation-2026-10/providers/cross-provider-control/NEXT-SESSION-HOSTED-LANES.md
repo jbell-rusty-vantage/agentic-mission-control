@@ -166,6 +166,13 @@ Today each lane declares one `interrupt_and_inject` mode (`LANE_COMMAND_SEMANTIC
 
 ## 6. Running the stack
 
+- **Regenerate the runtime env first (2026-11-07).** The files under `.scratch/sprint-oc/runtime/ai-engineer/` predate the
+  plane-qualified rename and hold names no process reads (`DATABASE_DIRECT`, `APPLICATION_*_DATABASE_*`, `SUPABASE_*`). Rerun
+  `scripts/sprint_oc_deployment_file.py --app ai-engineer --component-version <installed MC component, 1.13.0 on 2026-11-02>`, then `scripts/sprint_oc_runtime_env.py
+  --app ai-engineer --component-installation-id 7ebb2034-a3d6-41aa-893d-ab655a61593f --integrator-env
+  .scratch/sprint-oc/runtime/ai-engineer/logins.env --deployment-file .scratch/sprint-oc/runtime/ai-engineer/deployment.json
+  --require-complete` ([RUNTIME-ENVIRONMENT §5](../../sprint-oc/release/RUNTIME-ENVIRONMENT.md#5-generator), inputs and
+  checks). The ingress ref the deployment file names is `MC_AI_ENGINEER_INGRESS_DSN` in `mission-control.env`.
 - **Processes (Windows host):** `.scratch/sprint-oc/experiments/iter-3/stack-up-hosted.ps1 -Which temporal,ks,api,worker -Tag <x>`.
   It includes the hosted variables, and `stack-up.ps1` is the Deep Agents-only variant. Kill only PIDs from `iter-3/PIDS.txt`
   (`tree.ps1 -Root <pid> -Kill`).

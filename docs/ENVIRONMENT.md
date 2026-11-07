@@ -75,8 +75,10 @@ Provider cloud agents (Cursor cloud, Codex cloud, Claude Code web) reach reposit
 | `MC_BIOTECH_GRAPH_USERNAME` | no | same |
 | `MC_BIOTECH_GRAPH_PASSWORD` | yes | same |
 
-The graph is Aura biotech-graph, pinned in `deployments/biotech/graph.toml`; the AI Engineer graph is refused there. The Biotech integration refuses to create a driver when any of the three is blank. The runtime env generator reads them from the MC `.env` and writes them into the BKS executor's file under the names BKS reads (`NEO4J_URI`, `NEO4J_USERNAME`, `NEO4J_PASSWORD`), only after `--confirm-graph` names the pinned host.
+The graph is Aura biotech-graph, pinned in `deployments/biotech/graph.toml`; the AI Engineer graph is refused there. The Biotech integration refuses to create a driver when any of the three is blank. The runtime env generator reads them from the MC `.env` and writes them into the BKS executor's file under the names BKS reads (`BKS_BIOTECH_GRAPH_URI`, `BKS_BIOTECH_GRAPH_USERNAME`, `BKS_BIOTECH_GRAPH_PASSWORD`), only after `--confirm-graph` names the pinned host.
 
 ## Not covered here
 
-`MC_INGRESS_DSN` and the per-application `MC_<APP>_INGRESS_DSN` signal-ingress login are outside this page. The runtime env generator writes Knowledge Services names as KS reads them (`KS_<PLANE>_DB_COMPONENT_DSN` for a binding's `databaseUrlEnv`, `KS_AIENG_DB_RUNTIME_DSN` for the AI Engineer knowledge database) and Biotech Knowledge Services names as BKS reads them today (`NEO4J_*`, `BKS_VERIFICATION_DSN`, `BKS_TARGET`).
+`MC_INGRESS_DSN` and the per-application `MC_<APP>_INGRESS_DSN` signal-ingress login are outside this page. The runtime env generator writes Knowledge Services names as KS reads them (`KS_<PLANE>_DB_COMPONENT_DSN` for a binding's `databaseUrlEnv`, `KS_AIENG_DB_RUNTIME_DSN` for the AI Engineer knowledge database) and Biotech Knowledge Services names as BKS reads them (`BKS_BIOTECH_GRAPH_*`, `BKS_BIOTECH_DB_VERIFICATION_DSN`, `BKS_TARGET`). The ingress name the operator deployment file names is derived from the application id (`MC_AI_ENGINEER_INGRESS_DSN`, `MC_BIOTECH_INGRESS_DSN`, `scripts/sprint_oc_deployment_file.py`), not from the plane token.
+
+Env files generated under `.scratch/sprint-oc/runtime/<app>/` before the 2026-11-07 rename still carry retired names and must be regenerated: [RUNTIME-ENVIRONMENT §5](specs/provider-consolidation-2026-10/sprint-oc/release/RUNTIME-ENVIRONMENT.md#5-generator) gives the exact commands and inputs.

@@ -50,7 +50,7 @@ def run(out: Path, dsn_variable: str, timeout: int = 420) -> int:
     }
     env.update(
         MISSION_CONTROL_TEST_ADMIN_DSN=dsn,
-        KNOWLEDGE_DB_CONTRACT_ADMIN_DSN=dsn,
+        KS_AIENG_DB_ADMIN_DSN=dsn,
         LANGSMITH_TRACING="false",
         LANGCHAIN_TRACING_V2="false",
     )
