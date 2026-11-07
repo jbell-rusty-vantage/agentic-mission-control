@@ -60,6 +60,9 @@ async def create_application_postgres_pool(settings: Settings) -> asyncpg.Pool:
         min_size=1,
         max_size=8,
         command_timeout=30,
+        # Loop iter-3 F1-G7: the Supabase pooler drops idle client connections sooner than
+        # asyncpg's 300 s default, so a reused one was reset mid-write; recycle idle ones.
+        max_inactive_connection_lifetime=60,
     )
     try:
         async with pool.acquire() as connection:
@@ -79,6 +82,7 @@ async def create_application_family_writer_pool(settings: Settings) -> asyncpg.P
         min_size=1,
         max_size=4,
         command_timeout=30,
+        max_inactive_connection_lifetime=60,
     )
     try:
         async with pool.acquire() as connection:

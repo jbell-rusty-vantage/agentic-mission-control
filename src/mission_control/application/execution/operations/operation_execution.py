@@ -1029,6 +1029,34 @@ class ReusedOutputCarryPort(Protocol):
     async def carry(self, binding: OperationExecutionBinding, reused: ReusedResultRef) -> Any: ...
 
 
+# Loop iter-3 F1-G7: connection-level losses of the store (asyncpg, sockets), matched by name
+# so this layer imports no database driver. A query or constraint error is never transient here.
+TRANSIENT_STORE_ERRORS: frozenset[str] = frozenset(
+    {
+        "ConnectionDoesNotExistError",
+        "ConnectionFailureError",
+        "PostgresConnectionError",
+        "CannotConnectNowError",
+        "ConnectionResetError",
+        "ConnectionAbortedError",
+        "BrokenPipeError",
+    }
+)
+
+
+def transient_store_loss(error: BaseException) -> bool:
+    """True when `error` (or its cause chain) is a lost database connection."""
+
+    seen: set[int] = set()
+    current: BaseException | None = error
+    while current is not None and id(current) not in seen:
+        seen.add(id(current))
+        if type(current).__name__ in TRANSIENT_STORE_ERRORS:
+            return True
+        current = current.__cause__ or current.__context__
+    return False
+
+
 class OperationExecutionService:
     """Binds immutable intent before invoking any semantic provider side effect."""
 
@@ -2390,6 +2418,18 @@ class OperationExecutionService:
         except (CheckpointLineageError, OperationStopFencePending):
             raise
         except Exception as error:
+            if transient_store_loss(error):
+                # Loop iter-3 F1-G7 (live 4584570b, 0fc6e3b9): the remote pooler reset a
+                # pooled connection mid-write. That is infrastructure, not the unit's result:
+                # the attempt fails retryable and the retry resumes from the last checkpoint
+                # (REQ-CP-DA-018) instead of settling the stage `failed`.
+                _LOGGER.warning(
+                    "operation %s lost its database connection before settlement (%s); "
+                    "retrying the attempt",
+                    binding.binding_id,
+                    type(error).__name__,
+                )
+                raise
             # The settlement keeps only the error type (provider and secret text never
             # persist); an idempotency conflict is Mission Control's own text and names the
             # colliding identity, so it is logged for the operator.

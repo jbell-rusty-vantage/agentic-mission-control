@@ -107,13 +107,18 @@ def test_fresh_apply_repeat_and_rotate(installed, release, tmp_path, prefix):
     _runtime(target, release, descriptor, tmp_path)
     plan = run(login_plan(target, release, descriptor, prefix=prefix, **VERSIONS))
     assert plan["status"] == "pending" and plan["holds"] == []
-    assert [e["status"] for e in plan["logins"]] == ["absent"] * 3
+    assert [e["status"] for e in plan["logins"]] == ["absent"] * len(LOGINS)
 
     out_env = tmp_path / "secrets" / "logins.env"
     first = _apply(target, release, descriptor, out_env, prefix, probe=True)
-    assert [e["action"] for e in first["logins"]] == ["created"] * 3 and first["changed"]
+    assert [e["action"] for e in first["logins"]] == ["created"] * len(LOGINS) and first["changed"]
     values = read_env_file(out_env)
-    assert set(values) == {"MC_RUNTIME_DSN", "MC_FAMILY_WRITER_DSN", "MC_CHECKPOINTER_DSN"}
+    assert set(values) == {
+        "MC_RUNTIME_DSN",
+        "MC_FAMILY_WRITER_DSN",
+        "MC_CHECKPOINTER_DSN",
+        "MC_INGRESS_DSN",
+    }
     passwords = {name: dsn.split("@", 1)[0].rsplit(":", 1)[1] for name, dsn in values.items()}
     rendered = json.dumps(first)
     assert not any(password in rendered for password in passwords.values())
@@ -171,14 +176,16 @@ def test_fresh_apply_repeat_and_rotate(installed, release, tmp_path, prefix):
     # Repeat: verified, unchanged bytes; the plan reports complete.
     before = out_env.read_bytes()
     again = _apply(target, release, descriptor, out_env, prefix)
-    assert [e["action"] for e in again["logins"]] == ["verified"] * 3 and not again["changed"]
+    assert [e["action"] for e in again["logins"]] == ["verified"] * len(LOGINS) and not again[
+        "changed"
+    ]
     assert out_env.read_bytes() == before
     complete = run(login_plan(target, release, descriptor, prefix=prefix, **VERSIONS))
     assert complete["status"] == "complete" and complete["mutations"] == []
 
     # Rotate: new passwords that authenticate; the old ones no longer do.
     rotated = _apply(target, release, descriptor, out_env, prefix, rotate=True, probe=True)
-    assert [e["action"] for e in rotated["logins"]] == ["rotated"] * 3
+    assert [e["action"] for e in rotated["logins"]] == ["rotated"] * len(LOGINS)
     new_values = read_env_file(out_env)
     assert all(new_values[n] != values[n] for n in values)
     with pytest.raises(asyncpg.InvalidPasswordError):
@@ -333,7 +340,7 @@ def test_a_failed_rotation_keeps_the_working_file_and_capability_drift_holds(
     monkeypatch.setattr(logins, "scram_verifier", original)
     # The kept credentials still authenticate (a verify-only rerun probes them).
     again = _apply(target, release, descriptor, out_env, prefix)
-    assert again["changed"] is False and len(again["probes"]) == 3
+    assert again["changed"] is False and len(again["probes"]) == len(LOGINS)
 
     run(db.execute(f"CREATE ROLE {prefix}_extra NOLOGIN"))
     run(db.execute(f"GRANT {prefix}_extra TO mission_control_runtime"))
@@ -374,5 +381,5 @@ def test_a_crash_after_the_commit_keeps_the_pending_credentials(
     assert pending.exists()
     monkeypatch.setattr(logins, "_replace", original)
     adopted = _apply(target, release, descriptor, out_env, prefix)
-    assert adopted["changed"] is False and len(adopted["probes"]) == 3
+    assert adopted["changed"] is False and len(adopted["probes"]) == len(LOGINS)
     assert not pending.exists()

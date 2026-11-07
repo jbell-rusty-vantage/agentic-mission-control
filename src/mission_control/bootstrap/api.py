@@ -377,6 +377,9 @@ async def application_pool(secret_ref: str) -> asyncpg.Pool:
             max_size=8,
             command_timeout=30,
             server_settings={"statement_timeout": "30000", "lock_timeout": "10000"},
+            # Loop iter-3 F1-G7: the Supabase pooler drops idle client connections sooner than
+            # asyncpg's 300 s default; a reused one was reset mid-write. Recycle idle ones.
+            max_inactive_connection_lifetime=60,
         )
     except Exception:
         raise RuntimeError("configured PostgreSQL connection is unavailable") from None

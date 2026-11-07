@@ -185,6 +185,7 @@ def deployment_document(
     namespace: str,
     tenant: str,
     max_request_bytes: int = 1_000_000,
+    signal_ingress: bool = False,
 ) -> dict[str, Any]:
     from mission_control.adapters.temporal.coordinator_runtime import coordinator_task_queues
     from mission_control.application.installations.registry import ApplicationBinding
@@ -237,6 +238,13 @@ def deployment_document(
                     ],
                 },
                 "family_writer_secret_ref": f"MC_{upper}_FAMILY_WRITER_DSN",
+                # Loop iter-3: the restricted signal-ingress login (mission-db login-apply
+                # `MC_INGRESS_DSN`) the worker needs to compose the hosted lanes.
+                **(
+                    {"signal_ingress_secret_ref": f"MC_{upper}_INGRESS_DSN"}
+                    if signal_ingress
+                    else {}
+                ),
                 "temporal": {
                     "address": TEMPORAL_ADDRESS,
                     "namespace": namespace,
@@ -453,6 +461,11 @@ def run(argv: list[str] | None = None) -> tuple[int, dict[str, Any]]:
             namespace=namespace,
             tenant=tenant,
             max_request_bytes=args.max_request_bytes,
+            # The ingress ref is named only when the runtime env holds that login's DSN.
+            signal_ingress=(
+                f"MC_{args.app.upper().replace('-', '_')}_INGRESS_DSN"
+                in gen.read_env(out / "mission-control.env")
+            ),
         )
         gen.write_text(out / DEPLOYMENT, json.dumps(document, indent=2) + "\n", secret=False)
         binding = document["applications"][0]["authentication"]["binding"]

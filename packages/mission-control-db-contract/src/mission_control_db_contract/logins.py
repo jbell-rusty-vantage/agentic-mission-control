@@ -12,6 +12,7 @@ login          capability role                 integrator DSN name
 runtime        mission_control_runtime         ``MC_RUNTIME_DSN``
 family writer  mission_control_family_writer   ``MC_FAMILY_WRITER_DSN``
 checkpointer   mission_control_checkpointer    ``MC_CHECKPOINTER_DSN``
+ingress        mission_control_ingress         ``MC_INGRESS_DSN``
 =============  ==============================  =======================
 
 Each login is ``LOGIN NOSUPERUSER NOBYPASSRLS NOCREATEDB NOCREATEROLE NOREPLICATION`` and holds its
@@ -78,6 +79,9 @@ LOGINS = (
     LoginSpec("runtime", "mission_control_runtime", "MC_RUNTIME_DSN"),
     LoginSpec("family_writer", "mission_control_family_writer", "MC_FAMILY_WRITER_DSN"),
     LoginSpec("checkpointer", "mission_control_checkpointer", "MC_CHECKPOINTER_DSN"),
+    # Loop iter-3 (hosted lanes): the restricted signal-ingress edge login the worker needs to
+    # compose `claude_managed`/`codex_agents` (`bootstrap/signals.py::verify_signal_ingress_pool`).
+    LoginSpec("ingress", "mission_control_ingress", "MC_INGRESS_DSN"),
 )
 DSN_NAMES = tuple(spec.dsn_name for spec in LOGINS)
 _FORBIDDEN_ATTRIBUTES = (
@@ -441,7 +445,7 @@ async def login_apply(
     prefix: str = "mcl",
     require_ignored: bool = True,
 ) -> dict[str, Any]:
-    """Create or verify the three restricted logins; their DSNs go only to ``out_env``.
+    """Create or verify the restricted logins; their DSNs go only to ``out_env``.
 
     Order (review S1/S3): decide the actions, write the new DSNs to an owner-only
     ``<out-env>.pending`` sibling, then ONE transaction takes a transaction-scoped advisory lock,
