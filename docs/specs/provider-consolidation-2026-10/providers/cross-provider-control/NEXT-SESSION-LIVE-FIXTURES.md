@@ -121,6 +121,64 @@ run ids; nothing flips `qualified` (that is a reviewed release citing `docs/qual
   `history close execution is no longer live` (`adapters/postgres/lanes/execution_state.py:151`) on HEAD too; do not plan a
   worker-kill variant on this lane until that is triaged.
 
+#### 4.2.1 F2 Stage Graph mission through the API (F2-G2, 2026-11-06; shared by §4.3.1)
+
+Built offline on `iter3-hosted-bindings` (`tests/unit/authoring/test_hosted_stagegraph_fixtures.py`): **tested, not run
+live**. Bindings: `scripts/hosted_launch_bindings.py` wrote `<rt>/w1-launch-bindings-hosted.json` (`<rt>` =
+`.scratch/sprint-oc/runtime/ai-engineer`) from `w1-launch-bindings-iter2.json`: the v1 sections unchanged, schema v2, plus
+`providers.claude_managed` and `providers.codex_agents` (queue `mc-ai-engineer-lane-hosted`, `hosted.default` =
+`claude-haiku-5-5` / `gpt-6.1-sol`, auth `<lane>.api`, environment `ai-engineer-knowledge`, reviewed `hosted_projection` =
+the checked-in packs; Managed `max_list_cost` 100 cents per session; no repository). Rerun it after any pack edit.
+
+Prerequisites (both lanes; the worker refuses hosted composition without the first):
+
+1. **Restricted signal ingress.** `compose_hosted_lanes` needs the application's `signal_ingress_secret_ref`; the W1
+   `deployment.json` has none. Provision one login on the AI Engineer remote that is LOGIN, NOSUPERUSER, NOBYPASSRLS and a
+   member of `mission_control_ingress` only (no `mission-db login-apply` spec exists for it; `bootstrap/signals.py` checks
+   it), put its DSN in `mission-control.env` as `MC_AI_ENGINEER_INGRESS_DSN`, and add
+   `"signal_ingress_secret_ref": "MC_AI_ENGINEER_INGRESS_DSN"` to `applications[0]` of `deployment.json` (an application
+   field, outside the sealed binding digest).
+2. `ANTHROPIC_API_KEY`, `OPENAI_API_KEY` and `FIRECRAWL_API_KEY` (the Managed vault credential) in `mission-control.env`.
+
+Restart (same commands as `sprint-oc/release/RUNTIME-ENVIRONMENT.md` §1, extra variables first; the owner stops the old
+processes on 8010 and the worker):
+
+```bash
+export MANIFEST_LAUNCH_BINDINGS_PATH=$PWD/.scratch/sprint-oc/runtime/ai-engineer/w1-launch-bindings-hosted.json
+export MISSION_CONTROL_ALLOW_UNQUALIFIED_LANES=true            # API (launch resolver) and worker
+export MISSION_CONTROL_CLAUDE_MANAGED_LANE=true MISSION_CONTROL_CODEX_AGENTS_LANE=true   # worker
+export MISSION_CONTROL_LANE_TASK_QUEUES='["mc-ai-engineer-lane-hosted"]'   # worker: otherwise nothing polls it
+uv run --no-sync --env-file .scratch/sprint-oc/runtime/ai-engineer/mission-control.env python -m mission_control.bootstrap.worker
+uv run --no-sync --env-file .scratch/sprint-oc/runtime/ai-engineer/mission-control.env uvicorn mission_control.bootstrap.api:create_app \
+  --factory --loop mission_control.bootstrap.api:api_loop_factory --host 127.0.0.1 --port 8010
+```
+
+The base worker then serves the hosted queue beside the Deep Agents ones (one process, `adapters/temporal/worker.py`). Zero-token preflights first: §4.2 / §4.3.
+Run (compile shows a stale `hosted_launch_refused` warning from `DESCRIBE_ONLY_LAUNCH_EVIDENCE`; it is not a start blocker):
+
+```bash
+uv run --no-sync python scripts/experiment_loop_driver.py --app ai-engineer --api http://127.0.0.1:8010 \
+  --manifest tests/fixtures/manifests/experiment-loop/f2-managed-stagegraph.mission.yml \
+  --out .scratch/sprint-oc/experiments/iter-3/f2-managed --run-salt f2-1 run --timeout 2400
+```
+
+Expected sequence: `collect_a` and `collect_b` start together (concurrency 2) as two Managed sessions (`mc_prepare` with no
+commands, `env.prepared`, a two-line final answer), then `synthesize`, then `review` waits (`waiting`); approve it as for
+F1 (reviewer token); terminal `completed`. No `stage-accepted` event fires and the packet is empty: each `expected` text
+output stays an unmet shortfall by design. Read the answers in `run transcript`, then §3's points, state-as-of and fork.
+
+What the hosted lanes cannot do here, and why the fixtures look as they do:
+
+- **No named output submission.** `submit_output` exists only on Deep Agents (`adapters/deep_agents/knowledge_tools.py`);
+  hosted projection carries skills and streamable-HTTPS MCP servers only (`adapters/remote_session/host_files.py`); the
+  hosted harnesses register no `outputs/` files (their `end_session` stages one session manifest), so neither named text
+  nor schema outputs reach custody. Outputs are `enforcement: expected`; a `required` one would fail the stage.
+- **No stage-to-stage data.** Without an accepted revision there is nothing to bind with `from:`; the join is `depends_on`
+  and the synthesizer gets both frozen quotes inline.
+- **Repository-less only.** `provider_node` now admits a hosted node without `workspace.repo` (the binding already did); a
+  named repository still needs `repository_commits` plus, on `codex_agents`, a fresh read-only repository proof per binding
+  (`bootstrap/hosted_readonly.py`), which is why these bindings drop that pack's `GITHUB_TOKEN` vault credential.
+
 ### 4.3 `codex_agents` (OpenAI Agents API)
 
 - **Host:** any; `MISSION_CONTROL_CODEX_AGENTS_LANE=true`, same hosted queue, pack
@@ -132,6 +190,20 @@ run ids; nothing flips `qualified` (that is a reviewed release citing `docs/qual
   resolve to `codex`).
 - **Pre-existing failure to avoid:** `test_agents_worker_recovery.py::test_worker_loss_restores_items...` (same
   `history close execution is no longer live`).
+
+#### 4.3.1 F3 Stage Graph mission through the API (F2-G2)
+
+Same bindings file, prerequisites and restart as §4.2.1. Rerun HL-13 first: F3-G1 (send stall) was open when this was written.
+
+```bash
+uv run --no-sync python scripts/experiment_loop_driver.py --app ai-engineer --api http://127.0.0.1:8010 \
+  --manifest tests/fixtures/manifests/experiment-loop/f3-agents-stagegraph.mission.yml \
+  --out .scratch/sprint-oc/experiments/iter-3/f3-agents --run-salt f3-1 run --timeout 2400
+```
+
+Expected sequence as F2, with one `mc_signal findings.ready` per stage instead of `mc_prepare`. The stages do not upload:
+the shipped pack declares no `mc_prepare` function, and the production tools gate `mc_upload_artifact` on a recorded
+`env.prepared` that needs one (`adapters/openai_agents/tools.py`), so an upload returns `environment_not_prepared`.
 
 ## 5. Recommended order (and why)
 
