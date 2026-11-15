@@ -388,6 +388,17 @@ Built 2026-11-05 on the disposable PostgreSQL 17. Proof: `tests/integration/post
 the declared matrix, verify, replay) and `tests/unit/harness/test_lane_contracts.py` (0073 is the exact generated
 successor). No deployment lock and no remote install yet.
 
-## Colliding branch keys The unreviewed recovery branches `sprint-oc-wi14` (`0070_swarm_activations.sql`)
+## 1.15.0
+
+Entry added 2026-11-15 (truth pass; the release was built 2026-11-06 in `c88118d5` without an entry here).
+`1.15.0/component/` is the built 1.14.0 prefix (0001..0073) plus `0074_deep_agents_cooperative_inject_describe.sql`:
+the Deep Agents describe declares `interrupt_and_inject: cooperative_inject` (ADR-0070). Sources in `scripts/release_1150/`,
+prepared by `scripts/prepare_release_1150.py`; 65 ordered migrations in the manifest. No release-specific integration test
+(unlike 1.14.0), no deployment lock and no remote install yet.
+
+## Colliding branch keys
+
+Since the 2026-11-06 clean-slate move these branches exist only in the owner's private history bundle
+(note 2026-11-15). The unreviewed recovery branches `sprint-oc-wi14` (`0070_swarm_activations.sql`)
 and `sprint-oc-wi15` (`0071_evaluator_optimizer_rounds.sql`) also carry keys that collide with built
 or candidate keys; renumber them when they are integrated.

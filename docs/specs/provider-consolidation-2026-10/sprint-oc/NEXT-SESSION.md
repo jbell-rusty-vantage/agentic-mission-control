@@ -8,6 +8,20 @@ status: active
 
 # Sprint OC control board
 
+**Current state 2026-11-15 (truth pass; the sections below are not rewritten).** The live sections date from
+2026-11-01..07. Newer facts: (1) [iteration 3](experiments/ITER-3-2026-11-06.md#phase-2)
+phase 2 (2026-11-06) closed F1-G2, F1-G4, F1-G5 and F3-G1 live, and L2-02/F1-G3 through the accepted
+[ADR-0070](../../../adr/0070-operator-instructions-and-the-deep-agents-gentle-steer.md), so the "L2-02 owner decision" and the
+D39-D41 steps under Next action are done (D39, D41 in [iteration 1](experiments/ITER-1-2026-11-03.md), D40 in
+[iteration 2](experiments/ITER-2-2026-11-03.md)); open there: F2-G3, F2-G4, the live steer (L2-12) and the F1-G7 live re-proof.
+(2) Release **1.15.0** (0074, the Deep Agents `cooperative_inject` describe) is built locally and installed on no remote; the
+remotes stay 1.13.0 (AI Engineer) and 1.9.0 (Biotech). (3) The newest session instruction is
+[hosted lanes](../providers/cross-provider-control/NEXT-SESSION-HOSTED-LANES.md) (2026-11-06), blocked on owner prerequisites
+(F2-G4). (4) `05ff2c6d` (2026-11-15) adds a fixture driver in which Mission Control runs the AI Engineer Build 08 loop 8 watch on
+the Deep Agents lane through the production workers with the deterministic technical model (local, no provider call, no `src/`
+change); it moves no W gate. (5) W0 released and W1-W5 unreleased are unchanged since 2026-11-03; `main` is two commits ahead
+of origin. Workspace state card: [MISSION-CONTROL 2026-11-15](../../../../../../docs/state/2026-11-15/MISSION-CONTROL.md).
+
 Live part only (reconciled 2026-11-01, OVE-206). The dated batch logs of 2026-10-29..31 (overnight fixtures, foundation
 detour, B3-B4c) are in [SPRINT-OC-LOG-2026-10-29-31](../../archive/provider-consolidation-2026-10/docs/SPRINT-OC-LOG-2026-10-29-31.md);
 retrieve them by section, not in full. Reading order for current state: this board, then

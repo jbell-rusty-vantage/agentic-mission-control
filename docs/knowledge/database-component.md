@@ -2,7 +2,7 @@
 type: Concept
 category: persistence
 title: The common database component
-description: How Mission Control's SQL ships as one versioned component (mission-control-db-contract, mission-db), release numbering 1.3.0 to the built 1.14.0, who consumes it (deployment locks, the AI Engineer and Biotech installers), how the schemas live in each application's own Postgres beside the knowledge schemas, and what is installed where.
+description: How Mission Control's SQL ships as one versioned component (mission-control-db-contract, mission-db), release numbering 1.3.0 to the built 1.15.0, who consumes it (deployment locks, the AI Engineer and Biotech installers), how the schemas live in each application's own Postgres beside the knowledge schemas, and what is installed where.
 tags: [mission-control, database, release, mission-db, installer, deployment-locks, knowledge-schemas]
 aliases: [mission-control-db-contract, common component, release numbering, release lock, mission-db]
 questions:
@@ -44,8 +44,8 @@ Versions live only under `releases/<version>/component/`; there is no implicit `
 `component/` is the frozen 1.4.0 input kept for historical tests, never a build, lock or install source. A
 release is the byte-identical previous built prefix plus new migrations, prepared by
 `scripts/prepare_release_<nnn>.py`; applied SQL is never edited. A minor release adds migrations with an
-unchanged reader/writer protocol (`mission-control-runtime/1`). The newest built is **1.14.0** (migrations
-0001..0072).
+unchanged reader/writer protocol (`mission-control-runtime/1`). The newest built is **1.15.0** (migrations
+0001..0074; corrected 2026-11-15, the line said 1.14.0).
 
 | Release | Adds (migration keys) |
 | --- | --- |
@@ -60,13 +60,14 @@ unchanged reader/writer protocol (`mission-control-runtime/1`). The newest built
 | 1.12.0 | 0070: workspace closure |
 | 1.13.0 | 0071, 0072: nested program activations, native plan decision columns (the former "2.0.0 candidates"; additive, so a minor inside the `<2.0.0` component range) |
 | 1.14.0 | 0073: the cross-provider control describe refresh (every session lane declares `time_travel` and its fork cell; data only, schema fingerprint unchanged; OVE-224, ADR-0069) |
+| 1.15.0 | 0074: the Deep Agents describe declares `interrupt_and_inject: cooperative_inject` (ADR-0070; source `scripts/release_1150/`, `scripts/prepare_release_1150.py`; built 2026-11-06 in `c88118d5`; no release integration test like the 1.14.0 one, no lock, no remote install) |
 
 No candidate is outstanding: 0073 shipped in 1.14.0 (2026-11-05, source `scripts/release_1140/`, rendered by
 `scripts/prepare_release_1140.py`; no remote install yet). The
 runtime refuses to start on a release without a migration it reads (`REQUIRED_MIGRATIONS` in
 `bootstrap/common_installation.py`; a unit test keeps every key inside the newest built release). The
 unreviewed branches `sprint-oc-wi14` (0070) and `sprint-oc-wi15` (0071) carry colliding keys and must be
-renumbered when integrated. Keys are assigned by the integrator, so branches can collide: a `check` rule that
+renumbered when integrated (since the 2026-11-06 clean-slate move those branches exist only in the owner's private history bundle). Keys are assigned by the integrator, so branches can collide: a `check` rule that
 fails a reused key is a navigation-program item, and the integrator renumbers (never edits an applied file).
 
 ## Consumers and deployment locks
@@ -93,7 +94,8 @@ Built, locally proven: 1.13.0 (`tests/integration/postgres/test_sprint_oc_releas
 1.12.0, verify, replay). Remotes (2026-11-02): the **AI Engineer** disposable remote (`wkythqbofmckbuoothhn`) runs
 **1.13.0** verified (63 migrations, upgraded from 1.9.0 with plan `sha256:d6283af2…`), with seeds through
 agent-skills 1.0.4, knowledge-tools 1.2.0, workflow-parity 1.0.5 and mission-payloads 1.0.0 applied and their custody
-bytes published; the **Biotech** remote runs **1.9.0** (W1 session 7) and none of those seeds. Earlier: 1.8.0 with
+bytes published; the **Biotech** remote runs **1.9.0** (W1 session 7) and none of those seeds. 2026-11-06: the signal-ingress
+login was applied and probed on the AI Engineer remote (`mission-db login-apply`; iteration 3 phase 2); 1.14.0 and 1.15.0 are on neither remote. Earlier: 1.8.0 with
 the saver, seeds, bundle custody, restricted logins and tenants
 ([handoff](../specs/archive/provider-consolidation-2026-10/docs/HANDOFF-2026-10-28-S3.md) section 3). Receipts are
 private under `.scratch/sprint-oc/evidence/w1/` (`verify-190.*`, `s11/`).

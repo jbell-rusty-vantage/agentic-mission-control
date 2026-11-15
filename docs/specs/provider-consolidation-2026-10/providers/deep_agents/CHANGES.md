@@ -12,6 +12,11 @@ Every entry says whether a change is **general** (every lane inherits it) or **d
 (this lane only), names the module that is the finished part, and the test that proves it.
 Paths are relative to `src/mission_control/` unless they start with `tests/` or `docs/`.
 
+**Gap note 2026-11-15 (truth pass):** no entry was appended after 2026-10-31. The later Deep Agents lane changes are recorded in
+the experiment-loop iterations ([1](../../sprint-oc/experiments/ITER-1-2026-11-03.md), [2](../../sprint-oc/experiments/ITER-2-2026-11-03.md),
+[3](../../sprint-oc/experiments/ITER-3-2026-11-06.md)), [ADR-0070](../../../../adr/0070-operator-instructions-and-the-deep-agents-gentle-steer.md)
+(`OperatorSteerMiddleware`, release 1.15.0) and commit `05ff2c6d` (the loop 8 watch fixture, tests and scripts only).
+
 ## 2026-10-31 — provenance sprint slices (OVE-204)
 
 Appended 2026-11-01 (OVE-206) from the sprint's [final report](../../../archive/provider-consolidation-2026-10/sprint-oc/provenance-2026-10-31/REPORT.md)
