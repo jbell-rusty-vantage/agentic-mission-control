@@ -128,6 +128,7 @@ async def scoped_stack(
     knowledge_lane: Callable[..., Awaitable[Any]] | None = None,
     knowledge_tools: tuple[Any, ...] = (),
     application_id: str = "biotech",
+    extra_tools: dict[str, Any] | None = None,
 ) -> AsyncIterator[ScopedStack]:
     """The stack on a fresh common database.
 
@@ -155,6 +156,7 @@ async def scoped_stack(
                 knowledge_lane=knowledge_lane,
                 knowledge_tools=knowledge_tools,
                 application_id=application_id,
+                extra_tools=extra_tools,
             ) as stack:
                 yield stack
         finally:
@@ -190,6 +192,7 @@ async def _scoped_stack(
     knowledge_lane: Callable[..., Awaitable[Any]] | None = None,
     knowledge_tools: tuple[Any, ...] = (),
     application_id: str = "biotech",
+    extra_tools: dict[str, Any] | None = None,
 ) -> AsyncIterator[ScopedStack]:
     app = application_id
     owner_dsn = common.owner_dsn
@@ -326,6 +329,8 @@ async def _scoped_stack(
             binding_assets = technical.technical_binding()
             if knowledge_tools:
                 binding_assets = replace(binding_assets, knowledge_tools=knowledge_tools)
+            if extra_tools:
+                binding_assets = replace(binding_assets, extra_tools=dict(extra_tools))
             factory = ProductionWorkerActivityCompositionFactory(
                 env.client,
                 additional_components=binding_assets.components(model_log),

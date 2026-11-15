@@ -22,7 +22,7 @@ import os
 import sys
 import time
 from collections.abc import Mapping, Sequence
-from dataclasses import dataclass, fields
+from dataclasses import dataclass, field, fields
 from datetime import UTC, datetime
 from hashlib import sha256
 from pathlib import Path
@@ -740,6 +740,10 @@ class TechnicalBinding:
     # a knowledge-enabled stack sets them (the model then calls `report_register` and
     # `submit_output` when `MISSION_CONTROL_TECHNICAL_KNOWLEDGE=1`).
     knowledge_tools: tuple[Any, ...] = ()
+    # Build 08 loop 8 (AI Engineer watch mission): extra tool implementations by component
+    # digest; the components themselves go
+    # into `knowledge_tools` so the templates bind them (empty unless a watch stack sets them).
+    extra_tools: Mapping[str, BaseTool] = field(default_factory=dict)
 
     def components(self, model_log: list[dict[str, Any]]) -> DeploymentCapabilityComponents:
         """The qualification's exact components: deterministic parent and child models."""
@@ -753,7 +757,11 @@ class TechnicalBinding:
             qualification=True,
             model_factories={
                 self.binding.model.ref.digest: lambda bound, _secrets: TechnicalModel(
-                    run_id=bound.run_id, operation_id=bound.operation_id, log=model_log
+                    run_id=bound.run_id,
+                    operation_id=bound.operation_id,
+                    operation_attempt=bound.operation_attempt,
+                    execution_generation=bound.execution_generation,
+                    log=model_log,
                 ),
                 self.child_model_ref.digest: lambda bound, _secrets: ChildModel(
                     run_id=bound.run_id, operation_id=bound.operation_id, log=model_log
@@ -768,6 +776,7 @@ class TechnicalBinding:
             # The qualification MCP server (a Python stdio script, not a pinned package) is
             # registered exactly; the worker refuses any other launch (RRM-009 review).
             mcp_servers={server.ref.digest: server for server in self.binding.mcp_servers},
+            tools=dict(self.extra_tools),
             **extra,
         )
 
@@ -1091,6 +1100,10 @@ class _LoggedModel(BaseChatModel):
     run_id: str
     operation_id: str
     log: Any  # a shared list; pydantic would copy a validated `list`
+    # Build 08 loop 8: the invocation identity a watch tool call names (defaults keep older
+    # factories valid).
+    operation_attempt: int = 1
+    execution_generation: int = 1
 
     def bind_tools(
         self,
@@ -1205,6 +1218,12 @@ class TechnicalModel(_LoggedModel):
             }
         elif tools == 2:
             call = {"name": "lookup_binding_marker", "args": {"code": MCP_CODE}}
+        elif os.environ.get("MISSION_CONTROL_TECHNICAL_AIENG_WATCH") == "1" and (
+            watch := _aieng_watch_step(self, since_input, tools)
+        ):
+            # Build 08 loop 8: the AI Engineer knowledge-loop watch tick
+            # (tests/fixtures/aieng_watch_tools.py).
+            call = watch
         elif tools == 3 and os.environ.get("MISSION_CONTROL_TECHNICAL_KNOWLEDGE") == "1":
             # SV-16 (T1-MC): register the operation's report through the knowledge gateway.
             # A real executor needs a full `research-report/v2` registration: the test writes a
@@ -1326,6 +1345,14 @@ class TechnicalModel(_LoggedModel):
             "obligation_applicability": [[GOAL_OBLIGATION, True]],
             "output_contract_ref": GOAL_OUTPUT_CONTRACT,
         }
+
+
+def _aieng_watch_step(
+    model: Any, since_input: list[BaseMessage], tools: int
+) -> dict[str, Any] | None:
+    from tests.fixtures.aieng_watch_tools import watch_step
+
+    return watch_step(model, since_input, tools)
 
 
 def _report_path(operation_id: str) -> str:
