@@ -18,6 +18,6 @@ Invariants:
 - Fail closed at fresh launch when authored acceptance has no runtime evaluator.
 Explained by (docs/knowledge): mission-manifest, authoring, environments, agent-configuration, cursor-lane, deep-agents-children
 Decided by (docs/adr): ADR-0022, ADR-0034, ADR-0063, ADR-0006, ADR-0015
-Depends on: domain.authoring, domain, domain.execution, domain.programs, application.programs, application.environments (+1) · Used by: bootstrap, adapters.temporal, application.programs, interfaces.http, adapters.deep_agents, adapters.postgres (+2)
+Depends on: domain.authoring, domain, domain.execution, domain.programs, application.programs, application.environments (+1) · Used by: bootstrap, adapters.temporal, application.programs, adapters.deep_agents, interfaces.http, adapters.postgres (+2)
 Verify: uv run pytest tests/unit/authoring tests/unit/control_plane
 <!-- END:sdlc-module -->

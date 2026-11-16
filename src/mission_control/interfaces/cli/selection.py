@@ -1,8 +1,10 @@
 """`missionctl search` and `missionctl workspace check`: the Selection Workspace.
 
-``search QUERY [--facet capability|lane|model|sandbox_profile|workflow_type]... [--lane PROFILE]
-[--limit N]`` prints one ranked, faceted answer (`mc.selection_search.v1`): each hit's stable
-ref (a Capability Pin, `lane:<profile>` or `model:<profile>`) and why it matched.
+``search [QUERY] [--facet capability|lane|model|sandbox_profile|workflow_type]... [--kind KIND]...
+[--lane PROFILE] [--limit N] [--offset N]`` prints one ranked, faceted answer
+(`mc.selection_search.v1`): each hit's stable ref (a Capability Pin, `lane:<profile>` or
+`model:<profile>`) and why it matched. Without QUERY it lists the facets by name instead
+(``--kind skill`` lists the published skills; ``--offset`` pages).
 ``workspace check DRAFT`` reads a draft selection (JSON, or YAML for ``.yaml``/``.yml``) and
 prints the decision (`mc.selection_check.v1`). Both post to the same routes the coordinator MCP
 tools ``mission_search`` and ``selection_check`` call through. A refused draft exits 6 (a
@@ -35,12 +37,19 @@ class SelectionClient(Protocol):
 
 def add_selection_parsers(groups: Any, common: argparse.ArgumentParser) -> None:
     search = groups.add_parser(
-        "search", parents=[common], help="search capabilities, lanes, models and types"
+        "search", parents=[common], help="search or list capabilities, lanes, models and types"
     )
-    search.add_argument("query")
+    search.add_argument("query", nargs="?", help="omit to list the facets by name")
     search.add_argument("--facet", action="append", dest="facets", choices=FACETS)
+    search.add_argument(
+        "--kind",
+        action="append",
+        dest="kinds",
+        help="a catalog kind for the capability facet, e.g. skill or mcp_server (repeatable)",
+    )
     search.add_argument("--lane", dest="lane_profile")
     search.add_argument("--limit", type=int)
+    search.add_argument("--offset", type=int, help="a listing's first row")
     workspace = groups.add_parser(
         "workspace", parents=[common], help="check a draft lane/model/capability selection"
     )
@@ -60,13 +69,17 @@ def read_draft(path: str) -> dict[str, Any]:
 
 
 def search_body(args: argparse.Namespace) -> dict[str, Any]:
-    body: dict[str, Any] = {"query": args.query}
+    body: dict[str, Any] = {"query": getattr(args, "query", None) or ""}
     if getattr(args, "facets", None):
         body["facets"] = sorted(set(args.facets))
+    if getattr(args, "kinds", None):
+        body["kinds"] = sorted(set(args.kinds))
     if getattr(args, "lane_profile", None):
         body["lane_profile"] = args.lane_profile
     if getattr(args, "limit", None) is not None:
         body["limit"] = args.limit
+    if getattr(args, "offset", None) is not None:
+        body["offset"] = args.offset
     return body
 
 

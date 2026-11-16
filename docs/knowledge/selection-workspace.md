@@ -9,7 +9,8 @@ questions:
   - Which lane, model and capabilities should this node use?
   - How does Mission Control search workflows, providers and configuration?
   - Why did selection check refuse my draft?
-updated: 2026-11-01
+  - How do I list every skill, MCP server or Workflow Type, and why was a search empty?
+updated: 2026-11-15
 ---
 
 # The Selection Workspace
@@ -36,6 +37,19 @@ scales. Each hit carries the ref a draft names (a Capability Pin, `lane:<profile
 `unavailable`. `lane_profile` narrows capabilities to that lane's `supported` host support and
 models to vendors the lane routes.
 
+A search is never silently empty (2026-11-15). **Listing:** an empty query lists the requested facets by
+name instead of ranking them: every lane, every Model Profile and every published definition of the facet's
+kinds, read from the published definitions (cached 30 s), never from the Search Projection, behind `offset`
+and `limit` with a `total`. `kinds` names the catalog kinds the capability facet answers with (any kind:
+`skill`, `mcp_server`, `watcher` ...); kinds without facets ask that facet only. A listed hit is `facet`,
+`ref`, `title` and a 60-character `summary` (`kind` where the facet holds several): fifty Workflow Types
+list in about 3,000 tokens. **Definition scan:** when the catalog search answers a query with nothing, the
+workspace searches one published definition by its own title; if the projection does not return it, the
+projection is not built (or is stale) for that kind, so the workspace scans the published definitions
+itself (name, kind, description) and says so: scanned hits carry the reason `definition scan`, `notes` names
+the scanned facets, and `catalog_search_mode` is `definition_scan` when no facet was ranked by the catalog
+(`definition_listing` for a listing). A scan has no semantic ranking and applies no selection policy.
+
 `check(draft)` reads a draft (`lane_profile`, `model_profile`, `family`, optional `data_class`,
 `capabilities` pins, `sandbox_profile` and `workflow_type` pins) and returns
 `mc.selection_check.v1`: the resolution seam's admission (`RuntimeResolver.admit`), the lane
@@ -56,7 +70,7 @@ launch process's deployment facts), served digests, prerequisites and the KS app
 | Transport | Search | Check |
 | --- | --- | --- |
 | HTTP (`interfaces/http/selection.py`, `catalog.read`) | `POST /v1/applications/{app}/selection/search` | `POST .../selection/check` |
-| missionctl (`interfaces/cli/selection.py`) | `search QUERY [--facet F]... [--lane P] [--limit N]` | `workspace check DRAFT.json\|yaml` (exit 6 when refused) |
+| missionctl (`interfaces/cli/selection.py`) | `search [QUERY] [--facet F]... [--kind K]... [--lane P] [--limit N] [--offset N]` | `workspace check DRAFT.json\|yaml` (exit 6 when refused) |
 | MCP (`interfaces/mcp/selection_tools.py`, `catalog.read`) | `mission_search` | `selection_check` |
 
 The coordinator MCP server registers both tools when a workspace is composed
@@ -81,7 +95,8 @@ names them, and the agent-skills seed carrying that guidance (1.0.4) is not the 
 not the product; a workspace-wide documentation search across repositories is specified, not built
 ([applications](applications.md)).
 
-Built / specified / goal: search and check are implemented and unit-tested; the live qualification of a
+Built / specified / goal: search, listing, the definition scan and check are implemented and unit-tested
+(in-memory ports); none of the listing or scan has run on a deployed server; the live qualification of a
 populated embedding projection and skill guidance are open; the dashboard use of search is a goal.
 
 ## Citations

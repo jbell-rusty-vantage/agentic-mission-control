@@ -36,12 +36,12 @@ Entrypoints:
 - subscriptions/
 - environments/ — Execution-environment resolution, preparation attestation and network projection…
 - missions/ — Mission Control application handlers over the durable runtime authority
-Also: resolution/, recovery/, agentic_components/, workspaces/, reactions/, capabilities/, streams/, chains/, signals/, subordinates/, coordinator/, prerequisites/, selection/, watchers/, human_tasks/, artifacts/, secrets/, ports/, effects/, installations/
+Also: resolution/, recovery/, agentic_components/, workspaces/, reactions/, capabilities/, streams/, chains/, signals/, subordinates/, coordinator/, prerequisites/, selection/, guide/, watchers/, human_tasks/, artifacts/, secrets/, ports/, effects/, installations/
 Tests: tests/unit/run_control, tests/integration/postgres/test_mission_control_lifecycle_postgres.py, tests/integration/postgres/test_mission_control_composition_postgres.py
 Invariants:
 - Never choose a provider fallback or install a permissive policy because a binding is missing.
 Explained by (docs/knowledge): provider-frames-and-transcript, lanes-and-harness, mission-chains, capabilities, interventions, mission-stream
 Decided by (docs/adr): ADR-0054, ADR-0004, ADR-0005, ADR-0006, ADR-0008
-Depends on: domain, domain.execution, domain.authoring, domain.frames, contracts, domain.programs (+5) · Used by: bootstrap, adapters.temporal, adapters, adapters.postgres, adapters.cursor, interfaces.http (+7)
+Depends on: domain, domain.execution, domain.authoring, contracts, domain.frames, domain.programs (+5) · Used by: bootstrap, adapters.temporal, adapters, adapters.postgres, adapters.cursor, interfaces.http (+7)
 Verify: uv run pytest tests/unit/run_control
 <!-- END:sdlc-module -->

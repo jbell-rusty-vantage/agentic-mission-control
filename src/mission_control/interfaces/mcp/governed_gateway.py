@@ -215,22 +215,13 @@ def register_governed_tools(
         context: Context,
     ) -> dict[str, object]:
         """Prepare a Governed Effect: record the intent to run one Mission Control-owned effect
-        tool for a run. Nothing is executed yet.
-
-        It is the first of three steps: prepare, review, then mission_governed_execute.
-        `tool_name` names the governed tool; an unknown name is refused. `arguments` is that
-        tool's own JSON object, so its fields depend on the tool: for example repo_pr, where
-        it is offered, takes {"repository": "...", "branch": "mc/<run>/<unit>", "base":
-        "main", "title": "...", "body": "..."}. `run_id`, `harness_execution_id`,
-        `generation` and `lane_profile` name the Harness Execution that asks; they are in the
-        `lane` section of mission_run_inspect. `lane_profile` is one of deep_agents,
-        cursor_local, cursor_cloud, claude_agent_sdk, codex, claude_cloud, codex_cloud,
-        claude_managed, codex_agents.
-        Returns `status`, `intent_id`, `tool_name` and `input_digest`. With status
-        pending_approval it also returns the `human_task` (id, version, review_digest) a
-        reviewer must resolve first (mission_approval_resolve); with status ready, execute
-        at once. Preparing the same call again returns the same intent.
-        """
+        tool for a run. Nothing is executed yet; it is the first of three steps (prepare,
+        review, then mission_governed_execute). Required: `tool_name`, `arguments` (that
+        tool's own JSON object), and `run_id`, `harness_execution_id`, `generation` and
+        `lane_profile` from the `lane` section of mission_run_inspect. Example `arguments`
+        for repo_pr: {"repository": "...", "branch": "mc/<run>/<unit>", "base": "main",
+        "title": "...", "body": "..."}. Returns `status` (pending_approval or ready) and
+        `intent_id`. Full shape: mission_describe('tool:mission_governed_prepare')."""
 
         async def invoke(principal: Any) -> object:
             request = GovernedPrepareRequest.model_validate(

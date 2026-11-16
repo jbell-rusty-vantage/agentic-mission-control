@@ -8,6 +8,14 @@ lists by reciprocal rank, so one answer carries a stable reference per hit (a Ca
 `lane:<profile>` or `model:<profile>`) and why it matched. A facet that cannot answer here (no
 catalog search composed, or the search store refused) is reported, never silently dropped.
 
+Two more answers keep a search from being silently empty. An empty query **lists** the requested
+facets instead of ranking them: every lane, every Model Profile and every published definition
+of the facet's catalog kinds, by name, behind `offset` and `limit`. A query the catalog search
+answers with nothing is checked against the published definitions: when the Search Projection
+does not return a published definition searched by its own title, the workspace scans the
+published definitions itself (name, kind, description) and says so: a note names the scanned
+facets, and `catalog_search_mode` is `definition_scan` when the catalog ranked none.
+
 `SelectionWorkspace.check` takes a draft (application, lane, model profile, family, data class,
 capability pins, sandbox profile pin, Workflow Type pin) and returns a structured decision:
 the resolution seam's admission (`RuntimeResolver.admit`: lane, application, model route, data
@@ -26,7 +34,8 @@ registry, a declaration or a catalog row.
 from __future__ import annotations
 
 import re
-from collections.abc import Iterable, Mapping, Sequence
+import time
+from collections.abc import Callable, Iterable, Mapping, Sequence
 from typing import Final, Literal, Protocol
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -54,6 +63,7 @@ from mission_control.domain.authoring.contracts import (
     PublishedDefinition,
     WorkflowTypeDefinition,
 )
+from mission_control.domain.capabilities.catalog_entry import capability_pin
 from mission_control.domain.capabilities.host_support import (
     CapabilityHostSupport,
     HostSupportStatus,
@@ -128,6 +138,15 @@ DRAFT_POINTERS: Final[Mapping[str, str]] = {
     DATA_CLASS_POINTER: "/data_class",
     FAMILY_POINTER: "/family",
 }
+# `catalog_search_mode` when the workspace answered from the published definitions itself.
+DEFINITION_LISTING: Final = "definition_listing"
+DEFINITION_SCAN: Final = "definition_scan"
+# How long the published definitions (and a Search Projection probe that found nothing) are
+# reused, in seconds, and how long a probe the projection answered is trusted.
+PUBLISHED_TTL_SECONDS: Final = 30.0
+PROJECTION_BUILT_TTL_SECONDS: Final = 600.0
+# A listed or scanned hit's summary: the first line of the description, at most this long.
+SUMMARY_CHARS: Final = 60
 NOT_CHECKED: Final[tuple[str, ...]] = (
     "lane compile and seal (RuntimeResolver.resolve steps 3-6): they need the compiled node "
     "configuration and the launch process's deployment facts; run `missionctl mission compile`",
@@ -176,29 +195,54 @@ class _Frozen(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
 
+def _absent(value: object) -> bool:
+    return value is None
+
+
+def _empty(value: object) -> bool:
+    return not value
+
+
+class SelectionCatalogUnavailable(RuntimeError):
+    """No catalog is composed for this workspace, so nothing can be listed or read by pin."""
+
+
 class SelectionSearchRequest(_Frozen):
-    query: str = Field(min_length=1, max_length=2_000)
+    # Empty (or blank): list the requested facets by name instead of ranking them.
+    query: str = Field(default="", max_length=2_000)
     facets: frozenset[Facet] = frozenset(FACETS)
+    # The catalog kinds the capability facet answers with, instead of its node-attachable
+    # default (`FACET_KINDS`); any catalog kind may be named (`watcher`, `prompt`, ...).
+    # Naming kinds without facets asks the capability facet only.
+    kinds: frozenset[DefinitionKind] = frozenset()
     # Narrows capabilities to those whose host support marks this lane `supported`, and models
     # to those whose vendor the lane routes (`native` or `emulated`).
     lane_profile: str | None = Field(default=None, min_length=1, max_length=64)
     limit: int = Field(default=20, ge=1, le=100)
+    # A listing's first row (ranked searches ignore it).
+    offset: int = Field(default=0, ge=0, le=100_000)
     # Per catalog-backed facet.
     catalog_limit: int = Field(default=10, ge=1, le=50)
 
 
 class SelectionHit(_Frozen):
+    """One hit. A listed hit is small on purpose: `score`, `facet_rank`, `reasons` and
+    `details` are left out of its dump (nothing was ranked), and `kind` where the facet holds
+    one kind; the guide's describe reads the rest by `ref`."""
+
     facet: Facet
     # What a draft names: a Capability Pin, `lane:<profile>` or `model:<profile>`.
     ref: str
     title: str
     summary: str
-    # Reciprocal-rank merge score across facets, then the rank inside the facet.
-    score: float
-    facet_rank: int = Field(ge=1)
-    reasons: tuple[str, ...] = Field(min_length=1)
+    # A catalog hit's kind (`skill`, `mcp_server`, `workflow_type`, ...).
+    kind: str | None = Field(default=None, exclude_if=_absent)
+    # Reciprocal-rank merge score across facets, then the rank inside the facet (from 1).
+    score: float = Field(default=0.0, exclude_if=lambda value: value == 0.0)
+    facet_rank: int = Field(default=0, ge=0, exclude_if=lambda value: value == 0)
+    reasons: tuple[str, ...] = Field(default=(), exclude_if=_empty)
     # Facet-specific facts: supported lanes, qualification, routes, kind.
-    details: dict[str, object] = Field(default_factory=dict)
+    details: dict[str, object] = Field(default_factory=dict, exclude_if=_empty)
 
 
 class FacetUnavailable(_Frozen):
@@ -212,8 +256,16 @@ class SelectionSearchResult(_Frozen):
     facets: tuple[Facet, ...]
     hits: tuple[SelectionHit, ...]
     unavailable: tuple[FacetUnavailable, ...] = ()
-    # The catalog's own mode (`hybrid` or `lexical`) when a catalog facet answered.
+    # Who answered the catalog facets: the catalog's own mode (`hybrid` or `lexical`), or the
+    # workspace over the published definitions (`definition_listing`; `definition_scan` when
+    # it scanned every facet that answered; `notes` names the scanned facets either way).
     catalog_search_mode: str | None = None
+    mode: Literal["search", "listing"] = "search"
+    # A listing: how many rows the requested facets hold in all, and where this page starts.
+    total: int | None = Field(default=None, exclude_if=_absent)
+    offset: int = Field(default=0, exclude_if=lambda value: value == 0)
+    # What the caller must know to read the hits honestly (an unbuilt Search Projection).
+    notes: tuple[str, ...] = Field(default=(), exclude_if=_empty)
 
 
 class SelectionDraft(_Frozen):
@@ -321,6 +373,7 @@ class SelectionWorkspace:
         catalog_scope: str | None = None,
         search: CapabilitySearchPort | None = None,
         definitions: object | None = None,
+        clock: Callable[[], float] = time.monotonic,
     ) -> None:
         self._application_id = application_id
         self._lanes = lanes
@@ -331,39 +384,169 @@ class SelectionWorkspace:
         self._search = search
         # `CatalogDefinitions` (`find_by_pin` or `list_published_definitions`).
         self._definitions = definitions
+        self._clock = clock
+        # (read at, rows): the published definitions, reused for `PUBLISHED_TTL_SECONDS`.
+        self._definition_cache: tuple[float, tuple[PublishedDefinition, ...]] | None = None
+        # Per catalog kind: (probed at, whether the Search Projection answered the probe).
+        self._projection_probes: dict[DefinitionKind, tuple[float, bool]] = {}
 
     @property
     def application_id(self) -> str:
         return self._application_id
 
+    # -- the published definitions ---------------------------------------------------------------
+
+    async def published_definitions(self) -> tuple[PublishedDefinition, ...]:
+        """Every published catalog definition of this scope, retired ones excluded, read once
+        per `PUBLISHED_TTL_SECONDS`. `SelectionCatalogUnavailable` when no catalog is composed."""
+
+        lister = getattr(self._definitions, "list_published_definitions", None)
+        if not callable(lister):
+            raise SelectionCatalogUnavailable("no catalog is composed for this application")
+        now = self._clock()
+        cached = self._definition_cache
+        if cached is not None and now - cached[0] < PUBLISHED_TTL_SECONDS:
+            return cached[1]
+        rows = tuple(row for row in await lister() if row.retired_at is None)
+        self._definition_cache = (now, rows)
+        return rows
+
+    async def find_published(self, pin: CapabilityPin) -> PublishedDefinition | None:
+        """The published row a Capability Pin names (`SelectionCatalogUnavailable` without a
+        catalog)."""
+
+        if self._definitions is None:
+            raise SelectionCatalogUnavailable("no catalog is composed for this application")
+        return await find_published_by_pin(self._definitions, pin)
+
     # -- search ----------------------------------------------------------------------------------
 
     async def search(self, request: SelectionSearchRequest) -> SelectionSearchResult:
-        tokens = _tokens(request.query)
+        query = " ".join(request.query.split())
+        facets = _requested_facets(request)
+        if not query:
+            return await self._listing(request, facets)
+        tokens = _tokens(query)
         ranked: dict[Facet, list[tuple[float, SelectionHit]]] = {}
         unavailable: list[FacetUnavailable] = []
-        mode: str | None = None
-        for facet in FACETS:
-            if facet not in request.facets:
-                continue
+        # Facet -> the published definition the Search Projection did not return.
+        scanned: dict[Facet, str] = {}
+        modes: list[str] = []
+        for facet in facets:
             if facet == "lane":
                 ranked[facet] = self._lane_hits(tokens)
             elif facet == "model":
                 ranked[facet] = self._model_hits(tokens, request.lane_profile)
             else:
-                outcome = await self._catalog_hits(facet, request)
+                outcome = await self._catalog_hits(facet, request, query)
                 if isinstance(outcome, FacetUnavailable):
                     unavailable.append(outcome)
                 else:
-                    ranked[facet], facet_mode = outcome
-                    mode = mode or facet_mode
+                    ranked[facet], facet_mode, probe = outcome
+                    modes.append(facet_mode)
+                    if probe is not None:
+                        scanned[facet] = probe
+        # The catalog's own mode where its search answered a facet; `definition_scan` only when
+        # the workspace scanned every facet that answered. The note names the scanned facets.
+        ranked_modes = [mode for mode in modes if mode != DEFINITION_SCAN]
         return SelectionSearchResult(
-            query=request.query,
-            facets=tuple(facet for facet in FACETS if facet in request.facets),
+            query=query,
+            facets=facets,
             hits=_merge(ranked, request.limit),
             unavailable=tuple(unavailable),
-            catalog_search_mode=mode,
+            catalog_search_mode=(ranked_modes or modes or [None])[0],
+            notes=(_scan_note(scanned),) if scanned else (),
         )
+
+    async def _listing(
+        self, request: SelectionSearchRequest, facets: tuple[Facet, ...]
+    ) -> SelectionSearchResult:
+        """Every row of the requested facets by name; `offset` and `limit` window the whole."""
+
+        rows: list[SelectionHit] = []
+        unavailable: list[FacetUnavailable] = []
+        mode: str | None = None
+        for facet in facets:
+            if facet == "lane":
+                listed = self._lane_listing()
+            elif facet == "model":
+                listed = self._model_listing(request.lane_profile)
+            else:
+                try:
+                    listed = await self._catalog_listing(facet, request)
+                except SelectionCatalogUnavailable as error:
+                    unavailable.append(FacetUnavailable(facet=facet, reason=str(error)))
+                    continue
+                mode = DEFINITION_LISTING
+            rows += listed
+        return SelectionSearchResult(
+            query="",
+            facets=facets,
+            hits=tuple(rows[request.offset : request.offset + request.limit]),
+            unavailable=tuple(unavailable),
+            catalog_search_mode=mode,
+            mode="listing",
+            total=len(rows),
+            offset=request.offset,
+        )
+
+    def _lane_listing(self) -> list[SelectionHit]:
+        hits: list[SelectionHit] = []
+        for profile in self._lanes.profiles():
+            describe = self._lanes.describe(profile)
+            hits.append(_listed("lane", f"lane:{profile}", profile, _lane_summary(describe)))
+        return hits
+
+    def _model_listing(self, lane_profile: str | None) -> list[SelectionHit]:
+        hits: list[SelectionHit] = []
+        for profile in self._models.profiles():
+            model = self._models.get(profile)
+            if lane_profile is not None and self._routes(model).get(lane_profile) not in {
+                "native",
+                "emulated",
+            }:
+                continue
+            hits.append(
+                _listed("model", f"model:{profile}", profile, f"{model.vendor} {model.model_id}")
+            )
+        return hits
+
+    async def _catalog_listing(
+        self, facet: Facet, request: SelectionSearchRequest
+    ) -> list[SelectionHit]:
+        rows = await self._facet_rows(facet, request)
+        # A facet that answers with one kind names it once, as the facet.
+        mixed = len(_facet_kinds(facet, request)) > 1
+        return [
+            _listed(
+                facet,
+                capability_pin(row).render(),
+                row.definition.title,
+                _one_line(row.definition.description),
+                kind=row.ref.kind.value if mixed else None,
+            )
+            for row in rows
+        ]
+
+    async def _facet_rows(
+        self, facet: Facet, request: SelectionSearchRequest
+    ) -> list[PublishedDefinition]:
+        """The facet's published definitions by name, under the request's kind and lane
+        filters (the lane filter keeps rows whose host support marks the lane `supported`)."""
+
+        kinds = _facet_kinds(facet, request)
+        lane = request.lane_profile if facet == "capability" else None
+        rows = [
+            row
+            for row in await self.published_definitions()
+            if row.ref.kind in kinds
+            and (
+                lane is None
+                or _host_status(getattr(row.definition, "host_support", None), lane) == "supported"
+            )
+        ]
+        rows.sort(key=lambda row: (row.ref.logical_id, row.ref.revision))
+        return rows
 
     def _lane_hits(self, tokens: frozenset[str]) -> list[tuple[float, SelectionHit]]:
         hits: list[tuple[float, SelectionHit]] = []
@@ -410,14 +593,17 @@ class SelectionWorkspace:
                 details.update(families=families, model_routes=routes, items=items)
             score, reasons = _score(tokens, fields, FACET_WORDS["lane"], "lane")
             if score > 0:
-                summary = (
-                    f"{describe.lane} lane, {describe.placement} placement, "
-                    f"{'qualified' if describe.qualified else 'unqualified'}"
-                )
                 hits.append(
                     (
                         score,
-                        _hit("lane", f"lane:{profile}", profile, summary, reasons, details),
+                        _hit(
+                            "lane",
+                            f"lane:{profile}",
+                            profile,
+                            _lane_summary(describe),
+                            reasons,
+                            details,
+                        ),
                     )
                 )
         # Ties keep the default lane first, then the profile order.
@@ -481,8 +667,11 @@ class SelectionWorkspace:
         return routes
 
     async def _catalog_hits(
-        self, facet: Facet, request: SelectionSearchRequest
-    ) -> tuple[list[tuple[float, SelectionHit]], str] | FacetUnavailable:
+        self, facet: Facet, request: SelectionSearchRequest, query: str
+    ) -> tuple[list[tuple[float, SelectionHit]], str, str | None] | FacetUnavailable:
+        """The facet's ranked hits, who ranked them and, when that was the definition scan,
+        the published definition the Search Projection did not return."""
+
         if self._search is None or self._catalog_scope is None:
             return FacetUnavailable(
                 facet=facet, reason="no capability search is composed for this application"
@@ -498,22 +687,97 @@ class SelectionWorkspace:
         try:
             response = await self._search.search(
                 CapabilitySearchRequest(
-                    query=request.query,
-                    kinds=FACET_KINDS[facet],
+                    query=query,
+                    kinds=_facet_kinds(facet, request),
                     tenant_scope=self._catalog_scope,
                     host_profiles=host_profiles,
                     limit=request.catalog_limit,
                 )
             )
+            hits: list[tuple[float, SelectionHit]] = []
+            for hit in response.hits:
+                ref = _catalog_ref(hit)
+                if ref is None:
+                    continue
+                hits.append((hit.fused_rank, _catalog_hit(facet, ref, hit, response.search_mode)))
+            if hits:
+                return hits, response.search_mode, None
+            scanned = await self._definition_scan(facet, request, query)
         except CapabilitySearchUnavailable as error:
             return FacetUnavailable(facet=facet, reason=str(error))
-        hits: list[tuple[float, SelectionHit]] = []
-        for hit in response.hits:
-            ref = _catalog_ref(hit)
-            if ref is None:
-                continue
-            hits.append((hit.fused_rank, _catalog_hit(facet, ref, hit, response.search_mode)))
-        return hits, response.search_mode
+        if scanned is None:
+            # The Search Projection answers for this scope: the query matched nothing.
+            return [], response.search_mode, None
+        return scanned
+
+    async def _definition_scan(
+        self, facet: Facet, request: SelectionSearchRequest, query: str
+    ) -> tuple[list[tuple[float, SelectionHit]], str, str] | None:
+        """The fallback behind an empty catalog answer: `None` when the facet holds no
+        published definition or the Search Projection answers a probe, else a lexical scan of
+        the published definitions with the name of the definition the probe searched for."""
+
+        try:
+            rows = await self._facet_rows(facet, request)
+        except SelectionCatalogUnavailable:
+            return None
+        if not rows or await self._projection_answers(rows[0]):
+            return None
+        tokens = frozenset(_stem(token) for token in _tokens(query))
+        scored: list[tuple[float, PublishedDefinition, tuple[str, ...]]] = []
+        for row in rows:
+            fields = [
+                ("name", row.ref.logical_id, 3.0),
+                ("title", row.definition.title, 3.0),
+                ("kind", row.ref.kind.value, 2.0),
+                ("description", row.definition.description, 1.0),
+            ]
+            score, reasons = _score(tokens, fields, frozenset(), facet, stem=True)
+            if score > 0:
+                scored.append((score, row, reasons))
+        scored.sort(key=lambda item: (-item[0], item[1].ref.logical_id, item[1].ref.revision))
+        hits = [
+            (
+                score,
+                _hit(
+                    facet,
+                    capability_pin(row).render(),
+                    row.definition.title,
+                    _one_line(row.definition.description),
+                    ("definition scan", *reasons[:2]),
+                    {"kind": row.ref.kind.value},
+                    kind=row.ref.kind.value,
+                ),
+            )
+            for score, row, reasons in scored[: request.catalog_limit]
+        ]
+        return hits, DEFINITION_SCAN, rows[0].ref.logical_id
+
+    async def _projection_answers(self, probe: PublishedDefinition) -> bool:
+        """Whether the Search Projection returns a published definition searched by its own
+        title. Remembered per catalog kind: a projection that answered stays built for
+        `PROJECTION_BUILT_TTL_SECONDS`; one that did not is asked again after
+        `PUBLISHED_TTL_SECONDS`, so a rebuild is noticed soon."""
+
+        now = self._clock()
+        cached = self._projection_probes.get(probe.ref.kind)
+        if cached is not None and now - cached[0] < (
+            PROJECTION_BUILT_TTL_SECONDS if cached[1] else PUBLISHED_TTL_SECONDS
+        ):
+            return cached[1]
+        answered = False
+        if self._search is not None and self._catalog_scope is not None:
+            response = await self._search.search(
+                CapabilitySearchRequest(
+                    query=probe.definition.title,
+                    kinds=frozenset({probe.ref.kind}),
+                    tenant_scope=self._catalog_scope,
+                    limit=1,
+                )
+            )
+            answered = bool(response.hits)
+        self._projection_probes[probe.ref.kind] = (now, answered)
+        return answered
 
     # -- check -----------------------------------------------------------------------------------
 
@@ -835,18 +1099,74 @@ def _tokens(text: str) -> frozenset[str]:
     return frozenset(re.findall(r"[a-z0-9]+", text.lower()))
 
 
+def _stem(token: str) -> str:
+    """A plural folded onto its singular (`skills` finds the kind `skill`); nothing more."""
+
+    return token[:-1] if len(token) > 3 and token.endswith("s") else token
+
+
+def _requested_facets(request: SelectionSearchRequest) -> tuple[Facet, ...]:
+    """The facets in their fixed order; kinds named without facets ask capabilities only."""
+
+    if request.kinds and "facets" not in request.model_fields_set:
+        return ("capability",)
+    return tuple(facet for facet in FACETS if facet in request.facets)
+
+
+def _facet_kinds(facet: Facet, request: SelectionSearchRequest) -> frozenset[DefinitionKind]:
+    if facet == "capability" and request.kinds:
+        return request.kinds
+    return FACET_KINDS[facet]
+
+
+def _one_line(text: str) -> str:
+    line = " ".join(text.split("\n", 1)[0].split())
+    return line if len(line) <= SUMMARY_CHARS else line[: SUMMARY_CHARS - 3].rstrip() + "..."
+
+
+def _scan_note(scanned: Mapping[Facet, str]) -> str:
+    """What a caller must know about hits the workspace scanned for itself: which facets,
+    the evidence that the Search Projection does not hold them, and what a scan lacks."""
+
+    probe = next(iter(scanned.values()))
+    return (
+        f"{', '.join(scanned)}: the catalog Search Projection did not return a published "
+        f"definition searched by its own title ({probe}), so it is not built or is stale for "
+        "this catalog scope; these hits come from a lexical scan of the published definitions "
+        "(name, kind, description), without semantic ranking or the catalog's selection policy"
+    )
+
+
+def _lane_summary(describe: LaneDescribe) -> str:
+    return (
+        f"{describe.lane} lane, {describe.placement} placement, "
+        f"{'qualified' if describe.qualified else 'unqualified'}"
+    )
+
+
+def _listed(
+    facet: Facet, ref: str, title: str, summary: str, *, kind: str | None = None
+) -> SelectionHit:
+    """A listed row: nothing was ranked, so it carries no score, rank, reasons or details."""
+
+    return SelectionHit(facet=facet, ref=ref, title=title, summary=summary, kind=kind)
+
+
 def _score(
     tokens: frozenset[str],
     fields: Iterable[tuple[str, str, float]],
     facet_words: frozenset[str],
     facet: str,
+    *,
+    stem: bool = False,
 ) -> tuple[float, tuple[str, ...]]:
     """Weighted token overlap: each field adds its weight once per query token it contains."""
 
     score = 0.0
     reasons: list[str] = []
     for label, value, weight in fields:
-        matched = sorted(tokens & _tokens(value))
+        words = _tokens(value)
+        matched = sorted(tokens & (frozenset(_stem(word) for word in words) if stem else words))
         if matched:
             score += weight * len(matched)
             reasons.append(f"{label} {value!r} matches {', '.join(matched)}")
@@ -864,6 +1184,8 @@ def _hit(
     summary: str,
     reasons: tuple[str, ...],
     details: dict[str, object],
+    *,
+    kind: str | None = None,
 ) -> SelectionHit:
     # Score and rank are placeholders until the merge assigns them.
     return SelectionHit(
@@ -871,6 +1193,7 @@ def _hit(
         ref=ref,
         title=title,
         summary=summary,
+        kind=kind,
         score=0.0,
         facet_rank=1,
         reasons=reasons,
@@ -905,6 +1228,7 @@ def _catalog_hit(facet: Facet, ref: str, hit: CapabilitySearchHit, mode: str) ->
             "supported_profiles": [profile.value for profile in hit.supported_profiles],
             "authorization_state": str(hit.authorization_state),
         },
+        kind=hit.kind.value,
     )
 
 
@@ -980,6 +1304,8 @@ def _workspace_refusal(
 
 
 __all__ = [
+    "DEFINITION_LISTING",
+    "DEFINITION_SCAN",
     "FACETS",
     "FACET_KINDS",
     "SELECTION_CHECK_SCHEMA",
@@ -992,6 +1318,7 @@ __all__ = [
     "ModelFit",
     "PinFit",
     "SelectionAdmission",
+    "SelectionCatalogUnavailable",
     "SelectionCheck",
     "SelectionDraft",
     "SelectionHit",

@@ -2,7 +2,7 @@
 type: Concept
 category: surfaces
 title: Public interfaces
-description: The HTTP routers mounted by the configured API (all nineteen, including ingress, cognition points and closures, artifacts, run evidence, coordinator inbox, output inspection and knowledge reviews), the /missions Socket.IO entrypoint, missionctl command groups, the coordinator and operator MCP tool families, the implemented scope and error vocabulary and the OAuth rule; what is not built.
+description: The HTTP routers mounted by the configured API (all twenty, including the guide, ingress, cognition points and closures, artifacts, run evidence, coordinator inbox, output inspection and knowledge reviews), the /missions Socket.IO entrypoint, missionctl command groups, the coordinator and operator MCP tool families, the implemented scope and error vocabulary and the OAuth rule; what is not built.
 tags: [mission-control, interfaces, http, cli, mcp, implementation]
 aliases: [public API, HTTP routers, missionctl groups, MCP tools]
 questions:
@@ -10,7 +10,7 @@ questions:
   - Which prefix does a given route live under and who may call it?
   - Why did the API answer unauthorized, stale_version or installation_unavailable?
   - Which surfaces are specified but not built?
-updated: 2026-11-01
+updated: 2026-11-15
 ---
 
 # Public interfaces
@@ -23,7 +23,7 @@ How agents drive these surfaces (the skill router, `missionctl` grammar, MCP onb
 
 ## HTTP routers mounted by the configured API
 
-`bootstrap/api.py:964-982` includes nineteen routers (`create_app`); `GET /health/live` and
+`bootstrap/api.py:1101-1120` includes twenty routers (`create_app`); `GET /health/live` and
 `GET /health/ready` (503 `installation_unavailable`) are on the app itself. All paths are under the
 scoped prefix unless stated.
 
@@ -33,7 +33,8 @@ scoped prefix unless stated.
 | `ingress` (prefix `/v1/ingress/{application_id}`) | `POST signals`, `artifacts:prepare`, `artifacts:commit`, `provider/cursor/{run_ref}`, `provider/{provider}`, `github`, `missions:request`; `GET missions:request/{request_id}` ([signal ingress](signal-ingress.md)) |
 | `catalog` (`/catalog`) | `GET definitions`, `pins/{pin}`; `POST resolve`, `search`, `discover`, `inspect`, `components/search`, `publish:prepare`, `publish:complete`, `pin`, `render` ([capabilities](capabilities.md)) |
 | `lanes`, `models` | `/lanes` list and `{lane_profile}`; `/models` list and `{profile}` with every lane's route verdict ([model catalog](model-catalog.md)) |
-| `selection` (`/selection`) | `POST search`, `POST check` ([selection workspace](selection-workspace.md)) |
+| `selection` (`/selection`) | `POST search` (ranked, or a listing without a query), `POST check` ([selection workspace](selection-workspace.md)) |
+| `guide` | `GET guide`, `guide/{topic}` (`?surface=http\|cli\|mcp`), `describe?ref=`: how to use the server and everything about one lane, model, feature, tool request or capability (`application/guide`, `catalog.read`) |
 | `stop_fence`, `continuation` | `GET runs/{id}/stop-fence`; `GET runs/{id}/checkpoints[/{checkpoint_id}]` |
 | `transcript` | `GET runs/{id}/transcript`, `frames/tail`, `runs`, `runs/{id}/transcript/search` ([transcript](provider-frames-and-transcript.md)) |
 | `cognition_points` | `GET runs/{id}/points`, `points/{point_id}`, `state-as-of`, `closure`, `frames`, `replay`; `GET runs/{id}/closures`; `POST runs/{id}/points:reconcile` ([joinability](unit-and-point-joinability.md), [workspace closure](workspace-closure.md)) |
@@ -66,7 +67,7 @@ pointer until the operator's launch bindings bind every node ([mission manifest]
 | `mission`, `chain` | `schema`, `compile --offline`, `submit`, `start`; `chain inspect` |
 | `subscribe`, `events`, `wait`, `inbox` | `create\|list\|close`; `watch --after-seq`; `wait`; `inbox list\|ack\|observe\|content\|attention` |
 | `lane`, `model`, `catalog` | `list`, `describe`, `async-graphs`; `catalog list\|resolve\|search\|discover\|inspect\|components\|pin\|render\|publish` |
-| `search`, `workspace check` | [selection workspace](selection-workspace.md) |
+| `search`, `workspace check`, `guide [TOPIC]`, `describe REF` | [selection workspace](selection-workspace.md); the guide as Markdown in `missionctl` words (`--json`: the envelope) |
 | `outputs`, `knowledge` | `outputs show\|revisions\|events\|plans\|plan`; `knowledge review` |
 | `setup`, `prereq`, `preflight`, `token` | [owner prerequisites](owner-prerequisites.md), [operations](operations.md); `token mint` writes a file, never stdout |
 
@@ -77,7 +78,7 @@ inputs; HTTP is allowed only to loopback. Exit codes (`cli/exits.py`): 0 success
 
 ## MCP
 
-Two servers share one tool family (`register_scoped_tools`, `mcp/coordinator_server.py:574`).
+Two servers share one tool family (`register_scoped_tools`, `mcp/coordinator_server.py:577`).
 
 - **Coordinator server** (`coordinator_server.py`, FastMCP Streamable HTTP, local runner `__main__.py`):
   catalog and launch facade (`coordinator_bootstrap`, `search_capabilities`, `get_capability`,
@@ -85,6 +86,10 @@ Two servers share one tool family (`register_scoped_tools`, `mcp/coordinator_ser
   `prepare_workflow_launch`, `launch_workflow`, `get_workflow_result`) plus the scoped tools.
 - **Operator server** (`operator_server.py`, `/v1/applications/{application_id}/mcp` on the configured API):
   the scoped tools without the catalog facade or `mission_subscribe`.
+- **Guide** (`guide_tools.py`): `mission_guide(topic)` is the start page or a topic (interview, workflows, lanes,
+  models, capabilities, launch, observe, control); `mission_describe(ref)` reads a `lane:`, `model:`, `feature:` or
+  `tool:` ref or a Capability Pin (`tool:<name>`: the full request of the four tools whose listing is short). Pages
+  are also resources `mc://guide/<topic>` and the prompt `interview_before_mission`; facts are generated per request.
 - **Scoped tool families:** manifests and chains (`mission_preflight`, `mission_manifest_compile\|submit`,
   `mission_run_start`, `mission_chain_inspect`); run control (`mission_command_send`, `mission_run_inspect`,
   `mission_run_fork`); transcript (`mission_run_transcript\|search\|list`); cognition points
@@ -113,15 +118,16 @@ and 503 in `interfaces/http/mission_control.py`; the coordinator uses upper-case
 ## Not built
 
 `GET /system` and `system describe`, `POST /context:select`, mission drafting and proposals
-(`mission_create`, `mission_proposal_create`, `mission_revision_activate`), interviews and stream
-tickets, `auth login`, `run retry|replay` (apart from `replay --dry-run`), `recovery get`, `--tenant`,
+(`mission_create`, `mission_proposal_create`, `mission_revision_activate`), interview records (the
+guide's `interview` topic is guidance; the brief travels as the manifest) and stream tickets,
+`auth login`, `run retry|replay` (apart from `replay --dry-run`), `recovery get`, `--tenant`,
 and a single unified error envelope (the cross-surface error contract is the parked fault-tolerance
 proposal, `docs/specs/fault-tolerance-2026-10/`). The HTTP inventory is hand-maintained; generating it
 from `bootstrap/api.py` is scheduled with the SDLC navigation slices.
 
 Built / specified / goal: all routers, CLI groups and MCP tools above are implemented; the inventory is
-tested (`tests/unit/mission_control/test_public_interfaces.py`) and the authenticated scoped runtime is
-integrated locally; OAuth for remote MCP and the dashboard control plane are goals.
+tested (`tests/unit/mission_control/test_public_interfaces.py`, `tests/unit/guide`); the authenticated scoped
+runtime is integrated locally and the guide is unit-tested only; OAuth for remote MCP and the dashboard are goals.
 
 ## Citations
 
@@ -139,10 +145,10 @@ integrated locally; OAuth for remote MCP and the dashboard control plane are goa
   [run control grants](../../src/mission_control/interfaces/http/run_control.py),
   [CLI](../../src/mission_control/interfaces/cli/main.py), [exit codes](../../src/mission_control/interfaces/cli/exits.py),
   [coordinator MCP](../../src/mission_control/interfaces/mcp/coordinator_server.py),
-  [operator MCP](../../src/mission_control/interfaces/mcp/operator_server.py),
+  [operator MCP](../../src/mission_control/interfaces/mcp/operator_server.py), [guide](../../src/mission_control/application/guide/service.py),
   [MCP auth](../../src/mission_control/interfaces/mcp/coordinator_auth.py),
   [realtime entrypoint](../../src/mission_control/bootstrap/realtime.py).
-- Tests: [public interfaces](../../tests/unit/mission_control/test_public_interfaces.py),
+- Tests: [public interfaces](../../tests/unit/mission_control/test_public_interfaces.py), [guide surface](../../tests/unit/guide/test_guide_surface.py),
   [manifest interfaces](../../tests/unit/authoring/test_manifest_interfaces.py),
   [chain interfaces](../../tests/unit/chains/test_chain_interfaces.py),
   [transcript interfaces](../../tests/unit/frames/test_transcript_interfaces.py),

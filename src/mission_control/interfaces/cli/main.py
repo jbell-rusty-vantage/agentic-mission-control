@@ -19,6 +19,7 @@ import httpx
 from mission_control.contracts.json import parse_json_object
 from mission_control.domain.capabilities.bundles import build_bundle_manifest, skipped
 from mission_control.interfaces.cli.exits import exit_status
+from mission_control.interfaces.cli.guide import add_guide_parsers, run_guide
 from mission_control.interfaces.cli.knowledge import add_knowledge_parsers, run_knowledge
 from mission_control.interfaces.cli.outputs import add_output_parsers, run_outputs
 from mission_control.interfaces.cli.selection import add_selection_parsers, run_selection
@@ -129,6 +130,17 @@ class MissionClient:
         if action not in {"search", "check"}:
             raise ValueError("unknown selection action")
         return self.client.post(f"{self.prefix}/selection/{action}", json=body)
+
+    def guide(self, topic: str | None, *, surface: str) -> httpx.Response:
+        """`guide [TOPIC]`: the start page or one topic, in the named vocabulary."""
+
+        path = f"{self.prefix}/guide" + (f"/{quote(topic, safe='')}" if topic else "")
+        return self.client.get(path, params={"surface": surface})
+
+    def describe(self, ref: str) -> httpx.Response:
+        """`describe REF`: everything about one lane, model, feature, tool or capability."""
+
+        return self.client.get(f"{self.prefix}/describe", params={"ref": ref})
 
     def catalog_pin(self, pin: str) -> httpx.Response:
         """FT-A8: inspect one Capability Pin (body, host support, members)."""
@@ -1178,7 +1190,10 @@ def lane_async_graphs(args: argparse.Namespace) -> int:
     return 0
 
 
-def main(argv: list[str] | None = None) -> int:
+def build_parser() -> argparse.ArgumentParser:
+    """The whole `missionctl` grammar: every group and verb (the guide names them, and a test
+    holds the guide to this tree)."""
+
     # Common options at every depth allow flags before or after subcommands.
     common = argparse.ArgumentParser(add_help=False, argument_default=argparse.SUPPRESS)
     common.add_argument("--application")
@@ -1472,7 +1487,13 @@ def main(argv: list[str] | None = None) -> int:
     add_knowledge_parsers(groups, common)
     # The Selection Workspace: one faceted search; a read-only check of a draft selection.
     add_selection_parsers(groups, common)
-    args = parser.parse_args(argv)
+    # The guide: how to use the server (start page, topics) and everything about one thing.
+    add_guide_parsers(groups, common)
+    return parser
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = build_parser().parse_args(argv)
     if args.group == "token":
         return run_token(args)
     if args.group == "mission" and (args.action == "schema" or getattr(args, "offline", False)):
@@ -1582,6 +1603,8 @@ def main(argv: list[str] | None = None) -> int:
                 return run_knowledge(client, args)
             if args.group in {"search", "workspace"}:
                 return run_selection(client, args)
+            if args.group in {"guide", "describe"}:
+                return run_guide(client, args)
             deadline = time.monotonic() + (deadline_seconds or 0)
             started = False
             # FT-F6: `run inspect --wait` returns early on a lifecycle, phase or terminal

@@ -151,6 +151,7 @@ from mission_control.bootstrap.composition import (
     compose_knowledge_review,
     temporal_cluster_identity,
 )
+from mission_control.bootstrap.guide import compose_guide
 from mission_control.bootstrap.lanes import (
     SESSION_LANES,
     describe_only_registry,
@@ -184,6 +185,7 @@ from mission_control.interfaces.http.chains import router as chains_router
 from mission_control.interfaces.http.cognition_points import router as cognition_points_router
 from mission_control.interfaces.http.continuation import router as continuation_router
 from mission_control.interfaces.http.coordinator_inbox import router as coordinator_inbox_router
+from mission_control.interfaces.http.guide import router as guide_router
 from mission_control.interfaces.http.human_tasks import router as human_tasks_router
 from mission_control.interfaces.http.ingress import router as ingress_router
 from mission_control.interfaces.http.knowledge_reviews import router as knowledge_reviews_router
@@ -776,18 +778,29 @@ def create_application(
                         # The Selection Workspace: one search and one read-only draft check
                         # over this catalog, the describe-only lanes and the application's
                         # Model Catalog and Application Profile (admission is the seam's own).
+                        selection_workspace = compose_selection_workspace(
+                            application_id=binding.application_id,
+                            lanes=application.state.mission_control_lanes,
+                            models=application.state.mission_control_model_catalogs[
+                                binding.application_id
+                            ],
+                            applications=compose_application_registry(
+                                get_settings().deployments_root, (binding.application_id,)
+                            ),
+                            catalog=catalog,
+                        )
                         application.state.mission_control_selection_workspaces[key] = (
-                            compose_selection_workspace(
-                                application_id=binding.application_id,
-                                lanes=application.state.mission_control_lanes,
-                                models=application.state.mission_control_model_catalogs[
-                                    binding.application_id
-                                ],
-                                applications=compose_application_registry(
-                                    get_settings().deployments_root, (binding.application_id,)
-                                ),
-                                catalog=catalog,
-                            )
+                            selection_workspace
+                        )
+                        # The guide: how to use this server (start page, topics, describe),
+                        # generated from the same registries and this workspace's catalog
+                        # reads; served by HTTP, missionctl and the operator MCP alike.
+                        application.state.mission_control_guides[key] = compose_guide(
+                            workspace=selection_workspace,
+                            lanes=application.state.mission_control_lanes,
+                            models=application.state.mission_control_model_catalogs[
+                                binding.application_id
+                            ],
                         )
                         # SPEC-03 (C3): the run transcript, read under the tenant scope.
                         transcripts = TranscriptService(
@@ -1070,6 +1083,7 @@ def create_application(
     application.state.mission_control_manifest_services = {}
     application.state.mission_control_model_catalogs = {}
     application.state.mission_control_selection_workspaces = {}
+    application.state.mission_control_guides = {}
     application.state.mission_control_compositions = {}
     application.state.mission_control_ready = False
     # FT-G1: the API lists and describes lanes; workers execute them.
@@ -1090,6 +1104,7 @@ def create_application(
     application.include_router(lanes_router)
     application.include_router(models_router)
     application.include_router(selection_router)
+    application.include_router(guide_router)
     application.include_router(stop_fence_router)
     application.include_router(transcript_router)
     application.include_router(cognition_points_router)

@@ -12,11 +12,11 @@ Entrypoints:
 - coordinator_auth.py
 - coordinator_resources.py
 - coordinator_prompts.py
-Also: cognition_point_tools.py, transcript_tools.py, run_control_tools.py, governed_elicitation.py, coordinator_http_client.py, selection_tools.py, knowledge_review_tools.py, coordinator_bootstrap.py
+Also: cognition_point_tools.py, transcript_tools.py, run_control_tools.py, guide_tools.py, selection_tools.py, governed_elicitation.py, knowledge_review_tools.py, coordinator_http_client.py, coordinator_bootstrap.py
 Tests: tests/unit/coordinator, tests/unit/subscriptions
 Explained by (docs/knowledge): authoring, interfaces, coordinator-surface, human-gates, wake-channels, coordinator-attention
 Decided by (docs/adr): ADR-0015, ADR-0049, ADR-0040, ADR-0022, ADR-0032
-Depends on: application, domain, adapters.postgres, contracts, bootstrap, application.authoring (+9) · Used by: bootstrap
+Depends on: application, domain, adapters.postgres, contracts, bootstrap, domain.authoring (+9) · Used by: bootstrap
 Verify: uv run pytest tests/unit/coordinator tests/unit/subscriptions
 Program: docs/specs/coordinator-surface-2026-10/LEDGER.md
 <!-- END:sdlc-module -->

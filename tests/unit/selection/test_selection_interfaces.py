@@ -2,7 +2,8 @@
 
 `POST /selection/search` and `/selection/check` behind the authenticated principal, the CLI's
 `search` and `workspace check` (JSON and YAML drafts, exit 6 on a refused draft) over the same
-app, and the `mission_search` / `selection_check` MCP tools in their envelope.
+app, and the `mission_search` / `selection_check` MCP tools in their envelope. A search
+without a query lists by name on all three, with the same kind filter and paging.
 """
 
 from __future__ import annotations
@@ -32,6 +33,7 @@ from tests.fixtures.catalog_http import INSTALLATION, TENANT, CatalogHarness, ca
 from tests.unit.selection.test_selection_workspace import (
     NARROW_WORKFLOW,
     RESEARCH,
+    REVIEW,
     _pin,
     _workspace,
 )
@@ -121,6 +123,55 @@ async def test_search_parity_across_http_cli_and_mcp(
     assert status == 0 and [hit["ref"] for hit in from_cli["hits"]] == refs
     assert from_mcp.data["ok"] is True, from_mcp.data
     assert [hit["ref"] for hit in from_mcp.data["data"]["hits"]] == refs
+
+
+async def test_listing_parity_without_a_query(
+    harness: CatalogHarness,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    from_http = harness.client.post(_url("search"), json={"kinds": ["skill"], "limit": 1})
+    assert from_http.status_code == 200, from_http.text
+    status, from_cli = run_cli(
+        harness, monkeypatch, capsys, "search", "--kind", "skill", "--limit", "1"
+    )
+    async with Client(_server(harness, frozenset({"catalog.read"}))) as mcp:
+        from_mcp = await mcp.call_tool("mission_search", {"kinds": ["skill"], "limit": 1})
+        second = await mcp.call_tool(
+            "mission_search", {"kinds": ["skill"], "limit": 1, "offset": 1}
+        )
+        lanes = await mcp.call_tool("mission_search", {"facets": ["lane"]})
+        invalid = await mcp.call_tool("mission_search", {"kinds": ["spell"]})
+
+    listed = from_http.json()
+    assert (listed["mode"], listed["total"], listed["facets"]) == ("listing", 2, ["capability"])
+    assert listed["catalog_search_mode"] == "definition_listing"
+    # A listed hit is small: no score, rank, reasons or details travel with it.
+    assert listed["hits"] == [
+        {
+            "facet": "capability",
+            "ref": _pin(REVIEW),
+            "title": "Skill code-review",
+            "summary": "The code-review procedure",
+        }
+    ]
+    assert status == 0 and from_cli == listed
+    assert from_mcp.data["ok"] is True and from_mcp.data["data"] == listed
+    assert [hit["ref"] for hit in second.data["data"]["hits"]] == [_pin(RESEARCH)]
+    assert second.data["data"]["offset"] == 1
+    assert [hit["ref"] for hit in lanes.data["data"]["hits"]] == [
+        "lane:claude_agent_sdk",
+        "lane:deep_agents",
+    ]
+    # A kind that is no catalog kind is refused with the kinds that are.
+    assert invalid.data["ok"] is False and invalid.data["error"]["code"] == "INVALID_ARGUMENT"
+    assert "skill" in invalid.data["error"]["message"]
+    assert harness.client.post(_url("search"), json={"kinds": ["spell"]}).status_code == 422
+    status, from_cli = run_cli(harness, monkeypatch, capsys, "search", "--facet", "lane")
+    assert status == 0 and [hit["ref"] for hit in from_cli["hits"]] == [
+        "lane:claude_agent_sdk",
+        "lane:deep_agents",
+    ]
 
 
 async def test_check_parity_and_the_blocked_exit(

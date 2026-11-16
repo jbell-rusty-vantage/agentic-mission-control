@@ -14,8 +14,7 @@ from typing import Annotated, Any
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, ConfigDict
 
-from mission_control.application.authoring.subagent_support import subagent_field_support
-from mission_control.application.resolution.model_listing import declared_model_routes
+from mission_control.application.resolution import lane_listing
 from mission_control.application.resolution.registries import (
     LaneRegistry,
     UnknownLaneProfile,
@@ -75,19 +74,9 @@ def list_lanes(registry: Registry) -> LaneList:
 
 @router.get("/{lane_profile}")
 def describe_lane(lane_profile: str, registry: Registry) -> dict[str, Any]:
+    # The one document every transport serves (`application/resolution/lane_listing.py`): the
+    # describe matrix, the lane's subagent field support and its declared model routes.
     try:
-        describe = registry.describe(lane_profile)
+        return lane_listing.describe_lane(registry, lane_profile)
     except UnknownLaneProfile:
         raise HTTPException(404, detail={"code": "lane_profile_not_registered"}) from None
-    payload = describe.model_dump(mode="json")
-    # P1 subagents: what the lane does with each `mc.subagent_profile.v1` field, served
-    # beside the persisted describe document (the same table compile enforces). Folding it
-    # into `mc.lane_describe.v2` itself is a lane-describe migration.
-    payload["subagent_fields"] = dict(subagent_field_support(describe.lane_profile))
-    # OC-R6: the vendors this lane routes, from its package declaration; `null` for a profile
-    # without a package registration in this process (its routes are declared nowhere here).
-    routes = declared_model_routes(registry, describe.lane_profile)
-    payload["model_routes"] = (
-        [route.model_dump(mode="json") for route in routes] if routes is not None else None
-    )
-    return payload

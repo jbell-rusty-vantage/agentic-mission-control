@@ -35,6 +35,7 @@ from mission_control.interfaces.mcp.governed_gateway import (
     ScopedGovernedEffects,
     register_governed_tools,
 )
+from mission_control.interfaces.mcp.guide_tools import ScopedGuide, register_guide_tools
 from mission_control.interfaces.mcp.human_task_tools import (
     ScopedHumanTasks,
     register_human_task_tools,
@@ -289,6 +290,7 @@ def create_coordinator_server(
     governed: ScopedGovernedEffects | None = None,
     points: ScopedCognitionPoints | None = None,
     selection: ScopedSelection | None = None,
+    guide: ScopedGuide | None = None,
 ) -> FastMCP:
     surface = getattr(
         facade,
@@ -554,6 +556,7 @@ def create_coordinator_server(
         governed=governed,
         points=points,
         selection=selection,
+        guide=guide,
     )
     unavailable_tools = set(PRODUCTION_COORDINATOR_TOOL_NAMES) - set(surface.tools)
     if unavailable_tools:
@@ -585,6 +588,7 @@ def register_scoped_tools(
     session_push: bool = True,
     points: ScopedCognitionPoints | None = None,
     selection: ScopedSelection | None = None,
+    guide: ScopedGuide | None = None,
 ) -> None:
     """The tenant-scoped operation tools, shared by the coordinator and operator servers.
 
@@ -592,6 +596,10 @@ def register_scoped_tools(
     offers it; the inbox tools register whenever the bridge carries inbox services.
     """
 
+    if guide is not None:
+        # The guide: how to use this server (start page, topics, describe), for an agent that
+        # has only the MCP server.
+        register_guide_tools(server, guide, principals, call=_principal_call)
     if subscriptions is not None:
         # MP-15 / SPEC-04 §6: the coordinator inbox tools, including the W2 inbox wait.
         register_subscription_tools(

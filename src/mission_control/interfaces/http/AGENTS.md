@@ -12,12 +12,12 @@ Entrypoints:
 - transcript.py — Run Transcript over HTTP
 - run_forks.py — /run-control/v1: safe macro snapshots and semantic forks
 - missions.py — Mission Manifest verbs over HTTP
-Also: catalog.py, subscriptions.py, human_tasks.py, run_evidence.py, knowledge_reviews.py, lanes.py, hook_callback.py, chains.py, models.py, selection.py, stop_fence.py, control_plane.py, runtime_inspection.py, graph_runtime_schemas.py, continuation.py, middleware/, dependencies.py
+Also: catalog.py, subscriptions.py, human_tasks.py, run_evidence.py, knowledge_reviews.py, hook_callback.py, lanes.py, chains.py, models.py, selection.py, stop_fence.py, control_plane.py, runtime_inspection.py, graph_runtime_schemas.py, guide.py, continuation.py, middleware/, dependencies.py
 Tests: tests/unit/mission_control/test_public_interfaces.py, tests/unit/mission_control/test_runtime_interfaces.py, tests/unit/frames, tests/unit/run_control
 Invariants:
 - Keep replay response semantics and structured rejection codes explicit.
 Explained by (docs/knowledge): interfaces, coordinator-attention, events-and-commands, provider-frames-and-transcript, budgets-and-usage, capabilities
 Decided by (docs/adr): ADR-0054, ADR-0004, ADR-0008, ADR-0011, ADR-0013
-Depends on: application, domain, adapters.postgres, contracts, domain.execution, application.authoring (+9) · Used by: bootstrap, adapters.agent_server, interfaces.mcp
+Depends on: application, domain, adapters.postgres, contracts, domain.execution, application.missions (+9) · Used by: bootstrap, adapters.agent_server, interfaces.mcp
 Verify: uv run pytest tests/unit/mission_control
 <!-- END:sdlc-module -->

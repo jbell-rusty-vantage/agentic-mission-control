@@ -1,8 +1,9 @@
 """Selection Workspace tools on the coordinator and operator MCP servers.
 
-- tool `mission_search(query, facets, lane_profile, limit)` (read-only; `catalog.read`): one
-  ranked answer over capabilities, lanes, models, sandbox profiles and Workflow Types, as
-  `POST /selection/search` returns it.
+- tool `mission_search(query, facets, kinds, lane_profile, limit, offset)` (read-only;
+  `catalog.read`): one ranked answer over capabilities, lanes, models, sandbox profiles and
+  Workflow Types, or without a query a listing of them by name, as `POST /selection/search`
+  returns it.
 - tool `selection_check(draft)` (read-only; `catalog.read`): whether a draft selection would be
   admitted, with typed refusals and what was not checked, as `POST /selection/check`.
 
@@ -15,12 +16,15 @@ from collections.abc import Mapping
 from typing import Annotated, Any
 
 from fastmcp import Context, FastMCP
+from pydantic import ValidationError
 
 from mission_control.application.selection.workspace import (
+    FACETS,
     SelectionDraft,
     SelectionSearchRequest,
     SelectionWorkspace,
 )
+from mission_control.domain.authoring.contracts import DefinitionKind
 from mission_control.domain.coordinator.errors import CoordinatorDomainError, CoordinatorErrorCode
 from mission_control.interfaces.mcp.mission_tools import (
     MissionToolPrincipal,
@@ -66,6 +70,20 @@ class ScopedSelection:
         return result.model_dump(mode="json")
 
 
+def search_request(values: Mapping[str, object]) -> SelectionSearchRequest:
+    """The search request, or an `INVALID_ARGUMENT` that names the facets and kinds."""
+
+    try:
+        return SelectionSearchRequest.model_validate(dict(values))
+    except ValidationError:
+        raise CoordinatorDomainError(
+            CoordinatorErrorCode.INVALID_ARGUMENT,
+            f"invalid search arguments: facets are {', '.join(FACETS)}; kinds are catalog "
+            f"kinds ({', '.join(kind.value for kind in DefinitionKind)}); limit is 1 to 100 "
+            "and offset is 0 or more",
+        ) from None
+
+
 def register_selection_tools(
     server: FastMCP,
     selection: ScopedSelection,
@@ -77,24 +95,30 @@ def register_selection_tools(
 
     @server.tool(name=SEARCH_TOOL, annotations={"readOnlyHint": True})
     async def mission_search(
-        query: str,
         context: Context,
+        query: str | None = None,
         facets: list[str] | None = None,
+        kinds: list[str] | None = None,
         lane_profile: str | None = None,
         limit: int = 20,
+        offset: int = 0,
     ) -> dict[str, object]:
-        """Search capabilities, lanes (harnesses), models, sandbox profiles and Workflow Types
-        at once. Each hit carries the ref a draft pins and why it matched; facets: capability,
-        lane, model, sandbox_profile, workflow_type. `lane_profile` narrows capabilities and
-        models to that lane."""
+        """Search or list what a mission can select: capabilities, lanes (harnesses), models,
+        sandbox profiles and Workflow Types. With `query`, one ranked answer; without it, a
+        listing by name (`limit`, `offset`, `total`). `facets`: capability, lane, model,
+        sandbox_profile, workflow_type. `kinds`: catalog kinds for the capability facet
+        (skill, mcp_server, hook_script ...). `lane_profile` narrows capabilities and models
+        to that lane. A hit's `ref` is what a draft pins and mission_describe reads."""
 
         async def invoke(principal: Any) -> object:
-            values: dict[str, object] = {"query": query, "limit": limit}
+            values: dict[str, object] = {"query": query or "", "limit": limit, "offset": offset}
             if facets:
                 values["facets"] = facets
+            if kinds:
+                values["kinds"] = kinds
             if lane_profile is not None:
                 values["lane_profile"] = lane_profile
-            return await selection.search(principal, SelectionSearchRequest.model_validate(values))
+            return await selection.search(principal, search_request(values))
 
         return await call(context, principals, invoke)
 
@@ -113,4 +137,10 @@ def register_selection_tools(
         return await call(context, principals, invoke)
 
 
-__all__ = ["CHECK_TOOL", "SEARCH_TOOL", "ScopedSelection", "register_selection_tools"]
+__all__ = [
+    "CHECK_TOOL",
+    "SEARCH_TOOL",
+    "ScopedSelection",
+    "register_selection_tools",
+    "search_request",
+]

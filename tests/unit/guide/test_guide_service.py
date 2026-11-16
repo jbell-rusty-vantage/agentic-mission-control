@@ -1,0 +1,504 @@
+"""The guide service over in-memory ports (no database, no network).
+
+The start page and the topics: what each must say, that every fact in them comes from the
+registries (a changed registry changes the page), the size each stays under, and that a page
+is written in the caller's vocabulary. Describe: one lane, model, feature, tool request and
+capability, and a typed refusal for anything else.
+"""
+
+from __future__ import annotations
+
+import json
+import re
+from typing import get_args
+
+import pytest
+
+from mission_control.application.guide.operations import SURFACES, Surface
+from mission_control.application.guide.pages import (
+    INDEX,
+    TOPIC_IDS,
+    insert_generated,
+    load_page,
+    parse_page,
+)
+from mission_control.application.guide.service import GuideRefused
+from mission_control.application.guide.tool_docs import TOOL_DOCS, tool_document
+from mission_control.application.resolution.lane_listing import describe_lane
+from mission_control.application.resolution.model_listing import describe_model
+from mission_control.application.resolution.registries import LaneRegistry, ModelCatalog
+from mission_control.domain.execution.lanes import DELIVERY_COMMANDS, LANE_PROFILES
+from tests.architecture.test_package_boundaries import APPLICATION_NEEDLES
+from tests.conformance.lanes.compile.stub import NARROW_DECLARATION, STUB_DECLARATION
+from tests.conformance.resolution.fixtures import MODELS
+from tests.unit.guide.support import APPLICATION, full_guide, stub_guide
+from tests.unit.selection.test_selection_workspace import (
+    OPEN_WORKFLOW,
+    RESEARCH,
+    ROWS,
+    _pin,
+    _registration,
+)
+
+# The owner's budgets, in tokens (characters of the rendered page divided by four).
+INDEX_TOKENS = 500
+TOPIC_TOKENS = 1_250
+
+
+def _tokens(text: str) -> int:
+    return len(text) // 4
+
+
+# -- the start page ------------------------------------------------------------------------------
+
+
+async def test_the_index_names_the_caller_the_jobs_and_their_topics() -> None:
+    page = await stub_guide().index("mcp")
+
+    assert page.topic == INDEX and page.surface == "mcp"
+    assert "You are the Coordinator" in page.markdown
+    # The six jobs in order, each with its topic.
+    jobs = [
+        ("Interview the user", "`interview`"),
+        ("Select lane, model, capabilities", "`lanes`"),
+        ("Author and launch", "`launch`"),
+        ("Check in on the run", "`observe`"),
+        ("Steer or fork", "`control`"),
+        ("Accept results", "`observe`"),
+    ]
+    positions = [page.markdown.index(job) for job, _topic in jobs]
+    assert positions == sorted(positions)
+    for job, topic in jobs:
+        row = next(line for line in page.markdown.splitlines() if job in line)
+        assert topic in row
+    # Every topic is reachable from the start page.
+    assert all(f"`{topic}`" in page.markdown for topic in TOPIC_IDS)
+    assert '`mission_guide("<topic>")`' in page.markdown
+    assert "`mission_run_start`" in page.markdown and "approval" in page.markdown
+
+
+async def test_the_index_reports_this_installation_from_the_registries() -> None:
+    page = await stub_guide().index()
+    without_catalog = await stub_guide(catalog=False).index()
+
+    assert f"application `{APPLICATION}`" in page.markdown
+    assert "`claude_agent_sdk`, `deep_agents`" in page.markdown
+    assert f"{len(MODELS)} Model Profiles" in page.markdown
+    assert f"{len(ROWS)} published catalog definitions" in page.markdown
+    assert "no catalog is composed" in without_catalog.markdown
+
+
+# -- topics --------------------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize("surface", SURFACES)
+async def test_every_page_renders_whole_on_every_surface(surface: Surface) -> None:
+    guide = stub_guide()
+    for topic in (INDEX, *TOPIC_IDS):
+        page = await guide.topic(topic, surface)
+        assert page.markdown.startswith(f"# {page.title}\n")
+        assert page.summary and page.surface == surface
+        # Nothing the service was meant to fill is left in the text.
+        assert "{op:" not in page.markdown and "{{" not in page.markdown
+        assert "\n\n\n" not in page.markdown
+
+
+async def test_pages_stay_inside_their_budget_with_every_lane_bound() -> None:
+    guide = full_guide()
+    index = await guide.index("mcp")
+    sizes = {topic: _tokens((await guide.topic(topic, "mcp")).markdown) for topic in TOPIC_IDS}
+
+    assert _tokens(index.markdown) <= INDEX_TOKENS, _tokens(index.markdown)
+    assert all(size <= TOPIC_TOKENS for size in sizes.values()), sizes
+
+
+async def test_the_interview_page_names_the_brief_and_real_manifest_fields() -> None:
+    from mission_control.domain.authoring.manifest import (
+        Budget,
+        Environment,
+        Goal,
+        Governors,
+        HumanTaskSpec,
+        InputBinding,
+        MissionBlock,
+        OutputDeclaration,
+        SideEffect,
+        SuccessCriterion,
+    )
+
+    page = await stub_guide().topic("interview")
+    text = page.markdown
+
+    assert "## 3. The brief, and where each part goes" in text
+    assert "Record each answer in the user's own words" in text
+    assert "No interview record is persisted yet" in text
+    for purpose in ("Research", "Building content", "Improving the system"):
+        assert f"- {purpose}:" in text
+    # Every manifest field the mapping names exists on the manifest models.
+    named = {
+        MissionBlock: ("title", "description", "goals", "environment", "program", "application"),
+        Goal: ("description", "importance", "criteria"),
+        SuccessCriterion: ("description", "evidence", "acceptance"),
+        Environment: (
+            "lane",
+            "model",
+            "capabilities",
+            "agents",
+            "hooks",
+            "plugins",
+            "budget",
+            "governors",
+            "side_effects",
+            "workspace",
+        ),
+        Budget: ("usd", "tokens", "wall_clock", "tool_calls"),
+        Governors: ("depth", "fan_out", "iterations", "rounds", "patience", "transfers"),
+        InputBinding: ("name", "artifact", "value"),
+        OutputDeclaration: ("name", "form", "requirements"),
+        HumanTaskSpec: ("kind", "prompt", "reviewers"),
+    }
+    for model, fields in named.items():
+        for field in fields:
+            assert field in model.model_fields, (model.__name__, field)
+            assert f"`{field}" in text or f".{field}" in text, field
+    assert all(f"`{effect.value}`" in text for effect in SideEffect)
+    assert f"`mission.application` is `{APPLICATION}`" in text
+    assert "`manifest: mission/v2` or `manifest: mission/v1`" in text
+    # The order of the last steps, and the stop before the consequential ones.
+    steps = ["selection_check", "mission_manifest_compile", "mission_preflight", "approval"]
+    assert [text.index(step) for step in steps] == sorted(text.index(step) for step in steps)
+    assert text.index("approval") < text.index("mission_manifest_submit", text.index("approval"))
+
+
+async def test_workflow_and_lane_tables_follow_the_lane_declarations() -> None:
+    guide = stub_guide()
+    workflows = (await guide.topic("workflows")).markdown
+    lanes = (await guide.topic("lanes")).markdown
+
+    assert "| `deep_agents` | native | native | unqualified | unqualified |" in workflows
+    assert "| `claude_agent_sdk` | native | unqualified | unqualified | unsupported |" in workflows
+    assert "This installation allows unqualified lanes" in workflows
+    assert "published Workflow Types: 2" in workflows
+    row = next(line for line in lanes.splitlines() if line.startswith("| `claude_agent_sdk`"))
+    # Placement, qualification, families, routed vendors and supported item kinds, each from
+    # the declaration: openai, middleware and subagent profiles are unsupported there.
+    assert "| worker_hosted | no |" in row
+    assert "StageGraph; unqualified: GoalDirected, ParallelSwarm" in row
+    assert "| anthropic |" in row and "openai" not in row
+    assert "middleware" not in row and "subagent_profile" not in row
+    assert "`deep_agents` (default)" in lanes
+    # The lane's feature registry, the unavailable rows apart.
+    assert "- `deep_agents`: filesystem, bash, todo_list" in lanes
+    assert "- `anthropic`: prompt_caching" in lanes
+    assert "`deep_agents.memory` (planned)" in lanes
+
+    one_lane = stub_guide(declarations=(STUB_DECLARATION,), allow_unqualified=False)
+    assert "claude_agent_sdk" not in (await one_lane.topic("lanes")).markdown
+    assert "does not allow unqualified lanes" in (await one_lane.topic("workflows")).markdown
+
+
+async def test_models_and_capabilities_are_generated() -> None:
+    guide = stub_guide()
+    models = (await guide.topic("models")).markdown
+    capabilities = (await guide.topic("capabilities")).markdown
+
+    for model in MODELS:
+        assert f"| `{model.profile}` | {model.vendor} | `{model.model_id}` |" in models
+    assert "never a raw model id" in models
+    assert "| `skill` | 2 |" in capabilities and "| `workflow_type` | 2 |" in capabilities
+    assert "| `sandbox_profile` | 1 |" in capabilities
+    assert "Discovered is not runnable" in capabilities
+    # A kind the catalog does not hold is not listed.
+    assert "`watcher`" not in capabilities
+
+    empty = (await stub_guide(catalog=False).topic("capabilities")).markdown
+    assert "No catalog is composed" in empty
+
+
+async def test_the_control_table_is_each_lane_s_own_matrix() -> None:
+    guide = full_guide()
+    text = (await guide.topic("control")).markdown
+    lines = text.splitlines()
+
+    header = next(line for line in lines if line.startswith("| Lane profile |"))
+    # Only what a Coordinator can send: no column for a command no public request carries.
+    assert "`hard_pause`" not in header
+    assert [name for name in DELIVERY_COMMANDS if f"`{name}`" in header] == [
+        "queue_instruction",
+        "interrupt_and_inject",
+        "pause",
+        "resume",
+        "cancel",
+        "fork",
+        "request_continuation",
+    ]
+    deep_agents = next(line for line in lines if line.startswith("| `deep_agents` |"))
+    assert "cooperative_inject" in deep_agents and "R3 / R3" in deep_agents
+    # Lanes that declare the same share one row; every bound lane is in the table once.
+    assert "| `claude_managed`, `codex_agents` |" in text
+    first_cells = " ".join(line.split("|")[1] for line in lines if line.startswith("| `"))
+    assert sorted(re.findall(r"`([a-z_]+)`", first_cells)) == sorted(LANE_PROFILES)
+    for word in ("cancel_and_replace", "wait_then_send", "Stop Fence", "in_doubt"):
+        assert word in text
+
+
+async def test_launch_and_observe_carry_the_rules() -> None:
+    guide = stub_guide()
+    launch = (await guide.topic("launch")).markdown
+    observe = (await guide.topic("observe")).markdown
+
+    assert "the only step that runs agents" in launch
+    assert "`ok: false`" in launch and "`blockers`" in launch and "`start_blockers`" in launch
+    assert "wait for their yes" in launch
+    assert "Wait; never poll" in observe
+    assert "One wait lasts at most 300 seconds" in observe
+    assert "`terminal_result`" in observe and "Execution is not acceptance" in observe
+
+
+async def test_one_page_speaks_each_transport_s_vocabulary() -> None:
+    guide = stub_guide()
+    mcp = (await guide.topic("launch", "mcp")).markdown
+    cli = (await guide.topic("launch", "cli")).markdown
+    http = (await guide.topic("launch", "http")).markdown
+
+    assert "`mission_manifest_compile`" in mcp and "missionctl" not in mcp
+    assert "`missionctl mission compile`" in cli and "mission_manifest_compile" not in cli
+    assert "`POST missions:compile`" in http
+    # An operation one transport lacks names the nearest transport that has it.
+    index = (await guide.index("cli")).markdown
+    assert (
+        "`POST human-tasks/{human_task_id}/resolutions` (HTTP route; no missionctl command)"
+        in index
+    )
+    # The judgment is the same text on every transport.
+    strip = re.compile(r"`[^`]*`( \([^)]*; no [^)]*\))?")
+    assert strip.sub("", mcp) == strip.sub("", cli) == strip.sub("", http)
+
+
+async def test_an_unknown_topic_is_refused_with_the_topics() -> None:
+    with pytest.raises(GuideRefused) as refused:
+        await stub_guide().topic("pricing")
+
+    assert refused.value.code == "unknown_topic"
+    assert refused.value.valid == TOPIC_IDS and "interview" in str(refused.value)
+
+
+# -- the page sources ----------------------------------------------------------------------------
+
+
+def test_pages_have_their_frontmatter_and_name_no_application() -> None:
+    for directory, names in (("pages", (INDEX, *TOPIC_IDS)), ("tools", tuple(TOOL_DOCS))):
+        for name in names:
+            page = load_page(directory, name)
+            assert page.id == name and page.title and page.summary and page.body
+            lowered = f"{page.title} {page.summary} {page.body}".lower()
+            assert not [needle for needle in APPLICATION_NEEDLES if needle in lowered], name
+            # Written for a user of the service: no source paths, tickets or migrations.
+            assert not re.search(r"\b(OVE|ADR|SPEC|FT|MP|OC)-[A-Z]?\d|\.py\b|src/", page.body), name
+
+
+def test_a_malformed_page_is_refused() -> None:
+    with pytest.raises(ValueError, match="frontmatter"):
+        parse_page("no frontmatter", expected_id="x")
+    with pytest.raises(ValueError, match="declares id"):
+        parse_page("---\nid: y\ntitle: T\nsummary: S\n---\nbody", expected_id="x")
+    assert insert_generated("a\n\n{{generated}}\n\nb", "") == "a\n\nb"
+    assert insert_generated("a", "g") == "a\n\ng"
+
+
+# -- describe ------------------------------------------------------------------------------------
+
+
+def _lanes() -> LaneRegistry:
+    lanes = LaneRegistry(allow_unqualified=True)
+    for declaration in (STUB_DECLARATION, NARROW_DECLARATION):
+        lanes.register(_registration(declaration))
+    return lanes
+
+
+async def test_describe_a_lane_is_the_lane_route_s_document() -> None:
+    result = await stub_guide().describe("lane:deep_agents")
+
+    assert (result.kind, result.ref) == ("lane", "lane:deep_agents")
+    assert result.data == describe_lane(_lanes(), "deep_agents")
+    assert {"controls", "delivery_semantics", "time_travel", "model_routes"} <= set(result.data)
+    assert result.data["time_travel"] == {"read": "R3", "fork": "R3"}
+
+
+async def test_describe_a_model_is_the_model_route_s_document() -> None:
+    result = await stub_guide().describe("model:judge.default")
+
+    expected = describe_model(ModelCatalog(MODELS), _lanes(), "judge.default")
+    assert result.kind == "model" and result.data == expected.model_dump(mode="json")
+    assert result.data["routes"]["claude_agent_sdk"] == "unsupported"
+
+
+async def test_describe_a_capability_is_one_definition_s_summary() -> None:
+    guide = stub_guide()
+    by_pin = await guide.describe(_pin(RESEARCH))
+    ref = RESEARCH.ref
+    by_exact_ref = await guide.describe(
+        f"{ref.kind.value}:{ref.logical_id}@{ref.revision}#{ref.digest}"
+    )
+    workflow = await guide.describe(_pin(OPEN_WORKFLOW))
+
+    assert by_pin.kind == "capability" and by_pin.ref == _pin(RESEARCH)
+    assert by_pin.data == {
+        "pin": _pin(RESEARCH),
+        "kind": "skill",
+        "name": "skill.web-research",
+        "revision": 1,
+        "title": "Skill web-research",
+        "description": "The web-research procedure",
+        "retired": False,
+        "required_capabilities": ["web.fetch"],
+        "secret_names": [],
+        "host_support": {"deep_agents": "supported", "claude_agent_sdk": "unsupported"},
+    }
+    assert by_exact_ref.data == by_pin.data
+    assert workflow.data["authority_ceiling"] == {
+        "capabilities": ["sandbox", "web.fetch"],
+        "max_concurrency": 2,
+    }
+    assert workflow.data["purpose"] == "Exercise the authority-ceiling fit"
+
+
+async def test_describe_a_tool_returns_its_request_shape_notes_and_example() -> None:
+    result = await stub_guide().describe("tool:mission_command_send")
+
+    assert result.kind == "tool" and result.data["argument"] == "request"
+    properties = result.data["schema"]["properties"]
+    assert {"request_id", "expected_version", "expected_generation", "target", "kind"} <= set(
+        properties
+    )
+    assert "queue_instruction" in properties["kind"]["enum"]
+    assert "8 KiB" in result.data["notes"] and "satisfy_wait" in result.data["notes"]
+    assert result.data["example"]["kind"] == "queue_instruction"
+
+
+def test_every_documented_example_is_a_valid_request() -> None:
+    for name, doc in TOOL_DOCS.items():
+        document = tool_document(name)
+        assert document["notes"].strip(), name
+        if doc.model is None:
+            assert "schema" not in document
+            continue
+        doc.model.model_validate(doc.example)
+        # The model's own schema, less the generated titles that repeat each field's name.
+        full = doc.model.model_json_schema()
+        assert set(document["schema"]["properties"]) == set(full["properties"])
+        assert document["schema"].get("required") == full.get("required")
+        assert set(document["schema"].get("$defs", {})) == set(full.get("$defs", {}))
+        assert '"title": "' not in json.dumps(document["schema"])
+        assert len(json.dumps(document["schema"])) < len(json.dumps(full))
+
+
+def test_the_moved_tool_documentation_lost_no_fact() -> None:
+    """What the four tool descriptions said before they were shortened is in the notes."""
+
+    facts = {
+        "mission_command_send": (
+            "repeating it returns the first receipt",
+            "1 to 4096 characters",
+            "first fences the run against any further effect",
+            "next_iteration",
+            '"deadline"',
+            '"node_key"',
+            '"materialize"',
+            "activation_id",
+            "most recently active",
+            "authority_ref",
+            "pause_decision_id",
+            "runnable_work_remains",
+            "verification_evidence_ref",
+            "at most 8 KiB",
+            "sha256:<64 hex>",
+            "accepted, rejected or stale",
+        ),
+        "coordinator_inbox_command": (
+            "recursion depth",
+            "retryable later",
+            "recorded as caused by it",
+            "request_continuation",
+            "`admission`, `delivery`",
+        ),
+        "mission_run_fork": (
+            "a repeat returns the same fork",
+            "it pays for the new run",
+            "1 to 2000 characters",
+            "from_snapshot_id",
+            "snapshot_digest",
+            "`instruction` is the older name",
+            "coordinate.point.key",
+            "session_generation",
+            "declares patchable",
+            '"strict"',
+            "baseline_reservations",
+            "approval_refs",
+            "reused_units",
+            "frontier_closed",
+            "message_delivery",
+            "receipt.target_run_id",
+            "in-flight Commands and active children are never copied",
+        ),
+        "mission_governed_prepare": (
+            "an unknown name is refused",
+            "mc/<run>/<unit>",
+            "`lane` section of mission_run_inspect",
+            "input_digest",
+            "review_digest",
+            "mission_approval_resolve",
+            "returns the same intent",
+        ),
+    }
+    for name, expected in facts.items():
+        notes = load_page("tools", name).body
+        assert not [fact for fact in expected if fact not in notes], name
+    # The lane profiles the governed prepare description used to list are in its schema.
+    profiles = tool_document("mission_governed_prepare")["schema"]["properties"]["lane_profile"]
+    assert set(profiles["enum"]) == set(LANE_PROFILES)
+
+
+async def test_describe_a_feature_carries_its_configuration_schema() -> None:
+    result = await stub_guide().describe("feature:anthropic.web_search")
+
+    assert result.kind == "feature" and result.data["lane_profiles"] == ["deep_agents"]
+    assert result.data["model_provider"] == "anthropic" and result.data["status"] == "available"
+    assert "max_uses" in result.data["config_schema"]["properties"]
+
+
+@pytest.mark.parametrize(
+    ("ref", "code", "names"),
+    [
+        ("everything", "unknown_ref", "lane:<profile>"),
+        ("", "unknown_ref", "tool:<name>"),
+        ("run:123", "unknown_ref", "feature:<id>"),
+        ("lane:nowhere", "not_found", "lane:deep_agents"),
+        ("model:nobody.default", "not_found", "model:judge.default"),
+        ("tool:mission_run_inspect", "not_found", "tool:mission_command_send"),
+        ("feature:deep_agents.nothing", "not_found", "feature:deep_agents.bash"),
+    ],
+)
+async def test_an_unknown_ref_is_refused_with_what_is_valid(
+    ref: str, code: str, names: str
+) -> None:
+    with pytest.raises(GuideRefused) as refused:
+        await stub_guide().describe(ref)
+
+    assert refused.value.code == code
+    assert names in refused.value.valid
+
+
+async def test_an_unpublished_pin_and_a_missing_catalog_are_refused() -> None:
+    missing = _pin(RESEARCH).rsplit("#", 1)[0] + "#sha256:" + "0" * 64
+    with pytest.raises(GuideRefused) as not_found:
+        await stub_guide().describe(missing)
+    with pytest.raises(GuideRefused) as unavailable:
+        await stub_guide(catalog=False).describe(_pin(RESEARCH))
+
+    assert not_found.value.code == "not_found"
+    assert unavailable.value.code == "unavailable"
+
+
+def test_the_surface_vocabulary_is_closed() -> None:
+    assert get_args(Surface) == SURFACES == ("mcp", "cli", "http")

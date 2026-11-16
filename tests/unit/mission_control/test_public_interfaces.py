@@ -31,6 +31,33 @@ def test_unconfigured_authentication_fails_closed():
     assert response.status_code == 503
 
 
+def test_the_guide_is_on_every_transport_and_fails_closed():
+    """The guide's part of the interface inventory (`docs/knowledge/interfaces.md`): three
+    routes, two `missionctl` verbs and two MCP tools over one handler, authenticated like every
+    scoped route. Their agreement is proven in `tests/unit/guide`."""
+    import argparse
+
+    from mission_control.interfaces.cli.main import build_parser
+    from mission_control.interfaces.http.guide import router as guide_router
+    from mission_control.interfaces.mcp.guide_tools import DESCRIBE_TOOL, GUIDE_TOOL
+
+    app = FastAPI()
+    app.include_router(guide_router)
+    prefix = "/v1/applications/{application_id}"
+    assert {f"{prefix}/guide", f"{prefix}/guide/{{topic}}", f"{prefix}/describe"} == set(
+        app.openapi()["paths"]
+    )
+    for path in ("guide", "guide/interview", "describe?ref=lane:deep_agents"):
+        assert TestClient(app).get(f"/v1/applications/a/{path}").status_code == 503
+    groups = next(
+        action.choices
+        for action in build_parser()._actions
+        if isinstance(action, argparse._SubParsersAction)
+    )
+    assert {"guide", "describe", "search", "workspace"} <= set(groups)
+    assert (GUIDE_TOOL, DESCRIBE_TOOL) == ("mission_guide", "mission_describe")
+
+
 def test_cross_application_denied_before_service_selection():
     class ForbiddenRegistry:
         def get(self, key):
