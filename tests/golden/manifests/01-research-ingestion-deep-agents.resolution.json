@@ -1094,8 +1094,8 @@
     "context.biotech-schema-muscle-aging@1.0.0#sha256:192f1b52c6ee91dd730862e7d1ed5843c89003a5e383a267adbf12584cb5eeec",
     "skill.biotech-knowledge-charter@0.1.0#sha256:a9293924708a1be93bc49b59df6955c79ba5f804cf2847cb312a23a6d890e068",
     "skill.biotech-literature-review@1.0.0#sha256:a5f52a8d5b4dab28700851bbdcc04c03e330fe0f0d860bea38498b41345aae48",
-    "skill.biomcp@0.9.1#sha256:bf0c38d379bb838c460c62e1550ecd8824c341cd667311e3e8371821521680c6",
-    "skill.mission-control-compose@0.2.0#sha256:5f2bd8ec85e952cfd27b1a6512885273567d020f5a3e49b11f8b5d6c2fbe321c"
+    "skill.schema-explore@2026.11.16-7bc4aee#sha256:dfec224a5ec65663ab7293e931a857a5ce4bf4b693c35efe15ec9caf8e64e1cf",
+    "skill.biomcp@0.9.1#sha256:bf0c38d379bb838c460c62e1550ecd8824c341cd667311e3e8371821521680c6"
    ],
    "lanes": [
     "deep_agents"

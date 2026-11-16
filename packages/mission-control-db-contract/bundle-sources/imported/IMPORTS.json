@@ -1,0 +1,416 @@
+{
+  "schema_version": "mc.skill_imports.v1",
+  "imports": [
+    {
+      "skill": "ai-engineer-knowledge-charter",
+      "capability_id": "skill.ai-engineer-knowledge-charter",
+      "identifier": {
+        "scheme": "belllabs",
+        "value": "ai-engineer-service/ai-engineer-knowledge-charter"
+      },
+      "version": "2026.11.16-b7e6e21",
+      "description": "AI Engineer knowledge base purpose, source tiers, repository rules and paper levels, loaded before researching, verifying or ingesting AI engineering knowledge and paired with knowledge-research for the method.",
+      "license": "proprietary",
+      "source": {
+        "name": "ai-engineer-service",
+        "repository": "https://github.com/jbell-rusty-vantage/ai-engineer-services",
+        "commit": "b7e6e21fc6aef4549da0675b5f7723025b826289",
+        "committed_at": "2026-11-16T05:45:50Z",
+        "path": "skills/ai-engineer-knowledge-charter"
+      },
+      "directory": "packages/mission-control-db-contract/bundle-sources/imported/ai-engineer-service/b7e6e21/ai-engineer-knowledge-charter",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "sha256:bdba7d51f11396d6b4f3993b9017b8fccec729dd2c47fb9137882411ef45b3f6",
+          "git_blob": "0e5381d9e5e826406697b9e7ddf8f663ea1361bc",
+          "size_bytes": 10417
+        }
+      ]
+    },
+    {
+      "skill": "content-authoring",
+      "capability_id": "skill.content-authoring",
+      "identifier": {
+        "scheme": "belllabs",
+        "value": "ai-engineer-service/content-authoring"
+      },
+      "version": "2026.11.16-b7e6e21",
+      "description": "Author AI Engineer teaching content from verified knowledge - load when designing, drafting, running, revising, handing over for review or keeping current a course, curriculum, module, lesson, activity or course artifact.",
+      "license": "proprietary",
+      "source": {
+        "name": "ai-engineer-service",
+        "repository": "https://github.com/jbell-rusty-vantage/ai-engineer-services",
+        "commit": "b7e6e21fc6aef4549da0675b5f7723025b826289",
+        "committed_at": "2026-11-16T05:45:50Z",
+        "path": "skills/content-authoring"
+      },
+      "directory": "packages/mission-control-db-contract/bundle-sources/imported/ai-engineer-service/b7e6e21/content-authoring",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "sha256:db503561d79a1459e9335c2e08a7dc07125b718ae7cc71208f5613e5aafc12ed",
+          "git_blob": "3ed40df2850184dc6baf42f9028fa4404cf3a188",
+          "size_bytes": 10853
+        },
+        {
+          "path": "SOURCES.md",
+          "sha256": "sha256:2bdb43fe9947690e99898f84faebf1c68e1ef6824fa9f3f565bf9875b7a8492f",
+          "git_blob": "179bb11942cbde96416ec3271a5ff0ae4fdabb21",
+          "size_bytes": 29564
+        },
+        {
+          "path": "references/evidence-binding.md",
+          "sha256": "sha256:72dff8b3325ca3e4fbb0675dcb2c6fa0a8d785448def78d95709ed8538a81c22",
+          "git_blob": "3306d08bf9ec456a9bef731e12f5dfc6dc388bef",
+          "size_bytes": 7423
+        },
+        {
+          "path": "references/lesson-craft.md",
+          "sha256": "sha256:4507f33c50446e58e1904a7ae1c4f98099c42aae5d0de58a5d90722f6d02d7ee",
+          "git_blob": "d8cad23ebb6d7f200c7068ba3c13fceec02ee42a",
+          "size_bytes": 7787
+        },
+        {
+          "path": "references/review-and-release.md",
+          "sha256": "sha256:ec542c3dcb649bf03bbe470a8bccfd02afad77325854389b538b7c564819e6df",
+          "git_blob": "d734d202cf7166b313adec895e2fd50844cf3005",
+          "size_bytes": 7839
+        },
+        {
+          "path": "references/structure.md",
+          "sha256": "sha256:ac8c1c83dd9cd641b2119ab20e1eb6789b8d44ac53434f19a25b45edee60ee17",
+          "git_blob": "ca104fc5c7c04c5fc497d134fa4592514d6c6e3f",
+          "size_bytes": 8386
+        },
+        {
+          "path": "references/worked-example.md",
+          "sha256": "sha256:ce5577db0fed83139d64b3ed73f8e51023c4959de31fdb7df7c3f261008e222d",
+          "git_blob": "24ea56bd9c98246e288fdfe00eac7ef99460d6f4",
+          "size_bytes": 9812
+        }
+      ]
+    },
+    {
+      "skill": "knowledge-acquisition-and-vetting",
+      "capability_id": "skill.knowledge-acquisition-and-vetting",
+      "identifier": {
+        "scheme": "belllabs",
+        "value": "knowledge-services/knowledge-acquisition-and-vetting"
+      },
+      "version": "1.3.0-7bc4aee",
+      "description": "Use when discovering, acquiring, inspecting, or vetting a source for an AI Engineer knowledge store.",
+      "license": "proprietary",
+      "source": {
+        "name": "knowledge-services",
+        "repository": "https://github.com/jbell-rusty-vantage/agent-knowledge-services",
+        "commit": "7bc4aeec77c645f41bb0f550f6a9626c3ef24cf0",
+        "committed_at": "2026-11-16T05:18:42Z",
+        "path": "skills/knowledge-acquisition-and-vetting"
+      },
+      "directory": "packages/mission-control-db-contract/bundle-sources/imported/knowledge-services/7bc4aee/knowledge-acquisition-and-vetting",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "sha256:e4a16228915b32cb6d24eec93f139fd187742c09221223a6ba4003a167b7a588",
+          "git_blob": "eb56789d45d0b4b24113456441888fdfa3f87fdc",
+          "size_bytes": 4852
+        },
+        {
+          "path": "cli-reference.md",
+          "sha256": "sha256:151016881e13caa41e4effc14c9a843b6b93d61bf7c3c2bc1309c7238b9762f3",
+          "git_blob": "922f1f3ca56df3f617ab0e78ef6c8b18edd25e69",
+          "size_bytes": 2607
+        },
+        {
+          "path": "examples.md",
+          "sha256": "sha256:c3bb0ef4d719ce3c1a949d490b160f459b3c104b1a1d71e56b6a199a9edd44fa",
+          "git_blob": "02197791f70790ce812ca8caf970db58b764f392",
+          "size_bytes": 1290
+        },
+        {
+          "path": "mcp-reference.md",
+          "sha256": "sha256:65d838e632e52619be3a0152002905da6f8f2b6ae82c7de512f03f06baf44c79",
+          "git_blob": "c1359d7dfa782f25a7c5caa3385ce5f66b5f0a89",
+          "size_bytes": 939
+        }
+      ]
+    },
+    {
+      "skill": "knowledge-db",
+      "capability_id": "skill.knowledge-db",
+      "identifier": {
+        "scheme": "belllabs",
+        "value": "knowledge-services/knowledge-db"
+      },
+      "version": "2026.11.16-7bc4aee",
+      "description": "Use when you must read the shared knowledge database: check what it already contains about a subject, run named catalog queries (entity resolution, cards, point-in-time facts, history, what_changed, vocabularies, receipts) and record a reproducible snapshot with a knowledge head and digest that an ingestion intent can cite. Also use to read back and diff after an ingestion. Never writes; use knowledge-ingest to change the database.",
+      "license": "proprietary",
+      "source": {
+        "name": "knowledge-services",
+        "repository": "https://github.com/jbell-rusty-vantage/agent-knowledge-services",
+        "commit": "7bc4aeec77c645f41bb0f550f6a9626c3ef24cf0",
+        "committed_at": "2026-11-16T05:18:42Z",
+        "path": "skills/knowledge-db"
+      },
+      "directory": "packages/mission-control-db-contract/bundle-sources/imported/knowledge-services/7bc4aee/knowledge-db",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "sha256:e811c1802371a8c2afdb7f668d7e9aa5582091750b3fd062fc77cd1bf45b79bd",
+          "git_blob": "0a4b92bc9f56e6fed7b3c0318050990270af7cff",
+          "size_bytes": 7549
+        }
+      ]
+    },
+    {
+      "skill": "knowledge-ingest",
+      "capability_id": "skill.knowledge-ingest",
+      "identifier": {
+        "scheme": "belllabs",
+        "value": "knowledge-services/knowledge-ingest"
+      },
+      "version": "2026.11.16-7bc4aee",
+      "description": "Use when verified facts must be written into the shared knowledge database: compose a knowledge-ingestion intent (entities, aliases, identifiers, relationships, two-clock facts, events, evidence support, staged candidates, reports) from a sealed verification run and a knowledge-db snapshot, dry-run it, apply it through the deterministic executor, inspect the receipt, recover from stale-head or validation failures, and verify by re-reading. You never write to the database yourself; the executor does, as executor_service.",
+      "license": "proprietary",
+      "source": {
+        "name": "knowledge-services",
+        "repository": "https://github.com/jbell-rusty-vantage/agent-knowledge-services",
+        "commit": "7bc4aeec77c645f41bb0f550f6a9626c3ef24cf0",
+        "committed_at": "2026-11-16T05:18:42Z",
+        "path": "skills/knowledge-ingest"
+      },
+      "directory": "packages/mission-control-db-contract/bundle-sources/imported/knowledge-services/7bc4aee/knowledge-ingest",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "sha256:08a84f8d3c5f243fb45d247b304de9ea3fcfef984bea5664014ac2a3e8f43ba8",
+          "git_blob": "46a0b748c869c26c2acb13ba1801a2fc809308b3",
+          "size_bytes": 13742
+        }
+      ]
+    },
+    {
+      "skill": "knowledge-research",
+      "capability_id": "skill.knowledge-research",
+      "identifier": {
+        "scheme": "belllabs",
+        "value": "knowledge-services/knowledge-research"
+      },
+      "version": "2026.11.16-7bc4aee",
+      "description": "Research method and verification for a knowledge base, loaded before a task searches for sources, captures evidence, states or checks a claim, or hands research back.",
+      "license": "proprietary",
+      "source": {
+        "name": "knowledge-services",
+        "repository": "https://github.com/jbell-rusty-vantage/agent-knowledge-services",
+        "commit": "7bc4aeec77c645f41bb0f550f6a9626c3ef24cf0",
+        "committed_at": "2026-11-16T05:18:42Z",
+        "path": "skills/knowledge-research"
+      },
+      "directory": "packages/mission-control-db-contract/bundle-sources/imported/knowledge-services/7bc4aee/knowledge-research",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "sha256:d4fb7fee460acce0aea322a22adbb50f762a0223ca4fc21026e43434ce4ab0d6",
+          "git_blob": "23b2fa3cea038daca5a85b8d1c8f467c545b2181",
+          "size_bytes": 8986
+        },
+        {
+          "path": "references/handback.md",
+          "sha256": "sha256:b3f7e0076f9845e6d92af6f09efe66a8c35c7b26e0f2ca32e28a70becd65ddd0",
+          "git_blob": "94d4240223f36f3918bcfe39383612146ccf9b14",
+          "size_bytes": 7602
+        },
+        {
+          "path": "references/method.md",
+          "sha256": "sha256:ad5a9c4e72df73595965387ce79c52533f69e800779f8ebc3e10d9a40005f868",
+          "git_blob": "aa56107e27eac76c0419d975a9c3f4ef6d36cc98",
+          "size_bytes": 10551
+        },
+        {
+          "path": "references/sources.md",
+          "sha256": "sha256:53430c11fe9e91d9f8a91cc2377998cf383b906e51444de6e1d19c81fc38687e",
+          "git_blob": "ac68ae7961becdfdafae0f2146149797c09b0169",
+          "size_bytes": 8937
+        },
+        {
+          "path": "references/tools/arxiv.md",
+          "sha256": "sha256:79097b0d65145bc5d342ef5f49db53a760a8175dc1c1793bf69ee3ef8da1d97f",
+          "git_blob": "984c7f7e18fe80dbfdf0986638474bc819678796",
+          "size_bytes": 5617
+        },
+        {
+          "path": "references/tools/browser.md",
+          "sha256": "sha256:bd0dc51359440ebac289205761acbf860d42206333fa14387bd89b88b74b1b1c",
+          "git_blob": "6c76520e3b1244a1f7118d8ea211d43e4569e218",
+          "size_bytes": 5215
+        },
+        {
+          "path": "references/tools/context7.md",
+          "sha256": "sha256:040f034e48d78e6c3be87234b734ad78f7fd4833e403480b7dda65c6b0bcc0f3",
+          "git_blob": "961859b50d73b6236796df7867b4f6dccbb1fdda",
+          "size_bytes": 4166
+        },
+        {
+          "path": "references/tools/firecrawl.md",
+          "sha256": "sha256:f693470d741f3b4a64ac9676ed4ea29a18c708a9339b0207fc03fbfe8ade6ec2",
+          "git_blob": "ecf4afe018011bf8e43320a3031073e984040f00",
+          "size_bytes": 7515
+        },
+        {
+          "path": "references/tools/github.md",
+          "sha256": "sha256:4ff1ee464460e28d57897978c4742c0b9d8298767638be561e3690adb5170a98",
+          "git_blob": "659fc2ffe5ca3b31980e5dd4b1598db22b2fc766",
+          "size_bytes": 5449
+        },
+        {
+          "path": "references/tools/routing.md",
+          "sha256": "sha256:854246f31fb81778169334c00700150b431f53815e5c36d95abc1285bc215296",
+          "git_blob": "e09023a48cf5574a62681e2e87ae50d2e634ef26",
+          "size_bytes": 7430
+        },
+        {
+          "path": "references/tools/tavily.md",
+          "sha256": "sha256:fd1ef0cad6f762ffc33ee03a6bb4ff357b3fec8b1f3145b0db4892b0d1776bff",
+          "git_blob": "4aac0e69a3f074be9d53fa64dc23a61ff82e4f7b",
+          "size_bytes": 5874
+        },
+        {
+          "path": "references/verification.md",
+          "sha256": "sha256:3b7eabadf1cd891678e1f8a4ad91d8a9fb9bc54fd7a4be65ef4c6305916df02f",
+          "git_blob": "df0bb3b945a0b8a51c1b5eece2f712ef5ff4c2ce",
+          "size_bytes": 12866
+        }
+      ]
+    },
+    {
+      "skill": "knowledge-verification",
+      "capability_id": "skill.knowledge-verification",
+      "identifier": {
+        "scheme": "belllabs",
+        "value": "knowledge-services/knowledge-verification"
+      },
+      "version": "1.5.0-7bc4aee",
+      "description": "Runs admitted Knowledge Verification operations through the ks CLI and the verify_* platform MCP tools. Use when verifying an extraction, running a structured extraction, parsing a registered artifact, capturing a benchmark source, running or comparing an extraction benchmark, replaying a verification run, or reconciling a provider attempt.",
+      "license": "proprietary",
+      "source": {
+        "name": "knowledge-services",
+        "repository": "https://github.com/jbell-rusty-vantage/agent-knowledge-services",
+        "commit": "7bc4aeec77c645f41bb0f550f6a9626c3ef24cf0",
+        "committed_at": "2026-11-16T05:18:42Z",
+        "path": "skills/knowledge-verification"
+      },
+      "directory": "packages/mission-control-db-contract/bundle-sources/imported/knowledge-services/7bc4aee/knowledge-verification",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "sha256:1b45218b48187a9f34cd0127ed735545bae54b3a7a0581861c2cf28bef2dc93c",
+          "git_blob": "9effdc02e23fa483bb83c8a2b6b9b5f898037230",
+          "size_bytes": 11153
+        },
+        {
+          "path": "capabilities.md",
+          "sha256": "sha256:ce7b75c5b52e8cf7dd49497d10d403351f95717df8d5283d7162c0333acac1b5",
+          "git_blob": "afc71a293238164f5286ce58e543238f37c41a87",
+          "size_bytes": 2389
+        },
+        {
+          "path": "cli-reference.md",
+          "sha256": "sha256:05ea2c64e22e072012faecdc11bccf5d1471f8910f1c9a5434e3bbf5382983ce",
+          "git_blob": "b589413fe0729240d75a34af2fe61fbf1fd72bfc",
+          "size_bytes": 7335
+        },
+        {
+          "path": "examples.md",
+          "sha256": "sha256:82ebe670ce992435e0276c4a62083ef072969275582e76ae1ed9495a935b6c56",
+          "git_blob": "b40e28c61d97dafba6bd5e450465ee8b392f181a",
+          "size_bytes": 6332
+        },
+        {
+          "path": "mcp-reference.md",
+          "sha256": "sha256:bf2dfb93ce60c8b1e92f481663410ad432adf625e43cbfeb4e19794d794f7250",
+          "git_blob": "5b1c48ac005c82bfda3c44eff47b78776d8f65f5",
+          "size_bytes": 5721
+        }
+      ]
+    },
+    {
+      "skill": "knowledge-verify",
+      "capability_id": "skill.knowledge-verify",
+      "identifier": {
+        "scheme": "belllabs",
+        "value": "knowledge-services/knowledge-verify"
+      },
+      "version": "2026.11.16-7bc4aee",
+      "description": "Use when a task needs source-attributed evidence: capture sources as immutable evidence (including PDF, DOCX, XLSX, CSV and other documents), read and search captures, locate exact quotes, and register or read artifacts through the knowledge-verify CLI. The executor's verification chain (verify-claims, judge, policy, seal, check-report, status) is retired.",
+      "license": "proprietary",
+      "source": {
+        "name": "knowledge-services",
+        "repository": "https://github.com/jbell-rusty-vantage/agent-knowledge-services",
+        "commit": "7bc4aeec77c645f41bb0f550f6a9626c3ef24cf0",
+        "committed_at": "2026-11-16T05:18:42Z",
+        "path": "apps/verification-executor/skills/knowledge-verify"
+      },
+      "directory": "packages/mission-control-db-contract/bundle-sources/imported/knowledge-services/7bc4aee/knowledge-verify",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "sha256:11916bdb75fe923224200f8f65b8e82433736955c2d09f703c273e029abc791f",
+          "git_blob": "29aede29e795adb8954ab1bdf7d611f0e78da377",
+          "size_bytes": 7049
+        },
+        {
+          "path": "examples/offline.mjs",
+          "sha256": "sha256:2130a433d1cee6b8d627aec96059d865672c3052d38a42495f2daa85dc255263",
+          "git_blob": "a64e6f1010823c81174b22c1006e2d42a47cc59a",
+          "size_bytes": 3236
+        },
+        {
+          "path": "references/capabilities.md",
+          "sha256": "sha256:47a0b45d18178dba8c6162197d3fd6f6754a8b82c9b266e05358cef5ab5e2e31",
+          "git_blob": "2501167cb19d363574414deb3271cae69a67fc7e",
+          "size_bytes": 3188
+        },
+        {
+          "path": "references/failure-playbook.md",
+          "sha256": "sha256:5c4e970732bb6a9534f0417e29bd4485f2774def462e917b7cfe05962b165aaa",
+          "git_blob": "9e059e0f76c191c46e527b4be6ad290e952aa1a0",
+          "size_bytes": 2952
+        },
+        {
+          "path": "references/intents.md",
+          "sha256": "sha256:b7b9599926946ee80f78bf0dd7c8ee315b4e77efad06149ada1ca119b1c68849",
+          "git_blob": "d260b16292fd1da1f0db2443c228996a4ba0c912",
+          "size_bytes": 587
+        }
+      ]
+    },
+    {
+      "skill": "schema-explore",
+      "capability_id": "skill.schema-explore",
+      "identifier": {
+        "scheme": "belllabs",
+        "value": "knowledge-services/schema-explore"
+      },
+      "version": "2026.11.16-7bc4aee",
+      "description": "Use when you need to know what the shared knowledge database contains or how something is stored: which table/view/function holds a concept, how entities, relationships, two-clock temporal facts, evidence and claims relate, which named query answers a question, or what an ingestion proposal must contain. Navigates the pinned schema workspace (progressive disclosure) instead of guessing table names. Does not query the database; use knowledge-db.",
+      "license": "proprietary",
+      "source": {
+        "name": "knowledge-services",
+        "repository": "https://github.com/jbell-rusty-vantage/agent-knowledge-services",
+        "commit": "7bc4aeec77c645f41bb0f550f6a9626c3ef24cf0",
+        "committed_at": "2026-11-16T05:18:42Z",
+        "path": "skills/schema-explore"
+      },
+      "directory": "packages/mission-control-db-contract/bundle-sources/imported/knowledge-services/7bc4aee/schema-explore",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "sha256:558d3a8df195b85165ba6b8c464adfe722db2d7ce9759f9d35a01a17edc1aa43",
+          "git_blob": "3e2011d5cbed89b1f37555f87f75669ec1bac0f0",
+          "size_bytes": 6409
+        }
+      ]
+    }
+  ]
+}

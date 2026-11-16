@@ -16,10 +16,18 @@ of each bundle, not in place.
 | `common/` | `mc.catalog.workflow-parity@1.0.2` | Current registration including terminal workflow-result materialization, as new asset version 3; depends on frozen 1.0.1 | both apps, identical bytes |
 | `common/` | `mc.catalog.runtime-profiles@1.0.0` | runtime persistence descriptor pins; Agent Server graph pins (native persistence unqualified) | both apps, identical bytes |
 | `common/` | `mc.catalog.approved-assets@1.0.0` | `skill.mission-control-coordinator`, `prompt.coordinator.propose-workflow` (published-definition r1), canonical `skills/mission-control` manifest | both apps, identical bytes |
+| `common/` | `mc.catalog.approved-assets@1.0.3` | Successor of the frozen 1.0.2: the canonical `skills/mission-control` manifest at 0.6.0 (the router regenerated from the guide) and nothing else. The coordinator skill, retired by ADR-0033, is not published again; its source is archived under `bundle-sources/approved-assets-1.0.0/` | both apps, identical bytes |
+| `biotech/`, `ai-engineer/` | `mc.app.<app>.agent-skills@1.0.5` | Successor of the frozen 1.0.4: the six coordinator bundles regenerated from the guide (each at its next revision) and the method skills imported from their owning repositories (`bundle-sources/imported/`, `source_provenance.source: belllabs`): the seven Knowledge Services skills in both apps; `skill.content-authoring` and `skill.ai-engineer-knowledge-charter` (revision 2) in ai-engineer only | that app only |
+| `biotech/`, `ai-engineer/` | `mc.app.<app>.cognition-profiles@1.0.1` | Successor of the frozen 1.0.0: revision 2 of `plugin.cognition-knowledge` and `plugin.cognition-mixed` over `skill.knowledge-research`, `skill.knowledge-verify` and the application's knowledge charter; depends on agent-skills 1.0.5 | that app only |
 | `ai-engineer/` | `mc.app.ai-engineer.artifact-schemas@1.0.0` | D5 SDLC report schemas `schema.sdlc-diagnosis-report@1`, `schema.sdlc-patch-report@1`, `schema.sdlc-review-report@1` (published-definition r1, from `sdlc_report_schemas.py`); additive to `mc.catalog.artifact-schemas@1.0.0`, component `>=1.4.1 <2.0.0` | ai-engineer only |
 | `common/` | `mc.catalog.artifact-schemas@1.0.1` | Successor of 1.0.0 (applied bytes untouched, only new logical keys): Sprint OC W2 graph-variant schemas `schema.w2-triage-verdict@1`, `schema.w2-scan-flag@1`, `schema.w2-critique-verdict@1` (WI-08 route and Revisit Region facts, from `graph_route_schemas.py`); depends on 1.0.0 | both apps, identical bytes |
 | `biotech/`, `ai-engineer/` | `mc.app.bindings@1.0.0` | app identity from `deployments/<app>/target.toml`, secret reference names only | that app only |
 | `qualification/` | `mc.qualification.parity@1.0.0` | OPT-IN synthetic qualification tenant + generic contract-fixture blueprints | disposable / approved qualification only |
+
+A seed cannot retire a row: it inserts `asset_version` rows as `proposed` or `admitted` and may append an
+`asset_decision`, but it never moves `asset_version.status`, which is what the catalog reads as retired.
+A superseded definition therefore stays admitted beside its successor (`@latest` resolves to the highest
+revision); retiring one is the catalog's own retire operation on that installation.
 
 Deliberately not seeded: product Workflow Types and implementation bindings (application
 owned; none exist in the common kernel), provider/model routes, secrets or DSNs, embeddings

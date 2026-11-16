@@ -1,87 +1,58 @@
 ---
 name: mission-control-catalog
-description: Search, inspect, pin and publish Mission Control capabilities (skill bundles, MCP servers and tools, hook scripts, subagent profiles, plugins, model and sandbox profiles) with missionctl catalog, and compose plugins from exact pins. Use when a manifest needs a capability, when a human asks what tools or skills exist for a lane, when a new skill bundle must be published, or when an external MCP server or skill is discovered and must be quarantined.
+description: Choose what a mission runs on and with - list and search lanes, Model Profiles, capabilities, templates and sandbox profiles with missionctl search, read one with missionctl describe, check a draft selection, pin a capability or publish a skill bundle. Use when a manifest needs a lane, a model or a capability, when the user asks what exists, or when something outside the catalog is found.
 ---
 
-# Find, pin and publish capabilities
+# Select lanes, models and capabilities
 
-The catalog is the per-application set of admitted, versioned capabilities. Search ranks
-candidates; only an exact pin (`id@version#sha256:…`) is authority. Capability kinds are
-canonical in the catalog (ADR-0020); the ones you compose into missions are described in
-[kinds-and-projections.md](references/kinds-and-projections.md).
+The Selection Workspace answers "what exists here, and would it run": one search over lanes,
+Model Profiles, the capability catalog, templates and sandbox profiles, and one read-only check
+of a draft. Search ranks candidates; only an exact Capability Pin is authority.
 
-## 1. Search
+Facts come from the server: the counts, the lanes this installation binds, each lane's support
+and each model's route are in `missionctl guide TOPIC` and `missionctl describe REF`. The
+references are those pages as this release rendered them.
 
-```text
-missionctl catalog search --query "pubmed literature retrieval" --kind mcp_server --host deep_agents --json
-```
+## Order of work
 
-Availability: FT-A8 (today use `catalog search --request-file search.json` with
-`{query, kinds, hosts, limit}`; `--kind` and `--host` repeat). Search is hybrid: a lexical and a vector ranking fused after
-grant and `host_support` filtering; `search_mode: lexical` means no embedding route was
-configured. Each hit carries `ref`, `kind`, `score`, `pin`, `rank_provenance`,
-`availability` (`available | unavailable | gated`), `host_support` and a safe excerpt. Done when you have
-one to three candidates whose `availability` is `available` for the mission's lane.
+1. **List before you search.** `missionctl search --facet lane`, `missionctl search --facet model`
+   and `missionctl search --kind skill` read the published definitions, so a listing is
+   complete. Search by meaning with `missionctl search QUERY`, narrowed with `--lane PROFILE`.
+   Read `catalog_search_mode` and `notes` in the answer: they say who ranked the hits.
+   [capabilities](references/guide-capabilities.md)
+2. **Read one.** `missionctl describe REF` with a hit's `ref`, `lane:PROFILE`, `model:PROFILE`,
+   `feature:ID` or `sandbox:PROFILE`. Done when you can say what it does, which lanes support
+   it and which secrets it names.
+3. **Choose the lane** by what the node needs, in the order the lanes page gives: workflow
+   system, model vendor, capability kinds, run controls. [lanes](references/guide-lanes.md),
+   [workflows](references/guide-workflows.md)
+4. **Choose the model.** A judge runs on another profile than the producer, preferably another
+   vendor. [models](references/guide-models.md)
+5. **Check the draft.** `missionctl workspace check DRAFT`. Done when it admits every selection
+   on your lane and under the Workflow Type's authority ceiling.
+6. **Write it into the manifest** as a `pin` with the hit's `ref`, or as a `search` entry that
+   compile resolves. `missionctl catalog pin` resolves a query to exactly one pin or names the
+   candidates.
 
-## 2. Inspect
+## Publish a skill bundle
 
-```text
-missionctl catalog inspect --pin mcp.pubmed@0.1.0#sha256:… --json
-```
+`missionctl catalog publish --dir PATH --kind skill_bundle` stores the bytes under their digest
+path, then registers the row `proposed`; admission is the operator's decision. A server composed
+without custody refuses the call (`catalog_publish_unavailable`): there, bundles ship through
+the installation's seeds.
 
-Availability of `--pin`: FT-A8 (today `catalog inspect --request-file inspect.json`).
+## Rules that never bend
 
-Read the capability's inputs, side-effect class, secret references (names only), tool list
-(for an MCP server) and host overlays. Done when you can state what the capability does, what it
-may touch and which lanes can run it.
+- Discovered is not runnable: a hit runs only after the draft check and compile admit it.
+- A result from outside the catalog (`missionctl catalog discover`, `missionctl catalog inspect`)
+  is a candidate. Tell the user what you found; the installation's owner publishes it.
+- Selecting an MCP server selects no tool: name the tools the node may call.
+- A capability names its secrets. The installation resolves them; `missionctl preflight` lists
+  what the owner still has to set up.
 
-## 3. Pin
+## Common mistakes
 
-```text
-missionctl catalog pin --query "web search" --kind mcp_server --host cursor_cloud --json
-```
-
-Availability: FT-A8 (today `catalog resolve --request-file ref.json` with an exact ref). `catalog
-pin` returns exactly one pin or exits 2 with `AMBIGUOUS_CAPABILITY` and the candidates; choose one
-and pin it by its full string. `catalog render --pin PIN --host HOST` (FT-A8) previews the files a
-host projection would write. A pin names version and
-digest; `latest` is never resolved after admission. Selecting an MCP server never selects every
-tool: freeze an explicit tool allowlist in the manifest entry (`tools: [tavily_search]`).
-
-## 4. Compose a plugin
-
-A plugin is a pinned composition of other capabilities (skill bundles, MCP servers, hook
-scripts, subagent profiles, prompts, resources). Write `mc.plugin_manifest.v1` with exact
-member pins and publish it like a bundle (step 5). Installing a plugin installs its members; it
-never runs a package install hook.
-
-## 5. Publish a skill bundle
-
-```text
-missionctl catalog publish --dir ./skills/my-skill --kind skill_bundle --json
-```
-
-Availability: FT-A2. Custody first (bytes to the `capability-bundles` bucket under a
-digest-addressed path), then registration (catalog row with the manifest digest). The response
-is the exact pin. A bundle is a directory with `SKILL.md` (frontmatter `name` equal to the
-directory name, `description`), optional `scripts/`, `references/`, `assets/`, and a
-`manifest.json` of file digests. Done when `catalog inspect` on the returned pin shows every
-file digest you published.
-
-## 6. Discovery stays quarantined
-
-`catalog discover --request-file discovery.json` (source `mcp` or `skills`) returns external
-candidates. Record them, run `catalog inspect` on them, and request promotion; never attach a
-candidate to a mission, run its install command or treat its `tools/list` as trust.
-
-## Seeded set
-
-Live (FT-A6, FT-A7). Both applications: `mcp.tavily`, `mcp.firecrawl`, `mcp.agent-browser`,
-`skill.agent-browser`, `hook.mc-policy-template`, `plugin.web-research` (members `mcp.tavily`,
-`mcp.firecrawl`, `skill.agent-browser`, optional `mcp.agent-browser`), `skill.mission-control`
-and the five `skill.mission-control-*` bundles. Biotech only: `mcp.pubmed`, `mcp.biomcp`,
-`skill.biomcp`. AI Engineer only: `mcp.edgartools`, `skill.edgartools`. Skill and hook bytes
-live in the `capability-bundles` bucket under their manifest digest paths; pin them with
-`catalog pin` and check members with `catalog inspect --pin`. Secret references these need
-(`TAVILY_API_KEY`, `FIRECRAWL_API_KEY`, `NCBI_API_KEY`, `EDGAR_IDENTITY`) are deployment
-inputs; a manifest names them, never carries them.
+- Trusting rank: a high score is not admission.
+- Reading an empty search as "nothing exists": list the kind.
+- Starting a mission from a Workflow Type: a mission starts from a template.
+- Writing a pin from memory or from a reference file: a pin comes from this server's answer.

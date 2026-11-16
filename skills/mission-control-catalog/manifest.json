@@ -1,10 +1,13 @@
 {
   "schema_version": "mc.skill_bundle.v1",
   "name": "mission-control-catalog",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "service_contract_range": ">=0.1.0,<0.2.0",
   "files": {
-    "SKILL.md": "sha256:5ba76caef5d550d199c476af34bce1184751b7880c9f82732450547842541086",
-    "references/kinds-and-projections.md": "sha256:74fcaaf6ade072d4b9738104a2559877473b8d390eb060210c3fae8bb80693d2"
+    "SKILL.md": "sha256:f3a97a4262b91e7dbed3f1d4691bbccc53d83e9d36574711fb09dfc21d7d8cf7",
+    "references/guide-capabilities.md": "sha256:05394ce4f8c634898bea8b6d765138ad7f96eda62592bd28b0bf6ff836062363",
+    "references/guide-lanes.md": "sha256:a90ce30aeec0dce27b39deb7f9bac53fed571822087cb657aedcb58e83a8b47d",
+    "references/guide-models.md": "sha256:accd8acc471f7fa0b54c07ceb184aa30396e39b9a652400b8359cc0c6d03ae89",
+    "references/guide-workflows.md": "sha256:c793f860a9ef6e192c84aa6db690d8c63511a014aed7e33c9d530ce4160647d7"
   }
 }

@@ -23,7 +23,18 @@ from mission_control.bootstrap.settings import Settings
 from mission_control.domain.authoring.extensions import ExtensionRegistry
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_SKILL_ROOT = PROJECT_ROOT / ".agents" / "skills" / "mission-control-coordinator"
+# The retired coordinator skill (ADR-0033) is no live skill: its bytes are the archived source
+# of the applied `mc.catalog.approved-assets@1.0.0` seed.
+DEFAULT_SKILL_ROOT = (
+    PROJECT_ROOT
+    / "packages"
+    / "mission-control-db-contract"
+    / "bundle-sources"
+    / "approved-assets-1.0.0"
+    / ".agents"
+    / "skills"
+    / "mission-control-coordinator"
+)
 
 
 def _arguments() -> argparse.Namespace:

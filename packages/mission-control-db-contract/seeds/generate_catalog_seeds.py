@@ -317,23 +317,14 @@ def runtime_profiles_successor() -> dict[str, Any]:
     }
 
 
-def approved_assets() -> dict[str, Any]:
-    from mission_control.application.coordinator.coordinator_surface_promotion import (
-        build_coordinator_surface,
-    )
+def router_manifest_records() -> list[dict[str, Any]]:
+    """The canonical ``skills/mission-control`` bundle manifest at its present version, as an
+    approved asset (the row `mc.catalog.approved-assets` has carried since 1.0.0)."""
 
-    skill_root = ".agents/skills/mission-control-coordinator"
-    skill, prompt = build_coordinator_surface(REPO_ROOT / skill_root)
-    evidence = [
-        "src/mission_control/application/coordinator/coordinator_surface_promotion.py",
-        skill_root,
-    ]
-    records = _published_definition_records(skill, "definition", evidence)
-    records += _published_definition_records(prompt, "definition", evidence)
     manifest_path = "skills/mission-control/manifest.json"
     bundle = json.loads(_repo_file(manifest_path))
     key = f"skill-bundle-manifest:{bundle['name']}/{bundle['version']}"
-    records.append(
+    return [
         _asset(
             key,
             asset_id=f"skill-bundle-manifest:{bundle['name']}",
@@ -342,24 +333,9 @@ def approved_assets() -> dict[str, Any]:
             contract=bundle["schema_version"],
             manifest_ref="repo://" + manifest_path,
             manifest=bundle,
-        )
-    )
-    records.append(_admit(key + ":admit", key, [manifest_path]))
-    return {
-        "format": SEED_FORMAT,
-        "seed_key": "mc.catalog.approved-assets",
-        "seed_version": "1.0.0",
-        "component_compatibility": COMPATIBILITY,
-        "depends_on": [{"seed_key": "mc.catalog.runtime-profiles", "seed_version": "1.0.0"}],
-        "actor_ref": SEED_ACTOR,
-        "description": (
-            "Reviewed assets that exist in this repository: skill.mission-control-coordinator and "
-            "prompt.coordinator.propose-workflow (published-definition revision 1) and the "
-            "canonical skills/mission-control bundle manifest. Skill bytes are not uploaded here; "
-            "remote byte admission remains a separate capability-bundles registration."
         ),
-        "records": records,
-    }
+        _admit(key + ":admit", key, [manifest_path]),
+    ]
 
 
 # Applied seed bytes are immutable. `mc.app.bindings@1.0.0` was applied to both live
@@ -367,6 +343,28 @@ def approved_assets() -> dict[str, Any]:
 # by file SHA-256 and never regenerated. Later target facts ship as a new seed version
 # with a new asset version, so nothing is overwritten.
 FROZEN_BUNDLES = {
+    # The per-application knowledge charters (OVE-204 slice 6), frozen when 1.0.5 shipped the
+    # coordinator bundles regenerated from the guide and the imported method skills. Its
+    # sources are archived under bundle-sources/agent-skills-1.0.4/.
+    "biotech/mc.app.biotech.agent-skills-1.0.4.json": (
+        "4d0dc008f262c3cd90fcf988ec106ecb2e64e42bf5b3875b11ce91c3edd98f57"
+    ),
+    "ai-engineer/mc.app.ai-engineer.agent-skills-1.0.4.json": (
+        "b4eecfb3200ce7b33c7ab1da248cec9db9a7347ba83c757bfc97463f9e5b1be6"
+    ),
+    # The MO-35 cognition profiles over the eight `mc-cognition-*` skills, frozen when 1.0.1
+    # published revision 2 of the knowledge and mixed plugins over the imported method skills.
+    "biotech/mc.app.biotech.cognition-profiles-1.0.0.json": (
+        "b7f80e32302b965c529809092e329559d2826e1dc5bad7882fc1a894f927723f"
+    ),
+    "ai-engineer/mc.app.ai-engineer.cognition-profiles-1.0.0.json": (
+        "b8d7340310b931825196da6c2779dafd75fa26d66076c5e50ca0798e93f26506"
+    ),
+    # The router bundle manifest at 0.5.0, frozen when 1.0.3 recorded the router regenerated
+    # from the guide (0.6.0).
+    "common/mc.catalog.approved-assets-1.0.2.json": (
+        "071ddc496986738d2e493a7f0eddfb0fb31d9d6be4e07ad96d4e2984d9ec2987"
+    ),
     # Recorded by hand with submit_output revision 2 (OVE-170, 2026-10-29); frozen when 1.2.0
     # added knowledge_read_intent (OVE-204 slice 4).
     "common/mc.catalog.knowledge-tools-1.1.0.json": (
@@ -461,34 +459,45 @@ def frozen_bundle(relative: str) -> dict[str, Any]:
     return dict(json.loads(payload))
 
 
-APPROVED_ASSETS_FROZEN = "common/mc.catalog.approved-assets-1.0.0.json"
+APPROVED_ASSETS_FROZEN = tuple(
+    f"common/mc.catalog.approved-assets-{version}.json" for version in ("1.0.0", "1.0.1", "1.0.2")
+)
 
 
 def approved_assets_successor() -> dict[str, Any]:
-    """`mc.catalog.approved-assets@1.0.2`: the approved-asset records whose logical keys the
-    applied 1.0.0 bundle does not hold (today the newer `skills/mission-control` manifest).
+    """`mc.catalog.approved-assets@1.0.3`: the canonical `skills/mission-control` bundle
+    manifest at its present version, a logical key no frozen version holds.
 
-    Records 1.0.0 already holds are never re-emitted, even when their sources changed: an
-    applied logical key with different bytes is a seed conflict. A changed definition needs
-    a new definition revision (an owner decision), not new bytes under revision 1.
+    It seeds nothing else. `skill.mission-control-coordinator` and
+    `prompt.coordinator.propose-workflow` were published once, by the applied 1.0.0 (its bytes
+    are frozen and its skill source is archived under
+    `bundle-sources/approved-assets-1.0.0/`); the skill was retired by ADR-0033 and no later
+    version publishes it. A record a frozen version holds is never re-emitted: an applied
+    logical key with different bytes is a seed conflict.
     """
 
-    frozen = frozen_bundle(APPROVED_ASSETS_FROZEN)
-    previous = frozen_bundle("common/mc.catalog.approved-assets-1.0.1.json")
-    held = {record["logical_key"] for bundle in (frozen, previous) for record in bundle["records"]}
-    current = approved_assets()
+    held = {
+        record["logical_key"]
+        for relative in APPROVED_ASSETS_FROZEN
+        for record in frozen_bundle(relative)["records"]
+    }
     return {
-        **current,
-        "seed_version": "1.0.2",
-        "depends_on": [{"seed_key": "mc.catalog.approved-assets", "seed_version": "1.0.1"}],
+        "format": SEED_FORMAT,
+        "seed_key": "mc.catalog.approved-assets",
+        "seed_version": "1.0.3",
+        "component_compatibility": COMPATIBILITY,
+        "depends_on": [{"seed_key": "mc.catalog.approved-assets", "seed_version": "1.0.2"}],
+        "actor_ref": SEED_ACTOR,
         "description": (
-            "Successor of mc.catalog.approved-assets@1.0.1 (applied, frozen): the reviewed "
-            "approved assets whose logical keys neither applied version holds, including the "
-            "canonical "
-            "skills/mission-control bundle manifest at its present version. The coordinator "
-            "skill and prompt definitions stay at the applied revision 1."
+            "Successor of mc.catalog.approved-assets@1.0.2 (frozen): the canonical "
+            "skills/mission-control bundle manifest at its present version, the router "
+            "regenerated from the guide. The coordinator skill and prompt definitions of the "
+            "applied 1.0.0 are not published again: skill.mission-control-coordinator is "
+            "retired (ADR-0033) and its bytes are an archive, not a live skill."
         ),
-        "records": [record for record in current["records"] if record["logical_key"] not in held],
+        "records": [
+            record for record in router_manifest_records() if record["logical_key"] not in held
+        ],
     }
 
 
@@ -661,9 +670,11 @@ def cognition_profiles() -> dict[str, dict[str, Any]]:
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
 
-    def published(definition: Any, key_prefix: str, evidence: list[str]) -> list[dict[str, Any]]:
+    def published(
+        definition: Any, key_prefix: str, evidence: list[str], *, revision: int = 1
+    ) -> list[dict[str, Any]]:
         return _published_definition_records(
-            definition, key_prefix, evidence, published_at=module.SEED_TIME
+            definition, key_prefix, evidence, published_at=module.SEED_TIME, revision=revision
         )
 
     return dict(module.bundles(published, SEED_FORMAT, COMPATIBILITY, SEED_ACTOR))
@@ -778,7 +789,7 @@ def build_bundles() -> dict[str, dict[str, Any]]:
     bundles = {
         "common/mc.catalog.workflow-parity-1.0.5.json": workflow_parity_successor(),
         "common/mc.catalog.runtime-profiles-1.0.1.json": runtime_profiles_successor(),
-        "common/mc.catalog.approved-assets-1.0.2.json": approved_assets_successor(),
+        "common/mc.catalog.approved-assets-1.0.3.json": approved_assets_successor(),
         "qualification/mc.qualification.parity-1.0.0.json": qualification_parity(),
     }
     for relative in FROZEN_BUNDLES:

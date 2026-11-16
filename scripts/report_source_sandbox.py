@@ -14,12 +14,24 @@ import yaml
 from report_source_context import canonical, confined, digest, verify_context
 
 ROOT = Path(__file__).resolve().parents[1]
-KS = ROOT.parent / "knowledge-services"
 LOCAL = ROOT / "tests/fixtures/report-source-foundation/skills"
+IMPORTS = ROOT / "packages/mission-control-db-contract/bundle-sources/imported/IMPORTS.json"
+
+
+def imported_skill(name: str) -> Path:
+    """The custody copy of one Knowledge Services skill: its newest recorded import
+    (`scripts/skills_import.py`), an exact copy at one commit, so no sibling checkout is read."""
+
+    records = [
+        entry for entry in json.loads(IMPORTS.read_bytes())["imports"] if entry["skill"] == name
+    ]
+    newest = max(records, key=lambda entry: entry["source"]["committed_at"])
+    return ROOT / newest["directory"]
+
+
 CANONICAL = {
-    "knowledge-acquisition-and-vetting": KS / "skills/knowledge-acquisition-and-vetting",
-    "schema-explore": KS / "skills/schema-explore",
-    "knowledge-verify": KS / "apps/verification-executor/skills/knowledge-verify",
+    name: imported_skill(name)
+    for name in ("knowledge-acquisition-and-vetting", "schema-explore", "knowledge-verify")
 }
 REF = "sandbox/skills/report-source-procedure/references"
 MOUNT = "/skills/report-source-procedure/references"

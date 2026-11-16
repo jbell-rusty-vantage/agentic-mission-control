@@ -196,8 +196,11 @@ owner authorization as described in the operator guide.
 
 ### Fast-track targets
 
-`make skills-check` (part of `make check`) fails when a `skills/*/manifest.json` digest drifted from
-the files on disk; `make skills-manifest` rewrites them. `make seeds-validate` fails when a seed
+`make skills-check` (part of `make check`) fails when a coordinator bundle's generated
+`references/guide-*.md` differs from the guide, an imported skill copy differs from its record, or a
+`skills/*/manifest.json` digest drifted from the files on disk. After editing a guide page run
+`make skills-references`, bump the bundle's version, then `make skills-manifest`, which rewrites the
+digests. `make seeds-validate` fails when a seed
 Capability Pin does not parse or a tools/list digest drifted. `make lane-qualify PROFILE=cursor_local`
 (or `cursor_cloud`) runs the offline Cursor lane suites; `LIVE=1` adds the paid drill and needs
 `CURSOR_API_KEY` and a finite `MC_PAID_BUDGET_USD` (see

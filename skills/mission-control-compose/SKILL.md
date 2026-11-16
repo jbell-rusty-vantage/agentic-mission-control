@@ -1,70 +1,61 @@
 ---
 name: mission-control-compose
-description: Compose several Mission Control missions into a Mission Chain (missions plus links in one manifest), decide between chaining, nesting a Goal Loop or a Stage Graph, and invoking a child mission, and move state across links as a Context Packet. Use when a human wants one workflow to feed another, wants research then ingestion, or asks how mission state transfers between linked workflows.
+description: Compose several missions into a Mission Chain (missions plus links in one manifest), choose between a chain, a nested Goal Loop or Stage Graph and a child mission, and move accepted outputs across a link. Use when one mission should feed or release another, for research then ingestion, or when the user asks how state moves between linked missions.
 ---
 
 # Compose missions
 
-Three shapes exist; pick by governance boundary, not by size.
+Pick the shape by governance boundary, not by size.
 
 | Need | Shape | Because |
 | --- | --- | --- |
-| Adaptive steps toward an existing objective | Nest a `goal_loop` node inside the program | Same mission, same budget and acceptance |
-| A known route with dependencies | Nest a `stage_graph` node | Same mission; typed bindings between stages |
-| Independent goals, own budget and acceptance, started in order | A Mission Chain (`missions:` plus `links:`) | Each mission is independently admitted and judged; the link releases the next |
-| A node that must wait inside a program for another mission | `child_mission_invocation` node with `await` | The parent program blocks on the child's acceptance |
+| Adaptive steps toward one objective | A `goal_loop` node in the program | Same mission, budget and acceptance |
+| A known route with dependencies | A `stage_graph` node | Same mission; typed bindings between stages |
+| Independent goals, each with its own budget and acceptance, started in order | A Mission Chain: `missions` plus `links` | Each mission is admitted and judged on its own; a link releases the next |
+| A program that waits on another mission | A `child_mission_invocation` node | The parent blocks on the child |
 
-## 1. Write the chain
+Facts come from the server: `missionctl describe manifest:ChainLinkDeclaration` prints every
+link field with its allowed values and defaults, `missionctl describe manifest:InputBinding` an
+input, `missionctl describe manifest:ChildMissionInvocationNode` the child node.
 
-```yaml
-manifest: mission/v1
-missions:
-  - key: research
-    goals: [ { key: evidence_map, … } ]
-    environment: { lane: cursor_cloud, … }
-    program: { behavior: goal_loop, … , outputs: [ { name: sources, schema: source_manifest@1 } ] }
-  - key: ingestion
-    goals: [ { key: graph_updated, … } ]
-    inputs: [ { name: sources, schema: source_manifest@1, expand: materialize } ]
-    program: { behavior: goal_loop, … }
-links:
-  - { from: research.sources, to: ingestion.inputs.sources, kind: supplies,
-      release_on: goal_accepted, on_upstream_cancel: cancel_downstream }
-```
+## Order of work
 
-Rules: `supplies` binds one projected output to one declared input and releases the consumer
-when the condition holds (`goal_accepted` by default, `mission_accepted`, `execution_complete`);
-`depends_on` orders without data; cycles are a compile blocker; every link joins two missions
-declared in the same file (cross-file links are not in v1; use `child_mission_invocation` with an
-`existing_mission_ref` for that). A consumer with several incoming links releases when all are
-released (`any` is deferred to v2). See
-[chain-patterns.md](references/chain-patterns.md). Done when `missionctl mission compile` reports
-no blockers and the `links` section of the report shows every link resolved.
+1. **Write the chain.** One manifest with `missions` (two or more) and `links`; the
+   [patterns](references/chain-patterns.md) show whole links. A `supplies` link names the
+   supplier's root `outputs`; the consumer declares a node input `from: <mission key>.<output>`
+   for each. A `depends_on` link orders two missions and carries no data.
+2. **Compile.** `missionctl mission compile FILE`. Done when the report has no blockers; a
+   chain blocker names its link (`/links/N`) and its reason.
+3. **Stop for approval, then submit.** `missionctl mission submit FILE` returns the `chain_id`
+   and each `mission_id`. Only the first mission, the one no link enters, has an admitted
+   `run_id`.
+4. **Start the first run** on the user's word: `missionctl mission start RUN_ID`. A later
+   mission is admitted with its Context Packet when every link into it is released.
+5. **Follow it.** `missionctl chain inspect CHAIN_ID` lists each mission and each link's state
+   (`armed`, `released`, `blocked`, `detached`, `cancelled`); a blocked link says why. Wait on
+   each member run with `mission-control-observe`.
 
-## 2. Submit and start
+## How state moves
 
-`missionctl mission submit chain.yml --json` returns `chain_id` and one `mission_id` per mission;
-only the first mission (no incoming link) has an admitted `run_id`, every link is `armed`.
-`missionctl mission start RUN_ID` starts that run; later missions are admitted with their
-Context Packet when their link releases and the chain relay starts them. Available (FT-E3
-submit and start, FT-D2 release).
+When a link's condition holds, Mission Control builds the consumer's Context Packet from the
+supplier's accepted output revisions and admits the consumer's run with it. Nothing mutable
+crosses: no workspace, no transcript, no grant.
 
-## 3. How state moves
+## Rules that never bend
 
-When a link's condition commits, Mission Control builds a Context Packet for the consumer from
-the supplying mission's accepted outputs (as declared `expand`), its final Continuation
-Checkpoint reference and its Loop Journal digest, admits the consumer's run with that packet,
-and the outbox starts it. No workspace is shared; nothing mutable crosses. The consumer sees the
-packet in `.mission/context.md` and `/inputs/<name>/`.
+- A chain never widens authority: each mission keeps its own grants, budget and side effects.
+- Only accepted outputs release an ordinary `supplies` link. Unaccepted outputs travel only on
+  a repair link (`receiving_purpose: repair`), labelled as such.
+- Every mission but the first needs a link into it; links join missions of the same manifest.
+- A changed link after submit is a new revision of the chain.
 
-## 4. Inspect
+## Common mistakes
 
-`missionctl chain inspect CHAIN_ID --json` (available, FT-D2; MCP `mission_chain_inspect`) lists missions, link states (`armed |
-released | blocked | detached | cancelled`), the condition each waits for and the packet digest it released
-with. Cancelling an upstream mission applies each link's `on_upstream_cancel`.
-
-## Boundaries
-
-- A chain never widens authority: each mission's grants, budget and side effects are its own.
-- Provisional outputs cannot release a link; only accepted ones do.
-- Changing a link after submit is a new revision of the chain, not an edit.
+- Chaining to split one goal for budget accounting: narrow a node's `environment.budget`.
+- Writing the output into the link's ends: `from` and `to` are mission keys, `outputs` names
+  what is supplied.
+- Leaving out the consumer's `from:` input, or the supplier's root output: both are
+  `unbound_chain_output`.
+- Expecting a cancelled supplier to stop its consumer: `on_upstream_cancel` defaults to
+  `continue`; say `cancel_downstream` or `detach` when you mean it.
+- Hiding a chain inside a subagent: independent goals need independent admission.

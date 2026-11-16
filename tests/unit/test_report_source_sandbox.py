@@ -34,7 +34,18 @@ def test_deterministic_exact_inventory_and_fresh_output(package, tmp_path):
     assert module.verify(out, expected_digest=manifest["digest"]) == manifest
     assert len(manifest["skills"]) == 6
     assert manifest["qualified"] is False
-    assert any("add missing name" in row["transform"] for row in manifest["provenance"].values())
+    # The Knowledge Services skills come from this repository's custody copies (exact imports
+    # at one commit), never from a sibling checkout, and enter the sandbox unchanged.
+    custody = "/packages/mission-control-db-contract/bundle-sources/imported/knowledge-services/"
+    for name in module.CANONICAL:
+        rows = [
+            row
+            for destination, row in manifest["provenance"].items()
+            if destination.startswith(f"sandbox/skills/{name}/")
+            and "/workspace/tasks/" not in destination
+        ]
+        assert rows and all(custody in row["source"] for row in rows), name
+        assert {row["transform"] for row in rows} == {"none"}, name
     with pytest.raises(ValueError, match="fresh"):
         module.prepare(context, out)
     with pytest.raises(ValueError, match="pinned"):

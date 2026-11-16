@@ -87,6 +87,34 @@ async def test_a_knowledge_mission_mounts_its_application_charter(application: s
 
 
 @pytest.mark.asyncio
+async def test_an_installation_mounts_the_latest_charter_row_the_imported_copy() -> None:
+    """One installation's catalog holds every revision its seeds published: the 0.1.0 charter
+    Mission Control wrote (seed 1.0.4) and the copy imported from the application's own service
+    (seed 1.0.5, revision 2). The mount is `@latest`, so a knowledge mission gets the import."""
+
+    definitions, search = await fast_track_catalog(directories=("common", "ai-engineer"))
+    service = ManifestCompileService(
+        definitions=definitions,
+        search=search,
+        programs=ManifestProgramCompiler(definitions, ExtensionRegistry(), InMemoryPayloadStore()),
+        charter_skills=CHARTERS,
+    )
+    compilation = await service.compile(text(_knowledge()), scope("ai-engineer"))
+
+    assert compilation.ok, compilation.report.blockers
+    (charter,) = _charters(compilation)
+    assert charter.provenance == CHARTER_PROVENANCE
+    assert charter.result is not None
+    assert charter.result.version == "2026.11.16-b7e6e21"
+    revisions = sorted(
+        item.ref.revision
+        for item in await definitions.list_published_definitions()
+        if item.ref.logical_id == CHARTERS["ai-engineer"]
+    )
+    assert revisions == [1, 2]
+
+
+@pytest.mark.asyncio
 async def test_a_mission_without_knowledge_capabilities_mounts_no_charter() -> None:
     service, _ = await _service()
     compilation = await service.compile(text(minimal()), scope("biotech"))

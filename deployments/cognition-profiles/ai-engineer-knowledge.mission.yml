@@ -51,7 +51,7 @@ mission:
     - read_only
     - workspace_write
     plugins:
-    - pin: plugin.cognition-knowledge@1#sha256:c3408a615d7353410792b5f5b7f15e9f19a619f69a80a4af18ab136e24dc516b
+    - pin: plugin.cognition-knowledge@2#sha256:4cad94ba35b4eec057548b672846a3c3c4aba1eeefa6e13050c626129e8bced3
   program:
     key: root
     behavior: stage_graph

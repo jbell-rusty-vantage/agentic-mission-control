@@ -41,7 +41,13 @@ _WORD = re.compile(r"[a-z0-9]+")
 
 def seeded_published(
     directories: Iterable[str] = ("common", "biotech", "ai-engineer", "qualification"),
+    *,
+    every_revision: bool = False,
 ) -> list[PublishedDefinition]:
+    """The published definitions of the seed bundles, in file order. By default the first
+    revision of each id (the evaluation set is written against those rows);
+    ``every_revision`` keeps each id's whole succession, as one installation holds it."""
+
     published: list[PublishedDefinition] = []
     seen: set[tuple[str, str, int]] = set()
     for directory in directories:
@@ -56,7 +62,7 @@ def seeded_published(
                     item.ref.kind.value,
                     item.ref.logical_id,
                     item.ref.revision
-                    if item.ref.logical_id == "tool.knowledge-submit-output"
+                    if every_revision or item.ref.logical_id == "tool.knowledge-submit-output"
                     else 0,
                 )
                 if key not in seen:

@@ -51,8 +51,9 @@ snapshot -> read ledger -> pick one improvement -> change -> verify with make ->
   comment naming the false-positive class; tighten when a ty release fixes it.
 - Every ruff ignore carries a reason in `pyproject.toml`. Prefer a fix to a `# noqa`; a
   `# noqa` carries a reason.
-- `.agents/skills/mission-control-coordinator/` is digested into the catalog seed bundles.
-  Ruff excludes `.agents` with `force-exclude`; never format or lint-fix that directory.
+- `packages/mission-control-db-contract/bundle-sources/` holds bytes the catalog seed bundles
+  pin by digest (archived applied sources and imported skills). Ruff excludes it and `.agents`
+  with `force-exclude`; never format or lint-fix either directory.
 - No target or script deletes Docker volumes, `.venv`, `.env`, or files under `.scratch/`
   that the owner placed there. Cleaning is limited to tool caches.
 - Secrets never enter snapshots, ledgers or output. `scripts/dev/env_check.py` and the audit

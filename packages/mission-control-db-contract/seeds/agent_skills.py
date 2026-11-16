@@ -27,13 +27,21 @@ Sources (bytes are never edited; third-party bundles are kept verbatim):
   ``AGENT_CAPABILITY_SEED_NOTES.md``).
 - ``skill.mission-control`` and the five ``skill.mission-control-*`` bundles: ``skills/``
   (LF bytes; per-file digests equal ``make skills-manifest``).
-- ``skill.biotech-knowledge-charter`` and ``skill.ai-engineer-knowledge-charter``: ``skills/``
-  (LF bytes), each admitted to its own application only (``APPLICATION_SKILLS``, seed 1.0.4).
+- ``skill.biotech-knowledge-charter``: ``skills/`` (LF bytes), admitted to biotech only
+  (``APPLICATION_SKILLS``, seed 1.0.4).
+- The imported method skills (``IMPORTED_SKILLS``, seed 1.0.5): exact copies of a sibling
+  repository's skill at one commit, kept under ``bundle-sources/imported/`` and recorded in its
+  ``IMPORTS.json`` (``scripts/skills_import.py``; bytes verbatim, never edited here). Their
+  provenance is ``source: belllabs`` with the minted slug, the version and the commit. The
+  Knowledge Services skills are admitted to both applications; ``skill.content-authoring`` and
+  ``skill.ai-engineer-knowledge-charter`` (revision 2, replacing the 0.1.0 bundle Mission
+  Control wrote) to ai-engineer only.
 - ``hook.mc-policy-template``: ``scripts/hooks/policy_template`` (FT-A5).
 
-Admission per application (SPEC-01): every skill, the hook and the plugin in both
-applications, ``skill.biomcp`` and ``skill.biotech-knowledge-charter`` in biotech only,
-``skill.edgartools`` and ``skill.ai-engineer-knowledge-charter`` in ai-engineer only.
+Admission per application (SPEC-01): every Mission Control skill, the Knowledge Services
+skills, the hook and the plugin in both applications, ``skill.biomcp`` and
+``skill.biotech-knowledge-charter`` in biotech only, ``skill.edgartools``,
+``skill.content-authoring`` and ``skill.ai-engineer-knowledge-charter`` in ai-engineer only.
 ``scripts/seeds_publish_bundles.py`` uploads the bytes through the FT-A2 custody path.
 """
 
@@ -48,10 +56,10 @@ from typing import Any
 REPO_ROOT = Path(__file__).resolve().parents[3]
 SEEDS_ROOT = Path(__file__).resolve().parent
 AGENT_SKILL_SEED_TIME = datetime(2026, 10, 14, tzinfo=UTC)
-SEED_VERSION = "1.0.4"
+SEED_VERSION = "1.0.5"
 # Every committed seed version, oldest first; all but the last are frozen with their sources
 # under bundle-sources/agent-skills-<version>/.
-SEED_VERSIONS = ("1.0.0", "1.0.1", "1.0.2", "1.0.3", SEED_VERSION)
+SEED_VERSIONS = ("1.0.0", "1.0.1", "1.0.2", "1.0.3", "1.0.4", SEED_VERSION)
 FROZEN_SEED_VERSIONS = SEED_VERSIONS[:-1]
 FROZEN_SOURCES = SEEDS_ROOT.parent / "bundle-sources" / "agent-skills-1.0.0"
 APPS = ("biotech", "ai-engineer")
@@ -123,7 +131,27 @@ MISSION_CONTROL_SKILLS: tuple[str, ...] = (
 # Application Profile load check enforces (``bootstrap/application_profiles.charter_skill_id``).
 APPLICATION_SKILLS: dict[str, tuple[str, ...]] = {
     "biotech-knowledge-charter": ("biotech",),
-    "ai-engineer-knowledge-charter": ("ai-engineer",),
+}
+# Method skills imported from a sibling repository: name -> (the recorded import's version,
+# admitted applications). The version names one record of ``IMPORTS.json``, so a later import
+# changes nothing here until a new seed version names it. The AI Engineer charter keeps its
+# catalog id (``charter_skill_id``) and is published as that id's next revision.
+IMPORTS_RECORD = SEEDS_ROOT.parent / "bundle-sources" / "imported" / "IMPORTS.json"
+IMPORTED_SKILLS: dict[str, tuple[str, tuple[str, ...]]] = {
+    "knowledge-research": ("2026.11.16-7bc4aee", APPS),
+    "knowledge-verify": ("2026.11.16-7bc4aee", APPS),
+    "knowledge-acquisition-and-vetting": ("1.3.0-7bc4aee", APPS),
+    "knowledge-verification": ("1.5.0-7bc4aee", APPS),
+    "knowledge-ingest": ("2026.11.16-7bc4aee", APPS),
+    "knowledge-db": ("2026.11.16-7bc4aee", APPS),
+    "schema-explore": ("2026.11.16-7bc4aee", APPS),
+    "ai-engineer-knowledge-charter": ("2026.11.16-b7e6e21", ("ai-engineer",)),
+    "content-authoring": ("2026.11.16-b7e6e21", ("ai-engineer",)),
+}
+# Where a frozen seed version's bundle sources sit under its archive, for the capability ids
+# whose source has since left the path the repository held when that version shipped.
+FROZEN_DIRECTORIES: dict[str, str] = {
+    "skill.ai-engineer-knowledge-charter": "skills/ai-engineer-knowledge-charter",
 }
 HOOK: dict[str, Any] = {
     "id": "hook.mc-policy-template",
@@ -212,6 +240,52 @@ def _published_profiles(support: Any) -> Any:
     )
 
 
+def imported_records() -> dict[str, dict[str, Any]]:
+    """The import record of every skill ``IMPORTED_SKILLS`` names, by skill name."""
+
+    recorded = {
+        (entry["skill"], entry["version"]): entry
+        for entry in json.loads(IMPORTS_RECORD.read_bytes())["imports"]
+    }
+    return {name: recorded[(name, version)] for name, (version, _apps) in IMPORTED_SKILLS.items()}
+
+
+def imported_source(name: str, record: dict[str, Any]) -> dict[str, Any]:
+    """One imported skill as a seed source: its custody bytes verbatim, the description its
+    frontmatter gives on one line, and the upstream identity it was minted (CAP-D1).
+
+    A new row takes the matrix every profile has by default (``all_profiles``): supported on
+    the worker-hosted profiles and ``unqualified`` on the provider-hosted ones, which the
+    Cognition Profile plugins that pin it inherit. The rows older seed versions published keep
+    their five-profile matrix (``PUBLISHED_PROFILES``)."""
+
+    from mission_control.domain.capabilities.host_support import all_profiles
+
+    origin = record["source"]
+    return {
+        "id": record["capability_id"],
+        "kind": "skill_bundle",
+        "version": record["version"],
+        "apps": IMPORTED_SKILLS[name][1],
+        "directory": record["directory"],
+        "files": directory_files(record["directory"], lf=False),
+        "fields": {
+            "description": record["description"],
+            "source_provenance": {
+                "source": record["identifier"]["scheme"],
+                "locator": f"{origin['repository']}/tree/{origin['commit']}/{origin['path']}",
+                "upstream_identity": record["identifier"]["value"],
+                "upstream_version": record["version"],
+                "commit_digest": origin["commit"],
+                "license": record["license"],
+            },
+            "host_support": all_profiles().model_dump(mode="json"),
+            "review_status": "approved",
+            "maturity": "experimental",
+        },
+    }
+
+
 def bundle_sources() -> list[dict[str, Any]]:
     """Every seeded bundle: id, kind, version, applications, files and definition fields."""
 
@@ -289,6 +363,8 @@ def bundle_sources() -> list[dict[str, Any]]:
                 },
             }
         )
+    for name, record in imported_records().items():
+        sources.append(imported_source(name, record))
     sources.append(
         {
             "id": HOOK["id"],
@@ -348,8 +424,8 @@ def bundle_definition_for(source: dict[str, Any], application_id: str) -> tuple[
     return manifest, definition
 
 
-def definition_pin(definition: Any) -> str:
-    """The Capability Pin the catalog computes for the published row (revision 1).
+def definition_pin(definition: Any, revision: int = 1) -> str:
+    """The Capability Pin the catalog computes for the published row at ``revision``.
 
     Same rule as ``domain/capabilities/catalog_entry.capability_pin``: the upstream version
     when the definition records one, else the catalog revision.
@@ -363,7 +439,7 @@ def definition_pin(definition: Any) -> str:
         ref=ExactDefinitionRef(
             kind=definition.kind,
             logical_id=definition.logical_id,
-            revision=1,
+            revision=revision,
             digest=sha256_digest(definition),
         ),
         definition=definition,
@@ -468,6 +544,7 @@ def frozen_application_definitions(
     directories = {spec["id"]: spec["directory"] for spec in THIRD_PARTY_SKILLS}
     directories.update({f"skill.{name}": f"skills/{name}" for name in MISSION_CONTROL_SKILLS})
     directories.update({f"skill.{name}": f"skills/{name}" for name in APPLICATION_SKILLS})
+    directories.update(FROZEN_DIRECTORIES)
     directories[HOOK["id"]] = HOOK["directory"]
     entries = []
     for record in records:
@@ -516,36 +593,64 @@ def custody_definitions(application_id: str) -> list[dict[str, Any]]:
     return list(unique.values())
 
 
+def revised_definitions(application_id: str) -> list[tuple[dict[str, Any], int, bool]]:
+    """Every current definition with the catalog revision it has and whether this seed
+    version publishes it: a frozen row's revision when its definition is unchanged, the next
+    one when its bundle changed (which needs a new skill version), 1 for a new id."""
+
+    old_entries = {
+        entry["definition"].logical_id: entry
+        for version in FROZEN_SEED_VERSIONS
+        for entry in frozen_application_definitions(application_id, version)
+    }
+    revised: list[tuple[dict[str, Any], int, bool]] = []
+    for entry in application_definitions(application_id):
+        definition = entry["definition"]
+        frozen = old_entries.get(definition.logical_id)
+        previous = frozen["definition"] if frozen is not None else None
+        if frozen is not None and definition == previous:
+            revised.append((entry, frozen["revision"], False))
+            continue
+        if entry["source"] is None:
+            raise ValueError("plugin changes require explicitly versioned membership rows")
+        if frozen is None:
+            revision = 1  # a new skill id: its first published revision
+        elif (
+            definition.source_provenance.upstream_version
+            == previous.source_provenance.upstream_version
+        ):
+            raise ValueError(
+                f"changed bundle requires a new skill version: {definition.logical_id}"
+            )
+        else:
+            revision = frozen["revision"] + 1
+        revised.append((entry, revision, True))
+    return revised
+
+
+def seed_keys(application_id: str) -> dict[str, str]:
+    """Capability id -> the logical key of its current row in the agent-skill seeds, which a
+    later seed names to reference it (a plugin member row)."""
+
+    return {
+        entry["definition"].logical_id: (
+            f"{KEY_PREFIX}:{entry['definition'].kind.value.replace('_', '-')}:"
+            f"{entry['definition'].logical_id}/{revision}"
+        )
+        for entry, revision, _changed in revised_definitions(application_id)
+    }
+
+
 def bundles(published_records: Any, seed_format: str, compatibility: str, actor: str) -> dict:
     """Publish changed definitions at the next revision; never rewrite earlier seeds."""
     result: dict[str, Any] = {}
     for app in APPS:
-        old_entries = {
-            entry["definition"].logical_id: entry
-            for version in FROZEN_SEED_VERSIONS
-            for entry in frozen_application_definitions(app, version)
-        }
-        old = {key: entry["definition"] for key, entry in old_entries.items()}
         records: list[dict[str, Any]] = []
         names = []
-        for entry in application_definitions(app):
-            definition = entry["definition"]
-            previous = old.get(definition.logical_id)
-            if definition == previous:
+        for entry, revision, changed in revised_definitions(app):
+            if not changed:
                 continue
-            if entry["source"] is None:
-                raise ValueError("plugin changes require explicitly versioned membership rows")
-            if previous is None:
-                revision = 1  # a new skill id: its first published revision
-            elif (
-                definition.source_provenance.upstream_version
-                == previous.source_provenance.upstream_version
-            ):
-                raise ValueError(
-                    f"changed bundle requires a new skill version: {definition.logical_id}"
-                )
-            else:
-                revision = old_entries[definition.logical_id]["revision"] + 1
+            definition = entry["definition"]
             names.append(definition.logical_id)
             records += published_records(
                 definition,
@@ -564,8 +669,10 @@ def bundles(published_records: Any, seed_format: str, compatibility: str, actor:
             "depends_on": [{"seed_key": APP_KEYS[app], "seed_version": FROZEN_SEED_VERSIONS[-1]}],
             "actor_ref": actor,
             "description": (
-                f"The application's knowledge charter skill in '{app}': "
-                f"{', '.join(names)}. A new skill id starts at revision 1; all earlier "
+                "The coordinator skill bundles regenerated from the guide and the method "
+                "skills imported from their owning repositories (belllabs identifiers, pinned "
+                f"to a source commit) in '{app}': {', '.join(names)}. A new skill id starts at "
+                "revision 1 and a changed bundle takes its next revision; all earlier "
                 f"{', '.join(FROZEN_SEED_VERSIONS)} records and custody bytes are preserved."
             ),
             "records": records,

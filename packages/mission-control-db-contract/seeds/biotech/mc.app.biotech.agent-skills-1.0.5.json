@@ -1,0 +1,2599 @@
+{
+  "actor_ref": "seed:mission-control-catalog",
+  "component_compatibility": ">=1.0.0 <2.0.0",
+  "depends_on": [
+    {
+      "seed_key": "mc.app.biotech.agent-skills",
+      "seed_version": "1.0.4"
+    }
+  ],
+  "description": "The coordinator skill bundles regenerated from the guide and the method skills imported from their owning repositories (belllabs identifiers, pinned to a source commit) in 'biotech': skill.mission-control, skill.mission-control-author, skill.mission-control-catalog, skill.mission-control-compose, skill.mission-control-intervene, skill.mission-control-observe, skill.knowledge-research, skill.knowledge-verify, skill.knowledge-acquisition-and-vetting, skill.knowledge-verification, skill.knowledge-ingest, skill.knowledge-db, skill.schema-explore. A new skill id starts at revision 1 and a changed bundle takes its next revision; all earlier 1.0.0, 1.0.1, 1.0.2, 1.0.3, 1.0.4 records and custody bytes are preserved.",
+  "format": "mission-control-seed/v1",
+  "records": [
+    {
+      "fields": {
+        "asset_id": "definition:skill:skill.mission-control",
+        "contract": "mission-control.published-definition/1",
+        "host_support": {
+          "profiles": {
+            "claude_agent_sdk": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "codex": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "cursor_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "cursor_local": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "deep_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            }
+          },
+          "schema_version": "mc.capability_host_support.v1"
+        },
+        "kind": "skill_bundle",
+        "manifest": {
+          "definition": {
+            "attachment_targets": [
+              "agent.main"
+            ],
+            "body_summary": "Drive Mission Control through missionctl. Use to interview for a mission, choose lanes, models and capabilities, author and launch a manifest, wait on a run and accept its results, steer, cancel or fork a run, or chain missions.",
+            "bundle_ref": {
+              "digest": "sha256:b3b3f1cd5fd88b6f9bbb9395a1f5e6b3d39b5b491d9cde4871ed6e85943c428b",
+              "media_type": "application/vnd.mc.capability-bundle+json",
+              "size_bytes": 9188,
+              "uri": "capability-bundles://biotech/skill_bundle/skill.mission-control/0.6.0/b3b3f1cd5fd88b6f9bbb9395a1f5e6b3d39b5b491d9cde4871ed6e85943c428b"
+            },
+            "compatibility": {
+              "executables": [],
+              "network_capabilities": [],
+              "runtimes": [],
+              "workspace_capabilities": []
+            },
+            "compatible_compiler_versions": [
+              "control-plane-definitions/1"
+            ],
+            "conflicts_with": [],
+            "description": "Drive Mission Control through missionctl. Use to interview for a mission, choose lanes, models and capabilities, author and launch a manifest, wait on a run and accept its results, steer, cancel or fork a run, or chain missions.",
+            "file_manifest": [
+              {
+                "digest": "sha256:0a6c580a8165f5f4e749f84ef0b3360a0836bb97b3343b4ef69fc77f843ad32c",
+                "executable": false,
+                "path": "SKILL.md",
+                "size_bytes": 2986
+              },
+              {
+                "digest": "sha256:09f3784e943ab074e1df885e4fe3ed77b816d073afe70b6c37e312b8f22731c0",
+                "executable": false,
+                "path": "manifest.json",
+                "size_bytes": 675
+              },
+              {
+                "digest": "sha256:95135b2240dc7b3989506f20849203bc70e1d2eda61f4506c8bcdafc990043d8",
+                "executable": false,
+                "path": "references/guide-index.md",
+                "size_bytes": 2250
+              },
+              {
+                "digest": "sha256:0e6896e28e58434b604d2afb9408afc69d7e19107154e34bed305234fcb24021",
+                "executable": false,
+                "path": "references/operations.json",
+                "size_bytes": 1740
+              },
+              {
+                "digest": "sha256:da94a295f56328ec8b40ecfb081647ffd4ef5d291cf6c4dda55914fd90975c3e",
+                "executable": false,
+                "path": "references/whoami.md",
+                "size_bytes": 1537
+              }
+            ],
+            "frontmatter": {
+              "description": "Drive Mission Control through missionctl. Use to interview for a mission, choose lanes, models and capabilities, author and launch a manifest, wait on a run and accept its results, steer, cancel or fork a run, or chain missions.",
+              "name": "mission-control"
+            },
+            "host_support": {
+              "profiles": {
+                "claude_agent_sdk": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "codex": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "cursor_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "cursor_local": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "deep_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                }
+              },
+              "schema_version": "mc.capability_host_support.v1"
+            },
+            "kind": "skill",
+            "logical_id": "skill.mission-control",
+            "manifest_digest": "sha256:b3b3f1cd5fd88b6f9bbb9395a1f5e6b3d39b5b491d9cde4871ed6e85943c428b",
+            "maturity": "qualified",
+            "required_capabilities": [],
+            "review_status": "approved",
+            "schema_version": "1",
+            "skill_name": "mission-control",
+            "source_provenance": {
+              "commit_digest": null,
+              "license": "proprietary",
+              "locator": "repo://skills/mission-control",
+              "source": "local",
+              "upstream_identity": "skill.mission-control",
+              "upstream_version": "0.6.0"
+            },
+            "title": "mission-control"
+          },
+          "published_at": "2026-10-14T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:541a6a1e97947d483403e687aaad26ea3b2f5d401c86c0b87d185da4a78b84da",
+            "kind": "skill",
+            "lifecycle_status": "published",
+            "logical_id": "skill.mission-control",
+            "payload_ref": null,
+            "revision": 3,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:7eaea33149990fa14b722c9b73f4e076e45028986f0ea87650797ca3218a1191",
+        "manifest_ref": "mc-catalog://definition/skill/skill.mission-control/3",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "3"
+      },
+      "kind": "asset_version",
+      "logical_key": "agent-skill:skill:skill.mission-control/3"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "agent-skill:skill:skill.mission-control/3",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/agent_skills.py",
+          "skills/mission-control"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "agent-skill:skill:skill.mission-control/3:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:skill:skill.mission-control-author",
+        "contract": "mission-control.published-definition/1",
+        "host_support": {
+          "profiles": {
+            "claude_agent_sdk": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "codex": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "cursor_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "cursor_local": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "deep_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            }
+          },
+          "schema_version": "mc.capability_host_support.v1"
+        },
+        "kind": "skill_bundle",
+        "manifest": {
+          "definition": {
+            "attachment_targets": [
+              "agent.main"
+            ],
+            "body_summary": "Interview the user and author a Mission Manifest with missionctl - fill a template, record the brief, compile, preflight, submit and start. Use for a new mission, an edit to a manifest, a refused compile or a launch.",
+            "bundle_ref": {
+              "digest": "sha256:0004f9f4f781341231b35493b06716f1d324122cd371fb0324700efafa105f9b",
+              "media_type": "application/vnd.mc.capability-bundle+json",
+              "size_bytes": 20719,
+              "uri": "capability-bundles://biotech/skill_bundle/skill.mission-control-author/0.4.0/0004f9f4f781341231b35493b06716f1d324122cd371fb0324700efafa105f9b"
+            },
+            "compatibility": {
+              "executables": [],
+              "network_capabilities": [],
+              "runtimes": [],
+              "workspace_capabilities": []
+            },
+            "compatible_compiler_versions": [
+              "control-plane-definitions/1"
+            ],
+            "conflicts_with": [],
+            "description": "Interview the user and author a Mission Manifest with missionctl - fill a template, record the brief, compile, preflight, submit and start. Use for a new mission, an edit to a manifest, a refused compile or a launch.",
+            "file_manifest": [
+              {
+                "digest": "sha256:910e45e95f5270e9ed1d4548b675f80858c2145572e5f7bb70f26db5cf2a5cbe",
+                "executable": false,
+                "path": "SKILL.md",
+                "size_bytes": 3486
+              },
+              {
+                "digest": "sha256:c8cf867c726e484c98cc6bfe29a0eadd915cb9cad183dc9687a663895776a85f",
+                "executable": false,
+                "path": "manifest.json",
+                "size_bytes": 701
+              },
+              {
+                "digest": "sha256:d2c5136b7e03cd2760511d029103536eb459baa818f36f412dbb66083fe7e7e0",
+                "executable": false,
+                "path": "references/guide-interview.md",
+                "size_bytes": 5400
+              },
+              {
+                "digest": "sha256:7da4be2213b6a3609096906ab0f0f156cce3bcd4d039cc65d128bc473637c940",
+                "executable": false,
+                "path": "references/guide-launch.md",
+                "size_bytes": 3254
+              },
+              {
+                "digest": "sha256:600d4eba48c0400521b1ccc39ad3cc728b56c48268b057020c911613b83a4709",
+                "executable": false,
+                "path": "references/guide-manifest.md",
+                "size_bytes": 5246
+              },
+              {
+                "digest": "sha256:7842d6b50bb28d24750c378c64f9996ea192bb27e794e388a4e5a4b035fcf137",
+                "executable": false,
+                "path": "references/guide-templates.md",
+                "size_bytes": 2632
+              }
+            ],
+            "frontmatter": {
+              "description": "Interview the user and author a Mission Manifest with missionctl - fill a template, record the brief, compile, preflight, submit and start. Use for a new mission, an edit to a manifest, a refused compile or a launch.",
+              "name": "mission-control-author"
+            },
+            "host_support": {
+              "profiles": {
+                "claude_agent_sdk": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "codex": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "cursor_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "cursor_local": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "deep_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                }
+              },
+              "schema_version": "mc.capability_host_support.v1"
+            },
+            "kind": "skill",
+            "logical_id": "skill.mission-control-author",
+            "manifest_digest": "sha256:0004f9f4f781341231b35493b06716f1d324122cd371fb0324700efafa105f9b",
+            "maturity": "qualified",
+            "required_capabilities": [],
+            "review_status": "approved",
+            "schema_version": "1",
+            "skill_name": "mission-control-author",
+            "source_provenance": {
+              "commit_digest": null,
+              "license": "proprietary",
+              "locator": "repo://skills/mission-control-author",
+              "source": "local",
+              "upstream_identity": "skill.mission-control-author",
+              "upstream_version": "0.4.0"
+            },
+            "title": "mission-control-author"
+          },
+          "published_at": "2026-10-14T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:d50654037183b2880f0af0d94e3040ce764bd81d7f3b24baf240846b7787e80b",
+            "kind": "skill",
+            "lifecycle_status": "published",
+            "logical_id": "skill.mission-control-author",
+            "payload_ref": null,
+            "revision": 5,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:15e884ebf6a3f071d315ce41d62ff40ce2531ac49fbe8cdc74f13df5eaa40397",
+        "manifest_ref": "mc-catalog://definition/skill/skill.mission-control-author/5",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "5"
+      },
+      "kind": "asset_version",
+      "logical_key": "agent-skill:skill:skill.mission-control-author/5"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "agent-skill:skill:skill.mission-control-author/5",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/agent_skills.py",
+          "skills/mission-control-author"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "agent-skill:skill:skill.mission-control-author/5:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:skill:skill.mission-control-catalog",
+        "contract": "mission-control.published-definition/1",
+        "host_support": {
+          "profiles": {
+            "claude_agent_sdk": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "codex": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "cursor_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "cursor_local": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "deep_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            }
+          },
+          "schema_version": "mc.capability_host_support.v1"
+        },
+        "kind": "skill_bundle",
+        "manifest": {
+          "definition": {
+            "attachment_targets": [
+              "agent.main"
+            ],
+            "body_summary": "Choose what a mission runs on and with - list and search lanes, Model Profiles, capabilities, templates and sandbox profiles with missionctl search, read one with missionctl describe, check a draft selection, pin a capability or publish a skill bundle. Use when a manifest needs a lane, a model or a capability, when the user asks what exists, or when something outside the catalog is found.",
+            "bundle_ref": {
+              "digest": "sha256:c61c7ba2330b0dac3fbdc2209f09840b590f360c1103429a602ac5e908bd64e8",
+              "media_type": "application/vnd.mc.capability-bundle+json",
+              "size_bytes": 16859,
+              "uri": "capability-bundles://biotech/skill_bundle/skill.mission-control-catalog/0.3.0/c61c7ba2330b0dac3fbdc2209f09840b590f360c1103429a602ac5e908bd64e8"
+            },
+            "compatibility": {
+              "executables": [],
+              "network_capabilities": [],
+              "runtimes": [],
+              "workspace_capabilities": []
+            },
+            "compatible_compiler_versions": [
+              "control-plane-definitions/1"
+            ],
+            "conflicts_with": [],
+            "description": "Choose what a mission runs on and with - list and search lanes, Model Profiles, capabilities, templates and sandbox profiles with missionctl search, read one with missionctl describe, check a draft selection, pin a capability or publish a skill bundle. Use when a manifest needs a lane, a model or a capability, when the user asks what exists, or when something outside the catalog is found.",
+            "file_manifest": [
+              {
+                "digest": "sha256:f3a97a4262b91e7dbed3f1d4691bbccc53d83e9d36574711fb09dfc21d7d8cf7",
+                "executable": false,
+                "path": "SKILL.md",
+                "size_bytes": 3555
+              },
+              {
+                "digest": "sha256:9a14db66c0a605f4064bc6963b4cc8421532f4fee6dca31b8a8d79bfcea232b0",
+                "executable": false,
+                "path": "manifest.json",
+                "size_bytes": 702
+              },
+              {
+                "digest": "sha256:05394ce4f8c634898bea8b6d765138ad7f96eda62592bd28b0bf6ff836062363",
+                "executable": false,
+                "path": "references/guide-capabilities.md",
+                "size_bytes": 3323
+              },
+              {
+                "digest": "sha256:a90ce30aeec0dce27b39deb7f9bac53fed571822087cb657aedcb58e83a8b47d",
+                "executable": false,
+                "path": "references/guide-lanes.md",
+                "size_bytes": 4159
+              },
+              {
+                "digest": "sha256:accd8acc471f7fa0b54c07ceb184aa30396e39b9a652400b8359cc0c6d03ae89",
+                "executable": false,
+                "path": "references/guide-models.md",
+                "size_bytes": 1302
+              },
+              {
+                "digest": "sha256:c793f860a9ef6e192c84aa6db690d8c63511a014aed7e33c9d530ce4160647d7",
+                "executable": false,
+                "path": "references/guide-workflows.md",
+                "size_bytes": 3818
+              }
+            ],
+            "frontmatter": {
+              "description": "Choose what a mission runs on and with - list and search lanes, Model Profiles, capabilities, templates and sandbox profiles with missionctl search, read one with missionctl describe, check a draft selection, pin a capability or publish a skill bundle. Use when a manifest needs a lane, a model or a capability, when the user asks what exists, or when something outside the catalog is found.",
+              "name": "mission-control-catalog"
+            },
+            "host_support": {
+              "profiles": {
+                "claude_agent_sdk": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "codex": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "cursor_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "cursor_local": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "deep_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                }
+              },
+              "schema_version": "mc.capability_host_support.v1"
+            },
+            "kind": "skill",
+            "logical_id": "skill.mission-control-catalog",
+            "manifest_digest": "sha256:c61c7ba2330b0dac3fbdc2209f09840b590f360c1103429a602ac5e908bd64e8",
+            "maturity": "qualified",
+            "required_capabilities": [],
+            "review_status": "approved",
+            "schema_version": "1",
+            "skill_name": "mission-control-catalog",
+            "source_provenance": {
+              "commit_digest": null,
+              "license": "proprietary",
+              "locator": "repo://skills/mission-control-catalog",
+              "source": "local",
+              "upstream_identity": "skill.mission-control-catalog",
+              "upstream_version": "0.3.0"
+            },
+            "title": "mission-control-catalog"
+          },
+          "published_at": "2026-10-14T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:f80a22976fa51be04bed2bdbbfcf668dda354b7548658bbc3edfa7b802ac4281",
+            "kind": "skill",
+            "lifecycle_status": "published",
+            "logical_id": "skill.mission-control-catalog",
+            "payload_ref": null,
+            "revision": 2,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:930250430cd454b7ff68b61cf72aabdb0cc29416ac1a69cbaf32e77fb68ddafc",
+        "manifest_ref": "mc-catalog://definition/skill/skill.mission-control-catalog/2",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "2"
+      },
+      "kind": "asset_version",
+      "logical_key": "agent-skill:skill:skill.mission-control-catalog/2"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "agent-skill:skill:skill.mission-control-catalog/2",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/agent_skills.py",
+          "skills/mission-control-catalog"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "agent-skill:skill:skill.mission-control-catalog/2:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:skill:skill.mission-control-compose",
+        "contract": "mission-control.published-definition/1",
+        "host_support": {
+          "profiles": {
+            "claude_agent_sdk": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "codex": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "cursor_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "cursor_local": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "deep_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            }
+          },
+          "schema_version": "mc.capability_host_support.v1"
+        },
+        "kind": "skill_bundle",
+        "manifest": {
+          "definition": {
+            "attachment_targets": [
+              "agent.main"
+            ],
+            "body_summary": "Compose several missions into a Mission Chain (missions plus links in one manifest), choose between a chain, a nested Goal Loop or Stage Graph and a child mission, and move accepted outputs across a link. Use when one mission should feed or release another, for research then ingestion, or when the user asks how state moves between linked missions.",
+            "bundle_ref": {
+              "digest": "sha256:b35666be50c4a34bd02937458120be9b5973920de9782ba37521e940f65d38d4",
+              "media_type": "application/vnd.mc.capability-bundle+json",
+              "size_bytes": 8645,
+              "uri": "capability-bundles://biotech/skill_bundle/skill.mission-control-compose/0.3.0/b35666be50c4a34bd02937458120be9b5973920de9782ba37521e940f65d38d4"
+            },
+            "compatibility": {
+              "executables": [],
+              "network_capabilities": [],
+              "runtimes": [],
+              "workspace_capabilities": []
+            },
+            "compatible_compiler_versions": [
+              "control-plane-definitions/1"
+            ],
+            "conflicts_with": [],
+            "description": "Compose several missions into a Mission Chain (missions plus links in one manifest), choose between a chain, a nested Goal Loop or Stage Graph and a child mission, and move accepted outputs across a link. Use when one mission should feed or release another, for research then ingestion, or when the user asks how state moves between linked missions.",
+            "file_manifest": [
+              {
+                "digest": "sha256:8267cdfd59b1727f2de470036b37c78ede8507832b5d598ffaa70a6b7adb800d",
+                "executable": false,
+                "path": "SKILL.md",
+                "size_bytes": 3715
+              },
+              {
+                "digest": "sha256:f8229656979a38a883b2f271028ae171a77a6e102ecd8598c9708aa71a9ca4ef",
+                "executable": false,
+                "path": "manifest.json",
+                "size_bytes": 369
+              },
+              {
+                "digest": "sha256:3fd449d67cd988e9834a6eac958a335037a2df270a444c66515e36a8e0f372e7",
+                "executable": false,
+                "path": "references/chain-patterns.md",
+                "size_bytes": 4561
+              }
+            ],
+            "frontmatter": {
+              "description": "Compose several missions into a Mission Chain (missions plus links in one manifest), choose between a chain, a nested Goal Loop or Stage Graph and a child mission, and move accepted outputs across a link. Use when one mission should feed or release another, for research then ingestion, or when the user asks how state moves between linked missions.",
+              "name": "mission-control-compose"
+            },
+            "host_support": {
+              "profiles": {
+                "claude_agent_sdk": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "codex": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "cursor_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "cursor_local": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "deep_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                }
+              },
+              "schema_version": "mc.capability_host_support.v1"
+            },
+            "kind": "skill",
+            "logical_id": "skill.mission-control-compose",
+            "manifest_digest": "sha256:b35666be50c4a34bd02937458120be9b5973920de9782ba37521e940f65d38d4",
+            "maturity": "qualified",
+            "required_capabilities": [],
+            "review_status": "approved",
+            "schema_version": "1",
+            "skill_name": "mission-control-compose",
+            "source_provenance": {
+              "commit_digest": null,
+              "license": "proprietary",
+              "locator": "repo://skills/mission-control-compose",
+              "source": "local",
+              "upstream_identity": "skill.mission-control-compose",
+              "upstream_version": "0.3.0"
+            },
+            "title": "mission-control-compose"
+          },
+          "published_at": "2026-10-14T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:4d11a0a370fc02af798019077f77af3e8a288a339f87a8b557be2ab810f27aa8",
+            "kind": "skill",
+            "lifecycle_status": "published",
+            "logical_id": "skill.mission-control-compose",
+            "payload_ref": null,
+            "revision": 2,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:eb2ed64af909d29a71b28439595f0dc357f2e733d906ff84de8271ef5c4e117a",
+        "manifest_ref": "mc-catalog://definition/skill/skill.mission-control-compose/2",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "2"
+      },
+      "kind": "asset_version",
+      "logical_key": "agent-skill:skill:skill.mission-control-compose/2"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "agent-skill:skill:skill.mission-control-compose/2",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/agent_skills.py",
+          "skills/mission-control-compose"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "agent-skill:skill:skill.mission-control-compose/2:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:skill:skill.mission-control-intervene",
+        "contract": "mission-control.published-definition/1",
+        "host_support": {
+          "profiles": {
+            "claude_agent_sdk": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "codex": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "cursor_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "cursor_local": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "deep_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            }
+          },
+          "schema_version": "mc.capability_host_support.v1"
+        },
+        "kind": "skill_bundle",
+        "manifest": {
+          "definition": {
+            "attachment_targets": [
+              "agent.main"
+            ],
+            "body_summary": "Steer, stop or branch a running mission with missionctl - queue an instruction or context, interrupt and inject, pause, resume, cancel, fork from a Snapshot or a cognition point, read an agent's state at a point, or reconcile an in-doubt unit. Use when the user wants to redirect, stop, retry or explore from a run that already started.",
+            "bundle_ref": {
+              "digest": "sha256:d5216b51d56b85a77bc386919b426346f4b1f4d8d1bb7aa8bff8974f77229090",
+              "media_type": "application/vnd.mc.capability-bundle+json",
+              "size_bytes": 9925,
+              "uri": "capability-bundles://biotech/skill_bundle/skill.mission-control-intervene/0.6.0/d5216b51d56b85a77bc386919b426346f4b1f4d8d1bb7aa8bff8974f77229090"
+            },
+            "compatibility": {
+              "executables": [],
+              "network_capabilities": [],
+              "runtimes": [],
+              "workspace_capabilities": []
+            },
+            "compatible_compiler_versions": [
+              "control-plane-definitions/1"
+            ],
+            "conflicts_with": [],
+            "description": "Steer, stop or branch a running mission with missionctl - queue an instruction or context, interrupt and inject, pause, resume, cancel, fork from a Snapshot or a cognition point, read an agent's state at a point, or reconcile an in-doubt unit. Use when the user wants to redirect, stop, retry or explore from a run that already started.",
+            "file_manifest": [
+              {
+                "digest": "sha256:c53e7b11ef65d36aa85bc7ef4d64854bf036470c46a7e75866d5446f828551bb",
+                "executable": false,
+                "path": "SKILL.md",
+                "size_bytes": 3963
+              },
+              {
+                "digest": "sha256:cc4111ee60a1c09ec22eddedbe07c7e1288c817601a7307d6af602e96e528677",
+                "executable": false,
+                "path": "manifest.json",
+                "size_bytes": 370
+              },
+              {
+                "digest": "sha256:af29415cada718f56bc5004016921e968b532166663bc3e22a2b4d30520a0644",
+                "executable": false,
+                "path": "references/guide-control.md",
+                "size_bytes": 5592
+              }
+            ],
+            "frontmatter": {
+              "description": "Steer, stop or branch a running mission with missionctl - queue an instruction or context, interrupt and inject, pause, resume, cancel, fork from a Snapshot or a cognition point, read an agent's state at a point, or reconcile an in-doubt unit. Use when the user wants to redirect, stop, retry or explore from a run that already started.",
+              "name": "mission-control-intervene"
+            },
+            "host_support": {
+              "profiles": {
+                "claude_agent_sdk": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "codex": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "cursor_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "cursor_local": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "deep_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                }
+              },
+              "schema_version": "mc.capability_host_support.v1"
+            },
+            "kind": "skill",
+            "logical_id": "skill.mission-control-intervene",
+            "manifest_digest": "sha256:d5216b51d56b85a77bc386919b426346f4b1f4d8d1bb7aa8bff8974f77229090",
+            "maturity": "qualified",
+            "required_capabilities": [],
+            "review_status": "approved",
+            "schema_version": "1",
+            "skill_name": "mission-control-intervene",
+            "source_provenance": {
+              "commit_digest": null,
+              "license": "proprietary",
+              "locator": "repo://skills/mission-control-intervene",
+              "source": "local",
+              "upstream_identity": "skill.mission-control-intervene",
+              "upstream_version": "0.6.0"
+            },
+            "title": "mission-control-intervene"
+          },
+          "published_at": "2026-10-14T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:18cd220bf32920a8398eec062243628e83fc54fe7be1787c46ff9c8b8564e4a6",
+            "kind": "skill",
+            "lifecycle_status": "published",
+            "logical_id": "skill.mission-control-intervene",
+            "payload_ref": null,
+            "revision": 2,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:5aa686992579f20773016123aac797c3286037fa2e6865e225dce749e972a931",
+        "manifest_ref": "mc-catalog://definition/skill/skill.mission-control-intervene/2",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "2"
+      },
+      "kind": "asset_version",
+      "logical_key": "agent-skill:skill:skill.mission-control-intervene/2"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "agent-skill:skill:skill.mission-control-intervene/2",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/agent_skills.py",
+          "skills/mission-control-intervene"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "agent-skill:skill:skill.mission-control-intervene/2:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:skill:skill.mission-control-observe",
+        "contract": "mission-control.published-definition/1",
+        "host_support": {
+          "profiles": {
+            "claude_agent_sdk": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "codex": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "cursor_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "cursor_local": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "deep_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            }
+          },
+          "schema_version": "mc.capability_host_support.v1"
+        },
+        "kind": "skill_bundle",
+        "manifest": {
+          "definition": {
+            "attachment_targets": [
+              "agent.main"
+            ],
+            "body_summary": "Check in on a running mission and accept its results with missionctl - wait on the coordinator inbox, inspect on a wake, read the transcript, outputs, cost and cognition points, and tell execution from acceptance. Use after a start, to supervise one or several runs, to investigate a blocked or failed run, or to report what a run produced.",
+            "bundle_ref": {
+              "digest": "sha256:3420b4e6b744cf99a5151c4713587975961063fe3944dfd65e48d9c4952c74ce",
+              "media_type": "application/vnd.mc.capability-bundle+json",
+              "size_bytes": 8285,
+              "uri": "capability-bundles://biotech/skill_bundle/skill.mission-control-observe/0.4.0/3420b4e6b744cf99a5151c4713587975961063fe3944dfd65e48d9c4952c74ce"
+            },
+            "compatibility": {
+              "executables": [],
+              "network_capabilities": [],
+              "runtimes": [],
+              "workspace_capabilities": []
+            },
+            "compatible_compiler_versions": [
+              "control-plane-definitions/1"
+            ],
+            "conflicts_with": [],
+            "description": "Check in on a running mission and accept its results with missionctl - wait on the coordinator inbox, inspect on a wake, read the transcript, outputs, cost and cognition points, and tell execution from acceptance. Use after a start, to supervise one or several runs, to investigate a blocked or failed run, or to report what a run produced.",
+            "file_manifest": [
+              {
+                "digest": "sha256:cc690aef99b748243e2df38c2005f28f424c345b58b608aa2c1390c356bd5b48",
+                "executable": false,
+                "path": "SKILL.md",
+                "size_bytes": 3986
+              },
+              {
+                "digest": "sha256:5df07d2251e76fd44570d44748a0638ec229bd2f5222d285bfe190072aeb285f",
+                "executable": false,
+                "path": "manifest.json",
+                "size_bytes": 368
+              },
+              {
+                "digest": "sha256:f93ea1fc25270c96c48a922c01a60b4402381f05496be0db1d9fee686845a7a0",
+                "executable": false,
+                "path": "references/guide-observe.md",
+                "size_bytes": 3931
+              }
+            ],
+            "frontmatter": {
+              "description": "Check in on a running mission and accept its results with missionctl - wait on the coordinator inbox, inspect on a wake, read the transcript, outputs, cost and cognition points, and tell execution from acceptance. Use after a start, to supervise one or several runs, to investigate a blocked or failed run, or to report what a run produced.",
+              "name": "mission-control-observe"
+            },
+            "host_support": {
+              "profiles": {
+                "claude_agent_sdk": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "codex": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "cursor_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "cursor_local": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "deep_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                }
+              },
+              "schema_version": "mc.capability_host_support.v1"
+            },
+            "kind": "skill",
+            "logical_id": "skill.mission-control-observe",
+            "manifest_digest": "sha256:3420b4e6b744cf99a5151c4713587975961063fe3944dfd65e48d9c4952c74ce",
+            "maturity": "qualified",
+            "required_capabilities": [],
+            "review_status": "approved",
+            "schema_version": "1",
+            "skill_name": "mission-control-observe",
+            "source_provenance": {
+              "commit_digest": null,
+              "license": "proprietary",
+              "locator": "repo://skills/mission-control-observe",
+              "source": "local",
+              "upstream_identity": "skill.mission-control-observe",
+              "upstream_version": "0.4.0"
+            },
+            "title": "mission-control-observe"
+          },
+          "published_at": "2026-10-14T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:f96d3132b9c6f73099506ff067abaa2021f433e78c9b314b1911f0f7051fa225",
+            "kind": "skill",
+            "lifecycle_status": "published",
+            "logical_id": "skill.mission-control-observe",
+            "payload_ref": null,
+            "revision": 4,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:844e84035629bef220a91a4c2ff21da453f80688a8ad01a177df9ef04f37e1a9",
+        "manifest_ref": "mc-catalog://definition/skill/skill.mission-control-observe/4",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "4"
+      },
+      "kind": "asset_version",
+      "logical_key": "agent-skill:skill:skill.mission-control-observe/4"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "agent-skill:skill:skill.mission-control-observe/4",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/agent_skills.py",
+          "skills/mission-control-observe"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "agent-skill:skill:skill.mission-control-observe/4:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:skill:skill.knowledge-research",
+        "contract": "mission-control.published-definition/1",
+        "host_support": {
+          "profiles": {
+            "claude_agent_sdk": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "claude_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "claude_managed": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "codex_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "cursor_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "cursor_local": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "deep_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            }
+          },
+          "schema_version": "mc.capability_host_support.v1"
+        },
+        "kind": "skill_bundle",
+        "manifest": {
+          "definition": {
+            "attachment_targets": [
+              "agent.main"
+            ],
+            "body_summary": "Research method and verification for a knowledge base, loaded before a task searches for sources, captures evidence, states or checks a claim, or hands research back.",
+            "bundle_ref": {
+              "digest": "sha256:83bba43ace99afa2d2c50fac1f840737e97f8c91f9823fb519b6a95f97c961fc",
+              "media_type": "application/vnd.mc.capability-bundle+json",
+              "size_bytes": 90208,
+              "uri": "capability-bundles://biotech/skill_bundle/skill.knowledge-research/2026.11.16-7bc4aee/83bba43ace99afa2d2c50fac1f840737e97f8c91f9823fb519b6a95f97c961fc"
+            },
+            "compatibility": {
+              "executables": [],
+              "network_capabilities": [],
+              "runtimes": [],
+              "workspace_capabilities": []
+            },
+            "compatible_compiler_versions": [
+              "control-plane-definitions/1"
+            ],
+            "conflicts_with": [],
+            "description": "Research method and verification for a knowledge base, loaded before a task searches for sources, captures evidence, states or checks a claim, or hands research back.",
+            "file_manifest": [
+              {
+                "digest": "sha256:d4fb7fee460acce0aea322a22adbb50f762a0223ca4fc21026e43434ce4ab0d6",
+                "executable": false,
+                "path": "SKILL.md",
+                "size_bytes": 8986
+              },
+              {
+                "digest": "sha256:b3f7e0076f9845e6d92af6f09efe66a8c35c7b26e0f2ca32e28a70becd65ddd0",
+                "executable": false,
+                "path": "references/handback.md",
+                "size_bytes": 7602
+              },
+              {
+                "digest": "sha256:ad5a9c4e72df73595965387ce79c52533f69e800779f8ebc3e10d9a40005f868",
+                "executable": false,
+                "path": "references/method.md",
+                "size_bytes": 10551
+              },
+              {
+                "digest": "sha256:53430c11fe9e91d9f8a91cc2377998cf383b906e51444de6e1d19c81fc38687e",
+                "executable": false,
+                "path": "references/sources.md",
+                "size_bytes": 8937
+              },
+              {
+                "digest": "sha256:79097b0d65145bc5d342ef5f49db53a760a8175dc1c1793bf69ee3ef8da1d97f",
+                "executable": false,
+                "path": "references/tools/arxiv.md",
+                "size_bytes": 5617
+              },
+              {
+                "digest": "sha256:bd0dc51359440ebac289205761acbf860d42206333fa14387bd89b88b74b1b1c",
+                "executable": false,
+                "path": "references/tools/browser.md",
+                "size_bytes": 5215
+              },
+              {
+                "digest": "sha256:040f034e48d78e6c3be87234b734ad78f7fd4833e403480b7dda65c6b0bcc0f3",
+                "executable": false,
+                "path": "references/tools/context7.md",
+                "size_bytes": 4166
+              },
+              {
+                "digest": "sha256:f693470d741f3b4a64ac9676ed4ea29a18c708a9339b0207fc03fbfe8ade6ec2",
+                "executable": false,
+                "path": "references/tools/firecrawl.md",
+                "size_bytes": 7515
+              },
+              {
+                "digest": "sha256:4ff1ee464460e28d57897978c4742c0b9d8298767638be561e3690adb5170a98",
+                "executable": false,
+                "path": "references/tools/github.md",
+                "size_bytes": 5449
+              },
+              {
+                "digest": "sha256:854246f31fb81778169334c00700150b431f53815e5c36d95abc1285bc215296",
+                "executable": false,
+                "path": "references/tools/routing.md",
+                "size_bytes": 7430
+              },
+              {
+                "digest": "sha256:fd1ef0cad6f762ffc33ee03a6bb4ff357b3fec8b1f3145b0db4892b0d1776bff",
+                "executable": false,
+                "path": "references/tools/tavily.md",
+                "size_bytes": 5874
+              },
+              {
+                "digest": "sha256:3b7eabadf1cd891678e1f8a4ad91d8a9fb9bc54fd7a4be65ef4c6305916df02f",
+                "executable": false,
+                "path": "references/verification.md",
+                "size_bytes": 12866
+              }
+            ],
+            "frontmatter": {
+              "description": "Research method and verification for a knowledge base, loaded before a task searches for sources, captures evidence, states or checks a claim, or hands research back.",
+              "name": "knowledge-research"
+            },
+            "host_support": {
+              "profiles": {
+                "claude_agent_sdk": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "claude_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "claude_managed": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "codex_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "cursor_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "cursor_local": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "deep_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                }
+              },
+              "schema_version": "mc.capability_host_support.v1"
+            },
+            "kind": "skill",
+            "logical_id": "skill.knowledge-research",
+            "manifest_digest": "sha256:83bba43ace99afa2d2c50fac1f840737e97f8c91f9823fb519b6a95f97c961fc",
+            "maturity": "experimental",
+            "required_capabilities": [],
+            "review_status": "approved",
+            "schema_version": "1",
+            "skill_name": "knowledge-research",
+            "source_provenance": {
+              "commit_digest": "7bc4aeec77c645f41bb0f550f6a9626c3ef24cf0",
+              "license": "proprietary",
+              "locator": "https://github.com/jbell-rusty-vantage/agent-knowledge-services/tree/7bc4aeec77c645f41bb0f550f6a9626c3ef24cf0/skills/knowledge-research",
+              "source": "belllabs",
+              "upstream_identity": "knowledge-services/knowledge-research",
+              "upstream_version": "2026.11.16-7bc4aee"
+            },
+            "title": "knowledge-research"
+          },
+          "published_at": "2026-10-14T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:904cdb17a747b6841b0ff2e6935eb2be94260207bafa03afdfd89f146eda809f",
+            "kind": "skill",
+            "lifecycle_status": "published",
+            "logical_id": "skill.knowledge-research",
+            "payload_ref": null,
+            "revision": 1,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:8c6d1760510aaf1f6adc93411130948226b590965e678037774aec3f075f978d",
+        "manifest_ref": "mc-catalog://definition/skill/skill.knowledge-research/1",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "1"
+      },
+      "kind": "asset_version",
+      "logical_key": "agent-skill:skill:skill.knowledge-research/1"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "agent-skill:skill:skill.knowledge-research/1",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/agent_skills.py",
+          "packages/mission-control-db-contract/bundle-sources/imported/knowledge-services/7bc4aee/knowledge-research"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "agent-skill:skill:skill.knowledge-research/1:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:skill:skill.knowledge-verify",
+        "contract": "mission-control.published-definition/1",
+        "host_support": {
+          "profiles": {
+            "claude_agent_sdk": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "claude_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "claude_managed": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "codex_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "cursor_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "cursor_local": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "deep_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            }
+          },
+          "schema_version": "mc.capability_host_support.v1"
+        },
+        "kind": "skill_bundle",
+        "manifest": {
+          "definition": {
+            "attachment_targets": [
+              "agent.main"
+            ],
+            "body_summary": "Use when a task needs source-attributed evidence: capture sources as immutable evidence (including PDF, DOCX, XLSX, CSV and other documents), read and search captures, locate exact quotes, and register or read artifacts through the knowledge-verify CLI. The executor's verification chain (verify-claims, judge, policy, seal, check-report, status) is retired.",
+            "bundle_ref": {
+              "digest": "sha256:b00a7dc51ae65bc19b86ae107dd551cc2017222c3489b31612aa32ff3abb2de0",
+              "media_type": "application/vnd.mc.capability-bundle+json",
+              "size_bytes": 17012,
+              "uri": "capability-bundles://biotech/skill_bundle/skill.knowledge-verify/2026.11.16-7bc4aee/b00a7dc51ae65bc19b86ae107dd551cc2017222c3489b31612aa32ff3abb2de0"
+            },
+            "compatibility": {
+              "executables": [],
+              "network_capabilities": [],
+              "runtimes": [],
+              "workspace_capabilities": []
+            },
+            "compatible_compiler_versions": [
+              "control-plane-definitions/1"
+            ],
+            "conflicts_with": [],
+            "description": "Use when a task needs source-attributed evidence: capture sources as immutable evidence (including PDF, DOCX, XLSX, CSV and other documents), read and search captures, locate exact quotes, and register or read artifacts through the knowledge-verify CLI. The executor's verification chain (verify-claims, judge, policy, seal, check-report, status) is retired.",
+            "file_manifest": [
+              {
+                "digest": "sha256:11916bdb75fe923224200f8f65b8e82433736955c2d09f703c273e029abc791f",
+                "executable": false,
+                "path": "SKILL.md",
+                "size_bytes": 7049
+              },
+              {
+                "digest": "sha256:2130a433d1cee6b8d627aec96059d865672c3052d38a42495f2daa85dc255263",
+                "executable": false,
+                "path": "examples/offline.mjs",
+                "size_bytes": 3236
+              },
+              {
+                "digest": "sha256:47a0b45d18178dba8c6162197d3fd6f6754a8b82c9b266e05358cef5ab5e2e31",
+                "executable": false,
+                "path": "references/capabilities.md",
+                "size_bytes": 3188
+              },
+              {
+                "digest": "sha256:5c4e970732bb6a9534f0417e29bd4485f2774def462e917b7cfe05962b165aaa",
+                "executable": false,
+                "path": "references/failure-playbook.md",
+                "size_bytes": 2952
+              },
+              {
+                "digest": "sha256:b7b9599926946ee80f78bf0dd7c8ee315b4e77efad06149ada1ca119b1c68849",
+                "executable": false,
+                "path": "references/intents.md",
+                "size_bytes": 587
+              }
+            ],
+            "frontmatter": {
+              "name": "knowledge-verify"
+            },
+            "host_support": {
+              "profiles": {
+                "claude_agent_sdk": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "claude_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "claude_managed": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "codex_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "cursor_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "cursor_local": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "deep_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                }
+              },
+              "schema_version": "mc.capability_host_support.v1"
+            },
+            "kind": "skill",
+            "logical_id": "skill.knowledge-verify",
+            "manifest_digest": "sha256:b00a7dc51ae65bc19b86ae107dd551cc2017222c3489b31612aa32ff3abb2de0",
+            "maturity": "experimental",
+            "required_capabilities": [],
+            "review_status": "approved",
+            "schema_version": "1",
+            "skill_name": "knowledge-verify",
+            "source_provenance": {
+              "commit_digest": "7bc4aeec77c645f41bb0f550f6a9626c3ef24cf0",
+              "license": "proprietary",
+              "locator": "https://github.com/jbell-rusty-vantage/agent-knowledge-services/tree/7bc4aeec77c645f41bb0f550f6a9626c3ef24cf0/apps/verification-executor/skills/knowledge-verify",
+              "source": "belllabs",
+              "upstream_identity": "knowledge-services/knowledge-verify",
+              "upstream_version": "2026.11.16-7bc4aee"
+            },
+            "title": "knowledge-verify"
+          },
+          "published_at": "2026-10-14T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:0438c43f4907de9a45a84205693f6f420d8e30cd60f4e50c2809a7128a56d916",
+            "kind": "skill",
+            "lifecycle_status": "published",
+            "logical_id": "skill.knowledge-verify",
+            "payload_ref": null,
+            "revision": 1,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:d79830b89dbea65148afdda2a905fc2c78a92c336a353e3bb6b212a906a987f5",
+        "manifest_ref": "mc-catalog://definition/skill/skill.knowledge-verify/1",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "1"
+      },
+      "kind": "asset_version",
+      "logical_key": "agent-skill:skill:skill.knowledge-verify/1"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "agent-skill:skill:skill.knowledge-verify/1",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/agent_skills.py",
+          "packages/mission-control-db-contract/bundle-sources/imported/knowledge-services/7bc4aee/knowledge-verify"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "agent-skill:skill:skill.knowledge-verify/1:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:skill:skill.knowledge-acquisition-and-vetting",
+        "contract": "mission-control.published-definition/1",
+        "host_support": {
+          "profiles": {
+            "claude_agent_sdk": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "claude_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "claude_managed": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "codex_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "cursor_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "cursor_local": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "deep_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            }
+          },
+          "schema_version": "mc.capability_host_support.v1"
+        },
+        "kind": "skill_bundle",
+        "manifest": {
+          "definition": {
+            "attachment_targets": [
+              "agent.main"
+            ],
+            "body_summary": "Use when discovering, acquiring, inspecting, or vetting a source for an AI Engineer knowledge store.",
+            "bundle_ref": {
+              "digest": "sha256:a0a351bf1d6d9fb8936d99b7b61a231a06d298019bae801a87cb1f914b148f68",
+              "media_type": "application/vnd.mc.capability-bundle+json",
+              "size_bytes": 9688,
+              "uri": "capability-bundles://biotech/skill_bundle/skill.knowledge-acquisition-and-vetting/1.3.0-7bc4aee/a0a351bf1d6d9fb8936d99b7b61a231a06d298019bae801a87cb1f914b148f68"
+            },
+            "compatibility": {
+              "executables": [],
+              "network_capabilities": [],
+              "runtimes": [],
+              "workspace_capabilities": []
+            },
+            "compatible_compiler_versions": [
+              "control-plane-definitions/1"
+            ],
+            "conflicts_with": [],
+            "description": "Use when discovering, acquiring, inspecting, or vetting a source for an AI Engineer knowledge store.",
+            "file_manifest": [
+              {
+                "digest": "sha256:e4a16228915b32cb6d24eec93f139fd187742c09221223a6ba4003a167b7a588",
+                "executable": false,
+                "path": "SKILL.md",
+                "size_bytes": 4852
+              },
+              {
+                "digest": "sha256:151016881e13caa41e4effc14c9a843b6b93d61bf7c3c2bc1309c7238b9762f3",
+                "executable": false,
+                "path": "cli-reference.md",
+                "size_bytes": 2607
+              },
+              {
+                "digest": "sha256:c3bb0ef4d719ce3c1a949d490b160f459b3c104b1a1d71e56b6a199a9edd44fa",
+                "executable": false,
+                "path": "examples.md",
+                "size_bytes": 1290
+              },
+              {
+                "digest": "sha256:65d838e632e52619be3a0152002905da6f8f2b6ae82c7de512f03f06baf44c79",
+                "executable": false,
+                "path": "mcp-reference.md",
+                "size_bytes": 939
+              }
+            ],
+            "frontmatter": {
+              "description": "Use when discovering, acquiring, inspecting, or vetting a source for an AI Engineer knowledge store.",
+              "license": "Proprietary",
+              "name": "knowledge-acquisition-and-vetting"
+            },
+            "host_support": {
+              "profiles": {
+                "claude_agent_sdk": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "claude_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "claude_managed": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "codex_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "cursor_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "cursor_local": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "deep_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                }
+              },
+              "schema_version": "mc.capability_host_support.v1"
+            },
+            "kind": "skill",
+            "logical_id": "skill.knowledge-acquisition-and-vetting",
+            "manifest_digest": "sha256:a0a351bf1d6d9fb8936d99b7b61a231a06d298019bae801a87cb1f914b148f68",
+            "maturity": "experimental",
+            "required_capabilities": [],
+            "review_status": "approved",
+            "schema_version": "1",
+            "skill_name": "knowledge-acquisition-and-vetting",
+            "source_provenance": {
+              "commit_digest": "7bc4aeec77c645f41bb0f550f6a9626c3ef24cf0",
+              "license": "proprietary",
+              "locator": "https://github.com/jbell-rusty-vantage/agent-knowledge-services/tree/7bc4aeec77c645f41bb0f550f6a9626c3ef24cf0/skills/knowledge-acquisition-and-vetting",
+              "source": "belllabs",
+              "upstream_identity": "knowledge-services/knowledge-acquisition-and-vetting",
+              "upstream_version": "1.3.0-7bc4aee"
+            },
+            "title": "knowledge-acquisition-and-vetting"
+          },
+          "published_at": "2026-10-14T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:0b3131774f6977a4ffe78144132b6f042a4156bf2c2a5dcd1272429fcd696885",
+            "kind": "skill",
+            "lifecycle_status": "published",
+            "logical_id": "skill.knowledge-acquisition-and-vetting",
+            "payload_ref": null,
+            "revision": 1,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:1f8db0e3b346765255cf20e51bcf454d5e421a00ecdcb808e84dfc57fb0c6793",
+        "manifest_ref": "mc-catalog://definition/skill/skill.knowledge-acquisition-and-vetting/1",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "1"
+      },
+      "kind": "asset_version",
+      "logical_key": "agent-skill:skill:skill.knowledge-acquisition-and-vetting/1"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "agent-skill:skill:skill.knowledge-acquisition-and-vetting/1",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/agent_skills.py",
+          "packages/mission-control-db-contract/bundle-sources/imported/knowledge-services/7bc4aee/knowledge-acquisition-and-vetting"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "agent-skill:skill:skill.knowledge-acquisition-and-vetting/1:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:skill:skill.knowledge-verification",
+        "contract": "mission-control.published-definition/1",
+        "host_support": {
+          "profiles": {
+            "claude_agent_sdk": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "claude_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "claude_managed": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "codex_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "cursor_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "cursor_local": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "deep_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            }
+          },
+          "schema_version": "mc.capability_host_support.v1"
+        },
+        "kind": "skill_bundle",
+        "manifest": {
+          "definition": {
+            "attachment_targets": [
+              "agent.main"
+            ],
+            "body_summary": "Runs admitted Knowledge Verification operations through the ks CLI and the verify_* platform MCP tools. Use when verifying an extraction, running a structured extraction, parsing a registered artifact, capturing a benchmark source, running or comparing an extraction benchmark, replaying a verification run, or reconciling a provider attempt.",
+            "bundle_ref": {
+              "digest": "sha256:76a8ac18e1bdb00057e2a323b8d7ca4958d398c4e76e1009488d35babbad5d10",
+              "media_type": "application/vnd.mc.capability-bundle+json",
+              "size_bytes": 32930,
+              "uri": "capability-bundles://biotech/skill_bundle/skill.knowledge-verification/1.5.0-7bc4aee/76a8ac18e1bdb00057e2a323b8d7ca4958d398c4e76e1009488d35babbad5d10"
+            },
+            "compatibility": {
+              "executables": [],
+              "network_capabilities": [],
+              "runtimes": [],
+              "workspace_capabilities": []
+            },
+            "compatible_compiler_versions": [
+              "control-plane-definitions/1"
+            ],
+            "conflicts_with": [],
+            "description": "Runs admitted Knowledge Verification operations through the ks CLI and the verify_* platform MCP tools. Use when verifying an extraction, running a structured extraction, parsing a registered artifact, capturing a benchmark source, running or comparing an extraction benchmark, replaying a verification run, or reconciling a provider attempt.",
+            "file_manifest": [
+              {
+                "digest": "sha256:1b45218b48187a9f34cd0127ed735545bae54b3a7a0581861c2cf28bef2dc93c",
+                "executable": false,
+                "path": "SKILL.md",
+                "size_bytes": 11153
+              },
+              {
+                "digest": "sha256:ce7b75c5b52e8cf7dd49497d10d403351f95717df8d5283d7162c0333acac1b5",
+                "executable": false,
+                "path": "capabilities.md",
+                "size_bytes": 2389
+              },
+              {
+                "digest": "sha256:05ea2c64e22e072012faecdc11bccf5d1471f8910f1c9a5434e3bbf5382983ce",
+                "executable": false,
+                "path": "cli-reference.md",
+                "size_bytes": 7335
+              },
+              {
+                "digest": "sha256:82ebe670ce992435e0276c4a62083ef072969275582e76ae1ed9495a935b6c56",
+                "executable": false,
+                "path": "examples.md",
+                "size_bytes": 6332
+              },
+              {
+                "digest": "sha256:bf2dfb93ce60c8b1e92f481663410ad432adf625e43cbfeb4e19794d794f7250",
+                "executable": false,
+                "path": "mcp-reference.md",
+                "size_bytes": 5721
+              }
+            ],
+            "frontmatter": {
+              "license": "Proprietary",
+              "name": "knowledge-verification"
+            },
+            "host_support": {
+              "profiles": {
+                "claude_agent_sdk": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "claude_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "claude_managed": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "codex_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "cursor_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "cursor_local": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "deep_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                }
+              },
+              "schema_version": "mc.capability_host_support.v1"
+            },
+            "kind": "skill",
+            "logical_id": "skill.knowledge-verification",
+            "manifest_digest": "sha256:76a8ac18e1bdb00057e2a323b8d7ca4958d398c4e76e1009488d35babbad5d10",
+            "maturity": "experimental",
+            "required_capabilities": [],
+            "review_status": "approved",
+            "schema_version": "1",
+            "skill_name": "knowledge-verification",
+            "source_provenance": {
+              "commit_digest": "7bc4aeec77c645f41bb0f550f6a9626c3ef24cf0",
+              "license": "proprietary",
+              "locator": "https://github.com/jbell-rusty-vantage/agent-knowledge-services/tree/7bc4aeec77c645f41bb0f550f6a9626c3ef24cf0/skills/knowledge-verification",
+              "source": "belllabs",
+              "upstream_identity": "knowledge-services/knowledge-verification",
+              "upstream_version": "1.5.0-7bc4aee"
+            },
+            "title": "knowledge-verification"
+          },
+          "published_at": "2026-10-14T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:824b8804284fa4e9f345796f58f9c60efc1ceb958016e7f8361d28f8b6f512db",
+            "kind": "skill",
+            "lifecycle_status": "published",
+            "logical_id": "skill.knowledge-verification",
+            "payload_ref": null,
+            "revision": 1,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:1eac44611c7d58d07d6b003ead2e36c2e649ff2ba925c24a13e7cfdd1258233b",
+        "manifest_ref": "mc-catalog://definition/skill/skill.knowledge-verification/1",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "1"
+      },
+      "kind": "asset_version",
+      "logical_key": "agent-skill:skill:skill.knowledge-verification/1"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "agent-skill:skill:skill.knowledge-verification/1",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/agent_skills.py",
+          "packages/mission-control-db-contract/bundle-sources/imported/knowledge-services/7bc4aee/knowledge-verification"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "agent-skill:skill:skill.knowledge-verification/1:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:skill:skill.knowledge-ingest",
+        "contract": "mission-control.published-definition/1",
+        "host_support": {
+          "profiles": {
+            "claude_agent_sdk": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "claude_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "claude_managed": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "codex_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "cursor_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "cursor_local": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "deep_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            }
+          },
+          "schema_version": "mc.capability_host_support.v1"
+        },
+        "kind": "skill_bundle",
+        "manifest": {
+          "definition": {
+            "attachment_targets": [
+              "agent.main"
+            ],
+            "body_summary": "Use when verified facts must be written into the shared knowledge database: compose a knowledge-ingestion intent (entities, aliases, identifiers, relationships, two-clock facts, events, evidence support, staged candidates, reports) from a sealed verification run and a knowledge-db snapshot, dry-run it, apply it through the deterministic executor, inspect the receipt, recover from stale-head or validation failures, and verify by re-reading. You never write to the database yourself; the executor does, as executor_service.",
+            "bundle_ref": {
+              "digest": "sha256:29312cd22b14ab2fc3ff441b4b8c1b63944cf029730964d31db0f20bc0feaeb1",
+              "media_type": "application/vnd.mc.capability-bundle+json",
+              "size_bytes": 13742,
+              "uri": "capability-bundles://biotech/skill_bundle/skill.knowledge-ingest/2026.11.16-7bc4aee/29312cd22b14ab2fc3ff441b4b8c1b63944cf029730964d31db0f20bc0feaeb1"
+            },
+            "compatibility": {
+              "executables": [],
+              "network_capabilities": [],
+              "runtimes": [],
+              "workspace_capabilities": []
+            },
+            "compatible_compiler_versions": [
+              "control-plane-definitions/1"
+            ],
+            "conflicts_with": [],
+            "description": "Use when verified facts must be written into the shared knowledge database: compose a knowledge-ingestion intent (entities, aliases, identifiers, relationships, two-clock facts, events, evidence support, staged candidates, reports) from a sealed verification run and a knowledge-db snapshot, dry-run it, apply it through the deterministic executor, inspect the receipt, recover from stale-head or validation failures, and verify by re-reading. You never write to the database yourself; the executor does, as executor_service.",
+            "file_manifest": [
+              {
+                "digest": "sha256:08a84f8d3c5f243fb45d247b304de9ea3fcfef984bea5664014ac2a3e8f43ba8",
+                "executable": false,
+                "path": "SKILL.md",
+                "size_bytes": 13742
+              }
+            ],
+            "frontmatter": {
+              "name": "knowledge-ingest"
+            },
+            "host_support": {
+              "profiles": {
+                "claude_agent_sdk": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "claude_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "claude_managed": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "codex_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "cursor_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "cursor_local": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "deep_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                }
+              },
+              "schema_version": "mc.capability_host_support.v1"
+            },
+            "kind": "skill",
+            "logical_id": "skill.knowledge-ingest",
+            "manifest_digest": "sha256:29312cd22b14ab2fc3ff441b4b8c1b63944cf029730964d31db0f20bc0feaeb1",
+            "maturity": "experimental",
+            "required_capabilities": [],
+            "review_status": "approved",
+            "schema_version": "1",
+            "skill_name": "knowledge-ingest",
+            "source_provenance": {
+              "commit_digest": "7bc4aeec77c645f41bb0f550f6a9626c3ef24cf0",
+              "license": "proprietary",
+              "locator": "https://github.com/jbell-rusty-vantage/agent-knowledge-services/tree/7bc4aeec77c645f41bb0f550f6a9626c3ef24cf0/skills/knowledge-ingest",
+              "source": "belllabs",
+              "upstream_identity": "knowledge-services/knowledge-ingest",
+              "upstream_version": "2026.11.16-7bc4aee"
+            },
+            "title": "knowledge-ingest"
+          },
+          "published_at": "2026-10-14T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:ebd4af89858c4fe861fb50c116738e2198a82e7d50e9bb1a553d422e40e86c0a",
+            "kind": "skill",
+            "lifecycle_status": "published",
+            "logical_id": "skill.knowledge-ingest",
+            "payload_ref": null,
+            "revision": 1,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:b90ab5b1aa68c1a5371573bb95741f3cbbc2ac24001f03b53a161fc15ceff968",
+        "manifest_ref": "mc-catalog://definition/skill/skill.knowledge-ingest/1",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "1"
+      },
+      "kind": "asset_version",
+      "logical_key": "agent-skill:skill:skill.knowledge-ingest/1"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "agent-skill:skill:skill.knowledge-ingest/1",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/agent_skills.py",
+          "packages/mission-control-db-contract/bundle-sources/imported/knowledge-services/7bc4aee/knowledge-ingest"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "agent-skill:skill:skill.knowledge-ingest/1:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:skill:skill.knowledge-db",
+        "contract": "mission-control.published-definition/1",
+        "host_support": {
+          "profiles": {
+            "claude_agent_sdk": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "claude_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "claude_managed": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "codex_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "cursor_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "cursor_local": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "deep_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            }
+          },
+          "schema_version": "mc.capability_host_support.v1"
+        },
+        "kind": "skill_bundle",
+        "manifest": {
+          "definition": {
+            "attachment_targets": [
+              "agent.main"
+            ],
+            "body_summary": "Use when you must read the shared knowledge database: check what it already contains about a subject, run named catalog queries (entity resolution, cards, point-in-time facts, history, what_changed, vocabularies, receipts) and record a reproducible snapshot with a knowledge head and digest that an ingestion intent can cite. Also use to read back and diff after an ingestion. Never writes; use knowledge-ingest to change the database.",
+            "bundle_ref": {
+              "digest": "sha256:2256fea2966f87f1f8fb8a21ef97ee167752844848294d9f80f6f0fd690b4d5a",
+              "media_type": "application/vnd.mc.capability-bundle+json",
+              "size_bytes": 7549,
+              "uri": "capability-bundles://biotech/skill_bundle/skill.knowledge-db/2026.11.16-7bc4aee/2256fea2966f87f1f8fb8a21ef97ee167752844848294d9f80f6f0fd690b4d5a"
+            },
+            "compatibility": {
+              "executables": [],
+              "network_capabilities": [],
+              "runtimes": [],
+              "workspace_capabilities": []
+            },
+            "compatible_compiler_versions": [
+              "control-plane-definitions/1"
+            ],
+            "conflicts_with": [],
+            "description": "Use when you must read the shared knowledge database: check what it already contains about a subject, run named catalog queries (entity resolution, cards, point-in-time facts, history, what_changed, vocabularies, receipts) and record a reproducible snapshot with a knowledge head and digest that an ingestion intent can cite. Also use to read back and diff after an ingestion. Never writes; use knowledge-ingest to change the database.",
+            "file_manifest": [
+              {
+                "digest": "sha256:e811c1802371a8c2afdb7f668d7e9aa5582091750b3fd062fc77cd1bf45b79bd",
+                "executable": false,
+                "path": "SKILL.md",
+                "size_bytes": 7549
+              }
+            ],
+            "frontmatter": {
+              "name": "knowledge-db"
+            },
+            "host_support": {
+              "profiles": {
+                "claude_agent_sdk": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "claude_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "claude_managed": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "codex_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "cursor_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "cursor_local": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "deep_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                }
+              },
+              "schema_version": "mc.capability_host_support.v1"
+            },
+            "kind": "skill",
+            "logical_id": "skill.knowledge-db",
+            "manifest_digest": "sha256:2256fea2966f87f1f8fb8a21ef97ee167752844848294d9f80f6f0fd690b4d5a",
+            "maturity": "experimental",
+            "required_capabilities": [],
+            "review_status": "approved",
+            "schema_version": "1",
+            "skill_name": "knowledge-db",
+            "source_provenance": {
+              "commit_digest": "7bc4aeec77c645f41bb0f550f6a9626c3ef24cf0",
+              "license": "proprietary",
+              "locator": "https://github.com/jbell-rusty-vantage/agent-knowledge-services/tree/7bc4aeec77c645f41bb0f550f6a9626c3ef24cf0/skills/knowledge-db",
+              "source": "belllabs",
+              "upstream_identity": "knowledge-services/knowledge-db",
+              "upstream_version": "2026.11.16-7bc4aee"
+            },
+            "title": "knowledge-db"
+          },
+          "published_at": "2026-10-14T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:940ac0e5a4d3512013d0fc53a90b5a015de7a0b75e7f4738b91a8cb072349b3c",
+            "kind": "skill",
+            "lifecycle_status": "published",
+            "logical_id": "skill.knowledge-db",
+            "payload_ref": null,
+            "revision": 1,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:07132ab3f55308077f679bb7dc9f573225f6b07019201c4ac31ec9a67bcb183d",
+        "manifest_ref": "mc-catalog://definition/skill/skill.knowledge-db/1",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "1"
+      },
+      "kind": "asset_version",
+      "logical_key": "agent-skill:skill:skill.knowledge-db/1"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "agent-skill:skill:skill.knowledge-db/1",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/agent_skills.py",
+          "packages/mission-control-db-contract/bundle-sources/imported/knowledge-services/7bc4aee/knowledge-db"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "agent-skill:skill:skill.knowledge-db/1:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:skill:skill.schema-explore",
+        "contract": "mission-control.published-definition/1",
+        "host_support": {
+          "profiles": {
+            "claude_agent_sdk": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "claude_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "claude_managed": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "codex_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "cursor_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "cursor_local": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "deep_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            }
+          },
+          "schema_version": "mc.capability_host_support.v1"
+        },
+        "kind": "skill_bundle",
+        "manifest": {
+          "definition": {
+            "attachment_targets": [
+              "agent.main"
+            ],
+            "body_summary": "Use when you need to know what the shared knowledge database contains or how something is stored: which table/view/function holds a concept, how entities, relationships, two-clock temporal facts, evidence and claims relate, which named query answers a question, or what an ingestion proposal must contain. Navigates the pinned schema workspace (progressive disclosure) instead of guessing table names. Does not query the database; use knowledge-db.",
+            "bundle_ref": {
+              "digest": "sha256:b3b4bda7110a565156ca610f00deb3a777da069a5f96f3bb013f5e37cdfb9006",
+              "media_type": "application/vnd.mc.capability-bundle+json",
+              "size_bytes": 6409,
+              "uri": "capability-bundles://biotech/skill_bundle/skill.schema-explore/2026.11.16-7bc4aee/b3b4bda7110a565156ca610f00deb3a777da069a5f96f3bb013f5e37cdfb9006"
+            },
+            "compatibility": {
+              "executables": [],
+              "network_capabilities": [],
+              "runtimes": [],
+              "workspace_capabilities": []
+            },
+            "compatible_compiler_versions": [
+              "control-plane-definitions/1"
+            ],
+            "conflicts_with": [],
+            "description": "Use when you need to know what the shared knowledge database contains or how something is stored: which table/view/function holds a concept, how entities, relationships, two-clock temporal facts, evidence and claims relate, which named query answers a question, or what an ingestion proposal must contain. Navigates the pinned schema workspace (progressive disclosure) instead of guessing table names. Does not query the database; use knowledge-db.",
+            "file_manifest": [
+              {
+                "digest": "sha256:558d3a8df195b85165ba6b8c464adfe722db2d7ce9759f9d35a01a17edc1aa43",
+                "executable": false,
+                "path": "SKILL.md",
+                "size_bytes": 6409
+              }
+            ],
+            "frontmatter": {
+              "name": "schema-explore"
+            },
+            "host_support": {
+              "profiles": {
+                "claude_agent_sdk": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "claude_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "claude_managed": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "codex_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "cursor_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "cursor_local": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "deep_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                }
+              },
+              "schema_version": "mc.capability_host_support.v1"
+            },
+            "kind": "skill",
+            "logical_id": "skill.schema-explore",
+            "manifest_digest": "sha256:b3b4bda7110a565156ca610f00deb3a777da069a5f96f3bb013f5e37cdfb9006",
+            "maturity": "experimental",
+            "required_capabilities": [],
+            "review_status": "approved",
+            "schema_version": "1",
+            "skill_name": "schema-explore",
+            "source_provenance": {
+              "commit_digest": "7bc4aeec77c645f41bb0f550f6a9626c3ef24cf0",
+              "license": "proprietary",
+              "locator": "https://github.com/jbell-rusty-vantage/agent-knowledge-services/tree/7bc4aeec77c645f41bb0f550f6a9626c3ef24cf0/skills/schema-explore",
+              "source": "belllabs",
+              "upstream_identity": "knowledge-services/schema-explore",
+              "upstream_version": "2026.11.16-7bc4aee"
+            },
+            "title": "schema-explore"
+          },
+          "published_at": "2026-10-14T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:dfec224a5ec65663ab7293e931a857a5ce4bf4b693c35efe15ec9caf8e64e1cf",
+            "kind": "skill",
+            "lifecycle_status": "published",
+            "logical_id": "skill.schema-explore",
+            "payload_ref": null,
+            "revision": 1,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:b01dd5b5d00105d19dec94fa10e551cdc79a9886e43ce050d9e5144f82900d5f",
+        "manifest_ref": "mc-catalog://definition/skill/skill.schema-explore/1",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "1"
+      },
+      "kind": "asset_version",
+      "logical_key": "agent-skill:skill:skill.schema-explore/1"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "agent-skill:skill:skill.schema-explore/1",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/agent_skills.py",
+          "packages/mission-control-db-contract/bundle-sources/imported/knowledge-services/7bc4aee/schema-explore"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "agent-skill:skill:skill.schema-explore/1:admit"
+    }
+  ],
+  "seed_key": "mc.app.biotech.agent-skills",
+  "seed_version": "1.0.5"
+}

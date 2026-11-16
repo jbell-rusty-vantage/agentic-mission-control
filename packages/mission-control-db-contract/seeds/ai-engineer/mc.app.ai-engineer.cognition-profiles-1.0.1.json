@@ -1,0 +1,678 @@
+{
+  "actor_ref": "seed:mission-control-catalog",
+  "component_compatibility": ">=1.0.0 <2.0.0",
+  "depends_on": [
+    {
+      "seed_key": "mc.app.ai-engineer.cognition-profiles",
+      "seed_version": "1.0.0"
+    },
+    {
+      "seed_key": "mc.app.ai-engineer.agent-skills",
+      "seed_version": "1.0.5"
+    }
+  ],
+  "description": "Revision 2 of cognition/knowledge and cognition/mixed: the knowledge family mounts the imported method skills (skill.knowledge-research, skill.knowledge-verify) and skill.ai-engineer-knowledge-charter by exact pin, in place of the four eight-line mc-cognition knowledge skills. Each plugin's host support is the intersection of its members': supported on the worker-hosted lane profiles, unqualified on the provider-hosted ones. cognition/sdlc and every 1.0.0 record are unchanged.",
+  "format": "mission-control-seed/v1",
+  "records": [
+    {
+      "fields": {
+        "asset_id": "definition:plugin:plugin.cognition-knowledge",
+        "contract": "mission-control.published-definition/1",
+        "host_support": {
+          "profiles": {
+            "claude_agent_sdk": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "claude_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "claude_managed": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "codex_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "cursor_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "cursor_local": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "deep_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            }
+          },
+          "schema_version": "mc.capability_host_support.v1"
+        },
+        "kind": "plugin",
+        "manifest": {
+          "definition": {
+            "description": "Knowledge work method: research and verification (knowledge-research), evidence capture (knowledge-verify) and the application's knowledge charter, with source-verifier and summarizer subagents. Cognition Profile cognition/knowledge, revision 2: exact pins of the method skills their owning repositories maintain. The knowledge tools and the Knowledge Services binding are selected in the manifest.",
+            "host_support": {
+              "profiles": {
+                "claude_agent_sdk": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "claude_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "claude_managed": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "codex_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "cursor_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "cursor_local": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "deep_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                }
+              },
+              "schema_version": "mc.capability_host_support.v1"
+            },
+            "kind": "plugin",
+            "logical_id": "plugin.cognition-knowledge",
+            "manifest": {
+              "members": [
+                {
+                  "optional": false,
+                  "overlay": {},
+                  "pin": {
+                    "capability_id": "skill.knowledge-research",
+                    "digest": "sha256:8c6599e4ca5c21df737b5737b57aab19f06e1bc86e1f114bf913e642fa222b85",
+                    "version": "2026.11.16-7bc4aee"
+                  },
+                  "role": "skill"
+                },
+                {
+                  "optional": false,
+                  "overlay": {},
+                  "pin": {
+                    "capability_id": "skill.knowledge-verify",
+                    "digest": "sha256:439cbb245214c682d60850d2c8d842eda23e0df767fa21711eca10cdd91b8b46",
+                    "version": "2026.11.16-7bc4aee"
+                  },
+                  "role": "skill"
+                },
+                {
+                  "optional": false,
+                  "overlay": {},
+                  "pin": {
+                    "capability_id": "skill.ai-engineer-knowledge-charter",
+                    "digest": "sha256:920c28cc3b10b90b5a6420a781193542094a185e4b010ae753c98c4d4cd10680",
+                    "version": "2026.11.16-b7e6e21"
+                  },
+                  "role": "skill"
+                },
+                {
+                  "optional": false,
+                  "overlay": {},
+                  "pin": {
+                    "capability_id": "subagent.mc-cognition-source-verifier",
+                    "digest": "sha256:effd164e64dc7d6d4a7ce5112b04f496555ee9149b83b209307d63d30896eed7",
+                    "version": "1"
+                  },
+                  "role": "subagent"
+                },
+                {
+                  "optional": false,
+                  "overlay": {},
+                  "pin": {
+                    "capability_id": "subagent.mc-cognition-summarizer",
+                    "digest": "sha256:a60911610b8379412db4c001b29e41f6aa935b90f353d891a1080a01e85eac93",
+                    "version": "1"
+                  },
+                  "role": "subagent"
+                }
+              ],
+              "prompts": [],
+              "resources": [],
+              "schema_version": "mc.plugin_manifest.v1"
+            },
+            "schema_version": "1",
+            "secret_refs": [],
+            "title": "cognition/knowledge"
+          },
+          "published_at": "2026-10-14T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:4cad94ba35b4eec057548b672846a3c3c4aba1eeefa6e13050c626129e8bced3",
+            "kind": "plugin",
+            "lifecycle_status": "published",
+            "logical_id": "plugin.cognition-knowledge",
+            "payload_ref": null,
+            "revision": 2,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:c7e9b9815c3d22d65572925a31f561fddf2cf94e40f12e0fa24684435f10a6c7",
+        "manifest_ref": "mc-catalog://definition/plugin/plugin.cognition-knowledge/2",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "2"
+      },
+      "kind": "asset_version",
+      "logical_key": "cognition-profile:plugin:plugin.cognition-knowledge/2"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "cognition-profile:plugin:plugin.cognition-knowledge/2",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/cognition_profiles.py",
+          "packages/mission-control-db-contract/bundle-sources/imported/IMPORTS.json"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "cognition-profile:plugin:plugin.cognition-knowledge/2:admit"
+    },
+    {
+      "fields": {
+        "member": "agent-skill:skill:skill.knowledge-research/1",
+        "optional": false,
+        "plugin": "cognition-profile:plugin:plugin.cognition-knowledge/2",
+        "position": 0,
+        "role": "skill"
+      },
+      "kind": "capability_plugin_member",
+      "logical_key": "cognition-profile:plugin:plugin.cognition-knowledge/2:member:0"
+    },
+    {
+      "fields": {
+        "member": "agent-skill:skill:skill.knowledge-verify/1",
+        "optional": false,
+        "plugin": "cognition-profile:plugin:plugin.cognition-knowledge/2",
+        "position": 1,
+        "role": "skill"
+      },
+      "kind": "capability_plugin_member",
+      "logical_key": "cognition-profile:plugin:plugin.cognition-knowledge/2:member:1"
+    },
+    {
+      "fields": {
+        "member": "agent-skill:skill:skill.ai-engineer-knowledge-charter/2",
+        "optional": false,
+        "plugin": "cognition-profile:plugin:plugin.cognition-knowledge/2",
+        "position": 2,
+        "role": "skill"
+      },
+      "kind": "capability_plugin_member",
+      "logical_key": "cognition-profile:plugin:plugin.cognition-knowledge/2:member:2"
+    },
+    {
+      "fields": {
+        "member": "cognition-profile:subagent-profile:subagent.mc-cognition-source-verifier/1",
+        "optional": false,
+        "plugin": "cognition-profile:plugin:plugin.cognition-knowledge/2",
+        "position": 3,
+        "role": "subagent"
+      },
+      "kind": "capability_plugin_member",
+      "logical_key": "cognition-profile:plugin:plugin.cognition-knowledge/2:member:3"
+    },
+    {
+      "fields": {
+        "member": "cognition-profile:subagent-profile:subagent.mc-cognition-summarizer/1",
+        "optional": false,
+        "plugin": "cognition-profile:plugin:plugin.cognition-knowledge/2",
+        "position": 4,
+        "role": "subagent"
+      },
+      "kind": "capability_plugin_member",
+      "logical_key": "cognition-profile:plugin:plugin.cognition-knowledge/2:member:4"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:plugin:plugin.cognition-mixed",
+        "contract": "mission-control.published-definition/1",
+        "host_support": {
+          "profiles": {
+            "claude_agent_sdk": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "claude_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "claude_managed": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "codex_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "cursor_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "cursor_local": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "deep_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            }
+          },
+          "schema_version": "mc.capability_host_support.v1"
+        },
+        "kind": "plugin",
+        "manifest": {
+          "definition": {
+            "description": "SDLC skills (TDD, code review, publication, bug diagnosis) with the knowledge work method: research and verification (knowledge-research), evidence capture (knowledge-verify) and the application's knowledge charter, and four reviewer subagents. Cognition Profile cognition/mixed, revision 2: the union of cognition/sdlc and cognition/knowledge. The knowledge tools and the Knowledge Services binding are selected in the manifest.",
+            "host_support": {
+              "profiles": {
+                "claude_agent_sdk": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "claude_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "claude_managed": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "codex_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "cursor_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "cursor_local": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "deep_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                }
+              },
+              "schema_version": "mc.capability_host_support.v1"
+            },
+            "kind": "plugin",
+            "logical_id": "plugin.cognition-mixed",
+            "manifest": {
+              "members": [
+                {
+                  "optional": false,
+                  "overlay": {},
+                  "pin": {
+                    "capability_id": "skill.mc-cognition-tdd",
+                    "digest": "sha256:5dc15c04d3be2e09ac8ebccd12edcf4a3e4ab1e46ddfdaefe86ecf0b7152fde6",
+                    "version": "0.1.0"
+                  },
+                  "role": "skill"
+                },
+                {
+                  "optional": false,
+                  "overlay": {},
+                  "pin": {
+                    "capability_id": "skill.mc-cognition-code-review",
+                    "digest": "sha256:35f63ad301e4aeb75d40d8d9cd8319d030a156c204ca37cd9a4de4454a3ee1d9",
+                    "version": "0.1.0"
+                  },
+                  "role": "skill"
+                },
+                {
+                  "optional": false,
+                  "overlay": {},
+                  "pin": {
+                    "capability_id": "skill.mc-cognition-pr",
+                    "digest": "sha256:839fac1c87c3e6989ebf2fb1604d6c842f51c0d3fb6232074a3cbf0c27e6b1a6",
+                    "version": "0.1.0"
+                  },
+                  "role": "skill"
+                },
+                {
+                  "optional": false,
+                  "overlay": {},
+                  "pin": {
+                    "capability_id": "skill.mc-cognition-diagnosing-bugs",
+                    "digest": "sha256:6bb739981c07345b7dd74694eeb3787e4050331d52f57119632f3f58aa1fd490",
+                    "version": "0.1.0"
+                  },
+                  "role": "skill"
+                },
+                {
+                  "optional": false,
+                  "overlay": {},
+                  "pin": {
+                    "capability_id": "skill.knowledge-research",
+                    "digest": "sha256:8c6599e4ca5c21df737b5737b57aab19f06e1bc86e1f114bf913e642fa222b85",
+                    "version": "2026.11.16-7bc4aee"
+                  },
+                  "role": "skill"
+                },
+                {
+                  "optional": false,
+                  "overlay": {},
+                  "pin": {
+                    "capability_id": "skill.knowledge-verify",
+                    "digest": "sha256:439cbb245214c682d60850d2c8d842eda23e0df767fa21711eca10cdd91b8b46",
+                    "version": "2026.11.16-7bc4aee"
+                  },
+                  "role": "skill"
+                },
+                {
+                  "optional": false,
+                  "overlay": {},
+                  "pin": {
+                    "capability_id": "skill.ai-engineer-knowledge-charter",
+                    "digest": "sha256:920c28cc3b10b90b5a6420a781193542094a185e4b010ae753c98c4d4cd10680",
+                    "version": "2026.11.16-b7e6e21"
+                  },
+                  "role": "skill"
+                },
+                {
+                  "optional": false,
+                  "overlay": {},
+                  "pin": {
+                    "capability_id": "subagent.mc-cognition-reviewer",
+                    "digest": "sha256:873b0a03f8ef9961a470a470d16501df088cba9d344f2b7445cfb76c56682320",
+                    "version": "1"
+                  },
+                  "role": "subagent"
+                },
+                {
+                  "optional": false,
+                  "overlay": {},
+                  "pin": {
+                    "capability_id": "subagent.mc-cognition-test-runner",
+                    "digest": "sha256:9dde3cfd6bb70181334b732c0baeafacb20a674f9331f6c20219ac44f093de26",
+                    "version": "1"
+                  },
+                  "role": "subagent"
+                },
+                {
+                  "optional": false,
+                  "overlay": {},
+                  "pin": {
+                    "capability_id": "subagent.mc-cognition-source-verifier",
+                    "digest": "sha256:effd164e64dc7d6d4a7ce5112b04f496555ee9149b83b209307d63d30896eed7",
+                    "version": "1"
+                  },
+                  "role": "subagent"
+                },
+                {
+                  "optional": false,
+                  "overlay": {},
+                  "pin": {
+                    "capability_id": "subagent.mc-cognition-summarizer",
+                    "digest": "sha256:a60911610b8379412db4c001b29e41f6aa935b90f353d891a1080a01e85eac93",
+                    "version": "1"
+                  },
+                  "role": "subagent"
+                }
+              ],
+              "prompts": [],
+              "resources": [],
+              "schema_version": "mc.plugin_manifest.v1"
+            },
+            "schema_version": "1",
+            "secret_refs": [],
+            "title": "cognition/mixed"
+          },
+          "published_at": "2026-10-14T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:f5b1e1686fb5401cff6fc0a0726238a0bb272c37e1b216f2380861f9fa756bc3",
+            "kind": "plugin",
+            "lifecycle_status": "published",
+            "logical_id": "plugin.cognition-mixed",
+            "payload_ref": null,
+            "revision": 2,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:4d0c485c57d2439bf0ac9fabc111b92cfefd8b80840748bebd27618f6afac30c",
+        "manifest_ref": "mc-catalog://definition/plugin/plugin.cognition-mixed/2",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "2"
+      },
+      "kind": "asset_version",
+      "logical_key": "cognition-profile:plugin:plugin.cognition-mixed/2"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "cognition-profile:plugin:plugin.cognition-mixed/2",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/cognition_profiles.py",
+          "packages/mission-control-db-contract/bundle-sources/imported/IMPORTS.json"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "cognition-profile:plugin:plugin.cognition-mixed/2:admit"
+    },
+    {
+      "fields": {
+        "member": "cognition-profile:skill:skill.mc-cognition-tdd/1",
+        "optional": false,
+        "plugin": "cognition-profile:plugin:plugin.cognition-mixed/2",
+        "position": 0,
+        "role": "skill"
+      },
+      "kind": "capability_plugin_member",
+      "logical_key": "cognition-profile:plugin:plugin.cognition-mixed/2:member:0"
+    },
+    {
+      "fields": {
+        "member": "cognition-profile:skill:skill.mc-cognition-code-review/1",
+        "optional": false,
+        "plugin": "cognition-profile:plugin:plugin.cognition-mixed/2",
+        "position": 1,
+        "role": "skill"
+      },
+      "kind": "capability_plugin_member",
+      "logical_key": "cognition-profile:plugin:plugin.cognition-mixed/2:member:1"
+    },
+    {
+      "fields": {
+        "member": "cognition-profile:skill:skill.mc-cognition-pr/1",
+        "optional": false,
+        "plugin": "cognition-profile:plugin:plugin.cognition-mixed/2",
+        "position": 2,
+        "role": "skill"
+      },
+      "kind": "capability_plugin_member",
+      "logical_key": "cognition-profile:plugin:plugin.cognition-mixed/2:member:2"
+    },
+    {
+      "fields": {
+        "member": "cognition-profile:skill:skill.mc-cognition-diagnosing-bugs/1",
+        "optional": false,
+        "plugin": "cognition-profile:plugin:plugin.cognition-mixed/2",
+        "position": 3,
+        "role": "skill"
+      },
+      "kind": "capability_plugin_member",
+      "logical_key": "cognition-profile:plugin:plugin.cognition-mixed/2:member:3"
+    },
+    {
+      "fields": {
+        "member": "agent-skill:skill:skill.knowledge-research/1",
+        "optional": false,
+        "plugin": "cognition-profile:plugin:plugin.cognition-mixed/2",
+        "position": 4,
+        "role": "skill"
+      },
+      "kind": "capability_plugin_member",
+      "logical_key": "cognition-profile:plugin:plugin.cognition-mixed/2:member:4"
+    },
+    {
+      "fields": {
+        "member": "agent-skill:skill:skill.knowledge-verify/1",
+        "optional": false,
+        "plugin": "cognition-profile:plugin:plugin.cognition-mixed/2",
+        "position": 5,
+        "role": "skill"
+      },
+      "kind": "capability_plugin_member",
+      "logical_key": "cognition-profile:plugin:plugin.cognition-mixed/2:member:5"
+    },
+    {
+      "fields": {
+        "member": "agent-skill:skill:skill.ai-engineer-knowledge-charter/2",
+        "optional": false,
+        "plugin": "cognition-profile:plugin:plugin.cognition-mixed/2",
+        "position": 6,
+        "role": "skill"
+      },
+      "kind": "capability_plugin_member",
+      "logical_key": "cognition-profile:plugin:plugin.cognition-mixed/2:member:6"
+    },
+    {
+      "fields": {
+        "member": "cognition-profile:subagent-profile:subagent.mc-cognition-reviewer/1",
+        "optional": false,
+        "plugin": "cognition-profile:plugin:plugin.cognition-mixed/2",
+        "position": 7,
+        "role": "subagent"
+      },
+      "kind": "capability_plugin_member",
+      "logical_key": "cognition-profile:plugin:plugin.cognition-mixed/2:member:7"
+    },
+    {
+      "fields": {
+        "member": "cognition-profile:subagent-profile:subagent.mc-cognition-test-runner/1",
+        "optional": false,
+        "plugin": "cognition-profile:plugin:plugin.cognition-mixed/2",
+        "position": 8,
+        "role": "subagent"
+      },
+      "kind": "capability_plugin_member",
+      "logical_key": "cognition-profile:plugin:plugin.cognition-mixed/2:member:8"
+    },
+    {
+      "fields": {
+        "member": "cognition-profile:subagent-profile:subagent.mc-cognition-source-verifier/1",
+        "optional": false,
+        "plugin": "cognition-profile:plugin:plugin.cognition-mixed/2",
+        "position": 9,
+        "role": "subagent"
+      },
+      "kind": "capability_plugin_member",
+      "logical_key": "cognition-profile:plugin:plugin.cognition-mixed/2:member:9"
+    },
+    {
+      "fields": {
+        "member": "cognition-profile:subagent-profile:subagent.mc-cognition-summarizer/1",
+        "optional": false,
+        "plugin": "cognition-profile:plugin:plugin.cognition-mixed/2",
+        "position": 10,
+        "role": "subagent"
+      },
+      "kind": "capability_plugin_member",
+      "logical_key": "cognition-profile:plugin:plugin.cognition-mixed/2:member:10"
+    }
+  ],
+  "seed_key": "mc.app.ai-engineer.cognition-profiles",
+  "seed_version": "1.0.1"
+}

@@ -73,6 +73,38 @@ conversion) and are excluded from the whitespace hooks.
   name strictly may reject it.
 - Bytes reach the bucket only through `scripts/seeds_publish_bundles.py --target <app> --storage
   supabase` (publisher credential, never the service key); nothing was uploaded to a live bucket.
-- `skill.mission-control-coordinator` (frozen `mc.catalog.approved-assets@1.0.0`) is not retired
-  here: the coordinator catalog bindings still resolve it; retire it in a later seed version
-  together with the consumer change.
+- `skill.mission-control-coordinator` (frozen `mc.catalog.approved-assets@1.0.0`) is no live
+  skill since 2026-11-16: its source is the archive `bundle-sources/approved-assets-1.0.0/` and
+  no later seed version publishes it (`approved-assets@1.0.3` holds the router manifest only).
+  Its catalog row is not retired: the legacy coordinator composition still resolves it and
+  refuses a retired binding (`bootstrap/coordinator_composition.py`), and a seed cannot retire
+  a row (it never moves `asset_version.status`). Retire it with the catalog's retire operation
+  together with the consumer change (CS-D12).
+
+### Imported method skills (2026-11-16, `mc.app.<app>.agent-skills@1.0.5`)
+
+Exact copies of a sibling repository's skill at one commit, in
+`bundle-sources/imported/<source>/<commit7>/<skill>/`, recorded in `imported/IMPORTS.json`
+(`scripts/skills_import.py`). `source_provenance` is `source: belllabs`, `upstream_identity`
+the minted slug `<source>/<skill>`, `upstream_version` the skill's declared `metadata.version`
+or the commit's UTC date, followed by `-<commit7>`, and `commit_digest` the commit. The catalog
+description is the frontmatter description on one line.
+
+| Capability | Version | Applications | Source |
+| --- | --- | --- | --- |
+| `skill.knowledge-research` | `2026.11.16-7bc4aee` | both | Knowledge Services `skills/knowledge-research` |
+| `skill.knowledge-verify` | `2026.11.16-7bc4aee` | both | Knowledge Services `apps/verification-executor/skills/knowledge-verify` |
+| `skill.knowledge-acquisition-and-vetting` | `1.3.0-7bc4aee` | both | Knowledge Services `skills/` |
+| `skill.knowledge-verification` | `1.5.0-7bc4aee` | both | Knowledge Services `skills/` |
+| `skill.knowledge-ingest`, `skill.knowledge-db`, `skill.schema-explore` | `2026.11.16-7bc4aee` | both | Knowledge Services `skills/` |
+| `skill.ai-engineer-knowledge-charter` (revision 2) | `2026.11.16-b7e6e21` | ai-engineer | AI Engineer service `skills/` |
+| `skill.content-authoring` | `2026.11.16-b7e6e21` | ai-engineer | AI Engineer service `skills/` |
+
+- The imports take the default matrix (`all_profiles`): supported on the worker-hosted lane
+  profiles, `unqualified` on the provider-hosted ones. No lane has loaded one in a mission yet.
+- Revision 1 of `skill.ai-engineer-knowledge-charter` (0.1.0, written in this repository) stays
+  admitted beside revision 2 for the same reason the coordinator skill does; the charter mount
+  and the revision 2 cognition plugins take revision 2.
+- The Knowledge Services skills name that service's own CLIs and MCP tools (`ks`, `knowledge`,
+  `knowledge-verify`, `verify_*`). Mounting a skill grants none of them: a mission still selects
+  its tools and its Knowledge Services binding.

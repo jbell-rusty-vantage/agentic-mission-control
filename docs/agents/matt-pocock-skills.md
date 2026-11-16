@@ -55,4 +55,4 @@ In Mission Control the entry to the main flow is therefore `grill-with-answers`;
 
 - Upstream renamed the glossary convention from `CONTEXT.md` to `GLOSSARY.md`. Mission Control already uses `GLOSSARY.md`; no change needed.
 - Upstream says to rerun `setup-matt-pocock-skills` only to switch trackers or start over. It is a prompt-driven skill, so rerunning it asks again rather than diffing.
-- Our own dev-time skills (`mission-control-docs`, `mission-control-coordinator`, the LangChain family and others) sit beside the upstream set in `.agents/skills`; the shipped bundles under `skills/` are a separate population ([documentation-surfaces.md](documentation-surfaces.md#skills-two-populations-one-rule)).
+- Our own dev-time skills (`mission-control-docs`, `mission-control-local-setup`, the LangChain family and others) sit beside the upstream set in `.agents/skills`; the shipped bundles under `skills/` are a separate population ([documentation-surfaces.md](documentation-surfaces.md#skills-two-populations-one-rule)).

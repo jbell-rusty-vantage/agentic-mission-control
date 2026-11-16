@@ -575,16 +575,19 @@
       "id": "skills",
       "title": "Shipped skill bundles",
       "path": "skills",
-      "purpose": "Shipped agent skill bundles with digest manifests. Includes the mission-control router skill, the author, catalog, compose, intervene and observe skills, mc-signals, the mc-cognition-* skills and the knowledge charters.",
+      "purpose": "Shipped agent skill bundles with digest manifests. Includes the mission-control router skill, the author, catalog, compose, intervene and observe skills, mc-signals, the mc-cognition-* skills and the Biotech knowledge charter. Method skills imported from sibling repositories live in packages/mission-control-db-contract/bundle-sources/imported, not here.",
       "tests": [
         "tests/unit/skills"
       ],
       "verify": [
         "make skills-check",
+        "make skills-references (rewrites references/guide-*.md from the guide)",
         "make skills-manifest (rewrites digests after editing a bundle)"
       ],
       "invariants": [
-        "A bundle's manifest.json digests must match the files on disk."
+        "A bundle's manifest.json digests must match the files on disk.",
+        "A coordinator bundle's references/guide-*.md and whoami.md are generated from the guide: edit the guide page, never the reference.",
+        "A coordinator SKILL.md carries judgment only; every missionctl command a bundle names is in the CLI's argparse tree."
       ]
     },
     {

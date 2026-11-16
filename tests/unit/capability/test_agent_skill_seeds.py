@@ -61,8 +61,21 @@ CHARTERS = {
     "biotech": "skill.biotech-knowledge-charter",
     "ai-engineer": "skill.ai-engineer-knowledge-charter",
 }
+# Method skills imported from Knowledge Services (seed 1.0.5): admitted to both applications.
+KNOWLEDGE_SERVICES = {
+    "skill.knowledge-research",
+    "skill.knowledge-verify",
+    "skill.knowledge-acquisition-and-vetting",
+    "skill.knowledge-verification",
+    "skill.knowledge-ingest",
+    "skill.knowledge-db",
+    "skill.schema-explore",
+}
+# Imported from the AI Engineer service (seed 1.0.5): admitted to that application only.
+AI_ENGINEER_SERVICE = {CHARTERS["ai-engineer"], "skill.content-authoring"}
 ADMISSION = {
     "biotech": MISSION_CONTROL
+    | KNOWLEDGE_SERVICES
     | {
         "skill.agent-browser",
         "skill.biomcp",
@@ -71,13 +84,23 @@ ADMISSION = {
         CHARTERS["biotech"],
     },
     "ai-engineer": MISSION_CONTROL
+    | KNOWLEDGE_SERVICES
+    | AI_ENGINEER_SERVICE
     | {
         "skill.agent-browser",
         "skill.edgartools",
         "hook.mc-policy-template",
         "plugin.web-research",
-        CHARTERS["ai-engineer"],
     },
+}
+# The catalog revision seed 1.0.5 gives each regenerated coordinator bundle, with its version.
+COORDINATOR_REVISIONS = {
+    "skill.mission-control": ("3", "0.6.0"),
+    "skill.mission-control-author": ("5", "0.4.0"),
+    "skill.mission-control-catalog": ("2", "0.3.0"),
+    "skill.mission-control-compose": ("2", "0.3.0"),
+    "skill.mission-control-intervene": ("2", "0.6.0"),
+    "skill.mission-control-observe": ("4", "0.4.0"),
 }
 
 
@@ -178,8 +201,10 @@ def test_upstream_captures_are_verbatim_and_follow_the_frontmatter_rules() -> No
 
 
 def test_mission_control_bundles_carry_the_skills_manifest_digests() -> None:
+    # The bundles `skills/` holds: the router family and the Biotech charter. The AI Engineer
+    # charter is an imported copy since seed 1.0.5 and has no `skills/` manifest.
     for source in SKILLS.bundle_sources():
-        if source["id"] not in MISSION_CONTROL | set(CHARTERS.values()):
+        if source["id"] not in MISSION_CONTROL | {CHARTERS["biotech"]}:
             continue
         name = source["id"].removeprefix("skill.")
         manifest = json.loads((ROOT / "skills" / name / "manifest.json").read_text("utf-8"))
@@ -269,7 +294,7 @@ async def test_applied_skill_sources_remain_fetchable_beside_successors(
     )
     store = FilesystemBundleObjectStore(tmp_path / "store")
     await PUBLISH.publish_application(app, store)
-    assert SKILLS.FROZEN_SEED_VERSIONS == ("1.0.0", "1.0.1", "1.0.2", "1.0.3")
+    assert SKILLS.FROZEN_SEED_VERSIONS == ("1.0.0", "1.0.1", "1.0.2", "1.0.3", "1.0.4")
     for entry in [
         entry
         for version in SKILLS.FROZEN_SEED_VERSIONS
@@ -314,29 +339,35 @@ def test_model_catalog_guidance_ships_as_the_author_skill_successor(app: str) ->
     definition = row["fields"]["manifest"]["definition"]
     assert definition["logical_id"] == "skill.mission-control-author"
     assert definition["source_provenance"]["upstream_version"] == "0.3.2"
-    author = _published(app)["skill.mission-control-author"].definition
-    assert isinstance(author, SkillDefinition)
-    store_files = dict(
-        next(
-            source["files"]
-            for source in SKILLS.bundle_sources()
-            if source["id"] == "skill.mission-control-author"
-        )
-    )
+    (archived,) = SKILLS.frozen_application_definitions(app, "1.0.3")
+    store_files = dict(archived["source"]["files"])
     assert b"missionctl model list --json" in store_files["SKILL.md"]
     assert (
         b"model: { profile: producer.default }"
         in (store_files["references/manifest-cheatsheet.md"])
     )
-    assert author.manifest_digest == definition["manifest_digest"]
+    assert archived["definition"].manifest_digest == definition["manifest_digest"]
+
+
+def _frozen_files(app: str, version: str, logical_id: str) -> dict[str, bytes]:
+    """The archived bytes of one bundle a frozen seed version published."""
+
+    return dict(
+        next(
+            entry["source"]["files"]
+            for entry in SKILLS.frozen_application_definitions(app, version)
+            if entry["definition"].logical_id == logical_id
+        )
+    )
 
 
 @pytest.mark.parametrize("app", ["biotech", "ai-engineer"])
 def test_knowledge_charter_ships_at_revision_one_in_its_application_only(app: str) -> None:
     """OVE-204 slice 6: seed 1.0.4 publishes the application's knowledge charter as a new skill
-    id (revision 1, `0.1.0` from `skills/`); the other application's seed never carries it."""
+    id (revision 1, `0.1.0` from `skills/`); the other application's seed never carries it.
+    Frozen since 1.0.5: its bytes are pinned and its sources archived."""
 
-    successor = GENERATOR.agent_skills()[f"{app}/mc.app.{app}.agent-skills-1.0.4.json"]
+    successor = GENERATOR.frozen_bundle(f"{app}/mc.app.{app}.agent-skills-1.0.4.json")
     assert successor["depends_on"] == [
         {"seed_key": f"mc.app.{app}.agent-skills", "seed_version": "1.0.3"}
     ]
@@ -352,9 +383,7 @@ def test_knowledge_charter_ships_at_revision_one_in_its_application_only(app: st
     other = next(name for name in CHARTERS if name != app)
     assert CHARTERS[other] not in _published(app)
     assert CHARTERS[app] not in _published(other)
-    files = dict(
-        next(source["files"] for source in SKILLS.bundle_sources() if source["id"] == CHARTERS[app])
-    )
+    files = _frozen_files(app, "1.0.4", CHARTERS[app])
     assert set(files) == {
         "SKILL.md",
         "manifest.json",
@@ -366,6 +395,107 @@ def test_knowledge_charter_ships_at_revision_one_in_its_application_only(app: st
     assert 1 <= len(frontmatter["description"]) <= 1024
 
 
+def _imports() -> dict[str, dict[str, Any]]:
+    return {f"skill.{name}": record for name, record in SKILLS.imported_records().items()}
+
+
+@pytest.mark.parametrize("app", ["biotech", "ai-engineer"])
+def test_seed_105_publishes_the_regenerated_coordinator_bundles_and_the_imports(app: str) -> None:
+    """Seed 1.0.5: each coordinator bundle at its next revision, each imported method skill as
+    a new id, and the AI Engineer charter as the next revision of its id. Nothing a frozen
+    version holds is published again, and the retired coordinator skill is not in it."""
+
+    successor = GENERATOR.agent_skills()[f"{app}/mc.app.{app}.agent-skills-1.0.5.json"]
+    assert successor["depends_on"] == [
+        {"seed_key": f"mc.app.{app}.agent-skills", "seed_version": "1.0.4"}
+    ]
+    rows = {
+        row["fields"]["manifest"]["definition"]["logical_id"]: row
+        for row in successor["records"]
+        if row["kind"] == "asset_version"
+    }
+    imported = KNOWLEDGE_SERVICES | (AI_ENGINEER_SERVICE if app == "ai-engineer" else set())
+    assert set(rows) == MISSION_CONTROL | imported
+    assert "skill.mission-control-coordinator" not in rows
+    for logical_id, (revision, version) in COORDINATOR_REVISIONS.items():
+        definition = rows[logical_id]["fields"]["manifest"]["definition"]
+        assert rows[logical_id]["fields"]["version"] == revision
+        assert definition["source_provenance"]["upstream_version"] == version
+    held = {
+        record["logical_key"]
+        for version in SKILLS.FROZEN_SEED_VERSIONS
+        for record in GENERATOR.frozen_bundle(f"{app}/mc.app.{app}.agent-skills-{version}.json")[
+            "records"
+        ]
+    }
+    assert not held & {record["logical_key"] for record in successor["records"]}
+    records = _imports()
+    for logical_id in imported:
+        row, record = rows[logical_id], records[logical_id]
+        definition = row["fields"]["manifest"]["definition"]
+        # A new id is revision 1; the charter succeeds the 0.1.0 row seed 1.0.4 published.
+        assert row["fields"]["version"] == ("2" if logical_id == CHARTERS["ai-engineer"] else "1")
+        assert definition["description"] == record["description"]
+        assert 1 <= len(definition["description"]) <= 1024
+        assert "\n" not in definition["description"]
+        provenance = definition["source_provenance"]
+        origin = record["source"]
+        assert provenance == {
+            "source": "belllabs",
+            "locator": f"{origin['repository']}/tree/{origin['commit']}/{origin['path']}",
+            "upstream_identity": f"{origin['name']}/{logical_id.removeprefix('skill.')}",
+            "upstream_version": record["version"],
+            "commit_digest": origin["commit"],
+            "license": "proprietary",
+        }
+        assert record["version"].endswith("-" + origin["commit"][:7])
+        assert definition["maturity"] == "experimental"
+        assert capability_pin(_published(app)[logical_id]).version == record["version"]
+
+
+def test_imported_bundles_are_the_recorded_bytes_and_nothing_else() -> None:
+    """A published import is its custody copy: every file the record lists with its sha256, no
+    file Mission Control added, the upstream frontmatter name as the catalog skill name."""
+
+    records = _imports()
+    sources = {
+        source["id"]: source for source in SKILLS.bundle_sources() if source["id"] in records
+    }
+    assert set(sources) == set(records) == KNOWLEDGE_SERVICES | AI_ENGINEER_SERVICE
+    for logical_id, source in sources.items():
+        record = records[logical_id]
+        assert source["version"] == record["version"]
+        assert source["directory"] == record["directory"]
+        assert sorted(
+            (path, "sha256:" + hashlib.sha256(content).hexdigest(), len(content))
+            for path, content in source["files"]
+        ) == sorted((row["path"], row["sha256"], row["size_bytes"]) for row in record["files"])
+        assert "manifest.json" not in dict(source["files"])
+        (app, *_rest) = source["apps"]
+        definition = _published(app)[logical_id].definition
+        assert isinstance(definition, SkillDefinition)
+        assert definition.skill_name == logical_id.removeprefix("skill.")
+        assert NAME_RULE.fullmatch(definition.skill_name)
+        assert {entry.path: entry.digest for entry in definition.file_manifest} == {
+            row["path"]: row["sha256"] for row in record["files"]
+        }
+
+
+def test_the_stale_ai_engineer_charter_is_no_longer_a_live_source() -> None:
+    """The 0.1.0 charter Mission Control wrote left `skills/`: its bytes are the archive of the
+    frozen seed 1.0.4, and the latest row of its id is the imported copy."""
+
+    assert not (ROOT / "skills" / "ai-engineer-knowledge-charter").exists()
+    stale = _frozen_files("ai-engineer", "1.0.4", CHARTERS["ai-engineer"])
+    assert b"version" in stale["manifest.json"]
+    latest = _published("ai-engineer")[CHARTERS["ai-engineer"]]
+    assert latest.ref.revision == 2
+    assert latest.definition.source_provenance.source == "belllabs"
+    assert latest.definition.source_provenance.upstream_identity == (
+        "ai-engineer-service/ai-engineer-knowledge-charter"
+    )
+
+
 def test_charter_admission_follows_the_application_profile_rule() -> None:
     """The profile load check admits `skill.<app>-knowledge-charter` for `<app>` only; the seed
     admits each charter to exactly that application, and each profile names its charter."""
@@ -375,7 +505,13 @@ def test_charter_admission_follows_the_application_profile_rule() -> None:
         load_application_profile,
     )
 
-    for name, apps in SKILLS.APPLICATION_SKILLS.items():
+    charters = dict(SKILLS.APPLICATION_SKILLS) | {
+        name: apps
+        for name, (_version, apps) in SKILLS.IMPORTED_SKILLS.items()
+        if name.endswith("-knowledge-charter")
+    }
+    assert set(charters) == {name.removeprefix("skill.") for name in CHARTERS.values()}
+    for name, apps in charters.items():
         (app,) = apps
         assert f"skill.{name}" == charter_skill_id(app) == CHARTERS[app]
         profile = load_application_profile(ROOT / "deployments", app).profile

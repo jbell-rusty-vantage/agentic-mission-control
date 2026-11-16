@@ -34,6 +34,8 @@ EXPECTED = {
     ("mc.catalog.approved-assets", "1.0.0"),
     ("mc.catalog.approved-assets", "1.0.1"),
     ("mc.catalog.approved-assets", "1.0.2"),
+    # The router bundle manifest regenerated from the guide; 1.0.2 is frozen.
+    ("mc.catalog.approved-assets", "1.0.3"),
     ("mc.catalog.agent-capabilities", "1.0.0"),
     ("mc.catalog.knowledge-tools", "1.0.0"),
     # OVE-170 submit_output revision 2 (recorded), then OVE-204 slice 4 knowledge_read_intent.
@@ -91,7 +93,8 @@ def test_each_app_installation_set_is_valid_and_dependency_closed(app: str) -> N
     ]
     agent = [("mc.catalog.agent-capabilities", "1.0.0"), (APP_AGENT_KEYS[app], "1.0.0")]
     # FT-A7: skills, the policy hook and the plugin are per application.
-    skill_versions = ("1.0.0", "1.0.1", "1.0.2", "1.0.3", "1.0.4")
+    # 1.0.5: the coordinator bundles regenerated from the guide and the imported method skills.
+    skill_versions = ("1.0.0", "1.0.1", "1.0.2", "1.0.3", "1.0.4", "1.0.5")
     skills = [(f"mc.app.{app}.agent-skills", version) for version in skill_versions]
     # MO-12: starter Environment Kits, per application like the skills.
     kits = [(f"mc.app.{app}.environment-kits", "1.0.0")]
@@ -99,6 +102,8 @@ def test_each_app_installation_set_is_valid_and_dependency_closed(app: str) -> N
         (f"mc.app.{app}.{name}", "1.0.0")
         for name in ("cognition-profiles", "signal-skills", "watchers")
     ]
+    # Revision 2 of the knowledge and mixed plugins, over the skills agent-skills 1.0.5 publishes.
+    observation.append((f"mc.app.{app}.cognition-profiles", "1.0.1"))
     storage = [("mc.storage.capability-bundles", "1.0.0"), ("mc.storage.mission-payloads", "1.0.0")]
     # Succession of the applied, frozen approved-assets@1.0.0 (new logical keys only).
     successors = [
@@ -113,6 +118,8 @@ def test_each_app_installation_set_is_valid_and_dependency_closed(app: str) -> N
         ("mc.catalog.workflow-parity", "1.0.5"),
         # Sprint OC WI-23: the sealed async child graph pin, after the applied, frozen 1.0.0.
         ("mc.catalog.runtime-profiles", "1.0.1"),
+        # The router manifest regenerated from the guide, after the frozen 1.0.2.
+        ("mc.catalog.approved-assets", "1.0.3"),
     ]
     artifact_schemas = [
         ("mc.catalog.artifact-schemas", "1.0.0"),
@@ -144,6 +151,10 @@ def test_each_app_installation_set_is_valid_and_dependency_closed(app: str) -> N
     assert position_of(keys, successors[2]) > position_of(keys, successors[1])
     assert position_of(keys, successors[3]) > position_of(keys, successors[0])
     assert position_of(keys, successors[5]) > position_of(keys, base[1])
+    assert position_of(keys, successors[8]) > position_of(keys, successors[3])
+    # The revision 2 plugins apply after the skills they pin and after their own 1.0.0.
+    assert position_of(keys, observation[3]) > position_of(keys, skills[5])
+    assert position_of(keys, observation[3]) > position_of(keys, observation[0])
     assert position_of(keys, knowledge[2]) > position_of(keys, knowledge[1])
     # The schema successor applies after the frozen 1.0.0 it depends on.
     assert position_of(keys, artifact_schemas[1]) > position_of(keys, artifact_schemas[0])
@@ -207,6 +218,38 @@ def test_approved_assets_successor_never_rewrites_an_applied_logical_key() -> No
     assert {"seed_key": "mc.catalog.approved-assets", "seed_version": "1.0.0"} in successor[
         "depends_on"
     ]
+
+
+def test_current_approved_assets_hold_the_router_manifest_and_no_coordinator_skill() -> None:
+    """1.0.3 publishes the router bundle manifest at its present version and nothing else: the
+    coordinator skill (retired by ADR-0033) was seeded once, by the frozen 1.0.0, and its
+    source is an archive, not a live skill directory."""
+
+    generator = _generator()
+    by_version = {
+        bundle["seed_version"]: bundle
+        for bundle in _bundles("common")
+        if bundle["seed_key"] == "mc.catalog.approved-assets"
+    }
+    frozen = ("1.0.0", "1.0.1", "1.0.2")
+    current = by_version["1.0.3"]
+    assert current["depends_on"] == [
+        {"seed_key": "mc.catalog.approved-assets", "seed_version": "1.0.2"}
+    ]
+    held = {
+        record["logical_key"] for version in frozen for record in by_version[version]["records"]
+    }
+    assert not held & {record["logical_key"] for record in current["records"]}
+    (asset,) = [record for record in current["records"] if record["kind"] == "asset_version"]
+    router = json.loads((ROOT / "skills" / "mission-control" / "manifest.json").read_bytes())
+    assert asset["logical_key"] == f"skill-bundle-manifest:mission-control/{router['version']}"
+    assert asset["fields"]["manifest"] == router
+    assert "mission-control-coordinator" not in json.dumps(current["records"])
+    for version in frozen:
+        generator.frozen_bundle(f"common/mc.catalog.approved-assets-{version}.json")
+    assert not (ROOT / ".agents" / "skills" / "mission-control-coordinator").exists()
+    archive = SEEDS.parent / "bundle-sources" / "approved-assets-1.0.0"
+    assert (archive / ".agents" / "skills" / "mission-control-coordinator" / "SKILL.md").is_file()
 
 
 def test_workflow_parity_successor_never_rewrites_an_applied_logical_key() -> None:

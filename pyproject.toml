@@ -147,7 +147,7 @@ exclude_also = [
 line-length = 100
 target-version = "py312"
 # Pre-commit passes file paths explicitly; keep the excludes authoritative there too.
-# (.agents/skills/mission-control-coordinator is digested into the catalog seed bundles.)
+# (bundle-sources holds bytes the catalog seed bundles pin by digest.)
 force-exclude = true
 # First-party roots so isort classifies imports correctly from any working directory.
 src = ["src", "tests", "packages/mission-control-db-contract/src", "integrations/biotech/src"]

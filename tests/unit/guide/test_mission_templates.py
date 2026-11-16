@@ -12,6 +12,11 @@ import re
 
 import pytest
 
+from mission_control.adapters.storage.control_plane_payloads import InMemoryPayloadStore
+from mission_control.application.authoring.manifest_service import (
+    ManifestCompileService,
+    ManifestProgramCompiler,
+)
 from mission_control.application.guide.mission_templates import (
     TEMPLATE_IDS,
     MissionTemplate,
@@ -23,9 +28,11 @@ from mission_control.application.guide.mission_templates import (
 from mission_control.application.guide.service import GuideRefused
 from mission_control.application.selection.workspace import SelectionSearchRequest
 from mission_control.domain.authoring.brief import MissionBrief
+from mission_control.domain.authoring.extensions import ExtensionRegistry
 from mission_control.domain.authoring.manifest import load_manifest_yaml
 from mission_control.domain.authoring.manifest_v2 import BRIEF_MISSING, MANIFEST_V2_LITERAL
 from tests.architecture.test_package_boundaries import APPLICATION_NEEDLES
+from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog
 from tests.unit.authoring.test_manifest_compile import scope, service
 from tests.unit.guide.support import SANDBOXES, full_guide
 
@@ -185,6 +192,47 @@ async def test_the_research_report_reads_the_web_and_the_knowledge_base() -> Non
     # The goal carries the question, not a page of tool-call instructions.
     goal = load_manifest_yaml(filled(load_template("research-report")))["mission"]["goals"][0]
     assert len(goal["description"]) < 600 and "submit_output" not in goal["description"]
+
+
+@pytest.mark.asyncio
+async def test_the_research_report_mounts_the_method_skills_and_the_charter() -> None:
+    """On one installation's catalog (its common and application seeds, every revision), the
+    template's `plugin.cognition-knowledge@latest` is revision 2: the research mission mounts
+    the imported research and evidence skills and the application's charter by exact pin, the
+    charter once, and none of the eight-line knowledge skills revision 1 carried."""
+
+    definitions, search = await fast_track_catalog(directories=("common", APPLICATION))
+    charter = f"skill.{APPLICATION}-knowledge-charter"
+    compile_service = ManifestCompileService(
+        definitions=definitions,
+        search=search,
+        programs=ManifestProgramCompiler(definitions, ExtensionRegistry(), InMemoryPayloadStore()),
+        charter_skills={APPLICATION: charter},
+    )
+    compilation = await compile_service.compile(
+        filled(load_template("research-report")), scope(APPLICATION)
+    )
+
+    assert compilation.report.blockers == (), compilation.report.blockers
+    assert compilation.report.startable is True
+    assert compilation.resolution is not None
+    resolved = [item for item in compilation.resolution.resolved if item.result is not None]
+    by_id = {item.result.capability_id: item for item in resolved}
+    assert by_id["plugin.cognition-knowledge"].result.version == "2"
+    mounted = {"skill.knowledge-research", "skill.knowledge-verify", charter}
+    assert mounted <= set(by_id)
+    for logical_id in mounted:
+        assert by_id[logical_id].provenance == "plugin:knowledge_cognition"
+    # The compile-time charter mount finds the plugin's member and adds no second row.
+    assert [item.result.capability_id for item in resolved].count(charter) == 1
+    assert not {name for name in by_id if name.startswith("skill.mc-cognition-")}
+    # Each mounted skill has the one catalog line a node's purpose card quotes.
+    published = {
+        item.ref.logical_id: item for item in await definitions.list_published_definitions()
+    }
+    for logical_id in mounted:
+        description = published[logical_id].definition.description
+        assert description and len(description.splitlines()) == 1
 
 
 def test_fill_names_what_is_missing_and_what_is_unknown() -> None:

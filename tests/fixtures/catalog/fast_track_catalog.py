@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import hashlib
 import json
-from collections.abc import Mapping
+from collections.abc import Iterable, Mapping
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -432,20 +432,33 @@ def fixture_definitions() -> list[Any]:
 
 async def fast_track_catalog(
     tenant_scope: str = "global",
+    *,
+    directories: Iterable[str] | None = None,
 ) -> tuple[InMemoryDefinitionRepository, CapabilitySearchService]:
     """The seeded catalog plus the fixture rows, projected lexically (no embeddings) into
     ``tenant_scope`` (``global`` is visible to every tenant in memory; the PostgreSQL
-    projection is partitioned by the installation catalog scope instead)."""
+    projection is partitioned by the installation catalog scope instead).
+
+    ``directories`` names the seed directories of one installation (``common`` and one
+    application): the catalog then holds every revision each seed version published, as that
+    installation does, so ``@latest`` resolves to the newest row."""
 
     definitions = InMemoryDefinitionRepository()
     refs = []
-    for item in seeded_published():
+    succession = directories is not None
+    seeded_rows = (
+        seeded_published(directories, every_revision=True) if succession else seeded_published()
+    )
+    for item in seeded_rows:
         published = await definitions.publish(
             item.definition,
             "seed",
             NOW,
-            item.ref.revision - 1 if item.ref.logical_id == "tool.knowledge-submit-output" else 0,
+            item.ref.revision - 1
+            if succession or item.ref.logical_id == "tool.knowledge-submit-output"
+            else 0,
         )
+        assert not succession or published.ref == item.ref
         refs.append(published.ref)
     seeded = {(ref.kind, ref.logical_id) for ref in refs}
     for definition in fixture_definitions():

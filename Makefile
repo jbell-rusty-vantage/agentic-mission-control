@@ -71,7 +71,8 @@ WORKER    ?= auto
 	local-infra local-install local-up local-status local-eval local-down local-container-env image \
 	mission-db db-inspect db-plan db-verify db-runtime-plan db-seed-plan db-snapshot db-apply \
 	fmt fmt-check lint lint-fix typecheck typecheck-fast typecheck-watch typecheck-daemon \
-	deps-check audit links precommit arch skills-manifest skills-check manifest-schemas \
+	deps-check audit links precommit arch skills-references skills-manifest skills-check \
+	manifest-schemas \
 	manifest-schemas-check seeds-validate check ci \
 	test test-unit test-unit-fast test-arch test-conformance test-integration test-acceptance \
 	test-qualification test-db-contract test-failed coverage lane-qualify \
@@ -333,10 +334,15 @@ precommit: ## Run every pre-commit hook against all files
 
 arch: test-arch ## Alias: architecture boundary tests
 
+skills-references: ## Rewrite the coordinator bundles' references/guide-*.md from the guide (then bump the bundle version and run skills-manifest)
+	$(RUN) python scripts/skills_from_guide.py --write
+
 skills-manifest: ## Rewrite skills/*/manifest.json digests from the files on disk
 	$(RUN) python scripts/skills_manifest.py --write
 
-skills-check: ## Fail if any skills/*/manifest.json digest drifted from disk
+skills-check: ## Fail if a generated reference differs from the guide, an imported skill copy differs from its record, or a skills/*/manifest.json digest drifted from disk
+	$(RUN) python scripts/skills_from_guide.py --check
+	$(RUN) python scripts/skills_import.py --check
 	$(RUN) python scripts/skills_manifest.py --check
 
 manifest-schemas: ## Regenerate the Mission Manifest JSON Schemas under src/mission_control/contracts/schemas
