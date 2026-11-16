@@ -27,6 +27,7 @@ from mission_control.domain.authoring.graph_routes import (
 )
 from mission_control.domain.authoring.stagegraph_builder import (
     StageGraphStageSpec,
+    StageInputBindingSpec,
     build_stagegraph_v2,
 )
 from tests.unit.orchestration.test_wi08_graph_routes import Driver
@@ -51,7 +52,16 @@ def region_graph(*, until: bool = True, max_visits: int = 3, patience: int | Non
                 facts=FACTS,
                 obligation_refs=("critiqued",),
             ),
-            StageGraphStageSpec("publish", depends_on=("draft", "critique"), output_slots=("out",)),
+            # The consumer reads the region's outputs: data bindings, not ordering alone.
+            StageGraphStageSpec(
+                "publish",
+                depends_on=("draft", "critique"),
+                bindings=(
+                    StageInputBindingSpec("draft", "out"),
+                    StageInputBindingSpec("critique", "out"),
+                ),
+                output_slots=("out",),
+            ),
             StageGraphStageSpec("side", output_slots=("out",)),
         ),
         max_concurrency=8,

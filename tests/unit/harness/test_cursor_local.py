@@ -419,13 +419,28 @@ def test_closing_facts_map_every_run_result_status(status: str, expected: str) -
             "result": "x" * 10_000,
             "durationMs": 12,
             "model": {"id": "composer-2"},
-            "usage": {"inputTokens": 3, "outputTokens": 4},
+            # A complete report: without the cache counters (or a vendor total) the total is
+            # not inferred and the usage stays `unknown` (`cursor_token_usage`).
+            "usage": {
+                "inputTokens": 3,
+                "outputTokens": 4,
+                "cacheReadTokens": 0,
+                "cacheWriteTokens": 0,
+            },
             "git": {"branches": [{"repoUrl": "github.com/acme/repo", "branch": "mc/run-1"}]},
         }
     )
     assert facts.native_status == expected and len(facts.result_excerpt) == 4_096
     assert facts.usage.disposition == "estimated" and facts.usage.total_tokens == 7
     assert facts.cost_disposition == "estimated" and facts.git_branches[0].branch == "mc/run-1"
+
+
+def test_closing_facts_never_infer_a_total_from_an_incomplete_usage_report() -> None:
+    facts = closing_facts(
+        {"status": "finished", "result": "ok", "usage": {"inputTokens": 3, "outputTokens": 4}}
+    )
+    assert facts.usage.disposition == "unknown" and facts.usage.total_tokens != 7
+    assert facts.cost_disposition == "unknown"
 
 
 def test_sdk_events_and_wire_envelopes_map_identically() -> None:

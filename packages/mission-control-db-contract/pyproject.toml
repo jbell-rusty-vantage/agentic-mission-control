@@ -23,6 +23,9 @@ testpaths = ["tests"]
 [tool.ruff]
 line-length = 100
 target-version = "py312"
+# Immutable applied bundle bytes the catalog seed bundles pin by digest. Files under this
+# package read this configuration, so the root configuration's exclude does not reach them.
+extend-exclude = ["bundle-sources"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "ASYNC"]

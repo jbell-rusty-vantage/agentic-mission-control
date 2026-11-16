@@ -13,10 +13,8 @@ from biotech_mission_adapters.application.schema.schema_workspace import (
     select_workspace_candidates,
     workspace_profile_paths,
 )
-from biotech_mission_adapters.bootstrap.schema_source import (
-    locate_authoritative_schema,
-    read_authoritative_schema,
-)
+from biotech_mission_adapters.bootstrap.schema_source import read_authoritative_schema
+from tests.fixtures.sibling_checkouts import authoritative_schema_path
 from tests.schema_context_helpers import SDL
 
 
@@ -41,7 +39,7 @@ def test_profiles_mount_one_representation_per_candidate(tmp_path: Path) -> None
 
 
 def test_authoritative_schema_tier0_is_bounded_and_workload_candidates_are_present() -> None:
-    schema_path = locate_authoritative_schema()
+    schema_path = authoritative_schema_path()
     # Tracked copy of the live-windows-bind-9 input report; see tests/fixtures/schema_context/.
     report_path = (
         Path(__file__).resolve().parents[2]
@@ -67,7 +65,7 @@ def test_authoritative_schema_tier0_is_bounded_and_workload_candidates_are_prese
 def test_tier0_exposes_governed_ontological_categories() -> None:
     from biotech_mission_adapters.application.schema.schema_catalog import DEFAULT_SEMANTIC_OVERLAY
 
-    schema_path = locate_authoritative_schema()
+    schema_path = authoritative_schema_path()
     catalog = parse_schema_catalog(
         read_authoritative_schema(schema_path),
         str(schema_path),

@@ -232,6 +232,13 @@ async def test_cancel_before_dispatch_settles_cancelled_without_cognition() -> N
 
     harness = await recovery_harness()
     request = await harness.request(stage_recovery_unit(harness.run_id))
+    # The saga's `operation.cancel` follows the journaled cancel: a unit that never claimed its
+    # effect claims it for cancellation only while the run is `cancelling` (review F1).
+    run = await harness.run_control.get_run("tenant-1", harness.run_id)
+    cancelling = await harness.run_control.execute(
+        command(harness.run_id, run.version, "operator-cancel", CancelAction())
+    )
+    assert cancelling.status == CommandStatus.ACCEPTED
     result = await _cancel(harness, request)
     await _assert_cancelled_once(harness, request, result, model_calls=0, with_checkpoint=False)
     assert harness.runtime.invocations == 0

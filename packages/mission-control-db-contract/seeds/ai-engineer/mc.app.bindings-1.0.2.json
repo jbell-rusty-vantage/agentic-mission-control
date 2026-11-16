@@ -1,0 +1,71 @@
+{
+  "actor_ref": "seed:mission-control-catalog",
+  "component_compatibility": ">=1.0.0 <2.0.0",
+  "depends_on": [
+    {
+      "seed_key": "mc.catalog.approved-assets",
+      "seed_version": "1.0.0"
+    },
+    {
+      "seed_key": "mc.app.bindings",
+      "seed_version": "1.0.1"
+    }
+  ],
+  "description": "Installation binding for app 'ai-engineer': identity facts copied from deployments/ai-engineer/target.toml and secret reference NAMES only. No tenant/actor mapping or grant is seeded until owner-approved (approved_tenant_actor_mappings is a documented empty placeholder).",
+  "format": "mission-control-seed/v1",
+  "records": [
+    {
+      "fields": {
+        "asset_id": "app-binding:ai-engineer",
+        "contract": "mission-control.app-binding/1",
+        "kind": "profile",
+        "manifest": {
+          "application_id": "ai-engineer",
+          "approved_tenant_actor_mappings": [],
+          "binding": "mission-control.app-binding/1",
+          "common_catalog_seeds": [
+            "mc.catalog.workflow-parity@1.0.0",
+            "mc.catalog.runtime-profiles@1.0.0",
+            "mc.catalog.approved-assets@1.0.0"
+          ],
+          "installation_id": "01a103c0-9a9e-70f3-9398-eb1573a98324",
+          "project_label": "supabase-blue-ocean",
+          "project_ref": "wkythqbofmckbuoothhn",
+          "secret_reference_names": {
+            "migration_database_url_env": "AIENG_DB_ADMIN_DSN"
+          },
+          "supersedes": "app-binding:ai-engineer@2",
+          "target_ref": "deployments/ai-engineer/target.toml",
+          "target_sha256": "sha256:040d035ca16f494ee63ad5b448350bb64d96356c17e25a8ad175a17366cb6681",
+          "unresolved_operator_fields": []
+        },
+        "manifest_digest": "sha256:c4739a6a58cf9263b2b2fd4c27c76296451bb945e477ad8a1c412b386ef4705b",
+        "manifest_ref": "repo://deployments/ai-engineer/target.toml",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "3"
+      },
+      "kind": "asset_version",
+      "logical_key": "app-binding:ai-engineer/3"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "app-binding:ai-engineer/3",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "deployments/ai-engineer/target.toml"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "app-binding:ai-engineer/3:admit"
+    }
+  ],
+  "seed_key": "mc.app.bindings",
+  "seed_version": "1.0.2"
+}

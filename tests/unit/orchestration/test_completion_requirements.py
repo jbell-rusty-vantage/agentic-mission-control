@@ -5,6 +5,7 @@ import pytest
 from mission_control.domain.authoring.contracts import StageOutputSlot
 from mission_control.domain.authoring.stagegraph_builder import (
     StageGraphStageSpec,
+    StageInputBindingSpec,
     build_stagegraph_v2,
 )
 from mission_control.domain.programs.contracts import (
@@ -157,7 +158,13 @@ def test_absent_optional_producer_output_cannot_fulfill_required_dependency():
                     ),
                 ),
             ),
-            StageGraphStageSpec("consumer", depends_on=("producer",)),
+            # The consumer reads the producer's output: a required data binding. A predecessor
+            # without a binding is ordering only and waits on completion, never on the output.
+            StageGraphStageSpec(
+                "consumer",
+                depends_on=("producer",),
+                bindings=(StageInputBindingSpec("producer", "optional"),),
+            ),
         ),
     )
     kernel = StageGraphInterpreter(graph, effective_max_concurrency=1)

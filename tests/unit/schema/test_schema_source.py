@@ -16,6 +16,7 @@ from biotech_mission_adapters.bootstrap.schema_source import (
     published_source_reference,
     read_authoritative_schema,
 )
+from tests.fixtures.sibling_checkouts import authoritative_schema_path
 
 
 def test_default_follows_the_belllabs_layout(tmp_path: Path) -> None:
@@ -57,17 +58,24 @@ def test_bytes_other_than_the_published_reference_fail_closed(tmp_path: Path) ->
         read_authoritative_schema(edited)
 
 
-def test_current_source_is_exact_pinned_sdl_not_derived_api() -> None:
-    path = locate_authoritative_schema()
+def test_the_published_reference_pins_the_source_sdl_release() -> None:
     reference = published_source_reference()
-    payload = read_authoritative_schema(path)
-    assert len(payload) == 389072
+    assert reference["content_length"] == 389072
     assert reference["reference_version"] == "2"
     assert reference["source_kind"] == "neo4j-graphql-source-sdl"
     assert reference["git_blob"] == "ec16fda58ea0e1525c354aee6d4640d4c88a2bc9"
+
+
+def test_current_source_is_exact_pinned_sdl_not_derived_api() -> None:
+    path = authoritative_schema_path()
+    payload = read_authoritative_schema(path)
+    assert len(payload) == 389072
+    # The derived consumer API beside it in a Biotech Knowledge Services checkout is other
+    # bytes; an SDL configured outside a checkout has no such neighbour to compare.
     api = path.parents[4] / "apps/graphql-api/generated/schema.graphql"
-    with pytest.raises(AuthoritativeSchemaMismatch):
-        read_authoritative_schema(api)
+    if api.is_file():
+        with pytest.raises(AuthoritativeSchemaMismatch):
+            read_authoritative_schema(api)
 
 
 def test_overlay_drift_refuses_current_source(tmp_path, monkeypatch):
@@ -76,5 +84,8 @@ def test_overlay_drift_refuses_current_source(tmp_path, monkeypatch):
     changed = tmp_path / "semantic-overlay.v2.json"
     changed.write_text("{}", encoding="utf-8")
     monkeypatch.setattr(schema_source, "DEFAULT_SEMANTIC_OVERLAY", changed)
+    # The overlay is checked before the SDL digest, so any readable file reaches the refusal.
+    source = tmp_path / "assembled.graphql"
+    source.write_bytes(b"type A { id: ID! }")
     with pytest.raises(AuthoritativeSchemaMismatch, match="overlay"):
-        read_authoritative_schema(locate_authoritative_schema())
+        read_authoritative_schema(source)

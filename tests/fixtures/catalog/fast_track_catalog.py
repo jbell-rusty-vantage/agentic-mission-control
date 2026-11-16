@@ -243,7 +243,10 @@ def build_rows() -> list[Any]:
     kg_server_ref = _published(kg_server).ref
     kg_tool = MCPToolDefinition(
         logical_id="mcp.biotech-kg.tool.kg-ingest",
-        title="kg_ingest",
+        # The owner manifests find this stand-in by "knowledge graph ingestion claims". Its
+        # title carries those words: a tool named only `kg_ingest` has no name-surface match,
+        # and every `mcp.knowledge-capture` tool (agent-capabilities 1.1.0) then outranks it.
+        title="Knowledge graph ingestion (kg_ingest)",
         description="Knowledge graph ingestion of accepted claims with provenance receipts.",
         server_ref=kg_server_ref,
         tool_name="kg_ingest",

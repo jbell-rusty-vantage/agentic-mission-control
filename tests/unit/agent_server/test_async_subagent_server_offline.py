@@ -125,9 +125,16 @@ def test_canonical_config_preserves_bounded_graphs_and_uses_one_auth_surface() -
     assert config["auth"]["path"] == "mission_control.adapters.agent_server.deployment_auth:auth"
     assert config["http"]["app"] == "mission_control.adapters.agent_server.http_app:app"
     assert config["api_version"] == "0.12.0"
-    for line in ASYNC_ENV_FILE.read_text(encoding="utf-8").strip().splitlines():
-        name, _, value = line.partition("=")
-        assert value.startswith("${") and value.endswith("}"), name
+    assignments = [
+        line
+        for line in ASYNC_ENV_FILE.read_text(encoding="utf-8").splitlines()
+        if line.strip() and not line.lstrip().startswith("#")
+    ]
+    assert assignments
+    # Every value is a reference to the launching environment; a comment explains, never assigns.
+    for line in assignments:
+        name, separator, value = line.partition("=")
+        assert separator and value.startswith("${") and value.endswith("}"), name
 
 
 def test_compose_generation_uses_external_postgres_and_env_file_references() -> None:

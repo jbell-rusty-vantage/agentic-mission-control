@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 from pathlib import Path
 
 import yaml
@@ -35,6 +36,18 @@ CANONICAL = {
 }
 REF = "sandbox/skills/report-source-procedure/references"
 MOUNT = "/skills/report-source-procedure/references"
+# The AI Engineer contract's generated task pages are another repository's and are not copied
+# here. `MC_AIDB_CHECKOUT` names that checkout; without it the BellLabs layout beside this
+# repository is read. The recorded source is the layout path either way.
+AIDB_CHECKOUT_ENV = "MC_AIDB_CHECKOUT"
+AIDB_TASKS = "aiengineer/ai-engineer-db-contract/workspace/tasks"
+
+
+def entity_task_root() -> Path:
+    configured = os.environ.get(AIDB_CHECKOUT_ENV, "").strip()
+    if configured:
+        return Path(configured) / "workspace" / "tasks"
+    return ROOT.parents[1] / AIDB_TASKS
 
 
 def prepare(context_dir: Path, out: Path) -> dict:
@@ -83,13 +96,13 @@ def prepare(context_dir: Path, out: Path) -> dict:
     files[f"{REF}/partial-fixture.json"] = (
         ROOT / "tests/fixtures/report-source-foundation/partial-fixture.json"
     ).read_bytes()
-    entity_root = ROOT.parents[1] / "aiengineer/ai-engineer-db-contract/workspace/tasks"
+    entity_root = entity_task_root()
     for name in ("find-entity-by-identifier.md", "what-do-we-know-about-entity.md"):
         path = entity_root / name
         destination = f"sandbox/skills/schema-explore/references/workspace/tasks/{name}"
         files[destination] = path.read_bytes()
         provenance[destination] = {
-            "source": path.relative_to(ROOT.parents[1]).as_posix(),
+            "source": f"{AIDB_TASKS}/{name}",
             "source_digest": digest(path.read_bytes()),
             "transform": "none; optional read-only navigation, not entity write authority",
         }

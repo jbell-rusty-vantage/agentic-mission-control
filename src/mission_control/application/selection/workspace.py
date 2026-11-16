@@ -521,7 +521,7 @@ class SelectionWorkspace:
             facets=facets,
             hits=_merge(ranked, request.limit),
             unavailable=tuple(unavailable),
-            catalog_search_mode=(ranked_modes or modes or [None])[0],
+            catalog_search_mode=next(iter(ranked_modes or modes), None),
             lowered_hidden=hidden,
             notes=tuple(notes),
         )

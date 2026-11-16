@@ -10,6 +10,11 @@ Checked: inline links/images ``[text](target)`` and reference definitions
 anchors on Markdown targets are checked against GitHub-style heading slugs and
 explicit ``<a id/name>`` anchors. Fenced code blocks and inline code spans are ignored.
 
+Links that leave the repository (a sibling checkout, the workspace's own documents) are
+checked whenever that neighbour is present beside this checkout. In a checkout that stands
+alone, as on a CI runner, they cannot be checked: they are counted and reported, never
+failed, and never silently dropped.
+
 Usage::
 
     python docs/tools/check_links.py            # human report, exit 1 on broken links
@@ -154,7 +159,38 @@ def _targets(lines: list[str]) -> list[tuple[int, str]]:
     return found
 
 
-def check_file(path: Path, *, check_anchors: bool = True, root: Path = ROOT) -> list[Broken]:
+def beside(resolved: Path, root: Path = ROOT) -> Path | None:
+    """For a target outside the repository, the entry beside this checkout it belongs to.
+
+    That is the first path component below the deepest directory the target shares with the
+    repository root: a sibling checkout (``../knowledge-services``), the workspace's own
+    ``docs/`` or a workspace file. ``None`` for a target inside the repository.
+    """
+    root = root.resolve()
+    if resolved == root or root in resolved.parents:
+        return None
+    try:
+        common = Path(os.path.commonpath([root, resolved]))
+    except ValueError:  # another drive: nothing is shared
+        return resolved
+    parts = resolved.relative_to(common).parts
+    return common / parts[0] if parts else resolved
+
+
+def check_file(
+    path: Path,
+    *,
+    check_anchors: bool = True,
+    root: Path = ROOT,
+    outside: list[Broken] | None = None,
+) -> list[Broken]:
+    """Broken links of one file.
+
+    With ``outside``, a missing target that belongs to something not present beside this
+    checkout (another repository, the workspace's own documents) is appended there instead:
+    a checkout that stands alone cannot check it. When that neighbour is present the target
+    is checked like any other.
+    """
     broken: list[Broken] = []
     try:
         raw = path.read_text(encoding="utf-8", errors="replace").splitlines()
@@ -176,7 +212,11 @@ def check_file(path: Path, *, check_anchors: bool = True, root: Path = ROOT) -> 
             else (root / location.lstrip("/")).resolve()
         )
         if not resolved.exists():
-            broken.append(Broken(_rel(path, root), number, target, "missing target"))
+            neighbour = beside(resolved, root)
+            if outside is not None and neighbour is not None and not neighbour.exists():
+                outside.append(Broken(_rel(path, root), number, target, "outside this repository"))
+            else:
+                broken.append(Broken(_rel(path, root), number, target, "missing target"))
             continue
         if (
             check_anchors
@@ -199,13 +239,16 @@ def _rel(path: Path, root: Path) -> str:
 def run(*, check_anchors: bool = True, root: Path = ROOT) -> dict[str, object]:
     files = markdown_scope(root)
     broken: list[Broken] = []
+    outside: list[Broken] = []
     for path in files:
-        broken.extend(check_file(path, check_anchors=check_anchors, root=root))
+        broken.extend(check_file(path, check_anchors=check_anchors, root=root, outside=outside))
     return {
         "root": root.as_posix(),
         "files_checked": len(files),
         "broken_count": len(broken),
         "broken": [asdict(item) for item in broken],
+        "outside_unchecked_count": len(outside),
+        "outside_unchecked": [asdict(item) for item in outside],
     }
 
 
@@ -221,6 +264,11 @@ def main(argv: list[str] | None = None) -> int:
         broken: list[dict[str, object]] = report["broken"]  # type: ignore[assignment]
         for item in broken:
             print(f"{item['source']}:{item['line']}: {item['target']} ({item['reason']})")
+        if report["outside_unchecked_count"]:
+            print(
+                f"not checked: {report['outside_unchecked_count']} links to files outside this "
+                "repository (nothing is checked out beside it; --json lists them)"
+            )
         print(f"checked {report['files_checked']} files; broken links: {report['broken_count']}")
     return 1 if report["broken_count"] else 0
 

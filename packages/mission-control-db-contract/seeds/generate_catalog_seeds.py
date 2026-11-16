@@ -454,8 +454,18 @@ FROZEN_BUNDLES = {
     "ai-engineer/mc.app.bindings-1.0.0.json": (
         "a1364312eac8ad4fd2512888d1312f5eb574f8e261476dc339923fc9d4f493cb"
     ),
+    # The approved targets (asset version 2), applied wherever an installation was seeded.
+    # Frozen when the plane-qualified database names renamed each target's `database_url_env`
+    # (2026-11-07): the target bytes moved on, so 1.0.2 records them as asset version 3.
+    "biotech/mc.app.bindings-1.0.1.json": (
+        "34a39e597cffd8a458469c5302f84ef5e22cbbbb739589e404d71ad61c6b852e"
+    ),
+    "ai-engineer/mc.app.bindings-1.0.1.json": (
+        "de4e924f9538ef3e761f9cef056bd38704dcff462dcef16a49c0dd4d427b85fb"
+    ),
 }
-CURRENT_BINDING = ("1.0.1", "2")  # (seed_version, asset version)
+# (seed_version, asset version, the frozen seed version it succeeds)
+CURRENT_BINDING = ("1.0.2", "3", "1.0.1")
 
 
 def frozen_bundle(relative: str) -> dict[str, Any]:
@@ -508,7 +518,7 @@ def approved_assets_successor() -> dict[str, Any]:
 
 
 def app_bindings(app: str) -> dict[str, Any]:
-    seed_version, asset_version = CURRENT_BINDING
+    seed_version, asset_version, prior_seed_version = CURRENT_BINDING
     target_path = f"deployments/{app}/target.toml"
     target_bytes = _repo_file(target_path)
     target = tomllib.loads(target_bytes.decode("utf-8"))["target"]
@@ -533,7 +543,7 @@ def app_bindings(app: str) -> dict[str, Any]:
         ],
         "unresolved_operator_fields": unresolved,
         "approved_tenant_actor_mappings": [],
-        "supersedes": f"app-binding:{app}@1",
+        "supersedes": f"app-binding:{app}@{int(asset_version) - 1}",
     }
     key = f"app-binding:{app}/{asset_version}"
     return {
@@ -543,7 +553,7 @@ def app_bindings(app: str) -> dict[str, Any]:
         "component_compatibility": COMPATIBILITY,
         "depends_on": [
             {"seed_key": "mc.catalog.approved-assets", "seed_version": "1.0.0"},
-            {"seed_key": "mc.app.bindings", "seed_version": "1.0.0"},
+            {"seed_key": "mc.app.bindings", "seed_version": prior_seed_version},
         ],
         "actor_ref": SEED_ACTOR,
         "description": (

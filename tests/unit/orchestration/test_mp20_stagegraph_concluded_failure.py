@@ -9,6 +9,7 @@ from typing import Any
 from mission_control.application.programs.service import _completion_payload
 from mission_control.domain.authoring.stagegraph_builder import (
     StageGraphStageSpec,
+    StageInputBindingSpec,
     build_stagegraph_v2,
 )
 from mission_control.domain.programs.contracts import (
@@ -39,23 +40,25 @@ def _graph(*, optional_tail: bool = False) -> StageGraphInterpreter:
                 output_slots=("report",),
                 obligation_refs=("handed_off",),
             ),
-            StageGraphStageSpec("report", depends_on=("consume",), output_slots=("summary",)),
+            StageGraphStageSpec(
+                "report",
+                depends_on=("consume",),
+                output_slots=("summary",),
+                # An optional input is a data binding: a predecessor without one is an
+                # ordering dependency, which is always required.
+                bindings=(
+                    (StageInputBindingSpec("consume", "report", required=False),)
+                    if optional_tail
+                    else ()
+                ),
+            ),
             StageGraphStageSpec("side", output_slots=("note",)),
         ),
         max_concurrency=2,
     )
     if optional_tail:
-        blueprint = blueprint.model_validate(
-            {
-                **blueprint.model_dump(mode="python"),
-                "dependencies": tuple(
-                    item.model_copy(update={"dependency_class": "optional"})
-                    if item.consumer_stage_id == "report"
-                    else item
-                    for item in blueprint.dependencies
-                ),
-            }
-        )
+        (tail,) = [item for item in blueprint.dependencies if item.consumer_stage_id == "report"]
+        assert tail.dependency_class == "optional" and not tail.ordering_only
     return StageGraphInterpreter(blueprint, effective_max_concurrency=2)
 
 

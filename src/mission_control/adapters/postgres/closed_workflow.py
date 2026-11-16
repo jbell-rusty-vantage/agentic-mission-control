@@ -20,7 +20,11 @@ from mission_control.application.frames.sink import harness_execution_id
 from mission_control.application.recovery.closed_workflow import ProducerAuthority
 from mission_control.contracts.contracts import MissionControlRejected
 from mission_control.contracts.identities import mission_operation_id
-from mission_control.domain.authoring.canonical import contract_fingerprint, sha256_digest
+from mission_control.domain.authoring.canonical import (
+    contract_fingerprint,
+    sha256_digest,
+    stable_json_dump,
+)
 from mission_control.domain.execution.contracts import (
     OperationExecutionBinding,
     OperationSettlement,
@@ -261,7 +265,9 @@ class PostgresClosedWorkflowAuthority:
             {
                 "manifest": journal.result_manifest_digest,
                 "output": manifest.output_payload_digest,
-                "budget": budget.model_dump(mode="json"),
+                # `usage_ids` and `settlement_ids` are sets: sorted, so the proof is the same
+                # in every process (a JSON-mode dump lists them in iteration order).
+                "budget": stable_json_dump(budget),
             }
         )
 
@@ -545,7 +551,9 @@ class PostgresClosedWorkflowAuthority:
                 )
         fingerprint = metadata_digest(
             {
-                "head": head.model_dump(mode="json"),
+                # The validated head restores the projection's sets; sorted here, so a retry
+                # in another process records the same producer-authority fingerprint.
+                "head": stable_json_dump(head),
                 "commands": [dict(row) for row in commands],
                 "claims": [dict(row) for row in claims],
                 "settlements": settlements,

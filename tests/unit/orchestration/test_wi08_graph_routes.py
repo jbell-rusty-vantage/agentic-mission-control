@@ -316,9 +316,19 @@ def quorum_graph(*, optional_context: bool = False) -> StageGraphBlueprint:
             "synth",
             output_slots=("out",),
             depends_on=("context",) if optional_context else (),
-            bindings=(StageInputBindingSpec("context", "out", required=False),)
-            if optional_context
-            else (),
+            # The consumer reads each group member's output: without a data binding a
+            # predecessor is ordering only and its output never enters the frozen release.
+            bindings=(
+                *(
+                    StageInputBindingSpec(member, "out")
+                    for member in ("safety_a", "safety_b", "efficacy")
+                ),
+                *(
+                    (StageInputBindingSpec("context", "out", required=False),)
+                    if optional_context
+                    else ()
+                ),
+            ),
             groups=(
                 StageReleaseGroupSpec(
                     group_id="reviews",
@@ -337,6 +347,10 @@ def quorum_graph(*, optional_context: bool = False) -> StageGraphBlueprint:
         StageGraphStageSpec(
             "quick",
             output_slots=("out",),
+            bindings=(
+                StageInputBindingSpec("safety_a", "out"),
+                StageInputBindingSpec("safety_b", "out"),
+            ),
             groups=(
                 StageReleaseGroupSpec(
                     group_id="first",

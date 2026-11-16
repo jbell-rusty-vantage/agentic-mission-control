@@ -89,8 +89,18 @@ async def adoption_stack(*, currency=0, cost=None):
         release_usage=False,
         currency_reservation=currency,
     )
-    operation = fixture.operation
-    assert operation is not None
+    assert fixture.operation is not None
+    # A Stage Graph operation carries the idempotency key its admission writes
+    # (`StageGraphDecisionService`); the result decision scopes the producer's own effect
+    # claims by that key, so a template key would leave the adopted claim unowned.
+    stage = fixture.result.observation.identity
+    operation = fixture.operation.model_copy(
+        update={
+            "idempotency_key": (
+                f"stagegraph:{stage.semantic_key}:generation:{stage.execution_generation}"
+            )
+        }
+    )
     stack = lane_stack(operation=operation)
     binding = bind_operation_execution_request(operation)
     await stack.bindings.create_binding(binding)

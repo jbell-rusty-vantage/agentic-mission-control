@@ -566,9 +566,20 @@ async def test_evaluator_calls_stay_host_minted_with_distinct_subjects(tmp_path:
 
 async def test_schema_guide_and_relation_paths_stay_in_the_workspace(tmp_path: Path) -> None:
     worker = bridge(tmp_path, FakeHost({}))
+    # A workspace of this test's own: the generated AI Engineer contract workspace is another
+    # repository's, whose relations are renamed on its own schedule.
+    workspace = tmp_path / "aidb-workspace"
+    page = workspace / "relations" / "corpus" / "library.md"
+    page.parent.mkdir(parents=True)
+    page.write_text("# corpus.library\n\nOne row per library.\n", encoding="utf-8")
+    (tmp_path / "outside.md").write_text("outside the workspace", encoding="utf-8")
+    worker.workspace = workspace.resolve()
     guide = json.loads(await worker.aieng_schema())
     assert guide["total_chars"] > 0
     relation = json.loads(await worker.aieng_schema(section="relation", name="corpus/library"))
     assert "corpus.library" in relation["content"]
+    assert relation["schema_source"] == str(Path("relations") / "corpus" / "library.md")
     refused = json.loads(await worker.aieng_schema(section="relation", name=""))
     assert refused["status"] == "refused"
+    escaped = json.loads(await worker.aieng_schema(section="relation", name="../../outside"))
+    assert escaped["status"] == "refused"

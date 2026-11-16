@@ -171,7 +171,7 @@
      "pointer": "/missions/1/environment/capabilities/0",
      "resolved": {
       "capability_id": "mcp.biotech-kg.tool.kg-ingest",
-      "digest": "sha256:8e3bd986500c150e4eb5ce0089ba5c9d8cd5964351f56e868bfeebb356b55018",
+      "digest": "sha256:42556301c12678c72220f5c564979e9b4550e340c867b2517191af98c99a0704",
       "version": "1"
      },
      "role": "capability",
@@ -340,12 +340,12 @@
    "runtime_profile_digest": "sha256:14a3704d2f79e1fb73a56ed5e348f7d02e796cdb239469b596024a9d4dacb42d"
   },
   {
-   "blueprint_digest": "sha256:2913c388843a60e4f68d1c265875d02912e7f11d2d1234e8c61d30e889fb7ee4",
-   "definition_digest": "sha256:884237feb90e9c7052bd2d96251d18fabf03c390210ba8a2ebc1169a725ad508",
+   "blueprint_digest": "sha256:b09eb9df79ff6493b2e08687a98e5464db0ee9b8628dab921de3b08b68affa31",
+   "definition_digest": "sha256:b9bf961fc3436de0951be32850c16f2ed1cc24d03ace127b8ea6b6fdd15165bb",
    "family": "GoalDirected",
    "lowering_version": "mc.manifest-lowering/3",
    "mission_key": "ingestion",
-   "runtime_profile_digest": "sha256:97c03c5d1798c26de8bfff80f19d90cd35fadaca0207f6a64baf79cff191dcaf"
+   "runtime_profile_digest": "sha256:5975ef0900fa3e97cd7705f8ec9ae431f3b3cda35dced2904a29f8e5be79d826"
   }
  ],
  "manifest_digest": "sha256:efac882a819ea4eeb115bb39b4fa0471f186440d0ad9cd7b19a0f148876ebbe5",
@@ -1054,7 +1054,11 @@
    "alias": "kg_ingest",
    "blocker": null,
    "candidates": [
-    "mcp.biotech-kg.tool.kg-ingest@1#sha256:8e3bd986500c150e4eb5ce0089ba5c9d8cd5964351f56e868bfeebb356b55018"
+    "mcp.biotech-kg.tool.kg-ingest@1#sha256:42556301c12678c72220f5c564979e9b4550e340c867b2517191af98c99a0704",
+    "mcp.knowledge-capture.tool.knowledge-guide@1#sha256:3acf0fb3cb12e96d84748a7d64b82bd0a3e9611bad89da720a546b9fb4f087f7",
+    "mcp.knowledge-capture.tool.schema-get@1#sha256:fa1315e6e125fe922f5ff76eac9c5799ba20c507f32b21c4bd06911991dd689f",
+    "mcp.knowledge-capture.tool.schema-manifest@1#sha256:47cee363bc40c6ca964dbe99b449cf36dcdf8ee0f20244337f6e7bb9eb1abcc6",
+    "mcp.knowledge-capture.tool.schema-search@1#sha256:63237972cc025198f74a81a8e6271da64672a3aefcd6a58fa3d8525c25d862fb"
    ],
    "lanes": [
     "deep_agents"
@@ -1068,9 +1072,9 @@
    },
    "result": {
     "capability_id": "mcp.biotech-kg.tool.kg-ingest",
-    "digest": "sha256:8e3bd986500c150e4eb5ce0089ba5c9d8cd5964351f56e868bfeebb356b55018",
+    "digest": "sha256:42556301c12678c72220f5c564979e9b4550e340c867b2517191af98c99a0704",
     "exact_ref": {
-     "digest": "sha256:8e3bd986500c150e4eb5ce0089ba5c9d8cd5964351f56e868bfeebb356b55018",
+     "digest": "sha256:42556301c12678c72220f5c564979e9b4550e340c867b2517191af98c99a0704",
      "kind": "mcp_tool",
      "lifecycle_status": "published",
      "logical_id": "mcp.biotech-kg.tool.kg-ingest",
@@ -1079,7 +1083,7 @@
      "schema_version": "1"
     },
     "kind": "mcp_tool",
-    "pin": "mcp.biotech-kg.tool.kg-ingest@1#sha256:8e3bd986500c150e4eb5ce0089ba5c9d8cd5964351f56e868bfeebb356b55018",
+    "pin": "mcp.biotech-kg.tool.kg-ingest@1#sha256:42556301c12678c72220f5c564979e9b4550e340c867b2517191af98c99a0704",
     "supported_profiles": [],
     "version": "1"
    },
@@ -1150,6 +1154,12 @@
    "message": "subagent literature-verifier: lane deep_agents degrades readonly; the lane adapter records the exact loss in its materialization receipt at launch",
    "pointer": "/missions/0/environment/agents/0/readonly",
    "reason": "subagent_field_degraded"
+  },
+  {
+   "code": "CAPABILITY_UNAVAILABLE",
+   "message": "search 'knowledge graph ingestion claims' is ambiguous between mcp.biotech-kg.tool.kg-ingest@1#sha256:42556301c12678c72220f5c564979e9b4550e340c867b2517191af98c99a0704 and mcp.knowledge-capture.tool.knowledge-guide@1#sha256:3acf0fb3cb12e96d84748a7d64b82bd0a3e9611bad89da720a546b9fb4f087f7; the top hit was pinned",
+   "pointer": "/missions/1/environment/capabilities/0",
+   "reason": "ambiguous_search"
   },
   {
    "code": "UNSUPPORTED_BEHAVIOR",

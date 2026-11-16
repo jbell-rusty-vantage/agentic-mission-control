@@ -26,6 +26,7 @@ from tests.fixtures.qualia_knowledge import (
 )
 from tests.fixtures.qualia_runtime import SpendLedger
 from tests.fixtures.qualia_web_tools import SEED_URLS, EvidenceCapture
+from tests.fixtures.sibling_checkouts import BKS_CHECKOUT_ENV, sibling_checkout
 
 REPORT = {
     "kind": "report",
@@ -794,6 +795,8 @@ async def test_schema_guide_distinguishes_frozen_native_captures_from_browser_hi
 ) -> None:
     host, model = HostBoundary(), EvaluatorBoundary()
     worker = bridge(tmp_path, host, model)
+    # The guide is derived from the Biotech Knowledge Services canonical intent schema.
+    worker.bks_root = sibling_checkout(BKS_CHECKOUT_ENV, "Biotech Knowledge Services")
     response = json.loads(await worker.biotech_schema(section="guide", max_chars=12000))
     # Guide content is paginated output, never a tool-definition/schema or a WorkflowType change.
     text = response["content"]
@@ -988,7 +991,7 @@ async def test_agent_cannot_supply_source_bytes_or_foreign_report(tmp_path: Path
     assert not any(command["action"] == "native_intent" for command in host.commands)
 
 
-async def test_schema_guide_and_exact_capability_registration_are_local_only(
+async def test_exact_capability_registration_is_local_only(
     tmp_path: Path,
 ) -> None:
     bundle = build_qualia_knowledge_tools(
@@ -1002,6 +1005,18 @@ async def test_schema_guide_and_exact_capability_registration_are_local_only(
         assert component.schema_digest == sha256_digest(
             bundle.tools[component.tool_name].get_input_schema().model_json_schema()
         )
+
+
+async def test_schema_tool_reads_the_guide_and_canonical_schema_from_the_bks_checkout(
+    tmp_path: Path,
+) -> None:
+    bundle = build_qualia_knowledge_tools(
+        None,
+        ready=ready(),
+        evidence_dir=tmp_path / "web",
+        ledger=SpendLedger(tmp_path / "spend"),
+        bks_root=sibling_checkout(BKS_CHECKOUT_ENV, "Biotech Knowledge Services"),
+    )
     guide = json.loads(await bundle.tools["biotech_schema"].ainvoke({}))
     assert "subjectEvidence" in guide["content"]
     schema = json.loads(

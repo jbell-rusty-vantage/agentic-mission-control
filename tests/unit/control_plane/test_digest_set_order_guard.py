@@ -45,6 +45,20 @@ THIRD_PARTY = "third-party MCP `Tool` schema (JSON primitives only), not a BellL
 ANY_PAYLOAD = (
     f"{NO_SET}; `Any`/`dict[str, Any]` members are JSON payloads validated from JSON documents"
 )
+ROW_DOCUMENT = (
+    "generic helper over asyncpg rows and documents its callers already made JSON-shaped "
+    "(stable dumps and digests); PostgreSQL returns no set, so none reaches the dump"
+)
+AP = "mission_control.application.prerequisites.probes"
+KA = "mission_control.contracts.knowledge_assessment"
+KP = "mission_control.contracts.knowledge_protocol"
+TR = "mission_control.domain.context.transfer"
+# The selected host identity of a native prerequisite: the installation's pin, its auth pin and
+# its workspace provision, dumped to rebuild the public identity digest the prerequisite names.
+NATIVE_HOST = (
+    "mission_control.domain.execution.bindings.AuthPin",
+    "mission_control.application.authoring.cursor_launch.WorkspaceProvision",
+)
 
 
 _AUDIT: tuple[tuple[str, str, tuple[str, ...], tuple[str, ...], str], ...] = (
@@ -388,6 +402,274 @@ _AUDIT: tuple[tuple[str, str, tuple[str, ...], tuple[str, ...], str], ...] = (
         (f"{OE}.contracts.WorkspaceMount",),
         NO_SET,
     ),
+    # --- audited 2026-11-16 (MC-C): every site the guard had been reporting. The two that
+    # reach a set (`BudgetState.usage_ids`/`settlement_ids` and the restored projection sets of
+    # a `StageGraphDecisionMutation` in `adapters/postgres/closed_workflow.py`) moved to
+    # `stable_json_dump`; the rest dump set-free contracts and are pinned here.
+    (
+        "src/mission_control/adapters/deep_agents/hooks.py",
+        "install_event",
+        ("receipt.model_dump(mode='json')",),
+        ("mission_control.application.context.hook_contributions.InstallationReceipt",),
+        NO_SET,
+    ),
+    (
+        "src/mission_control/adapters/postgres/closed_workflow.py",
+        "metadata_digest",
+        ("to_jsonable_python(value)",),
+        (),
+        ROW_DOCUMENT,
+    ),
+    (
+        "src/mission_control/adapters/postgres/workspace_closures.py",
+        "PostgresWorkspaceClosures.put",
+        ("closure.model_dump(mode='json')",),
+        (f"{OE}.workspace_closure.WorkspaceClosure",),
+        NO_SET,
+    ),
+    (
+        "src/mission_control/adapters/prerequisites/claude_native.py",
+        "verify_native_claude",
+        (
+            "pinned.model_dump(mode='json', exclude={'build_commit', 'cli_sha256', 'attestor', "
+            "'path', 'content_sha256'})",
+            "pinned.auth.model_dump(mode='json', exclude_none=True)",
+            "pinned.workspace.model_dump(mode='json', exclude_none=True)",
+        ),
+        (f"{AP}.NativeClaudeEvidenceBinding", *NATIVE_HOST),
+        NO_SET,
+    ),
+    (
+        "src/mission_control/adapters/prerequisites/codex_native.py",
+        "verify_native_codex",
+        (
+            "pinned.workspace.model_dump(mode='json', exclude_none=True)",
+            "pinned.auth.model_dump(mode='json', exclude_none=True)",
+        ),
+        (f"{AP}.NativeCodexEvidenceBinding", *NATIVE_HOST),
+        NO_SET,
+    ),
+    (
+        "src/mission_control/adapters/prerequisites/cursor_native.py",
+        "verify_native_cursor",
+        (
+            "pinned.model_dump(mode='json', exclude={'build_commit', 'attestor', "
+            "'node_version', 'node_sha256', 'bridge_archive_version', 'bridge_archive_sha256', "
+            "'sdk_closure_sha256', 'loader_closure_sha256', 'observed_repository_commit', "
+            "'git_executable', 'git_sha256', 'path', 'content_sha256'})",
+            "pinned.auth.model_dump(mode='json', exclude_none=True)",
+            "pinned.workspace.model_dump(mode='json', exclude_none=True)",
+        ),
+        (f"{AP}.NativeCursorEvidenceBinding", *NATIVE_HOST),
+        NO_SET,
+    ),
+    (
+        "src/mission_control/application/context/linked_transfer.py",
+        "LinkedExportResolver.resolve",
+        ("item.model_dump(mode='json')",),
+        (
+            f"{TR}.LinkedGoalFindingSnapshot",
+            "mission_control.domain.outputs.contracts.Assessment",
+        ),
+        NO_SET,
+    ),
+    (
+        "src/mission_control/application/context/resolution.py",
+        "ContentResolutionService.resolve",
+        ("selected.model_dump(mode='json')",),
+        (f"{KP}.SelectedReportRead",),
+        NO_SET,
+    ),
+    (
+        "src/mission_control/application/execution/operations/journaled_operation_execution.py",
+        "JournaledOperationExecutionCoordinator.acquire_lane_admission_rejection",
+        ("claim.model_dump(mode='json')",),
+        (f"{OE}.journal.OperationEffectClaim",),
+        NO_SET,
+    ),
+    (
+        "src/mission_control/application/execution/unstarted_cancellation.py",
+        "UnstartedRunCancellation.close",
+        ("item.model_dump(mode='json')",),
+        (f"{RC}.contracts.AcceptedObligationEvidence",),
+        NO_SET,
+    ),
+    (
+        "src/mission_control/application/knowledge/native_write.py",
+        "KnowledgePlanPreview.preview",
+        ("access.wire_origin().model_dump(mode='json')",),
+        (f"{KP}.Origin",),
+        NO_SET,
+    ),
+    (
+        "src/mission_control/application/knowledge/read_intent.py",
+        "read_handle",
+        ("operation.model_dump(mode='json')",),
+        (
+            f"{KP}.ReadIntentNamedQueryOperation",
+            f"{KP}.ReadIntentSchemaSearchOperation",
+            f"{KP}.ReadIntentSchemaGetOperation",
+        ),
+        NO_SET,
+    ),
+    (
+        "src/mission_control/application/prerequisites/preflight.py",
+        "BoundClaudePrerequisiteIdentity.__call__",
+        ("host.model_dump(mode='json', exclude_none=True)",),
+        ("mission_control.domain.execution.bindings.EnvironmentBinding",),
+        NO_SET,
+    ),
+    (
+        "src/mission_control/application/prerequisites/preflight.py",
+        "cursor_sealed_configuration",
+        ("binding.hook_callback.model_dump(mode='json')",),
+        (f"{OE}.lanes.CursorHookCallback",),
+        NO_SET,
+    ),
+    (
+        "src/mission_control/application/prerequisites/preflight.py",
+        "BoundCursorPrerequisiteIdentity.__call__",
+        (
+            "lane.hook_callback.model_dump(mode='json')",
+            "host.model_dump(mode='json', exclude_none=True)",
+        ),
+        (
+            f"{OE}.lanes.CursorHookCallback",
+            "mission_control.domain.execution.bindings.EnvironmentBinding",
+        ),
+        NO_SET,
+    ),
+    (
+        "src/mission_control/application/prerequisites/preflight.py",
+        "PrerequisitePreflight.assess",
+        ("provider.environment.model_dump(mode='json', exclude_none=True)",),
+        ("mission_control.domain.execution.bindings.EnvironmentBinding",),
+        NO_SET,
+    ),
+    (
+        "src/mission_control/application/recovery/closed_workflow.py",
+        "ClosedWorkflowRecovery._recover",
+        ("request.model_dump(mode='json')", "item.model_dump(mode='json')"),
+        (
+            "mission_control.contracts.runtime_contracts.ClosedWorkflowRecoveryRequest",
+            f"{RC}.contracts.AcceptedObligationEvidence",
+        ),
+        NO_SET,
+    ),
+    (
+        "src/mission_control/application/subscriptions/coordinator.py",
+        "CoordinatorNotification.notice_digest",
+        ("self.model_dump(mode='json')",),
+        ("mission_control.application.subscriptions.coordinator.CoordinatorNotification",),
+        NO_SET,
+    ),
+    (
+        # The request models whose wire bytes a wait record binds (`_Wire`, validated JSON).
+        "src/mission_control/contracts/knowledge_assessment.py",
+        "assessment_request_digest",
+        ("request.model_dump(mode='json', by_alias=True)",),
+        (
+            f"{KA}.ReportObservationRequest",
+            f"{KA}.EvaluationContextRequest",
+            f"{KA}.ReportSealRequest",
+            f"{KA}.ReportUseRequest",
+            f"{KA}.ReportReviewRequest",
+            f"{KA}.DecisionResolveRequest",
+        ),
+        ANY_PAYLOAD,
+    ),
+    (
+        "src/mission_control/contracts/knowledge_protocol.py",
+        "SelectedReportRead.digest",
+        ("self.model_dump(mode='json')",),
+        (f"{KP}.SelectedReportRead",),
+        NO_SET,
+    ),
+    (
+        "src/mission_control/contracts/knowledge_protocol.py",
+        "OperationEnvelope.digest",
+        ("self.model_dump(mode='json')",),
+        (f"{KP}.OperationEnvelope",),
+        NO_SET,
+    ),
+    (
+        "src/mission_control/domain/context/transfer.py",
+        "LinkedExport.digest",
+        ("self.model_dump(mode='json')",),
+        (f"{TR}.LinkedExport",),
+        NO_SET,
+    ),
+    (
+        "src/mission_control/domain/context/transfer.py",
+        "TransferSelection.digest",
+        ("self.model_dump(mode='json')",),
+        (f"{TR}.TransferSelection",),
+        NO_SET,
+    ),
+    (
+        "src/mission_control/domain/context/transfer.py",
+        "plan_digest",
+        ("plan.model_dump(mode='json')",),
+        (f"{TR}.SealedTransferPlan",),
+        NO_SET,
+    ),
+    (
+        "src/mission_control/domain/context/transfer.py",
+        "seal_plan",
+        (
+            "receiver.model_dump(mode='json')",
+            "selection.backend.model_dump(mode='json')",
+            "member.model_dump(mode='json')",
+            "item.model_dump(mode='json')",
+            "resources.model_dump(mode='json')",
+        ),
+        (
+            f"{TR}.ReceiverRef",
+            f"{TR}.BackendCapabilities",
+            f"{TR}.ExactMember",
+            f"{TR}.PlacedMember",
+            f"{TR}.Omission",
+            f"{TR}.ResourcePlan",
+        ),
+        NO_SET,
+    ),
+    (
+        # The digest of the saved result's own JSON: the row stores that dump and the record
+        # re-derives the digest from the stored document, so both sides read one order.
+        "src/mission_control/domain/execution/invocation_settlement.py",
+        "saved_result_digest",
+        ("result.model_dump(mode='json')",),
+        (f"{OE}.contracts.RuntimeResult",),
+        ANY_PAYLOAD,
+    ),
+    (
+        "src/mission_control/domain/knowledge/effects.py",
+        "bound_effect_digest",
+        ("originating_origin.model_dump(mode='json')",),
+        ("mission_control.domain.knowledge.origin.InvocationOrigin",),
+        NO_SET,
+    ),
+    (
+        "src/mission_control/domain/knowledge/handles.py",
+        "QualifiedHandle.identity_digest",
+        ("self.model_dump(mode='json')",),
+        ("mission_control.domain.knowledge.handles.QualifiedHandle",),
+        NO_SET,
+    ),
+    (
+        "src/mission_control/domain/knowledge/origin.py",
+        "InvocationOrigin.digest",
+        ("self.model_dump(mode='json')",),
+        ("mission_control.domain.knowledge.origin.InvocationOrigin",),
+        NO_SET,
+    ),
+    (
+        "src/mission_control/domain/reactions/contracts.py",
+        "ReactionDescriptor.digest",
+        ("self.model_dump(mode='json')",),
+        ("mission_control.domain.reactions.contracts.ReactionDescriptor",),
+        NO_SET,
+    ),
 )
 
 AUDITED_NOT_AFFECTED: dict[tuple[str, str, str], Audited] = {
@@ -446,7 +728,7 @@ def test_audited_models_hold_no_sets(key: tuple[str, str, str], audited: Audited
         assert not model_holds_set(_resolve(qualified)), (
             f"{qualified} now holds a set; move {key} to stable_json_digest/stable_json_dump"
         )
-    assert audited.models or audited.reason == THIRD_PARTY
+    assert audited.models or audited.reason in {THIRD_PARTY, ROW_DOCUMENT}
 
 
 def test_scanner_detects_the_banned_patterns(tmp_path: Path) -> None:
@@ -561,6 +843,10 @@ def _declared_models(annotation: object) -> list[type[BaseModel]]:
 
     if isinstance(annotation, type) and issubclass(annotation, BaseModel):
         return [annotation]
+    if typing.get_origin(annotation) is type:
+        # `type[Model]` holds a class (a LangChain tool's `args_schema`), never an instance
+        # that a dump or a fingerprint could walk.
+        return []
     return [model for arg in typing.get_args(annotation) for model in _declared_models(arg)]
 
 
@@ -600,6 +886,19 @@ KNOWN_EXTENDED_DECLARED_MODELS = {
     # only ever held by fields declared as the inbox delivery union (`InboxDelivery`), never by a
     # `WebhookChannel`-declared subscription channel, and never feeds contract_fingerprint.
     ("WebhookChannel", "InboxWebhookDelivery"),
+    # A native host observation is only ever validated from the evidence file's JSON
+    # (`Native*Observation.model_validate_json`), so `identity` holds exactly the declared host
+    # identity. The extending `Native*EvidenceBinding` (`path`, `content_sha256`) is the
+    # installation's pin, declared by its own type on `OwnerProbeBinding`; neither is an input
+    # of contract_fingerprint or stable_json_dump.
+    ("NativeClaudeHostIdentity", "NativeClaudeEvidenceBinding"),
+    ("NativeCodexHostIdentity", "NativeCodexEvidenceBinding"),
+    ("NativeCursorHostIdentity", "NativeCursorEvidenceBinding"),
+    # `GET .../models` rebuilds every row as an exact `ModelListing`
+    # (`ModelListing.model_validate(describe_model(...).model_dump(exclude={"lanes"}))`);
+    # `ModelDescription` is the separate `GET .../models/{profile}` body. A read model, never
+    # an input of contract_fingerprint or stable_json_dump.
+    ("ModelListing", "ModelDescription"),
 }
 
 

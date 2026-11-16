@@ -954,9 +954,7 @@ class LaneTurnService:
                 f"{bounds.max_duration_s}s"
             ) from error
         finally:
-            ticker.cancel()
-            with suppress(asyncio.CancelledError):
-                await ticker
+            await _stop_helper(ticker)
 
     async def _start_and_send(
         self,
@@ -1553,9 +1551,7 @@ class LaneTurnService:
         except NativeTurnLost:
             return await self._lost(request, identity, reason="native_turn_lost")
         finally:
-            ticker.cancel()
-            with suppress(asyncio.CancelledError):
-                await ticker
+            await _stop_helper(ticker)
         native = NativeRefs(
             session_ref=turn.session.native_session_ref, turn_ref=turn.native_turn_ref
         )
@@ -1665,9 +1661,7 @@ class LaneTurnService:
                 finally:
                     # Close only the owner's observer, after its outstanding read ends.
                     if pending is not None:
-                        pending.cancel()
-                        with suppress(asyncio.CancelledError, StopAsyncIteration, Exception):
-                            await pending
+                        await _stop_helper(pending, discard_error=True)
         finally:
             history.cancel()
             if watch is not None:
@@ -3804,6 +3798,25 @@ class _DispatchParked(Exception):
     def __init__(self, reason: str) -> None:
         super().__init__(reason)
         self.reason = reason[:128]
+
+
+async def _stop_helper(helper: asyncio.Future[Any], *, discard_error: bool = False) -> None:
+    """Cancel a helper task of this turn and wait until it has ended.
+
+    `asyncio.wait` never raises the helper's own cancellation, so a cancellation that reaches
+    the calling task during the wait still propagates. `suppress(CancelledError)` around
+    `await helper` absorbed both: a requested Activity cancel delivered in that window was
+    lost, and the turn went on observing until its segment bound. A helper that failed on its
+    own still raises here unless `discard_error` (an abandoned observer read).
+    """
+
+    helper.cancel()
+    await asyncio.wait({helper})
+    if helper.cancelled():
+        return
+    error = helper.exception()
+    if error is not None and not discard_error:
+        raise error
 
 
 async def _heartbeat_ticker(

@@ -127,7 +127,7 @@
      "pointer": "/mission/environment/capabilities/3",
      "resolved": {
       "capability_id": "mcp.biotech-kg.tool.kg-ingest",
-      "digest": "sha256:8e3bd986500c150e4eb5ce0089ba5c9d8cd5964351f56e868bfeebb356b55018",
+      "digest": "sha256:42556301c12678c72220f5c564979e9b4550e340c867b2517191af98c99a0704",
       "version": "1"
      },
      "role": "capability",
@@ -184,7 +184,7 @@
      "pointer": "/mission/program/nodes/3/environment/capabilities/0",
      "resolved": {
       "capability_id": "mcp.biotech-kg.tool.kg-ingest",
-      "digest": "sha256:8e3bd986500c150e4eb5ce0089ba5c9d8cd5964351f56e868bfeebb356b55018",
+      "digest": "sha256:42556301c12678c72220f5c564979e9b4550e340c867b2517191af98c99a0704",
       "version": "1"
      },
      "role": "capability",
@@ -350,12 +350,12 @@
  ],
  "lowering": [
   {
-   "blueprint_digest": "sha256:dda4779510a718523e58e4bc46e0fd057a7a8372a2e4324eb9e37af719f23315",
-   "definition_digest": "sha256:bdfa1682bf23b0ad0da225d6bef75bedf7c5681ba7d1535d6d27ec3115b41527",
+   "blueprint_digest": "sha256:64fbf73a8cc7f905730cff68c60ce65eef13f48a89ce3a2e10d328d71ba615ab",
+   "definition_digest": "sha256:dfdef1e80c64e2050fcdc8b69c7cebde3e37e55c5946c18e61d9cc8a0bee94ef",
    "family": "StageGraph",
    "lowering_version": "mc.manifest-lowering/3",
    "mission_key": "nad-muscle-research-ingestion",
-   "runtime_profile_digest": "sha256:274e2c9ed1aedf0dc4ba7239b5083b02473402f0a8c16bcf450dd3c2bc276413"
+   "runtime_profile_digest": "sha256:3b3614e547903c24dd22094e6d29340200bcc12f2cece55ca01de735d4124628"
   }
  ],
  "manifest_digest": "sha256:7a291ad3f4db4376077fcecce6e292fe8816c66c368e20c643a79d9284e8d675",
@@ -1265,9 +1265,9 @@
    "candidates": [
     "mcp.tavily@0.2.22#sha256:0ddb64e0269e50f242bd52ca3dbb0eaea8ce6bebf28d3a52b5692829f50785f2",
     "mcp.firecrawl@3.28.2#sha256:c97558d2fdb993b1ec66a529445065b9648de5674f1cd8ede0529fa9503e79bf",
+    "mcp.github@2.1.0#sha256:8a9527386e0634359e8c61114aac0d9439ffdc2646b8d44b2875a6ef0d15a60a",
     "mcp.edgartools@5.61.1#sha256:fa757ab0c00da175bd51c261389e0ed8b7e776c83a907b7a489950dab2c8cbde",
-    "mcp.pubmed@2.10.20#sha256:39bb8510e8fc14ad611fb2c5a66f58e68fb634c5b6426b00ddc2c1351ab81599",
-    "mcp.biomcp@0.9.1#sha256:4f7617b49d40ab0b58ac6d34918b99850cbac9782b3ed73a92a7b7f178d433f2"
+    "mcp.pubmed@2.10.20#sha256:39bb8510e8fc14ad611fb2c5a66f58e68fb634c5b6426b00ddc2c1351ab81599"
    ],
    "lanes": [
     "deep_agents"
@@ -1311,9 +1311,9 @@
    "candidates": [
     "mcp.firecrawl@3.28.2#sha256:c97558d2fdb993b1ec66a529445065b9648de5674f1cd8ede0529fa9503e79bf",
     "mcp.tavily@0.2.22#sha256:0ddb64e0269e50f242bd52ca3dbb0eaea8ce6bebf28d3a52b5692829f50785f2",
-    "mcp.agent-browser@0.38.2#sha256:0adefa4043827cb505858f7f76060f08140d0fc9a3aeeb580f6b0d2ecc6e3282",
-    "mcp.edgartools@5.61.1#sha256:fa757ab0c00da175bd51c261389e0ed8b7e776c83a907b7a489950dab2c8cbde",
-    "mcp.biomcp@0.9.1#sha256:4f7617b49d40ab0b58ac6d34918b99850cbac9782b3ed73a92a7b7f178d433f2"
+    "mcp.github@2.1.0#sha256:8a9527386e0634359e8c61114aac0d9439ffdc2646b8d44b2875a6ef0d15a60a",
+    "mcp.context7@4.7.0#sha256:47e93031a67707b5085404eeb1d5d535556c59b0246bdac0c25814c12671ddf4",
+    "mcp.agent-browser@0.38.2#sha256:0adefa4043827cb505858f7f76060f08140d0fc9a3aeeb580f6b0d2ecc6e3282"
    ],
    "lanes": [
     "deep_agents"
@@ -1355,7 +1355,11 @@
    "alias": "kg_ingest",
    "blocker": null,
    "candidates": [
-    "mcp.biotech-kg.tool.kg-ingest@1#sha256:8e3bd986500c150e4eb5ce0089ba5c9d8cd5964351f56e868bfeebb356b55018"
+    "mcp.biotech-kg.tool.kg-ingest@1#sha256:42556301c12678c72220f5c564979e9b4550e340c867b2517191af98c99a0704",
+    "mcp.knowledge-capture.tool.knowledge-guide@1#sha256:3acf0fb3cb12e96d84748a7d64b82bd0a3e9611bad89da720a546b9fb4f087f7",
+    "mcp.knowledge-capture.tool.schema-get@1#sha256:fa1315e6e125fe922f5ff76eac9c5799ba20c507f32b21c4bd06911991dd689f",
+    "mcp.knowledge-capture.tool.schema-manifest@1#sha256:47cee363bc40c6ca964dbe99b449cf36dcdf8ee0f20244337f6e7bb9eb1abcc6",
+    "mcp.knowledge-capture.tool.schema-search@1#sha256:63237972cc025198f74a81a8e6271da64672a3aefcd6a58fa3d8525c25d862fb"
    ],
    "lanes": [
     "deep_agents"
@@ -1369,9 +1373,9 @@
    },
    "result": {
     "capability_id": "mcp.biotech-kg.tool.kg-ingest",
-    "digest": "sha256:8e3bd986500c150e4eb5ce0089ba5c9d8cd5964351f56e868bfeebb356b55018",
+    "digest": "sha256:42556301c12678c72220f5c564979e9b4550e340c867b2517191af98c99a0704",
     "exact_ref": {
-     "digest": "sha256:8e3bd986500c150e4eb5ce0089ba5c9d8cd5964351f56e868bfeebb356b55018",
+     "digest": "sha256:42556301c12678c72220f5c564979e9b4550e340c867b2517191af98c99a0704",
      "kind": "mcp_tool",
      "lifecycle_status": "published",
      "logical_id": "mcp.biotech-kg.tool.kg-ingest",
@@ -1380,7 +1384,7 @@
      "schema_version": "1"
     },
     "kind": "mcp_tool",
-    "pin": "mcp.biotech-kg.tool.kg-ingest@1#sha256:8e3bd986500c150e4eb5ce0089ba5c9d8cd5964351f56e868bfeebb356b55018",
+    "pin": "mcp.biotech-kg.tool.kg-ingest@1#sha256:42556301c12678c72220f5c564979e9b4550e340c867b2517191af98c99a0704",
     "supported_profiles": [],
     "version": "1"
    },
@@ -1468,7 +1472,11 @@
    "alias": "kg_ingest",
    "blocker": null,
    "candidates": [
-    "mcp.biotech-kg.tool.kg-ingest@1#sha256:8e3bd986500c150e4eb5ce0089ba5c9d8cd5964351f56e868bfeebb356b55018"
+    "mcp.biotech-kg.tool.kg-ingest@1#sha256:42556301c12678c72220f5c564979e9b4550e340c867b2517191af98c99a0704",
+    "mcp.knowledge-capture.tool.knowledge-guide@1#sha256:3acf0fb3cb12e96d84748a7d64b82bd0a3e9611bad89da720a546b9fb4f087f7",
+    "mcp.knowledge-capture.tool.schema-get@1#sha256:fa1315e6e125fe922f5ff76eac9c5799ba20c507f32b21c4bd06911991dd689f",
+    "mcp.knowledge-capture.tool.schema-manifest@1#sha256:47cee363bc40c6ca964dbe99b449cf36dcdf8ee0f20244337f6e7bb9eb1abcc6",
+    "mcp.knowledge-capture.tool.schema-search@1#sha256:63237972cc025198f74a81a8e6271da64672a3aefcd6a58fa3d8525c25d862fb"
    ],
    "lanes": [
     "deep_agents"
@@ -1482,9 +1490,9 @@
    },
    "result": {
     "capability_id": "mcp.biotech-kg.tool.kg-ingest",
-    "digest": "sha256:8e3bd986500c150e4eb5ce0089ba5c9d8cd5964351f56e868bfeebb356b55018",
+    "digest": "sha256:42556301c12678c72220f5c564979e9b4550e340c867b2517191af98c99a0704",
     "exact_ref": {
-     "digest": "sha256:8e3bd986500c150e4eb5ce0089ba5c9d8cd5964351f56e868bfeebb356b55018",
+     "digest": "sha256:42556301c12678c72220f5c564979e9b4550e340c867b2517191af98c99a0704",
      "kind": "mcp_tool",
      "lifecycle_status": "published",
      "logical_id": "mcp.biotech-kg.tool.kg-ingest",
@@ -1493,7 +1501,7 @@
      "schema_version": "1"
     },
     "kind": "mcp_tool",
-    "pin": "mcp.biotech-kg.tool.kg-ingest@1#sha256:8e3bd986500c150e4eb5ce0089ba5c9d8cd5964351f56e868bfeebb356b55018",
+    "pin": "mcp.biotech-kg.tool.kg-ingest@1#sha256:42556301c12678c72220f5c564979e9b4550e340c867b2517191af98c99a0704",
     "supported_profiles": [],
     "version": "1"
    },
@@ -1505,6 +1513,18 @@
  "schema_version": "mc.manifest_resolution.v1",
  "tenant_id": "9287e246-224b-5814-bc00-44bb5396e0c5",
  "warnings": [
+  {
+   "code": "CAPABILITY_UNAVAILABLE",
+   "message": "search 'knowledge graph ingestion claims' is ambiguous between mcp.biotech-kg.tool.kg-ingest@1#sha256:42556301c12678c72220f5c564979e9b4550e340c867b2517191af98c99a0704 and mcp.knowledge-capture.tool.knowledge-guide@1#sha256:3acf0fb3cb12e96d84748a7d64b82bd0a3e9611bad89da720a546b9fb4f087f7; the top hit was pinned",
+   "pointer": "/mission/environment/capabilities/3",
+   "reason": "ambiguous_search"
+  },
+  {
+   "code": "CAPABILITY_UNAVAILABLE",
+   "message": "search 'knowledge graph ingestion claims' is ambiguous between mcp.biotech-kg.tool.kg-ingest@1#sha256:42556301c12678c72220f5c564979e9b4550e340c867b2517191af98c99a0704 and mcp.knowledge-capture.tool.knowledge-guide@1#sha256:3acf0fb3cb12e96d84748a7d64b82bd0a3e9611bad89da720a546b9fb4f087f7; the top hit was pinned",
+   "pointer": "/mission/program/nodes/3/environment/capabilities/0",
+   "reason": "ambiguous_search"
+  },
   {
    "code": "UNSUPPORTED_BEHAVIOR",
    "message": "controls.notifications is consumed only by mission/v2 (as notify watchers); mission/v1 ignores it",

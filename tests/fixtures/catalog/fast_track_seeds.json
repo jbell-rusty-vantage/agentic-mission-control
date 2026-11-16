@@ -701,7 +701,7 @@
   {
    "schema_version": "1",
    "logical_id": "mcp.biotech-kg.tool.kg-ingest",
-   "title": "kg_ingest",
+   "title": "Knowledge graph ingestion (kg_ingest)",
    "description": "Knowledge graph ingestion of accepted claims with provenance receipts.",
    "kind": "mcp_tool",
    "server_ref": {

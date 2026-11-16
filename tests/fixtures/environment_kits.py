@@ -5,11 +5,10 @@ from __future__ import annotations
 
 import json
 import os
-import shutil
 from datetime import UTC, datetime
 from typing import Any
 
-from mission_control.adapters.workspaces.mission_setup import BashMissionSetupRunner
+from mission_control.adapters.workspaces.mission_setup import BashMissionSetupRunner, resolve_bash
 from mission_control.application.capabilities.bundle_custody import bundle_definition
 from mission_control.application.environments.kits import EnvironmentKitCatalog
 from mission_control.application.environments.mission_layer import MissionLayerService
@@ -23,7 +22,9 @@ from mission_control.domain.authoring.contracts import (
 from mission_control.domain.capabilities.bundles import build_bundle_manifest
 from mission_control.domain.capabilities.catalog_entry import capability_pin
 
-BASH = shutil.which("bash")
+# The bash the mission layer itself runs under: on Windows `shutil.which("bash")` is the WSL
+# launcher in System32, which cannot open a Windows path; `resolve_bash` finds Git for Windows'.
+BASH = resolve_bash()
 PUBLISHED_AT = datetime(2026, 10, 13, tzinfo=UTC)
 
 

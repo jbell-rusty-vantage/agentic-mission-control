@@ -18,6 +18,14 @@ def package(tmp_path, monkeypatch):
     context = tmp_path / "context"
     context.mkdir()
     (context / "manifest.json").write_text("{}", encoding="utf-8")
+    # The two entity task pages come from the AI Engineer contract checkout the script is
+    # pointed at. This test packages stand-in pages: it proves the inventory, the digests and
+    # the custody of the Knowledge Services skills, not that repository's current text.
+    tasks = tmp_path / "ai-engineer-db-contract" / "workspace" / "tasks"
+    tasks.mkdir(parents=True)
+    for name in ("find-entity-by-identifier.md", "what-do-we-know-about-entity.md"):
+        (tasks / name).write_text(f"# {name}\n\nFIXTURE task page.\n", encoding="utf-8")
+    monkeypatch.setenv(module.AIDB_CHECKOUT_ENV, str(tasks.parents[1]))
     monkeypatch.setattr(
         module,
         "verify_context",
@@ -46,6 +54,16 @@ def test_deterministic_exact_inventory_and_fresh_output(package, tmp_path):
         ]
         assert rows and all(custody in row["source"] for row in rows), name
         assert {row["transform"] for row in rows} == {"none"}, name
+    tasks = {
+        destination: row
+        for destination, row in manifest["provenance"].items()
+        if "/workspace/tasks/" in destination
+    }
+    assert len(tasks) == 2
+    assert all(
+        row["source"].startswith("aiengineer/ai-engineer-db-contract/workspace/tasks/")
+        for row in tasks.values()
+    )
     with pytest.raises(ValueError, match="fresh"):
         module.prepare(context, out)
     with pytest.raises(ValueError, match="pinned"):

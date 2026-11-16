@@ -42,6 +42,7 @@ from biotech_mission_adapters.domain.schema_grounding.errors import (
     SchemaDeploymentMismatch,
 )
 from mission_control.domain.authoring.canonical import sha256_digest
+from tests.fixtures.sibling_checkouts import authoritative_schema_path
 
 NOW = datetime(2026, 7, 26, 18, 0, tzinfo=UTC)
 SCHEMA_DIGEST = "sha256:" + "1" * 64
@@ -570,7 +571,7 @@ def test_exact_index_descriptors_resolve_aliased_physical_properties() -> None:
 
 def test_canonical_schema_exact_comparison_is_compatible_without_stale_artifacts() -> None:
     # The Biotech-owned SDL, located and verified against the published reference.
-    canonical_sdl = read_authoritative_schema().decode("utf-8")
+    canonical_sdl = read_authoritative_schema(authoritative_schema_path()).decode("utf-8")
     schema_ref = "schema-definition:canonical-alias-regression"
     physical = parse_physical_schema(canonical_sdl.encode(), schema_ref)
     request = _provision_request(

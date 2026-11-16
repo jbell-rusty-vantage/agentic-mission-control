@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from hashlib import sha256
+from typing import Any
 
 import pytest
 
@@ -9,10 +10,7 @@ from biotech_mission_adapters.application.schema.schema_catalog import (
     DEFAULT_SEMANTIC_OVERLAY,
     parse_schema_catalog,
 )
-from biotech_mission_adapters.bootstrap.schema_source import (
-    locate_authoritative_schema,
-    read_authoritative_schema,
-)
+from biotech_mission_adapters.bootstrap.schema_source import read_authoritative_schema
 from biotech_mission_adapters.domain.schema_catalog import (
     CatalogValidationError,
     derive_catalog,
@@ -22,6 +20,7 @@ from biotech_mission_adapters.domain.schema_catalog import (
     require_valid_catalog_overlay,
     semantic_overlay_json_schema,
 )
+from tests.fixtures.sibling_checkouts import authoritative_schema_path
 
 SDL = b"""
 directive @node on OBJECT
@@ -114,7 +113,7 @@ def test_overlay_drift_fails_closed() -> None:
 
 
 def test_governed_trudiagnostic_overlay_validates_against_authoritative_sdl() -> None:
-    authoritative_sdl = locate_authoritative_schema()
+    authoritative_sdl = authoritative_schema_path()
     physical = parse_physical_schema(
         read_authoritative_schema(authoritative_sdl), str(authoritative_sdl)
     )
@@ -148,16 +147,30 @@ def test_governed_trudiagnostic_overlay_validates_against_authoritative_sdl() ->
     )
 
 
+def _published_reference() -> dict[str, Any]:
+    return dict(
+        json.loads(
+            (DEFAULT_SEMANTIC_OVERLAY.parent / "source-reference.v2.json").read_text(
+                encoding="utf-8"
+            )
+        )
+    )
+
+
 def test_published_schema_reference_matches_authoritative_source() -> None:
     # Raw bytes from the located Biotech-owned file, compared independently of the resolver.
-    authoritative_sdl = locate_authoritative_schema()
-    reference = json.loads(
-        (DEFAULT_SEMANTIC_OVERLAY.parent / "source-reference.v2.json").read_text(encoding="utf-8")
-    )
+    authoritative_sdl = authoritative_schema_path()
+    reference = _published_reference()
     source = authoritative_sdl.read_bytes()
 
     assert reference["sha256"] == sha256(source).hexdigest()
     assert reference["content_length"] == len(source)
+
+
+def test_published_schema_reference_names_its_release_and_current_overlay() -> None:
+    """What the reference says without the Biotech-owned bytes beside it."""
+
+    reference = _published_reference()
     assert reference["release_id"] == "biotech-schema-v2.0.2"
     assert reference["path"] == "schema/pinned/release/sdl/assembled.graphql"
     assert (
@@ -195,12 +208,14 @@ def test_v2_overlay_encodes_current_evidence_distinctions() -> None:
     assert "kind PANEL" in overlay.elements["node:LabTest"].description
 
 
-def test_legacy_workflow_catalog_digest_is_portable_and_receives_semantics() -> None:
+def test_legacy_workflow_catalog_digest_is_portable() -> None:
     plain_first = parse_schema_catalog(SDL, "C:/one/schema.graphql")
     plain_second = parse_schema_catalog(SDL, "/other/schema.graphql")
     assert plain_first.catalog_digest == plain_second.catalog_digest
 
-    authoritative_sdl = locate_authoritative_schema()
+
+def test_legacy_workflow_catalog_receives_semantics_from_the_authoritative_sdl() -> None:
+    authoritative_sdl = authoritative_schema_path()
     catalog = parse_schema_catalog(
         read_authoritative_schema(authoritative_sdl),
         str(authoritative_sdl),

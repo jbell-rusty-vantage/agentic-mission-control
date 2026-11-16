@@ -1,7 +1,6 @@
 """Owner wizard evidence, authorization and shell rendering regressions."""
 
 import asyncio
-import shutil
 import subprocess
 from pathlib import Path
 from types import SimpleNamespace
@@ -11,6 +10,7 @@ import httpx
 import pytest
 from fastapi.testclient import TestClient
 
+from mission_control.adapters.workspaces.mission_setup import resolve_bash
 from mission_control.application.prerequisites.preflight import PrerequisitePreflight
 from mission_control.application.prerequisites.service import InMemoryOwnerPrerequisiteRepository
 from mission_control.application.prerequisites.setup import (
@@ -134,7 +134,9 @@ def test_generated_wizard_preserves_library_and_quotes_server_text(tmp_path):
     assert "confirm" in script and " prereq attest " in script and " prereq verify " in script
     assert "--definition-digest" in script
     assert "MISSION_CONTROL_TOKEN=" not in script
-    bash = shutil.which("bash")
+    # Git for Windows' bash on Windows: the System32 `bash` is the WSL launcher, which cannot
+    # open the Windows path of the generated script.
+    bash = resolve_bash()
     assert bash, "Git Bash is required for the wizard syntax proof"
     path = tmp_path / "wizard.sh"
     path.write_text(script, encoding="utf-8", newline="\n")

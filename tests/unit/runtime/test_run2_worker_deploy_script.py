@@ -16,6 +16,12 @@ SERVICE = runpy.run_path(str(ROOT / "deployments/worker-aws/service.py"))
 GROUP = "sg-" + "a" * 17
 TASK_ARN = "arn:aws:ecs:us-east-1:298199649527:task-definition/mc-worker-ai-engineer:1"
 MUTATIONS = {"ecs register-task-definition", "ecs create-service", "ecs update-service"}
+# PowerShell 7 (`pwsh`) wherever it is installed, which includes the Linux CI image. A Windows
+# host without it still has Windows PowerShell 5.1, the shell an operator there runs the
+# script with; nothing else substitutes, so a host with neither fails instead of skipping.
+POWERSHELL = shutil.which("pwsh") or (
+    shutil.which("powershell") if sys.platform == "win32" else None
+)
 
 MOCK = r"""
 param([string]$Fixture, [string]$Calls, [string]$Task, [string]$Deploy,
@@ -149,7 +155,7 @@ def fixture(create, drift):
 
 
 def execute(tmp_path, create, drift=None):
-    pwsh = shutil.which("pwsh")
+    pwsh = POWERSHELL
     assert pwsh, "PowerShell is required to exercise the actual deploy script"
     task = PLAN["render"](
         image="298199649527.dkr.ecr.us-east-1.amazonaws.com/mission-control-worker@sha256:"

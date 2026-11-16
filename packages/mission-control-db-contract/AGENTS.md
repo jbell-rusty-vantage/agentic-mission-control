@@ -20,7 +20,7 @@ database. Read the root `GLOSSARY.md` and `docs/knowledge/persistence.md` first.
 ## Invariants
 
 A release is immutable once applied: never edit migration bytes or an applied seed; add a new
-component version and a new seed version (`mc.app.bindings@1.0.0` is frozen, 1.0.1 is current).
+component version and a new seed version (`mc.app.bindings@1.0.0` and 1.0.1 are frozen, 1.0.2 is current).
 Every apply, runtime-apply and seed-apply writes a receipt; verify compares the persisted
 fingerprint and contract digest. Protected objects outside the three schemas must not change.
 Runtime persistence targets a separate app-bound database (ADR-0017); the descriptor stays here.

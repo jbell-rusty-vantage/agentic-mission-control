@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import importlib.util
 import json
 import re
@@ -104,6 +105,8 @@ def test_each_app_installation_set_is_valid_and_dependency_closed(app: str) -> N
         ("mc.catalog.approved-assets", "1.0.0"),
         ("mc.app.bindings", "1.0.0"),
         ("mc.app.bindings", "1.0.1"),
+        # The target's database variable was renamed (plane-qualified names); 1.0.1 is frozen.
+        ("mc.app.bindings", "1.0.2"),
     ]
     agent = [("mc.catalog.agent-capabilities", "1.0.0"), (APP_AGENT_KEYS[app], "1.0.0")]
     # The research capabilities: new common ids, after the frozen common 1.0.0.
@@ -185,14 +188,26 @@ def test_each_app_installation_set_is_valid_and_dependency_closed(app: str) -> N
         < position[skills[0]]
     )
     bindings = [item for item in ordered if item["seed_key"] == "mc.app.bindings"]
-    frozen, current = (item["records"][0]["fields"] for item in bindings)
-    assert (frozen["version"], current["version"]) == ("1", "2")
+    frozen, approved, current = (item["records"][0]["fields"] for item in bindings)
+    assert (frozen["version"], approved["version"], current["version"]) == ("1", "2", "3")
     binding = current["manifest"]
     assert binding["application_id"] == app
     assert binding["approved_tenant_actor_mappings"] == []
     # The approved target has no unresolved operator fields; 1.0.0 recorded the placeholders.
     assert binding["unresolved_operator_fields"] == []
+    assert approved["manifest"]["unresolved_operator_fields"] == []
     assert frozen["manifest"]["unresolved_operator_fields"]
+    # Each version supersedes the one before it and applies after it; the current one records
+    # the target file as it is now, and differs from the frozen 1.0.1 only in those facts.
+    assert (approved["manifest"]["supersedes"], binding["supersedes"]) == (
+        f"app-binding:{app}@1",
+        f"app-binding:{app}@2",
+    )
+    assert {"seed_key": "mc.app.bindings", "seed_version": "1.0.1"} in bindings[2]["depends_on"]
+    target = (ROOT / "deployments" / app / "target.toml").read_bytes().replace(b"\r\n", b"\n")
+    assert binding["target_sha256"] == "sha256:" + hashlib.sha256(target).hexdigest()
+    changed = {key for key in binding if binding[key] != approved["manifest"][key]}
+    assert changed == {"secret_reference_names", "supersedes", "target_sha256"}
     # Common catalog bytes are one shared copy; only the app binding differs.
     assert _bundles("common") == [
         item

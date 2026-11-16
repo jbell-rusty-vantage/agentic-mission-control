@@ -37,6 +37,12 @@ FIXTURES = (
     "e4-linked-chain.mission.yml",
     "e5-nested-goal-in-graph.mission.yml",
 )
+# The hosted-lane Stage Graph fixtures share the directory; `test_hosted_stagegraph_fixtures.py`
+# compiles and seals them (F2: claude_managed, F3: codex_agents).
+HOSTED_FIXTURES = (
+    "f2-managed-stagegraph.mission.yml",
+    "f3-agents-stagegraph.mission.yml",
+)
 # What the driver substitutes; the pack shape matters only to the model, never to compile.
 PLACEHOLDERS = {"__PACK__": '{"reportId":"fixture","task":{},"fragments":[]}'}
 PRODUCERS = {"producer.default", "producer.fallback"}  # the rows sprint_oc_w1_bindings binds
@@ -60,7 +66,11 @@ async def compiled(name: str, producer: str = "producer.fallback") -> ManifestCo
 
 
 def test_the_fixture_set_is_exactly_e1_to_e5() -> None:
-    assert sorted(path.name for path in LOOP.glob("*.yml")) == sorted(FIXTURES)
+    """The experiment fixtures are exactly E1-E5; the only other files are the two hosted ones."""
+
+    names = sorted(path.name for path in LOOP.glob("*.yml"))
+    assert [name for name in names if name.startswith("e")] == sorted(FIXTURES)
+    assert names == sorted((*FIXTURES, *HOSTED_FIXTURES))
 
 
 @pytest.mark.asyncio
