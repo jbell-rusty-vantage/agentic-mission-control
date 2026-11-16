@@ -32,30 +32,38 @@ def test_unconfigured_authentication_fails_closed():
 
 
 def test_the_guide_is_on_every_transport_and_fails_closed():
-    """The guide's part of the interface inventory (`docs/knowledge/interfaces.md`): three
-    routes, two `missionctl` verbs and two MCP tools over one handler, authenticated like every
-    scoped route. Their agreement is proven in `tests/unit/guide`."""
+    """The guide's part of the interface inventory (`docs/knowledge/interfaces.md`): four
+    routes, three `missionctl` verbs and three MCP tools over one handler (the guide, describe
+    and who the caller is), authenticated like every scoped route. Their agreement is proven
+    in `tests/unit/guide`."""
     import argparse
 
     from mission_control.interfaces.cli.main import build_parser
     from mission_control.interfaces.http.guide import router as guide_router
-    from mission_control.interfaces.mcp.guide_tools import DESCRIBE_TOOL, GUIDE_TOOL
+    from mission_control.interfaces.mcp.guide_tools import DESCRIBE_TOOL, GUIDE_TOOL, WHOAMI_TOOL
 
     app = FastAPI()
     app.include_router(guide_router)
     prefix = "/v1/applications/{application_id}"
-    assert {f"{prefix}/guide", f"{prefix}/guide/{{topic}}", f"{prefix}/describe"} == set(
-        app.openapi()["paths"]
-    )
-    for path in ("guide", "guide/interview", "describe?ref=lane:deep_agents"):
+    assert {
+        f"{prefix}/guide",
+        f"{prefix}/guide/{{topic}}",
+        f"{prefix}/describe",
+        f"{prefix}/whoami",
+    } == set(app.openapi()["paths"])
+    for path in ("guide", "guide/interview", "describe?ref=lane:deep_agents", "whoami"):
         assert TestClient(app).get(f"/v1/applications/a/{path}").status_code == 503
     groups = next(
         action.choices
         for action in build_parser()._actions
         if isinstance(action, argparse._SubParsersAction)
     )
-    assert {"guide", "describe", "search", "workspace"} <= set(groups)
-    assert (GUIDE_TOOL, DESCRIBE_TOOL) == ("mission_guide", "mission_describe")
+    assert {"guide", "describe", "whoami", "search", "workspace"} <= set(groups)
+    assert (GUIDE_TOOL, DESCRIBE_TOOL, WHOAMI_TOOL) == (
+        "mission_guide",
+        "mission_describe",
+        "mission_whoami",
+    )
 
 
 def test_cross_application_denied_before_service_selection():

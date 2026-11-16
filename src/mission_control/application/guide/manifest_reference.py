@@ -515,10 +515,11 @@ def _merged(labels: Sequence[str]) -> str:
 
 
 def manifest_topic_section(
-    *, lanes: Iterable[str], sandbox_profiles: Iterable[str] | None, application_id: str
+    *, lanes: Iterable[str], sandbox_profiles: Mapping[str, str] | None, application_id: str
 ) -> str:
     """The generated part of the `manifest` topic: required fields, allowed values, what each
-    bound lane requires, which acceptance starts where and the sandbox profiles bound here."""
+    bound lane requires, which acceptance starts where and the sandbox profiles bound here,
+    each with the one line that says what it suits (`sandbox_profiles`: name -> line)."""
 
     required = _table(
         ["Where", "Required"],
@@ -541,12 +542,17 @@ def manifest_topic_section(
     for lane in lanes:
         by_requirement.setdefault(lane_environment_requirements(lane), []).append(lane)
     lane_rows = [[_spans(names), _spans(needed)] for needed, names in by_requirement.items()]
-    bound = None if sandbox_profiles is None else tuple(sandbox_profiles)
     sandboxes = (
         "This server does not launch, so it binds no sandbox profile."
-        if bound is None
-        else f"Sandbox profiles bound here (`environment.sandbox.profile`): {_spans(bound)}."
-        if bound
+        if sandbox_profiles is None
+        else "\n".join(
+            [
+                "Sandbox profiles bound here (`environment.sandbox.profile`); read one in "
+                "full with its `sandbox:<name>` ref:",
+                *(f"- `{name}`: {line}" for name, line in sandbox_profiles.items()),
+            ]
+        )
+        if sandbox_profiles
         else "No sandbox profile is bound here: a `deep_agents` node cannot start."
     )
     return "\n\n".join(

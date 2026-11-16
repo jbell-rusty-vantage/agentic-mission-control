@@ -3,6 +3,8 @@
 Read-only routes over the tenant's ``OutputInspectionService``; ``missionctl outputs`` and the
 operator MCP call the same handlers. Every route needs ``workflow_run.read``; a run of another
 tenant reads as absent. Pages carry an opaque cursor the service issued.
+``GET runs/{id}/outputs/{obligation_key}/content`` returns the bounded text of the promise's
+accepted (or latest submitted) revision and also needs ``workflow.result.read``.
 """
 
 from __future__ import annotations
@@ -12,6 +14,7 @@ from typing import Annotated, Any
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 
 from mission_control.application.outputs.inspection import (
+    DEFAULT_CONTENT_CHARS,
     InspectionRejected,
     OutputInspectionService,
 )
@@ -25,7 +28,7 @@ from mission_control.interfaces.http.mission_control import (
 router = APIRouter(prefix="/v1/applications/{application_id}", tags=["output-inspection"])
 Principal = Annotated[MissionPrincipal, Depends(get_mission_principal)]
 REGISTRY = "mission_control_output_inspection_services"
-STATUS = {"unauthorized": 403, "not_found": 404, "invalid": 422}
+STATUS = {"unauthorized": 403, "not_found": 404, "invalid": 422, "unavailable": 503}
 
 
 def get_output_inspection_service(
@@ -77,6 +80,26 @@ async def output_revisions(
     except InspectionRejected as exc:
         raise _error(exc) from None
     return {"application_id": principal.application_id, **page.model_dump(mode="json")}
+
+
+@router.get("/runs/{run_id}/outputs/{obligation_key}/content")
+async def output_content(
+    run_id: str,
+    obligation_key: str,
+    principal: Principal,
+    service: Service,
+    max_chars: Annotated[int, Query(ge=1, le=8_000)] = DEFAULT_CONTENT_CHARS,
+) -> dict[str, Any]:
+    """The bounded text of one promise's accepted (or latest submitted) revision
+    (`mc.output_content.v1`); also needs `workflow.result.read`."""
+
+    try:
+        content = await service.content(
+            run_id, obligation_key, principal.actor, max_chars=max_chars
+        )
+    except InspectionRejected as exc:
+        raise _error(exc) from None
+    return {"application_id": principal.application_id, **content.model_dump(mode="json")}
 
 
 @router.get("/runs/{run_id}/output-events")

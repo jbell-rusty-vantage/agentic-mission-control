@@ -11,8 +11,13 @@ profiles are listed by the `sandbox_profile` facet and accepted by the draft che
 
 from __future__ import annotations
 
+import json
 from collections.abc import Sequence
+from pathlib import Path
+from types import SimpleNamespace
+from typing import Any, get_args
 
+from mission_control.adapters.deep_agents.describe import SANDBOX_BACKEND_FACTS
 from mission_control.application.capabilities.capability_search import CapabilitySearchResponse
 from mission_control.application.resolution.registries import (
     ApplicationRegistry,
@@ -25,6 +30,7 @@ from mission_control.application.selection.workspace import (
     SelectionSearchRequest,
     SelectionWorkspace,
 )
+from mission_control.bootstrap.selection import bound_sandbox_details, bound_sandbox_profiles
 from mission_control.domain.authoring.contracts import DefinitionKind, PublishedDefinition
 from mission_control.domain.authoring.manifest_lowering import (
     MANIFEST_INPUT_CONTRACT,
@@ -32,9 +38,16 @@ from mission_control.domain.authoring.manifest_lowering import (
     manifest_lowered_refs,
 )
 from mission_control.domain.coordinator.contracts import CapabilitySearchRequest
+from mission_control.domain.execution.contracts import DeepAgentSandboxComponent
 from tests.conformance.lanes.compile.stub import STUB_DECLARATION
 from tests.conformance.resolution.fixtures import APPLICATIONS, MODELS
-from tests.unit.guide.support import SANDBOXES, lowered_rows, stub_guide, workspace_entries
+from tests.unit.guide.support import (
+    SANDBOX_DETAILS,
+    SANDBOXES,
+    lowered_rows,
+    stub_guide,
+    workspace_entries,
+)
 from tests.unit.selection.test_selection_workspace import (
     CATALOG_SCOPE,
     NARROW_WORKFLOW,
@@ -199,10 +212,76 @@ async def test_the_bound_sandbox_profiles_are_listed_and_checked() -> None:
     assert [refusal.code for refusal in unbound.refusals] == ["SANDBOX_PROFILE_UNBOUND"]
     assert name in unbound.refusals[0].reason
 
+    # The describe answer is the launch binding: what the backend gives a node, not a name.
     described = await stub_guide().describe(f"sandbox:{name}")
     assert described.kind == "sandbox_profile" and described.markdown is None
     assert described.data == {
         "profile": name,
         "summary": SANDBOXES[name],
         "manifest_field": "environment.sandbox.profile",
+        **{key: value for key, value in SANDBOX_DETAILS[name].items() if key != "summary"},
     }
+    assert described.data["backend"] == "docker"
+    assert described.data["execution"].startswith("commands run in one local container")
+    assert described.data["network"].startswith("none")
+
+
+def test_the_launch_bindings_say_what_each_sandbox_profile_gives(tmp_path: Path) -> None:
+    """Two profiles that bind one sandbox say so; each line says what the backend suits."""
+
+    component = {
+        "ref": {
+            "schema_version": "1",
+            "kind": "sandbox_profile",
+            "logical_id": "sandbox.state",
+            "revision": 1,
+            "digest": "sha256:" + "7" * 64,
+            "lifecycle_status": "published",
+            "payload_ref": None,
+        },
+        "backend": "state",
+        "runtime_digest": "sha256:" + "c" * 64,
+        "snapshot_ref": None,
+        "credential_refs": [],
+        "idle_ttl_seconds": 300,
+    }
+    docker = component | {"backend": "docker", "idle_ttl_seconds": 900}
+    path = tmp_path / "bindings.json"
+    path.write_text(
+        json.dumps(
+            {
+                "schema_version": "mc.manifest_launch_bindings.v2",
+                "sandbox_profiles": {
+                    "research.standard": component,
+                    "ingestion.standard": component,
+                    "build.isolated": docker,
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+    settings: Any = SimpleNamespace(manifest_launch_bindings_path=path)
+
+    details = bound_sandbox_details(settings)
+    lines = bound_sandbox_profiles(settings)
+
+    assert details is not None and lines is not None
+    assert list(details) == ["build.isolated", "ingestion.standard", "research.standard"]
+    research = details["research.standard"]
+    assert research["backend"] == "state" and research["idle_ttl_seconds"] == 300
+    assert research["execution"] == SANDBOX_BACKEND_FACTS["state"]["execution"]
+    assert research["definition"] == "sandbox.state@1"
+    assert research["same_binding_as"] == ["ingestion.standard"]
+    assert research["starts_from_snapshot"] is False and research["secret_names"] == []
+    assert details["build.isolated"]["same_binding_as"] == []
+    assert details["build.isolated"]["network"].startswith("none")
+    # The one line a listing shows: the backend, what it suits, and its twin.
+    assert lines["research.standard"].startswith("`state` backend: ")
+    assert "no command has to run" in lines["research.standard"]
+    assert "binds the same sandbox as `ingestion.standard`" in lines["research.standard"]
+    assert "binds the same sandbox" not in lines["build.isolated"]
+    # Every backend a binding may name has its facts.
+    backends = get_args(DeepAgentSandboxComponent.model_fields["backend"].annotation)
+    assert set(backends) == set(SANDBOX_BACKEND_FACTS)
+    # A process that reads no launch bindings cannot say.
+    assert bound_sandbox_details(SimpleNamespace(manifest_launch_bindings_path=None)) is None  # type: ignore[arg-type]

@@ -6,6 +6,7 @@ claim that the inherited GoalDirected executor implements every GENERAL Goal Loo
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from typing import Any, Literal
 from uuid import UUID
 
@@ -324,6 +325,45 @@ class BudgetView(Contract):
     exhausted: tuple[str, ...] = ()
 
 
+class ModelCostView(Contract):
+    """One model's share of a run's estimated cost."""
+
+    model_id: str = Field(min_length=1)
+    calls: int = Field(ge=0)
+    input_tokens: int = Field(ge=0)
+    output_tokens: int = Field(ge=0)
+    # None: no Model Profile of this installation prices the model.
+    estimated_micros: int | None = Field(default=None, ge=0)
+
+
+class RunCostView(Contract):
+    """`mc.run_cost.v1`: what a run's recorded model calls cost at list prices.
+
+    Read from the run's recorded usage frames (one per model call, with its model and token
+    counts) and priced with the Model Catalog's list prices, the long-prompt tier included. An
+    estimate: it is `list_price` of every input token (a provider's cache discount is not
+    applied, so it is an upper bound where prompts were cached) and it is not the provider's
+    invoice. `disposition` is `estimated` when every call was priced, `partial` when some
+    calls name a model the catalog does not price (never counted as zero: `unpriced_calls`
+    says how many) and `unknown` when the run recorded no priceable call. The run budget's
+    currency dimensions are a separate account and are not charged with this estimate
+    (`budget_charged` is false)."""
+
+    schema_version: Literal["mc.run_cost.v1"] = "mc.run_cost.v1"
+    disposition: Literal["estimated", "partial", "unknown"]
+    estimated_micros: int | None = Field(default=None, ge=0)
+    # The same amount in US dollars, as a decimal string (`0.001872`).
+    estimated_usd: str | None = None
+    basis: Literal["list_price"] = "list_price"
+    model_calls: int = Field(ge=0)
+    unpriced_calls: int = Field(default=0, ge=0)
+    input_tokens: int = Field(ge=0)
+    output_tokens: int = Field(ge=0)
+    cached_input_tokens: int = Field(default=0, ge=0)
+    by_model: tuple[ModelCostView, ...] = ()
+    budget_charged: Literal[False] = False
+
+
 class UnitFailureView(Contract):
     """A unit that settled failed with a typed reason (tracing Stage 2, F-T3-1): the reason
     code (`output_unparseable`), the unit it names and the full failure reference."""
@@ -367,14 +407,44 @@ class MissionInspection(Contract):
     unit_failures: tuple[UnitFailureView, ...] | None = Field(default=None, exclude_if=_absent)
     # Tracing Stage 2 (FX-TR-BUDGET): the run's budget account, when its source is composed.
     budget: BudgetView | None = Field(default=None, exclude_if=_absent)
+    # The run's model calls priced at the Model Catalog's list prices (an estimate; the
+    # budget's currency dimensions are not charged with it), when its source is composed.
+    cost: RunCostView | None = Field(default=None, exclude_if=_absent)
 
 
 class MissionControlRejected(ValueError):
     def __init__(
-        self, code: str, message: str, *, frontier: dict[str, object] | None = None
+        self,
+        code: str,
+        message: str,
+        *,
+        frontier: dict[str, object] | None = None,
+        details: dict[str, str] | None = None,
     ) -> None:
         super().__init__(message)
         self.code = code
         # SPEC-06: a stale `expected_version` / `expected_generation` is answered with the
         # current frontier so the caller can re-read and retry deliberately.
         self.frontier = dict(frontier) if frontier is not None else None
+        # What was required and what the principal holds, where the refusal is about a grant.
+        self.details = dict(details or {})
+
+
+def grant_not_held(
+    grant: Literal["sponsorship", "approval"], required: Iterable[str], held: Iterable[str]
+) -> MissionControlRejected:
+    """The `unauthorized` refusal of a sponsorship or approval ref the verified principal does
+    not hold: it names what the request required and what the principal holds."""
+
+    holds = sorted(held)
+    missing = sorted(set(required) - set(holds))
+    return MissionControlRejected(
+        "unauthorized",
+        f"{grant} {', '.join(missing)} was not granted to this principal; it holds "
+        f"{', '.join(holds) or f'no {grant} ref'}",
+        details={
+            "grant": f"{grant}_refs",
+            "required": ",".join(missing),
+            "held": ",".join(holds),
+        },
+    )

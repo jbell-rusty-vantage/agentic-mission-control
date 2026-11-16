@@ -258,10 +258,11 @@ async def state_as_of(
                 status_code=404,
                 detail={"code": "point_state_missing", "reason": error.reason},
             ) from None
-        raise HTTPException(
-            status_code=501,
-            detail={"code": "time_travel_unavailable", "reason": error.reason},
-        ) from None
+        unavailable: dict[str, Any] = {"code": "time_travel_unavailable", "reason": error.reason}
+        if error.prerequisite is not None:
+            # What this server lacks to read the lane's saved state (also in `GET whoami`).
+            unavailable["prerequisite"] = error.prerequisite
+        raise HTTPException(status_code=501, detail=unavailable) from None
     except LookupError:
         raise HTTPException(status_code=404, detail={"code": "run_not_found"}) from None
     return {"application_id": principal.application_id, **state.model_dump(mode="json")}

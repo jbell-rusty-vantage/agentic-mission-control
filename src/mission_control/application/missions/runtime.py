@@ -25,7 +25,7 @@ from mission_control.application.recovery.run_forks import (
     SemanticForkService,
 )
 from mission_control.contracts.canonical import canonical_digest
-from mission_control.contracts.contracts import MissionControlRejected
+from mission_control.contracts.contracts import MissionControlRejected, grant_not_held
 from mission_control.contracts.runtime_contracts import (
     ClosedWorkflowRecoveryRequest,
     ForkSeedView,
@@ -94,9 +94,9 @@ class MissionControlRuntimeService:
         self._authorize(actor, FORK_PERMISSION, ADMIT_PERMISSION)
         request = MissionForkRequest.model_validate(request.model_dump(mode="python"))
         if request.sponsorship_ref not in sponsorship_refs:
-            raise MissionControlRejected("unauthorized", "sponsorship was not granted")
+            raise grant_not_held("sponsorship", (request.sponsorship_ref,), sponsorship_refs)
         if not set(request.approval_refs) <= approval_refs:
-            raise MissionControlRejected("unauthorized", "approval was not granted")
+            raise grant_not_held("approval", request.approval_refs, approval_refs)
         # Loop iter-3 F1-G3 (owner 2026-11-06): every fork message, seeded or not, is the
         # derived run's queued operator instruction for the fork's stage.
         if request.message is not None:

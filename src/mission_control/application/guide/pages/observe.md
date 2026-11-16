@@ -15,15 +15,17 @@ Wait; never poll. Your coordinator inbox is the wake channel, inspection is the 
 
 ## What each notification asks of you
 
-- `review_required`: a Human Task is open. Read it with {op:human_task_list}; resolve it with {op:human_task_resolve} only on the reviewer's decision, never on your own. Only one of its `reviewers` can resolve it: that actor id, or a principal holding the permission `reviewer:<name>`; anyone else is refused `not_reviewer`.
+- `review_required`: a Human Task is open. Read it with {op:human_task_list}; resolve it with {op:human_task_resolve} only on the reviewer's decision, never on your own. Only one of its `reviewers` can resolve it: that actor id, or a principal holding the permission `reviewer:<name>`; anyone else is refused `not_reviewer`. {op:whoami} returns `reviews_as`, every reviewer name you satisfy; the refusal names the reviewers required and what you review as.
 - `blocked`: the run waits on a condition, an approval or owner setup. Inspect, find the wait, tell the user.
 - `failed`: read the cause in the inspection and the transcript before proposing a retry or a fork (topic `control`).
 - `terminal_result`: execution ended. Report the outcome and the acceptance separately.
 
 ## Evidence on demand
 
-- {op:transcript}: what the run did, in order, behind a cursor. {op:run_search} finds entries by text.
-- {op:outputs}: the outputs the mission promised, their accepted revisions, the assessments and what is still unmet.
+- {op:transcript}: what the run did, in order, as structured entries behind a cursor. {op:run_search} finds entries by text.
+- {op:outputs}: the outputs the mission promised, their accepted revisions (by digest), the assessments and what is still unmet.
+- {op:output_content}: the text of one promised output: its accepted revision, or the latest submitted one where none is accepted yet.
+- {op:inspect} also carries `cost`: the run's model calls at this installation's list prices. It is an estimate, and the `budget` currency dimensions are a separate account it does not charge.
 - {op:points}: the recorded positions a fork can start from (topic `control`).
 - {op:chain}: the members and links of a Mission Chain. {op:run_list}: runs by state.
 

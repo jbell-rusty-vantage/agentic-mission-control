@@ -1128,7 +1128,8 @@
     ],
     "version": "1.0.0"
    },
-   "role": "context"
+   "role": "context",
+   "search_mode": "lexical"
   },
   {
    "alias": null,
@@ -1210,7 +1211,8 @@
     ],
     "version": "1.0.0"
    },
-   "role": "skill"
+   "role": "skill",
+   "search_mode": "lexical"
   },
   {
    "alias": "pubmed",
@@ -1254,7 +1256,8 @@
     ],
     "version": "2.10.20"
    },
-   "role": "capability"
+   "role": "capability",
+   "search_mode": "lexical"
   },
   {
    "alias": "tavily",
@@ -1299,7 +1302,8 @@
     ],
     "version": "0.2.22"
    },
-   "role": "capability"
+   "role": "capability",
+   "search_mode": "lexical"
   },
   {
    "alias": "firecrawl",
@@ -1344,7 +1348,8 @@
     ],
     "version": "3.28.2"
    },
-   "role": "capability"
+   "role": "capability",
+   "search_mode": "lexical"
   },
   {
    "alias": "kg_ingest",
@@ -1379,7 +1384,8 @@
     "supported_profiles": [],
     "version": "1"
    },
-   "role": "capability"
+   "role": "capability",
+   "search_mode": "lexical"
   },
   {
    "alias": "citation_check",
@@ -1418,7 +1424,8 @@
     ],
     "version": "1"
    },
-   "role": "hook"
+   "role": "hook",
+   "search_mode": "lexical"
   },
   {
    "alias": "coverage_check",
@@ -1454,7 +1461,8 @@
     "supported_profiles": [],
     "version": "1"
    },
-   "role": "assessment"
+   "role": "assessment",
+   "search_mode": "lexical"
   },
   {
    "alias": "kg_ingest",
@@ -1489,7 +1497,8 @@
     "supported_profiles": [],
     "version": "1"
    },
-   "role": "capability"
+   "role": "capability",
+   "search_mode": "lexical"
   }
  ],
  "resolved_at": "2026-10-08T12:00:00Z",

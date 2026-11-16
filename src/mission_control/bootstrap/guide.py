@@ -8,12 +8,14 @@ feature registry, which lives in the lane's package: bootstrap is where a lane p
 
 from __future__ import annotations
 
-from collections.abc import Mapping
-from typing import Final
+from collections.abc import Callable, Mapping
+from typing import Any, Final
 
 from mission_control.adapters.deep_agents.describe import DEEP_AGENTS_DECLARATION
 from mission_control.adapters.deep_agents.routes import AGENT_FEATURES
+from mission_control.application.execution.harness.time_travel import TimeTravelRegistry
 from mission_control.application.guide.service import GuideService
+from mission_control.application.guide.whoami import server_facts
 from mission_control.application.resolution.registries import LaneRegistry, ModelCatalog
 from mission_control.application.selection.workspace import SelectionWorkspace
 from mission_control.domain.capabilities.features.registry import FeatureRegistry
@@ -31,10 +33,18 @@ def compose_guide(
     lanes: LaneRegistry,
     models: ModelCatalog,
     sandbox_profiles: Mapping[str, str] | None = None,
+    sandbox_details: Mapping[str, Mapping[str, Any]] | None = None,
+    time_travel: Callable[[], TimeTravelRegistry | None] | None = None,
+    external_discovery: bool = False,
+    external_discovery_prerequisite: str | None = None,
 ) -> GuideService:
     """One application's guide over the registries its Selection Workspace was composed from.
     `sandbox_profiles` is what the workspace was given (`bootstrap/selection.py`): the sandbox
-    profiles the deployment binds, or `None` where the process reads no launch bindings."""
+    profiles the deployment binds, or `None` where the process reads no launch bindings, and
+    `sandbox_details` what each launch binding declares. `time_travel` is the process's
+    time-travel registry, read when asked: `whoami` and the `control` page say for which lanes
+    this server reads saved state and what a lane it cannot read still needs.
+    `external_discovery_prerequisite` is what a composed discovery call still needs here."""
 
     return GuideService(
         application_id=workspace.application_id,
@@ -43,6 +53,13 @@ def compose_guide(
         catalog=workspace,
         features=LANE_FEATURE_REGISTRIES,
         sandbox_profiles=sandbox_profiles,
+        sandbox_details=sandbox_details,
+        server=lambda: server_facts(
+            lanes,
+            time_travel() if time_travel is not None else None,
+            external_discovery=external_discovery,
+            external_discovery_prerequisite=external_discovery_prerequisite,
+        ),
     )
 
 

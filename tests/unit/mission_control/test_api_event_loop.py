@@ -3,7 +3,7 @@
 psycopg's async adapter (the LangGraph saver behind time travel) refuses uvicorn's default
 Windows ``ProactorEventLoop``; ``api_loop_factory`` is the uvicorn ``--loop`` the
 ``mission-control api`` entrypoint (``make server``) and the operator guide pass, and a Proactor
-loop leaves time travel unset with a log naming the fix.
+loop leaves the Deep Agents lane out of time travel: the log and the registry name the fix.
 """
 
 from __future__ import annotations
@@ -54,7 +54,7 @@ def test_uvicorn_resolves_the_loop_flag_and_the_entrypoint_passes_it() -> None:
 
 
 @pytest.mark.skipif(sys.platform != "win32", reason="the Proactor loop exists on Windows only")
-def test_a_proactor_loop_leaves_time_travel_unset_and_names_the_fix(
+def test_a_proactor_loop_leaves_deep_agents_time_travel_out_and_names_the_fix(
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     application = FastAPI()
@@ -70,7 +70,11 @@ def test_a_proactor_loop_leaves_time_travel_unset_and_names_the_fix(
             loop.run_until_complete(compose())
     finally:
         loop.close()
-    assert getattr(application.state, "time_travel_registry", None) is None
+    # The registry is always attached: it says which lane this process cannot read and what
+    # the lane still needs, so a `state-as-of` refusal and `whoami` name the fix too.
+    registry = application.state.time_travel_registry
+    assert registry.supports("deep_agents") is False
+    assert LOOP in (registry.prerequisite("deep_agents") or "")
     assert LOOP in caplog.text
 
 

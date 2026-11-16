@@ -1,10 +1,11 @@
-"""The full argument documentation of the tools whose request is an object.
+"""The full documentation of the tools whose listing description is short.
 
 A tool listing is read on every session, so a tool's description there stays short: its
-purpose, its required fields, one example. The rest lives here and is read on demand with
-`tool:<name>`: the JSON schema of the request model the HTTP route validates the same object
-with (where one exists), the field notes (`tools/<name>.md`) and one valid example. The notes
-are the documentation that used to be in the tool descriptions, moved, not rewritten.
+purpose, its required fields, where it helps one example. The rest lives here and is read on
+demand with `tool:<name>`: the JSON schema of the request model the HTTP route validates the
+same object with (where one exists), the notes (`tools/<name>.md`) and one valid example. The
+notes are the documentation that used to be in the tool descriptions, moved, not rewritten;
+a tool whose arguments the listing types in full has notes and a minimal call only.
 
 `tests/unit/guide/` holds every entry to the surface: each name is a tool of the operator
 server, each example validates against its model, and every tool that takes an object the
@@ -102,6 +103,90 @@ TOOL_DOCS: Final[dict[str, ToolDoc]] = {
         argument="profile",
         model=CoordinatorProfile,
         example={"kinds": ["terminal_result", "blocked", "review_required", "failed"]},
+    ),
+    # The tools whose listing description was shortened to fit the listing's token ceiling:
+    # their whole documentation is the notes, and the listing types their arguments, so each
+    # entry is a minimal call (`model` is None).
+    "coordinator_inbox_observe": ToolDoc(
+        argument=None,
+        model=None,
+        example={
+            "subscription_id": "<subscription_id>",
+            "notification_id": "<notification_id>",
+            "observation": {
+                "stage": "visible",
+                "channel": "tool_result",
+                "delivery_nonce": "<delivery_nonce of the delivered page>",
+                "observation_key": "<an id you choose>",
+                "observed_at": "2026-01-01T00:00:00Z",
+            },
+        },
+    ),
+    "knowledge_review": ToolDoc(
+        argument=None,
+        model=None,
+        example={
+            "run_id": _RUN,
+            "request": {
+                "decision": {"kind": "use_decision", "id": "<id>", "version": 1},
+                "outcome": "approve",
+                "bound_effect_digest": "sha256:<64 hex>",
+                "rationale": "the cited sources support the claim",
+            },
+        },
+    ),
+    "mission_approval_resolve": ToolDoc(
+        argument=None,
+        model=None,
+        example={
+            "human_task_id": "<human_task_id>",
+            "request": {
+                "request_id": "<an id you choose>",
+                "expected_task_version": 1,
+                "reviewed_digest": "sha256:<the task's packet_digest>",
+                "decision": "approve",
+                "answer": "Use the staging database.",
+            },
+        },
+    ),
+    "mission_governed_status": ToolDoc(
+        argument=None, model=None, example={"intent_id": "<intent_id>"}
+    ),
+    "mission_human_task_get": ToolDoc(
+        argument=None, model=None, example={"human_task_id": "<human_task_id>"}
+    ),
+    "mission_human_task_list": ToolDoc(
+        argument=None, model=None, example={"run_id": _RUN, "lifecycle": "open"}
+    ),
+    "mission_human_task_resolve": ToolDoc(
+        argument=None,
+        model=None,
+        example={
+            "human_task_id": "<human_task_id>",
+            "request": {
+                "request_id": "<an id you choose>",
+                "expected_task_version": 1,
+                "reviewed_packet_digest": "sha256:<the task's packet_digest>",
+                "decision": "approve",
+            },
+        },
+    ),
+    "mission_run_inspect": ToolDoc(argument=None, model=None, example={"run_id": _RUN}),
+    "mission_run_list": ToolDoc(
+        argument=None, model=None, example={"query": "phase='executing'", "limit": 20}
+    ),
+    "mission_run_points": ToolDoc(
+        argument=None, model=None, example={"run_id": _RUN, "seedable": True, "limit": 20}
+    ),
+    "mission_run_points_reconcile": ToolDoc(argument=None, model=None, example={"run_id": _RUN}),
+    "mission_run_replay": ToolDoc(
+        argument=None, model=None, example={"run_id": _RUN, "point_id": "<point_id>"}
+    ),
+    "mission_run_state_as_of": ToolDoc(
+        argument=None, model=None, example={"run_id": _RUN, "point_id": "<point_id>"}
+    ),
+    "mission_run_transcript": ToolDoc(
+        argument=None, model=None, example={"run_id": _RUN, "limit": 20}
     ),
 }
 

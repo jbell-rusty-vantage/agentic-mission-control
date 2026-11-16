@@ -7,12 +7,12 @@ Entrypoints:
 - run_control.py
 - mission_control.py — Application-scoped Mission Control HTTP transport
 - cognition_points.py — Cognition points over HTTP
-- artifacts.py — Artifact and frame-body download over HTTP
 - output_inspection.py — Exact output, fulfillment and transfer inspection over HTTP
+- artifacts.py — Artifact and frame-body download over HTTP
 - transcript.py — Run Transcript over HTTP
 - run_forks.py — /run-control/v1: safe macro snapshots and semantic forks
 - missions.py — Mission Manifest verbs over HTTP
-Also: catalog.py, subscriptions.py, human_tasks.py, run_evidence.py, knowledge_reviews.py, hook_callback.py, lanes.py, chains.py, models.py, selection.py, stop_fence.py, control_plane.py, runtime_inspection.py, graph_runtime_schemas.py, guide.py, continuation.py, middleware/, dependencies.py
+Also: catalog.py, subscriptions.py, human_tasks.py, run_evidence.py, knowledge_reviews.py, hook_callback.py, lanes.py, chains.py, models.py, selection.py, stop_fence.py, control_plane.py, guide.py, runtime_inspection.py, graph_runtime_schemas.py, continuation.py, middleware/, dependencies.py
 Tests: tests/unit/mission_control/test_public_interfaces.py, tests/unit/mission_control/test_runtime_interfaces.py, tests/unit/frames, tests/unit/run_control
 Invariants:
 - Keep replay response semantics and structured rejection codes explicit.

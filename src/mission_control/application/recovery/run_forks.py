@@ -861,8 +861,9 @@ class RunSnapshotService:
         return snapshot
 
     async def latest_or_take(self, request_scope: str, run_id: str) -> RunSnapshotManifest:
-        """FT-F4: the latest safe Snapshot of the run, taking one at the current boundary
-        when none was sealed; a run with no safe boundary is `CHECKPOINT_INVALID`."""
+        """FT-F4: the latest safe Snapshot of the run, taking one now when none was sealed
+        and the run is at a safe boundary; otherwise `CHECKPOINT_INVALID`, saying what holds
+        the boundary open and when a fork becomes possible (`snapshot_refusal`)."""
 
         latest = await self._snapshots.latest(request_scope, run_id)
         if latest is not None:
@@ -874,9 +875,58 @@ class RunSnapshotService:
                 raise
             raise ForkRejected(
                 "CHECKPOINT_INVALID",
-                "the run has no safe Snapshot to fork from",
+                snapshot_refusal(error),
                 reasons=(error.code, *error.reasons),
             ) from error
+
+
+# What holds a safe boundary open, by the prefix of a `snapshot_not_quiescent` reason.
+_BOUNDARY_BLOCKERS: Mapping[str, str] = {
+    "stage_active": "stage {ref} is active (a Human Gate stays active until its Human Task is "
+    "resolved)",
+    "stage_liability_open": "stage work {ref} is admitted and not yet settled",
+    "unit_unsettled": "a unit has not settled its current generation",
+    "unit_in_doubt": "a unit is in doubt and waits for reconciliation",
+    "cognition_in_flight": "an agent turn is in flight",
+    "operation_claim_unsettled": "an operation's effect claim is not settled",
+    "budget_reservation_open": "a budget reservation is open for work in flight",
+    "usage_pending_settlement": "usage waits for settlement",
+    "effect_claim_unsettled": "effect {ref} is not settled",
+    "operator_reconciliation_wait": "the run waits for an operator reconciliation",
+    "command_unapplied": "command {ref} is admitted and not yet applied",
+    "continuation_pending": "a continuation proposal is pending",
+    "async_child_active": "an asynchronous child is active",
+    "linked_run_active": "linked run {ref} is active",
+    "run_cancelling": "the run is cancelling",
+}
+
+
+def snapshot_refusal(error: ForkRejected) -> str:
+    """Why no Snapshot can be taken now, and when a fork becomes possible.
+
+    A Snapshot is taken only at a safe boundary (EXEC-016): the run has started, at least one
+    stage settlement is accepted, and nothing is in flight (no active stage, open liability,
+    unsettled unit, effect or usage, unapplied command, pending continuation or active child).
+    Every fork starts from a Snapshot, a fork from a cognition point included."""
+
+    if error.code == "unsupported_boundary":
+        held = [error.message]
+    else:
+        seen: dict[str, None] = {}
+        for reason in error.reasons:
+            prefix, _, ref = reason.partition(":")
+            template = _BOUNDARY_BLOCKERS.get(prefix)
+            seen.setdefault(template.format(ref=ref) if template else reason)
+        held = list(seen) or [error.message]
+    return (
+        "the run has no safe Snapshot to fork from and none can be taken now: "
+        f"{'; '.join(held)}. A Snapshot is taken only at a safe boundary: after a stage "
+        "settlement is accepted and while no stage, unit, effect, command or child is in "
+        "flight. Every fork starts from a Snapshot, a fork from a cognition point included, "
+        "so no cognition point of this run can seed a fork yet; once the work above settles "
+        "(or the run ends), a fork is possible from the run's boundary and from every "
+        "seedable cognition point."
+    )
 
 
 # --- Fork command, policy registry, admission compilation ---------------------------------

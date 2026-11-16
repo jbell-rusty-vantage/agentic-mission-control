@@ -70,7 +70,7 @@ Service = Annotated[HumanTaskService, Depends(get_human_task_service)]
 def _error(exc: HumanTaskRejected) -> HTTPException:
     return HTTPException(
         status_code=REJECTION_STATUS.get(exc.code, 422),
-        detail={"code": exc.code, "message": str(exc)},
+        detail={"code": exc.code, "message": str(exc), **exc.details},
     )
 
 

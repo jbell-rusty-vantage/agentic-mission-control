@@ -290,7 +290,7 @@ def _error(exc: Exception) -> HTTPException:
             # SPEC-06: inline mailbox content above the cap is a typed 413.
             "content_too_large": 413,
         }.get(exc.code, 422)
-        detail: dict[str, object] = {"code": exc.code, "message": str(exc)}
+        detail: dict[str, object] = {"code": exc.code, "message": str(exc), **exc.details}
         if exc.frontier is not None:
             detail["frontier"] = exc.frontier
         return HTTPException(status_code=status, detail=detail)

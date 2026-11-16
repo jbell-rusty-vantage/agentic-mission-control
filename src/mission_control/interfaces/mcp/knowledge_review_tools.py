@@ -107,19 +107,10 @@ def register_knowledge_review_tools(
         request: Annotated[dict[str, Any], ShapeOf(KnowledgeReviewRequest)],
         context: Context,
     ) -> dict[str, object]:
-        """Record an operator's review of one Knowledge Services use decision that an
-        assessment of a run cites: approve, hold or reject.
-
-        Use it for knowledge that needs a reviewer's decision; Human Tasks are answered with
-        mission_human_task_resolve instead. You need the knowledge.review permission and
-        must not be the one who launched or revised the run, its producer or an evaluator.
-        `request`: `decision` is the exact reference of the use decision (`kind`
-        "use_decision", with its id, version, digest, tenant and binding), `outcome` is
-        approve, hold or reject, `bound_effect_digest` and the optional `qualifiers_digest`
-        are the digests that decision carries, and `rationale` is your reason.
-        Returns `run_id`, `decision`, `reviewer`, `outcome` and the recorded `review`. Sending
-        the same review twice records it once. See the result with mission_run_outputs.
-        """
+        """Record an operator's review (approve, hold or reject) of one Knowledge Services use
+        decision that an assessment of a run cites. Needs knowledge.review, and a reviewer
+        who is not the run's launcher, producer or evaluator. Full shape:
+        mission_describe('tool:knowledge_review')."""
 
         async def invoke(principal: Any) -> object:
             return await reviews.review(principal, run_id=run_id, request=request)

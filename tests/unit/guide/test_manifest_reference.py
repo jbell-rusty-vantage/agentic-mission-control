@@ -281,9 +281,13 @@ async def test_the_manifest_topic_is_generated_and_stays_inside_its_budget() -> 
     assert "| `human: review_accept` | starts | refused | refused | starts |" in page
     assert "| `assessment`, `all`, `any` | refused | refused | refused | refused |" in page
     assert "`task.kind: APPROVAL`, `QUESTION`, `SELECTION`, `POLICY_OVERRIDE`" in page
+    # Each bound sandbox profile on its own line, with what it suits, and where to read more.
     assert (
-        "Sandbox profiles bound here (`environment.sandbox.profile`): `research.standard`." in page
+        "Sandbox profiles bound here (`environment.sandbox.profile`); read one in full with "
+        "its `sandbox:<name>` ref:\n- `research.standard`: docker sandbox bound by this "
+        "deployment" in page
     )
+    assert '`mission_describe("sandbox:<profile>")`' in page
     assert '`mission_describe("manifest")`' in page and "completion_evaluator_unavailable" in page
 
     unbound = (await stub_guide(sandboxes={}).topic("manifest")).markdown

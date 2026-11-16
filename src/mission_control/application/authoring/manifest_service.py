@@ -63,6 +63,11 @@ from mission_control.application.capabilities.capability_search_repository impor
     CapabilitySearchUnavailable,
 )
 from mission_control.application.capabilities.catalog import DEFAULT_PIN_MARGIN
+from mission_control.application.capabilities.definition_scan import (
+    DEFINITION_SCAN,
+    projection_answers,
+    scan_definitions,
+)
 from mission_control.application.chains.service import (
     CapabilityResolution,
     CapabilityResult,
@@ -1284,7 +1289,7 @@ class ManifestCompileService:
             else None,
         )
         if capability.search is not None:
-            return await self._resolve_search(base, capability, kind, lanes, scope, warnings)
+            return await self._resolve_search(base, capability, kind, lanes, scope, warnings, by_id)
         return self._resolve_pin(base, capability, kind, lanes, by_id)
 
     async def _resolve_search(
@@ -1295,6 +1300,7 @@ class ManifestCompileService:
         lanes: tuple[str, ...],
         scope: ManifestScope,
         warnings: list[ManifestIssue],
+        by_id: Mapping[str, list[PublishedDefinition]],
     ) -> CapabilityResolution:
         assert capability.search is not None
         if self._search is None:
@@ -1346,10 +1352,20 @@ class ManifestCompileService:
             and (namespace is None or hit.exact_ref.logical_id.startswith(namespace))
         ]
         candidates = tuple(str(hit.pin) for hit in hits)
+        if not hits and not response.hits:
+            # The Search Projection returned nothing at all: where it is not built, the
+            # published definitions the pins resolve against are scanned instead, and the
+            # resolution says so (`search_mode: definition_scan`).
+            scanned = await self._resolve_by_scan(
+                base, capability, kind, lanes, scope, warnings, by_id, namespace=namespace
+            )
+            if scanned is not None:
+                return scanned
         if not hits:
             return base.model_copy(
                 update={
                     "candidates": candidates,
+                    "search_mode": response.search_mode,
                     "blocker": _issue(
                         ManifestErrorCode.CAPABILITY_UNAVAILABLE,
                         capability.pointer,
@@ -1375,7 +1391,94 @@ class ManifestCompileService:
         return base.model_copy(
             update={
                 "candidates": candidates,
+                "search_mode": response.search_mode,
                 "result": _result(top.pin, top.exact_ref, top.host_support),
+            }
+        )
+
+    async def _resolve_by_scan(
+        self,
+        base: CapabilityResolution,
+        capability: DefinitionCapability,
+        kind: DefinitionKind | None,
+        lanes: tuple[str, ...],
+        scope: ManifestScope,
+        warnings: list[ManifestIssue],
+        by_id: Mapping[str, list[PublishedDefinition]],
+        *,
+        namespace: str | None,
+    ) -> CapabilityResolution | None:
+        """A `search` entry answered from the published definitions, where the Search
+        Projection is not built (`None`: the projection answers, so its empty answer stands,
+        or the scan matches nothing).
+
+        The candidates are what a pin could name: the latest admitted revision of each
+        definition of the kind, in the entry's namespace, supported on every lane of the
+        entry where the definition declares host support. The scan ranks them; a tie for the
+        top is a warning, as an ambiguous ranked search is."""
+
+        assert capability.search is not None and self._search is not None
+        latest: dict[tuple[DefinitionKind, str], PublishedDefinition] = {}
+        for rows in by_id.values():
+            for row in rows:
+                if row.retired_at is not None or (kind is not None and row.ref.kind != kind):
+                    continue
+                if namespace is not None and not row.ref.logical_id.startswith(namespace):
+                    continue
+                support = getattr(row.definition, "host_support", None)
+                if (
+                    isinstance(support, CapabilityHostSupport)
+                    and row.ref.kind in HOST_FILTERED_KINDS
+                    and not all(support.supports(lane) for lane in lanes)
+                ):
+                    continue
+                key = (row.ref.kind, row.ref.logical_id)
+                if key not in latest or row.ref.revision > latest[key].ref.revision:
+                    latest[key] = row
+        scored = scan_definitions(latest.values(), capability.search.query)
+        if not scored:
+            return None
+        try:
+            if await projection_answers(
+                self._search,
+                scored[0][1],
+                tenant_scope=self._catalog_scope or scope.request_scope,
+            ):
+                return None
+        except CapabilitySearchUnavailable:
+            return None
+        top = scored[0][1]
+        pin = capability_pin(top).render()
+        warnings.append(
+            _issue(
+                ManifestErrorCode.CAPABILITY_UNAVAILABLE,
+                capability.pointer,
+                f"the capability search index is not built on this installation: search "
+                f"{capability.search.query!r} was answered by a scan of the published "
+                f"definitions and resolved to {pin}; write it as `pin` to freeze it",
+                DEFINITION_SCAN,
+            )
+        )
+        if len(scored) > 1 and scored[1][0] == scored[0][0]:
+            warnings.append(
+                _issue(
+                    ManifestErrorCode.CAPABILITY_UNAVAILABLE,
+                    capability.pointer,
+                    f"search {capability.search.query!r} is ambiguous between {pin} and "
+                    f"{capability_pin(scored[1][1]).render()}; the first by name was pinned",
+                    "ambiguous_search",
+                )
+            )
+        support = getattr(top.definition, "host_support", None)
+        return base.model_copy(
+            update={
+                "candidates": tuple(
+                    capability_pin(row).render() for _score, row, _why in scored[:MAX_RESULTS]
+                ),
+                "search_mode": DEFINITION_SCAN,
+                "result": _result(
+                    pin, top.ref, support if isinstance(support, CapabilityHostSupport) else None
+                ),
             }
         )
 

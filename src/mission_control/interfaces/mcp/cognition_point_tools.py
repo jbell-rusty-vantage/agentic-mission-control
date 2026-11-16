@@ -166,6 +166,14 @@ class ScopedCognitionPoints:
             details = {"reason": error.reason}
             if error.saver is not None:
                 details["saver"] = error.saver
+            message = f"time travel {error.reason}"
+            if error.prerequisite is not None:
+                # A deployment prerequisite of this server, never a retry (also in whoami).
+                details["prerequisite"] = error.prerequisite
+                message = (
+                    f"this server cannot read saved state of lane {error.lane_profile}: "
+                    f"{error.prerequisite}"
+                )
             saver_outcome = error.reason in SAVER_OUTCOMES
             if saver_outcome:
                 try:
@@ -176,7 +184,7 @@ class ScopedCognitionPoints:
                     details["restore_level"] = restore_level
             raise CoordinatorDomainError(
                 code=CoordinatorErrorCode.DEPENDENCY_UNAVAILABLE,
-                message=f"time travel {error.reason}",
+                message=message,
                 retryable=saver_outcome,
                 details=details,
             ) from None
@@ -281,17 +289,9 @@ def register_cognition_point_tools(
         cursor: str | None = None,
     ) -> dict[str, object]:
         """List a run's cognition points: recorded positions in an agent's work where its state
-        can be read back and a fork can start.
-
-        Use it to get a `point_id` for mission_run_state_as_of, mission_run_point_frames or
-        mission_run_replay, or a seed for mission_run_fork. Filters: `node` (a node key),
-        `iteration`, `cycle`, `session_generation`, `unit_key`, `kind`, `seedable` (only
-        points a fork can start from) and `role` (input, intermediate, leaf, result, source,
-        interrupted, replacement_start, fork_seed, rollover_start, cycle_start, reused,
-        subagent_root).
-        Returns up to `limit` (at most 500) `entries`, each with its `point_id` and
-        `coordinate`, and a `next_cursor` to pass back as `cursor`.
-        """
+        can be read back and a fork can start. Returns `entries` (each with `point_id` and
+        `coordinate`) and `next_cursor`. `seedable` keeps the points a fork can start from.
+        Filters and roles: mission_describe('tool:mission_run_points')."""
 
         async def invoke(principal: Any) -> object:
             selection = CognitionPointFilter(
@@ -314,14 +314,10 @@ def register_cognition_point_tools(
     async def mission_run_state_as_of(
         run_id: str, point_id: str, context: Context
     ) -> dict[str, object]:
-        """Read an agent's state as it was at one cognition point of a run.
-
-        Use it to see the messages and files the agent held then; mission_run_point_frames
-        gives the provider frames of that step. `point_id` comes from mission_run_points.
-        Returns the `point`, its `state` (messages, files, pending tasks, interrupts),
-        `restore_level` (R0 to R3: how much could be read back) and `usage_to_point`. An
-        error marked retryable means the saved state did not answer: call again.
-        """
+        """Read an agent's state as it was at one cognition point of a run: its messages,
+        files, pending tasks and interrupts. `point_id` comes from mission_run_points. A
+        retryable error: call again; a `prerequisite` names what this server lacks (also in
+        mission_whoami). More: mission_describe('tool:mission_run_state_as_of')."""
 
         async def invoke(principal: Any) -> object:
             return await points.state_as_of(principal, run_id=run_id, point_id=point_id)
@@ -332,16 +328,9 @@ def register_cognition_point_tools(
     async def mission_run_points_reconcile(
         run_id: str, context: Context, unit_key: str | None = None
     ) -> dict[str, object]:
-        """Repair a run's cognition point records: add the points and frame ranges that are
-        missing for work that already settled.
-
-        Use it when mission_run_inspect lists units under `points_incomplete`, or when
-        mission_run_points lacks steps you expect. It changes only the point records and is
-        safe to repeat; `unit_key` limits it to one unit.
-        Returns `points_added`, `frame_ranges_filled`, `pruned`, `walks_completed` and
-        `saver_unreachable` (units whose saved state did not answer). Then call
-        mission_run_points again.
-        """
+        """Repair a run's cognition point records: add the points and frame ranges missing for
+        work that already settled. It changes only the point records and is safe to repeat.
+        When to use it: mission_describe('tool:mission_run_points_reconcile')."""
 
         async def invoke(principal: Any) -> object:
             return await points.reconcile(principal, run_id=run_id, unit_key=unit_key)
@@ -352,13 +341,10 @@ def register_cognition_point_tools(
     async def mission_run_point_frames(
         run_id: str, point_id: str, context: Context
     ) -> dict[str, object]:
-        """List the provider frames recorded while one cognition point's step ran.
-
-        Use it for the raw evidence of one step; mission_run_transcript gives the readable
-        view of the whole run. `point_id` comes from mission_run_points.
-        Returns `frames`. NOT_FOUND "the point has no frame range" means no frames are
-        linked to the point yet: mission_run_points_reconcile can fill the range.
-        """
+        """List the provider frames recorded while one cognition point's step ran: the raw
+        evidence of one step (mission_run_transcript is the readable view of the run).
+        `point_id` comes from mission_run_points. Returns `frames`. NOT_FOUND "the point has
+        no frame range" means none is linked yet: mission_run_points_reconcile can fill it."""
 
         async def invoke(principal: Any) -> object:
             return await points.point_frames(principal, run_id=run_id, point_id=point_id)
@@ -375,15 +361,8 @@ def register_cognition_point_tools(
         dry_run: bool = True,
     ) -> dict[str, object]:
         """Rebuild the input of one model call at a cognition point from the run's records and
-        compare it with what was recorded. No model is called.
-
-        Use it to verify that a step can be reconstructed exactly. `point_id` comes from
-        mission_run_points; `call_index` picks a model call of the step (default: the last);
-        `include_batch` adds the rebuilt message bodies. Leave `dry_run` true: a paid replay
-        is not available and false is refused.
-        Returns `exact`, `first_difference` when it is false, the compared `messages` and
-        the `model`.
-        """
+        compare it with what was recorded. No model is called; leave `dry_run` true. Returns
+        `exact`. Arguments: mission_describe('tool:mission_run_replay')."""
 
         async def invoke(principal: Any) -> object:
             return await points.replay(

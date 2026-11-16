@@ -19,14 +19,14 @@ A report with `ok: false` is a refusal: the definition cannot be committed, and 
 | `code` | Means | Do |
 | --- | --- | --- |
 | `INVALID_DEFINITION` | The shape or a rule is broken; `reason` says which (`widens_authority`: a node widened the budget, governors or side effects it inherits). | Fix the field at `pointer`. Nodes may only narrow. |
-| `CAPABILITY_UNAVAILABLE` | A `search` entry has no admitted hit, or a pin is not in the catalog, was retired or is not supported on the node's lane. | Search again (topic `capabilities`). |
+| `CAPABILITY_UNAVAILABLE` | A `search` entry matches no admitted definition, or a pin is not in the catalog, was retired or is not supported on the node's lane. | Search again (topic `capabilities`). |
 | `CAPABILITY_DRIFT` | A pin's version or digest does not match the admitted row. | Pin the row the message names. |
 | `UNSUPPORTED_BEHAVIOR` | The lane does not run that node's behaviour. | Choose another lane or behaviour (topic `workflows`). |
 | `APPLICATION_FORBIDDEN` | `mission.application` is not this server's application. | Write this server's application id. |
 
 For any other code, act on its `message` and `reason`.
 
-`warnings` do not block: show every one to the user before submit. `start_blockers` and `startable: false` name what a start would refuse although the compile is valid. `resolution.resolved` names the exact pin each `search` became; copy one into the manifest as `pin` when the user wants it frozen.
+`warnings` do not block: show every one to the user before submit. `start_blockers` and `startable: false` name what a start would refuse although the compile is valid. `resolution.resolved` names the exact pin each `search` became and the `search_mode` that answered it: the catalog's own mode, or `definition_scan` where the search index is not built and the published definitions were scanned (a warning says so). Copy a pin into the manifest as `pin` when the user wants it frozen.
 
 ## Stop for approval
 

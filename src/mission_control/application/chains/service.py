@@ -14,7 +14,7 @@ from datetime import datetime
 from typing import Literal, Protocol
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 from mission_control.application.environments.requirements import readiness_requirements
 from mission_control.domain.authoring.contracts import ExactDefinitionRef
@@ -85,6 +85,10 @@ class CapabilityResolution(ReportModel):
     result: CapabilityResult | None = None
     blocker: ManifestIssue | None = None
     candidates: tuple[str, ...] = ()
+    # A `search` entry only: who answered it. The catalog's own mode (`hybrid`, `lexical`),
+    # or `definition_scan` where the Search Projection is not built and the compiler scanned
+    # the published definitions instead.
+    search_mode: str | None = Field(default=None, exclude_if=lambda value: value is None)
 
 
 class PluginExpansion(ReportModel):

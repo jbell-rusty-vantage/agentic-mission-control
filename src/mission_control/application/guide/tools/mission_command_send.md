@@ -7,6 +7,8 @@ Send one Command to a run: pause, resume, cancel, satisfy a wait, or give its ag
 
 Call mission_run_inspect first: `expected_version` is its `version` and `expected_generation` its `execution_generation`; a stale value is refused with the current ones. To act because of an inbox notification, use coordinator_inbox_command.
 
+Inspect, send, and on `stale_version` (or `stale_generation`) resend once. A run's version moves with every event, so a Command sent right after a start or beside running work is often stale; nothing was admitted. The refusal's `details` carry the current `version`, `execution_generation` and `phase`: send the request again with `expected_version` and `expected_generation` set to them (the same `request_id` or a new one: a stale request was never recorded). If it is stale a second time, inspect and decide again: the run moved on.
+
 `request` fields, all required:
 
 - `request_id`: a new UUID; repeating it returns the first receipt.

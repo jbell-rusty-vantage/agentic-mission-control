@@ -4,9 +4,10 @@
 `guide` and `describe` over the same app (Markdown by default, the envelope with `--json`), and
 the `mission_guide` / `mission_describe` MCP tools, page resources and interview prompt. One
 page is the same text on every transport once it is asked for in the same vocabulary: the MCP
-tool's text content is the page's Markdown and its structured content is the envelope the route
-returns. A describe answer that is prose arrives the same way; one that is data stays
-structured. A refusal is typed on each.
+tool's text content is the page's Markdown, its structured content is the envelope without the
+body, and the HTTP route returns the same Markdown for `Accept: text/markdown`. A describe
+answer that is prose arrives the same way; one that is data stays structured. A refusal is
+typed on each.
 """
 
 from __future__ import annotations
@@ -79,6 +80,15 @@ class Resolver:
         return self.principal
 
 
+MARKDOWN = {"Accept": "text/markdown"}
+
+
+def _header(document: dict[str, Any]) -> dict[str, Any]:
+    """A page or prose answer without its body: what the MCP structured content keeps."""
+
+    return {key: value for key, value in document.items() if key not in {"markdown", "data"}}
+
+
 def _text(result: Any) -> str:
     """A tool result's text content: what an agent reads."""
 
@@ -116,11 +126,19 @@ async def test_the_start_page_is_one_text_on_http_cli_and_mcp(
         from_mcp = await mcp.call_tool("mission_guide", {})
     envelope = from_mcp.structured_content
     assert envelope is not None and envelope["ok"] is True, envelope
-    assert envelope["data"] == from_http.json()
+    # The structured part is the envelope without the body: the page is sent once, as text.
+    assert envelope["data"] == _header(from_http.json())
+    assert set(envelope["data"]) == {"schema_version", "topic", "title", "summary", "surface"}
+    assert "markdown" not in json.dumps(envelope)
     assert from_http.json()["topic"] == INDEX and from_http.json()["surface"] == "mcp"
     # The page arrives as Markdown: the text content is the page itself, not escaped JSON.
     assert _text(from_mcp) == from_http.json()["markdown"]
     assert _text(from_mcp).startswith("# Mission Control: start here\n\nYou are the Coordinator")
+    # HTTP honours `Accept: text/markdown`: the same page, as the page.
+    as_markdown = harness.client.get(_url("guide"), params={"surface": "mcp"}, headers=MARKDOWN)
+    assert as_markdown.status_code == 200
+    assert as_markdown.headers["content-type"].startswith("text/markdown")
+    assert as_markdown.text == _text(from_mcp)
 
     # The HTTP route speaks routes by default; missionctl asks for its own commands.
     assert "`POST missions:start`" in harness.client.get(_url("guide")).json()["markdown"]
@@ -142,9 +160,13 @@ async def test_every_topic_is_served_on_every_transport(
             from_http = harness.client.get(_url(f"guide/{topic}"), params={"surface": "mcp"})
             from_mcp = await mcp.call_tool("mission_guide", {"topic": topic})
             assert from_http.status_code == 200, (topic, from_http.text)
-            assert from_mcp.structured_content["data"] == from_http.json(), topic  # type: ignore[index]
+            assert from_mcp.structured_content["data"] == _header(from_http.json()), topic  # type: ignore[index]
             assert _text(from_mcp) == from_http.json()["markdown"], topic
             assert _text(from_mcp).startswith("# "), topic
+            as_markdown = harness.client.get(
+                _url(f"guide/{topic}"), params={"surface": "mcp"}, headers=MARKDOWN
+            )
+            assert as_markdown.text == _text(from_mcp), topic
     status, markdown = run_cli(harness, monkeypatch, capsys, "guide", "interview")
     assert status == 0 and "## 3. The brief, and where each part goes" in markdown
     assert "`missionctl workspace check`" in markdown
@@ -169,15 +191,26 @@ async def test_describe_parity_and_the_cli_rendering(
             assert from_http.status_code == 200, (ref, from_http.text)
             envelope = from_mcp.structured_content
             assert envelope is not None and envelope["ok"] is True, (ref, envelope)
-            assert envelope["data"] == from_http.json(), ref
+            as_markdown = harness.client.get(
+                _url("describe"), params={"ref": ref}, headers=MARKDOWN
+            )
+            assert as_markdown.headers["content-type"].startswith("text/markdown"), ref
+            assert as_markdown.text == describe_markdown(from_http.json()), ref
             if ref in prose:
-                # A prose answer arrives as Markdown, the same Markdown the route carries.
-                assert _text(from_mcp) == from_http.json()["markdown"], ref
+                # A prose answer arrives as Markdown, the same Markdown the route carries,
+                # and its structured part names the answer without restating it.
+                assert _text(from_mcp) == from_http.json()["markdown"] == as_markdown.text, ref
                 assert _text(from_mcp).startswith("#"), ref
+                assert envelope["data"] == _header(from_http.json()), ref
+                assert set(envelope["data"]) == {"schema_version", "ref", "kind", "title"}, ref
             else:
                 # A data answer stays structured: the envelope as JSON text.
+                assert envelope["data"] == from_http.json(), ref
                 assert "markdown" not in from_http.json(), ref
                 assert json.loads(_text(from_mcp)) == envelope, ref
+    sandbox = harness.client.get(_url("describe"), params={"ref": "sandbox:research.standard"})
+    assert sandbox.json()["data"]["backend"] == "docker"
+    assert sandbox.json()["data"]["network"].startswith("none")
     lane = harness.client.get(_url("describe"), params={"ref": "lane:deep_agents"}).json()
     assert {"controls", "delivery_semantics", "time_travel"} <= set(lane["data"])
     # A typed tool is described from the server's own listing on both transports.

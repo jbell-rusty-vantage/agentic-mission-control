@@ -56,7 +56,7 @@ def domain_error(error: HumanTaskRejected) -> CoordinatorDomainError:
     return CoordinatorDomainError(
         code=_CODES.get(error.code, CoordinatorErrorCode.INVALID_ARGUMENT),
         message=str(error),
-        details={"code": error.code},
+        details={"code": error.code, **error.details},
     )
 
 
@@ -140,15 +140,9 @@ def register_human_task_tools(
     async def mission_human_task_list(
         context: Context, run_id: str | None = None, lifecycle: str | None = None
     ) -> dict[str, object]:
-        """List Human Tasks: the decisions runs are waiting on a reviewer to make.
-
-        Use it to find what blocks a run, for example after a review_required notification.
-        `run_id` limits the list to one run; `lifecycle` is open, resolved, expired or
-        cancelled (omit it for all).
-        Returns `human_tasks`, each with `human_task_id`, `origin`, `kind`, `lifecycle`,
-        `version`, `prompt`, `permitted_decisions` and `packet_digest`. Read one with
-        mission_human_task_get, then answer it with mission_human_task_resolve.
-        """
+        """List Human Tasks: the decisions runs are waiting on a reviewer to make. `run_id`
+        limits it to one run; `lifecycle` is open, resolved, expired or cancelled. Returned
+        fields: mission_describe('tool:mission_human_task_list')."""
 
         async def invoke(principal: Any) -> object:
             return await human_tasks.list(principal, run_id=run_id, lifecycle=lifecycle)
@@ -157,17 +151,9 @@ def register_human_task_tools(
 
     @server.tool(name=HUMAN_TASK_GET_TOOL, annotations={"readOnlyHint": True})
     async def mission_human_task_get(human_task_id: str, context: Context) -> dict[str, object]:
-        """Read one Human Task: what is asked, by which run, and what an answer must cite.
-
-        Use it before answering. `human_task_id` comes from mission_human_task_list.
-        Returns the task: `origin` (workflow_gate for a Human Gate; otherwise
-        provider_permission, provider_question, mcp_elicitation or governed_effect),
-        `prompt`, `permitted_decisions`, `reviewers`, `deadline_at`, `version`,
-        `packet_digest` and what is under review (the review packet, the pending tool call,
-        the question or the form).
-        Next: mission_human_task_resolve, or mission_approval_resolve to approve with edited
-        arguments, choose among offered options, fill a form or cancel.
-        """
+        """Read one Human Task before answering it: what is asked, by which run, its
+        `reviewers`, and the `version` and `packet_digest` an answer must cite. Fields:
+        mission_describe('tool:mission_human_task_get')."""
 
         async def invoke(principal: Any) -> object:
             return await human_tasks.get(principal, human_task_id=human_task_id)
@@ -180,17 +166,11 @@ def register_human_task_tools(
         request: Annotated[dict[str, Any], ShapeOf(HumanResolutionRequest)],
         context: Context,
     ) -> dict[str, object]:
-        """Answer a Human Task with approve, deny or request_changes, as one of its reviewers.
-
-        Use it for Human Gate tasks and for a plain approve or deny of any other task;
-        mission_approval_resolve covers edited arguments, offered options, forms and cancel.
-        Read the task first (mission_human_task_get). `request`: `expected_task_version` is
-        the task's `version`, `reviewed_packet_digest` its `packet_digest`, `decision` one of
-        its `permitted_decisions`, and `request_id` an id you choose (repeating the same
-        request returns the same result). request_changes needs a `comment` or
-        `feedback_artifact_refs`; on a question task the `comment` is the answer.
-        Returns `status` (accepted or duplicate) and the updated `task`.
-        """
+        """Answer a Human Task with approve, deny or request_changes, as one of its
+        `reviewers` (mission_whoami lists who you review as). `request`: `request_id`,
+        `expected_task_version` (the task's `version`), `reviewed_packet_digest` (its
+        `packet_digest`) and `decision`. Full shape:
+        mission_describe('tool:mission_human_task_resolve')."""
 
         async def invoke(principal: Any) -> object:
             return await human_tasks.resolve(

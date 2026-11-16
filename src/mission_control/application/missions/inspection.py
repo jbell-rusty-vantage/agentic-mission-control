@@ -10,7 +10,9 @@ Control already holds, never from a provider call:
 - `delivery_reports`: requested and delivered semantics, outcome and native refs of every
   Command in the receipt ledger;
 - `chain` and `subscriptions` from the chain and subscription tables;
-- `stop_fence`: the immediate cancel's four-timestamp report (FT-F3).
+- `stop_fence`: the immediate cancel's four-timestamp report (FT-F3);
+- `cost`: the run's recorded model calls priced at the Model Catalog's list prices
+  (`mc.run_cost.v1`, an estimate; the budget account is not charged with it).
 
 Each section is present only where its source is composed; an absent section is left out of
 the body, so existing clients keep parsing the same document.
@@ -23,6 +25,7 @@ from dataclasses import dataclass
 from typing import Literal, Protocol
 
 from mission_control.application.execution.mailbox import MailboxDeliveryService
+from mission_control.application.frames.cost import RunCostReader
 from mission_control.application.frames.transcript import TranscriptService
 from mission_control.contracts.contracts import (
     BudgetView,
@@ -103,6 +106,8 @@ class InspectionSources:
     points: PointsStatusReader | None = None
     failures: UnitFailureReader | None = None
     budget: BudgetViewReader | None = None
+    # The run's model calls priced at list prices (`application/frames/cost.py`).
+    cost: RunCostReader | None = None
 
 
 def usage_disposition(usage: UsageReport | None) -> str | None:
@@ -196,6 +201,8 @@ async def enrich_inspection(
         update["unit_failures"] = await sources.failures.unit_failures(request_scope, run_id)
     if sources.budget is not None:
         update["budget"] = await sources.budget.budget(request_scope, run_id)
+    if sources.cost is not None:
+        update["cost"] = await sources.cost.run_cost(request_scope, run_id)
     if sources.transcripts is not None:
         summary = await sources.transcripts.inspection_summary(run_id, actor=actor)
         sessions = tuple(

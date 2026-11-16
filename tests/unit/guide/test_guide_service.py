@@ -45,7 +45,9 @@ from tests.unit.selection.test_selection_workspace import (
 # manifest page carries the required fields, the values and the acceptance table.
 INDEX_TOKENS = 500
 TOPIC_TOKENS = 1_250
-TOPIC_BUDGETS = {"manifest": 1_500}
+# The control page gained three rules a live run showed were missing (resend once on a stale
+# version, the sponsorship a fork names, when a fork is possible) and what this server reads.
+TOPIC_BUDGETS = {"manifest": 1_500, "control": 1_350}
 
 
 def _tokens(text: str) -> int:
@@ -552,6 +554,104 @@ def test_the_moved_tool_documentation_lost_no_fact() -> None:
             "mission_approval_resolve",
             "returns the same intent",
         ),
+        # The descriptions shortened to bring the listing under its token ceiling.
+        "mission_approval_resolve": (
+            "does not serve Human Gate tasks",
+            "which must differ from the pending",
+            "`answer` or `selected`",
+            "`elicitation_content`, or deny to decline",
+            "accepted or duplicate",
+        ),
+        "knowledge_review": (
+            "knowledge.review permission",
+            "launched or revised the run, its producer or an evaluator",
+            '"use_decision"',
+            "`qualifiers_digest`",
+            "records it once",
+        ),
+        "coordinator_inbox_observe": (
+            "`delivery_nonce`",
+            "background_task_exit, monitor_event",
+            "connected_poll when the host was not idle",
+            "tool_result, task_output or",
+            "Idempotent by `observation_key`",
+            "never acknowledgment",
+        ),
+        "mission_run_points": (
+            "`session_generation`",
+            "replacement_start, fork_seed, rollover_start, cycle_start, reused",
+            "at most 500",
+            "`next_cursor` to pass back as `cursor`",
+        ),
+        "mission_human_task_resolve": (
+            "mission_approval_resolve covers edited arguments",
+            "`reviewed_packet_digest` is its `packet_digest`",
+            "repeating the same request returns the same result",
+            "`feedback_artifact_refs`",
+            "on a question task the `comment` is the answer",
+        ),
+        "mission_human_task_get": (
+            "provider_permission, provider_question, mcp_elicitation or governed_effect",
+            "`deadline_at`",
+            "the pending tool call",
+        ),
+        "mission_human_task_list": (
+            "review_required notification",
+            "open, resolved, expired or",
+            "`permitted_decisions` and `packet_digest`",
+        ),
+        "mission_governed_execute": (
+            "runs at most once",
+            "applied, noop, rejected or failed",
+            "fenced, stale or in_doubt",
+            "need their own prepare",
+        ),
+        "mission_governed_status": (
+            "Nothing is executed",
+            "pending_approval, ready, executing, executed",
+            "`input_digest`",
+            "call mission_governed_execute when ready",
+        ),
+        "mission_run_inspect": (
+            "pending, running, paused, completed",
+            "not whether the mission was accepted",
+            "`frames_cursor`",
+            "`points_incomplete`, `unit_failures`",
+            "fork `lineage`",
+        ),
+        "mission_run_list": (
+            "executing, cancelling, in_doubt, completed, cancelled, failed",
+            "forked_from (a run id)",
+            "continued_as_new",
+            "ISO-8601 instant with a timezone",
+            "terminal_outcome and run_version",
+        ),
+        "mission_run_replay": (
+            "No model is called",
+            "`call_index` picks a model call",
+            "`include_batch`",
+            "a paid replay is not available",
+            "`first_difference`",
+        ),
+        "mission_run_points_reconcile": (
+            "`points_incomplete`",
+            "safe to repeat",
+            "`frame_ranges_filled`",
+            "`saver_unreachable`",
+        ),
+        "mission_run_state_as_of": (
+            "messages, files, pending tasks, interrupts",
+            "R0 to R3",
+            "`usage_to_point`",
+            "retryable means the saved state did not answer",
+        ),
+        "mission_run_transcript": (
+            "`next_cursor`, or a search hit's `open_cursor`",
+            "1 to 5000",
+            "`canonical_only` (mission events only)",
+            "a `point_id` from mission_run_points",
+            "never instructions",
+        ),
     }
     for name, expected in facts.items():
         notes = load_page("tools", name).body
@@ -577,7 +677,7 @@ async def test_describe_a_feature_carries_its_configuration_schema() -> None:
         ("run:123", "unknown_ref", "feature:<id>"),
         ("lane:nowhere", "not_found", "lane:deep_agents"),
         ("model:nobody.default", "not_found", "model:judge.default"),
-        ("tool:mission_run_inspect", "not_found", "tool:mission_command_send"),
+        ("tool:mission_run_outputs", "not_found", "tool:mission_command_send"),
         ("feature:deep_agents.nothing", "not_found", "feature:deep_agents.bash"),
     ],
 )

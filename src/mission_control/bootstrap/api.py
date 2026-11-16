@@ -37,7 +37,12 @@ from mission_control.adapters.capabilities.capability_pins import CapabilityPins
 from mission_control.adapters.deep_agents.checkpoint_history import LangGraphCheckpointHistoryReader
 from mission_control.adapters.deep_agents.compile import deep_agents_lane
 from mission_control.adapters.deep_agents.persistence import StandalonePersistenceLifespan
-from mission_control.adapters.deep_agents.time_travel import DeepAgentsTimeTravel
+from mission_control.adapters.deep_agents.time_travel import (
+    LANE_PROFILE as DEEP_AGENTS_LANE,
+)
+from mission_control.adapters.deep_agents.time_travel import (
+    DeepAgentsTimeTravel,
+)
 from mission_control.adapters.postgres.approvals.context import PostgresApprovalContextProbe
 from mission_control.adapters.postgres.approvals.intents import PostgresGovernedIntentRepository
 from mission_control.adapters.postgres.approvals.tasks import PostgresApprovalTaskRepository
@@ -123,6 +128,7 @@ from mission_control.application.frames.artifact_bodies import (
     ContentAddressedPayloadReader,
     GrantedArtifactBodyReader,
 )
+from mission_control.application.frames.cost import CatalogUsagePrices, FrameRunCost
 from mission_control.application.frames.replay import ReplayService
 from mission_control.application.frames.search import RunListService, TranscriptSearchService
 from mission_control.application.frames.sink import FrameReader
@@ -143,6 +149,7 @@ from mission_control.bootstrap.application_profiles import (
 )
 from mission_control.bootstrap.catalog import (
     compose_catalog_service,
+    compose_external_discovery,
     configured_catalog_embeddings,
 )
 from mission_control.bootstrap.composition import (
@@ -163,6 +170,7 @@ from mission_control.bootstrap.manifests import (
 )
 from mission_control.bootstrap.model_profiles import compose_model_catalog
 from mission_control.bootstrap.selection import (
+    bound_sandbox_details,
     bound_sandbox_profiles,
     compose_selection_workspace,
 )
@@ -431,6 +439,18 @@ def _proactor_loop() -> bool:
     return proactor is not None and isinstance(asyncio.get_running_loop(), proactor)
 
 
+def _discovery_subprocess_prerequisite() -> str | None:
+    """What agent-skill discovery and candidate inspection still need on this process: each
+    starts a subprocess, which the selector loop the API runs on Windows cannot do."""
+
+    if sys.platform != "win32" or _proactor_loop():
+        return None
+    return (
+        "agent-skill discovery and candidate inspection start a subprocess, which the "
+        "selector event loop this API runs on Windows cannot do; MCP server discovery answers"
+    )
+
+
 class PayloadSnapshotReader:
     """K3: the API's read-only view of an application's artifact payloads as a snapshot
     byte source (`retrieve` by durable locator, as `PayloadContextFiles` does; no `stage`:
@@ -531,20 +551,37 @@ async def compose_time_travel(application: FastAPI, settings: Any, stack: AsyncE
     snapshot store (`ApplicationFrameReaders.register`)."""
 
     dsn = getattr(settings, "langgraph_checkpoint_dsn", None)
-    if dsn and _proactor_loop():
+    registry = TimeTravelRegistry()
+    # What this process lacks to read Deep Agents saver state is recorded on the registry:
+    # the `state-as-of` refusal and `whoami` name it (never a bare `time_travel_unsupported`).
+    if not dsn:
+        registry.mark_unavailable(
+            DEEP_AGENTS_LANE,
+            "no runtime checkpoint DSN is configured for the API process (the "
+            "`*_DB_CHECKPOINT_DSN` variable of the selected database plane)",
+        )
+    elif _proactor_loop():
         logger.error(
             "time travel is unavailable: the API runs a ProactorEventLoop; start uvicorn with "
             "--loop mission_control.bootstrap.api:api_loop_factory"
         )
-        return
-    registry = TimeTravelRegistry()
-    if dsn:
+        registry.mark_unavailable(
+            DEEP_AGENTS_LANE,
+            "the API process runs a Windows ProactorEventLoop: start uvicorn with "
+            "`--loop mission_control.bootstrap.api:api_loop_factory`",
+        )
+    else:
         try:
             persistence = await stack.enter_async_context(StandalonePersistenceLifespan(dsn))
             pins = CapabilityPins.from_settings(settings)
             checkpointers = {item.ref.digest: persistence.saver for item in pins.checkpointers}
         except Exception:
             logger.exception("time travel is unavailable: the runtime persistence did not open")
+            registry.mark_unavailable(
+                DEEP_AGENTS_LANE,
+                "the runtime checkpoint persistence did not open when the API started (the "
+                "API log holds the cause)",
+            )
         else:
             registry.register(
                 DeepAgentsTimeTravel(
@@ -611,6 +648,11 @@ def create_application(
                         compose_model_catalog(
                             get_settings().deployments_root, binding.application_id
                         )
+                    )
+                    # What a run's recorded model calls cost at this catalog's list prices
+                    # (inspection and outputs report it; the budget account is not charged).
+                    usage_prices = CatalogUsagePrices(
+                        application.state.mission_control_model_catalogs[binding.application_id]
                     )
                     pool = await application_pool(binding.database_secret_ref)
                     stack.push_async_callback(pool.close)
@@ -744,6 +786,7 @@ def create_application(
                                 client,
                                 task_queue=maintenance_task_queue(item.temporal.queue_base),
                             ),
+                            usage_prices=usage_prices,
                         )
                         key = (binding.installation_id, binding.application_id, tenant)
                         application.state.mission_control_services[key] = services.lifecycle
@@ -763,12 +806,19 @@ def create_application(
                             )
                         else:
                             # FT-A3: lexical search always; hybrid when the embedding
-                            # Model Profile and its credential are configured.
+                            # Model Profile and its credential are configured. External
+                            # discovery and candidate inspection only where the deployment
+                            # enables them (`external_capability_discovery_enabled`).
+                            discovery, inspection = compose_external_discovery(
+                                get_settings(), pool, catalog_scope=catalog_scope
+                            )
                             catalog = compose_catalog_service(
                                 pool,
                                 request_scope=request_scope(identity),
                                 catalog_scope=catalog_scope,
                                 embeddings=catalog_embeddings,
+                                discovery=discovery,
+                                inspection=inspection,
                             )
                         if (
                             catalog.request_scope != request_scope(identity)
@@ -809,6 +859,14 @@ def create_application(
                                 binding.application_id
                             ],
                             sandbox_profiles=sandbox_profiles,
+                            sandbox_details=bound_sandbox_details(get_settings()),
+                            # `whoami` and the control page say for which lanes this process
+                            # reads saved state, and what a lane it cannot read still needs.
+                            time_travel=lambda: getattr(
+                                application.state, "time_travel_registry", None
+                            ),
+                            external_discovery=catalog.discovery is not None,
+                            external_discovery_prerequisite=(_discovery_subprocess_prerequisite()),
                         )
                         # SPEC-03 (C3): the run transcript, read under the tenant scope.
                         transcripts = TranscriptService(
@@ -847,6 +905,10 @@ def create_application(
                         point_reads = CognitionPointReadService(
                             PostgresCognitionPointRepository(pool),
                             request_scope=request_scope(identity),
+                            # The registry `compose_time_travel` attached: HTTP, the CLI and
+                            # the operator MCP read `state-as-of` through the same service
+                            # (the MCP tools read this registry of services directly).
+                            time_travel=getattr(application.state, "time_travel_registry", None),
                             frames=PostgresFrameRepository(pool),
                             artifacts=body_reader,
                             # OVE-204 slice 5: the run's Workspace Closures.
@@ -919,8 +981,18 @@ def create_application(
                             )
                         )
                         # WI-19: exact output, fulfillment and transfer inspection (read-only).
+                        # Its content read is the coordinator inbox's bounded reader; its cost
+                        # is the run's recorded model calls at the catalog's list prices.
                         application.state.mission_control_output_inspection_services[key] = (
-                            compose_output_inspection_service(pool, request_scope(identity))
+                            compose_output_inspection_service(
+                                pool,
+                                request_scope(identity),
+                                cost=FrameRunCost(
+                                    PostgresFrameRepository(pool),
+                                    usage_prices,
+                                    runs=PostgresMissionEventReader(pool),
+                                ),
+                            )
                         )
                         # W1 D2: the operator review route over the KS review path (only
                         # with a configured knowledge binding).

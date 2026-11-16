@@ -9,7 +9,7 @@ questions:
   - How is a budget reserved before work and settled after?
   - What is the current spend rule for paid runs?
   - Why was a model call refused for budget?
-updated: 2026-11-02
+updated: 2026-11-16
 ---
 
 # Budgets and usage
@@ -99,12 +99,19 @@ The kernel checks usage against an operation's bound limits at settlement (`oper
   partial lineage's points, and the failed settlement records both; before it the unit settled
   with `usage: {}` and no points (`adapter.py::_observed_usage`). T0 proof only
   (`test_fx_tr_disconnect_t0`); the live re-proof was not run.
-- **The lane reports no cost.** Usage is `model.turns` and `tokens.total`; no `cost_micros` is
-  produced, so the declared `usage.cost: estimated` is not what the lane does, and `currency.*`
-  and the run's `external.openai` dimension are never charged by it. The resolved pin carries list
-  prices ([model catalog](model-catalog.md), OC-R6); the only reader is the trusted evaluator runner, which prices
-  `usage.costUsd` from the `models.toml` row (`adapters/deep_agents/evaluators.py:22-24,183-190`); the run budget
-  charges no cost.
+- **The lane reports no cost; inspection estimates it.** Usage is `model.turns` and `tokens.total`; no
+  `cost_micros` is produced, so the declared `usage.cost: estimated` is not what the lane does, and
+  `currency.*` and the run's `external.openai` dimension are never charged by it: a manifest's `budget.usd`
+  lowers to a `currency.estimated_micros` hard cap that nothing enforces, and its `consumed` stays 0. The
+  sealed execution binding carries the model name without prices; the resolved pin and the Model Catalog carry
+  list prices ([model catalog](model-catalog.md), OC-R6). Since 2026-11-16 the API prices a run at read time
+  (`application/frames/cost.py`): one model call per `usage` frame `message_id`, priced with the `models.toml`
+  row of its model (long-prompt tier included), summed as `mc.run_cost.v1` in `run inspect` and
+  `outputs show` (`cost`: `estimated_micros`, `estimated_usd`, `by_model`, `disposition`). It is an
+  estimate at list prices (no cache discount, so an upper bound), an unpriced model is reported and never
+  counted as zero, and it does not charge the budget account (`budget_charged: false`). Charging the estimate
+  to `currency.estimated_micros` at settlement, and stopping a turn on it, is an owner decision (it makes
+  `budget.usd` an enforced cap and needs the price sealed into the binding).
 
 Provider capacity limits are not budget: a lane's `ProviderCapacityLimited` becomes a bounded
 Temporal wait under the deployment's `MISSION_CONTROL_CAPACITY_*` policy, carried on every operation

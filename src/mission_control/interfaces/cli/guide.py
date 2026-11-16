@@ -1,5 +1,7 @@
-"""`missionctl guide` and `missionctl describe`: how to use the server, read from the server.
+"""`missionctl guide`, `describe` and `whoami`: how to use the server, read from the server.
 
+``whoami`` prints `mc.whoami.v1` (`GET /whoami`): the actor, tenant, permissions, sponsorship
+and approval refs and reviewer names of the token in use, and what the server composed.
 ``guide [TOPIC]`` prints the start page (who you are, the jobs in order, the commands for
 each) or one topic; ``describe REF`` prints everything about one thing (`lane:<profile>`,
 `model:<profile>`, `feature:<id>`, `tool:<name>`, `template:<id>`, `sandbox:<profile>`,
@@ -30,8 +32,15 @@ class GuideClient(Protocol):
 
     def describe(self, ref: str) -> httpx.Response: ...
 
+    def whoami(self) -> httpx.Response: ...
+
 
 def add_guide_parsers(groups: Any, common: argparse.ArgumentParser) -> None:
+    groups.add_parser(
+        "whoami",
+        parents=[common],
+        help="who this token is: actor, tenant, permissions, sponsorship refs, reviewer roles",
+    )
     guide = groups.add_parser(
         "guide", parents=[common], help="how to use this server: the start page or one topic"
     )
@@ -73,6 +82,8 @@ def _emit(text: str) -> None:
 def run_guide(client: GuideClient, args: argparse.Namespace) -> int:
     if args.group == "guide":
         response = client.guide(getattr(args, "topic", None), surface=SURFACE)
+    elif args.group == "whoami":
+        response = client.whoami()
     else:
         response = client.describe(args.ref)
     try:
@@ -80,7 +91,13 @@ def run_guide(client: GuideClient, args: argparse.Namespace) -> int:
     except ValueError:
         document = {"error": "non-JSON service response", "status": response.status_code}
     status = exit_status(response.status_code)
-    if status != 0 or getattr(args, "json", False) or not isinstance(document, dict):
+    if (
+        status != 0
+        or args.group == "whoami"
+        or getattr(args, "json", False)
+        or not isinstance(document, dict)
+    ):
+        # `whoami` is data (`mc.whoami.v1`): one JSON document, like every other read.
         print(json.dumps(document, allow_nan=False))
     elif args.group == "guide":
         _emit(str(document.get("markdown", "")))

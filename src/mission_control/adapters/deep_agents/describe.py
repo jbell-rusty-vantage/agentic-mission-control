@@ -162,4 +162,41 @@ DEEP_AGENTS_DECLARATION: Final = LaneDeclaration(
     pins=dict(DEEP_AGENTS_DESCRIBE.versions),
 )
 
-__all__ = ["DEEP_AGENTS_DECLARATION", "DEEP_AGENTS_DESCRIBE", "DEEP_AGENTS_SUBAGENT_FIELDS"]
+# What each sandbox backend gives a node, as its factory builds it (`materializer.py`,
+# `docker_sandbox.py`). The guide shows these beside a sandbox profile's launch binding, so a
+# Coordinator can tell which bound profile suits which work. Keys are the values of
+# `DeepAgentSandboxComponent.backend`; `tests/unit/guide` holds the two sets equal.
+SANDBOX_BACKEND_FACTS: Final[Mapping[str, Mapping[str, str]]] = {
+    "state": {
+        "execution": "none: the agent has file tools only, no shell",
+        "network": "none of its own (a tool the node binds may still call out)",
+        "files": "kept in the agent's saved state",
+        "suits": "writing, reading and submitting text or files when no command has to run",
+    },
+    "docker": {
+        "execution": "commands run in one local container created for the attempt",
+        "network": "none (`--network none`)",
+        "files": "read-only root with a writable `/workspace` (64 MB) and `/tmp` (16 MB)",
+        "suits": "running code or tools over workspace files without network access",
+    },
+    "langsmith": {
+        "execution": "commands run in a hosted sandbox created for the attempt and deleted "
+        "when it ends",
+        "network": "what the hosted sandbox provider allows; Mission Control adds no rule",
+        "files": "the hosted sandbox's filesystem",
+        "suits": "running code that needs a full environment",
+    },
+    "daytona": {
+        "execution": "not available: no factory is wired for this backend",
+        "network": "not available",
+        "files": "not available",
+        "suits": "nothing yet: a node that names it is refused before it runs",
+    },
+}
+
+__all__ = [
+    "DEEP_AGENTS_DECLARATION",
+    "DEEP_AGENTS_DESCRIBE",
+    "DEEP_AGENTS_SUBAGENT_FIELDS",
+    "SANDBOX_BACKEND_FACTS",
+]

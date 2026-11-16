@@ -10,7 +10,8 @@ permission; the budgets and the selection are the pure :func:`plan_excerpts`.
 
 from __future__ import annotations
 
-from typing import Final
+from collections.abc import Sequence
+from typing import Final, Literal
 
 from mission_control.application.frames.artifact_bodies import ARTIFACT_READ_PERMISSION
 from mission_control.application.subscriptions.coordinator_ports import (
@@ -57,24 +58,41 @@ class NoticeContentService:
         ``budget`` is what remains of a page's aggregate character budget."""
 
         if CONTENT_PERMISSION not in actor.permissions:
-            return ExcerptBundle(
-                purpose=purpose,
-                omissions=tuple(
-                    Omission(obligation_key=key, code="GRANT_MISSING") for key in policy.obligations
-                ),
-                max_total_chars=policy.max_total_chars,
-            )
+            return _grant_missing(policy, purpose)
         accepted = await self._outputs.accepted_outputs(scope, run_id)
+        return await self.excerpts(accepted, policy, purpose=purpose, actor=actor, budget=budget)
+
+    async def excerpts(
+        self,
+        outputs: Sequence[ExactOutput],
+        policy: NoticeContent,
+        *,
+        purpose: str,
+        actor: ActorContext,
+        status: Literal["accepted", "submitted"] = "accepted",
+        budget: int | None = None,
+    ) -> ExcerptBundle:
+        """The bounded excerpts of exact revisions the caller already selected (the accepted
+        heads, or the latest submitted revisions where none is accepted yet), under the same
+        grant, digest check and budgets as :meth:`bundle`; `status` says which they are."""
+
+        if CONTENT_PERMISSION not in actor.permissions:
+            return _grant_missing(policy, purpose)
         wanted = set(policy.obligations)
         candidates = [
-            await self._candidate(output, purpose=purpose, actor=actor)
-            for output in accepted
+            await self._candidate(output, purpose=purpose, actor=actor, status=status)
+            for output in outputs
             if output.obligation_key in wanted
         ]
         return plan_excerpts(candidates, policy, purpose=purpose, budget=budget)
 
     async def _candidate(
-        self, output: ExactOutput, *, purpose: str, actor: ActorContext
+        self,
+        output: ExactOutput,
+        *,
+        purpose: str,
+        actor: ActorContext,
+        status: Literal["accepted", "submitted"] = "accepted",
     ) -> ExcerptCandidate:
         candidate = output.candidate
         text: str | None = None
@@ -110,12 +128,22 @@ class NoticeContentService:
             revision=output.revision,
             form=output.form.value,
             content_digest=output.content_digest,
-            status="accepted",
+            status=status,
             issuer=issuer,
             attribution=output.producer_origin_ref,
             text=text,
             refusal=refusal,
         )
+
+
+def _grant_missing(policy: NoticeContent, purpose: str) -> ExcerptBundle:
+    return ExcerptBundle(
+        purpose=purpose,
+        omissions=tuple(
+            Omission(obligation_key=key, code="GRANT_MISSING") for key in policy.obligations
+        ),
+        max_total_chars=policy.max_total_chars,
+    )
 
 
 __all__ = ["CONTENT_PERMISSION", "KS_HANDLE_PREFIX", "NoticeContentService"]

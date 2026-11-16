@@ -48,6 +48,7 @@ class TimeTravelUnsupported(LookupError):
         reason: str = "time_travel_unsupported",
         *,
         saver: str | None = None,
+        prerequisite: str | None = None,
     ) -> None:
         super().__init__(f"{reason} on lane profile {lane_profile}")
         self.lane_profile = lane_profile
@@ -55,6 +56,9 @@ class TimeTravelUnsupported(LookupError):
         # 1.4.4 (P6.1): the checkpointer the outcome is about (`saver_unreachable`,
         # `saver_not_served`), for the typed 503 and the fork refusal.
         self.saver = saver
+        # What this process lacks to read the lane's state, where the composition knows it
+        # (`TimeTravelRegistry.mark_unavailable`): a deployment prerequisite, never a retry.
+        self.prerequisite = prerequisite
 
 
 class ForkSeedRequest(BaseModel):
@@ -185,9 +189,29 @@ class TimeTravelRegistry:
 
     def __init__(self, lanes: Mapping[str, TimeTravelLane] | None = None) -> None:
         self._lanes: dict[str, TimeTravelLane] = dict(lanes or {})
+        # Lane profile -> what this process lacks to compose the lane's time travel.
+        self._prerequisites: dict[str, str] = {}
 
     def register(self, lane: TimeTravelLane) -> None:
         self._lanes[lane.lane_profile] = lane
+        self._prerequisites.pop(lane.lane_profile, None)
+
+    def mark_unavailable(self, lane_profile: str, prerequisite: str) -> None:
+        """Record why the composition could not register a lane's time travel: the sentence a
+        refusal and the caller's `whoami` carry, so an operator knows what to configure."""
+
+        if lane_profile not in self._lanes:
+            self._prerequisites[lane_profile] = prerequisite
+
+    def prerequisite(self, lane_profile: str) -> str | None:
+        """What is missing for a lane this registry does not hold (`None`: nothing recorded)."""
+
+        return self._prerequisites.get(lane_profile)
+
+    def unsupported(self, lane_profile: str) -> TimeTravelUnsupported:
+        """The refusal for a lane this registry does not hold, with its prerequisite."""
+
+        return TimeTravelUnsupported(lane_profile, prerequisite=self.prerequisite(lane_profile))
 
     def register_all(self, lanes: Iterable[TimeTravelLane | None]) -> TimeTravelRegistry:
         """K3: register what each lane package's composition returned (None entries are
@@ -205,7 +229,7 @@ class TimeTravelRegistry:
         try:
             lane = self._lanes[lane_profile]
         except KeyError:
-            raise TimeTravelUnsupported(lane_profile) from None
+            raise self.unsupported(lane_profile) from None
         if request_scope is not None and isinstance(lane, ScopedTimeTravelLane):
             return lane.for_scope(request_scope)
         return lane

@@ -14,6 +14,7 @@ import argparse
 import json
 import re
 from pathlib import Path
+from types import SimpleNamespace
 from typing import Any
 
 import pytest
@@ -43,6 +44,7 @@ from mission_control.interfaces.http.models import router as models_router
 from mission_control.interfaces.http.output_inspection import router as output_inspection_router
 from mission_control.interfaces.http.selection import router as selection_router
 from mission_control.interfaces.http.transcript import router as transcript_router
+from mission_control.interfaces.mcp.catalog_tools import DISCOVERY_TOOL_NAMES
 from mission_control.interfaces.mcp.guide_tools import (
     DESCRIBE_TOOL,
     GUIDE_RESOURCE_PREFIX,
@@ -50,7 +52,15 @@ from mission_control.interfaces.mcp.guide_tools import (
     INTERVIEW_PROMPT,
     server_tool_listing,
 )
-from tests.unit.guide.support import full_guide, operator_server
+from mission_control.interfaces.mcp.operator_server import create_operator_server
+from tests.unit.guide.support import (
+    APPLICATION,
+    INSTALLATION,
+    OPERATOR_REGISTRIES,
+    TENANT,
+    full_guide,
+    operator_server,
+)
 
 ROOT = Path(__file__).resolve().parents[3]
 PREFIX = "/v1/applications/{application_id}/"
@@ -62,14 +72,38 @@ SHORTENED = (
     "mission_governed_prepare",
 )
 # `tools/list` in tokens (characters of the JSON divided by four). Before the guide: 39 tools,
-# 11,106. With it: two more tools and four shortened descriptions. The listing may only
-# shrink from here: templates, the manifest reference and `include_lowered` were added inside
-# this ceiling. The owner's target is 9,000 (`scripts/consumer_surface_eval.py` checks it);
-# what is left above it is every other tool's bare `outputSchema` and empty `_meta`, the
-# other tools' descriptions and the request schemas the listing types.
+# 11,106. The owner's ceiling is 9,000 (`scripts/consumer_surface_eval.py` checks it live), and
+# the listing is now under it with every tool the operator server can register (whoami, the
+# output text read, external discovery, inspection and pinning included): the server drops
+# each entry's bare `outputSchema` and empty `_meta`, and the long descriptions moved to
+# `tool:<name>` (`MOVED`). A new tool has to fit inside the ceiling.
 LISTING_TOKENS_BEFORE = 11_106
-LISTING_TOKENS_CEILING = 10_450
-_TOOL_WORD = re.compile(r"\b(mission_[a-z_]+|coordinator_inbox_[a-z_]+|selection_check)\b")
+LISTING_TOKENS_CEILING = 9_000
+# The tools whose description moved to their notes when the listing was brought under the
+# ceiling; each still says what it is for and points at its full shape.
+MOVED = (
+    "coordinator_inbox_observe",
+    "knowledge_review",
+    "mission_approval_resolve",
+    "mission_governed_execute",
+    "mission_governed_status",
+    "mission_human_task_get",
+    "mission_human_task_list",
+    "mission_human_task_resolve",
+    "mission_run_inspect",
+    "mission_run_list",
+    "mission_run_points",
+    "mission_run_points_reconcile",
+    "mission_run_replay",
+    "mission_run_state_as_of",
+    "mission_run_transcript",
+)
+# Field names a note may write that have a tool's shape.
+FIELD_WORDS = frozenset({"mission_id"})
+_TOOL_WORD = re.compile(
+    r"\b(mission_[a-z_]+|coordinator_inbox_[a-z_]+|selection_check|pin_capability"
+    r"|discover_[a-z_]+|inspect_external_candidate|knowledge_review)\b"
+)
 
 
 async def _tools() -> dict[str, Any]:
@@ -247,7 +281,8 @@ async def test_every_documented_tool_exists_and_every_bare_object_is_documented(
             assert argument is None or argument in bare, (name, argument, bare)
     for name in TOOL_DOCS:
         notes = load_page("tools", name).body
-        assert not [word for word in _TOOL_WORD.findall(notes) if word not in tools], name
+        named = [word for word in _TOOL_WORD.findall(notes) if word not in FIELD_WORDS]
+        assert not [word for word in named if word not in tools], name
 
 
 async def test_the_shortened_descriptions_point_at_their_full_shape() -> None:
@@ -259,6 +294,80 @@ async def test_the_shortened_descriptions_point_at_their_full_shape() -> None:
         assert "Example" in description, name
     for name in tools:
         assert (tools[name].description or "").strip(), name
+    # A moved description stays short and names where its full documentation is.
+    for name in MOVED:
+        description = (tools[name].description or "").strip()
+        assert len(description) <= 480, (name, len(description))
+        assert f"mission_describe('tool:{name}')" in description, name
+        assert name in TOOL_DOCS, name
+
+
+async def test_the_listing_drops_what_every_entry_repeats() -> None:
+    """The operator server lists no bare `outputSchema` and no empty `_meta`; a tool that
+    declares real meta (the consequential tags) keeps it, and a result still carries its
+    envelope as structured content."""
+
+    async with Client(operator_server()) as client:
+        tools = {tool.name: tool for tool in await client.list_tools()}
+    listed = {
+        name: tool.model_dump(mode="json", exclude_none=True, by_alias=True)
+        for name, tool in tools.items()
+    }
+
+    assert not [name for name, item in listed.items() if "outputSchema" in item]
+    assert sorted(name for name, item in listed.items() if "_meta" in item) == [
+        "mission_governed_execute",
+        "mission_manifest_submit",
+        "mission_run_start",
+    ]
+    assert listed["mission_run_start"]["_meta"]["fastmcp"]["tags"] == ["consequential"]
+    # A typed request keeps its schema; the model's own docstring is in the tool's notes.
+    request = listed["mission_human_task_resolve"]["inputSchema"]["properties"]["request"]
+    assert "expected_task_version" in request["properties"] and "description" not in request
+
+
+async def test_the_new_reads_and_the_discovery_tools_are_on_the_operator_server() -> None:
+    tools = await _tools()
+
+    assert {"mission_whoami", "mission_run_output_content", *DISCOVERY_TOOL_NAMES} <= set(tools)
+    assert tools["mission_whoami"].inputSchema.get("properties", {}) == {}
+    assert tools["mission_run_output_content"].inputSchema["required"] == [
+        "run_id",
+        "obligation_key",
+    ]
+    # Superseded and legacy tools stay off the production surface.
+    assert not {
+        "search_capabilities",
+        "get_capability",
+        "validate_workflow_design",
+        "prepare_workflow_launch",
+        "launch_workflow",
+        "get_workflow_result",
+        "coordinator_bootstrap",
+    } & set(tools)
+    # The transcript answers structured entries by default, one small page.
+    transcript = tools["mission_run_transcript"].inputSchema["properties"]
+    assert transcript["format"]["default"] == "json" and transcript["limit"]["default"] == 20
+    assert set(transcript["format"]["enum"]) == {"json", "md", "jsonl"}
+
+
+async def test_discovery_tools_register_only_where_the_api_composed_them() -> None:
+    """A server whose catalog composes search alone lists the pin and no discovery tool."""
+
+    key = (INSTALLATION, APPLICATION, TENANT)
+    state = SimpleNamespace(
+        **{f"mission_control_{name}": {key: object()} for name in OPERATOR_REGISTRIES}
+    )
+    state.mission_control_catalog_services = {
+        key: SimpleNamespace(search=object(), discovery=None, inspection=None)
+    }
+    async with Client(create_operator_server(state)) as client:
+        names = {tool.name for tool in await client.list_tools()}
+
+    assert "pin_capability" in names
+    assert not {"discover_mcp_servers", "discover_agent_skills", "inspect_external_candidate"} & (
+        names
+    )
 
 
 async def test_describe_answers_for_every_tool_of_the_server() -> None:
@@ -317,5 +426,5 @@ async def test_the_tool_listing_only_shrinks() -> None:
     ]
     tokens = sum(len(json.dumps(item)) for item in listing) // 4
 
-    assert len(tools) == 41
+    assert len(tools) == 47
     assert tokens <= LISTING_TOKENS_CEILING < LISTING_TOKENS_BEFORE, tokens

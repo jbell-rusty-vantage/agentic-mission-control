@@ -87,6 +87,9 @@ class ShapeOf:
     receives the caller's object and the scoped service validates it with that model, so a
     body the model refuses keeps its ``INVALID_ARGUMENT`` envelope. A server with strict input
     validation checks the object against the published schema before the tool runs.
+
+    The model's own docstring is left out of the published schema: the listing is read on
+    every session, and what the docstring says is in the tool's notes (``tool:<name>``).
     """
 
     def __init__(self, model: type[BaseModel]) -> None:
@@ -95,7 +98,9 @@ class ShapeOf:
     def __get_pydantic_json_schema__(
         self, _core_schema: CoreSchema, handler: GetJsonSchemaHandler
     ) -> JsonSchemaValue:
-        return handler(self._model.__pydantic_core_schema__)
+        schema = handler(self._model.__pydantic_core_schema__)
+        handler.resolve_ref_schema(schema).pop("description", None)
+        return schema
 
 
 def scope_of(principal: MissionToolPrincipal, application_id: str | None) -> str:

@@ -17,7 +17,7 @@ elicitation content and ``cancel`` (distinct from ``deny``).
 from __future__ import annotations
 
 import logging
-from collections.abc import Callable
+from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from typing import Literal, Protocol
@@ -39,6 +39,7 @@ from mission_control.domain.programs.human_gate import (
     HumanTaskView,
     ResolutionCheck,
     decide_resolution,
+    reviews_as,
 )
 
 LOGGER = logging.getLogger(__name__)
@@ -86,11 +87,33 @@ class HumanGateWake(Protocol):
 
 
 class HumanTaskRejected(Exception):
-    """A typed refusal; `code` maps to the HTTP status and the MCP error code."""
+    """A typed refusal; `code` maps to the HTTP status and the MCP error code. `details` says
+    what was required and what the principal holds, where the refusal is about the principal
+    (`not_reviewer`: `required_reviewers` and `principal_reviews_as`, comma-separated)."""
 
-    def __init__(self, code: str, message: str) -> None:
+    def __init__(
+        self, code: str, message: str, *, details: Mapping[str, str] | None = None
+    ) -> None:
         super().__init__(message)
         self.code = code
+        self.details = dict(details or {})
+
+
+def not_reviewer(reviewers: Iterable[str], actor: ActorContext) -> HumanTaskRejected:
+    """The `not_reviewer` refusal: who may resolve the task and what the principal holds."""
+
+    required = tuple(reviewers)
+    held = reviews_as(actor.actor_id, actor.permissions)
+    return HumanTaskRejected(
+        "not_reviewer",
+        f"the principal is not a reviewer of this task: it needs one of {', '.join(required)} "
+        f"(that actor id, or the permission reviewer:<name>); this principal reviews as "
+        f"{', '.join(held)}",
+        details={
+            "required_reviewers": ",".join(required),
+            "principal_reviews_as": ",".join(held),
+        },
+    )
 
 
 AnyHumanTask = HumanTaskView | ApprovalTaskView
@@ -220,6 +243,8 @@ class HumanTaskService:
         check, task = result
         if check.status == "reject":
             code = check.code or "rejected"
+            if code == "not_reviewer":
+                raise not_reviewer(task.activation.spec.reviewers, actor)
             raise HumanTaskRejected(code, _MESSAGES.get(code, code))
         await self._nudge(task)
         return ResolutionReceipt("accepted" if check.status == "accept" else "duplicate", task)
@@ -286,6 +311,8 @@ class HumanTaskService:
         check, task = result
         if check.status == "reject":
             code = refused[0] if refused else (check.code or "rejected")
+            if code == "not_reviewer":
+                raise not_reviewer(task.packet.reviewers, actor)
             raise HumanTaskRejected(code, check.message or _MESSAGES.get(code, code))
         await self._nudge_approval(task)
         return ResolutionReceipt("accepted" if check.status == "accept" else "duplicate", task)
@@ -329,4 +356,5 @@ __all__ = [
     "HumanTaskRepository",
     "HumanTaskService",
     "ResolutionReceipt",
+    "not_reviewer",
 ]

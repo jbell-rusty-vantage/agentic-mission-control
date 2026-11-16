@@ -10,7 +10,7 @@ questions:
   - Which skill bundle do I load to author, observe or intervene?
   - What is built of the coordinator-surface proposal and what is not?
   - What does the dashboard control plane need that does not exist yet?
-updated: 2026-11-01
+updated: 2026-11-16
 ---
 
 # Coordinator surface
@@ -60,6 +60,31 @@ The focused part of the proposal was adopted into Sprint OC (OC-D125/126/176) an
 - **Position on events:** `unit_key` and `point_ref` are optional fields on the `mc.event.v1` envelope
   (`domain/subscriptions/contracts.py:196-197`), so a consumer jumps from an event to a point
   ([joinability](unit-and-point-joinability.md)).
+
+## MCP-only coordinator
+
+A coordinator with nothing but the operator MCP mount (no shell, no skill, no HTTP) runs a mission from the
+guide's start page alone (2026-11-16; `scripts/consumer_surface_eval.py --run-id` scores it against a server):
+
+- **Who it is:** `mission_whoami` (`GET whoami`, `missionctl whoami`; `mc.whoami.v1`) answers the actor id,
+  permissions, sponsorship and approval refs, `reviews_as` (what a Human Task's `reviewers` may name) and what
+  the process composed (`server.time_travel` per lane, `server.external_discovery` and what either still needs).
+  A refusal for a grant names it: `not_reviewer` the reviewers required, a fork the sponsorship refs held.
+- **What a run produced and cost:** `mission_run_output_content` returns the bounded text of an output's
+  accepted (else latest submitted) revision; `mission_run_inspect` and `mission_run_outputs` carry `cost`, a
+  list-price estimate that charges no budget ([budgets and usage](budgets-and-usage.md)).
+- **What a run did:** `mission_run_transcript` answers structured `entries`, 20 a page; `mission_run_state_as_of`
+  reads the point service the API composed with its time-travel registry, as the HTTP route does.
+- **A listing read every session:** `tools/list` drops bare `outputSchema` and empty `_meta` (`OperatorMCP`) and
+  stays under 9,000 tokens (`tests/unit/guide/test_guide_surface.py`); long descriptions are `tool:<name>` notes.
+- **What the catalog lacks:** `catalog_tools.py` adds `pin_capability`, and `discover_mcp_servers`,
+  `discover_agent_skills` and `inspect_external_candidate` only where `external_capability_discovery_enabled`
+  composed discovery (off by default). A candidate is never runnable. The last two start a subprocess, which the
+  selector loop the API runs on Windows cannot do: they refuse `DEPENDENCY_UNAVAILABLE` and `whoami` says so.
+
+Implemented and unit-tested; integrated on the local AI Engineer stack on 2026-11-16 (evaluation and one
+`smallest` mission driven through MCP alone); not qualified. Stale-version refusals carry the current
+`version`, `execution_generation` and `phase`; a fork with no safe Snapshot says why ([recovery](recovery.md)).
 
 ## Specified, not built
 

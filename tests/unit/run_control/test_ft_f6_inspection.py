@@ -144,6 +144,8 @@ def test_existing_clients_keep_parsing_the_inspection_body() -> None:
         "points_incomplete",
         "unit_failures",
         "budget",
+        # The run's estimated model cost (`mc.run_cost.v1`): optional, absent when not composed.
+        "cost",
     }
     assert set(PreF6Inspection.model_fields) == fields - added
     for name in added:

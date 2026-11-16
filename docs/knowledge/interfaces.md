@@ -10,7 +10,7 @@ questions:
   - Which prefix does a given route live under and who may call it?
   - Why did the API answer unauthorized, stale_version or installation_unavailable?
   - Which surfaces are specified but not built?
-updated: 2026-11-15
+updated: 2026-11-16
 ---
 
 # Public interfaces
@@ -34,7 +34,7 @@ scoped prefix unless stated.
 | `catalog` (`/catalog`) | `GET definitions`, `pins/{pin}`; `POST resolve`, `search`, `discover`, `inspect`, `components/search`, `publish:prepare`, `publish:complete`, `pin`, `render` ([capabilities](capabilities.md)) |
 | `lanes`, `models` | `/lanes` list and `{lane_profile}`; `/models` list and `{profile}` with every lane's route verdict ([model catalog](model-catalog.md)) |
 | `selection` (`/selection`) | `POST search` (ranked, or a listing without a query), `POST check` ([selection workspace](selection-workspace.md)) |
-| `guide` | `GET guide`, `guide/{topic}` (`?surface=http\|cli\|mcp`), `describe?ref=`: how to use the server and everything about one lane, model, feature, tool, mission template, sandbox profile, capability or the Mission Manifest; a prose answer carries `markdown` (`application/guide`, `catalog.read`) |
+| `guide` | `GET guide`, `guide/{topic}` (`?surface=http\|cli\|mcp`), `describe?ref=`: how to use the server and everything about one lane, model, feature, tool, mission template, sandbox profile (its launch binding: backend, execution, network), capability or the Mission Manifest; a prose answer carries `markdown`, and `Accept: text/markdown` returns the page itself (`application/guide`, `catalog.read`). `GET whoami` (`mc.whoami.v1`, any authenticated principal of the application): actor, tenant, permissions, sponsorship and approval refs, `reviews_as`, and what the process composed (`server.time_travel`, `server.external_discovery`) |
 | `stop_fence`, `continuation` | `GET runs/{id}/stop-fence`; `GET runs/{id}/checkpoints[/{checkpoint_id}]` |
 | `transcript` | `GET runs/{id}/transcript`, `frames/tail`, `runs`, `runs/{id}/transcript/search` ([transcript](provider-frames-and-transcript.md)) |
 | `cognition_points` | `GET runs/{id}/points`, `points/{point_id}`, `state-as-of`, `closure`, `frames`, `replay`; `GET runs/{id}/closures`; `POST runs/{id}/points:reconcile` ([joinability](unit-and-point-joinability.md), [workspace closure](workspace-closure.md)) |
@@ -44,7 +44,7 @@ scoped prefix unless stated.
 | `chains`, `missions` | `GET chains/{id}`, `chains?mission_id=`; `POST missions:compile`, `missions:submit`, `missions:start`, `missions/{id}/runs` |
 | `human_tasks` | `GET human-tasks[/{id}]`, `POST human-tasks/{id}/resolutions` |
 | `coordinator_inbox` | `POST/GET /coordinator-inboxes`, `GET .../{sub}/notifications`, `attention`, `POST .../acks`, `notifications/{n}/commands\|observations\|content`, `DELETE` ([wake channels](wake-channels.md), [coordinator attention](coordinator-attention.md)) |
-| `output_inspection` | `GET runs/{id}/outputs`, `outputs/{obligation_key}/revisions`, `output-events`, `transfer-plans`; `GET transfer-plans/{plan_id}` ([output contracts](output-contracts.md)) |
+| `output_inspection` | `GET runs/{id}/outputs` (with the run's estimated `cost`), `outputs/{obligation_key}/revisions`, `outputs/{obligation_key}/content` (the bounded text of the accepted or latest submitted revision; also needs `workflow.result.read`), `output-events`, `transfer-plans`; `GET transfer-plans/{plan_id}` ([output contracts](output-contracts.md)) |
 | `knowledge_reviews` | `POST runs/{id}/knowledge-reviews`, `POST runs/{id}/evaluator-attempt-resets` ([trusted judgment](trusted-judgment.md), [evaluator attempts](evaluator-attempts.md)) |
 
 Mounted only by the proof facade `bootstrap/technical_api.py` (not primary startup): `/control-plane/v1`,
@@ -67,8 +67,8 @@ pointer until the operator's launch bindings bind every node ([mission manifest]
 | `mission`, `chain` | `schema`, `compile --offline`, `submit`, `start`; `chain inspect` |
 | `subscribe`, `events`, `wait`, `inbox` | `create\|list\|close`; `watch --after-seq`; `wait`; `inbox list\|ack\|observe\|content\|attention` |
 | `lane`, `model`, `catalog` | `list`, `describe`, `async-graphs`; `catalog list\|resolve\|search\|discover\|inspect\|components\|pin\|render\|publish` |
-| `search`, `workspace check`, `guide [TOPIC]`, `describe REF` | [selection workspace](selection-workspace.md); the guide as Markdown in `missionctl` words (`--json`: the envelope) |
-| `outputs`, `knowledge` | `outputs show\|revisions\|events\|plans\|plan`; `knowledge review` |
+| `search`, `workspace check`, `guide [TOPIC]`, `describe REF`, `whoami` | [selection workspace](selection-workspace.md); the guide as Markdown in `missionctl` words (`--json`: the envelope); `whoami` prints `mc.whoami.v1` |
+| `outputs`, `knowledge` | `outputs show\|revisions\|content\|events\|plans\|plan`; `knowledge review` |
 | `setup`, `prereq`, `preflight`, `token` | [owner prerequisites](owner-prerequisites.md), [operations](operations.md); `token mint` writes a file, never stdout |
 
 Flags `--application`, `--url`, `--json`, `--wait` and `--request-file` may precede or follow
@@ -85,11 +85,11 @@ Two servers share one tool family (`register_scoped_tools`, `mcp/coordinator_ser
   `discover_mcp_servers`, `discover_agent_skills`, `inspect_external_candidate`, `validate_workflow_design`,
   `prepare_workflow_launch`, `launch_workflow`, `get_workflow_result`) plus the scoped tools.
 - **Operator server** (`operator_server.py`, `/v1/applications/{application_id}/mcp` on the configured API):
-  the scoped tools without the catalog facade or `mission_subscribe`.
+  the scoped tools without the catalog facade or `mission_subscribe`, plus `catalog_tools.py` ([MCP-only coordinator](coordinator-surface.md#mcp-only-coordinator)).
 - **Guide** (`guide_tools.py`): `mission_guide(topic)` is the start page or one of ten topics (`pages.TOPIC_IDS`);
   `mission_describe(ref)` reads `lane:`, `model:`, `feature:`, `tool:` (every tool of the server), `template:`,
-  `sandbox:`, `manifest[:<section>]` or a Capability Pin. A page or a prose answer is Markdown text content with
-  the envelope as structured content. Pages are also resources `mc://guide/<topic>` and one prompt.
+  `sandbox:`, `manifest[:<section>]` or a Capability Pin; `mission_whoami()` is `GET whoami`. A page or prose answer
+  is Markdown text, its structured content the envelope without the body. Pages are also resources `mc://guide/<topic>` and one prompt.
 - **Scoped tool families:** manifests and chains (`mission_preflight`, `mission_manifest_compile\|submit`,
   `mission_run_start`, `mission_chain_inspect`); run control (`mission_command_send`, `mission_run_inspect`,
   `mission_run_fork`); transcript (`mission_run_transcript\|search\|list`); cognition points
@@ -97,8 +97,8 @@ Two servers share one tool family (`register_scoped_tools`, `mcp/coordinator_ser
   `mission_run_replay`); selection (`mission_search`, `selection_check`); human tasks
   (`mission_human_task_list\|get\|resolve`); governed effects (`mission_governed_prepare\|execute\|status`,
   `mission_approval_resolve`); inbox and outputs (`coordinator_inbox_*`, `mission_run_outputs`,
-  `mission_run_output_revisions\|events`, `mission_transfer_plan`); `knowledge_review`; `signal_emit` on the
-  Signal Ingress. Resources use `belllabs://` and `mc://applications/{application_id}/...`.
+  `mission_run_output_revisions\|events\|content`, `mission_transfer_plan`); `knowledge_review`; `signal_emit` on
+  the Signal Ingress. Resources use `belllabs://` and `mc://applications/{application_id}/...`.
 - `coordinator_auth.py` derives the principal only from FastMCP's verified token; ADR-0015 requires
   resource-bound OAuth with PKCE and forbids forwarding application JWTs, but no authorization-server
   discovery or OAuth adapter exists in `interfaces/mcp`: the server trusts the token FastMCP presents.

@@ -2,7 +2,8 @@
 
 ``outputs show RUN`` prints the run's promises, accepted revisions, fulfillment, assessments,
 transfer plans and actionable items; ``outputs revisions RUN KEY [--cursor C]`` one promise's
-history; ``outputs events RUN [--cursor C]`` the output/transfer transitions; ``outputs plans
+history; ``outputs content RUN KEY [--max-chars N]`` the bounded text of its accepted (or
+latest submitted) revision; ``outputs events RUN [--cursor C]`` the transitions; ``outputs plans
 RUN`` the sealed plans and ``outputs plan PLAN_ID`` one plan with its attempt receipts. Every
 command is one JSON document on stdout over the same HTTP handlers as the operator MCP.
 """
@@ -34,6 +35,12 @@ def add_output_parsers(groups: Any, common: argparse.ArgumentParser) -> None:
     revisions.add_argument("obligation_key")
     revisions.add_argument("--cursor")
     revisions.add_argument("--limit", type=int, default=50)
+    content = actions.add_parser(
+        "content", parents=[common], help="the bounded text of one promise's output"
+    )
+    content.add_argument("run_id")
+    content.add_argument("obligation_key")
+    content.add_argument("--max-chars", type=int, default=4_000)
     events = actions.add_parser("events", parents=[common])
     events.add_argument("run_id")
     events.add_argument("--cursor")
@@ -54,6 +61,12 @@ def run_outputs(client: OutputsClient, args: argparse.Namespace) -> int:
             f"{client.quoted(args.obligation_key)}/revisions"
         )
         params = {"limit": args.limit, **({"cursor": args.cursor} if args.cursor else {})}
+    elif args.action == "content":
+        path = (
+            f"runs/{client.quoted(args.run_id)}/outputs/"
+            f"{client.quoted(args.obligation_key)}/content"
+        )
+        params = {"max_chars": args.max_chars}
     elif args.action == "events":
         path = f"runs/{client.quoted(args.run_id)}/output-events"
         params = {"limit": args.limit, **({"cursor": args.cursor} if args.cursor else {})}

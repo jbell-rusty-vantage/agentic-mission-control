@@ -33,6 +33,7 @@ from mission_control.adapters.subscriptions.webhook import (
     EgressGuardedWebhookTransport,
     EgressPolicy,
 )
+from mission_control.application.frames.cost import RunCostReader
 from mission_control.application.outputs.inspection import OutputInspectionService
 from mission_control.application.subscriptions.coordinator_ports import (
     CoordinatorCommandGateway,
@@ -41,6 +42,7 @@ from mission_control.application.subscriptions.coordinator_ports import (
 from mission_control.application.subscriptions.coordinator_service import (
     CoordinatorInboxService,
 )
+from mission_control.application.subscriptions.notice_content import NoticeContentService
 from mission_control.application.subscriptions.ports import McpSessionNotifier, WebhookTransport
 from mission_control.application.subscriptions.relay import SubscriptionRelay
 from mission_control.application.subscriptions.service import SubscriptionService
@@ -104,12 +106,19 @@ def compose_coordinator_inbox_service(
 
 
 def compose_output_inspection_service(
-    pool: asyncpg.Pool, request_scope: str
+    pool: asyncpg.Pool, request_scope: str, *, cost: RunCostReader | None = None
 ) -> OutputInspectionService:
-    """WI-19: read-only exact output, fulfillment and transfer inspection of one tenant scope."""
+    """WI-19: read-only exact output, fulfillment and transfer inspection of one tenant scope.
+    Its bounded content read is the coordinator inbox's reader over the same WI-01 output
+    store (no Knowledge Services excerpt reader: a report handle is refused, as there)."""
 
+    outputs = PostgresOutputContractStore(pool)
     return OutputInspectionService(
-        PostgresOutputInspectionReader(pool), request_scope=request_scope
+        PostgresOutputInspectionReader(pool),
+        request_scope=request_scope,
+        content=NoticeContentService(outputs),
+        submitted=outputs,
+        cost=cost,
     )
 
 

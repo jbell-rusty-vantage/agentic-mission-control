@@ -754,11 +754,23 @@ async def test_compile_searches_the_installation_catalog_partition() -> None:
             catalog_scope=catalog_scope,
         )
 
-    blocked = await compiler(None).compile(owner_manifest, request)
-    assert "search_no_admitted_hits" in {issue.reason for issue in blocked.report.blockers}
+    # Under the tenant request scope the projection holds nothing, as on an installation
+    # whose projection was never built: the entries are answered by a scan of the published
+    # definitions and say so (`test_manifest_search_fallback.py`), never by the projection.
+    unprojected = await compiler(None).compile(owner_manifest, request)
+    assert unprojected.resolution is not None
+    modes = {
+        item.search_mode for item in unprojected.resolution.resolved if "search" in item.request
+    }
+    assert modes == {"definition_scan"}
+    assert "definition_scan" in {issue.reason for issue in unprojected.report.warnings}
     recording.requests.clear()
     resolved = await compiler(catalog).compile(owner_manifest, request)
     assert "search_no_admitted_hits" not in {issue.reason for issue in resolved.report.blockers}
+    assert resolved.resolution is not None
+    assert {
+        item.search_mode for item in resolved.resolution.resolved if "search" in item.request
+    } == {"lexical"}
     assert recording.requests
     assert {item.tenant_scope for item in recording.requests} == {catalog}
 

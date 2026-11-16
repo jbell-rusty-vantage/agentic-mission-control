@@ -10,7 +10,7 @@ questions:
   - What is a cognition point and how do I read the state at one?
   - Why does a fork never copy the source mailbox or children?
   - How are local workspace leases kept, cleaned and continued?
-updated: 2026-11-06
+updated: 2026-11-16
 ---
 
 # Snapshots forks and reconciliation
@@ -44,8 +44,17 @@ single `workspace` item ([context and continuation](context-and-continuation.md)
 launched: `run start` stays separate. Surfaces: `POST /runs/{id}/forks` (the latest safe Snapshot
 by default, optional instruction), `missionctl run fork --instruction-file`, MCP
 `mission_run_fork`; sponsorship and approvals are the principal's own claims, never the
-request's. A fork is findable with `run list --query "forked_from='<run>'"` through the
-`ForkedFromRunId` search attribute.
+request's (`whoami` lists them; a ref not held is refused naming the refs held). A fork is
+findable with `run list --query "forked_from='<run>'"` (`ForkedFromRunId` search attribute).
+
+Every fork, one from a cognition point included, starts from a Snapshot and none is taken
+automatically: `latest_or_take` uses the newest sealed one or takes one, which
+`build_run_snapshot` allows only at a safe boundary (started, a stage settlement accepted, no
+stage, liability, unit, effect, usage, Command, continuation, child or linked run in flight).
+A Human Gate keeps its stage `waiting`, so a run parked at a gate with no earlier Snapshot is
+refused `CHECKPOINT_INVALID`; since 2026-11-16 the refusal names what holds the boundary open
+(`snapshot_refusal`; `reasons` such as `stage_active:<stage>` on HTTP and MCP). Sealing a
+Snapshot at stage settlement, or treating a gate wait as a boundary, is an owner decision.
 
 Restore is lane specific. `cursor_local` freezes a lease as `mc.cursor_snapshot.v1` and
 `end_session` records the `cursor-snapshot:<ref>` on the released lease; the Snapshot service

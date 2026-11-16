@@ -660,8 +660,9 @@ async def test_mcp_tool_takes_by_point_and_unit() -> None:
         assert data["by"] == "step"
         assert [group["key"] for group in data["groups"]] == [P_STEP.point_id, P_CHILD.point_id]
         assert all(entry["schema_version"] == "mc.transcript_entry.v2" for entry in data["entries"])
+        # Structured entries are the default; JSON Lines is asked for by name.
         jsonl = await client.call_tool(
-            TRANSCRIPT_TOOL, {"run_id": RUN_KEY, "by": "stage", "unit": UNIT}
+            TRANSCRIPT_TOOL, {"run_id": RUN_KEY, "format": "jsonl", "by": "stage", "unit": UNIT}
         )
         content = jsonl.structured_content
         assert content is not None

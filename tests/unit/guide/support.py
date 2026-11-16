@@ -17,6 +17,7 @@ from uuid import UUID
 from fastmcp import FastMCP
 
 from mission_control.adapters.deep_agents.compile import deep_agents_lane
+from mission_control.adapters.deep_agents.describe import SANDBOX_BACKEND_FACTS
 from mission_control.application.guide.mission_templates import load_template, mission_templates
 from mission_control.application.guide.service import GuideService
 from mission_control.application.resolution.registries import (
@@ -51,8 +52,19 @@ from tests.unit.selection.test_selection_workspace import (
 )
 
 APPLICATION = "biotech"
-# The sandbox profiles a deployment's launch bindings bind, as the composition reads them.
+# The sandbox profiles a deployment's launch bindings bind, as the composition reads them
+# (`bootstrap/selection.bound_sandbox_details`): the one line, and what the binding declares.
 SANDBOXES: Mapping[str, str] = {"research.standard": "docker sandbox bound by this deployment"}
+SANDBOX_DETAILS: Mapping[str, Mapping[str, Any]] = {
+    "research.standard": {
+        "summary": SANDBOXES["research.standard"],
+        "backend": "docker",
+        **SANDBOX_BACKEND_FACTS["docker"],
+        "idle_ttl_seconds": 300,
+        "definition": "sandbox.docker@1",
+        "same_binding_as": [],
+    }
+}
 INSTALLATION = UUID("11111111-1111-4111-8111-111111111111")
 TENANT = UUID("22222222-2222-4222-8222-222222222222")
 # The scoped registries `create_operator_server` reads from the API's `app.state`.
@@ -139,6 +151,7 @@ def stub_guide(
         catalog=workspace if catalog else None,
         features=LANE_FEATURE_REGISTRIES,
         sandbox_profiles=sandboxes,
+        sandbox_details=SANDBOX_DETAILS if sandboxes else None,
     )
 
 
@@ -156,6 +169,7 @@ def full_guide() -> GuideService:
         lanes=lanes,
         models=models,
         sandbox_profiles=SANDBOXES,
+        sandbox_details=SANDBOX_DETAILS,
     )
 
 
@@ -190,6 +204,11 @@ def operator_server(guides: dict[Any, GuideService] | None = None) -> FastMCP:
     state = SimpleNamespace(
         **{f"mission_control_{name}": {key: object()} for name in OPERATOR_REGISTRIES}
     )
+    # A catalog that composes search, external discovery and candidate inspection, so the
+    # listing holds every tool the operator server can register.
+    state.mission_control_catalog_services = {
+        key: SimpleNamespace(search=object(), discovery=object(), inspection=object())
+    }
     if guides is not None:
         state.mission_control_guides = guides
     return create_operator_server(state)

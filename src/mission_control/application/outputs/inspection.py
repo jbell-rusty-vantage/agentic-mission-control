@@ -14,8 +14,13 @@ Focused public reads over the immutable WI-01/WI-02 records, never a recomputati
   attempt receipt.
 
 HTTP, ``missionctl`` and the operator MCP call these handlers; they share one permission
-(``workflow_run.read``). Content bodies are not here: bounded content is the coordinator inbox's
-explicit retrieval.
+(``workflow_run.read``).
+
+- ``content``: the bounded text of one promise's exact accepted revision (or, where none is
+  accepted yet, its latest finalized submitted one), through the reader behind the coordinator
+  inbox's content retrieval (``NoticeContentService``) and under its grant
+  (``workflow.result.read``). It needs no notification: a coordinator that inspects a run can
+  read what the run produced.
 """
 
 from __future__ import annotations
@@ -28,10 +33,25 @@ from uuid import UUID
 
 from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, JsonValue
 
+from mission_control.application.frames.cost import RunCostReader
+from mission_control.application.subscriptions.notice_content import (
+    CONTENT_PERMISSION,
+    NoticeContentService,
+)
+from mission_control.contracts.contracts import RunCostView
+from mission_control.domain.coordinator.attention import (
+    MAX_EXCERPT_CHARS,
+    ExcerptBundle,
+    NoticeContent,
+)
+from mission_control.domain.outputs.contracts import ExactOutput
 from mission_control.domain.policies.contracts import ActorContext
 
 READ_PERMISSION: Final = "workflow_run.read"
 MAX_PAGE: Final = 200
+# A direct read of an output's text is a coordinator's review of it.
+CONTENT_PURPOSE: Final = "coordinator_review"
+DEFAULT_CONTENT_CHARS: Final = 4_000
 EventKind = Literal[
     "output.submitted", "assessment.recorded", "fulfillment.decided", "delivery.recorded"
 ]
@@ -165,6 +185,8 @@ class RunOutputs(_View):
     assessments: tuple[AssessmentView, ...]
     transfer_plans: tuple[PlanSummary, ...]
     actionable: tuple[ActionableItem, ...]
+    # The run's model calls at list prices (`mc.run_cost.v1`), where a price source is composed.
+    cost: RunCostView | None = Field(default=None, exclude_if=lambda value: value is None)
 
 
 class RevisionPage(_View):
@@ -202,8 +224,27 @@ class TransferPlanDetail(_View):
     receipts: tuple[dict[str, JsonValue], ...]
 
 
+class OutputContent(_View):
+    """`mc.output_content.v1`: the bounded text of one promise's output. `status` is
+    `accepted` (the exact accepted revision), `submitted` (none accepted yet: the latest
+    finalized submitted revision) or `none`. `content.excerpts[].excerpt` is the text, with
+    its revision, digest, `source_chars` and `truncated`; `content.omissions` names every gap."""
+
+    schema_version: Literal["mc.output_content.v1"] = "mc.output_content.v1"
+    run_id: str
+    obligation_key: str
+    status: Literal["accepted", "submitted", "none"]
+    content: ExcerptBundle
+
+
+class FinalizedOutputs(Protocol):
+    """The finalized submitted revisions of a run's promises (WI-02), oldest first."""
+
+    async def finalized_outputs(self, scope: str, run_id: str) -> tuple[ExactOutput, ...]: ...
+
+
 class InspectionRejected(Exception):
-    """Typed refusal: unauthorized, invalid, not_found."""
+    """Typed refusal: unauthorized, invalid, not_found, unavailable."""
 
     def __init__(self, code: str, message: str) -> None:
         super().__init__(message)
@@ -334,14 +375,101 @@ def actionable_items(
 
 
 class OutputInspectionService:
-    def __init__(self, reader: OutputInspectionReader, *, request_scope: str) -> None:
+    def __init__(
+        self,
+        reader: OutputInspectionReader,
+        *,
+        request_scope: str,
+        content: NoticeContentService | None = None,
+        submitted: FinalizedOutputs | None = None,
+        cost: RunCostReader | None = None,
+    ) -> None:
         self._reader = reader
         self.request_scope = request_scope
+        # The bounded reader behind the coordinator inbox's content retrieval, and the
+        # finalized revisions a promise without an accepted head falls back to.
+        self._content = content
+        self._submitted = submitted
+        # What the run's model calls cost at list prices, beside what it produced.
+        self._cost = cost
 
     @staticmethod
     def _require(actor: ActorContext) -> None:
         if READ_PERMISSION not in actor.permissions:
             raise InspectionRejected("unauthorized", f"actor lacks {READ_PERMISSION}")
+
+    async def content(
+        self,
+        run_id: str,
+        obligation_key: str,
+        actor: ActorContext,
+        *,
+        max_chars: int = DEFAULT_CONTENT_CHARS,
+    ) -> OutputContent:
+        """The text of one promise's output, bounded: the exact accepted revision of each of
+        its deliverables, or, where none is accepted yet, the latest finalized submitted one
+        (`status` says which). The same reader, grant (`workflow.result.read`), digest check
+        and typed omissions as the coordinator inbox's content retrieval; no notification is
+        needed. Text is evidence with provenance, never instructions."""
+
+        self._require(actor)
+        if CONTENT_PERMISSION not in actor.permissions:
+            raise InspectionRejected(
+                "unauthorized",
+                f"actor lacks {CONTENT_PERMISSION}: an output's text needs the result-body grant",
+            )
+        if self._content is None:
+            raise InspectionRejected("unavailable", "no output content source is composed")
+        if not 1 <= max_chars <= MAX_EXCERPT_CHARS:
+            raise InspectionRejected("invalid", f"max_chars is 1..{MAX_EXCERPT_CHARS}")
+        run = _run(run_id)
+        scope = self.request_scope
+        promised = [item.obligation_key for item in await self._reader.obligations(scope, run)]
+        if obligation_key not in promised:
+            raise InspectionRejected(
+                "not_found",
+                f"the run promises no output {obligation_key!r}; it promises: "
+                f"{', '.join(promised) or 'nothing'}",
+            )
+        policy = NoticeContent(
+            mode="bounded_excerpts",
+            purpose=CONTENT_PURPOSE,
+            obligations=(obligation_key,),
+            max_excerpt_chars=max_chars,
+            max_total_chars=max_chars,
+        )
+        bundle = await self._content.bundle(
+            scope, run, policy, purpose=CONTENT_PURPOSE, actor=actor
+        )
+        status: Literal["accepted", "submitted", "none"] = "accepted"
+        if not bundle.excerpts and all(
+            item.code == "NO_ACCEPTED_REVISION" for item in bundle.omissions
+        ):
+            latest = await self._latest_submitted(scope, run, obligation_key)
+            status = "submitted" if latest else "none"
+            if latest:
+                bundle = await self._content.excerpts(
+                    latest, policy, purpose=CONTENT_PURPOSE, actor=actor, status="submitted"
+                )
+        return OutputContent(
+            run_id=run, obligation_key=obligation_key, status=status, content=bundle
+        )
+
+    async def _latest_submitted(
+        self, scope: str, run_id: str, obligation_key: str
+    ) -> tuple[ExactOutput, ...]:
+        """The newest finalized revision of each deliverable of the promise."""
+
+        if self._submitted is None:
+            return ()
+        newest: dict[str, ExactOutput] = {}
+        for output in await self._submitted.finalized_outputs(scope, run_id):
+            if output.obligation_key != obligation_key:
+                continue
+            prior = newest.get(output.deliverable_id)
+            if prior is None or output.revision > prior.revision:
+                newest[output.deliverable_id] = output
+        return tuple(newest[key] for key in sorted(newest))
 
     async def outputs(self, run_id: str, actor: ActorContext) -> RunOutputs:
         self._require(actor)
@@ -362,6 +490,7 @@ class OutputInspectionService:
             assessments=assessments,
             transfer_plans=plans,
             actionable=actionable_items(obligations, fulfillment, assessments, plans),
+            cost=await self._cost.run_cost(scope, run) if self._cost is not None else None,
         )
 
     async def revisions(
@@ -427,16 +556,20 @@ class OutputInspectionService:
 
 
 __all__ = [
+    "CONTENT_PURPOSE",
+    "DEFAULT_CONTENT_CHARS",
     "READ_PERMISSION",
     "AcceptedView",
     "ActionableItem",
     "AssessmentView",
     "DecisionView",
     "EventPage",
+    "FinalizedOutputs",
     "FindingView",
     "FulfillmentView",
     "InspectionRejected",
     "ObligationView",
+    "OutputContent",
     "OutputEvent",
     "OutputInspectionReader",
     "OutputInspectionService",

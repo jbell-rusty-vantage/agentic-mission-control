@@ -28,10 +28,7 @@ from mission_control.application.execution.cognition_points import (
     CognitionPointRepository,
     page_size,
 )
-from mission_control.application.execution.harness.time_travel import (
-    TimeTravelRegistry,
-    TimeTravelUnsupported,
-)
+from mission_control.application.execution.harness.time_travel import TimeTravelRegistry
 from mission_control.application.frames.sink import FrameReader
 from mission_control.application.frames.transcript import ArtifactBodyReader
 from mission_control.domain.execution.cognition_points import (
@@ -173,7 +170,7 @@ class CognitionPointReadService:
 
         record = await self.get_point(run_id, point_id)
         if not self._time_travel.supports(record.lane_profile):
-            raise TimeTravelUnsupported(record.lane_profile)
+            raise self._time_travel.unsupported(record.lane_profile)
         # K3 (2026-11-05): a session lane reads scoped frames and snapshots, so it is
         # bound to this service's request scope; the Deep Agents saver ignores it.
         lane = self._time_travel.lane(record.lane_profile, request_scope=self._scope)

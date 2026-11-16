@@ -142,6 +142,11 @@ class MissionClient:
 
         return self.client.get(f"{self.prefix}/describe", params={"ref": ref})
 
+    def whoami(self) -> httpx.Response:
+        """`whoami`: the token's actor, tenant, permissions, refs and reviewer names."""
+
+        return self.client.get(f"{self.prefix}/whoami")
+
     def catalog_pin(self, pin: str) -> httpx.Response:
         """FT-A8: inspect one Capability Pin (body, host support, members)."""
         return self.client.get(f"{self.prefix}/catalog/pins/{quote(pin, safe='')}")
@@ -1603,7 +1608,7 @@ def main(argv: list[str] | None = None) -> int:
                 return run_knowledge(client, args)
             if args.group in {"search", "workspace"}:
                 return run_selection(client, args)
-            if args.group in {"guide", "describe"}:
+            if args.group in {"guide", "describe", "whoami"}:
                 return run_guide(client, args)
             deadline = time.monotonic() + (deadline_seconds or 0)
             started = False

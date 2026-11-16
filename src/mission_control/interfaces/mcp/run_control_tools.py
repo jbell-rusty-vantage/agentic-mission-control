@@ -55,6 +55,7 @@ class RunControlPrincipal(Protocol):
     def request_scope(self) -> str: ...
 
 
+STALE_CODES = frozenset({"stale_version", "stale_generation"})
 _REJECTION_CODES: dict[str, CoordinatorErrorCode] = {
     "unauthorized": CoordinatorErrorCode.FORBIDDEN,
     "stale_version": CoordinatorErrorCode.CONFLICT,
@@ -67,12 +68,21 @@ def domain_error(error: Exception) -> CoordinatorDomainError:
     """The MCP error envelope of a run-control rejection (the HTTP status's equivalent)."""
 
     if isinstance(error, MissionControlRejected):
-        details = {"code": error.code}
+        # What a grant refusal required and what the principal holds travels in `details`.
+        details = {"code": error.code, **error.details}
+        message = str(error)
         if error.frontier is not None:
+            # The current frontier, machine-readable: `version`, `execution_generation`, `phase`.
             details.update({key: str(value) for key, value in error.frontier.items()})
+            if error.code in STALE_CODES:
+                message = (
+                    f"{error}: current version {error.frontier.get('version')}, "
+                    f"execution_generation {error.frontier.get('execution_generation')}; resend "
+                    "once with these as expected_version and expected_generation"
+                )
         return CoordinatorDomainError(
             code=_REJECTION_CODES.get(error.code, CoordinatorErrorCode.INVALID_ARGUMENT),
-            message=str(error),
+            message=message,
             details=details,
         )
     if isinstance(error, RunControlNotFound | ForkSnapshotNotFound):
@@ -80,6 +90,11 @@ def domain_error(error: Exception) -> CoordinatorDomainError:
             code=CoordinatorErrorCode.NOT_FOUND, message="run or snapshot not found"
         )
     if isinstance(error, ForkRejected):
+        fork_details: dict[str, str] = {"code": error.code}
+        if error.reasons:
+            # As the HTTP route's `reasons`: what holds a safe boundary open, or the stages a
+            # strict frontier must add.
+            fork_details["reasons"] = ",".join(error.reasons)
         return CoordinatorDomainError(
             code=(
                 CoordinatorErrorCode.FORBIDDEN
@@ -87,7 +102,7 @@ def domain_error(error: Exception) -> CoordinatorDomainError:
                 else CoordinatorErrorCode.CONFLICT
             ),
             message=str(error),
-            details={"code": error.code},
+            details=fork_details,
         )
     if isinstance(error, IdempotencyConflict | RunVersionConflict):
         return CoordinatorDomainError(
@@ -217,17 +232,10 @@ def register_run_control_tools(
 
     @server.tool(name=RUN_INSPECT_TOOL, annotations={"readOnlyHint": True})
     async def mission_run_inspect(run_id: str, context: Context) -> dict[str, object]:
-        """Read a run's current state: lifecycle, phase, outcome and its control sections.
-
-        Call it before mission_command_send (it gives the `version` and
-        `execution_generation` a Command must name) and afterwards to see the delivery. To
-        read what the run did, use mission_run_transcript.
-        Returns `lifecycle` (pending, running, paused, completed), `phase`,
-        `execution_outcome` (how execution ended, not whether the mission was accepted) and,
-        where the run has them, `lane`, `sessions`, `mailbox`, `delivery_reports`,
-        `frames_cursor`, `chain`, `stop_fence`, `points_incomplete`, `unit_failures`,
-        `budget` and fork `lineage`.
-        """
+        """Read a run's current state: `lifecycle`, `phase`, `execution_outcome`, its `budget`,
+        its estimated `cost` and its control sections. It gives the `version` and
+        `execution_generation` a Command must name. Sections:
+        mission_describe('tool:mission_run_inspect')."""
 
         async def invoke(principal: Any) -> object:
             return await run_control.inspect(principal, run_id=run_id)

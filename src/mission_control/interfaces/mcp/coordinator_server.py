@@ -91,6 +91,9 @@ class CoordinatorPrincipal:
     # FT-F4: the sponsorships and approvals the verified identity holds (forks admit runs).
     sponsorship_refs: frozenset[str] = frozenset()
     approval_refs: frozenset[str] = frozenset()
+    # The grant's authority refs, reported by `mission_whoami` only: the MCP tools build their
+    # actor without them, as before.
+    authority_refs: frozenset[str] = frozenset()
 
 
 class PrincipalResolver(Protocol):

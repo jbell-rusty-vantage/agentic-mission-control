@@ -107,6 +107,7 @@ from mission_control.application.execution.service import (
     RunControlService,
 )
 from mission_control.application.frames.artifact_bodies import ArtifactPayloadReader
+from mission_control.application.frames.cost import FrameRunCost, UsagePrices
 from mission_control.application.frames.transcript import TranscriptService
 from mission_control.application.human_tasks.service import HumanTaskService
 from mission_control.application.installations.registry import (
@@ -242,6 +243,7 @@ async def compose_application_services(
     cluster: TemporalClusterIdentity | None = None,
     time_travel: Callable[[], TimeTravelRegistry | None] | None = None,
     fork_seed_runner: ForkSeedRunner | None = None,
+    usage_prices: UsagePrices | None = None,
 ) -> MissionApplicationServices:
     if registry is not None:
         registry.disable(binding.application_id)
@@ -401,6 +403,17 @@ async def compose_application_services(
                 failures=PostgresUnitFailureReader(runtime_pool),
                 # Tracing Stage 2 (FX-TR-BUDGET): the budget account on `run inspect`.
                 budget=PostgresBudgetViewReader(runtime_pool),
+                # The run's model calls at the Model Catalog's list prices, where the process
+                # composed the catalog (the API); a process without it reports no cost.
+                cost=(
+                    FrameRunCost(
+                        PostgresFrameRepository(runtime_pool),
+                        usage_prices,
+                        runs=PostgresMissionEventReader(runtime_pool),
+                    )
+                    if usage_prices is not None
+                    else None
+                ),
             ),
             # MP-11: an admitted cancel closes the run's open approval tasks.
             approvals=HumanTaskService(

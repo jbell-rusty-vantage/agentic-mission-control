@@ -19,4 +19,4 @@ A Mission Manifest is one YAML document: the mission's goals, its `environment` 
 
 A goal is owned by the last stage whose `objectives` name it or one of its objectives. `schema` starts only where every `evidence` output is a structured output of the owning node with that schema, and the schema is a published `artifact_schema`. A refused operator still compiles: the report says `ok: true` and `startable: false` and names it in `start_blockers` (`completion_evaluator_unavailable`). To accept text by review, end a Stage Graph with a `human_gate` whose `objectives` name every goal.
 
-On a lane that requires `sandbox`, a node starts only when `sandbox.profile` names a bound sandbox profile. List them with {op:list_sandboxes}.
+On a lane that requires `sandbox`, a node starts only when `sandbox.profile` names a bound sandbox profile. The list above says what each one suits; read one in full (backend, command execution, network, files, lifetime) with {op:describe_sandbox} and list them with {op:list_sandboxes}.

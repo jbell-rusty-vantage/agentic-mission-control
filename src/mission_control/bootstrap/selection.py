@@ -13,8 +13,10 @@ the deployment's launch bindings bind.
 from __future__ import annotations
 
 from collections.abc import Mapping
+from typing import Any
 
 from mission_control.adapters.deep_agents.compile import deep_agents_lane
+from mission_control.adapters.deep_agents.describe import SANDBOX_BACKEND_FACTS
 from mission_control.application.authoring.manifest_launch_inputs import ManifestLaunchBindings
 from mission_control.application.capabilities.catalog import CatalogService
 from mission_control.application.guide.mission_templates import mission_templates
@@ -45,6 +47,19 @@ def bound_sandbox_profiles(settings: Settings) -> dict[str, str] | None:
     resolves against the same file at launch. `None` where the process reads no launch
     bindings (it launches nothing, so it cannot say which profiles are bound)."""
 
+    details = bound_sandbox_details(settings)
+    if details is None:
+        return None
+    return {name: str(facts["summary"]) for name, facts in details.items()}
+
+
+def bound_sandbox_details(settings: Settings) -> dict[str, dict[str, Any]] | None:
+    """Each bound sandbox profile as its launch binding declares it, name -> facts: the
+    backend and what that backend gives a node (`SANDBOX_BACKEND_FACTS`), the idle lifetime,
+    the pinned sandbox definition, the secrets it names, and the other profiles that bind the
+    same sandbox. `summary` is the one line the listings show. `None` where the process reads
+    no launch bindings."""
+
     path = settings.manifest_launch_bindings_path
     if path is None:
         return None
@@ -53,10 +68,43 @@ def bound_sandbox_profiles(settings: Settings) -> dict[str, str] | None:
     except ValueError:
         # The launch composition reports an unreadable bindings file; the guide does not.
         return None
-    return {
-        name: f"{component.backend} sandbox bound by this deployment"
-        for name, component in sorted(bindings.sandbox_profiles.items())
-    }
+    components = dict(sorted(bindings.sandbox_profiles.items()))
+    details: dict[str, dict[str, Any]] = {}
+    for name, component in components.items():
+        backend = SANDBOX_BACKEND_FACTS.get(component.backend, {})
+        twins = [
+            other
+            for other, twin in components.items()
+            if other != name
+            and (twin.ref.digest, twin.backend, twin.runtime_digest, twin.snapshot_ref)
+            == (
+                component.ref.digest,
+                component.backend,
+                component.runtime_digest,
+                component.snapshot_ref,
+            )
+        ]
+        definition = f"{component.ref.logical_id}@{component.ref.revision}"
+        summary = (
+            f"`{component.backend}` backend: {backend.get('suits', 'see its describe')}; "
+            f"execution: {backend.get('execution', 'undeclared')}; network: "
+            f"{backend.get('network', 'undeclared')}"
+        )
+        if twins:
+            summary += f"; binds the same sandbox as {', '.join(f'`{twin}`' for twin in twins)}"
+        details[name] = {
+            "summary": summary,
+            "backend": component.backend,
+            **{key: backend[key] for key in ("execution", "network", "files", "suits") if backend},
+            "idle_ttl_seconds": component.idle_ttl_seconds,
+            "definition": definition,
+            "definition_digest": component.ref.digest,
+            "runtime_digest": component.runtime_digest,
+            "starts_from_snapshot": component.snapshot_ref is not None,
+            "secret_names": [str(ref.key) for ref in component.credential_refs],
+            "same_binding_as": twins,
+        }
+    return details
 
 
 def compose_selection_workspace(
@@ -116,6 +164,7 @@ def compose_settings_selection_workspace(
 
 
 __all__ = [
+    "bound_sandbox_details",
     "bound_sandbox_profiles",
     "compose_selection_workspace",
     "compose_settings_selection_workspace",

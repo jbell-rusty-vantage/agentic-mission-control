@@ -14,6 +14,7 @@ from __future__ import annotations
 import asyncio
 import importlib.util
 import sys
+from dataclasses import replace
 from pathlib import Path
 from types import ModuleType
 from typing import Any
@@ -50,6 +51,7 @@ from tests.fixtures.catalog.fast_track_catalog import NOW, fast_track_catalog
 from tests.fixtures.catalog_http import INSTALLATION, TENANT, catalog_harness
 from tests.unit.guide.support import (
     OPERATOR_REGISTRIES,
+    SANDBOX_DETAILS,
     SANDBOXES,
     lowered_rows,
     workspace_entries,
@@ -58,8 +60,8 @@ from tests.unit.selection.test_selection_workspace import NARROW_WORKFLOW, OPEN_
 
 ROOT = Path(__file__).resolve().parents[3]
 BOUND_LANES = ("deep_agents", "cursor_local", "claude_agent_sdk")
-# What the evaluation asks, one check each, beside one compile per template.
-QUESTIONS = 23
+# What the evaluation asks without a run id, one check each, beside one compile per template.
+QUESTIONS = 27
 
 
 def _evaluation() -> ModuleType:
@@ -109,12 +111,21 @@ def _application() -> Any:
     key = (INSTALLATION, "biotech", TENANT)
     for name in OPERATOR_REGISTRIES:
         setattr(app.state, f"mission_control_{name}", {key: object()})
+    # As an API that composes external discovery and candidate inspection beside its search.
+    app.state.mission_control_catalog_services = {
+        key: replace(harness.service, discovery=object(), inspection=object())  # type: ignore[arg-type]
+    }
     app.state.mission_control_lanes = lanes
     app.state.mission_control_model_catalogs = {"biotech": models}
     app.state.mission_control_selection_workspaces = {key: workspace}
     app.state.mission_control_guides = {
         key: compose_guide(
-            workspace=workspace, lanes=lanes, models=models, sandbox_profiles=SANDBOXES
+            workspace=workspace,
+            lanes=lanes,
+            models=models,
+            sandbox_profiles=SANDBOXES,
+            sandbox_details=SANDBOX_DETAILS,
+            external_discovery=True,
         )
     }
     # The real compile over the same catalog: the launch section compiles every template.
@@ -153,23 +164,43 @@ def test_the_evaluation_scores_the_guide_the_listing_and_the_templates() -> None
 
     results = {(check.path, check.question): check for check in card.checks}
     failed = sorted(question for (_path, question), check in results.items() if not check.passed)
-    # Everything a consumer asks is answered; the tool listing is still above the ceiling.
-    assert failed == ["Is the tool listing small enough to read every session?"], [
+    # Everything a consumer asks is answered, the tool listing inside its ceiling included.
+    assert failed == [], [
         (check.question, check.observed) for check in card.checks if not check.passed
     ]
+    # Without a run id the four checks that read a run are not run.
     assert len(card.checks) == QUESTIONS + len(TEMPLATE_IDS)
     assert evaluation.GUIDE_TOPICS == TOPIC_IDS
 
     def observed(path: str, question: str) -> str:
         return str(results[(path, question)].observed)
 
-    assert "41 tools" in observed("mcp", "Is every tool self-explanatory?")
-    assert "for 41 tools, mission_manifest_compile among them" in observed(
+    assert "47 tools" in observed("mcp", "Is every tool self-explanatory?")
+    assert "for 47 tools, mission_manifest_compile among them" in observed(
         "mcp", "Does describe answer for every tool?"
     )
+    listing = observed("mcp", "Is the tool listing small enough to read every session?")
+    assert "entries with an `outputSchema`: 0; with `_meta`: 3" in listing
+    who = observed("mcp", "Who am I, and what do I hold?")
+    assert "actor reader" in who and "reviews_as ['reader']" in who
+    assert "fields absent: none" in who and "the same document: True" in who
     assert "prompts: 1; resources: 11" in observed("mcp", "Where do I start?")
     markdown = observed("mcp", "Does a page arrive as Markdown?")
     assert "11 pages; not Markdown: none" in markdown and "manifest ~" in markdown
+    assert "structured content repeating the page: none" in markdown
+    discovery = observed(
+        "mcp", "Can I look for a capability the catalog lacks, and pin one it has?"
+    )
+    assert "absent of" in discovery and ": none; mission_whoami" in discovery
+    assert "server.external_discovery: composed" in discovery
+    sandbox = observed("mcp", "What does each sandbox profile give me?")
+    assert "sandbox:research.standard: backend docker" in sandbox
+    assert "no line in mission_guide('manifest'): none" in sandbox
+    # A capability written as a search resolves to the capability it names, and the
+    # resolution says who answered (this catalog's projection is built: `lexical`).
+    searched = observed("mcp", "Does a manifest whose capability is a `search` entry compile?")
+    assert "ok True" in searched and "resolved to tool.knowledge-submit-output@" in searched
+    assert "search_mode lexical" in searched
     # The workflow systems, the templates, and the two published Workflow Types counted apart
     # from the one manifest's lowered Workflow Type.
     workflows = observed("mcp", "How do I look up all workflow types?")
@@ -200,6 +231,6 @@ def test_the_evaluation_scores_the_guide_the_listing_and_the_templates() -> None
     )
     report = evaluation.render(card)
     assert report.startswith(
-        f"Consumer surface: {QUESTIONS + len(TEMPLATE_IDS) - 1} of "
+        f"Consumer surface: {QUESTIONS + len(TEMPLATE_IDS)} of "
         f"{QUESTIONS + len(TEMPLATE_IDS)} checks pass (biotech at"
     )

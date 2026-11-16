@@ -16,7 +16,7 @@ from mission_control.contracts.admission_contracts import (
     MissionAdmissionRequest,
     MissionLaunchRequest,
 )
-from mission_control.contracts.contracts import MissionControlRejected
+from mission_control.contracts.contracts import MissionControlRejected, grant_not_held
 from mission_control.domain.policies.contracts import ActorContext, AdmissionDecision, RunRequest
 
 
@@ -50,9 +50,9 @@ class MissionAdmissionService:
             raise MissionControlRejected("unauthorized", "admission permission required")
         request = MissionAdmissionRequest.model_validate(request.model_dump(mode="python"))
         if request.sponsorship_ref not in sponsorship_refs:
-            raise MissionControlRejected("unauthorized", "sponsorship was not granted")
+            raise grant_not_held("sponsorship", (request.sponsorship_ref,), sponsorship_refs)
         if not set(request.approval_refs) <= approval_refs:
-            raise MissionControlRejected("unauthorized", "approval was not granted")
+            raise grant_not_held("approval", request.approval_refs, approval_refs)
         if not request.delegation_authority_refs <= actor.authority_refs:
             raise MissionControlRejected("unauthorized", "delegation authority was not granted")
         body = request.model_dump(mode="python", exclude={"schema_version", "request_id"})

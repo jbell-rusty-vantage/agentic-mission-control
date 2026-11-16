@@ -608,7 +608,8 @@
     "supported_profiles": [],
     "version": "1"
    },
-   "role": "capability"
+   "role": "capability",
+   "search_mode": "lexical"
   },
   {
    "alias": "git_snapshot",
@@ -644,7 +645,8 @@
     "supported_profiles": [],
     "version": "1"
    },
-   "role": "capability"
+   "role": "capability",
+   "search_mode": "lexical"
   },
   {
    "alias": "verifier",
@@ -688,7 +690,8 @@
     ],
     "version": "1"
    },
-   "role": "agent"
+   "role": "agent",
+   "search_mode": "lexical"
   },
   {
    "alias": "shell_policy",
@@ -729,7 +732,8 @@
     ],
     "version": "1"
    },
-   "role": "hook"
+   "role": "hook",
+   "search_mode": "lexical"
   },
   {
    "alias": "agent_browser",
@@ -769,7 +773,8 @@
     ],
     "version": "1"
    },
-   "role": "plugin"
+   "role": "plugin",
+   "search_mode": "lexical"
   },
   {
    "alias": "verify_change",
@@ -805,7 +810,8 @@
     "supported_profiles": [],
     "version": "1"
    },
-   "role": "assessment"
+   "role": "assessment",
+   "search_mode": "lexical"
   },
   {
    "alias": null,

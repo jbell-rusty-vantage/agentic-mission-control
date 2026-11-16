@@ -43,7 +43,6 @@ registry, a declaration or a catalog row.
 
 from __future__ import annotations
 
-import re
 import time
 from collections.abc import Callable, Iterable, Mapping, Sequence
 from typing import Final, Literal, Protocol
@@ -56,6 +55,11 @@ from mission_control.application.capabilities.capability_search_repository impor
     CapabilitySearchUnavailable,
 )
 from mission_control.application.capabilities.catalog import find_published_by_pin
+from mission_control.application.capabilities.definition_scan import (
+    scan_definitions,
+    score_fields,
+)
+from mission_control.application.capabilities.definition_scan import tokens as _tokens
 from mission_control.application.resolution.ports import (
     ApplicationRegistry,
     LaneRegistration,
@@ -832,19 +836,8 @@ class SelectionWorkspace:
             return None
         if not rows or await self._projection_answers(rows[0]):
             return None
-        tokens = frozenset(_stem(token) for token in _tokens(query))
-        scored: list[tuple[float, PublishedDefinition, tuple[str, ...]]] = []
-        for row in rows:
-            fields = [
-                ("name", row.ref.logical_id, 3.0),
-                ("title", row.definition.title, 3.0),
-                ("kind", row.ref.kind.value, 2.0),
-                ("description", row.definition.description, 1.0),
-            ]
-            score, reasons = _score(tokens, fields, frozenset(), facet, stem=True)
-            if score > 0:
-                scored.append((score, row, reasons))
-        scored.sort(key=lambda item: (-item[0], item[1].ref.logical_id, item[1].ref.revision))
+        # The same scan the manifest compiler falls back to (`definition_scan.py`).
+        scored = scan_definitions(rows, query)
         hits = [
             (
                 score,
@@ -1233,16 +1226,6 @@ class SelectionWorkspace:
 # -- helpers -------------------------------------------------------------------------------------
 
 
-def _tokens(text: str) -> frozenset[str]:
-    return frozenset(re.findall(r"[a-z0-9]+", text.lower()))
-
-
-def _stem(token: str) -> str:
-    """A plural folded onto its singular (`skills` finds the kind `skill`); nothing more."""
-
-    return token[:-1] if len(token) > 3 and token.endswith("s") else token
-
-
 def _requested_facets(request: SelectionSearchRequest) -> tuple[Facet, ...]:
     """The facets in their fixed order; kinds named without facets ask capabilities only."""
 
@@ -1326,16 +1309,10 @@ def _score(
     *,
     stem: bool = False,
 ) -> tuple[float, tuple[str, ...]]:
-    """Weighted token overlap: each field adds its weight once per query token it contains."""
+    """Weighted token overlap (`score_fields`), plus a half point where the query names the
+    facet itself."""
 
-    score = 0.0
-    reasons: list[str] = []
-    for label, value, weight in fields:
-        words = _tokens(value)
-        matched = sorted(tokens & (frozenset(_stem(word) for word in words) if stem else words))
-        if matched:
-            score += weight * len(matched)
-            reasons.append(f"{label} {value!r} matches {', '.join(matched)}")
+    score, reasons = score_fields(tokens, fields, stemmed=stem)
     named = sorted(tokens & facet_words)
     if named:
         score += 0.5

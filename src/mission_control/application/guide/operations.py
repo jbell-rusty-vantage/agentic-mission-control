@@ -45,6 +45,7 @@ class Operation:
 
 OPERATIONS: Final[dict[str, Operation]] = {
     # -- the guide itself --------------------------------------------------------------------
+    "whoami": Operation("mission_whoami", "missionctl whoami", "GET whoami"),
     "guide_topic": Operation(
         'mission_guide("<topic>")', "missionctl guide TOPIC", "GET guide/{topic}"
     ),
@@ -85,6 +86,11 @@ OPERATIONS: Final[dict[str, Operation]] = {
         'mission_describe("manifest:<section>")',
         "missionctl describe manifest:SECTION",
         "GET describe?ref=manifest:SECTION",
+    ),
+    "describe_sandbox": Operation(
+        'mission_describe("sandbox:<profile>")',
+        "missionctl describe sandbox:PROFILE",
+        "GET describe?ref=sandbox:PROFILE",
     ),
     # -- selection ---------------------------------------------------------------------------
     "search": Operation("mission_search", "missionctl search", "POST selection/search"),
@@ -134,6 +140,17 @@ OPERATIONS: Final[dict[str, Operation]] = {
         'POST selection/search {"query": "...", "lane_profile": "PROFILE"}',
     ),
     "check": Operation("selection_check", "missionctl workspace check", "POST selection/check"),
+    # -- pin, and look outside the catalog (only where the server composes discovery) ---------
+    "pin": Operation("pin_capability", "missionctl catalog pin", "POST catalog/pin"),
+    "discover_mcp": Operation(
+        "discover_mcp_servers", "missionctl catalog discover", "POST catalog/discover"
+    ),
+    "discover_skills": Operation(
+        "discover_agent_skills", "missionctl catalog discover", "POST catalog/discover"
+    ),
+    "inspect_candidate": Operation(
+        "inspect_external_candidate", "missionctl catalog inspect", "POST catalog/inspect"
+    ),
     # -- author and launch -------------------------------------------------------------------
     "compile": Operation(
         "mission_manifest_compile", "missionctl mission compile", "POST missions:compile"
@@ -169,6 +186,11 @@ OPERATIONS: Final[dict[str, Operation]] = {
     "run_list": Operation("mission_run_list", "missionctl run list", "GET runs"),
     "outputs": Operation(
         "mission_run_outputs", "missionctl outputs show", "GET runs/{run_id}/outputs"
+    ),
+    "output_content": Operation(
+        "mission_run_output_content",
+        "missionctl outputs content",
+        "GET runs/{run_id}/outputs/{obligation_key}/content",
     ),
     "chain": Operation(
         "mission_chain_inspect", "missionctl chain inspect", "GET chains/{chain_id}"

@@ -10,7 +10,7 @@ questions:
   - How does Mission Control search workflows, providers and configuration?
   - Why did selection check refuse my draft?
   - How do I list every skill, MCP server or Workflow Type, and why was a search empty?
-updated: 2026-11-15
+updated: 2026-11-16
 ---
 
 # The Selection Workspace
@@ -49,6 +49,11 @@ projection is not built (or is stale) for that kind, so the workspace scans the 
 itself (name, kind, description) and says so: scanned hits carry the reason `definition scan`, `notes` names
 the scanned facets, and `catalog_search_mode` is `definition_scan` when no facet was ranked by the catalog
 (`definition_listing` for a listing). A scan has no semantic ranking and applies no selection policy.
+The Mission Manifest compiler falls back to the same scan (`application/capabilities/definition_scan.py`)
+for a `search` capability entry the projection answers with nothing: it scans the admitted rows a pin
+could name (kind, namespace, lane support), probes the projection the same way, and records
+`search_mode: definition_scan` on the entry of `resolution.resolved` with a warning; a projection that
+answers keeps its own mode and its own empty answer (`search_no_admitted_hits`).
 
 Three answers are not reusable catalog rows as such (2026-11-15). **Templates:** the `template` facet lists
 the curated mission templates the composition hands in (`template:<id>`, read with the guide's describe).

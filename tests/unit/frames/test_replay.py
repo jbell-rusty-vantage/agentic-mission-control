@@ -21,6 +21,7 @@ from fastmcp import Client, FastMCP
 
 from mission_control.adapters.storage.artifact_payloads import InMemoryArtifactPayloadStore
 from mission_control.application.execution.cognition_point_reads import (
+    CognitionPointNotFound,
     CognitionPointReadService,
     FrameReaderUnavailable,
     PointFramesUnavailable,
@@ -567,3 +568,81 @@ def test_cli_run_replay_requires_dry_run_and_prints_the_report(tmp_path: Any, ca
     printed = json.loads(capsys.readouterr().out)
     assert printed["exact"] is True and "batch" not in printed and printed["out"] == str(out)
     assert json.loads(out.read_text(encoding="utf-8")) == report
+
+
+# --- state as of: one service and one registry behind HTTP and MCP ---------------------------
+
+
+@pytest.mark.asyncio
+async def test_state_as_of_names_what_this_server_lacks_on_http_and_mcp() -> None:
+    """The MCP tool reads the service the API composed with its time-travel registry (it used
+    to read one without a registry and answered a bare `time_travel_unsupported` for a lane
+    the HTTP route could read). A lane the process could not compose names its prerequisite
+    in the refusal, on both transports."""
+
+    from mission_control.application.execution.harness.time_travel import TimeTravelRegistry
+    from mission_control.interfaces.mcp.cognition_point_tools import STATE_AS_OF_TOOL
+
+    world = await World().build()
+    prerequisite = "no runtime checkpoint DSN is configured for the API process"
+    registry = TimeTravelRegistry()
+    registry.mark_unavailable("deep_agents", prerequisite)
+    service = world.service().with_time_travel(registry)
+    assert service.time_travel is registry
+
+    server = FastMCP("state-as-of-test")
+    register_cognition_point_tools(
+        server,
+        ScopedCognitionPoints({SCOPE: service}),
+        Principals(FULL | {"workflow_run.read_checkpoint_summary"}),
+        call=_principal_call,
+    )
+    async with Client(server) as client:
+        refused = await client.call_tool(
+            STATE_AS_OF_TOOL, {"run_id": RUN, "point_id": world.point_id}
+        )
+    envelope = refused.structured_content
+    assert envelope is not None and envelope["ok"] is False
+    error = envelope["error"]
+    assert error["code"] == "DEPENDENCY_UNAVAILABLE" and error["retryable"] is False
+    assert error["details"] == {"reason": "time_travel_unsupported", "prerequisite": prerequisite}
+    assert "cannot read saved state of lane deep_agents" in error["message"]
+    assert prerequisite in error["message"]
+
+    app = http_app(world, FULL | {"workflow_run.read_checkpoint_summary"})
+    app.state.time_travel_registry = registry
+    over_http = TestClient(app).get(
+        f"/v1/applications/biotech/runs/{RUN}/points/{world.point_id}/state-as-of"
+    )
+    assert over_http.status_code == 501
+    assert over_http.json()["detail"] == {
+        "code": "time_travel_unavailable",
+        "reason": "time_travel_unsupported",
+        "prerequisite": prerequisite,
+    }
+
+    # A registry that holds the lane answers through the same service on MCP.
+    class _Lane:
+        lane_profile = "deep_agents"
+        asked: list[str] = []
+
+        async def read_as_of(self, record: Any) -> Any:
+            self.asked.append(record.point_id)
+            raise CognitionPointNotFound(record.point_id)
+
+    composed = TimeTravelRegistry()
+    composed.register(_Lane())  # type: ignore[arg-type]
+    answering = FastMCP("state-as-of-composed")
+    register_cognition_point_tools(
+        answering,
+        ScopedCognitionPoints({SCOPE: world.service().with_time_travel(composed)}),
+        Principals(FULL | {"workflow_run.read_checkpoint_summary"}),
+        call=_principal_call,
+    )
+    async with Client(answering) as client:
+        reached = await client.call_tool(
+            STATE_AS_OF_TOOL, {"run_id": RUN, "point_id": world.point_id}
+        )
+    # The lane was reached (its own answer here is "not found", never "unsupported").
+    assert _Lane.asked == [world.point_id]
+    assert reached.structured_content["error"]["code"] == "NOT_FOUND"  # type: ignore[index]

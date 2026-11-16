@@ -62,6 +62,7 @@ from mission_control.application.guide.tool_docs import (
     tool_notes,
     untitled_schema,
 )
+from mission_control.application.guide.whoami import PrincipalFacts, ServerFacts, WhoAmI, whoami
 from mission_control.application.resolution.lane_listing import describe_lane
 from mission_control.application.resolution.model_listing import describe_model
 from mission_control.application.resolution.registries import LaneRegistry, ModelCatalog
@@ -204,6 +205,8 @@ class GuideService:
         catalog: GuideCatalog | None = None,
         features: Mapping[str, FeatureRegistry] | None = None,
         sandbox_profiles: Mapping[str, str] | None = None,
+        sandbox_details: Mapping[str, Mapping[str, Any]] | None = None,
+        server: Callable[[], ServerFacts] | None = None,
     ) -> None:
         self._application_id = application_id
         self._lanes = lanes
@@ -213,8 +216,15 @@ class GuideService:
         # vendor rows of its model routes), composed by bootstrap from the lane's package.
         self._features = dict(features or {})
         # The sandbox profiles this deployment binds, name -> one line (`None`: this process
-        # reads no launch bindings, so it cannot say).
+        # reads no launch bindings, so it cannot say), and name -> what each launch binding
+        # declares (backend, what the backend gives, lifetime, the pinned definition).
         self._sandbox_profiles = None if sandbox_profiles is None else dict(sandbox_profiles)
+        self._sandbox_details = {
+            name: dict(facts) for name, facts in (sandbox_details or {}).items()
+        }
+        # What this process composed for the controls its lanes declare, read when asked (the
+        # composition may finish after the guide is built).
+        self._server = server
         self._sections: dict[str, Callable[[], Awaitable[str]]] = {
             INDEX: self._index_section,
             "interview": self._interview_section,
@@ -235,6 +245,17 @@ class GuideService:
     @property
     def application_id(self) -> str:
         return self._application_id
+
+    # -- who the caller is -----------------------------------------------------------------------
+
+    def server_facts(self) -> ServerFacts | None:
+        return self._server() if self._server is not None else None
+
+    def whoami(self, principal: PrincipalFacts) -> WhoAmI:
+        """The verified principal and its grant, with what this server composed
+        (`whoami.py`)."""
+
+        return whoami(principal, self.server_facts())
 
     # -- pages -----------------------------------------------------------------------------------
 
@@ -461,7 +482,7 @@ class GuideService:
                 f"{travel.read} / {travel.fork}" if travel is not None else "not declared",
             )
             grouped.setdefault(cells, []).append(profile)
-        return _table(
+        table = _table(
             [
                 "Lane profile",
                 *(f"`{command}`" for command in SENDABLE_COMMANDS),
@@ -470,6 +491,19 @@ class GuideService:
             ],
             [[_spans(profiles), *cells] for cells, profiles in grouped.items()],
         )
+        facts = self.server_facts()
+        if facts is None:
+            return table
+        # What this server composed for the declared restore levels (also in whoami); lanes
+        # that lack the same thing share a sentence.
+        readable = [row.lane_profile for row in facts.time_travel if row.state_as_of == "readable"]
+        missing: dict[str, list[str]] = {}
+        for row in facts.time_travel:
+            if row.state_as_of == "not_composed":
+                missing.setdefault(row.prerequisite or "not composed", []).append(row.lane_profile)
+        served = f"This server reads state at a point for {_spans(readable) or 'no lane'}."
+        gaps = [f" Not for {_spans(lanes)}: {why}." for why, lanes in missing.items()]
+        return f"{table}\n\n{served}{''.join(gaps)}"
 
     # -- describe --------------------------------------------------------------------------------
 
@@ -633,6 +667,13 @@ class GuideService:
                 "profile": profile,
                 "summary": bound[profile],
                 "manifest_field": "environment.sandbox.profile",
+                # What the launch binding declares: backend, what it gives, lifetime, the
+                # pinned definition and the profiles that bind the same sandbox.
+                **{
+                    key: value
+                    for key, value in self._sandbox_details.get(profile, {}).items()
+                    if key != "summary"
+                },
             },
         )
 
@@ -708,6 +749,16 @@ class GuideService:
 
 
 # -- helpers -------------------------------------------------------------------------------------
+
+
+def describe_markdown(result: DescribeResult) -> str:
+    """A describe answer as Markdown: its own where it is prose (a tool, a template, the
+    manifest reference), else its title and its data as one JSON block (a lane, a model, a
+    capability, a sandbox profile)."""
+
+    if result.markdown is not None:
+        return result.markdown
+    return f"# {result.title or result.ref}\n\n{_json_block(result.data)}"
 
 
 def _by_exact_ref(
@@ -787,4 +838,5 @@ __all__ = [
     "GuideService",
     "RefusalCode",
     "ToolListing",
+    "describe_markdown",
 ]

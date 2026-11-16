@@ -19,6 +19,7 @@ resolves ``approved`` or ``denied``.
 from __future__ import annotations
 
 import re
+from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Any, Final, Literal
@@ -424,6 +425,27 @@ def is_reviewer(spec: HumanGateSpec, actor_id: str, permissions: frozenset[str])
     )
 
 
+def reviewer_roles(permissions: Iterable[str]) -> tuple[str, ...]:
+    """The reviewer names a grant satisfies besides the principal's own actor id: `r` for
+    every permission `reviewer:r`, sorted."""
+
+    return tuple(
+        sorted(
+            permission.removeprefix(REVIEWER_PERMISSION_PREFIX)
+            for permission in permissions
+            if permission.startswith(REVIEWER_PERMISSION_PREFIX)
+            and len(permission) > len(REVIEWER_PERMISSION_PREFIX)
+        )
+    )
+
+
+def reviews_as(actor_id: str, permissions: Iterable[str]) -> tuple[str, ...]:
+    """Every `reviewers` entry the principal satisfies: its actor id, then its reviewer
+    roles."""
+
+    return tuple(dict.fromkeys((actor_id, *reviewer_roles(permissions))))
+
+
 def resolution_action(task_kind: str, decision: GateDecision) -> ResolutionAction:
     if task_kind == "REVIEW":
         return "review_accept" if decision == "approve" else "review_reject"
@@ -777,6 +799,8 @@ __all__ = [
     "packet_item",
     "resolution_action",
     "review_packet_digest",
+    "reviewer_roles",
+    "reviews_as",
     "stagegraph_gate_result",
     "timeout_disposition",
 ]

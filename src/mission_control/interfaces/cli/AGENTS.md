@@ -8,7 +8,7 @@ Entrypoints:
 - exits.py — missionctl exit codes: 0 success, 2 invalid, 3 denied, 4 conflict, 5 unavailable…
 - setup.py — Render the repository wizard pattern; credentials remain in provider/broker UIs
 - selection.py — missionctl search and missionctl workspace check: the Selection Workspace
-- guide.py — missionctl guide and missionctl describe: how to use the server, read from the…
+- guide.py — missionctl guide, describe and whoami: how to use the server, read from the server
 - knowledge.py — missionctl knowledge review: an operator's review of one exact KS use decision
 - token.py — Local token helper
 Tests: tests/unit/run_control/test_cli_command_cancel.py, tests/unit/capability/test_catalog_cli.py, tests/unit/prerequisites/test_bootstrap_cli.py

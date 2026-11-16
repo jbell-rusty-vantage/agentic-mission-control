@@ -289,3 +289,45 @@ def test_cli_points_pages_under_the_route_cap(capsys: pytest.CaptureFixture[str]
     assert [int(item["limit"]) for item in seen] == [500, 500, 100]
     assert cli.run_points(client, argparse.Namespace(**{**vars(args), "limit": 5_000})) == 0
     assert len(json.loads(capsys.readouterr().out)["entries"]) == 1_200
+
+
+async def test_the_mcp_tool_answers_structured_entries_by_default_one_small_page() -> None:
+    """With no `format` the tool returns entries an agent reads without unescaping a string of
+    JSON Lines, 20 a page; JSON Lines and Markdown stay options."""
+
+    principal = CoordinatorPrincipal(
+        actor_id="coordinator",
+        tenant_scope=SCOPE,
+        roles=frozenset(),
+        permissions=frozenset({"workflow.result.read"}),
+        request_scope=SCOPE,
+    )
+
+    class Principals:
+        async def resolve(self, context: Any) -> CoordinatorPrincipal:
+            del context
+            return principal
+
+    server = FastMCP("transcript-default-test")
+    register_transcript_tools(
+        server, ScopedTranscripts({SCOPE: transcript_service()}), Principals(), call=_principal_call
+    )
+    async with Client(server) as client:
+        tools = {tool.name: tool for tool in await client.list_tools()}
+        default = await client.call_tool(TRANSCRIPT_TOOL, {"run_id": RUN_KEY})
+        lines = await client.call_tool(TRANSCRIPT_TOOL, {"run_id": RUN_KEY, "format": "jsonl"})
+        first = await client.call_tool(TRANSCRIPT_TOOL, {"run_id": RUN_KEY, "limit": 3})
+
+    schema = tools[TRANSCRIPT_TOOL].inputSchema["properties"]
+    assert schema["format"]["default"] == "json" and schema["limit"]["default"] == 20
+    data = default.structured_content["data"]  # type: ignore[index]
+    assert data["format"] == "json" and "content" not in data
+    assert isinstance(data["entries"], list) and 0 < len(data["entries"]) <= 20
+    assert {"cursor", "kind"} <= set(data["entries"][0])
+    as_lines = lines.structured_content["data"]  # type: ignore[index]
+    assert as_lines["format"] == "jsonl" and "entries" not in as_lines
+    assert [json.loads(line)["cursor"] for line in as_lines["content"].splitlines()] == [
+        entry["cursor"] for entry in data["entries"]
+    ]
+    page = first.structured_content["data"]  # type: ignore[index]
+    assert len(page["entries"]) == 3 and page["has_more"] is True and page["next_cursor"]
