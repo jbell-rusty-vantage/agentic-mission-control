@@ -459,6 +459,18 @@ APPLICATION_NAME_ALLOWED = {
         "biotech_mission_adapters",
     ): "the optional integration package's schema, listed so the checkpoint login is proven "
     "unable to reach it (FORBIDDEN_SCHEMAS); it names a package, not an application",
+    # The 2026-11-07 environment naming program named the database planes after the
+    # applications (`MC_{AIENG,BIOTECH,LOCAL}_DB_*`, one plane per process chosen by
+    # `MISSION_CONTROL_APPLICATION`). These four literals are that mapping and one variable
+    # name; no application behaviour hangs on them. Moving the mapping into deployment data
+    # would remove them.
+    ("src/mission_control/bootstrap/settings.py", "ai-engineer"): "database plane selector key",
+    ("src/mission_control/bootstrap/settings.py", "biotech"): "database plane selector key",
+    ("src/mission_control/bootstrap/settings.py", "BIOTECH"): "database plane name",
+    (
+        "src/mission_control/domain/frames/body.py",
+        "MC_BIOTECH_DB_SECRET_KEY",
+    ): "an environment variable name in the secret redaction list",
 }
 
 

@@ -70,9 +70,10 @@ def plane_for_application(application: str | None) -> DbPlane:
         return "LOCAL"
     plane = _APPLICATION_PLANES.get(application)
     if plane is None:
+        known = ", ".join(sorted(_APPLICATION_PLANES))
         raise IntegrationConfigurationError(
             f"MISSION_CONTROL_APPLICATION={application} selects no database plane "
-            "(ai-engineer, biotech, or unset for the local Docker database)"
+            f"({known}, or unset for the local Docker database)"
         )
     return plane
 
