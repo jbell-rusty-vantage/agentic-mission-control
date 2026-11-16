@@ -14,6 +14,7 @@ from typing import get_args
 
 import pytest
 
+from mission_control.application.guide.mission_templates import TEMPLATE_IDS
 from mission_control.application.guide.operations import SURFACES, Surface
 from mission_control.application.guide.pages import (
     INDEX,
@@ -40,9 +41,11 @@ from tests.unit.selection.test_selection_workspace import (
     _registration,
 )
 
-# The owner's budgets, in tokens (characters of the rendered page divided by four).
+# The owner's budgets, in tokens (characters of the rendered page divided by four). The
+# manifest page carries the required fields, the values and the acceptance table.
 INDEX_TOKENS = 500
 TOPIC_TOKENS = 1_250
+TOPIC_BUDGETS = {"manifest": 1_500}
 
 
 def _tokens(text: str) -> int:
@@ -85,7 +88,12 @@ async def test_the_index_reports_this_installation_from_the_registries() -> None
     assert "`claude_agent_sdk`, `deep_agents`" in page.markdown
     assert f"{len(MODELS)} Model Profiles" in page.markdown
     assert f"{len(ROWS)} published catalog definitions" in page.markdown
+    assert f"{len(TEMPLATE_IDS)} mission templates" in page.markdown
     assert "no catalog is composed" in without_catalog.markdown
+    # The launch job starts from a template and the manifest page.
+    row = next(line for line in page.markdown.splitlines() if "Author and launch" in line)
+    assert "`templates`, `manifest`, `launch`" in row
+    assert '`mission_describe("template:<id>")`' in row
 
 
 # -- topics --------------------------------------------------------------------------------------
@@ -109,20 +117,28 @@ async def test_pages_stay_inside_their_budget_with_every_lane_bound() -> None:
     sizes = {topic: _tokens((await guide.topic(topic, "mcp")).markdown) for topic in TOPIC_IDS}
 
     assert _tokens(index.markdown) <= INDEX_TOKENS, _tokens(index.markdown)
-    assert all(size <= TOPIC_TOKENS for size in sizes.values()), sizes
+    assert all(size <= TOPIC_BUDGETS.get(topic, TOPIC_TOKENS) for topic, size in sizes.items()), (
+        sizes
+    )
 
 
 async def test_the_interview_page_names_the_brief_and_real_manifest_fields() -> None:
     from mission_control.domain.authoring.manifest import (
+        AgentExecutorNode,
         Budget,
         Environment,
         Goal,
+        GoalLoopNode,
         Governors,
+        HumanGateNode,
         HumanTaskSpec,
         InputBinding,
         MissionBlock,
+        Objective,
         OutputDeclaration,
+        SandboxSelection,
         SideEffect,
+        StageGraphNode,
         SuccessCriterion,
     )
 
@@ -134,14 +150,26 @@ async def test_the_interview_page_names_the_brief_and_real_manifest_fields() -> 
     assert "No interview record is persisted yet" in text
     for purpose in ("Research", "Building content", "Improving the system"):
         assert f"- {purpose}:" in text
-    # Every manifest field the mapping names exists on the manifest models.
+    # Every manifest field the mapping names exists on the manifest models. The table names
+    # what a first manifest needs: the keys, the objectives, the evidence, the instruction,
+    # the sandbox profile and the action space.
     named = {
-        MissionBlock: ("title", "description", "goals", "environment", "program", "application"),
-        Goal: ("description", "importance", "criteria"),
-        SuccessCriterion: ("description", "evidence", "acceptance"),
+        MissionBlock: (
+            "key",
+            "title",
+            "description",
+            "goals",
+            "environment",
+            "program",
+            "application",
+        ),
+        Goal: ("key", "description", "importance", "objectives", "criteria"),
+        Objective: ("key", "description"),
+        SuccessCriterion: ("key", "description", "evidence", "acceptance"),
         Environment: (
             "lane",
             "model",
+            "sandbox",
             "capabilities",
             "agents",
             "hooks",
@@ -151,17 +179,34 @@ async def test_the_interview_page_names_the_brief_and_real_manifest_fields() -> 
             "side_effects",
             "workspace",
         ),
+        SandboxSelection: ("profile",),
         Budget: ("usd", "tokens", "wall_clock", "tool_calls"),
         Governors: ("depth", "fan_out", "iterations", "rounds", "patience", "transfers"),
         InputBinding: ("name", "artifact", "value"),
         OutputDeclaration: ("name", "form", "requirements"),
+        AgentExecutorNode: ("key", "objectives", "instruction"),
+        HumanGateNode: ("key", "task"),
         HumanTaskSpec: ("kind", "prompt", "reviewers"),
+        StageGraphNode: ("key", "objectives", "nodes"),
+        GoalLoopNode: ("key", "objective", "action_space"),
     }
     for model, fields in named.items():
         for field in fields:
             assert field in model.model_fields, (model.__name__, field)
             assert f"`{field}" in text or f".{field}" in text, field
     assert all(f"`{effect.value}`" in text for effect in SideEffect)
+    # The importance values are the model's own, in its order.
+    values = get_args(Goal.model_fields["importance"].annotation)
+    assert "`importance` (" + ", ".join(f"`{value}`" for value in values[:-1]) in text
+    assert f"or `{values[-1]}`)" in text
+    assert "schema" in OutputDeclaration.model_json_schema(by_alias=True)["properties"]
+    assert "then `form` (`text` for prose) or a `schema`" in text
+    assert "`evidence` (a list of output names)" in text
+    assert "`acceptance` (a typed expression such as `human: review_accept`" in text
+    assert "`environment.sandbox.profile` where the lane requires a sandbox" in text
+    assert "both are required" in text
+    assert "aliases that name a capability, agent, plugin or node" in text
+    assert "Start from a template (topic `templates`)" in text
     assert f"`mission.application` is `{APPLICATION}`" in text
     assert "`manifest: mission/v2` or `manifest: mission/v1`" in text
     # The order of the last steps, and the stop before the consequential ones.
@@ -178,7 +223,27 @@ async def test_workflow_and_lane_tables_follow_the_lane_declarations() -> None:
     assert "| `deep_agents` | native | native | unqualified | unqualified |" in workflows
     assert "| `claude_agent_sdk` | native | unqualified | unqualified | unsupported |" in workflows
     assert "This installation allows unqualified lanes" in workflows
-    assert "published Workflow Types: 2" in workflows
+    assert (
+        "Published Workflow Types that are not lowered from a manifest: 2. Lowered from "
+        "submitted manifests and left out of listings: 0." in workflows
+    )
+    assert (
+        "The templates to start from (topic `templates`): `smallest`, `research-report`, "
+        "`staged-review`, `system-improvement`." in workflows
+    )
+    # The systems, then the templates, then what a Workflow Type is.
+    order = [
+        "| Stage Graph |",
+        "## What to start from",
+        "The templates to start from",
+        "A Workflow Type is",
+    ]
+    assert [workflows.index(part) for part in order] == sorted(
+        workflows.index(part) for part in order
+    )
+    without_catalog = (await stub_guide(catalog=False).topic("workflows")).markdown
+    assert "The catalog is not composed: no Workflow Type can be listed." in without_catalog
+    assert "{{" not in workflows
     row = next(line for line in lanes.splitlines() if line.startswith("| `claude_agent_sdk`"))
     # Placement, qualification, families, routed vendors and supported item kinds, each from
     # the declaration: openai, middleware and subagent profiles are unsupported there.
@@ -253,6 +318,43 @@ async def test_launch_and_observe_carry_the_rules() -> None:
     assert "Wait; never poll" in observe
     assert "One wait lasts at most 300 seconds" in observe
     assert "`terminal_result`" in observe and "Execution is not acceptance" in observe
+
+
+async def test_who_may_resolve_a_review_is_the_gate_s_own_rule() -> None:
+    """The page and the templates say who resolves a Human Task as `is_reviewer` decides it:
+    a listed actor id, or the holder of `reviewer:<name>`; anyone else is `not_reviewer`."""
+
+    from mission_control.application.guide.mission_templates import mission_templates
+    from mission_control.domain.programs.human_gate import (
+        REVIEWER_PERMISSION_PREFIX,
+        HumanGateSpec,
+        ResolutionRejection,
+        is_reviewer,
+    )
+
+    observe = (await stub_guide().topic("observe")).markdown
+    assert (
+        f"that actor id, or a principal holding the permission `{REVIEWER_PERMISSION_PREFIX}"
+        "<name>`; anyone else is refused `not_reviewer`" in observe
+    )
+    spec = HumanGateSpec.model_validate(
+        {
+            "gate_key": "review",
+            "task_kind": "REVIEW",
+            "prompt": "Review.",
+            "reviewers": ["owner", "operator:probe"],
+        }
+    )
+    assert is_reviewer(spec, "operator:probe", frozenset())
+    assert is_reviewer(spec, "someone", frozenset({f"{REVIEWER_PERMISSION_PREFIX}owner"}))
+    assert not is_reviewer(spec, "someone", frozenset({"workflow_run.control"}))
+    assert "not_reviewer" in get_args(ResolutionRejection)
+    # Every template with a human gate has the reviewer as a slot and says who can resolve.
+    for template in mission_templates():
+        slot = next((slot for slot in template.slots if slot.name == "reviewer"), None)
+        if "behavior: human_gate" in template.manifest:
+            assert slot is not None and "reviewers: [{{reviewer}}]" in template.manifest
+            assert "actor id" in slot.description and "reviewer role" in slot.description
 
 
 async def test_one_page_speaks_each_transport_s_vocabulary() -> None:

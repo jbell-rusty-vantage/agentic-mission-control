@@ -2,7 +2,8 @@
 
 ``guide [TOPIC]`` prints the start page (who you are, the jobs in order, the commands for
 each) or one topic; ``describe REF`` prints everything about one thing (`lane:<profile>`,
-`model:<profile>`, `feature:<id>`, `tool:<name>` or a Capability Pin). Both are thin clients of
+`model:<profile>`, `feature:<id>`, `tool:<name>`, `template:<id>`, `sandbox:<profile>`,
+`manifest`, `manifest:<section>` or a Capability Pin). Both are thin clients of
 `GET /guide[/{topic}]` and `GET /describe`, the routes behind the MCP tools ``mission_guide``
 and ``mission_describe``. Plain Markdown by default, with every call written as a `missionctl`
 command; ``--json`` prints the envelope (`mc.guide.v1`, `mc.describe.v1`). A refusal prints its
@@ -39,18 +40,21 @@ def add_guide_parsers(groups: Any, common: argparse.ArgumentParser) -> None:
         "describe", parents=[common], help="everything about one lane, model, tool or capability"
     )
     describe.add_argument(
-        "ref", help="lane:PROFILE, model:PROFILE, feature:ID, tool:NAME or a search hit's ref"
+        "ref",
+        help="lane:PROFILE, model:PROFILE, feature:ID, tool:NAME, template:ID, manifest, "
+        "manifest:SECTION or a search hit's ref",
     )
 
 
 def describe_markdown(document: dict[str, Any]) -> str:
-    """A describe envelope as Markdown: the notes as written, the rest as one JSON block."""
+    """A describe envelope as Markdown: the answer's own Markdown where it is prose (a tool, a
+    template, the manifest reference), else its title and its data as one JSON block."""
 
+    markdown = document.get("markdown")
+    if isinstance(markdown, str):
+        return markdown
     data = dict(document.get("data") or {})
-    notes = data.pop("notes", None)
     lines = [f"# {document.get('title') or document.get('ref', '')}", ""]
-    if isinstance(notes, str):
-        lines += [notes, ""]
     lines += ["```json", json.dumps(data, indent=2, ensure_ascii=False), "```"]
     return "\n".join(lines)
 

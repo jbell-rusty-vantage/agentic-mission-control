@@ -26,9 +26,15 @@ LANE_FEATURE_REGISTRIES: Final[Mapping[str, FeatureRegistry]] = {
 
 
 def compose_guide(
-    *, workspace: SelectionWorkspace, lanes: LaneRegistry, models: ModelCatalog
+    *,
+    workspace: SelectionWorkspace,
+    lanes: LaneRegistry,
+    models: ModelCatalog,
+    sandbox_profiles: Mapping[str, str] | None = None,
 ) -> GuideService:
-    """One application's guide over the registries its Selection Workspace was composed from."""
+    """One application's guide over the registries its Selection Workspace was composed from.
+    `sandbox_profiles` is what the workspace was given (`bootstrap/selection.py`): the sandbox
+    profiles the deployment binds, or `None` where the process reads no launch bindings."""
 
     return GuideService(
         application_id=workspace.application_id,
@@ -36,6 +42,7 @@ def compose_guide(
         models=models,
         catalog=workspace,
         features=LANE_FEATURE_REGISTRIES,
+        sandbox_profiles=sandbox_profiles,
     )
 
 

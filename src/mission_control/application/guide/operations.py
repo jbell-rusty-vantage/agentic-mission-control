@@ -71,6 +71,21 @@ OPERATIONS: Final[dict[str, Operation]] = {
         "missionctl describe tool:NAME",
         "GET describe?ref=tool:NAME",
     ),
+    "describe_template": Operation(
+        'mission_describe("template:<id>")',
+        "missionctl describe template:ID",
+        "GET describe?ref=template:ID",
+    ),
+    "describe_manifest": Operation(
+        'mission_describe("manifest")',
+        "missionctl describe manifest",
+        "GET describe?ref=manifest",
+    ),
+    "describe_manifest_section": Operation(
+        'mission_describe("manifest:<section>")',
+        "missionctl describe manifest:SECTION",
+        "GET describe?ref=manifest:SECTION",
+    ),
     # -- selection ---------------------------------------------------------------------------
     "search": Operation("mission_search", "missionctl search", "POST selection/search"),
     "list_lanes": Operation(
@@ -87,6 +102,21 @@ OPERATIONS: Final[dict[str, Operation]] = {
         'mission_search(facets=["workflow_type"], limit=50)',
         "missionctl search --facet workflow_type --limit 50",
         'POST selection/search {"facets": ["workflow_type"], "limit": 50}',
+    ),
+    "list_lowered": Operation(
+        'mission_search(facets=["workflow_type"], include_lowered=true)',
+        "missionctl search --facet workflow_type --include-lowered",
+        'POST selection/search {"facets": ["workflow_type"], "include_lowered": true}',
+    ),
+    "list_templates": Operation(
+        'mission_search(facets=["template"])',
+        "missionctl search --facet template",
+        'POST selection/search {"facets": ["template"]}',
+    ),
+    "list_sandboxes": Operation(
+        'mission_search(facets=["sandbox_profile"])',
+        "missionctl search --facet sandbox_profile",
+        'POST selection/search {"facets": ["sandbox_profile"]}',
     ),
     "list_kind": Operation(
         'mission_search(kinds=["skill"])',

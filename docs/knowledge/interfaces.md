@@ -34,7 +34,7 @@ scoped prefix unless stated.
 | `catalog` (`/catalog`) | `GET definitions`, `pins/{pin}`; `POST resolve`, `search`, `discover`, `inspect`, `components/search`, `publish:prepare`, `publish:complete`, `pin`, `render` ([capabilities](capabilities.md)) |
 | `lanes`, `models` | `/lanes` list and `{lane_profile}`; `/models` list and `{profile}` with every lane's route verdict ([model catalog](model-catalog.md)) |
 | `selection` (`/selection`) | `POST search` (ranked, or a listing without a query), `POST check` ([selection workspace](selection-workspace.md)) |
-| `guide` | `GET guide`, `guide/{topic}` (`?surface=http\|cli\|mcp`), `describe?ref=`: how to use the server and everything about one lane, model, feature, tool request or capability (`application/guide`, `catalog.read`) |
+| `guide` | `GET guide`, `guide/{topic}` (`?surface=http\|cli\|mcp`), `describe?ref=`: how to use the server and everything about one lane, model, feature, tool, mission template, sandbox profile, capability or the Mission Manifest; a prose answer carries `markdown` (`application/guide`, `catalog.read`) |
 | `stop_fence`, `continuation` | `GET runs/{id}/stop-fence`; `GET runs/{id}/checkpoints[/{checkpoint_id}]` |
 | `transcript` | `GET runs/{id}/transcript`, `frames/tail`, `runs`, `runs/{id}/transcript/search` ([transcript](provider-frames-and-transcript.md)) |
 | `cognition_points` | `GET runs/{id}/points`, `points/{point_id}`, `state-as-of`, `closure`, `frames`, `replay`; `GET runs/{id}/closures`; `POST runs/{id}/points:reconcile` ([joinability](unit-and-point-joinability.md), [workspace closure](workspace-closure.md)) |
@@ -86,10 +86,10 @@ Two servers share one tool family (`register_scoped_tools`, `mcp/coordinator_ser
   `prepare_workflow_launch`, `launch_workflow`, `get_workflow_result`) plus the scoped tools.
 - **Operator server** (`operator_server.py`, `/v1/applications/{application_id}/mcp` on the configured API):
   the scoped tools without the catalog facade or `mission_subscribe`.
-- **Guide** (`guide_tools.py`): `mission_guide(topic)` is the start page or a topic (interview, workflows, lanes,
-  models, capabilities, launch, observe, control); `mission_describe(ref)` reads a `lane:`, `model:`, `feature:` or
-  `tool:` ref or a Capability Pin (`tool:<name>`: the full request of the four tools whose listing is short). Pages
-  are also resources `mc://guide/<topic>` and the prompt `interview_before_mission`; facts are generated per request.
+- **Guide** (`guide_tools.py`): `mission_guide(topic)` is the start page or one of ten topics (`pages.TOPIC_IDS`);
+  `mission_describe(ref)` reads `lane:`, `model:`, `feature:`, `tool:` (every tool of the server), `template:`,
+  `sandbox:`, `manifest[:<section>]` or a Capability Pin. A page or a prose answer is Markdown text content with
+  the envelope as structured content. Pages are also resources `mc://guide/<topic>` and one prompt.
 - **Scoped tool families:** manifests and chains (`mission_preflight`, `mission_manifest_compile\|submit`,
   `mission_run_start`, `mission_chain_inspect`); run control (`mission_command_send`, `mission_run_inspect`,
   `mission_run_fork`); transcript (`mission_run_transcript\|search\|list`); cognition points

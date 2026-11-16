@@ -21,19 +21,22 @@ Record each answer in the user's own words and quote them into the `description`
 
 ## 3. The brief, and where each part goes
 
+Start from a template (topic `templates`): its slots are the answers below. Every goal, objective, criterion and node, and the program itself, has a `key`, a slug you choose.
+
 | Brief | Manifest field under `mission` |
 | --- | --- |
-| Purpose | `title`, `description` |
-| Goal | `goals[].description`, `goals[].importance` |
-| Success criteria | `goals[].criteria[]`: `description`, `evidence`, `acceptance` (`assessment`, `human: review_accept` or `schema`) |
+| Purpose | `key`, `title`, `description` |
+| Goal | `goals[]`: `key`, `description`, `importance` (`primary`, `secondary` or `optional`), `objectives[]` (`key`, `description`) |
+| Success criteria | `goals[].criteria[]`: `key`, `description`, `evidence` (a list of output names), `acceptance` (a typed expression such as `human: review_accept`; topic `manifest` says which can start) |
 | Inputs | `inputs[]` of a `program` node (`name` with `artifact`, `value` or `from`); `environment.workspace.context` |
-| Outputs promised | `outputs[]` of a `program` node (`name`, `form`, `schema`, `requirements`) |
-| Budget | `environment.budget` (`usd`, `tokens`, `wall_clock`, `tool_calls`) and `environment.governors` (`depth`, `fan_out`, `iterations`, `rounds`, `patience`, `transfers`) |
+| Outputs promised | `outputs[]` of a `program` node: `name`, then `form` (`text` for prose) or a `schema`; `requirements` |
+| Budget | `environment.budget` (`usd`, `tokens`, `wall_clock`, `tool_calls`) and `environment.governors` (`depth`, `fan_out`, `iterations`, `rounds`, `patience`, `transfers`); both are required |
 | Side effects allowed | `environment.side_effects`: `read_only`, `workspace_write`, `external_write_reversible`, `external_write_irreversible`, `spend` |
-| Lane and model | `environment.lane`, `environment.model.profile` (topics `lanes`, `models`) |
+| Lane and model | `environment.lane`, `environment.model.profile`, and `environment.sandbox.profile` where the lane requires a sandbox (topics `lanes`, `models`, `manifest`) |
 | Capabilities | `environment.capabilities[]` (`pin`, or `search` with `kind` and `as`), `agents`, `hooks`, `plugins` (topic `capabilities`) |
-| Review gates | a `program` node with `behavior: human_gate` and `task` (`kind`, `prompt`, `reviewers`) |
-| Route | `program.behavior`: `stage_graph` with `nodes`, or `goal_loop` with `objective` and `action_space` (topic `workflows`) |
+| Work | a `program` node with `behavior: agent_executor`: `key`, `objectives` (goal or objective keys) and its `instruction` |
+| Review gates | a `program` node with `behavior: human_gate`: `key` and `task` (`kind`, `prompt`, `reviewers`) |
+| Route | `program`: `key` and `behavior`, `stage_graph` with `objectives` and `nodes`, or `goal_loop` with `objective` and `action_space` (aliases that name a capability, agent, plugin or node) (topic `workflows`) |
 
 {{generated}}
 

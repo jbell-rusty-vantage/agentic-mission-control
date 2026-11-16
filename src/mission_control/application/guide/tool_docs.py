@@ -13,6 +13,7 @@ listing does not type has an entry here.
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import Any, Final
 
@@ -131,7 +132,13 @@ def tool_document(tool: str) -> dict[str, Any]:
 def request_schema(model: type[BaseModel]) -> dict[str, Any]:
     """The model's JSON schema without the generated titles (each repeats its field's name)."""
 
-    stripped: dict[str, Any] = _untitled(model.model_json_schema())
+    return untitled_schema(model.model_json_schema())
+
+
+def untitled_schema(schema: Mapping[str, Any]) -> dict[str, Any]:
+    """A JSON schema without its generated titles (a tool listing's argument schema too)."""
+
+    stripped: dict[str, Any] = _untitled(dict(schema))
     return stripped
 
 
@@ -148,4 +155,11 @@ def _untitled(node: Any) -> Any:
     return node
 
 
-__all__ = ["TOOL_DOCS", "ToolDoc", "request_schema", "tool_document", "tool_notes"]
+__all__ = [
+    "TOOL_DOCS",
+    "ToolDoc",
+    "request_schema",
+    "tool_document",
+    "tool_notes",
+    "untitled_schema",
+]

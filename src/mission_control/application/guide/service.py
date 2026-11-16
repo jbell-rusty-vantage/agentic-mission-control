@@ -1,15 +1,26 @@
-"""The guide: one start page, eight topics and one describe, the same on every transport.
+"""The guide: one start page, ten topics and one describe, the same on every transport.
 
 A Coordinator that has only the MCP server cannot read a skill file, so the server itself says
 how it is used. `GuideService.index` is the start page (who the caller is, the jobs in order,
 the topic and calls for each), `topic` is one page and `describe` is everything about one
-thing: a lane, a Model Profile, a capability, a feature or a tool's request.
+thing: a lane, a Model Profile, a capability, a feature, a tool, a mission template, a sandbox
+profile or the Mission Manifest.
 
 Judgment lives in the pages (`pages/*.md`); every fact is generated at request time from the
 registries the Selection Workspace already reads (the Lane Registry and each Lane Declaration,
-the Model Catalog, the published catalog definitions) and from the lane's feature registry, so
-a page never restates a registry and cannot drift from it. A page names operations by id and
-the service renders them in the caller's vocabulary (`operations.py`).
+the Model Catalog, the published catalog definitions), from the lane's feature registry, from
+the manifest models (`manifest_reference.py`) and from the mission templates
+(`mission_templates.py`), so a page never restates a registry and cannot drift from it. A page
+names operations by id and the service renders them in the caller's vocabulary
+(`operations.py`).
+
+A page is Markdown. So is a describe answer that is prose (a tool's documentation, a template,
+the manifest reference): it carries `markdown` beside its `data`. An answer that is data (a
+lane, a model, a catalog definition) carries `data` only.
+
+The definitions a submitted manifest lowered (its own Workflow Type with its blueprint and
+profiles) are never counted or presented as reusable types: the counts here leave them out and
+say how many there are.
 
 Provider-neutral and application-neutral: no lane, vendor or application is named here; the
 application id is the composed one.
@@ -17,24 +28,53 @@ application id is the composed one.
 
 from __future__ import annotations
 
+import json
 from collections import Counter
 from collections.abc import Awaitable, Callable, Iterable, Mapping
+from dataclasses import dataclass
 from typing import Any, Final, Literal, Protocol, get_args
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
+from mission_control.application.guide.manifest_reference import (
+    MANIFEST_REF,
+    UnknownSection,
+    manifest_reference_document,
+    manifest_reference_markdown,
+    manifest_topic_section,
+    required_fields,
+    section_markdown,
+    section_names,
+)
+from mission_control.application.guide.mission_templates import (
+    TEMPLATE_IDS,
+    TEMPLATE_REF_PREFIX,
+    load_template,
+    mission_templates,
+    template_document,
+    template_markdown,
+)
 from mission_control.application.guide.operations import Surface, render_operations
 from mission_control.application.guide.pages import INDEX, TOPIC_IDS, insert_generated, load_page
-from mission_control.application.guide.tool_docs import TOOL_DOCS, tool_document, tool_notes
+from mission_control.application.guide.tool_docs import (
+    TOOL_DOCS,
+    tool_document,
+    tool_notes,
+    untitled_schema,
+)
 from mission_control.application.resolution.lane_listing import describe_lane
 from mission_control.application.resolution.model_listing import describe_model
 from mission_control.application.resolution.registries import LaneRegistry, ModelCatalog
-from mission_control.application.selection.workspace import SelectionCatalogUnavailable
+from mission_control.application.selection.workspace import (
+    SANDBOX_REF_PREFIX,
+    SelectionCatalogUnavailable,
+)
 from mission_control.application.subscriptions.coordinator import DEFAULT_KINDS
 from mission_control.application.subscriptions.coordinator_service import MAX_WAIT_SECONDS
 from mission_control.contracts.contracts import MissionCommandRequest
 from mission_control.domain.authoring.contracts import DefinitionKind, PublishedDefinition
 from mission_control.domain.authoring.manifest import MissionManifest
+from mission_control.domain.authoring.manifest_lowering import manifest_lowered_refs
 from mission_control.domain.authoring.manifest_v2 import MissionManifestV2
 from mission_control.domain.capabilities.catalog_entry import capability_pin
 from mission_control.domain.capabilities.features.registry import FeatureRegistry, FeatureStatus
@@ -46,12 +86,16 @@ from mission_control.domain.resolution.profiles import LaneDeclaration
 
 GUIDE_SCHEMA: Final = "mc.guide.v1"
 DESCRIBE_SCHEMA: Final = "mc.describe.v1"
-# What `describe` reads by prefix; anything else must be a Capability Pin or a catalog ref.
+# What `describe` reads; anything else must be a Capability Pin or a catalog ref.
 REF_FORMS: Final[tuple[str, ...]] = (
     "lane:<profile>",
     "model:<profile>",
     "feature:<id>",
     "tool:<name>",
+    f"{TEMPLATE_REF_PREFIX}<id>",
+    f"{SANDBOX_REF_PREFIX}<profile>",
+    MANIFEST_REF,
+    f"{MANIFEST_REF}:<section>",
     "<capability pin>",
 )
 # The run-level controls a Coordinator invokes, shown beside the delivery semantics.
@@ -89,7 +133,9 @@ KIND_LINES: Final[Mapping[DefinitionKind, str]] = {
 }
 
 RefusalCode = Literal["unknown_topic", "unknown_ref", "not_found", "unavailable"]
-DescribedKind = Literal["lane", "model", "capability", "feature", "tool"]
+DescribedKind = Literal[
+    "lane", "model", "capability", "feature", "tool", "template", "sandbox_profile", "manifest"
+]
 
 
 class GuideRefused(Exception):
@@ -112,6 +158,16 @@ class GuideCatalog(Protocol):
     async def find_published(self, pin: CapabilityPin) -> PublishedDefinition | None: ...
 
 
+@dataclass(frozen=True, slots=True)
+class ToolListing:
+    """One tool as the transport that serves it lists it: its description and the JSON Schema
+    of its arguments. `tool:<name>` answers from the listing of the server it was asked on."""
+
+    name: str
+    description: str
+    input_schema: Mapping[str, Any]
+
+
 class _Frozen(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
@@ -132,6 +188,8 @@ class DescribeResult(_Frozen):
     kind: DescribedKind
     title: str
     data: dict[str, Any]
+    # The answer as Markdown, where the answer is prose (a tool, a template, the manifest).
+    markdown: str | None = Field(default=None, exclude_if=lambda value: value is None)
 
 
 class GuideService:
@@ -145,6 +203,7 @@ class GuideService:
         models: ModelCatalog,
         catalog: GuideCatalog | None = None,
         features: Mapping[str, FeatureRegistry] | None = None,
+        sandbox_profiles: Mapping[str, str] | None = None,
     ) -> None:
         self._application_id = application_id
         self._lanes = lanes
@@ -153,15 +212,24 @@ class GuideService:
         # Lane profile -> the lane's selectable feature registry (lane features and the
         # vendor rows of its model routes), composed by bootstrap from the lane's package.
         self._features = dict(features or {})
+        # The sandbox profiles this deployment binds, name -> one line (`None`: this process
+        # reads no launch bindings, so it cannot say).
+        self._sandbox_profiles = None if sandbox_profiles is None else dict(sandbox_profiles)
         self._sections: dict[str, Callable[[], Awaitable[str]]] = {
             INDEX: self._index_section,
             "interview": self._interview_section,
             "workflows": self._workflows_section,
+            "templates": self._templates_section,
+            "manifest": self._manifest_section,
             "lanes": self._lanes_section,
             "models": self._models_section,
             "capabilities": self._capabilities_section,
             "observe": self._observe_section,
             "control": self._control_section,
+        }
+        # A page's further generated sections, by the name of their marker.
+        self._named_sections: dict[str, dict[str, Callable[[], Awaitable[str]]]] = {
+            "workflows": {"types": self._workflow_types_section},
         }
 
     @property
@@ -188,7 +256,12 @@ class GuideService:
     async def _page(self, page_id: str, surface: Surface) -> GuidePage:
         source = load_page("pages", page_id)
         section = self._sections.get(page_id)
-        body = insert_generated(source.body, await section() if section is not None else "")
+        named = self._named_sections.get(page_id, {})
+        body = insert_generated(
+            source.body,
+            await section() if section is not None else "",
+            {name: await generate() for name, generate in named.items()},
+        )
         return GuidePage(
             topic=page_id,
             title=source.title,
@@ -209,6 +282,21 @@ class GuideService:
         except SelectionCatalogUnavailable:
             return None
 
+    async def _curated(self) -> tuple[tuple[PublishedDefinition, ...], int] | None:
+        """The published definitions no submitted manifest lowered, and how many it did lower
+        (`None` where no catalog is composed)."""
+
+        published = await self._published()
+        if published is None:
+            return None
+        lowered = manifest_lowered_refs(published)
+        curated = tuple(
+            row
+            for row in published
+            if (row.ref.kind.value, row.ref.logical_id, row.ref.digest) not in lowered
+        )
+        return curated, len(published) - len(curated)
+
     def _declaration(self, profile: str) -> LaneDeclaration | None:
         try:
             return self._lanes.get(profile).declaration
@@ -216,16 +304,16 @@ class GuideService:
             return None
 
     async def _index_section(self) -> str:
-        published = await self._published()
+        curated = await self._curated()
         catalog = (
             "no catalog is composed"
-            if published is None
-            else f"{len(published)} published catalog definitions"
+            if curated is None
+            else f"{len(curated[0])} published catalog definitions"
         )
         return (
             f"This server: application `{self._application_id}`; lanes "
             f"{_spans(self._lanes.profiles())}; {len(self._models.profiles())} Model Profiles; "
-            f"{catalog}."
+            f"{catalog}; {len(TEMPLATE_IDS)} mission templates."
         )
 
     async def _interview_section(self) -> str:
@@ -252,14 +340,39 @@ class GuideService:
             rows.append([f"`{profile}`", *cells])
         table = _table(["Lane profile", *(f"`{family}`" for family in FAMILIES)], rows)
         allowed = "allows" if self._lanes.allow_unqualified else "does not allow"
+        return f"{table}\n\nThis installation {allowed} unqualified lanes."
+
+    async def _workflow_types_section(self) -> str:
+        """What a Coordinator starts from, and what the catalog holds as Workflow Types: the
+        published ones no manifest lowered, and how many submitted manifests lowered."""
+
+        templates = f"The templates to start from (topic `templates`): {_spans(TEMPLATE_IDS)}."
+        curated = await self._curated()
         published = await self._published()
-        count = (
-            "the catalog is not composed"
-            if published is None
-            else "published Workflow Types: "
-            f"{sum(row.ref.kind is DefinitionKind.WORKFLOW_TYPE for row in published)}"
+        if curated is None or published is None:
+            return f"{templates}\n\nThe catalog is not composed: no Workflow Type can be listed."
+        kept = sum(row.ref.kind is DefinitionKind.WORKFLOW_TYPE for row in curated[0])
+        every = sum(row.ref.kind is DefinitionKind.WORKFLOW_TYPE for row in published)
+        return (
+            f"{templates}\n\nPublished Workflow Types that are not lowered from a manifest: "
+            f"{kept}. Lowered from submitted manifests and left out of listings: {every - kept}."
         )
-        return f"{table}\n\nThis installation {allowed} unqualified lanes; {count}."
+
+    async def _templates_section(self) -> str:
+        return _table(
+            ["Template", "What it is", "Use it when"],
+            [
+                [f"`{template.id}`", template.purpose, template.use_when]
+                for template in mission_templates()
+            ],
+        )
+
+    async def _manifest_section(self) -> str:
+        return manifest_topic_section(
+            lanes=self._lanes.profiles(),
+            sandbox_profiles=self._sandbox_profiles,
+            application_id=self._application_id,
+        )
 
     async def _lanes_section(self) -> str:
         rows = []
@@ -304,9 +417,10 @@ class GuideService:
         return _table(["Model Profile", "Vendor", "Model id"], rows)
 
     async def _capabilities_section(self) -> str:
-        published = await self._published()
-        if published is None:
+        curated = await self._curated()
+        if curated is None:
             return "No catalog is composed for this application: nothing can be listed or pinned."
+        published, lowered = curated
         counts = Counter(row.ref.kind for row in published)
         rows = [
             [f"`{kind.value}`", str(counts[kind]), line]
@@ -316,11 +430,16 @@ class GuideService:
         others = sorted(
             (kind.value, count) for kind, count in counts.items() if kind not in KIND_LINES
         )
-        table = _table(["Kind", "Published", "What it is"], rows)
-        if not others:
-            return table
-        parts = ", ".join(f"`{kind}` {count}" for kind, count in others)
-        return f"{table}\n\nOther published kinds, not selected directly in a manifest: {parts}."
+        parts = [_table(["Kind", "Published", "What it is"], rows)]
+        if others:
+            listed = ", ".join(f"`{kind}` {count}" for kind, count in others)
+            parts.append(f"Other published kinds, not selected directly in a manifest: {listed}.")
+        if lowered:
+            parts.append(
+                f"Not counted: {lowered} definitions lowered from submitted manifests (topic "
+                "`workflows`)."
+            )
+        return "\n\n".join(parts)
 
     async def _observe_section(self) -> str:
         return (
@@ -354,11 +473,17 @@ class GuideService:
 
     # -- describe --------------------------------------------------------------------------------
 
-    async def describe(self, ref: str) -> DescribeResult:
+    async def describe(
+        self, ref: str, *, tools: Mapping[str, ToolListing] | None = None
+    ) -> DescribeResult:
         """Everything about one thing; `GuideRefused` for a ref that is no known form
-        (`unknown_ref`, naming the forms) or names nothing here (`not_found`)."""
+        (`unknown_ref`, naming the forms) or names nothing here (`not_found`). `tools` is the
+        tool listing of the server the question was asked on, which `tool:<name>` answers
+        from."""
 
         text = ref.strip()
+        if text == MANIFEST_REF:
+            return self._describe_manifest()
         if is_pin(text):
             return await self._describe_capability(text)
         prefix, separator, name = text.partition(":")
@@ -370,7 +495,13 @@ class GuideService:
             if prefix == "feature":
                 return self._describe_feature(name)
             if prefix == "tool":
-                return self._describe_tool(name)
+                return self._describe_tool(name, tools)
+            if f"{prefix}:" == TEMPLATE_REF_PREFIX:
+                return self._describe_template(name)
+            if f"{prefix}:" == SANDBOX_REF_PREFIX:
+                return self._describe_sandbox(name)
+            if prefix == MANIFEST_REF:
+                return self._describe_manifest_section(name)
         raise GuideRefused(
             "unknown_ref",
             f"{ref!r} is not a ref; a ref is {', '.join(REF_FORMS[:-1])} or a Capability Pin "
@@ -428,17 +559,108 @@ class GuideService:
             data={**row.describe(), "lane_profiles": lanes},
         )
 
-    def _describe_tool(self, tool: str) -> DescribeResult:
-        if tool not in TOOL_DOCS:
-            documented = sorted(TOOL_DOCS)
+    def _describe_tool(self, tool: str, tools: Mapping[str, ToolListing] | None) -> DescribeResult:
+        """A tool's description and the schema of its arguments as its server lists them, with
+        the extended notes, the request schema and an example where the tool has them."""
+
+        listing = (tools or {}).get(tool)
+        if listing is None and tool not in TOOL_DOCS:
+            known = sorted({*(tools or {}), *TOOL_DOCS})
             raise GuideRefused(
                 "not_found",
-                f"no extended documentation for tool {tool!r}: its arguments are typed in the "
-                f"tool listing. Documented here: {', '.join(documented)}",
-                (f"tool:{name}" for name in documented),
+                f"no tool {tool!r} on this server; tools: {', '.join(known)}",
+                (f"tool:{name}" for name in known),
+            )
+        data: dict[str, Any] = {"tool": tool}
+        lines = [f"# `{tool}`"]
+        if listing is not None:
+            schema = untitled_schema(listing.input_schema)
+            data |= {"description": listing.description, "input_schema": schema}
+            lines += ["", listing.description, "", "## Arguments", "", _json_block(schema)]
+        title = tool
+        if tool in TOOL_DOCS:
+            document = tool_document(tool)
+            notes = tool_notes(tool)
+            title = notes.title
+            data |= document
+            lines += ["", f"## {notes.title}", "", notes.body]
+            if "schema" in document:
+                lines += [
+                    "",
+                    f"## The request object `{document['argument'] or tool}`",
+                    "",
+                    _json_block(document["schema"]),
+                ]
+            lines += ["", "## Example", "", _json_block(document["example"])]
+        return DescribeResult(
+            ref=f"tool:{tool}", kind="tool", title=title, data=data, markdown="\n".join(lines)
+        )
+
+    def _describe_template(self, template_id: str) -> DescribeResult:
+        if template_id not in TEMPLATE_IDS:
+            raise GuideRefused(
+                "not_found",
+                f"no mission template {template_id!r}; templates: {', '.join(TEMPLATE_IDS)}",
+                (f"{TEMPLATE_REF_PREFIX}{name}" for name in TEMPLATE_IDS),
+            )
+        template = load_template(template_id)
+        return DescribeResult(
+            ref=template.ref,
+            kind="template",
+            title=template.title,
+            data=template_document(template),
+            markdown=template_markdown(template),
+        )
+
+    def _describe_sandbox(self, profile: str) -> DescribeResult:
+        bound = self._sandbox_profiles
+        if bound is None:
+            raise GuideRefused(
+                "unavailable", "this server reads no launch bindings, so it binds no sandbox"
+            )
+        if profile not in bound:
+            raise GuideRefused(
+                "not_found",
+                f"sandbox profile {profile!r} is not bound here; bound: "
+                f"{', '.join(sorted(bound)) or 'none'}",
+                (f"{SANDBOX_REF_PREFIX}{name}" for name in sorted(bound)),
             )
         return DescribeResult(
-            ref=f"tool:{tool}", kind="tool", title=tool_notes(tool).title, data=tool_document(tool)
+            ref=f"{SANDBOX_REF_PREFIX}{profile}",
+            kind="sandbox_profile",
+            title=profile,
+            data={
+                "profile": profile,
+                "summary": bound[profile],
+                "manifest_field": "environment.sandbox.profile",
+            },
+        )
+
+    def _describe_manifest(self) -> DescribeResult:
+        return DescribeResult(
+            ref=MANIFEST_REF,
+            kind="manifest",
+            title="Mission Manifest reference",
+            data=manifest_reference_document(),
+            markdown=manifest_reference_markdown(),
+        )
+
+    def _describe_manifest_section(self, section: str) -> DescribeResult:
+        try:
+            markdown = section_markdown(section)
+        except UnknownSection:
+            names = section_names()
+            raise GuideRefused(
+                "not_found",
+                f"no manifest section {section!r}; sections: {', '.join(names)}",
+                (f"{MANIFEST_REF}:{name}" for name in names),
+            ) from None
+        return DescribeResult(
+            ref=f"{MANIFEST_REF}:{section}",
+            kind="manifest",
+            title=section,
+            data={"section": section, "required": list(required_fields(section))},
+            markdown=markdown,
         )
 
     async def _describe_capability(self, text: str) -> DescribeResult:
@@ -512,6 +734,10 @@ def _spans(names: Iterable[str]) -> str:
     return ", ".join(f"`{name}`" for name in names)
 
 
+def _json_block(value: object) -> str:
+    return f"```json\n{json.dumps(value, indent=2, ensure_ascii=False)}\n```"
+
+
 def _table(header: list[str], rows: list[list[str]]) -> str:
     lines = [f"| {' | '.join(header)} |", f"|{' --- |' * len(header)}"]
     lines += [f"| {' | '.join(row)} |" for row in rows]
@@ -560,4 +786,5 @@ __all__ = [
     "GuideRefused",
     "GuideService",
     "RefusalCode",
+    "ToolListing",
 ]

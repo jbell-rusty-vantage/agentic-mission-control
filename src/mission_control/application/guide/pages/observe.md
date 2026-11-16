@@ -15,7 +15,7 @@ Wait; never poll. Your coordinator inbox is the wake channel, inspection is the 
 
 ## What each notification asks of you
 
-- `review_required`: a Human Task is open. Read it with {op:human_task_list}; resolve it with {op:human_task_resolve} only on the reviewer's decision, never on your own.
+- `review_required`: a Human Task is open. Read it with {op:human_task_list}; resolve it with {op:human_task_resolve} only on the reviewer's decision, never on your own. Only one of its `reviewers` can resolve it: that actor id, or a principal holding the permission `reviewer:<name>`; anyone else is refused `not_reviewer`.
 - `blocked`: the run waits on a condition, an approval or owner setup. Inspect, find the wait, tell the user.
 - `failed`: read the cause in the inspection and the transcript before proposing a retry or a fork (topic `control`).
 - `terminal_result`: execution ended. Report the outcome and the acceptance separately.

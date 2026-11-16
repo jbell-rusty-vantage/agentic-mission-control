@@ -4,9 +4,11 @@
 topic and calls for each) and `GET .../guide/{topic}` one topic, each as Markdown inside
 `mc.guide.v1`; `surface` chooses the vocabulary its calls are written in (`http` routes by
 default, `cli` for `missionctl`, `mcp` for the MCP tools). `GET .../describe?ref=` answers
-`mc.describe.v1` for `lane:<profile>`, `model:<profile>`, `feature:<id>`, `tool:<name>` or a
-Capability Pin. All need `catalog.read`, launch nothing and write nothing; the handler is
-`application/guide/service.py`, the same one behind `mission_guide` and `mission_describe`.
+`mc.describe.v1` for `lane:<profile>`, `model:<profile>`, `feature:<id>`, `tool:<name>`,
+`template:<id>`, `sandbox:<profile>`, `manifest`, `manifest:<section>` or a Capability Pin; an
+answer that is prose carries `markdown` beside `data`. All need `catalog.read`, launch nothing
+and write nothing; the handler is `application/guide/service.py`, the same one behind
+`mission_guide` and `mission_describe`.
 """
 
 from __future__ import annotations
@@ -30,6 +32,9 @@ from mission_control.interfaces.http.mission_control import (
 
 router = APIRouter(prefix="/v1/applications/{application_id}", tags=["guide"])
 Principal = Annotated[MissionPrincipal, Depends(get_mission_principal)]
+# `app.state` attribute: the operator MCP server's tools (`Mapping[str, ToolListing]`), set by
+# the API once it has built that server.
+TOOL_LISTING_STATE = "mission_control_tool_listing"
 _STATUS = {"unknown_topic": 404, "unknown_ref": 422, "not_found": 404, "unavailable": 503}
 _CODES = {
     "unknown_topic": "guide_topic_unknown",
@@ -83,9 +88,11 @@ async def topic(topic: str, guide: Guide, surface: PageSurface = "http") -> Guid
 
 @router.get("/describe", response_model=DescribeResult)
 async def describe(
-    ref: Annotated[str, Query(min_length=1, max_length=512)], guide: Guide
+    ref: Annotated[str, Query(min_length=1, max_length=512)], guide: Guide, request: Request
 ) -> DescribeResult:
+    # `tool:<name>` answers from the listing of the operator MCP server this API mounts.
+    tools = getattr(request.app.state, TOOL_LISTING_STATE, None)
     try:
-        return await guide.describe(ref)
+        return await guide.describe(ref, tools=tools)
     except GuideRefused as refused:
         raise refusal(refused) from None

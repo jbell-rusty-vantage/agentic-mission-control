@@ -48,6 +48,7 @@ from mission_control.interfaces.mcp.guide_tools import (
     GUIDE_RESOURCE_PREFIX,
     GUIDE_TOOL,
     INTERVIEW_PROMPT,
+    server_tool_listing,
 )
 from tests.unit.guide.support import full_guide, operator_server
 
@@ -62,9 +63,10 @@ SHORTENED = (
 )
 # `tools/list` in tokens (characters of the JSON divided by four). Before the guide: 39 tools,
 # 11,106. With it: two more tools and four shortened descriptions. The listing may only
-# shrink from here. The owner's target is 9,000 (`scripts/consumer_surface_eval.py` checks
-# it); what is left above it is every tool's bare `outputSchema` and empty `_meta`, the other
-# tools' descriptions and the request schemas the listing types.
+# shrink from here: templates, the manifest reference and `include_lowered` were added inside
+# this ceiling. The owner's target is 9,000 (`scripts/consumer_surface_eval.py` checks it);
+# what is left above it is every other tool's bare `outputSchema` and empty `_meta`, the
+# other tools' descriptions and the request schemas the listing types.
 LISTING_TOKENS_BEFORE = 11_106
 LISTING_TOKENS_CEILING = 10_450
 _TOOL_WORD = re.compile(r"\b(mission_[a-z_]+|coordinator_inbox_[a-z_]+|selection_check)\b")
@@ -91,17 +93,20 @@ def _cli_parsers() -> dict[tuple[str, ...], argparse.ArgumentParser]:
     return found
 
 
-def _cli_call(call: str) -> tuple[tuple[str, ...], list[str]]:
-    """A `missionctl` call's command path and the flags it uses."""
+def _cli_call(
+    call: str, parsers: dict[tuple[str, ...], argparse.ArgumentParser]
+) -> tuple[tuple[str, ...], list[str]]:
+    """A `missionctl` call's command path and the flags it uses. The path ends at the first
+    word that is no subcommand: an argument (`REF`, or a literal such as `manifest`)."""
 
     words = call.split()
     assert words[0] == "missionctl", call
-    path: list[str] = []
+    path: tuple[str, ...] = ()
     for word in words[1:]:
-        if not re.fullmatch(r"[a-z][a-z-]*", word):
+        if (*path, word) not in parsers:
             break
-        path.append(word)
-    return tuple(path), [word for word in words if word.startswith("--")]
+        path = (*path, word)
+    return path, [word for word in words if word.startswith("--")]
 
 
 def _routes() -> set[tuple[str, str]]:
@@ -189,8 +194,8 @@ def test_every_cli_call_is_in_the_argparse_tree() -> None:
         if operation.cli is None:
             continue
         named += 1
-        path, flags = _cli_call(operation.cli)
-        assert path in parsers, (name, operation.cli)
+        path, flags = _cli_call(operation.cli, parsers)
+        assert path and path in parsers, (name, operation.cli)
         accepted = {option for action in parsers[path]._actions for option in action.option_strings}
         assert not [flag for flag in flags if flag not in accepted], (name, operation.cli)
     assert named > 30
@@ -221,7 +226,7 @@ async def test_rendered_pages_name_only_real_tools_and_commands() -> None:
         assert not [word for word in _TOOL_WORD.findall(mcp) if word not in tools], page_id
         cli = (await guide.topic(page_id, "cli")).markdown
         for call in re.findall(r"`(missionctl [^`]+)`", cli):
-            assert _cli_call(call)[0] in parsers, (page_id, call)
+            assert _cli_call(call, parsers)[0] in parsers, (page_id, call)
         for surface in SURFACES:
             assert "{op:" not in (await guide.topic(page_id, surface)).markdown
 
@@ -254,6 +259,40 @@ async def test_the_shortened_descriptions_point_at_their_full_shape() -> None:
         assert "Example" in description, name
     for name in tools:
         assert (tools[name].description or "").strip(), name
+
+
+async def test_describe_answers_for_every_tool_of_the_server() -> None:
+    """`tool:<name>` is the tool's own listing (description and argument schema) for every
+    tool the operator server has, typed or not, with the extended notes where they exist."""
+
+    server = operator_server()
+    listing = await server_tool_listing(server)
+    tools = await _tools()
+    guide = full_guide()
+
+    assert set(listing) == set(tools) and "mission_manifest_compile" in listing
+    for name, tool in tools.items():
+        described = await guide.describe(f"tool:{name}", tools=listing)
+        assert described.kind == "tool" and described.markdown is not None, name
+        assert described.markdown.startswith(f"# `{name}`\n\n{(tool.description or '').strip()}")
+        assert described.data["description"] == (tool.description or "").strip(), name
+        assert set(described.data["input_schema"].get("properties", {})) == set(
+            tool.inputSchema.get("properties", {})
+        ), name
+        assert described.data["input_schema"].get("required") == tool.inputSchema.get("required"), (
+            name
+        )
+        assert '"title": "' not in json.dumps(described.data["input_schema"]), name
+        assert ("notes" in described.data) is (name in TOOL_DOCS), name
+    compile_tool = await guide.describe("tool:mission_manifest_compile", tools=listing)
+    assert compile_tool.data["input_schema"]["required"] == ["manifest_yaml"]
+    assert "## Arguments" in (compile_tool.markdown or "")
+    fork = await guide.describe("tool:mission_run_fork", tools=listing)
+    assert "## mission_run_fork: fork a run" in (fork.markdown or "")
+    assert "## The request object `request`" in (fork.markdown or "")
+    assert "## Example" in (fork.markdown or "")
+    # Without a listing (a transport that serves no tools) the documented tools still answer.
+    assert (await guide.describe("tool:mission_run_fork")).data["argument"] == "request"
 
 
 async def test_the_guide_tools_resources_and_prompt_are_on_the_operator_server() -> None:

@@ -50,6 +50,16 @@ itself (name, kind, description) and says so: scanned hits carry the reason `def
 the scanned facets, and `catalog_search_mode` is `definition_scan` when no facet was ranked by the catalog
 (`definition_listing` for a listing). A scan has no semantic ranking and applies no selection policy.
 
+Three answers are not reusable catalog rows as such (2026-11-15). **Templates:** the `template` facet lists
+the curated mission templates the composition hands in (`template:<id>`, read with the guide's describe).
+**Sandbox profiles:** the `sandbox_profile` facet lists first the profiles the deployment's launch bindings
+bind (`sandbox:<name>`, the name a manifest writes in `environment.sandbox.profile`), then the catalog's
+sandbox definitions; `check` accepts a bound profile by name. **Lowered definitions:** a submitted manifest
+lowers into a Workflow Type of its own with its blueprint and four profiles
+(`manifest_lowering.manifest_lowered_refs`: the Workflow Type admits only the manifest input contract, and the
+rest are the rows it allows). A listing, a ranked search and a scan leave those rows out, report
+`lowered_hidden` with a note, and return them only for `include_lowered`.
+
 `check(draft)` reads a draft (`lane_profile`, `model_profile`, `family`, optional `data_class`,
 `capabilities` pins, `sandbox_profile` and `workflow_type` pins) and returns
 `mc.selection_check.v1`: the resolution seam's admission (`RuntimeResolver.admit`), the lane
@@ -70,7 +80,7 @@ launch process's deployment facts), served digests, prerequisites and the KS app
 | Transport | Search | Check |
 | --- | --- | --- |
 | HTTP (`interfaces/http/selection.py`, `catalog.read`) | `POST /v1/applications/{app}/selection/search` | `POST .../selection/check` |
-| missionctl (`interfaces/cli/selection.py`) | `search [QUERY] [--facet F]... [--kind K]... [--lane P] [--limit N] [--offset N]` | `workspace check DRAFT.json\|yaml` (exit 6 when refused) |
+| missionctl (`interfaces/cli/selection.py`) | `search [QUERY] [--facet F]... [--kind K]... [--lane P] [--limit N] [--offset N] [--include-lowered]` | `workspace check DRAFT.json\|yaml` (exit 6 when refused) |
 | MCP (`interfaces/mcp/selection_tools.py`, `catalog.read`) | `mission_search` | `selection_check` |
 
 The coordinator MCP server registers both tools when a workspace is composed

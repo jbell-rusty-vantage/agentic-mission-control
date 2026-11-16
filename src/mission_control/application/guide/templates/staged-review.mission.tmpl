@@ -1,0 +1,142 @@
+---
+id: staged-review
+title: Produce, review, approve
+purpose: A known route with a review step; one agent produces a draft, a second agent reviews it, a human approves.
+use_when: The route is known and nothing should be accepted before an independent review and a human decision.
+produces: The text outputs `produce.draft` and `review.review_notes`, then one REVIEW Human Task at `approve`. Approving it accepts the mission.
+slots:
+  application_id:
+    description: This server's application id (the start page names it).
+    example: demo-app
+  mission_key:
+    description: "A stable slug for the mission: lower case letters, digits, `-` or `_`."
+    example: staged-review
+  title:
+    description: A one-line title.
+    example: A reviewed one-page brief
+  goal:
+    description: What to produce, for whom and in which form, one line.
+    example: Write a one-page brief on how a Stage Graph releases its stages.
+  criterion:
+    description: How the reviewer knows it is done, one line.
+    example: The brief is accurate, fits one page and the review found no open defect.
+  model_profile:
+    description: The producer's Model Profile (topic `models`).
+    example: producer.default
+  reviewer_model_profile:
+    description: The reviewing agent's Model Profile; prefer another vendor than the producer's.
+    example: judge.default
+  sandbox_profile:
+    description: A sandbox profile bound on this installation (topic `manifest`).
+    example: research.standard
+  budget_usd:
+    description: The ceiling on model spend in US dollars, a number.
+    example: "1"
+  reviewer:
+    description: Who resolves the approval; an actor id, or a reviewer role such as `owner`. Only that actor, or a principal holding `reviewer:<role>`, can.
+    example: owner
+notes:
+  - The `review` stage reads the accepted draft through its `from` binding. A start is refused with `dependent_inputs_unavailable` where the installation composes no trusted settlement to accept the draft.
+  - Each stage may only narrow the mission budget; the two stage budgets here sum under it.
+---
+manifest: mission/v2
+mission:
+  key: {{mission_key}}
+  application: {{application_id}}
+  title: >-
+    {{title}}
+  description: >-
+    {{goal}}
+  goals:
+    - key: deliverable
+      description: >-
+        {{goal}}
+      importance: primary
+      objectives:
+        - key: produce_draft
+          description: Produce the draft and submit it as the output named draft.
+        - key: review_draft
+          description: Review the accepted draft against the goal and submit the findings as review_notes.
+      criteria:
+        - key: approved
+          description: >-
+            {{criterion}}
+          evidence: [draft, review_notes]
+          acceptance:
+            human: review_accept
+  environment:
+    lane: deep_agents
+    model:
+      profile: {{model_profile}}
+    sandbox:
+      profile: {{sandbox_profile}}
+    capabilities:
+      - pin: tool.knowledge-submit-output@latest
+        kind: tool
+        as: submit_output
+    budget:
+      usd: {{budget_usd}}
+      tokens: 400000
+      wall_clock: 45m
+      tool_calls: 30
+    governors:
+      depth: 1
+      fan_out: 1
+      iterations: 1
+      patience: 1
+    side_effects: [read_only, workspace_write]
+  program:
+    key: root
+    behavior: stage_graph
+    objectives: [deliverable]
+    nodes:
+      - key: produce
+        behavior: agent_executor
+        objectives: [produce_draft]
+        environment:
+          budget:
+            tokens: 200000
+            tool_calls: 15
+        instruction: >-
+          {{goal}}
+          Submit the draft with the submit_output tool: one call, obligation "produce.draft",
+          one inline text item. Stop after its receipt.
+        outputs:
+          - name: draft
+            form: text
+            media_type: text/plain
+      - key: review
+        behavior: agent_executor
+        objectives: [review_draft]
+        environment:
+          model:
+            profile: {{reviewer_model_profile}}
+          budget:
+            tokens: 150000
+            tool_calls: 12
+        inputs:
+          - name: draft
+            from: produce.draft
+            expand: materialize
+        instruction: >-
+          Review the draft you received as the input named draft against this goal: {{goal}}
+          List each defect with the passage it concerns, or state that you found none.
+          Submit the findings with the submit_output tool: one call, obligation
+          "review.review_notes", one inline text item. Stop after its receipt.
+        outputs:
+          - name: review_notes
+            form: text
+            media_type: text/plain
+      - key: approve
+        behavior: human_gate
+        objectives: [deliverable]
+        depends_on: [review]
+        task:
+          kind: REVIEW
+          prompt: >-
+            {{criterion}}
+          reviewers: [{{reviewer}}]
+          packet: [produce.draft, review.review_notes]
+          on_timeout: keep_waiting
+  controls:
+    commands_allowed: [pause, resume, cancel, queue_instruction, add_context]

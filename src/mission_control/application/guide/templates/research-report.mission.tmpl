@@ -1,0 +1,113 @@
+---
+id: research-report
+title: A sourced research report
+purpose: An agent reads the knowledge base and the web, registers one sourced report, and an independent verifier checks it before a reviewer accepts.
+use_when: The user asks a research question and wants findings that each cite a source.
+produces: The registered report `root.report` (a reference, independently assessed), the text outputs `root.progress_note`, `root.summary` and `root.caveats`, then one review Human Task. Approving it accepts the mission.
+slots:
+  application_id:
+    description: This server's application id (the start page names it).
+    example: demo-app
+  mission_key:
+    description: "A stable slug for the mission: lower case letters, digits, `-` or `_`."
+    example: research-report
+  title:
+    description: A one-line title.
+    example: What published sources say about agent memory
+  goal:
+    description: The research question in the user's words, one line. Name the sources that count and how recent they must be.
+    example: What do published sources from the last two years say about long-term memory for coding agents?
+  criterion:
+    description: How the reviewer knows it is done, one line.
+    example: Every finding cites a source the report registers and the limits are stated.
+  model_profile:
+    description: The producer's Model Profile (topic `models`).
+    example: producer.default
+  verifier_model_profile:
+    description: The verifier's Model Profile; prefer another vendor than the producer's.
+    example: judge.default
+  sandbox_profile:
+    description: A sandbox profile bound on this installation (topic `manifest`).
+    example: research.standard
+  budget_usd:
+    description: The ceiling on model spend in US dollars, a number.
+    example: "2"
+notes:
+  - A Goal Loop of at most two iterations. The verifier's findings return to the executor as repair feedback.
+  - How to search, cite and register is in the skills of the knowledge cognition plugin and in each tool's own description; the goal text carries the question only.
+  - The report is judged by the installation's trusted assessment. A start is refused with `trusted_assessment_unavailable` where none is composed.
+  - The web research plugin needs its servers' secrets; preflight lists the ones that are missing.
+---
+manifest: mission/v2
+mission:
+  key: {{mission_key}}
+  application: {{application_id}}
+  title: >-
+    {{title}}
+  description: >-
+    {{goal}}
+  goals:
+    - key: sourced_report
+      description: >-
+        {{goal}}
+        Answer from the knowledge base and the web. Register one report whose every finding
+        cites a source, and submit the named outputs.
+      importance: primary
+      objectives:
+        - key: research_and_register
+          description: Read the knowledge base and the web, register the sourced report and submit the named outputs.
+      criteria:
+        - key: report_assessed
+          description: >-
+            {{criterion}}
+          evidence: [report, progress_note]
+          acceptance:
+            human: review_accept
+  environment:
+    lane: deep_agents
+    model:
+      profile: {{model_profile}}
+    sandbox:
+      profile: {{sandbox_profile}}
+    plugins:
+      - pin: plugin.web-research@latest
+        as: web_research
+      - pin: plugin.cognition-knowledge@latest
+        as: knowledge_cognition
+    capabilities:
+      - {pin: tool.knowledge-read-intent@latest, kind: tool, as: knowledge_search}
+      - {pin: tool.knowledge-read@latest, kind: tool, as: knowledge_read}
+      - {pin: tool.knowledge-report-register@latest, kind: tool, as: report_register}
+      - {pin: tool.knowledge-submit-output@latest, kind: tool, as: submit_output}
+    budget:
+      usd: {{budget_usd}}
+      tokens: 600000
+      wall_clock: 45m
+      tool_calls: 60
+    governors:
+      depth: 1
+      fan_out: 2
+      iterations: 2
+      patience: 1
+    side_effects: [read_only, workspace_write, external_write_reversible]
+  program:
+    key: root
+    behavior: goal_loop
+    objective: sourced_report
+    action_space: [web_research, knowledge_search, knowledge_read, report_register, submit_output]
+    verifier:
+      independent: true
+      environment:
+        model:
+          profile: {{verifier_model_profile}}
+    outputs:
+      - name: report
+        form: reference
+        enforcement: required
+        requirements:
+          - {key: assessed, validator: "knowledge.report.assess@1"}
+      - {name: progress_note, form: text, enforcement: required, media_type: text/plain, scope: iteration}
+      - {name: summary, form: text, enforcement: expected, media_type: text/plain, scope: iteration}
+      - {name: caveats, form: text, enforcement: optional, media_type: text/plain, scope: iteration}
+  controls:
+    commands_allowed: [pause, resume, cancel, queue_instruction, add_context]

@@ -13,7 +13,7 @@ Do the jobs in order. Read a job's topic first with {op:guide_topic}. Read every
 | --- | --- | --- |
 | 1. Interview the user | `interview` | {op:search} |
 | 2. Select lane, model, capabilities | `lanes`, `models`, `capabilities`, `workflows` | {op:search}, {op:describe}, {op:check} |
-| 3. Author and launch | `launch` | {op:compile}, {op:preflight}, {op:submit}, {op:start} |
+| 3. Author and launch | `templates`, `manifest`, `launch` | {op:describe_template}, {op:compile}, {op:preflight}, {op:submit}, {op:start} |
 | 4. Check in on the run | `observe` | {op:inbox_wait}, {op:inspect}, {op:transcript} |
 | 5. Steer or fork | `control` | {op:command}, {op:fork}, {op:points} |
 | 6. Accept results | `observe` | {op:outputs}, {op:human_task_resolve} |

@@ -1,10 +1,12 @@
 """`missionctl search` and `missionctl workspace check`: the Selection Workspace.
 
-``search [QUERY] [--facet capability|lane|model|sandbox_profile|workflow_type]... [--kind KIND]...
-[--lane PROFILE] [--limit N] [--offset N]`` prints one ranked, faceted answer
-(`mc.selection_search.v1`): each hit's stable ref (a Capability Pin, `lane:<profile>` or
-`model:<profile>`) and why it matched. Without QUERY it lists the facets by name instead
-(``--kind skill`` lists the published skills; ``--offset`` pages).
+``search [QUERY] [--facet capability|lane|model|sandbox_profile|workflow_type|template]...
+[--kind KIND]... [--lane PROFILE] [--limit N] [--offset N] [--include-lowered]`` prints one
+ranked, faceted answer (`mc.selection_search.v1`): each hit's stable ref (a Capability Pin,
+`lane:<profile>`, `model:<profile>`, `template:<id>` or `sandbox:<profile>`) and why it matched.
+Without QUERY it lists the facets by name instead (``--kind skill`` lists the published skills;
+``--offset`` pages). The definitions submitted manifests lowered are left out unless
+``--include-lowered`` is given.
 ``workspace check DRAFT`` reads a draft selection (JSON, or YAML for ``.yaml``/``.yml``) and
 prints the decision (`mc.selection_check.v1`). Both post to the same routes the coordinator MCP
 tools ``mission_search`` and ``selection_check`` call through. A refused draft exits 6 (a
@@ -26,7 +28,7 @@ from mission_control.interfaces.cli.exits import exit_status
 
 # `application/selection/workspace.FACETS`, repeated so the thin client imports no handler; the
 # route validates the body either way.
-FACETS = ("capability", "lane", "model", "sandbox_profile", "workflow_type")
+FACETS = ("capability", "lane", "model", "sandbox_profile", "workflow_type", "template")
 # A blocked result (exits.py): the draft was checked and refused.
 BLOCKED = 6
 
@@ -50,6 +52,11 @@ def add_selection_parsers(groups: Any, common: argparse.ArgumentParser) -> None:
     search.add_argument("--lane", dest="lane_profile")
     search.add_argument("--limit", type=int)
     search.add_argument("--offset", type=int, help="a listing's first row")
+    search.add_argument(
+        "--include-lowered",
+        action="store_true",
+        help="also answer with the definitions submitted manifests lowered (not reusable types)",
+    )
     workspace = groups.add_parser(
         "workspace", parents=[common], help="check a draft lane/model/capability selection"
     )
@@ -80,6 +87,8 @@ def search_body(args: argparse.Namespace) -> dict[str, Any]:
         body["limit"] = args.limit
     if getattr(args, "offset", None) is not None:
         body["offset"] = args.offset
+    if getattr(args, "include_lowered", False):
+        body["include_lowered"] = True
     return body
 
 

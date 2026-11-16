@@ -1,0 +1,152 @@
+---
+id: system-improvement
+title: Diagnose, change, review
+purpose: A coding mission with the SDLC cognition profile; one agent diagnoses a wrong behaviour, a second proposes the change test-first, a human reviews.
+use_when: The user names a behaviour that is wrong today, how to observe it and what must keep working.
+produces: The text outputs `diagnose.diagnosis` and `change.change_report` (the change as a diff and the tests that ran), then one REVIEW Human Task at `review`. Approving it accepts the mission; nothing is merged or published.
+slots:
+  application_id:
+    description: This server's application id (the start page names it).
+    example: demo-app
+  mission_key:
+    description: "A stable slug for the mission: lower case letters, digits, `-` or `_`."
+    example: system-improvement
+  title:
+    description: A one-line title.
+    example: Fix the failing parser test
+  goal:
+    description: The behaviour that is wrong today and how to observe it, one line.
+    example: The parser rejects a manifest with a trailing comment; reproduce it with the parser test and fix it.
+  criterion:
+    description: What must hold after the change, one line.
+    example: The failing test passes, every other test still passes and the diff is minimal.
+  repository_url:
+    description: The repository the change lands in (https or ssh).
+    example: "https://example.invalid/org/repository.git"
+  repository_ref:
+    description: The branch or commit to start from.
+    example: main
+  model_profile:
+    description: A Model Profile the lane routes (topic `models`).
+    example: producer.default
+  sandbox_profile:
+    description: A sandbox profile bound on this installation (topic `manifest`).
+    example: research.standard
+  budget_usd:
+    description: The ceiling on model spend in US dollars, a number.
+    example: "3"
+  reviewer:
+    description: Who resolves the review; an actor id, or a reviewer role such as `owner`. Only that actor, or a principal holding `reviewer:<role>`, can.
+    example: owner
+notes:
+  - Compiles against the seeded catalog; not yet proven by a run.
+  - On the `deep_agents` lane the agent works in its sandbox and fetches the repository itself. Mission Control checks out `workspace.repo` only on the repository-bound lanes (topic `lanes`), so the sandbox must be allowed to reach the repository.
+  - The `change` stage reads the accepted diagnosis through its `from` binding. A start is refused with `dependent_inputs_unavailable` where the installation composes no trusted settlement.
+---
+manifest: mission/v2
+mission:
+  key: {{mission_key}}
+  application: {{application_id}}
+  title: >-
+    {{title}}
+  description: >-
+    {{goal}}
+  goals:
+    - key: improvement
+      description: >-
+        {{goal}}
+      importance: primary
+      objectives:
+        - key: diagnose_fault
+          description: Reproduce the behaviour and name its cause with evidence.
+        - key: make_change
+          description: Change the code test-first and report the diff and the tests that ran.
+      criteria:
+        - key: change_reviewed
+          description: >-
+            {{criterion}}
+          evidence: [diagnosis, change_report]
+          acceptance:
+            human: review_accept
+  environment:
+    lane: deep_agents
+    model:
+      profile: {{model_profile}}
+    sandbox:
+      profile: {{sandbox_profile}}
+    workspace:
+      repo:
+        url: {{repository_url}}
+        ref: {{repository_ref}}
+    plugins:
+      - pin: plugin.cognition-sdlc@latest
+        as: sdlc
+    capabilities:
+      - pin: tool.knowledge-submit-output@latest
+        kind: tool
+        as: submit_output
+    budget:
+      usd: {{budget_usd}}
+      tokens: 800000
+      wall_clock: 1h
+      tool_calls: 120
+    governors:
+      depth: 1
+      fan_out: 1
+      iterations: 1
+      patience: 1
+    side_effects: [read_only, workspace_write]
+  program:
+    key: root
+    behavior: stage_graph
+    objectives: [improvement]
+    nodes:
+      - key: diagnose
+        behavior: agent_executor
+        objectives: [diagnose_fault]
+        environment:
+          budget:
+            tokens: 300000
+            tool_calls: 50
+        instruction: >-
+          {{goal}}
+          Work in {{repository_url}} at {{repository_ref}}. Reproduce the behaviour and find
+          its cause. Submit the diagnosis with the submit_output tool: one call, obligation
+          "diagnose.diagnosis", one inline text item. Stop after its receipt.
+        outputs:
+          - name: diagnosis
+            form: text
+            media_type: text/plain
+      - key: change
+        behavior: agent_executor
+        objectives: [make_change]
+        environment:
+          budget:
+            tokens: 450000
+            tool_calls: 65
+        inputs:
+          - name: diagnosis
+            from: diagnose.diagnosis
+            expand: materialize
+        instruction: >-
+          Make the change the diagnosis you received calls for, test-first, in
+          {{repository_url}} at {{repository_ref}}. Submit the change report with the
+          submit_output tool: one call, obligation "change.change_report", one inline text
+          item holding the diff and each test command with its result. Stop after its receipt.
+        outputs:
+          - name: change_report
+            form: text
+            media_type: text/plain
+      - key: review
+        behavior: human_gate
+        objectives: [improvement]
+        depends_on: [change]
+        task:
+          kind: REVIEW
+          prompt: >-
+            {{criterion}}
+          reviewers: [{{reviewer}}]
+          packet: [diagnose.diagnosis, change.change_report]
+          on_timeout: keep_waiting
+  controls:
+    commands_allowed: [pause, resume, cancel, queue_instruction, add_context]

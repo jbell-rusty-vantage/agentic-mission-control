@@ -16,6 +16,16 @@ does not return a published definition searched by its own title, the workspace 
 published definitions itself (name, kind, description) and says so: a note names the scanned
 facets, and `catalog_search_mode` is `definition_scan` when the catalog ranked none.
 
+Two facets are not catalog definitions. `template` lists the curated mission templates the
+composition hands in (a hit's ref is `template:<id>`). `sandbox_profile` lists first the sandbox
+profiles this deployment binds, the names a manifest writes in `environment.sandbox.profile`
+(`sandbox:<name>`), then the catalog's sandbox profile definitions.
+
+A submitted manifest lowers into one Workflow Type of its own with its blueprint and profiles
+(`manifest_lowering.manifest_lowered_refs`). Those rows belong to that manifest and are not
+reusable, so a search leaves them out unless the request sets `include_lowered`; the result
+says how many it left out (`lowered_hidden`).
+
 `SelectionWorkspace.check` takes a draft (application, lane, model profile, family, data class,
 capability pins, sandbox profile pin, Workflow Type pin) and returns a structured decision:
 the resolution seam's admission (`RuntimeResolver.admit`: lane, application, model route, data
@@ -63,6 +73,7 @@ from mission_control.domain.authoring.contracts import (
     PublishedDefinition,
     WorkflowTypeDefinition,
 )
+from mission_control.domain.authoring.manifest_lowering import manifest_lowered_refs
 from mission_control.domain.capabilities.catalog_entry import capability_pin
 from mission_control.domain.capabilities.host_support import (
     CapabilityHostSupport,
@@ -86,14 +97,17 @@ SELECTION_CHECK_SCHEMA: Final = "mc.selection_check.v1"
 # The constant of the reciprocal-rank merge across facets (the catalog's own fusion uses 60).
 MERGE_RRF_K: Final = 60
 
-Facet = Literal["capability", "lane", "model", "sandbox_profile", "workflow_type"]
+Facet = Literal["capability", "lane", "model", "sandbox_profile", "workflow_type", "template"]
 FACETS: Final[tuple[Facet, ...]] = (
     "capability",
     "lane",
     "model",
     "sandbox_profile",
     "workflow_type",
+    "template",
 )
+# What a hit's `ref` starts with where it is not a Capability Pin.
+SANDBOX_REF_PREFIX: Final = "sandbox:"
 # The catalog kinds each catalog-backed facet searches.
 FACET_KINDS: Final[Mapping[Facet, frozenset[DefinitionKind]]] = {
     "capability": frozenset(
@@ -129,6 +143,8 @@ ITEM_KIND_OF: Final[Mapping[DefinitionKind, ConfigurationItemKind]] = {
 FACET_WORDS: Final[Mapping[Facet, frozenset[str]]] = {
     "lane": frozenset({"lane", "lanes", "harness", "harnesses"}),
     "model": frozenset({"model", "models"}),
+    "sandbox_profile": frozenset({"sandbox", "sandboxes"}),
+    "template": frozenset({"template", "templates"}),
 }
 # The resolver's manifest pointers, re-pointed into the draft's fields.
 DRAFT_POINTERS: Final[Mapping[str, str]] = {
@@ -207,6 +223,15 @@ class SelectionCatalogUnavailable(RuntimeError):
     """No catalog is composed for this workspace, so nothing can be listed or read by pin."""
 
 
+class WorkspaceEntry(_Frozen):
+    """One entry the composition hands in beside the catalog: a mission template, or a sandbox
+    profile this deployment binds. `ref` is what the guide's describe reads."""
+
+    ref: str
+    title: str
+    summary: str
+
+
 class SelectionSearchRequest(_Frozen):
     # Empty (or blank): list the requested facets by name instead of ranking them.
     query: str = Field(default="", max_length=2_000)
@@ -223,6 +248,9 @@ class SelectionSearchRequest(_Frozen):
     offset: int = Field(default=0, ge=0, le=100_000)
     # Per catalog-backed facet.
     catalog_limit: int = Field(default=10, ge=1, le=50)
+    # Also answer with the definitions a submitted manifest lowered (its own Workflow Type,
+    # blueprint and profiles); left out by default because none of them is reusable.
+    include_lowered: bool = False
 
 
 class SelectionHit(_Frozen):
@@ -231,7 +259,8 @@ class SelectionHit(_Frozen):
     one kind; the guide's describe reads the rest by `ref`."""
 
     facet: Facet
-    # What a draft names: a Capability Pin, `lane:<profile>` or `model:<profile>`.
+    # What a draft names: a Capability Pin, `lane:<profile>` or `model:<profile>`; what a
+    # manifest starts from or names: `template:<id>`, `sandbox:<profile>`.
     ref: str
     title: str
     summary: str
@@ -264,6 +293,9 @@ class SelectionSearchResult(_Frozen):
     # A listing: how many rows the requested facets hold in all, and where this page starts.
     total: int | None = Field(default=None, exclude_if=_absent)
     offset: int = Field(default=0, exclude_if=lambda value: value == 0)
+    # How many definitions lowered from submitted manifests the requested facets hold and this
+    # answer left out (`include_lowered` adds them).
+    lowered_hidden: int = Field(default=0, exclude_if=lambda value: value == 0)
     # What the caller must know to read the hits honestly (an unbuilt Search Projection).
     notes: tuple[str, ...] = Field(default=(), exclude_if=_empty)
 
@@ -278,6 +310,7 @@ class SelectionDraft(_Frozen):
     # Undeclared: the application's Data Class ceiling, as the seam treats an undeclared mission.
     data_class: DataClass | None = None
     capabilities: tuple[str, ...] = Field(default=(), max_length=64)
+    # A sandbox profile this deployment binds (its name or `sandbox:<name>`), or a catalog pin.
     sandbox_profile: str | None = None
     workflow_type: str | None = None
 
@@ -374,8 +407,15 @@ class SelectionWorkspace:
         search: CapabilitySearchPort | None = None,
         definitions: object | None = None,
         clock: Callable[[], float] = time.monotonic,
+        templates: Sequence[WorkspaceEntry] = (),
+        sandbox_profiles: Sequence[WorkspaceEntry] = (),
     ) -> None:
         self._application_id = application_id
+        # The curated mission templates and the sandbox profiles this deployment binds.
+        self._entries: dict[Facet, tuple[WorkspaceEntry, ...]] = {
+            "template": tuple(templates),
+            "sandbox_profile": tuple(sandbox_profiles),
+        }
         self._lanes = lanes
         self._models = models
         self._applications = applications
@@ -419,6 +459,14 @@ class SelectionWorkspace:
             raise SelectionCatalogUnavailable("no catalog is composed for this application")
         return await find_published_by_pin(self._definitions, pin)
 
+    async def _lowered(self) -> frozenset[tuple[str, str, str]]:
+        """The published definitions submitted manifests lowered (empty without a catalog)."""
+
+        try:
+            return manifest_lowered_refs(await self.published_definitions())
+        except SelectionCatalogUnavailable:
+            return frozenset()
+
     # -- search ----------------------------------------------------------------------------------
 
     async def search(self, request: SelectionSearchRequest) -> SelectionSearchResult:
@@ -432,30 +480,46 @@ class SelectionWorkspace:
         # Facet -> the published definition the Search Projection did not return.
         scanned: dict[Facet, str] = {}
         modes: list[str] = []
+        lowered = frozenset() if request.include_lowered else await self._lowered()
+        hidden = 0
         for facet in facets:
             if facet == "lane":
                 ranked[facet] = self._lane_hits(tokens)
-            elif facet == "model":
+                continue
+            if facet == "model":
                 ranked[facet] = self._model_hits(tokens, request.lane_profile)
-            else:
-                outcome = await self._catalog_hits(facet, request, query)
-                if isinstance(outcome, FacetUnavailable):
+                continue
+            entries = self._entry_hits(tokens, facet)
+            if facet not in FACET_KINDS:
+                ranked[facet] = entries
+                continue
+            outcome = await self._catalog_hits(facet, request, query, lowered)
+            if isinstance(outcome, FacetUnavailable):
+                # What the deployment binds is still an answer where no catalog search is.
+                ranked[facet] = entries
+                if not entries:
                     unavailable.append(outcome)
-                else:
-                    ranked[facet], facet_mode, probe = outcome
-                    modes.append(facet_mode)
-                    if probe is not None:
-                        scanned[facet] = probe
+                continue
+            catalog_hits, facet_mode, probe, left_out = outcome
+            ranked[facet] = [*entries, *catalog_hits]
+            hidden += left_out
+            modes.append(facet_mode)
+            if probe is not None:
+                scanned[facet] = probe
         # The catalog's own mode where its search answered a facet; `definition_scan` only when
         # the workspace scanned every facet that answered. The note names the scanned facets.
         ranked_modes = [mode for mode in modes if mode != DEFINITION_SCAN]
+        notes = [_scan_note(scanned)] if scanned else []
+        if hidden:
+            notes.append(_lowered_note(hidden))
         return SelectionSearchResult(
             query=query,
             facets=facets,
             hits=_merge(ranked, request.limit),
             unavailable=tuple(unavailable),
             catalog_search_mode=(ranked_modes or modes or [None])[0],
-            notes=(_scan_note(scanned),) if scanned else (),
+            lowered_hidden=hidden,
+            notes=tuple(notes),
         )
 
     async def _listing(
@@ -466,18 +530,29 @@ class SelectionWorkspace:
         rows: list[SelectionHit] = []
         unavailable: list[FacetUnavailable] = []
         mode: str | None = None
+        hidden = 0
         for facet in facets:
             if facet == "lane":
-                listed = self._lane_listing()
-            elif facet == "model":
-                listed = self._model_listing(request.lane_profile)
-            else:
-                try:
-                    listed = await self._catalog_listing(facet, request)
-                except SelectionCatalogUnavailable as error:
+                rows += self._lane_listing()
+                continue
+            if facet == "model":
+                rows += self._model_listing(request.lane_profile)
+                continue
+            entries = [
+                _listed(facet, entry.ref, entry.title, entry.summary)
+                for entry in self._entries.get(facet, ())
+            ]
+            rows += entries
+            if facet not in FACET_KINDS:
+                continue
+            try:
+                listed, left_out = await self._catalog_listing(facet, request)
+            except SelectionCatalogUnavailable as error:
+                if not entries:
                     unavailable.append(FacetUnavailable(facet=facet, reason=str(error)))
-                    continue
-                mode = DEFINITION_LISTING
+                continue
+            mode = DEFINITION_LISTING
+            hidden += left_out
             rows += listed
         return SelectionSearchResult(
             query="",
@@ -488,6 +563,8 @@ class SelectionWorkspace:
             mode="listing",
             total=len(rows),
             offset=request.offset,
+            lowered_hidden=hidden,
+            notes=(_lowered_note(hidden),) if hidden else (),
         )
 
     def _lane_listing(self) -> list[SelectionHit]:
@@ -513,8 +590,10 @@ class SelectionWorkspace:
 
     async def _catalog_listing(
         self, facet: Facet, request: SelectionSearchRequest
-    ) -> list[SelectionHit]:
-        rows = await self._facet_rows(facet, request)
+    ) -> tuple[list[SelectionHit], int]:
+        """The facet's listed rows and how many lowered definitions were left out."""
+
+        rows, hidden = await self._facet_rows(facet, request)
         # A facet that answers with one kind names it once, as the facet.
         mixed = len(_facet_kinds(facet, request)) > 1
         return [
@@ -526,27 +605,47 @@ class SelectionWorkspace:
                 kind=row.ref.kind.value if mixed else None,
             )
             for row in rows
-        ]
+        ], hidden
 
     async def _facet_rows(
         self, facet: Facet, request: SelectionSearchRequest
-    ) -> list[PublishedDefinition]:
+    ) -> tuple[list[PublishedDefinition], int]:
         """The facet's published definitions by name, under the request's kind and lane
-        filters (the lane filter keeps rows whose host support marks the lane `supported`)."""
+        filters (the lane filter keeps rows whose host support marks the lane `supported`),
+        and how many definitions lowered from submitted manifests were left out of them."""
 
         kinds = _facet_kinds(facet, request)
         lane = request.lane_profile if facet == "capability" else None
+        published = await self.published_definitions()
+        lowered = frozenset() if request.include_lowered else manifest_lowered_refs(published)
         rows = [
             row
-            for row in await self.published_definitions()
+            for row in published
             if row.ref.kind in kinds
             and (
                 lane is None
                 or _host_status(getattr(row.definition, "host_support", None), lane) == "supported"
             )
         ]
-        rows.sort(key=lambda row: (row.ref.logical_id, row.ref.revision))
-        return rows
+        kept = [row for row in rows if _definition_key(row) not in lowered]
+        kept.sort(key=lambda row: (row.ref.logical_id, row.ref.revision))
+        return kept, len(rows) - len(kept)
+
+    def _entry_hits(self, tokens: frozenset[str], facet: Facet) -> list[tuple[float, SelectionHit]]:
+        """The facet's handed-in entries (templates, bound sandbox profiles) a query matches."""
+
+        hits: list[tuple[float, SelectionHit]] = []
+        for entry in self._entries.get(facet, ()):
+            fields = [("name", entry.title, 3.0), ("summary", entry.summary, 1.0)]
+            score, reasons = _score(
+                tokens, fields, FACET_WORDS.get(facet, frozenset()), facet, stem=True
+            )
+            if score > 0:
+                hits.append(
+                    (score, _hit(facet, entry.ref, entry.title, entry.summary, reasons, {}))
+                )
+        hits.sort(key=lambda item: -item[0])
+        return hits
 
     def _lane_hits(self, tokens: frozenset[str]) -> list[tuple[float, SelectionHit]]:
         hits: list[tuple[float, SelectionHit]] = []
@@ -667,10 +766,15 @@ class SelectionWorkspace:
         return routes
 
     async def _catalog_hits(
-        self, facet: Facet, request: SelectionSearchRequest, query: str
-    ) -> tuple[list[tuple[float, SelectionHit]], str, str | None] | FacetUnavailable:
-        """The facet's ranked hits, who ranked them and, when that was the definition scan,
-        the published definition the Search Projection did not return."""
+        self,
+        facet: Facet,
+        request: SelectionSearchRequest,
+        query: str,
+        lowered: frozenset[tuple[str, str, str]],
+    ) -> tuple[list[tuple[float, SelectionHit]], str, str | None, int] | FacetUnavailable:
+        """The facet's ranked hits, who ranked them, when that was the definition scan the
+        published definition the Search Projection did not return, and how many hits lowered
+        from submitted manifests (`lowered`) were left out."""
 
         if self._search is None or self._catalog_scope is None:
             return FacetUnavailable(
@@ -695,30 +799,35 @@ class SelectionWorkspace:
                 )
             )
             hits: list[tuple[float, SelectionHit]] = []
+            hidden = 0
             for hit in response.hits:
                 ref = _catalog_ref(hit)
                 if ref is None:
                     continue
+                if _hit_key(hit) in lowered:
+                    hidden += 1
+                    continue
                 hits.append((hit.fused_rank, _catalog_hit(facet, ref, hit, response.search_mode)))
-            if hits:
-                return hits, response.search_mode, None
+            if hits or hidden:
+                return hits, response.search_mode, None, hidden
             scanned = await self._definition_scan(facet, request, query)
         except CapabilitySearchUnavailable as error:
             return FacetUnavailable(facet=facet, reason=str(error))
         if scanned is None:
             # The Search Projection answers for this scope: the query matched nothing.
-            return [], response.search_mode, None
+            return [], response.search_mode, None, 0
         return scanned
 
     async def _definition_scan(
         self, facet: Facet, request: SelectionSearchRequest, query: str
-    ) -> tuple[list[tuple[float, SelectionHit]], str, str] | None:
+    ) -> tuple[list[tuple[float, SelectionHit]], str, str, int] | None:
         """The fallback behind an empty catalog answer: `None` when the facet holds no
         published definition or the Search Projection answers a probe, else a lexical scan of
-        the published definitions with the name of the definition the probe searched for."""
+        the published definitions with the name of the definition the probe searched for and
+        the number of lowered definitions the scan left out."""
 
         try:
-            rows = await self._facet_rows(facet, request)
+            rows, hidden = await self._facet_rows(facet, request)
         except SelectionCatalogUnavailable:
             return None
         if not rows or await self._projection_answers(rows[0]):
@@ -751,7 +860,7 @@ class SelectionWorkspace:
             )
             for score, row, reasons in scored[: request.catalog_limit]
         ]
-        return hits, DEFINITION_SCAN, rows[0].ref.logical_id
+        return hits, DEFINITION_SCAN, rows[0].ref.logical_id, hidden
 
     async def _projection_answers(self, probe: PublishedDefinition) -> bool:
         """Whether the Search Projection returns a published definition searched by its own
@@ -847,7 +956,8 @@ class SelectionWorkspace:
             )
         workflow, ceiling = await self._workflow_type(draft.workflow_type, refusals)
         sandbox = (
-            await self._pin_fit(
+            self._bound_sandbox(draft.sandbox_profile, refusals)
+            or await self._pin_fit(
                 "/sandbox_profile",
                 draft.sandbox_profile,
                 draft.lane_profile,
@@ -881,6 +991,34 @@ class SelectionWorkspace:
             capabilities=tuple(capabilities),
             refusals=tuple(refusals),
         )
+
+    def _bound_sandbox(self, text: str, refusals: list[SelectionRefusal]) -> PinFit | None:
+        """A draft's sandbox profile where it names what a manifest names: a sandbox profile
+        this deployment binds, by name or as a search hit's `sandbox:<name>`. `None`: it is
+        neither, so it is read as a catalog pin."""
+
+        bound = {entry.title for entry in self._entries["sandbox_profile"]}
+        name = text.removeprefix(SANDBOX_REF_PREFIX)
+        if name in bound:
+            return PinFit(
+                pointer="/sandbox_profile",
+                pin=text,
+                found=True,
+                kind=DefinitionKind.SANDBOX_PROFILE,
+                title=name,
+            )
+        if not text.startswith(SANDBOX_REF_PREFIX):
+            return None
+        refusals.append(
+            _workspace_refusal(
+                "SANDBOX_PROFILE_UNBOUND",
+                "/sandbox_profile",
+                f"sandbox profile {name} is not bound by this deployment; bound: "
+                f"{', '.join(sorted(bound)) or 'none'}",
+                "name a bound sandbox profile",
+            )
+        )
+        return PinFit(pointer="/sandbox_profile", pin=text, found=False)
 
     def _lane_fit(self, draft: SelectionDraft) -> LaneFit:
         try:
@@ -1124,6 +1262,34 @@ def _one_line(text: str) -> str:
     return line if len(line) <= SUMMARY_CHARS else line[: SUMMARY_CHARS - 3].rstrip() + "..."
 
 
+def _definition_key(row: PublishedDefinition) -> tuple[str, str, str]:
+    """A published row as `manifest_lowered_refs` names it."""
+
+    return (row.ref.kind.value, row.ref.logical_id, row.ref.digest)
+
+
+def _hit_key(hit: CapabilitySearchHit) -> tuple[str, str, str] | None:
+    """A catalog search hit as `manifest_lowered_refs` names it (`None`: it carries no digest)."""
+
+    if hit.exact_ref is not None:
+        return (hit.kind.value, hit.exact_ref.logical_id, hit.exact_ref.digest)
+    if hit.pin is None:
+        return None
+    try:
+        pin = CapabilityPin.parse(hit.pin)
+    except CapabilityPinError:
+        return None
+    return (hit.kind.value, pin.capability_id, pin.digest) if pin.digest is not None else None
+
+
+def _lowered_note(hidden: int) -> str:
+    return (
+        f"{hidden} definitions lowered from submitted manifests are left out: each belongs to "
+        "the one manifest it was lowered from and is not a reusable type; `include_lowered` "
+        "lists them"
+    )
+
+
 def _scan_note(scanned: Mapping[Facet, str]) -> str:
     """What a caller must know about hits the workspace scanned for itself: which facets,
     the evidence that the Search Projection does not hold them, and what a scan lacks."""
@@ -1308,6 +1474,7 @@ __all__ = [
     "DEFINITION_SCAN",
     "FACETS",
     "FACET_KINDS",
+    "SANDBOX_REF_PREFIX",
     "SELECTION_CHECK_SCHEMA",
     "SELECTION_SEARCH_SCHEMA",
     "CapabilitySearchPort",
@@ -1327,4 +1494,5 @@ __all__ = [
     "SelectionSearchResult",
     "SelectionWorkspace",
     "WorkflowTypeFit",
+    "WorkspaceEntry",
 ]

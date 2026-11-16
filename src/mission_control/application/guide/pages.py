@@ -3,15 +3,18 @@
 A page says what to do and why; it restates no fact a registry holds. Its frontmatter is three
 `key: value` lines (`id`, `title`, `summary`). Its body names operations as `{op:<id>}`
 (`operations.py`) and marks where the service puts the section it generates from the registries
-with one `{{generated}}` line (a page without the marker gets the section appended).
+with one `{{generated}}` line (a page without the marker gets the section appended); a second
+generated section of the same page is marked `{{generated:<name>}}`.
 
 `pages/` holds the start page (`index`) and the topics; `tools/` holds the field notes of the
-tools whose request is an object too large for a tool listing (`tool_docs.py`).
+tools whose request is an object too large for a tool listing (`tool_docs.py`). The mission
+templates are package data of their own (`templates/`, `mission_templates.py`).
 """
 
 from __future__ import annotations
 
 import re
+from collections.abc import Mapping
 from dataclasses import dataclass
 from functools import cache
 from importlib import resources
@@ -22,6 +25,8 @@ INDEX: Final = "index"
 TOPIC_IDS: Final[tuple[str, ...]] = (
     "interview",
     "workflows",
+    "templates",
+    "manifest",
     "lanes",
     "models",
     "capabilities",
@@ -78,15 +83,18 @@ def load_page(directory: str, page_id: str) -> PageSource:
     return parse_page(source.read_text(encoding="utf-8"), expected_id=page_id)
 
 
-def insert_generated(body: str, generated: str) -> str:
+def insert_generated(body: str, generated: str, named: Mapping[str, str] | None = None) -> str:
     """`body` with the generated section at its marker, or appended; an empty section leaves
-    no blank marker behind."""
+    no blank marker behind. A page with more than one generated section marks each further
+    one `{{generated:<name>}}`, filled from `named`."""
 
     section = generated.strip()
     if GENERATED_MARKER in body:
         merged = body.replace(GENERATED_MARKER, section)
     else:
         merged = f"{body}\n\n{section}" if section else body
+    for name, text in (named or {}).items():
+        merged = merged.replace(f"{{{{generated:{name}}}}}", text.strip())
     return re.sub(r"\n{3,}", "\n\n", merged).strip()
 
 

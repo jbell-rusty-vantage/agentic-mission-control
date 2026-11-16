@@ -9,7 +9,7 @@ it, for listing its tools, resources and prompts.
 
 from __future__ import annotations
 
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping, Sequence
 from types import SimpleNamespace
 from typing import Any
 from uuid import UUID
@@ -17,6 +17,7 @@ from uuid import UUID
 from fastmcp import FastMCP
 
 from mission_control.adapters.deep_agents.compile import deep_agents_lane
+from mission_control.application.guide.mission_templates import load_template, mission_templates
 from mission_control.application.guide.service import GuideService
 from mission_control.application.resolution.registries import (
     ApplicationRegistry,
@@ -24,9 +25,18 @@ from mission_control.application.resolution.registries import (
     ModelCatalog,
 )
 from mission_control.application.resolution.resolver import RuntimeResolver
-from mission_control.application.selection.workspace import SelectionWorkspace
+from mission_control.application.selection.workspace import (
+    SANDBOX_REF_PREFIX,
+    SelectionWorkspace,
+    WorkspaceEntry,
+)
 from mission_control.bootstrap.guide import LANE_FEATURE_REGISTRIES, compose_guide
 from mission_control.bootstrap.lanes import SESSION_LANES, describe_only_registry
+from mission_control.domain.authoring.contracts import PublishedDefinition
+from mission_control.domain.authoring.manifest import load_manifest_yaml
+from mission_control.domain.authoring.manifest_lowering import lower_mission
+from mission_control.domain.authoring.manifest_v2 import parse_manifest_any
+from mission_control.domain.authoring.mission_definition import manifest_to_definitions
 from mission_control.domain.execution.lanes import LANE_PROFILES
 from mission_control.domain.resolution.profiles import LaneDeclaration
 from mission_control.interfaces.mcp.operator_server import create_operator_server
@@ -36,10 +46,13 @@ from tests.unit.selection.test_selection_workspace import (
     CATALOG_SCOPE,
     FakeDefinitions,
     FakeSearch,
+    _published,
     _registration,
 )
 
 APPLICATION = "biotech"
+# The sandbox profiles a deployment's launch bindings bind, as the composition reads them.
+SANDBOXES: Mapping[str, str] = {"research.standard": "docker sandbox bound by this deployment"}
 INSTALLATION = UUID("11111111-1111-4111-8111-111111111111")
 TENANT = UUID("22222222-2222-4222-8222-222222222222")
 # The scoped registries `create_operator_server` reads from the API's `app.state`.
@@ -64,7 +77,30 @@ OPERATOR_REGISTRIES = (
 )
 
 
-def _workspace(lanes: LaneRegistry, models: ModelCatalog, *, catalog: bool) -> SelectionWorkspace:
+def workspace_entries(
+    sandboxes: Mapping[str, str] | None = SANDBOXES,
+) -> dict[str, tuple[WorkspaceEntry, ...]]:
+    """The templates and bound sandbox profiles as `bootstrap/selection.py` hands them in."""
+
+    return {
+        "templates": tuple(
+            WorkspaceEntry(ref=template.ref, title=template.title, summary=template.purpose)
+            for template in mission_templates()
+        ),
+        "sandbox_profiles": tuple(
+            WorkspaceEntry(ref=f"{SANDBOX_REF_PREFIX}{name}", title=name, summary=summary)
+            for name, summary in (sandboxes or {}).items()
+        ),
+    }
+
+
+def _workspace(
+    lanes: LaneRegistry,
+    models: ModelCatalog,
+    *,
+    catalog: bool,
+    rows: Sequence[PublishedDefinition] | None = None,
+) -> SelectionWorkspace:
     applications = ApplicationRegistry(APPLICATIONS)
     return SelectionWorkspace(
         application_id=APPLICATION,
@@ -76,7 +112,10 @@ def _workspace(lanes: LaneRegistry, models: ModelCatalog, *, catalog: bool) -> S
         ),
         catalog_scope=CATALOG_SCOPE if catalog else None,
         search=FakeSearch() if catalog else None,
-        definitions=FakeDefinitions() if catalog else None,
+        definitions=(FakeDefinitions() if rows is None else FakeDefinitions(rows))
+        if catalog
+        else None,
+        **workspace_entries(),
     )
 
 
@@ -85,18 +124,21 @@ def stub_guide(
     declarations: Iterable[LaneDeclaration] = (STUB_DECLARATION, NARROW_DECLARATION),
     allow_unqualified: bool = True,
     catalog: bool = True,
+    rows: Sequence[PublishedDefinition] | None = None,
+    sandboxes: Mapping[str, str] | None = SANDBOXES,
 ) -> GuideService:
     lanes = LaneRegistry(allow_unqualified=allow_unqualified)
     for declaration in declarations:
         lanes.register(_registration(declaration))
     models = ModelCatalog(MODELS)
-    workspace = _workspace(lanes, models, catalog=catalog)
+    workspace = _workspace(lanes, models, catalog=catalog, rows=rows)
     return GuideService(
         application_id=APPLICATION,
         lanes=lanes,
         models=models,
         catalog=workspace if catalog else None,
         features=LANE_FEATURE_REGISTRIES,
+        sandbox_profiles=sandboxes,
     )
 
 
@@ -110,8 +152,37 @@ def full_guide() -> GuideService:
     )
     models = ModelCatalog(MODELS)
     return compose_guide(
-        workspace=_workspace(lanes, models, catalog=True), lanes=lanes, models=models
+        workspace=_workspace(lanes, models, catalog=True),
+        lanes=lanes,
+        models=models,
+        sandbox_profiles=SANDBOXES,
     )
+
+
+def lowered_rows() -> tuple[PublishedDefinition, ...]:
+    """The six definitions one submitted manifest leaves in the catalog, from the real
+    lowering of the `smallest` template: its Workflow Type first, then its blueprint, control
+    profile, runtime profile, workspace template and evaluation profile."""
+
+    template = load_template("smallest")
+    document = load_manifest_yaml(template.fill(template.examples()))
+    (definition,) = manifest_to_definitions(parse_manifest_any(document), document)
+    lowered = lower_mission(definition)
+    blueprint = _published(lowered.blueprint)
+    control = _published(lowered.control_profile(blueprint.ref))
+    runtime = _published(lowered.runtime_profile)
+    workspace = _published(lowered.workspace_template)
+    evaluation = _published(lowered.evaluation_profile)
+    workflow = _published(
+        lowered.workflow_type(
+            blueprint_ref=blueprint.ref,
+            control_ref=control.ref,
+            runtime_ref=runtime.ref,
+            workspace_ref=workspace.ref,
+            evaluation_ref=evaluation.ref,
+        )
+    )
+    return (workflow, blueprint, control, runtime, workspace, evaluation)
 
 
 def operator_server(guides: dict[Any, GuideService] | None = None) -> FastMCP:

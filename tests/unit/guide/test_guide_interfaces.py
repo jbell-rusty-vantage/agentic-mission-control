@@ -2,9 +2,11 @@
 
 `GET /guide`, `/guide/{topic}` and `/describe` behind the authenticated principal, the CLI's
 `guide` and `describe` over the same app (Markdown by default, the envelope with `--json`), and
-the `mission_guide` / `mission_describe` MCP tools, page resources and interview prompt in
-their envelope. One page is the same text on every transport once it is asked for in the same
-vocabulary; a refusal is typed on each.
+the `mission_guide` / `mission_describe` MCP tools, page resources and interview prompt. One
+page is the same text on every transport once it is asked for in the same vocabulary: the MCP
+tool's text content is the page's Markdown and its structured content is the envelope the route
+returns. A describe answer that is prose arrives the same way; one that is data stays
+structured. A refusal is typed on each.
 """
 
 from __future__ import annotations
@@ -32,6 +34,7 @@ from mission_control.interfaces.mcp.guide_tools import (
     INTERVIEW_PROMPT,
     ScopedGuide,
     register_guide_tools,
+    server_tool_listing,
 )
 from tests.fixtures.catalog_http import INSTALLATION, TENANT, CatalogHarness, catalog_harness
 from tests.unit.guide.support import stub_guide
@@ -76,6 +79,20 @@ class Resolver:
         return self.principal
 
 
+def _text(result: Any) -> str:
+    """A tool result's text content: what an agent reads."""
+
+    return "".join(getattr(part, "text", "") for part in result.content)
+
+
+def _envelope(result: Any) -> dict[str, Any]:
+    """A tool result's structured content, which is also its text when it is a refusal."""
+
+    envelope: dict[str, Any] = result.structured_content
+    assert json.loads(_text(result)) == envelope
+    return envelope
+
+
 def _server(harness: CatalogHarness, permissions: frozenset[str]) -> FastMCP:
     server = FastMCP("guide test")
     guide = harness.app.state.mission_control_guides[(INSTALLATION, "biotech", TENANT)]
@@ -97,9 +114,13 @@ async def test_the_start_page_is_one_text_on_http_cli_and_mcp(
     assert from_http.status_code == 200, from_http.text
     async with Client(_server(harness, frozenset({"catalog.read"}))) as mcp:
         from_mcp = await mcp.call_tool("mission_guide", {})
-    assert from_mcp.data["ok"] is True, from_mcp.data
-    assert from_mcp.data["data"] == from_http.json()
+    envelope = from_mcp.structured_content
+    assert envelope is not None and envelope["ok"] is True, envelope
+    assert envelope["data"] == from_http.json()
     assert from_http.json()["topic"] == INDEX and from_http.json()["surface"] == "mcp"
+    # The page arrives as Markdown: the text content is the page itself, not escaped JSON.
+    assert _text(from_mcp) == from_http.json()["markdown"]
+    assert _text(from_mcp).startswith("# Mission Control: start here\n\nYou are the Coordinator")
 
     # The HTTP route speaks routes by default; missionctl asks for its own commands.
     assert "`POST missions:start`" in harness.client.get(_url("guide")).json()["markdown"]
@@ -121,7 +142,9 @@ async def test_every_topic_is_served_on_every_transport(
             from_http = harness.client.get(_url(f"guide/{topic}"), params={"surface": "mcp"})
             from_mcp = await mcp.call_tool("mission_guide", {"topic": topic})
             assert from_http.status_code == 200, (topic, from_http.text)
-            assert from_mcp.data["data"] == from_http.json(), topic
+            assert from_mcp.structured_content["data"] == from_http.json(), topic  # type: ignore[index]
+            assert _text(from_mcp) == from_http.json()["markdown"], topic
+            assert _text(from_mcp).startswith("# "), topic
     status, markdown = run_cli(harness, monkeypatch, capsys, "guide", "interview")
     assert status == 0 and "## 3. The brief, and where each part goes" in markdown
     assert "`missionctl workspace check`" in markdown
@@ -132,26 +155,54 @@ async def test_describe_parity_and_the_cli_rendering(
     monkeypatch: pytest.MonkeyPatch,
     capsys: pytest.CaptureFixture[str],
 ) -> None:
-    refs = ["lane:deep_agents", "model:producer.default", "tool:mission_run_fork", _pin(RESEARCH)]
-    async with Client(_server(harness, frozenset({"catalog.read"}))) as mcp:
-        for ref in refs:
+    server = _server(harness, frozenset({"catalog.read"}))
+    # The API hands the HTTP route the listing of the MCP server it mounts.
+    harness.app.state.mission_control_tool_listing = await server_tool_listing(server)
+    data = ["lane:deep_agents", "model:producer.default", "sandbox:research.standard"]
+    data.append(_pin(RESEARCH))
+    prose = ["tool:mission_run_fork", "tool:mission_describe", "template:smallest", "manifest"]
+    prose.append("manifest:Goal")
+    async with Client(server) as mcp:
+        for ref in (*data, *prose):
             from_http = harness.client.get(_url("describe"), params={"ref": ref})
             from_mcp = await mcp.call_tool("mission_describe", {"ref": ref})
             assert from_http.status_code == 200, (ref, from_http.text)
-            assert from_mcp.data["ok"] is True and from_mcp.data["data"] == from_http.json(), ref
+            envelope = from_mcp.structured_content
+            assert envelope is not None and envelope["ok"] is True, (ref, envelope)
+            assert envelope["data"] == from_http.json(), ref
+            if ref in prose:
+                # A prose answer arrives as Markdown, the same Markdown the route carries.
+                assert _text(from_mcp) == from_http.json()["markdown"], ref
+                assert _text(from_mcp).startswith("#"), ref
+            else:
+                # A data answer stays structured: the envelope as JSON text.
+                assert "markdown" not in from_http.json(), ref
+                assert json.loads(_text(from_mcp)) == envelope, ref
     lane = harness.client.get(_url("describe"), params={"ref": "lane:deep_agents"}).json()
     assert {"controls", "delivery_semantics", "time_travel"} <= set(lane["data"])
+    # A typed tool is described from the server's own listing on both transports.
+    described = harness.client.get(_url("describe"), params={"ref": "tool:mission_describe"})
+    assert described.json()["data"]["input_schema"]["required"] == ["ref"]
+    assert "Everything about one thing" in described.json()["data"]["description"]
 
     status, enveloped = run_cli(
         harness, monkeypatch, capsys, "describe", "lane:deep_agents", "--json"
     )
     assert status == 0 and json.loads(enveloped) == lane
+    status, markdown = run_cli(harness, monkeypatch, capsys, "describe", "lane:deep_agents")
+    assert status == 0 and markdown.strip() == describe_markdown(lane)
+    assert markdown.startswith("# deep_agents\n\n```json")
     status, markdown = run_cli(harness, monkeypatch, capsys, "describe", "tool:mission_run_fork")
     fork = harness.client.get(_url("describe"), params={"ref": "tool:mission_run_fork"}).json()
-    assert status == 0 and markdown.strip() == describe_markdown(fork)
-    # The notes read as Markdown; the schema and the example are one JSON block.
-    assert markdown.startswith("# mission_run_fork: fork a run")
-    assert "`sponsorship_ref`" in markdown and '"example"' in markdown and "```json" in markdown
+    assert status == 0 and markdown.strip() == fork["markdown"] == describe_markdown(fork)
+    # The notes read as Markdown; the request schema and the example are JSON blocks.
+    assert markdown.startswith("# `mission_run_fork`")
+    assert "## mission_run_fork: fork a run" in markdown
+    assert "`sponsorship_ref`" in markdown and "## Example" in markdown and "```json" in markdown
+    status, markdown = run_cli(harness, monkeypatch, capsys, "describe", "template:smallest")
+    assert status == 0 and markdown.startswith("# Template `smallest`") and "```yaml" in markdown
+    status, markdown = run_cli(harness, monkeypatch, capsys, "describe", "manifest")
+    assert status == 0 and markdown.startswith("# Mission Manifest reference")
 
 
 async def test_refusals_are_typed_on_every_transport(
@@ -175,14 +226,19 @@ async def test_refusals_are_typed_on_every_transport(
     assert bad_surface.status_code == 422
 
     async with Client(_server(harness, frozenset({"catalog.read"}))) as mcp:
-        topic = await mcp.call_tool("mission_guide", {"topic": "pricing"})
-        ref = await mcp.call_tool("mission_describe", {"ref": "everything"})
-        lane = await mcp.call_tool("mission_describe", {"ref": "lane:nowhere"})
-    assert topic.data["ok"] is False and topic.data["error"]["code"] == "INVALID_ARGUMENT"
-    assert "interview" in topic.data["error"]["details"]["valid"]
-    assert ref.data["error"]["details"]["reason"] == "unknown_ref"
-    assert "tool:<name>" in ref.data["error"]["details"]["valid"]
-    assert lane.data["error"]["code"] == "NOT_FOUND"
+        topic = _envelope(await mcp.call_tool("mission_guide", {"topic": "pricing"}))
+        ref = _envelope(await mcp.call_tool("mission_describe", {"ref": "everything"}))
+        lane = _envelope(await mcp.call_tool("mission_describe", {"ref": "lane:nowhere"}))
+        tool = _envelope(await mcp.call_tool("mission_describe", {"ref": "tool:nowhere"}))
+    assert topic["ok"] is False and topic["error"]["code"] == "INVALID_ARGUMENT"
+    assert "interview" in topic["error"]["details"]["valid"]
+    assert ref["error"]["details"]["reason"] == "unknown_ref"
+    assert "tool:<name>" in ref["error"]["details"]["valid"]
+    assert "template:<id>" in ref["error"]["details"]["valid"]
+    assert lane["error"]["code"] == "NOT_FOUND"
+    # An unknown tool names the tools of the server it was asked on.
+    assert tool["error"]["code"] == "NOT_FOUND"
+    assert "tool:mission_guide" in tool["error"]["details"]["valid"]
 
     status, out = run_cli(harness, monkeypatch, capsys, "guide", "pricing")
     assert status == 2 and json.loads(out)["detail"]["code"] == "guide_topic_unknown"
@@ -209,10 +265,10 @@ async def test_the_pages_are_resources_and_the_interview_is_a_prompt(
 
 async def test_reads_need_catalog_read(harness: CatalogHarness) -> None:
     async with Client(_server(harness, frozenset({"workflow_run.read"}))) as mcp:
-        denied = await mcp.call_tool("mission_guide", {})
-        described = await mcp.call_tool("mission_describe", {"ref": "lane:deep_agents"})
-    assert denied.data["ok"] is False and denied.data["error"]["code"] == "FORBIDDEN"
-    assert described.data["error"]["code"] == "FORBIDDEN"
+        denied = _envelope(await mcp.call_tool("mission_guide", {}))
+        described = _envelope(await mcp.call_tool("mission_describe", {"ref": "lane:deep_agents"}))
+    assert denied["ok"] is False and denied["error"]["code"] == "FORBIDDEN"
+    assert described["error"]["code"] == "FORBIDDEN"
 
     harness.app.state.mission_control_guides = {}
     unavailable = harness.client.get(_url("guide"))

@@ -162,7 +162,10 @@ from mission_control.bootstrap.manifests import (
     compose_manifest_service,
 )
 from mission_control.bootstrap.model_profiles import compose_model_catalog
-from mission_control.bootstrap.selection import compose_selection_workspace
+from mission_control.bootstrap.selection import (
+    bound_sandbox_profiles,
+    compose_selection_workspace,
+)
 from mission_control.bootstrap.session_time_travel import session_lane_time_travel
 from mission_control.bootstrap.settings import get_settings
 from mission_control.bootstrap.signals import compose_signal_ingress, verify_signal_ingress_pool
@@ -204,6 +207,7 @@ from mission_control.interfaces.http.selection import router as selection_router
 from mission_control.interfaces.http.stop_fence import router as stop_fence_router
 from mission_control.interfaces.http.subscriptions import router as subscriptions_router
 from mission_control.interfaces.http.transcript import router as transcript_router
+from mission_control.interfaces.mcp.guide_tools import server_tool_listing
 from mission_control.interfaces.mcp.operator_server import (
     OPERATOR_MCP_PATH,
     BearerAuthenticator,
@@ -778,7 +782,10 @@ def create_application(
                         # The Selection Workspace: one search and one read-only draft check
                         # over this catalog, the describe-only lanes and the application's
                         # Model Catalog and Application Profile (admission is the seam's own).
+                        # It and the guide name the sandbox profiles the launch bindings bind.
+                        sandbox_profiles = bound_sandbox_profiles(get_settings())
                         selection_workspace = compose_selection_workspace(
+                            sandbox_profiles=sandbox_profiles,
                             application_id=binding.application_id,
                             lanes=application.state.mission_control_lanes,
                             models=application.state.mission_control_model_catalogs[
@@ -801,6 +808,7 @@ def create_application(
                             models=application.state.mission_control_model_catalogs[
                                 binding.application_id
                             ],
+                            sandbox_profiles=sandbox_profiles,
                         )
                         # SPEC-03 (C3): the run transcript, read under the tenant scope.
                         transcripts = TranscriptService(
@@ -1039,7 +1047,13 @@ def create_application(
                 )
                 await stack.enter_async_context(signal_mcp.router.lifespan_context(signal_mcp))
                 stack.callback(application.router.routes.remove, application.router.routes[-1])
-                operator_mcp = create_operator_server(application.state).http_app(
+                operator_server = create_operator_server(application.state)
+                # `GET describe?ref=tool:<name>` answers from this server's own tool listing,
+                # as `mission_describe` does.
+                application.state.mission_control_tool_listing = await server_tool_listing(
+                    operator_server
+                )
+                operator_mcp = operator_server.http_app(
                     path="/", transport="streamable-http", stateless_http=True, json_response=True
                 )
                 await stack.enter_async_context(operator_mcp.router.lifespan_context(operator_mcp))

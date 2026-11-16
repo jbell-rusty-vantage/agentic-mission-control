@@ -48,6 +48,7 @@ from mission_control.domain.authoring.contracts import (
     GoalSessionRolloverPolicy,
     GoalVerifierPolicy,
     JoinKind,
+    PublishedDefinition,
     RunInputManifestRef,
     RuntimeProfileDefinition,
     StageGraphBlueprint,
@@ -148,6 +149,44 @@ def lowering_base_id(definition: MissionDefinition) -> str:
 
     digest = sha256_digest({"definition": definition.digest, "lowering": LOWERING_VERSION})
     return f"mc.manifest.{definition.mission_key}.{digest.removeprefix('sha256:')[:12]}"
+
+
+def is_manifest_lowered(definition: object) -> bool:
+    """Whether a Workflow Type was minted by this lowering for one submitted manifest: it admits
+    only the manifest input contract (`LoweredMission.workflow_type`). A curated Workflow Type
+    states its own input admission contract."""
+
+    return (
+        isinstance(definition, WorkflowTypeDefinition)
+        and definition.input_admission_contract == MANIFEST_INPUT_CONTRACT
+    )
+
+
+def manifest_lowered_refs(
+    published: Iterable[PublishedDefinition],
+) -> frozenset[tuple[str, str, str]]:
+    """Every published definition one submitted manifest lowered, as `(kind, logical id,
+    digest)`: each lowered Workflow Type and the blueprint, control profile, runtime profile,
+    workspace template and evaluation profile it allows. None of them is a reusable type: each
+    belongs to the manifest it was lowered from."""
+
+    lowered: set[tuple[str, str, str]] = set()
+    for row in published:
+        definition = row.definition
+        if not isinstance(definition, WorkflowTypeDefinition) or not is_manifest_lowered(
+            definition
+        ):
+            continue
+        lowered.add((row.ref.kind.value, row.ref.logical_id, row.ref.digest))
+        for refs in (
+            definition.allowed_blueprints,
+            definition.allowed_control_profiles,
+            definition.allowed_runtime_profiles,
+            definition.allowed_workspace_templates,
+            definition.allowed_evaluation_profiles,
+        ):
+            lowered.update((ref.kind.value, ref.logical_id, ref.digest) for ref in refs)
+    return frozenset(lowered)
 
 
 def required_goals(definition: MissionDefinition) -> frozenset[str]:

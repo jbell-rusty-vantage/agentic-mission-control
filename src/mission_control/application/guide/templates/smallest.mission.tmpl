@@ -1,0 +1,111 @@
+---
+id: smallest
+title: The smallest mission
+purpose: One agent writes one short text; one reviewer accepts it.
+use_when: The first run on an installation, or a check that launch, observation and review work end to end.
+produces: The text output `write.result`, then one REVIEW Human Task at `review`. Approving it accepts the mission.
+slots:
+  application_id:
+    description: This server's application id (the start page names it).
+    example: demo-app
+  mission_key:
+    description: "A stable slug for the mission: lower case letters, digits, `-` or `_`."
+    example: hello-mission
+  title:
+    description: A one-line title.
+    example: Hello from a first mission
+  goal:
+    description: The outcome in the user's words, one line.
+    example: Write three sentences that explain what a Mission Manifest is.
+  criterion:
+    description: How the reviewer knows it is done, one line.
+    example: The text is three sentences and names compile, submit and start.
+  model_profile:
+    description: A Model Profile the lane routes (topic `models`).
+    example: producer.default
+  sandbox_profile:
+    description: A sandbox profile bound on this installation (topic `manifest`).
+    example: research.standard
+  budget_usd:
+    description: The ceiling on model spend in US dollars, a number.
+    example: "0.5"
+  reviewer:
+    description: Who resolves the review; an actor id, or a reviewer role such as `owner`. To resolve it yourself write your own actor id, the `resolution.actor_ref` of a compile report.
+    example: owner
+notes:
+  - The run stops at `review` and waits. Its inbox notification is `review_required`. Only the named reviewer can resolve the Human Task (that actor, or a principal holding `reviewer:<role>`); anyone else is refused `not_reviewer`.
+  - The agent submits through the `submit_output` tool, pinned at its latest admitted revision.
+---
+manifest: mission/v2
+mission:
+  key: {{mission_key}}
+  application: {{application_id}}
+  title: >-
+    {{title}}
+  description: >-
+    {{goal}}
+  goals:
+    - key: result
+      description: >-
+        {{goal}}
+      importance: primary
+      objectives:
+        - key: write_result
+          description: Write the text and submit it as the output named result.
+      criteria:
+        - key: accepted
+          description: >-
+            {{criterion}}
+          evidence: [result]
+          acceptance:
+            human: review_accept
+  environment:
+    lane: deep_agents
+    model:
+      profile: {{model_profile}}
+    sandbox:
+      profile: {{sandbox_profile}}
+    capabilities:
+      - pin: tool.knowledge-submit-output@latest
+        kind: tool
+        as: submit_output
+    budget:
+      usd: {{budget_usd}}
+      tokens: 150000
+      wall_clock: 15m
+      tool_calls: 8
+    governors:
+      depth: 1
+      fan_out: 1
+      iterations: 1
+      patience: 1
+    side_effects: [read_only, workspace_write]
+  program:
+    key: root
+    behavior: stage_graph
+    objectives: [result]
+    nodes:
+      - key: write
+        behavior: agent_executor
+        objectives: [write_result]
+        instruction: >-
+          {{goal}}
+          Submit the text with the submit_output tool: one call, obligation "write.result",
+          one inline text item. Stop after its receipt.
+        outputs:
+          - name: result
+            form: text
+            media_type: text/plain
+      - key: review
+        behavior: human_gate
+        objectives: [result]
+        depends_on: [write]
+        task:
+          kind: REVIEW
+          prompt: >-
+            {{criterion}}
+          reviewers: [{{reviewer}}]
+          packet: [write.result]
+          on_timeout: keep_waiting
+  controls:
+    commands_allowed: [pause, resume, cancel, queue_instruction, add_context]

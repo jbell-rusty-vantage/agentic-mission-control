@@ -1,9 +1,9 @@
 """Selection Workspace tools on the coordinator and operator MCP servers.
 
-- tool `mission_search(query, facets, kinds, lane_profile, limit, offset)` (read-only;
-  `catalog.read`): one ranked answer over capabilities, lanes, models, sandbox profiles and
-  Workflow Types, or without a query a listing of them by name, as `POST /selection/search`
-  returns it.
+- tool `mission_search(query, facets, kinds, lane_profile, limit, offset, include_lowered)`
+  (read-only; `catalog.read`): one ranked answer over capabilities, lanes, models, sandbox
+  profiles, Workflow Types and mission templates, or without a query a listing of them by
+  name, as `POST /selection/search` returns it.
 - tool `selection_check(draft)` (read-only; `catalog.read`): whether a draft selection would be
   admitted, with typed refusals and what was not checked, as `POST /selection/check`.
 
@@ -102,13 +102,15 @@ def register_selection_tools(
         lane_profile: str | None = None,
         limit: int = 20,
         offset: int = 0,
+        include_lowered: bool = False,
     ) -> dict[str, object]:
-        """Search or list what a mission can select: capabilities, lanes (harnesses), models,
-        sandbox profiles and Workflow Types. With `query`, one ranked answer; without it, a
-        listing by name (`limit`, `offset`, `total`). `facets`: capability, lane, model,
-        sandbox_profile, workflow_type. `kinds`: catalog kinds for the capability facet
-        (skill, mcp_server, hook_script ...). `lane_profile` narrows capabilities and models
-        to that lane. A hit's `ref` is what a draft pins and mission_describe reads."""
+        """Search or list what a mission selects or starts from. With `query`, one ranked
+        answer; without it, a listing by name (`limit`, `offset`, `total`). `facets`:
+        capability, lane (harness), model, sandbox_profile, workflow_type, template. `kinds`:
+        catalog kinds for the capability facet (skill, mcp_server, hook_script ...).
+        `lane_profile` narrows capabilities and models to that lane. `include_lowered` adds
+        per-manifest definitions. A hit's `ref` is what a draft pins and mission_describe
+        reads."""
 
         async def invoke(principal: Any) -> object:
             values: dict[str, object] = {"query": query or "", "limit": limit, "offset": offset}
@@ -118,6 +120,8 @@ def register_selection_tools(
                 values["kinds"] = kinds
             if lane_profile is not None:
                 values["lane_profile"] = lane_profile
+            if include_lowered:
+                values["include_lowered"] = True
             return await selection.search(principal, search_request(values))
 
         return await call(context, principals, invoke)
@@ -127,9 +131,9 @@ def register_selection_tools(
         draft: Annotated[dict[str, object], ShapeOf(SelectionDraft)], context: Context
     ) -> dict[str, object]:
         """Check a draft selection before writing the manifest: lane_profile, model_profile,
-        family, optional data_class, capabilities (pins), sandbox_profile (pin) and
-        workflow_type (pin). Returns admissible, typed refusals with draft pointers and what
-        was not checked (compile, serving, preflight). Never launches."""
+        family, optional data_class, capabilities (pins), sandbox_profile (a bound profile's
+        name or a pin) and workflow_type (pin). Returns admissible, typed refusals with draft
+        pointers and what was not checked (compile, serving, preflight). Never launches."""
 
         async def invoke(principal: Any) -> object:
             return await selection.check(principal, SelectionDraft.model_validate(draft))
