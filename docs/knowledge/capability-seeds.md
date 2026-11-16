@@ -25,7 +25,17 @@ and `mcp.agent-browser`, `skill.agent-browser`, the router `skill.mission-contro
 bundles (`-author`, `-catalog`, `-compose`, `-intervene`, `-observe`) and `hook.mc-policy-template`;
 the `biotech` bundle adds `mcp.pubmed` and `mcp.biomcp` (+ `skill.biomcp`), `ai-engineer` adds
 `mcp.edgartools` (+ `skill.edgartools`) (`packages/mission-control-db-contract/seeds/`, notes
-in `AGENT_CAPABILITY_SEED_NOTES.md`). The per-application skill rows ship in
+in `AGENT_CAPABILITY_SEED_NOTES.md`). **`mc.catalog.agent-capabilities@1.1.0`** (common, 2026-11-16; the
+common 1.0.0 is frozen by bytes) adds new ids for research: `mcp.github` (GitHub's official server 2.1.0,
+`--read-only` with the repos, issues and pull_requests toolsets, 22 tools), `mcp.context7` (4.7.0,
+`resolve-library-id` and `query-docs`), `plugin.code-research` over those two, and
+`mcp.knowledge-capture`, the Knowledge Services executor's capture, locate, source, schema and guide tools
+over Streamable HTTP (19 allowlisted of the 40 it lists; the knowledge writes, the issuer-credential tools
+and the direct database reads are withheld). Their tool lists are **captured** from the servers, with real
+input schemas; every binding is evidenced in the
+[research capabilities sheet](../specs/provider-consolidation-2026-10/providers/research-capabilities/RESEARCH-CAPABILITIES-SURFACE-2026-11-16.md#bindings).
+`mcp.knowledge-capture` is `unqualified` on every lane, so no manifest can pin it yet (below); no arXiv
+server is seeded. The per-application skill rows ship in
 `mc.app.<app>.agent-skills`: 1.0.0 to 1.0.3 are frozen with their sources under
 `bundle-sources/agent-skills-<version>/` (1.0.3, OC-R7, carries `skill.mission-control-author`
 0.3.2, the Model Catalog authoring guidance, as revision 4), and 1.0.4 (OVE-204) adds each
@@ -49,7 +59,7 @@ new import and a new seed version. Seeds cannot retire a row (a seed appends a d
 `asset_version.status`), so revision 1 of the charter stays admitted beside revision 2; `@latest` is the
 import.
 Custody upload and remote apply are separate steps. `mc.app.<app>.environment-kits@1.0.0` holds the six starter
-Environment Kits built from `envkits/` ([environment preparation](environment-preparation.md)). Tool lists are transcribed, not captured live. The
+Environment Kits built from `envkits/` ([environment preparation](environment-preparation.md)). The six 1.0.0 servers' tool lists are transcribed, not captured live; the three of 1.1.0 are captured. The
 operational catalog surfaces are unchanged: `missionctl catalog list|resolve|search|discover|inspect|components`
 plus the new `pin`, `render` and `publish` ([interfaces](interfaces.md)).
 
@@ -74,7 +84,7 @@ for the SDLC diagnose → patch → review missions
 installation on 2026-10-19, after a dry run and a backup record, with readback
 ([status ledger](../specs/archive/materialization-observation-2026-10/runs/RUN-2-CLOSE-STATUS.md), P2/D5).
 
-Built / specified / goal: seeds generated, validated (`scripts/seeds_validate.py`) and applied to the W0 remotes with recorded limitations (`release/RELEASE-BUNDLE.md:264-271`); agent-skills 1.0.4 and the `mission-payloads` seed are built, not yet applied remotely; agent-skills 1.0.5, cognition-profiles 1.0.1 and approved-assets 1.0.3 are built and unit-tested, applied to no remote installation, and no mission has run with the imported skills mounted.
+Built / specified / goal: seeds generated, validated (`scripts/seeds_validate.py`) and applied to the W0 remotes with recorded limitations (`release/RELEASE-BUNDLE.md:264-271`); agent-skills 1.0.4 and the `mission-payloads` seed are built, not yet applied remotely; agent-skills 1.0.5, cognition-profiles 1.0.1 and approved-assets 1.0.3 are built and unit-tested, applied to no remote installation, and no mission has run with the imported skills mounted; agent-capabilities 1.1.0 is built, validated and unit-tested, applied to no installation, and no mission has mounted one of its servers.
 
 ## Not wired or not published
 
@@ -83,6 +93,10 @@ Built / specified / goal: seeds generated, validated (`scripts/seeds_validate.py
   verifier subagents, shell-policy hook, `test_run` and `git_snapshot` executors). The
   stand-in rows in `tests/fixtures/catalog/fast_track_seeds.json` are test data, not reviewed
   capabilities (blocker B2 in the [owner runbook](../specs/archive/fast-track-2026-10/OWNER-FIXTURE-RUNBOOK.md)).
+- **The capture path is catalogued, not mountable.** `mcp.knowledge-capture` is seeded `unqualified`: the
+  materializer cannot narrow a server's 40 tools to an allowlist and a production worker launches no remote
+  MCP server, so no manifest can pin it. `mcp.github` (a Go binary) and `mcp.context7` are not in the worker
+  pin file yet. What to build first: [capture path](../specs/provider-consolidation-2026-10/providers/research-capabilities/RESEARCH-CAPABILITIES-SURFACE-2026-11-16.md#capture-path).
 - The worker launches only components in its pin file `infra/capability-pins/research-capabilities.json`
   (one OpenAI model, `mcp.tavily`, `mcp.firecrawl`, the `agent-browser` skill) (B3). Since W1
   (D4) the Skill pin is the `bytes_v1` `capability-bundles://` custody form of
@@ -121,6 +135,8 @@ catalog's retire operation together with that consumer change (CS-D12).
   [SPEC-08](../specs/archive/fast-track-2026-10/SPEC-08-agent-skills.md),
   [seed capabilities and formats](../specs/archive/fast-track-2026-10/research/seed-capabilities-and-formats.md),
   [owner runbook](../specs/archive/fast-track-2026-10/OWNER-FIXTURE-RUNBOOK.md) (B2 to B4).
+- Research: [research capabilities as of 2026-11-16](../specs/provider-consolidation-2026-10/providers/research-capabilities/RESEARCH-CAPABILITIES-SURFACE-2026-11-16.md)
+  (GitHub, Context7, arXiv, the Knowledge Services capture server; evidence for seed 1.1.0).
 - ADRs: [0023](../adr/0023-capability-kinds-provider-neutral-core-host-projection.md),
   [0033](../adr/0033-mission-control-skill-is-a-router-over-specific-skill-bundles.md).
 - Code: [seed generator](../../packages/mission-control-db-contract/seeds/generate_catalog_seeds.py),

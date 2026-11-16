@@ -13,7 +13,11 @@ from pydantic import ValidationError
 
 from mission_control.application.programs.artifact_validation import supported_schema
 from mission_control.domain.authoring.canonical import sha256_digest
-from mission_control.domain.authoring.contracts import ArtifactSchemaDefinition, PublishedDefinition
+from mission_control.domain.authoring.contracts import (
+    ArtifactSchemaDefinition,
+    MCPToolDefinition,
+    PublishedDefinition,
+)
 from mission_control_db_contract.errors import ContractError
 from mission_control_db_contract.seeds import load_bundles, order_bundles, validate_bundle
 
@@ -37,6 +41,9 @@ EXPECTED = {
     # The router bundle manifest regenerated from the guide; 1.0.2 is frozen.
     ("mc.catalog.approved-assets", "1.0.3"),
     ("mc.catalog.agent-capabilities", "1.0.0"),
+    # The research capabilities (GitHub, Context7, the capture server, plugin.code-research)
+    # as new ids, after the applied, frozen 1.0.0.
+    ("mc.catalog.agent-capabilities", "1.1.0"),
     ("mc.catalog.knowledge-tools", "1.0.0"),
     # OVE-170 submit_output revision 2 (recorded), then OVE-204 slice 4 knowledge_read_intent.
     ("mc.catalog.knowledge-tools", "1.1.0"),
@@ -53,6 +60,13 @@ APP_AGENT_KEYS = {
 }
 SECRET_LIKE = re.compile(
     r"(postgres(ql)?://|password|passwd|secret_value|api[_-]?key|bearer |-----BEGIN)", re.IGNORECASE
+)
+# What a secret value looks like. A captured MCP tool's own prose (its description and the
+# annotation text of its input schema) is quoted from the server's `tools/list`, where words
+# such as "password" are ordinary English; that prose is held to this pattern only.
+SECRET_VALUE_SHAPED = re.compile(
+    r"(postgres(ql)?://|bearer [a-z0-9]|-----BEGIN|\b(sk|fc|tvly|ghp|github_pat)[-_][a-z0-9]{8})",
+    re.IGNORECASE,
 )
 
 
@@ -92,6 +106,8 @@ def test_each_app_installation_set_is_valid_and_dependency_closed(app: str) -> N
         ("mc.app.bindings", "1.0.1"),
     ]
     agent = [("mc.catalog.agent-capabilities", "1.0.0"), (APP_AGENT_KEYS[app], "1.0.0")]
+    # The research capabilities: new common ids, after the frozen common 1.0.0.
+    research = [("mc.catalog.agent-capabilities", "1.1.0")]
     # FT-A7: skills, the policy hook and the plugin are per application.
     # 1.0.5: the coordinator bundles regenerated from the guide and the imported method skills.
     skill_versions = ("1.0.0", "1.0.1", "1.0.2", "1.0.3", "1.0.4", "1.0.5")
@@ -138,6 +154,7 @@ def test_each_app_installation_set_is_valid_and_dependency_closed(app: str) -> N
     assert sorted(keys) == sorted(
         base
         + agent
+        + research
         + skills
         + kits
         + observation
@@ -146,6 +163,7 @@ def test_each_app_installation_set_is_valid_and_dependency_closed(app: str) -> N
         + artifact_schemas
         + knowledge
     )
+    assert position_of(keys, research[0]) > position_of(keys, agent[0])
     assert position_of(keys, successors[0]) > position_of(keys, base[2])
     assert position_of(keys, successors[1]) > position_of(keys, base[0])
     assert position_of(keys, successors[2]) > position_of(keys, successors[1])
@@ -386,20 +404,93 @@ def test_bundles_seed_no_fabricated_authority_usage_or_secrets() -> None:
         decisions = [r for r in bundle["records"] if r["kind"] == "asset_decision"]
         assert {d["fields"]["asset_version"] for d in decisions} == assets
         assert all(d["fields"]["decision"] == "admit" for d in decisions)
-        text = json.dumps(bundle)
+        scanned, prose = _split_tool_prose(bundle)
+        text = json.dumps(scanned)
         # Secret reference NAMES (e.g. TAVILY_API_KEY) are allowed; values never are.
         for name in _secret_ref_names(bundle):
             text = text.replace(name, "SECRET_REF_NAME")
         assert not SECRET_LIKE.search(text), bundle["seed_key"]
+        assert not [item for item in prose if SECRET_VALUE_SHAPED.search(item)], bundle["seed_key"]
         _assert_no_seeded_runtime_facts(bundle)
+
+
+def _split_tool_prose(bundle: dict) -> tuple[dict, list[str]]:
+    """The bundle with each MCP tool's own prose blanked, and that prose.
+
+    The prose is what a server's `tools/list` says about a tool: a published MCP Tool's
+    description, the tool descriptions an MCP Server definition lists, and the `description`
+    and `title` annotation strings inside a tool's input or output schema. Names, enum values,
+    defaults and everything else stay in the strictly scanned copy.
+    """
+    copy = json.loads(json.dumps(bundle))
+    prose: list[str] = []
+
+    def take(holder: dict, key: str) -> None:
+        if isinstance(holder.get(key), str):
+            prose.append(holder[key])
+            holder[key] = ""
+
+    def annotations(schema: object) -> None:
+        if isinstance(schema, dict):
+            take(schema, "description")
+            take(schema, "title")
+            for child in schema.values():
+                annotations(child)
+        elif isinstance(schema, list):
+            for child in schema:
+                annotations(child)
+
+    for record in copy["records"]:
+        if record["kind"] != "asset_version":
+            continue
+        definition = record["fields"].get("manifest", {}).get("definition")
+        if not isinstance(definition, dict):
+            continue
+        if definition.get("kind") == "mcp_tool":
+            take(definition, "description")
+            annotations(definition.get("input_schema"))
+            annotations(definition.get("output_schema"))
+        elif definition.get("kind") == "mcp_server":
+            for tool in definition.get("tools", ()):
+                take(tool, "description")
+    return copy, prose
+
+
+def test_tool_prose_is_still_scanned_for_secret_values() -> None:
+    """A captured description may say "password"; it may never carry a value, and nothing but
+    a tool's own prose is exempt from the strict scan."""
+
+    (bundle,) = [
+        b
+        for b in _bundles("common")
+        if (b["seed_key"], b["seed_version"]) == ("mc.catalog.agent-capabilities", "1.1.0")
+    ]
+    scanned, prose = _split_tool_prose(bundle)
+    assert any("password" in item for item in prose)
+    assert SECRET_LIKE.search(json.dumps(bundle)) and not SECRET_LIKE.search(
+        re.sub("|".join(sorted(_secret_ref_names(bundle))), "SECRET_REF_NAME", json.dumps(scanned))
+    )
+    assert SECRET_VALUE_SHAPED.search("Authorization: Bearer abc123")
+    assert SECRET_VALUE_SHAPED.search("use sk-abcdefgh12345678 here")
+    assert not SECRET_VALUE_SHAPED.search("login fails after password reset")
+    changed = json.loads(json.dumps(bundle))
+    tool = next(
+        record["fields"]["manifest"]["definition"]
+        for record in changed["records"]
+        if record["kind"] == "asset_version"
+        and record["fields"]["manifest"]["definition"]["kind"] == "mcp_tool"
+    )
+    tool["tool_name"] = "password_reader"
+    assert SECRET_LIKE.search(json.dumps(_split_tool_prose(changed)[0]))
 
 
 def _assert_no_seeded_runtime_facts(bundle: dict) -> None:
     """Schema property names declare shapes; they are never runtime ledger records.
 
-    Only a typed published Artifact Schema's validated JSON Schema gets declaration-name
-    handling. Its other metadata and any non-schema seed payload remain fully checked.
-    Secret-value scanning above still covers the complete unmodified schema document.
+    Only a typed published Artifact Schema's validated JSON Schema and a typed published MCP
+    Tool's input and output schemas get declaration-name handling. Their other metadata and
+    any non-schema seed payload remain fully checked. Secret-value scanning above still covers
+    the schema documents (annotation prose under its own pattern).
     """
     forbidden = {"embedding", "mission_run", "usage", "receipt"}
     schema_roots = set()
@@ -407,7 +498,15 @@ def _assert_no_seeded_runtime_facts(bundle: dict) -> None:
         if record["kind"] != "asset_version":
             continue
         manifest = record["fields"].get("manifest", {})
-        if manifest.get("definition", {}).get("kind") != "artifact_schema":
+        kind = manifest.get("definition", {}).get("kind")
+        if kind == "mcp_tool":
+            published = PublishedDefinition.model_validate(manifest)
+            assert isinstance(published.definition, MCPToolDefinition)
+            for field in ("input_schema", "output_schema"):
+                if isinstance(manifest["definition"].get(field), dict):
+                    schema_roots.add(id(manifest["definition"][field]))
+            continue
+        if kind != "artifact_schema":
             continue
         published = PublishedDefinition.model_validate(manifest)
         assert isinstance(published.definition, ArtifactSchemaDefinition)

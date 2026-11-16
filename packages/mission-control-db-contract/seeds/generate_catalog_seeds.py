@@ -343,6 +343,12 @@ def router_manifest_records() -> list[dict[str, Any]]:
 # by file SHA-256 and never regenerated. Later target facts ship as a new seed version
 # with a new asset version, so nothing is overwritten.
 FROZEN_BUNDLES = {
+    # Tavily, Firecrawl and agent-browser (FT-A6), applied to both Sprint OC remotes (W0);
+    # frozen when 1.1.0 added the research capabilities (GitHub, Context7, the Knowledge
+    # Services capture server and plugin.code-research) as new ids.
+    "common/mc.catalog.agent-capabilities-1.0.0.json": (
+        "4d17da099c01a60470f6b6592ed06545468aba24100bafafb1e68e780fe13f77"
+    ),
     # The per-application knowledge charters (OVE-204 slice 6), frozen when 1.0.5 shipped the
     # coordinator bundles regenerated from the guide and the imported method skills. Its
     # sources are archived under bundle-sources/agent-skills-1.0.4/.
@@ -607,9 +613,14 @@ def agent_capabilities() -> dict[str, dict[str, Any]]:
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
 
-    def published(definition: Any, key_prefix: str, evidence: list[str]) -> list[dict[str, Any]]:
+    def published(
+        definition: Any,
+        key_prefix: str,
+        evidence: list[str],
+        published_at: datetime = module.AGENT_SEED_TIME,
+    ) -> list[dict[str, Any]]:
         return _published_definition_records(
-            definition, key_prefix, evidence, published_at=module.AGENT_SEED_TIME
+            definition, key_prefix, evidence, published_at=published_at
         )
 
     return dict(module.bundles(published, SEED_FORMAT, COMPATIBILITY, SEED_ACTOR))

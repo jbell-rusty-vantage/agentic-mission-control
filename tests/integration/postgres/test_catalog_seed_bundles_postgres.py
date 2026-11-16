@@ -163,6 +163,26 @@ async def test_ai_engineer_seeds_admit_edgartools_only_there() -> None:
                     "SELECT asset_id FROM mission_control.asset_version WHERE kind='mcp_server'"
                 )
             }
+            # Seed 1.1.0 (research capabilities): the plugin's member rows, the capture
+            # server's host support and one MCP Tool row per allowlisted tool.
+            members = await connection.fetch(
+                "SELECT member_asset_id, role, optional "
+                "FROM mission_control.capability_plugin_member "
+                "WHERE plugin_asset_id = 'definition:plugin:plugin.code-research' "
+                "ORDER BY position"
+            )
+            capture = await connection.fetchrow(
+                "SELECT host_support, secret_refs FROM mission_control.asset_version "
+                "WHERE asset_id = 'definition:mcp_server:mcp.knowledge-capture'"
+            )
+            tools = {
+                name: await connection.fetchval(
+                    "SELECT count(*) FROM mission_control.asset_version WHERE kind = 'mcp_tool' "
+                    "AND asset_id LIKE $1",
+                    f"definition:mcp_tool:{name}.tool.%",
+                )
+                for name in ("mcp.github", "mcp.context7", "mcp.knowledge-capture")
+            }
         finally:
             await connection.close()
         assert ids == {
@@ -170,6 +190,23 @@ async def test_ai_engineer_seeds_admit_edgartools_only_there() -> None:
             "definition:mcp_server:mcp.firecrawl",
             "definition:mcp_server:mcp.agent-browser",
             "definition:mcp_server:mcp.edgartools",
+            "definition:mcp_server:mcp.github",
+            "definition:mcp_server:mcp.context7",
+            "definition:mcp_server:mcp.knowledge-capture",
         }
+        assert [(row["member_asset_id"], row["role"], row["optional"]) for row in members] == [
+            ("definition:mcp_server:mcp.context7", "mcp_server", False),
+            ("definition:mcp_server:mcp.github", "mcp_server", False),
+        ]
+        assert capture is not None
+        statuses = {
+            profile: entry["status"]
+            for profile, entry in json.loads(capture["host_support"])["profiles"].items()
+        }
+        assert (
+            statuses["deep_agents"] == "unqualified" and statuses["cursor_cloud"] == "unsupported"
+        )
+        assert list(capture["secret_refs"]) == ["VERIFY_EXECUTOR_TOKEN"]
+        assert tools == {"mcp.github": 22, "mcp.context7": 2, "mcp.knowledge-capture": 19}
     finally:
         await drop_common_database(database)

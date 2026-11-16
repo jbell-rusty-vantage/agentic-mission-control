@@ -33,8 +33,13 @@ mixed already contains both families, and duplicate selections are refused.
 
 A knowledge mission also selects its knowledge tools and, where it reads a remote
 Knowledge Services endpoint, the application's admitted MCP pin and egress policy.
-This repository has no configured endpoint or authoritative MCP schema to publish,
-so the seeds do not invent one. The charter in the plugin is the one compile
+Since 2026-11-16 the common seed `mc.catalog.agent-capabilities@1.1.0` publishes
+the executor's capture, source, schema and guide tools as `mcp.knowledge-capture`,
+with a tool list captured from a running executor. It is `unqualified` on every
+lane and a member of no profile: no lane can yet narrow the executor's 40 tools to
+that allowlist, and a deployment binds its own endpoint (the
+[capability seeds concept](../../docs/knowledge/capability-seeds.md#not-wired-or-not-published)
+says what is missing). The charter in the plugin is the one compile
 mounts on a knowledge mission anyway (`[knowledge] charter_skill`): a mission that
 selects the plugin gets it once. Output custody and `artifact.ready` emission are
 explicit skill instructions; completion still needs the mission's Completion

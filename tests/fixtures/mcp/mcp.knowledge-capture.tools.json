@@ -1,0 +1,2811 @@
+{
+  "capture": {
+    "command": "POST http://127.0.0.1:4310/mcp {\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/list\"}",
+    "credential": "none (the local executor ran without VERIFY_EXECUTOR_TOKEN)",
+    "reported_server": "knowledge-verification-executor",
+    "reported_version": "0.1.0",
+    "source_checkout": "7bc4aeec77c645f41bb0f550f6a9626c3ef24cf0 (clean; the server reports no commit)",
+    "tool": "curl",
+    "tool_count": 40
+  },
+  "capture_method": "captured",
+  "captured_on": "2026-11-16",
+  "environment": {},
+  "note": "tools/list of the Knowledge Services executor already running on this machine with the AI Engineer knowledge workspace configured (the schema_*, db_*, ingest_*, checkpoint_*, source_* and artifact_get tools are registered only then). The executor publishes no annotations, so read_only_hint is null and side_effect_class is Mission Control's classification of each captured description. Titles are not kept.",
+  "package_pin": "git:https://github.com/jbell-rusty-vantage/agent-knowledge-services@7bc4aeec77c645f41bb0f550f6a9626c3ef24cf0#apps/verification-executor",
+  "schema_version": "mc.mcp_tools_fixture.v1",
+  "server": "mcp.knowledge-capture",
+  "source": "docs/specs/provider-consolidation-2026-10/providers/research-capabilities/RESEARCH-CAPABILITIES-SURFACE-2026-11-16.md (Knowledge Services executor 0.1.0)",
+  "tools": [
+    {
+      "description": "Return an orchestration.artifact row (intent, snapshot, plan, receipt, report) with its JSON or text body when the bytes are available.",
+      "input_schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "artifactId": {
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          },
+          "tenantId": {
+            "description": "Tenant; defaults to the executor's configured tenant.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "artifactId"
+        ],
+        "type": "object"
+      },
+      "name": "artifact_get",
+      "read_only_hint": null,
+      "side_effect_class": "read_only"
+    },
+    {
+      "description": "Verify complete remote artifact closure and atomically advance the expected scoped checkpoint head.",
+      "input_schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "request": {
+            "additionalProperties": false,
+            "properties": {
+              "expectedHead": {
+                "anyOf": [
+                  {
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "harnessRequestDigest": {
+                "pattern": "^sha256:[a-f0-9]{64}$",
+                "type": "string"
+              },
+              "idempotencyKey": {
+                "maxLength": 256,
+                "minLength": 1,
+                "type": "string"
+              },
+              "manifest": {
+                "additionalProperties": false,
+                "properties": {
+                  "boundary": {
+                    "enum": [
+                      "dirty_interval",
+                      "source",
+                      "verification",
+                      "ingestion",
+                      "report",
+                      "publication",
+                      "transfer",
+                      "failure",
+                      "cancellation",
+                      "completion",
+                      "manual"
+                    ],
+                    "type": "string"
+                  },
+                  "capabilityProfileDigest": {
+                    "pattern": "^sha256:[a-f0-9]{64}$",
+                    "type": "string"
+                  },
+                  "capabilityProfileVersion": {
+                    "maxLength": 256,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "executorStateArtifact": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "artifactId": {
+                        "format": "uuid",
+                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                        "type": "string"
+                      },
+                      "attestationArtifactId": {
+                        "format": "uuid",
+                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                        "type": "string"
+                      },
+                      "byteLength": {
+                        "maximum": 9007199254740991,
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      "contentEncoding": {
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "createdAt": {
+                        "format": "date-time",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                        "type": "string"
+                      },
+                      "dataClassification": {
+                        "enum": [
+                          "public",
+                          "internal",
+                          "confidential",
+                          "restricted"
+                        ],
+                        "type": "string"
+                      },
+                      "digest": {
+                        "pattern": "^sha256:[a-f0-9]{64}$",
+                        "type": "string"
+                      },
+                      "downloadHandle": {
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "encryptionClass": {
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "mediaType": {
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "objectKey": {
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "parentArtifactIds": {
+                        "items": {
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "producerActivityId": {
+                        "maxLength": 255,
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "producerVersion": {
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "retentionClass": {
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "tenantId": {
+                        "format": "uuid",
+                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                        "type": "string"
+                      },
+                      "transformationSignature": {
+                        "pattern": "^sha256:[a-f0-9]{64}$",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "artifactId",
+                      "tenantId",
+                      "digest",
+                      "mediaType",
+                      "byteLength",
+                      "objectKey",
+                      "createdAt",
+                      "producerActivityId",
+                      "producerVersion",
+                      "encryptionClass",
+                      "retentionClass",
+                      "dataClassification",
+                      "parentArtifactIds"
+                    ],
+                    "type": "object"
+                  },
+                  "files": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "artifact": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "artifactId": {
+                              "format": "uuid",
+                              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                              "type": "string"
+                            },
+                            "attestationArtifactId": {
+                              "format": "uuid",
+                              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                              "type": "string"
+                            },
+                            "byteLength": {
+                              "maximum": 9007199254740991,
+                              "minimum": 0,
+                              "type": "integer"
+                            },
+                            "contentEncoding": {
+                              "minLength": 1,
+                              "type": "string"
+                            },
+                            "createdAt": {
+                              "format": "date-time",
+                              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                              "type": "string"
+                            },
+                            "dataClassification": {
+                              "enum": [
+                                "public",
+                                "internal",
+                                "confidential",
+                                "restricted"
+                              ],
+                              "type": "string"
+                            },
+                            "digest": {
+                              "pattern": "^sha256:[a-f0-9]{64}$",
+                              "type": "string"
+                            },
+                            "downloadHandle": {
+                              "minLength": 1,
+                              "type": "string"
+                            },
+                            "encryptionClass": {
+                              "minLength": 1,
+                              "type": "string"
+                            },
+                            "mediaType": {
+                              "minLength": 1,
+                              "type": "string"
+                            },
+                            "objectKey": {
+                              "minLength": 1,
+                              "type": "string"
+                            },
+                            "parentArtifactIds": {
+                              "items": {
+                                "format": "uuid",
+                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                "type": "string"
+                              },
+                              "type": "array"
+                            },
+                            "producerActivityId": {
+                              "maxLength": 255,
+                              "minLength": 1,
+                              "type": "string"
+                            },
+                            "producerVersion": {
+                              "minLength": 1,
+                              "type": "string"
+                            },
+                            "retentionClass": {
+                              "minLength": 1,
+                              "type": "string"
+                            },
+                            "tenantId": {
+                              "format": "uuid",
+                              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                              "type": "string"
+                            },
+                            "transformationSignature": {
+                              "pattern": "^sha256:[a-f0-9]{64}$",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "artifactId",
+                            "tenantId",
+                            "digest",
+                            "mediaType",
+                            "byteLength",
+                            "objectKey",
+                            "createdAt",
+                            "producerActivityId",
+                            "producerVersion",
+                            "encryptionClass",
+                            "retentionClass",
+                            "dataClassification",
+                            "parentArtifactIds"
+                          ],
+                          "type": "object"
+                        },
+                        "path": {
+                          "maxLength": 1024,
+                          "minLength": 1,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "path",
+                        "artifact"
+                      ],
+                      "type": "object"
+                    },
+                    "maxItems": 2000,
+                    "type": "array"
+                  },
+                  "mode": {
+                    "enum": [
+                      "archive",
+                      "continuation"
+                    ],
+                    "type": "string"
+                  },
+                  "parentCheckpointId": {
+                    "anyOf": [
+                      {
+                        "format": "uuid",
+                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "pendingOperations": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "operationId": {
+                          "maxLength": 256,
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "owner": {
+                          "enum": [
+                            "source_discovery",
+                            "verification",
+                            "ingestion",
+                            "report",
+                            "publication",
+                            "external_tool"
+                          ],
+                          "type": "string"
+                        },
+                        "requestDigest": {
+                          "pattern": "^sha256:[a-f0-9]{64}$",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "owner",
+                        "operationId",
+                        "requestDigest"
+                      ],
+                      "type": "object"
+                    },
+                    "maxItems": 1000,
+                    "type": "array"
+                  },
+                  "requiredArtifacts": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "artifactId": {
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                          "type": "string"
+                        },
+                        "attestationArtifactId": {
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                          "type": "string"
+                        },
+                        "byteLength": {
+                          "maximum": 9007199254740991,
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "contentEncoding": {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                          "type": "string"
+                        },
+                        "dataClassification": {
+                          "enum": [
+                            "public",
+                            "internal",
+                            "confidential",
+                            "restricted"
+                          ],
+                          "type": "string"
+                        },
+                        "digest": {
+                          "pattern": "^sha256:[a-f0-9]{64}$",
+                          "type": "string"
+                        },
+                        "downloadHandle": {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "encryptionClass": {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "mediaType": {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "objectKey": {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "parentArtifactIds": {
+                          "items": {
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "producerActivityId": {
+                          "maxLength": 255,
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "producerVersion": {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "retentionClass": {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "tenantId": {
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                          "type": "string"
+                        },
+                        "transformationSignature": {
+                          "pattern": "^sha256:[a-f0-9]{64}$",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "artifactId",
+                        "tenantId",
+                        "digest",
+                        "mediaType",
+                        "byteLength",
+                        "objectKey",
+                        "createdAt",
+                        "producerActivityId",
+                        "producerVersion",
+                        "encryptionClass",
+                        "retentionClass",
+                        "dataClassification",
+                        "parentArtifactIds"
+                      ],
+                      "type": "object"
+                    },
+                    "maxItems": 10000,
+                    "type": "array"
+                  },
+                  "retentionPolicyDigest": {
+                    "pattern": "^sha256:[a-f0-9]{64}$",
+                    "type": "string"
+                  },
+                  "retentionPolicyVersion": {
+                    "maxLength": 256,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "schemaVersion": {
+                    "const": "scoped-checkpoint.v1",
+                    "type": "string"
+                  },
+                  "scope": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "childId": {
+                        "maxLength": 256,
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "namespace": {
+                        "maxLength": 1024,
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "parentScopeId": {
+                        "format": "uuid",
+                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                        "type": "string"
+                      },
+                      "producerAttemptId": {
+                        "maxLength": 256,
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "runId": {
+                        "maxLength": 256,
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "sandboxId": {
+                        "maxLength": 256,
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "sessionId": {
+                        "maxLength": 256,
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "tenantId": {
+                        "format": "uuid",
+                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "tenantId",
+                      "runId",
+                      "producerAttemptId",
+                      "sessionId",
+                      "sandboxId",
+                      "namespace"
+                    ],
+                    "type": "object"
+                  },
+                  "semanticHandoffArtifact": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "artifactId": {
+                        "format": "uuid",
+                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                        "type": "string"
+                      },
+                      "attestationArtifactId": {
+                        "format": "uuid",
+                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                        "type": "string"
+                      },
+                      "byteLength": {
+                        "maximum": 9007199254740991,
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      "contentEncoding": {
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "createdAt": {
+                        "format": "date-time",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                        "type": "string"
+                      },
+                      "dataClassification": {
+                        "enum": [
+                          "public",
+                          "internal",
+                          "confidential",
+                          "restricted"
+                        ],
+                        "type": "string"
+                      },
+                      "digest": {
+                        "pattern": "^sha256:[a-f0-9]{64}$",
+                        "type": "string"
+                      },
+                      "downloadHandle": {
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "encryptionClass": {
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "mediaType": {
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "objectKey": {
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "parentArtifactIds": {
+                        "items": {
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "producerActivityId": {
+                        "maxLength": 255,
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "producerVersion": {
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "retentionClass": {
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "tenantId": {
+                        "format": "uuid",
+                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                        "type": "string"
+                      },
+                      "transformationSignature": {
+                        "pattern": "^sha256:[a-f0-9]{64}$",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "artifactId",
+                      "tenantId",
+                      "digest",
+                      "mediaType",
+                      "byteLength",
+                      "objectKey",
+                      "createdAt",
+                      "producerActivityId",
+                      "producerVersion",
+                      "encryptionClass",
+                      "retentionClass",
+                      "dataClassification",
+                      "parentArtifactIds"
+                    ],
+                    "type": "object"
+                  },
+                  "storageProfileDigest": {
+                    "pattern": "^sha256:[a-f0-9]{64}$",
+                    "type": "string"
+                  },
+                  "storageProfileVersion": {
+                    "maxLength": 256,
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "schemaVersion",
+                  "scope",
+                  "parentCheckpointId",
+                  "storageProfileVersion",
+                  "storageProfileDigest",
+                  "retentionPolicyVersion",
+                  "retentionPolicyDigest",
+                  "capabilityProfileVersion",
+                  "capabilityProfileDigest",
+                  "mode",
+                  "boundary",
+                  "files",
+                  "requiredArtifacts",
+                  "pendingOperations"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "idempotencyKey",
+              "expectedHead",
+              "manifest"
+            ],
+            "type": "object"
+          },
+          "tenantId": {
+            "description": "Tenant; defaults to the executor's configured tenant.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "request"
+        ],
+        "type": "object"
+      },
+      "name": "checkpoint_commit",
+      "read_only_hint": null,
+      "side_effect_class": "bounded_write"
+    },
+    {
+      "description": "Host adapter for approved files, executor state and tool observations. Returns a verified durable receipt; continuation remains blocked on unresolved owner work.",
+      "input_schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "request": {
+            "additionalProperties": false,
+            "properties": {
+              "action": {
+                "enum": [
+                  "restore",
+                  "commit",
+                  "observe"
+                ],
+                "type": "string"
+              },
+              "boundary": {
+                "enum": [
+                  "dirty_interval",
+                  "source",
+                  "verification",
+                  "ingestion",
+                  "report",
+                  "publication",
+                  "transfer",
+                  "failure",
+                  "cancellation",
+                  "completion",
+                  "manual"
+                ],
+                "type": "string"
+              },
+              "captureIds": {
+                "default": [],
+                "items": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "maxItems": 2048,
+                "type": "array"
+              },
+              "event": {
+                "additionalProperties": false,
+                "properties": {
+                  "data": {},
+                  "eventId": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "eventType": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "turnId": {
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "eventId",
+                  "eventType",
+                  "data"
+                ],
+                "type": "object"
+              },
+              "expectedHead": {
+                "anyOf": [
+                  {
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "files": {
+                "default": [],
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "base64": {
+                      "type": "string"
+                    },
+                    "digest": {
+                      "pattern": "^sha256:[a-f0-9]{64}$",
+                      "type": "string"
+                    },
+                    "path": {
+                      "maxLength": 1024,
+                      "minLength": 1,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "path",
+                    "base64",
+                    "digest"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 2000,
+                "type": "array"
+              },
+              "idempotencyKey": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "profilePins": {
+                "properties": {
+                  "capabilityProfileDigest": {
+                    "pattern": "^sha256:[a-f0-9]{64}$",
+                    "type": "string"
+                  },
+                  "capabilityProfileVersion": {
+                    "type": "string"
+                  },
+                  "retentionPolicyDigest": {
+                    "pattern": "^sha256:[a-f0-9]{64}$",
+                    "type": "string"
+                  },
+                  "retentionPolicyVersion": {
+                    "type": "string"
+                  },
+                  "storageProfileDigest": {
+                    "pattern": "^sha256:[a-f0-9]{64}$",
+                    "type": "string"
+                  },
+                  "storageProfileVersion": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "storageProfileVersion",
+                  "storageProfileDigest",
+                  "retentionPolicyVersion",
+                  "retentionPolicyDigest",
+                  "capabilityProfileVersion",
+                  "capabilityProfileDigest"
+                ],
+                "type": "object"
+              },
+              "runIds": {
+                "default": [],
+                "items": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "maxItems": 128,
+                "type": "array"
+              },
+              "scopeContext": {
+                "additionalProperties": false,
+                "properties": {
+                  "namespace": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "producerAttemptId": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "runId": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "tenantId": {
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "tenantId",
+                  "runId",
+                  "producerAttemptId",
+                  "namespace"
+                ],
+                "type": "object"
+              },
+              "session": {
+                "additionalProperties": false,
+                "properties": {
+                  "childId": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "parentSessionId": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "sandboxId": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "sessionId": {
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "sessionId",
+                  "sandboxId"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "action",
+              "session",
+              "scopeContext",
+              "profilePins"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "request"
+        ],
+        "type": "object"
+      },
+      "name": "checkpoint_harness",
+      "read_only_hint": null,
+      "side_effect_class": "bounded_write"
+    },
+    {
+      "description": "Read the latest committed receipt for an exact standalone session scope.",
+      "input_schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "scope": {
+            "additionalProperties": false,
+            "properties": {
+              "childId": {
+                "maxLength": 256,
+                "minLength": 1,
+                "type": "string"
+              },
+              "namespace": {
+                "maxLength": 1024,
+                "minLength": 1,
+                "type": "string"
+              },
+              "parentScopeId": {
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                "type": "string"
+              },
+              "producerAttemptId": {
+                "maxLength": 256,
+                "minLength": 1,
+                "type": "string"
+              },
+              "runId": {
+                "maxLength": 256,
+                "minLength": 1,
+                "type": "string"
+              },
+              "sandboxId": {
+                "maxLength": 256,
+                "minLength": 1,
+                "type": "string"
+              },
+              "sessionId": {
+                "maxLength": 256,
+                "minLength": 1,
+                "type": "string"
+              },
+              "tenantId": {
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "tenantId",
+              "runId",
+              "producerAttemptId",
+              "sessionId",
+              "sandboxId",
+              "namespace"
+            ],
+            "type": "object"
+          },
+          "tenantId": {
+            "description": "Tenant; defaults to the executor's configured tenant.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "scope"
+        ],
+        "type": "object"
+      },
+      "name": "checkpoint_head",
+      "read_only_hint": null,
+      "side_effect_class": "read_only"
+    },
+    {
+      "description": "Verify archived bytes and manifest without resuming work.",
+      "input_schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "request": {
+            "additionalProperties": false,
+            "properties": {
+              "checkpointId": {
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                "type": "string"
+              },
+              "expectedProfilePins": {
+                "additionalProperties": false,
+                "properties": {
+                  "capabilityProfileDigest": {
+                    "pattern": "^sha256:[a-f0-9]{64}$",
+                    "type": "string"
+                  },
+                  "capabilityProfileVersion": {
+                    "maxLength": 256,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "retentionPolicyDigest": {
+                    "pattern": "^sha256:[a-f0-9]{64}$",
+                    "type": "string"
+                  },
+                  "retentionPolicyVersion": {
+                    "maxLength": 256,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "storageProfileDigest": {
+                    "pattern": "^sha256:[a-f0-9]{64}$",
+                    "type": "string"
+                  },
+                  "storageProfileVersion": {
+                    "maxLength": 256,
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "storageProfileVersion",
+                  "storageProfileDigest",
+                  "retentionPolicyVersion",
+                  "retentionPolicyDigest",
+                  "capabilityProfileVersion",
+                  "capabilityProfileDigest"
+                ],
+                "type": "object"
+              },
+              "expectedScope": {
+                "additionalProperties": false,
+                "properties": {
+                  "childId": {
+                    "maxLength": 256,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "namespace": {
+                    "maxLength": 1024,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "parentScopeId": {
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                    "type": "string"
+                  },
+                  "producerAttemptId": {
+                    "maxLength": 256,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "runId": {
+                    "maxLength": 256,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "sandboxId": {
+                    "maxLength": 256,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "sessionId": {
+                    "maxLength": 256,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "tenantId": {
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "tenantId",
+                  "runId",
+                  "producerAttemptId",
+                  "sessionId",
+                  "sandboxId",
+                  "namespace"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "checkpointId",
+              "expectedScope",
+              "expectedProfilePins"
+            ],
+            "type": "object"
+          },
+          "tenantId": {
+            "description": "Tenant; defaults to the executor's configured tenant.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "request"
+        ],
+        "type": "object"
+      },
+      "name": "checkpoint_read",
+      "read_only_hint": null,
+      "side_effect_class": "read_only"
+    },
+    {
+      "description": "Verify checkpoint closure and reconcile pending work through its existing owner before continuation.",
+      "input_schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "request": {
+            "additionalProperties": false,
+            "properties": {
+              "checkpointId": {
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                "type": "string"
+              },
+              "expectedProfilePins": {
+                "additionalProperties": false,
+                "properties": {
+                  "capabilityProfileDigest": {
+                    "pattern": "^sha256:[a-f0-9]{64}$",
+                    "type": "string"
+                  },
+                  "capabilityProfileVersion": {
+                    "maxLength": 256,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "retentionPolicyDigest": {
+                    "pattern": "^sha256:[a-f0-9]{64}$",
+                    "type": "string"
+                  },
+                  "retentionPolicyVersion": {
+                    "maxLength": 256,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "storageProfileDigest": {
+                    "pattern": "^sha256:[a-f0-9]{64}$",
+                    "type": "string"
+                  },
+                  "storageProfileVersion": {
+                    "maxLength": 256,
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "storageProfileVersion",
+                  "storageProfileDigest",
+                  "retentionPolicyVersion",
+                  "retentionPolicyDigest",
+                  "capabilityProfileVersion",
+                  "capabilityProfileDigest"
+                ],
+                "type": "object"
+              },
+              "expectedScope": {
+                "additionalProperties": false,
+                "properties": {
+                  "childId": {
+                    "maxLength": 256,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "namespace": {
+                    "maxLength": 1024,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "parentScopeId": {
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                    "type": "string"
+                  },
+                  "producerAttemptId": {
+                    "maxLength": 256,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "runId": {
+                    "maxLength": 256,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "sandboxId": {
+                    "maxLength": 256,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "sessionId": {
+                    "maxLength": 256,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "tenantId": {
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "tenantId",
+                  "runId",
+                  "producerAttemptId",
+                  "sessionId",
+                  "sandboxId",
+                  "namespace"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "checkpointId",
+              "expectedScope",
+              "expectedProfilePins"
+            ],
+            "type": "object"
+          },
+          "tenantId": {
+            "description": "Tenant; defaults to the executor's configured tenant.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "request"
+        ],
+        "type": "object"
+      },
+      "name": "checkpoint_restore",
+      "read_only_hint": null,
+      "side_effect_class": "bounded_write"
+    },
+    {
+      "description": "Apply reference-aware retirement after the canonical minimum orphan age; referenced artifacts cannot be retired.",
+      "input_schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "request": {
+            "additionalProperties": false,
+            "properties": {
+              "artifactId": {
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                "type": "string"
+              },
+              "reason": {
+                "maxLength": 2000,
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "artifactId",
+              "reason"
+            ],
+            "type": "object"
+          },
+          "tenantId": {
+            "description": "Tenant; defaults to the executor's configured tenant.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "request"
+        ],
+        "type": "object"
+      },
+      "name": "checkpoint_tombstone",
+      "read_only_hint": null,
+      "side_effect_class": "consequential"
+    },
+    {
+      "description": "Return the JSON query plan (no ANALYZE) for one SELECT/WITH statement as pipeline_agent. Use it to check cost before running a heavy read.",
+      "input_schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "params": {
+            "items": {},
+            "maxItems": 32,
+            "type": "array"
+          },
+          "sql": {
+            "maxLength": 20000,
+            "minLength": 1,
+            "type": "string"
+          },
+          "tenantId": {
+            "description": "Tenant; defaults to the executor's configured tenant.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "sql"
+        ],
+        "type": "object"
+      },
+      "name": "db_explain",
+      "read_only_hint": null,
+      "side_effect_class": "read_only"
+    },
+    {
+      "description": "Return the tenant's knowledge_seq (the head every snapshot and ingestion intent cites) and the database migration head.",
+      "input_schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "tenantId": {
+            "description": "Tenant; defaults to the executor's configured tenant.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "db_head",
+      "read_only_hint": null,
+      "side_effect_class": "read_only"
+    },
+    {
+      "description": "Execute named catalog queries in one read-only transaction at one knowledge head and return a knowledge-read-snapshot.v1 with per-op and snapshot digests. persist:true stores intent+snapshot as artifacts.",
+      "input_schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "intent": {
+            "additionalProperties": {},
+            "propertyNames": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "persist": {
+            "default": false,
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "intent"
+        ],
+        "type": "object"
+      },
+      "name": "db_read_intent",
+      "read_only_hint": null,
+      "side_effect_class": "bounded_write"
+    },
+    {
+      "description": "Run ONE SELECT/WITH statement as pipeline_agent in a read-only transaction with a statement timeout and row cap. No writes, no set_config. Prefer catalog queries (db_read_intent) when one fits.",
+      "input_schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "limit": {
+            "maximum": 2000,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "params": {
+            "items": {},
+            "maxItems": 32,
+            "type": "array"
+          },
+          "sql": {
+            "maxLength": 20000,
+            "minLength": 1,
+            "type": "string"
+          },
+          "statementTimeoutMs": {
+            "maximum": 60000,
+            "minimum": 100,
+            "type": "integer"
+          },
+          "tenantId": {
+            "description": "Tenant; defaults to the executor's configured tenant.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "sql"
+        ],
+        "type": "object"
+      },
+      "name": "db_sql_readonly",
+      "read_only_hint": null,
+      "side_effect_class": "read_only"
+    },
+    {
+      "description": "Plan, then apply admitted proposals in one transaction as executor_service via temporal.begin_batch/assert_*/commit_batch; return a knowledge-ingestion-receipt.v1. Same bytes \u21d2 same receipt (duplicateOf). REBASE_REQUIRED when the head moved.",
+      "input_schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "expectedHead": {
+            "description": "Overrides intent.expectedKnowledgeHead.",
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "intent": {
+            "additionalProperties": {},
+            "propertyNames": {
+              "type": "string"
+            },
+            "type": "object"
+          }
+        },
+        "required": [
+          "intent"
+        ],
+        "type": "object"
+      },
+      "name": "ingest_apply",
+      "read_only_hint": null,
+      "side_effect_class": "consequential"
+    },
+    {
+      "description": "Validate a knowledge-ingestion-intent.v1 against vocabularies, rules, evidence, and the current head; return a knowledge-ingestion-plan.v1 with per-proposal outcomes. Writes nothing.",
+      "input_schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "expectedHead": {
+            "description": "Overrides intent.expectedKnowledgeHead.",
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "intent": {
+            "additionalProperties": {},
+            "propertyNames": {
+              "type": "string"
+            },
+            "type": "object"
+          }
+        },
+        "required": [
+          "intent"
+        ],
+        "type": "object"
+      },
+      "name": "ingest_plan",
+      "read_only_hint": null,
+      "side_effect_class": "read_only"
+    },
+    {
+      "description": "Return the stored knowledge-ingestion-receipt.v1 for a receiptId (orchestration.operation_receipt.id).",
+      "input_schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "receiptId": {
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          },
+          "tenantId": {
+            "description": "Tenant; defaults to the executor's configured tenant.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "receiptId"
+        ],
+        "type": "object"
+      },
+      "name": "ingest_receipt",
+      "read_only_hint": null,
+      "side_effect_class": "read_only"
+    },
+    {
+      "description": "binding-descriptor.v2 of the credential's binding: protocol and core schemas, operations, report kinds, media, guarantees, signing issuer, pinned component and qualification receipts.",
+      "input_schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {},
+        "type": "object"
+      },
+      "name": "knowledge_describe",
+      "read_only_hint": null,
+      "side_effect_class": "read_only"
+    },
+    {
+      "description": "Read the guidance as Markdown: the start page, or one skill or one reference of a skill.\nCall it first, without a topic, for the jobs, the skill and the tools of each job and the rules that always hold.\nReturns one Markdown page that ends with the topics it links to. Read a skill, then only the reference the step you are on needs.",
+      "input_schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "topic": {
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "knowledge_guide",
+      "read_only_hint": null,
+      "side_effect_class": "read_only"
+    },
+    {
+      "description": "Idempotent cancellation by cancelRequestId: the first request id is kept; queued operations cancel, running or waiting_review ones move to cancelling and settle cancelled.",
+      "input_schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "cancelRequestId": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@-]{0,199}$",
+            "type": "string"
+          },
+          "operationId": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@-]{0,199}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "operationId",
+          "cancelRequestId"
+        ],
+        "type": "object"
+      },
+      "name": "knowledge_operation_cancel",
+      "read_only_hint": null,
+      "side_effect_class": "bounded_write"
+    },
+    {
+      "description": "Poll one operation handle by operationId (scope from the credential). Returns operation-status.v2 with a bounded retryAfterMs while not terminal.",
+      "input_schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "operationId": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@-]{0,199}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "operationId"
+        ],
+        "type": "object"
+      },
+      "name": "knowledge_operation_get",
+      "read_only_hint": null,
+      "side_effect_class": "read_only"
+    },
+    {
+      "description": "Send one ks.knowledge_operation.v2 operation-envelope.v2. Returns operation-receipt.v2 for a synchronous effect (report.register, knowledge.apply), knowledge-plan-preview.v1 for the read-only knowledge.plan_preview, knowledge-read-intent-result.v1 for the recorded read-only knowledge.read_intent (allowlisted named queries and schema reads), or operation-handle.v2 (knowledge.read, report.assess, report.derive, report.observe, report.seal, report.decide, report.review, decision.resolve). A binding serves only the operations its knowledge_describe descriptor lists. Refusals are protocol-error.v2.",
+      "input_schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "envelope": {
+            "additionalProperties": {},
+            "propertyNames": {
+              "type": "string"
+            },
+            "type": "object"
+          }
+        },
+        "required": [
+          "envelope"
+        ],
+        "type": "object"
+      },
+      "name": "knowledge_operation_invoke",
+      "read_only_hint": null,
+      "side_effect_class": "consequential"
+    },
+    {
+      "description": "Receipt-first recovery: receipt-lookup.v2 for one effect key (found, not_found or unresolved). A negative lookup after an uncertain dispatch is not proof that nothing was applied.",
+      "input_schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "effectKey": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@-]{0,199}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "effectKey"
+        ],
+        "type": "object"
+      },
+      "name": "knowledge_receipt_get",
+      "read_only_hint": null,
+      "side_effect_class": "read_only"
+    },
+    {
+      "description": "Return a workspace page by id (rel:<schema>.<name>, dom:<slug>, task:<slug>, fn:<schema>.<name>) or relative path, capped in size. Search before reading; read the domain page before a relation page; \u22644 reads to an operation.",
+      "input_schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "id": {
+            "maxLength": 300,
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxBytes": {
+            "maximum": 256000,
+            "minimum": 256,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "schema_get",
+      "read_only_hint": null,
+      "side_effect_class": "read_only"
+    },
+    {
+      "description": "Return the workspace manifest (fingerprint, migration head, scope) plus the connected database's migration head and whether they match.",
+      "input_schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {},
+        "type": "object"
+      },
+      "name": "schema_manifest",
+      "read_only_hint": null,
+      "side_effect_class": "read_only"
+    },
+    {
+      "description": "Copy a scoped workspace bundle (workspace-scopes/<scope>.json) into an empty directory, via the db-contract CLI when present, else an in-process filter.",
+      "input_schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "outDir": {
+            "maxLength": 1000,
+            "minLength": 1,
+            "type": "string"
+          },
+          "scope": {
+            "maxLength": 120,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "scope",
+          "outDir"
+        ],
+        "type": "object"
+      },
+      "name": "schema_materialize",
+      "read_only_hint": null,
+      "side_effect_class": "bounded_write"
+    },
+    {
+      "description": "Find tables, functions, domains, tasks, queries, and terms in the pinned schema workspace. Ranked: exact alias > name > tokens. Search before reading; read the domain page before a relation page; \u22644 reads to an operation.",
+      "input_schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "domain": {
+            "type": "string"
+          },
+          "kinds": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "limit": {
+            "maximum": 50,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "query": {
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "schema_search",
+      "read_only_hint": null,
+      "side_effect_class": "read_only"
+    },
+    {
+      "description": "Read the original source attempt and its provenance trust. Terminal leads require verified remote receipt custody. An unfinished attempt returns no leads and must be reconciled before any new provider dispatch.",
+      "input_schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "attemptId": {
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          },
+          "limit": {
+            "maximum": 200,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "offset": {
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "tenantId": {
+            "description": "Tenant; defaults to the executor's configured tenant.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "attemptId"
+        ],
+        "type": "object"
+      },
+      "name": "source_attempt",
+      "read_only_hint": null,
+      "side_effect_class": "read_only"
+    },
+    {
+      "description": "Dispatch a configured search provider after durable request registration; preserve output before returning its receipt. Snippets remain untrusted discovery material. Reuse the idempotency key to recover the original attempt.",
+      "input_schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "definitions": {
+          "__schema0": {
+            "anyOf": [
+              {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean",
+                  "null"
+                ]
+              },
+              {
+                "items": {
+                  "$ref": "#/definitions/__schema0"
+                },
+                "type": "array"
+              },
+              {
+                "additionalProperties": {
+                  "$ref": "#/definitions/__schema0"
+                },
+                "propertyNames": {
+                  "type": "string"
+                },
+                "type": "object"
+              }
+            ]
+          }
+        },
+        "properties": {
+          "request": {
+            "additionalProperties": false,
+            "properties": {
+              "idempotencyKey": {
+                "maxLength": 256,
+                "minLength": 1,
+                "type": "string"
+              },
+              "parameters": {
+                "$ref": "#/definitions/__schema0"
+              },
+              "providerCode": {
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              },
+              "providerVersion": {
+                "default": "unspecified",
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              },
+              "purpose": {
+                "maxLength": 2000,
+                "minLength": 1,
+                "type": "string"
+              },
+              "queryText": {
+                "maxLength": 8000,
+                "minLength": 1,
+                "type": "string"
+              },
+              "requestedUrls": {
+                "items": {
+                  "format": "uri",
+                  "maxLength": 8192,
+                  "type": "string"
+                },
+                "maxItems": 256,
+                "type": "array"
+              },
+              "retryOfAttemptId": {
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                "type": "string"
+              },
+              "schemaVersion": {
+                "const": "source-discovery-managed-request.v1",
+                "type": "string"
+              }
+            },
+            "required": [
+              "providerCode",
+              "queryText",
+              "purpose",
+              "parameters",
+              "requestedUrls",
+              "schemaVersion",
+              "idempotencyKey"
+            ],
+            "type": "object"
+          },
+          "tenantId": {
+            "description": "Tenant; defaults to the executor's configured tenant.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "request"
+        ],
+        "type": "object"
+      },
+      "name": "source_discover",
+      "read_only_hint": null,
+      "side_effect_class": "bounded_write"
+    },
+    {
+      "description": "Account for externally executed provider attempts using already preserved receipt artifacts. Imported metadata is self-reported and never gains managed-provider authority.",
+      "input_schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "definitions": {
+          "__schema0": {
+            "anyOf": [
+              {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean",
+                  "null"
+                ]
+              },
+              {
+                "items": {
+                  "$ref": "#/definitions/__schema0"
+                },
+                "type": "array"
+              },
+              {
+                "additionalProperties": {
+                  "$ref": "#/definitions/__schema0"
+                },
+                "propertyNames": {
+                  "type": "string"
+                },
+                "type": "object"
+              }
+            ]
+          }
+        },
+        "properties": {
+          "receipt": {
+            "additionalProperties": false,
+            "properties": {
+              "externalAttemptId": {
+                "maxLength": 256,
+                "minLength": 1,
+                "type": "string"
+              },
+              "externalReceiptArtifact": {
+                "additionalProperties": false,
+                "properties": {
+                  "artifactId": {
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                    "type": "string"
+                  },
+                  "attestationArtifactId": {
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                    "type": "string"
+                  },
+                  "byteLength": {
+                    "maximum": 9007199254740991,
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "contentEncoding": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "createdAt": {
+                    "format": "date-time",
+                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                    "type": "string"
+                  },
+                  "dataClassification": {
+                    "enum": [
+                      "public",
+                      "internal",
+                      "confidential",
+                      "restricted"
+                    ],
+                    "type": "string"
+                  },
+                  "digest": {
+                    "pattern": "^sha256:[a-f0-9]{64}$",
+                    "type": "string"
+                  },
+                  "downloadHandle": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "encryptionClass": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "mediaType": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "objectKey": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "parentArtifactIds": {
+                    "items": {
+                      "format": "uuid",
+                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "producerActivityId": {
+                    "maxLength": 255,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "producerVersion": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "retentionClass": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "tenantId": {
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                    "type": "string"
+                  },
+                  "transformationSignature": {
+                    "pattern": "^sha256:[a-f0-9]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "artifactId",
+                  "tenantId",
+                  "digest",
+                  "mediaType",
+                  "byteLength",
+                  "objectKey",
+                  "createdAt",
+                  "producerActivityId",
+                  "producerVersion",
+                  "encryptionClass",
+                  "retentionClass",
+                  "dataClassification",
+                  "parentArtifactIds"
+                ],
+                "type": "object"
+              },
+              "failureCode": {
+                "pattern": "^[A-Z][A-Z0-9_]{2,127}$",
+                "type": "string"
+              },
+              "idempotencyKey": {
+                "maxLength": 256,
+                "minLength": 1,
+                "type": "string"
+              },
+              "occurredAt": {
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                "type": "string"
+              },
+              "parameters": {
+                "$ref": "#/definitions/__schema0"
+              },
+              "providerCode": {
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              },
+              "providerVersion": {
+                "default": "unspecified",
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              },
+              "purpose": {
+                "maxLength": 2000,
+                "minLength": 1,
+                "type": "string"
+              },
+              "queryText": {
+                "maxLength": 8000,
+                "minLength": 1,
+                "type": "string"
+              },
+              "rawOutputArtifact": {
+                "additionalProperties": false,
+                "properties": {
+                  "artifactId": {
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                    "type": "string"
+                  },
+                  "attestationArtifactId": {
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                    "type": "string"
+                  },
+                  "byteLength": {
+                    "maximum": 9007199254740991,
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "contentEncoding": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "createdAt": {
+                    "format": "date-time",
+                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                    "type": "string"
+                  },
+                  "dataClassification": {
+                    "enum": [
+                      "public",
+                      "internal",
+                      "confidential",
+                      "restricted"
+                    ],
+                    "type": "string"
+                  },
+                  "digest": {
+                    "pattern": "^sha256:[a-f0-9]{64}$",
+                    "type": "string"
+                  },
+                  "downloadHandle": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "encryptionClass": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "mediaType": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "objectKey": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "parentArtifactIds": {
+                    "items": {
+                      "format": "uuid",
+                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "producerActivityId": {
+                    "maxLength": 255,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "producerVersion": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "retentionClass": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "tenantId": {
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                    "type": "string"
+                  },
+                  "transformationSignature": {
+                    "pattern": "^sha256:[a-f0-9]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "artifactId",
+                  "tenantId",
+                  "digest",
+                  "mediaType",
+                  "byteLength",
+                  "objectKey",
+                  "createdAt",
+                  "producerActivityId",
+                  "producerVersion",
+                  "encryptionClass",
+                  "retentionClass",
+                  "dataClassification",
+                  "parentArtifactIds"
+                ],
+                "type": "object"
+              },
+              "requestedUrls": {
+                "items": {
+                  "format": "uri",
+                  "maxLength": 8192,
+                  "type": "string"
+                },
+                "maxItems": 256,
+                "type": "array"
+              },
+              "results": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "captureId": {
+                      "format": "uuid",
+                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                      "type": "string"
+                    },
+                    "disposition": {
+                      "enum": [
+                        "selected",
+                        "omitted",
+                        "duplicate",
+                        "unreviewed"
+                      ],
+                      "type": "string"
+                    },
+                    "finalUrl": {
+                      "format": "uri",
+                      "maxLength": 8192,
+                      "type": "string"
+                    },
+                    "payloadDigest": {
+                      "pattern": "^sha256:[a-f0-9]{64}$",
+                      "type": "string"
+                    },
+                    "providerResultId": {
+                      "maxLength": 256,
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "rank": {
+                      "exclusiveMinimum": 0,
+                      "maximum": 10000,
+                      "type": "integer"
+                    },
+                    "redirectUrls": {
+                      "items": {
+                        "format": "uri",
+                        "maxLength": 8192,
+                        "type": "string"
+                      },
+                      "maxItems": 32,
+                      "type": "array"
+                    },
+                    "requestedUrl": {
+                      "format": "uri",
+                      "maxLength": 8192,
+                      "type": "string"
+                    },
+                    "snippet": {
+                      "maxLength": 16000,
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "sourceClass": {
+                      "enum": [
+                        "web_page",
+                        "api",
+                        "repository",
+                        "pdf",
+                        "transcript",
+                        "dataset",
+                        "registry",
+                        "other"
+                      ],
+                      "type": "string"
+                    },
+                    "title": {
+                      "maxLength": 2000,
+                      "minLength": 1,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "rank",
+                    "requestedUrl",
+                    "finalUrl",
+                    "redirectUrls",
+                    "disposition",
+                    "sourceClass",
+                    "payloadDigest"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 10000,
+                "type": "array"
+              },
+              "retryOfAttemptId": {
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                "type": "string"
+              },
+              "schemaVersion": {
+                "const": "source-discovery-import-receipt.v1",
+                "type": "string"
+              },
+              "selfReported": {
+                "const": true,
+                "type": "boolean"
+              },
+              "state": {
+                "enum": [
+                  "succeeded",
+                  "failed",
+                  "uncertain",
+                  "cancelled"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "providerCode",
+              "queryText",
+              "purpose",
+              "parameters",
+              "requestedUrls",
+              "schemaVersion",
+              "idempotencyKey",
+              "occurredAt",
+              "selfReported",
+              "externalReceiptArtifact",
+              "state",
+              "results"
+            ],
+            "type": "object"
+          },
+          "tenantId": {
+            "description": "Tenant; defaults to the executor's configured tenant.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "receipt"
+        ],
+        "type": "object"
+      },
+      "name": "source_import",
+      "read_only_hint": null,
+      "side_effect_class": "bounded_write"
+    },
+    {
+      "description": "Convert and chunk exact remotely retained native text captures through durable preparation. Requires a trusted preparation host. Returns canonical receipts and pending independent review; does not publish.",
+      "input_schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "captureId": {
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": {
+            "maxLength": 500,
+            "minLength": 1,
+            "type": "string"
+          },
+          "version": {
+            "maxLength": 100,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "captureId",
+          "title",
+          "version"
+        ],
+        "type": "object"
+      },
+      "name": "source_prepare_captured",
+      "read_only_hint": null,
+      "side_effect_class": "bounded_write"
+    },
+    {
+      "description": "Recover an original managed attempt from verified completion custody under a fresh fence. Does not call the provider again. Refuses a live dispatch lease; missing completion custody yields an explicit uncertain outcome.",
+      "input_schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "attemptId": {
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          },
+          "tenantId": {
+            "description": "Tenant; defaults to the executor's configured tenant.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "attemptId"
+        ],
+        "type": "object"
+      },
+      "name": "source_reconcile",
+      "read_only_hint": null,
+      "side_effect_class": "bounded_write"
+    },
+    {
+      "description": "Preserve explicit selected, omitted or duplicate lead decisions and reasons in an immutable selection receipt. Does not rewrite provider output, admit evidence or authorize publication.",
+      "input_schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "request": {
+            "additionalProperties": false,
+            "properties": {
+              "attemptId": {
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                "type": "string"
+              },
+              "decisions": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "disposition": {
+                      "enum": [
+                        "selected",
+                        "omitted",
+                        "duplicate"
+                      ],
+                      "type": "string"
+                    },
+                    "rank": {
+                      "exclusiveMinimum": 0,
+                      "maximum": 10000,
+                      "type": "integer"
+                    },
+                    "reason": {
+                      "maxLength": 2000,
+                      "minLength": 1,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "rank",
+                    "disposition",
+                    "reason"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 10000,
+                "minItems": 1,
+                "type": "array"
+              },
+              "idempotencyKey": {
+                "maxLength": 256,
+                "minLength": 1,
+                "type": "string"
+              },
+              "schemaVersion": {
+                "const": "source-discovery-selection.v1",
+                "type": "string"
+              }
+            },
+            "required": [
+              "schemaVersion",
+              "attemptId",
+              "idempotencyKey",
+              "decisions"
+            ],
+            "type": "object"
+          },
+          "tenantId": {
+            "description": "Tenant; defaults to the executor's configured tenant.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "request"
+        ],
+        "type": "object"
+      },
+      "name": "source_select",
+      "read_only_hint": null,
+      "side_effect_class": "bounded_write"
+    },
+    {
+      "description": "Capture bytes instead of a URL: markdown/text/json inline as `text`, or any supported document (pdf, docx, doc, odt, rtf, xlsx, xls, pptx, ppt, epub, csv, html) as `base64`. The executor converts the document to markdown itself (Firecrawl parse) and stores the original bytes beside the text, so the capture is trustworthy evidence. Sandbox files are normally pushed through the HTTP POST /captures route instead of inlining base64.",
+      "input_schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "base64": {
+            "description": "Base64 bytes for binary documents.",
+            "maxLength": 70000000,
+            "minLength": 1,
+            "type": "string"
+          },
+          "captureId": {
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          },
+          "filename": {
+            "description": "File name with extension; drives media-type detection.",
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          },
+          "mediaType": {
+            "maxLength": 120,
+            "minLength": 1,
+            "type": "string"
+          },
+          "runId": {
+            "description": "Agent-chosen run id; capture steps are logged as non-authoritative step receipts under it.",
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          },
+          "sourceUri": {
+            "description": "Where the bytes came from (URL, bucket key, sandbox path).",
+            "maxLength": 2000,
+            "minLength": 1,
+            "type": "string"
+          },
+          "text": {
+            "description": "UTF-8 content for text-like files.",
+            "maxLength": 4000000,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "filename"
+        ],
+        "type": "object"
+      },
+      "name": "verify_capture_file",
+      "read_only_hint": null,
+      "side_effect_class": "bounded_write"
+    },
+    {
+      "description": "Resolve a unique quote against an exact representation digest and return a research-core.fragment.v2 with original capture custody and acquisition-time provenance. Requires durable artifact custody. Tenant is host-owned; rights are producer-declared and registration/admission remain separate.",
+      "input_schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "access": {
+            "additionalProperties": false,
+            "properties": {
+              "limits": {
+                "items": {
+                  "maxLength": 500,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "rights": {
+                "enum": [
+                  "public",
+                  "licensed",
+                  "restricted",
+                  "private"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "rights",
+              "limits"
+            ],
+            "type": "object"
+          },
+          "binding": {
+            "description": "Target K01 reference binding; this projection grants no binding authority.",
+            "pattern": "^[a-z][a-z0-9_.-]{0,119}$",
+            "type": "string"
+          },
+          "captureId": {
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          },
+          "id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@-]{0,199}$",
+            "type": "string"
+          },
+          "quote": {
+            "maxLength": 4000,
+            "minLength": 1,
+            "type": "string"
+          },
+          "representationDigest": {
+            "pattern": "^sha256:[0-9a-f]{64}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "binding",
+          "captureId",
+          "representationDigest",
+          "quote",
+          "access"
+        ],
+        "type": "object"
+      },
+      "name": "verify_capture_fragment",
+      "read_only_hint": null,
+      "side_effect_class": "bounded_write"
+    },
+    {
+      "description": "Fetch a URL (Firecrawl when configured, otherwise HTTPS GET), store the captured text as an immutable content-addressed artifact, and return a captureId plus a preview. Quotes used in intents must be exact substrings of this captured text.",
+      "input_schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "captureId": {
+            "description": "Optional stable id; defaults to a digest-derived id.",
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          },
+          "method": {
+            "enum": [
+              "auto",
+              "firecrawl",
+              "https_get"
+            ],
+            "type": "string"
+          },
+          "runId": {
+            "description": "Agent-chosen run id; capture steps are logged as non-authoritative step receipts under it.",
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          },
+          "url": {
+            "format": "uri",
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ],
+        "type": "object"
+      },
+      "name": "verify_capture_source",
+      "read_only_hint": null,
+      "side_effect_class": "bounded_write"
+    },
+    {
+      "description": "Fetch a stored artifact by artifactId or digest (as text, json or just the handle).",
+      "input_schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "artifactId": {
+            "type": "string"
+          },
+          "as": {
+            "enum": [
+              "text",
+              "json",
+              "handle"
+            ],
+            "type": "string"
+          },
+          "digest": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "verify_get_artifact",
+      "read_only_hint": null,
+      "side_effect_class": "read_only"
+    },
+    {
+      "description": "List every capture in the store with its digest and size.",
+      "input_schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {},
+        "type": "object"
+      },
+      "name": "verify_list_captures",
+      "read_only_hint": null,
+      "side_effect_class": "read_only"
+    },
+    {
+      "description": "Resolve a candidate quote as a text_quote selector on the captured bytes. status=resolved means it occurs exactly once and is safe to put in an intent; ambiguous/not_found include suggestions.",
+      "input_schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "captureId": {
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          },
+          "quote": {
+            "maxLength": 4000,
+            "minLength": 1,
+            "type": "string"
+          },
+          "runId": {
+            "description": "Agent-chosen run id; capture steps are logged as non-authoritative step receipts under it.",
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "captureId",
+          "quote"
+        ],
+        "type": "object"
+      },
+      "name": "verify_locate_quote",
+      "read_only_hint": null,
+      "side_effect_class": "read_only"
+    },
+    {
+      "description": "Read a window of the exact captured text (default 6000 chars, max 20000). Use this to inspect the source before choosing quotes.",
+      "input_schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "captureId": {
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          },
+          "length": {
+            "exclusiveMinimum": 0,
+            "maximum": 20000,
+            "type": "integer"
+          },
+          "offset": {
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "runId": {
+            "description": "Agent-chosen run id; capture steps are logged as non-authoritative step receipts under it.",
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "captureId"
+        ],
+        "type": "object"
+      },
+      "name": "verify_read_capture",
+      "read_only_hint": null,
+      "side_effect_class": "read_only"
+    },
+    {
+      "description": "Store text (an intent file, a report, notes) as a content-addressed artifact and get back its artifactId/digest. Sandbox files are normally pushed via the HTTP /artifacts route instead.",
+      "input_schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "label": {
+            "maxLength": 80,
+            "type": "string"
+          },
+          "mediaType": {
+            "default": "application/json",
+            "maxLength": 120,
+            "minLength": 1,
+            "type": "string"
+          },
+          "runId": {
+            "description": "Agent-chosen run id; capture steps are logged as non-authoritative step receipts under it.",
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          },
+          "text": {
+            "maxLength": 2000000,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "type": "object"
+      },
+      "name": "verify_register_artifact",
+      "read_only_hint": null,
+      "side_effect_class": "bounded_write"
+    },
+    {
+      "description": "Find where a phrase (or the words of a phrase) occurs in a capture. Returns exact substrings with context and their occurrence counts so you can build a unique quote.",
+      "input_schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "captureId": {
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          },
+          "limit": {
+            "exclusiveMinimum": 0,
+            "maximum": 25,
+            "type": "integer"
+          },
+          "query": {
+            "maxLength": 400,
+            "minLength": 1,
+            "type": "string"
+          },
+          "runId": {
+            "description": "Agent-chosen run id; capture steps are logged as non-authoritative step receipts under it.",
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "captureId",
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "verify_search_capture",
+      "read_only_hint": null,
+      "side_effect_class": "read_only"
+    },
+    {
+      "description": "List every content type the executor can capture and how each is converted to the text representation quotes are selected from.",
+      "input_schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {},
+        "type": "object"
+      },
+      "name": "verify_supported_media_types",
+      "read_only_hint": null,
+      "side_effect_class": "read_only"
+    }
+  ]
+}

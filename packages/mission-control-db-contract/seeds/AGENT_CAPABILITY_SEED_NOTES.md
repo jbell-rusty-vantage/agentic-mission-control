@@ -23,12 +23,53 @@ The `tools/list` fixtures are transcribed from `docs/specs/archive/fast-track-20
 (`capture_method: transcribed`); no server was run in this wave. Input schemas are recorded as
 `{"type": "object"}` until a live capture. Re-capture each server once with
 `scripts/capture_mcp_tool_snapshot.py`, replace the fixture, regenerate the bundles (new seed
-version if 1.0.0 was applied) and run `make seeds-validate`.
+version if 1.0.0 was applied) and run `make seeds-validate`. That holds for the six 1.0.0 servers
+only: the three servers of 1.1.0 below are `capture_method: captured`.
+
+## Research capabilities (2026-11-16, `mc.catalog.agent-capabilities@1.1.0`)
+
+A common bundle of new ids, generated from `RESEARCH_SERVERS` and `CODE_RESEARCH_PLUGIN` in
+`agent_capabilities.py`; it depends on 1.0.0, whose common bundle is now frozen by bytes
+(`FROZEN_BUNDLES`). Identity, version, transport, authentication and read-only configuration of
+each row are evidenced in the
+[research capabilities provider note](../../../docs/specs/provider-consolidation-2026-10/providers/research-capabilities/RESEARCH-CAPABILITIES-SURFACE-2026-11-16.md#bindings).
+
+| Capability | Upstream identifier | Pin | Launch or endpoint | Tools | Secret reference names |
+| --- | --- | --- | --- | --- | --- |
+| `mcp.github` 2.1.0 | `mcp_registry` `io.github.github/github-mcp-server` | `oci:ghcr.io/github/github-mcp-server@sha256:f6056fc1…0f8a` (tag commit `4bcdcdf8`) | `github-mcp-server stdio --read-only --toolsets=repos,issues,pull_requests` | 22, all read-only | `GITHUB_PERSONAL_ACCESS_TOKEN` (a read-only token) |
+| `mcp.context7` 4.7.0 | `mcp_registry` `io.github.upstash/context7` | `npm:@upstash/context7-mcp@4.7.0` | `npx -y @upstash/context7-mcp@4.7.0`; remote `https://mcp.context7.com/mcp` as the cursor_cloud overlay | 2, both read-only | `CONTEXT7_API_KEY` (optional upstream) |
+| `mcp.knowledge-capture` 0.1.0-7bc4aee | `belllabs` `knowledge-services/verification-executor` | `git:` Knowledge Services at `7bc4aeec`, `apps/verification-executor` | Streamable HTTP, catalog default `http://127.0.0.1:4310/mcp`; a deployment binds its own endpoint | 19 allowlisted of the 40 the executor lists | `VERIFY_EXECUTOR_TOKEN` (the executor's token, on the Authorization header) |
+| `plugin.code-research` revision 1 | none (a Mission Control composition) | exact pins of `mcp.context7` and `mcp.github` | not applicable | not applicable | the two members' names |
+
+- **The tool lists are captured, not transcribed** (`capture_method: captured`; each fixture's `capture`
+  object records the command, the version the server reported, the tool count and that no credential
+  was set). Each MCP Tool row carries the server's own description and input schema.
+- `mcp.github` needs no allowlist: read-only is the server's own mode, and it lists no write tool in it.
+  The OCI image of the tag was not run; the list came from the release binary of the same tag.
+- `mcp.knowledge-capture` withholds every tool that writes knowledge or needs an issuer credential
+  (`ingest_*`, `knowledge_operation_*`, `knowledge_receipt_get`, `knowledge_describe`), the direct
+  database reads (`db_*`; the recorded read is the governed `tool.knowledge-read-intent`), and the
+  host-side state and file tools (`checkpoint_*`, `artifact_get`, `schema_materialize`,
+  `source_prepare_captured`). It is `unqualified` on every worker-hosted profile and `unsupported` on
+  cursor_cloud: the executor lists all 40 tools and no lane narrows a server's list to an allowlist, so
+  a manifest pin is refused at compile until a lane qualifies. What has to be built first is in the
+  [provider note](../../../docs/specs/provider-consolidation-2026-10/providers/research-capabilities/RESEARCH-CAPABILITIES-SURFACE-2026-11-16.md#capture-path).
+- `plugin.code-research` is a sibling of `plugin.web-research`, not its next revision: a mission that
+  only searches the web keeps needing only the Tavily and Firecrawl secrets, and a plugin that changes
+  membership under `@latest` would change what running missions mount. It sits in the common bundle
+  because both members do. The Deep Agents lane has no launch binding for a plugin a node selects
+  (`adapters/deep_agents/compile.py`), so a Deep Agents mission pins the two servers under
+  `environment.capabilities`; the plugin serves the file lanes and a child's seeds.
+- No arXiv server is seeded (see the rejected candidates and the provider note).
 
 ## Rejected candidates
 
 | Candidate | Why |
 | --- | --- |
+| `arxiv-mcp-server` (PyPI 0.8.2, `io.github.blazickjp/arxiv-mcp-server`) | Maintained, pinnable and Apache-2.0, but not first-party and one maintainer; 15 runtime dependencies, a third network host (Semantic Scholar), and downloads, watches and a search index kept on the worker. What it reads is already reachable: the paper index of the seeded `mcp.firecrawl`, then arXiv's own record of the exact version captured through the capture path. Not seeded on 2026-11-16; an owner decision if wanted |
+| `@cyanheads/arxiv-mcp-server` (npm 1.8.2) | Apache-2.0 and node, but 7 stars on 2026-11-16, 47 versions in under eight months, scheduled jobs and a native SQLite store in the server; its public endpoint is author-operated |
+| Remote-only arXiv endpoints in the MCP registry (10 of its 17 `arxiv` entries on 2026-11-16) | Operated by individuals or unnamed parties; no entry is published under an arXiv namespace |
+| GitHub remote endpoint as the catalog transport (`https://api.githubcopilot.com/mcp/`) | Selecting three toolsets read-only needs the `X-MCP-Toolsets` and `X-MCP-Readonly` request headers; the definition and the host overlay carry secret header references only, and a URL path selects one toolset or the default set |
 | `sec-edgar-mcp` (PyPI 1.1.0) | AGPL-3.0 licence risk for a hosted Mission Control and unauthenticated HTTP transport |
 | `pubmedmcp` (PyPI 0.1.4) | Stale (last upload 2025-09-02), no licence or author metadata |
 | unscoped npm `pubmed-mcp-server` 1.0.0 | Not the cyanheads server; stale; name trap |
