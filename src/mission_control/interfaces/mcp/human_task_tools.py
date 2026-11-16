@@ -13,7 +13,7 @@ durable Human Task through an ordinary tool call under its own authenticated pri
 from __future__ import annotations
 
 from collections.abc import Awaitable, Callable, Mapping
-from typing import Any, Protocol
+from typing import Annotated, Any, Protocol
 
 from fastmcp import Context, FastMCP
 
@@ -22,6 +22,7 @@ from mission_control.contracts.identities import parse_request_scope
 from mission_control.domain.coordinator.errors import CoordinatorDomainError, CoordinatorErrorCode
 from mission_control.domain.policies.contracts import ActorContext
 from mission_control.domain.programs.human_gate import HumanResolutionRequest
+from mission_control.interfaces.mcp.mission_tools import ShapeOf
 
 HUMAN_TASK_LIST_TOOL = "mission_human_task_list"
 HUMAN_TASK_GET_TOOL = "mission_human_task_get"
@@ -139,6 +140,16 @@ def register_human_task_tools(
     async def mission_human_task_list(
         context: Context, run_id: str | None = None, lifecycle: str | None = None
     ) -> dict[str, object]:
+        """List Human Tasks: the decisions runs are waiting on a reviewer to make.
+
+        Use it to find what blocks a run, for example after a review_required notification.
+        `run_id` limits the list to one run; `lifecycle` is open, resolved, expired or
+        cancelled (omit it for all).
+        Returns `human_tasks`, each with `human_task_id`, `origin`, `kind`, `lifecycle`,
+        `version`, `prompt`, `permitted_decisions` and `packet_digest`. Read one with
+        mission_human_task_get, then answer it with mission_human_task_resolve.
+        """
+
         async def invoke(principal: Any) -> object:
             return await human_tasks.list(principal, run_id=run_id, lifecycle=lifecycle)
 
@@ -146,6 +157,18 @@ def register_human_task_tools(
 
     @server.tool(name=HUMAN_TASK_GET_TOOL, annotations={"readOnlyHint": True})
     async def mission_human_task_get(human_task_id: str, context: Context) -> dict[str, object]:
+        """Read one Human Task: what is asked, by which run, and what an answer must cite.
+
+        Use it before answering. `human_task_id` comes from mission_human_task_list.
+        Returns the task: `origin` (workflow_gate for a Human Gate; otherwise
+        provider_permission, provider_question, mcp_elicitation or governed_effect),
+        `prompt`, `permitted_decisions`, `reviewers`, `deadline_at`, `version`,
+        `packet_digest` and what is under review (the review packet, the pending tool call,
+        the question or the form).
+        Next: mission_human_task_resolve, or mission_approval_resolve to approve with edited
+        arguments, choose among offered options, fill a form or cancel.
+        """
+
         async def invoke(principal: Any) -> object:
             return await human_tasks.get(principal, human_task_id=human_task_id)
 
@@ -153,8 +176,22 @@ def register_human_task_tools(
 
     @server.tool(name=HUMAN_TASK_RESOLVE_TOOL)
     async def mission_human_task_resolve(
-        human_task_id: str, request: dict[str, Any], context: Context
+        human_task_id: str,
+        request: Annotated[dict[str, Any], ShapeOf(HumanResolutionRequest)],
+        context: Context,
     ) -> dict[str, object]:
+        """Answer a Human Task with approve, deny or request_changes, as one of its reviewers.
+
+        Use it for Human Gate tasks and for a plain approve or deny of any other task;
+        mission_approval_resolve covers edited arguments, offered options, forms and cancel.
+        Read the task first (mission_human_task_get). `request`: `expected_task_version` is
+        the task's `version`, `reviewed_packet_digest` its `packet_digest`, `decision` one of
+        its `permitted_decisions`, and `request_id` an id you choose (repeating the same
+        request returns the same result). request_changes needs a `comment` or
+        `feedback_artifact_refs`; on a question task the `comment` is the answer.
+        Returns `status` (accepted or duplicate) and the updated `task`.
+        """
+
         async def invoke(principal: Any) -> object:
             return await human_tasks.resolve(
                 principal, human_task_id=human_task_id, request=request

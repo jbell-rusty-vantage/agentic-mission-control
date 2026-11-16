@@ -43,7 +43,7 @@ from __future__ import annotations
 
 import logging
 from collections.abc import Awaitable, Callable, Mapping
-from typing import Any, Final, Literal, Protocol, cast
+from typing import Annotated, Any, Final, Literal, Protocol, cast
 from uuid import UUID
 
 from fastmcp import Context, FastMCP
@@ -82,6 +82,7 @@ from mission_control.domain.subscriptions.contracts import (
     MissionEventEnvelope,
     SubscriptionRequest,
 )
+from mission_control.interfaces.mcp.mission_tools import ShapeOf
 
 LOGGER = logging.getLogger(__name__)
 NOTIFICATION_METHOD: Final = "notifications/mission/event"
@@ -526,15 +527,17 @@ def _register_inbox_tools(
     async def coordinator_inbox_observe(
         subscription_id: str,
         notification_id: str,
-        observation: dict[str, Any],
+        observation: Annotated[dict[str, Any], ShapeOf(HostObservation)],
         context: Context,
     ) -> dict[str, object]:
         """Attest what this host observed about one notice (`mc.coordinator_host_observation.v2`).
 
         Echo the `delivery_nonce` the delivered page carried for that notice. `stage: wake` first,
         with `idle_since` and the wake `channel` (background_task_exit, monitor_event,
-        session_prompt, or connected_poll when the host was not idle); then `stage: visible`.
-        Idempotent by `observation_key`. An attestation, never acknowledgment.
+        session_prompt, or connected_poll when the host was not idle); then `stage: visible`
+        with the `channel` the payload reached the model through (tool_result, task_output or
+        session_prompt) and no `idle_since`. Idempotent by `observation_key`. An attestation,
+        never acknowledgment.
         """
 
         async def operation() -> object:
@@ -609,7 +612,24 @@ def _register_inbox_tools(
         command: dict[str, Any],
         context: Context,
     ) -> dict[str, object]:
-        """Admit an `mc.command.v1` because of a notification (recursion and rate bounded)."""
+        """Send one Command to a run because of an inbox notification.
+
+        Use it instead of mission_command_send when a delivered notification is the reason:
+        the Command is recorded as caused by it and is bounded. It is refused when the chain
+        of reactions passes the inbox's recursion depth, or above the inbox's rate of such
+        Commands per run (retryable later).
+        `subscription_id` and `notification_id` name your inbox and that notification.
+        `command` is the object mission_command_send takes as `request`: `request_id` (a new
+        UUID), `expected_version` and `expected_generation` (from mission_run_inspect),
+        `target` ({"kind": "run", "id": the run to command}), `kind` (pause, resume, cancel,
+        satisfy_wait, queue_instruction, add_context, interrupt_and_inject,
+        request_continuation), `payload` (per kind, as listed under mission_command_send) and
+        `reason`. Example: {"request_id": "9a7b6c5d-4e3f-4a2b-8c1d-0e9f8a7b6c5d",
+        "expected_version": 7, "expected_generation": 1, "target": {"kind": "run", "id":
+        "<run_id>"}, "kind": "cancel", "payload": {"urgency": "normal"}, "reason": "the
+        run failed its review"}.
+        Returns the same receipt as mission_command_send (`admission`, `delivery`).
+        """
 
         async def operation() -> object:
             principal = await resolve(context)

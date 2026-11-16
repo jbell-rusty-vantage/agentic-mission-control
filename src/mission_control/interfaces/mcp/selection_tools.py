@@ -12,7 +12,7 @@ The principal's canonical request scope selects the tenant's workspace; neither 
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any
+from typing import Annotated, Any
 
 from fastmcp import Context, FastMCP
 
@@ -25,6 +25,7 @@ from mission_control.domain.coordinator.errors import CoordinatorDomainError, Co
 from mission_control.interfaces.mcp.mission_tools import (
     MissionToolPrincipal,
     PrincipalResolver,
+    ShapeOf,
     scope_of,
 )
 
@@ -98,7 +99,9 @@ def register_selection_tools(
         return await call(context, principals, invoke)
 
     @server.tool(name=CHECK_TOOL, annotations={"readOnlyHint": True})
-    async def selection_check(draft: dict[str, object], context: Context) -> dict[str, object]:
+    async def selection_check(
+        draft: Annotated[dict[str, object], ShapeOf(SelectionDraft)], context: Context
+    ) -> dict[str, object]:
         """Check a draft selection before writing the manifest: lane_profile, model_profile,
         family, optional data_class, capabilities (pins), sandbox_profile (pin) and
         workflow_type (pin). Returns admissible, typed refusals with draft pointers and what

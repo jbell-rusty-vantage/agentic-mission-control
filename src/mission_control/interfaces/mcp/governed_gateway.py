@@ -24,7 +24,7 @@ Every tool resolves the service of the principal's verified tenant scope and nee
 from __future__ import annotations
 
 from collections.abc import Awaitable, Callable, Mapping
-from typing import Any, Final, Protocol
+from typing import Annotated, Any, Final, Protocol
 
 from fastmcp import Context, FastMCP
 
@@ -41,6 +41,7 @@ from mission_control.domain.coordinator.errors import CoordinatorDomainError, Co
 from mission_control.domain.policies.contracts import ActorContext
 from mission_control.interfaces.mcp.governed_elicitation import elicit_from_client
 from mission_control.interfaces.mcp.human_task_tools import ScopedHumanTasks, domain_error
+from mission_control.interfaces.mcp.mission_tools import ShapeOf
 
 GOVERNED_PREPARE_TOOL: Final = "mission_governed_prepare"
 GOVERNED_EXECUTE_TOOL: Final = "mission_governed_execute"
@@ -213,6 +214,24 @@ def register_governed_tools(
         lane_profile: str,
         context: Context,
     ) -> dict[str, object]:
+        """Prepare a Governed Effect: record the intent to run one Mission Control-owned effect
+        tool for a run. Nothing is executed yet.
+
+        It is the first of three steps: prepare, review, then mission_governed_execute.
+        `tool_name` names the governed tool; an unknown name is refused. `arguments` is that
+        tool's own JSON object, so its fields depend on the tool: for example repo_pr, where
+        it is offered, takes {"repository": "...", "branch": "mc/<run>/<unit>", "base":
+        "main", "title": "...", "body": "..."}. `run_id`, `harness_execution_id`,
+        `generation` and `lane_profile` name the Harness Execution that asks; they are in the
+        `lane` section of mission_run_inspect. `lane_profile` is one of deep_agents,
+        cursor_local, cursor_cloud, claude_agent_sdk, codex, claude_cloud, codex_cloud,
+        claude_managed, codex_agents.
+        Returns `status`, `intent_id`, `tool_name` and `input_digest`. With status
+        pending_approval it also returns the `human_task` (id, version, review_digest) a
+        reviewer must resolve first (mission_approval_resolve); with status ready, execute
+        at once. Preparing the same call again returns the same intent.
+        """
+
         async def invoke(principal: Any) -> object:
             request = GovernedPrepareRequest.model_validate(
                 {
@@ -236,6 +255,18 @@ def register_governed_tools(
     async def mission_governed_execute(
         intent_id: str, context: Context, arguments: dict[str, Any] | None = None
     ) -> dict[str, object]:
+        """Execute a prepared Governed Effect once and return its receipt.
+
+        Call it after mission_governed_prepare, when the Human Task it opened (if any) is
+        resolved. `intent_id` comes from prepare. `arguments` is optional: when given it must
+        equal the prepared arguments, otherwise the call is refused and the new arguments
+        need their own prepare. Safe to repeat: the effect runs at most once and a repeat
+        returns the same state.
+        Returns `status`: executed with a `receipt` (`outcome` applied, noop, rejected or
+        failed, and the tool's `output`), pending_approval while the review is still open,
+        or denied, cancelled, expired, fenced, stale or in_doubt with a `reason`.
+        """
+
         async def invoke(principal: Any) -> object:
             return await governed.execute(principal, intent_id=intent_id, arguments=arguments)
 
@@ -243,6 +274,17 @@ def register_governed_tools(
 
     @server.tool(name=GOVERNED_STATUS_TOOL, annotations={"readOnlyHint": True})
     async def mission_governed_status(intent_id: str, context: Context) -> dict[str, object]:
+        """Read the state of a prepared Governed Effect. Nothing is executed.
+
+        Use it to check whether an effect still waits for review, is ready, was executed or
+        was refused. `intent_id` comes from mission_governed_prepare.
+        Returns `status` (pending_approval, ready, executing, executed, denied, cancelled,
+        expired, fenced, stale or in_doubt), `tool_name`, `input_digest`, the `human_task`
+        under review if there is one, and the `receipt` once executed.
+        Next: resolve the Human Task while pending_approval; call mission_governed_execute
+        when ready.
+        """
+
         async def invoke(principal: Any) -> object:
             return await governed.status(principal, intent_id=intent_id)
 
@@ -253,8 +295,24 @@ def register_governed_tools(
 
         @server.tool(name=APPROVAL_RESOLVE_TOOL)
         async def mission_approval_resolve(
-            human_task_id: str, request: dict[str, Any], context: Context
+            human_task_id: str,
+            request: Annotated[dict[str, Any], ShapeOf(ApprovalResolutionRequest)],
+            context: Context,
         ) -> dict[str, object]:
+            """Answer a Human Task raised by an agent's own request: a tool permission, a
+            question, a form or a Governed Effect.
+
+            Use it when the answer is more than approve or deny (mission_human_task_resolve
+            does those); it does not serve Human Gate tasks (`origin` workflow_gate). Read
+            the task first (mission_human_task_get). `request`: `expected_task_version` is
+            the task's `version`, `reviewed_digest` its `packet_digest`, `request_id` an id
+            you choose, and `decision` one of its `permitted_decisions`: approve, deny,
+            approve_edited (with `edited_arguments`, which must differ from the pending
+            ones) or cancel. A question takes approve with `answer` or `selected` (offered
+            options); a form takes approve with `elicitation_content`, or deny to decline.
+            Returns `status` (accepted or duplicate) and the updated `task`.
+            """
+
             async def invoke(principal: Any) -> object:
                 return await resolve_approval(
                     scoped_tasks, principal, human_task_id=human_task_id, request=request

@@ -9,7 +9,7 @@ producer or evaluators). Only the operator server registers it: a coordinator ne
 from __future__ import annotations
 
 from collections.abc import Awaitable, Callable, Mapping
-from typing import Any, Protocol
+from typing import Annotated, Any, Protocol
 
 from fastmcp import Context, FastMCP
 
@@ -21,6 +21,7 @@ from mission_control.application.knowledge.review import (
 from mission_control.contracts.identities import parse_request_scope
 from mission_control.domain.coordinator.errors import CoordinatorDomainError, CoordinatorErrorCode
 from mission_control.domain.policies.contracts import ActorContext
+from mission_control.interfaces.mcp.mission_tools import ShapeOf
 
 KNOWLEDGE_REVIEW_TOOL = "knowledge_review"
 _CODES: dict[str, CoordinatorErrorCode] = {
@@ -102,8 +103,24 @@ def register_knowledge_review_tools(
 
     @server.tool(name=KNOWLEDGE_REVIEW_TOOL)
     async def knowledge_review(
-        run_id: str, request: dict[str, Any], context: Context
+        run_id: str,
+        request: Annotated[dict[str, Any], ShapeOf(KnowledgeReviewRequest)],
+        context: Context,
     ) -> dict[str, object]:
+        """Record an operator's review of one Knowledge Services use decision that an
+        assessment of a run cites: approve, hold or reject.
+
+        Use it for knowledge that needs a reviewer's decision; Human Tasks are answered with
+        mission_human_task_resolve instead. You need the knowledge.review permission and
+        must not be the one who launched or revised the run, its producer or an evaluator.
+        `request`: `decision` is the exact reference of the use decision (`kind`
+        "use_decision", with its id, version, digest, tenant and binding), `outcome` is
+        approve, hold or reject, `bound_effect_digest` and the optional `qualifiers_digest`
+        are the digests that decision carries, and `rationale` is your reason.
+        Returns `run_id`, `decision`, `reviewer`, `outcome` and the recorded `review`. Sending
+        the same review twice records it once. See the result with mission_run_outputs.
+        """
+
         async def invoke(principal: Any) -> object:
             return await reviews.review(principal, run_id=run_id, request=request)
 

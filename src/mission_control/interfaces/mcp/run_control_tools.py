@@ -201,6 +201,41 @@ def register_run_control_tools(
     async def mission_command_send(
         run_id: str, request: dict[str, Any], context: Context
     ) -> dict[str, object]:
+        """Send one Command to a run: pause, resume, cancel, satisfy a wait, or give its agents
+        an instruction or more context.
+
+        Call mission_run_inspect first: `expected_version` is its `version` and
+        `expected_generation` its `execution_generation`; a stale value is refused with the
+        current ones. To act because of an inbox notification, use coordinator_inbox_command.
+        `request` fields, all required: `request_id` (a new UUID; repeating it returns the
+        first receipt), `expected_version`, `expected_generation`, `target` ({"kind": "run",
+        "id": the same run_id}), `kind`, `payload` and `reason` (1 to 4096 characters).
+        `payload` for each `kind`:
+        - cancel: {"urgency": "normal" (default, stops at the next safe boundary) or
+          "immediate" (first fences the run against any further effect)}.
+        - queue_instruction: {"content", "boundary": "next_turn" (default) or
+          "next_iteration", optional "deadline" and "node_key"}; read once at that boundary.
+        - add_context: the same fields plus "expand": "auto" (default), "inline", "reference"
+          or "materialize"; added to the next Context Packet.
+        - interrupt_and_inject: {"content", optional "node_key"}; delivered now.
+        - request_continuation: {optional "activation_id"}; seals the agent session at the
+          next turn boundary and transfers its work (default: the most recently active one).
+        - pause: {"decision": {"decision_id", "scope" (a list of "run", "workflow" or
+          "stage:<stage id>"), "reason", "authority_ref"}, "runnable_work_remains": true or
+          false}.
+        - resume: {"decision": {"decision_id", "pause_decision_id", "reason",
+          "authority_ref"}}.
+        - satisfy_wait: {"condition_id", "verification_evidence_ref"}.
+        "content" is {"text": "..."} (inline, at most 8 KiB) or {"artifact_ref",
+        "content_digest": "sha256:<64 hex>"}.
+        Example: {"request_id": "0b8f6c1e-5d1a-4c57-9d0e-2f6a3b7c8d90", "expected_version": 7,
+        "expected_generation": 1, "target": {"kind": "run", "id": "<run_id>"}, "kind":
+        "queue_instruction", "payload": {"content": {"text": "Cite every source."}},
+        "reason": "operator steer"}.
+        Returns the receipt: `admission` (status accepted, rejected or stale) and `delivery`
+        (the Command's receipts so far). Follow its delivery with mission_run_inspect.
+        """
+
         async def invoke(principal: Any) -> object:
             return await run_control.send(principal, run_id=run_id, request=request)
 
@@ -208,6 +243,18 @@ def register_run_control_tools(
 
     @server.tool(name=RUN_INSPECT_TOOL, annotations={"readOnlyHint": True})
     async def mission_run_inspect(run_id: str, context: Context) -> dict[str, object]:
+        """Read a run's current state: lifecycle, phase, outcome and its control sections.
+
+        Call it before mission_command_send (it gives the `version` and
+        `execution_generation` a Command must name) and afterwards to see the delivery. To
+        read what the run did, use mission_run_transcript.
+        Returns `lifecycle` (pending, running, paused, completed), `phase`,
+        `execution_outcome` (how execution ended, not whether the mission was accepted) and,
+        where the run has them, `lane`, `sessions`, `mailbox`, `delivery_reports`,
+        `frames_cursor`, `chain`, `stop_fence`, `points_incomplete`, `unit_failures`,
+        `budget` and fork `lineage`.
+        """
+
         async def invoke(principal: Any) -> object:
             return await run_control.inspect(principal, run_id=run_id)
 
@@ -217,6 +264,38 @@ def register_run_control_tools(
     async def mission_run_fork(
         run_id: str, request: dict[str, Any], context: Context
     ) -> dict[str, object]:
+        """Fork a run: admit a new run that starts from a Snapshot of this one, optionally
+        with changes, a first instruction or an agent state to continue from.
+
+        Use it to retry or explore from a safe boundary without touching the source run;
+        in-flight Commands and active children are never copied. `request` fields:
+        - required: `request_id` (a new UUID; a repeat returns the same fork),
+          `sponsorship_ref` (a sponsorship your principal holds; it pays for the new run) and
+          `reason` (1 to 2000 characters).
+        - `snapshot_id` (also accepted as `from_snapshot_id`): omit it to use the latest safe
+          Snapshot, taking one if none exists; `snapshot_digest` may pin it.
+        - `message`: {"text": "..."} or {"artifact_ref", "content_digest"}, given to the new
+          run as its first instruction (`instruction` is the older name of the same field).
+        - `cognitive_seed`: start an agent from a cognition point listed by
+          mission_run_points. For a checkpoint point: {"unit_key": coordinate.unit_key,
+          "checkpoint": coordinate.point.key}; for any other kind: {"unit_key":
+          coordinate.unit_key, "point": coordinate.point}.
+        - `at`: where the new run resumes: {"stage", "cycle"} for a Stage Graph run, or
+          {"iteration", optional "session_generation"} for a Goal Loop run. Derived from the
+          seed point when omitted.
+        - `changes`: [{"path", "value"}], edits to fields the run's Workflow Type declares
+          patchable; `invalidation_frontier`: stage ids, or "*", whose work must run again;
+          `frontier_policy`: "close" (default: also re-run every stage that depends on
+          them) or "strict" (refuse a frontier that leaves a dependent stage out).
+        - `baseline_reservations`: {dimension: amount}, budget held for the new run (default:
+          the source run's); `approval_refs`: approvals your principal holds.
+        Example: {"request_id": "5c2d9a40-7e1b-4f0a-8b6c-3d4e5f6a7b80", "sponsorship_ref":
+        "<your sponsorship>", "reason": "explore a stricter review"}.
+        Returns `receipt` (`target_run_id`, `snapshot_id`, `reused_units`, `frontier_closed`,
+        `message_delivery`) and `seed`. The new run is admitted, not started: call
+        mission_run_start with `receipt.target_run_id`.
+        """
+
         async def invoke(principal: Any) -> object:
             return await run_control.fork(principal, run_id=run_id, request=request)
 

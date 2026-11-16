@@ -22,6 +22,9 @@ from typing import Any, Literal, Protocol
 from uuid import UUID
 
 from fastmcp import Context, FastMCP
+from pydantic import BaseModel, GetJsonSchemaHandler
+from pydantic.json_schema import JsonSchemaValue
+from pydantic_core import CoreSchema
 
 from mission_control.application.authoring.manifest_service import (
     ManifestPermissionDenied,
@@ -74,6 +77,25 @@ class SponsoringPrincipal(MissionToolPrincipal, Protocol):
 
 class PrincipalResolver(Protocol):
     async def resolve(self, context: Context) -> Any: ...
+
+
+class ShapeOf:
+    """Tool-argument annotation: publish ``model``'s JSON schema, keep the JSON object.
+
+    ``Annotated[dict[str, Any], ShapeOf(Model)]`` lists the argument in ``tools/list`` with the
+    schema of the request model the HTTP route takes for the same operation. The tool still
+    receives the caller's object and the scoped service validates it with that model, so a
+    body the model refuses keeps its ``INVALID_ARGUMENT`` envelope. A server with strict input
+    validation checks the object against the published schema before the tool runs.
+    """
+
+    def __init__(self, model: type[BaseModel]) -> None:
+        self._model = model
+
+    def __get_pydantic_json_schema__(
+        self, _core_schema: CoreSchema, handler: GetJsonSchemaHandler
+    ) -> JsonSchemaValue:
+        return handler(self._model.__pydantic_core_schema__)
 
 
 def scope_of(principal: MissionToolPrincipal, application_id: str | None) -> str:
