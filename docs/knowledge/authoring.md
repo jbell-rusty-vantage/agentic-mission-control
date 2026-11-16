@@ -9,7 +9,7 @@ questions:
   - How does a mission go from description to an explicit start?
   - Why is my mission start blocked?
   - How do I compile and submit a Mission Manifest?
-updated: 2026-11-01
+updated: 2026-11-16
 ---
 
 # Coordinator authoring and launch
@@ -29,7 +29,7 @@ conversation with the human is not the execution program and not Temporal histor
    deliverables, side effects, review needs and ceilings. This is the
    [Interview](../../GLOSSARY.md), the question-asking mode of a bounded, budgeted
    [Authoring Session](../../GLOSSARY.md), used for research, ingestion, content and
-   coding missions alike.
+   coding missions alike. Its result is recorded as the [Mission Brief](../../GLOSSARY.md), the manifest's `brief` block in the user's words ([mission manifest](mission-manifest.md#the-mission-brief-and-the-purpose-card)).
 3. Choose exact templates, profiles, skills, MCP tools, sandbox profiles and
    executors from the admitted catalog; missing capabilities are visible blockers.
 4. Create an editable [Draft](../../GLOSSARY.md) with program, objectives, bindings,
@@ -125,7 +125,7 @@ file exists; its model, auth, sandbox and secret-ref choices are owner decisions
 
 ## Specified only
 
-No `AuthoringSession@1` record, interview budget, `mission_*` draft or proposal tools,
+The Interview's result is recorded (the Mission Brief, sealed with the Revision); the session that produced it is not. No `AuthoringSession@1` record, interview budget, `mission_*` draft or proposal tools,
 or context-pack selection operation exists in `src/`; the coordinator path is validate
 design, prepare ticket, launch, and the manifest path is compile, submit, start (the
 manifest Validation Report does carry JSON pointers). The only drafts are catalog definition drafts

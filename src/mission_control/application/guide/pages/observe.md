@@ -26,6 +26,7 @@ Wait; never poll. Your coordinator inbox is the wake channel, inspection is the 
 - {op:outputs}: the outputs the mission promised, their accepted revisions (by digest), the assessments and what is still unmet.
 - {op:output_content}: the text of one promised output: its accepted revision, or the latest submitted one where none is accepted yet.
 - {op:inspect} also carries `cost`: the run's model calls at this installation's list prices. It is an estimate, and the `budget` currency dimensions are a separate account it does not charge.
+- {op:inspect} also carries `brief`: the interview's result as the run's mission revision seals it (the purpose, the user's request, the answers, what done means). Each node was told it on a purpose card that opens its instructions, with how each output it owes is accepted; read the card in a node's first `model_request` entry with {op:transcript} and `full: true`.
 - {op:points}: the recorded positions a fork can start from (topic `control`).
 - {op:chain}: the members and links of a Mission Chain. {op:run_list}: runs by state.
 

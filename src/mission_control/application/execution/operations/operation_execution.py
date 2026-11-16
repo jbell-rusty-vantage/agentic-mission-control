@@ -93,6 +93,8 @@ from mission_control.domain.execution.contracts import (
     RuntimeUsage,
     SnapshotCloneRequest,
     SnapshotCloneResult,
+    is_purpose_card,
+    purpose_card_problem,
 )
 from mission_control.domain.execution.environment_preparation import ENVIRONMENT_NOT_READY
 from mission_control.domain.execution.errors import (
@@ -648,6 +650,12 @@ class RunControlOperationAuthority:
             for ref in configuration.source_refs
             if ref.kind == DefinitionKind.PROMPT
         }
+        # The Purpose Card is the host's own instruction segment (assembled at launch from
+        # the mission's sealed facts, frozen in the template): it names no published Prompt,
+        # so it is admitted by its exact source, class and header, once.
+        card_problem = purpose_card_problem(request.prompt_segments)
+        if card_problem is not None:
+            raise ValueError(f"privileged prompt segments: {card_problem}")
         privileged_prompt_sources = {
             segment.source_ref
             for segment in request.prompt_segments
@@ -656,6 +664,7 @@ class RunControlOperationAuthority:
                 PromptTrustClass.SYSTEM_AUTHORITY,
                 PromptTrustClass.AUTHORED_INSTRUCTION,
             }
+            and not is_purpose_card(segment)
         }
         if not privileged_prompt_sources <= authoritative_prompts:
             raise ValueError(

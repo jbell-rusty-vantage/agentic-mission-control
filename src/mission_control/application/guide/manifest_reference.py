@@ -79,6 +79,8 @@ _PATTERNS: Final[Mapping[str, str]] = {
 SECTION_PLACES: Final[Mapping[str, str]] = {
     ROOT_SECTION: "the document",
     "MissionBlock": "`mission`",
+    "MissionBrief": "`mission.brief`, the interview's result in the user's words",
+    "BriefAnswer": "`brief.answers[]`",
     "Goal": "`mission.goals[]`",
     "Objective": "`goals[].objectives[]`",
     "SuccessCriterion": "`goals[].criteria[]`",
@@ -108,6 +110,7 @@ SECTION_PLACES: Final[Mapping[str, str]] = {
 REQUIRED_SHAPES: Final[tuple[tuple[str, str], ...]] = (
     ("the document", ROOT_SECTION),
     ("`mission`", "MissionBlock"),
+    ("`brief`", "MissionBrief"),
     ("`goals[]`", "Goal"),
     ("`goals[].objectives[]`", "Objective"),
     ("`goals[].criteria[]`", "SuccessCriterion"),
@@ -121,6 +124,7 @@ REQUIRED_SHAPES: Final[tuple[tuple[str, str], ...]] = (
 )
 # The enumerated fields the short page lists: (label, section, field).
 VALUE_FIELDS: Final[tuple[tuple[str, str, str], ...]] = (
+    ("`brief.purpose`", "MissionBrief", "purpose"),
     ("`goals[].importance`", "Goal", "importance"),
     ("`task.kind`", "HumanTaskSpec", "kind"),
     ("`outputs[].form`", "OutputDeclaration", "form"),

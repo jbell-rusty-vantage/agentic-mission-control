@@ -25,6 +25,7 @@ from typing import Annotated, Any, ClassVar, Final, Literal, get_args
 from pydantic import ConfigDict, Field, ValidationError, model_validator
 
 from mission_control.domain.agentic_components.layering import MaterializationPolicy
+from mission_control.domain.authoring.brief import BriefAnswer, MissionBrief, MissionPurpose
 from mission_control.domain.authoring.manifest import (
     HOSTED_LANES,
     MANIFEST_LITERAL,
@@ -693,12 +694,15 @@ class MissionBlockV2(MissionBlock):
     """A v1 mission block with v2 Environments and its Data Class. Lanes that are not
     ZDR-eligible admit a mission only by its declared class; a mission without one is
     refused there (``domain/execution/data_class.py``), never assumed harmless. Its controls
-    add watchers and consumed notifications (SPEC-04 §5, :mod:`mission_watchers`)."""
+    add watchers and consumed notifications (SPEC-04 §5, :mod:`mission_watchers`). Its
+    ``brief`` is the Interview's result, sealed with the revision (:mod:`brief`); optional, and
+    a mission without one compiles with a warning."""
 
     environment: EnvironmentV2
     program: ProgramNodeV2
     data_class: DataClass | None = None
     controls: ControlsV2 | None = None
+    brief: MissionBrief | None = None
 
 
 class MissionManifestV2(MissionManifest):
@@ -788,6 +792,27 @@ def is_v2(manifest: MissionManifest) -> bool:
     return isinstance(manifest, MissionManifestV2)
 
 
+BRIEF_MISSING: Final = "brief_missing"
+
+
+def brief_warnings(manifest: MissionManifest) -> tuple[ManifestIssue, ...]:
+    """One warning per ``mission/v2`` mission that records no brief. Never a blocker: the
+    mission compiles and runs, and its nodes' Purpose Cards carry no request."""
+
+    if not is_v2(manifest):
+        return ()
+    return tuple(
+        _issue(
+            f"{pointer}/brief",
+            "the mission records no brief: the user's request and what done means are not "
+            "sealed with this revision, and its nodes are told only the mission title",
+            BRIEF_MISSING,
+        )
+        for pointer, block in manifest.mission_blocks()
+        if getattr(block, "brief", None) is None
+    )
+
+
 def manifest_v2_json_schema() -> dict[str, Any]:
     """The JSON Schema exported to ``contracts/schemas/mc.mission_manifest.v2.json``."""
 
@@ -807,21 +832,26 @@ def manifest_v2_json_schema_text() -> str:
 
 
 __all__ = [
+    "BRIEF_MISSING",
     "MANIFEST_V2_LITERAL",
     "MANIFEST_V2_SCHEMA_FILENAME",
     "MANIFEST_V2_SCHEMA_ID",
     "MANIFEST_VERSIONS",
     "PROVIDER_OF_HOSTED_LANE",
     "AuthSelection",
+    "BriefAnswer",
     "ContinuationPolicy",
     "EnvironmentV2",
     "ExecutionEnvironmentSelection",
     "MissionBlockV2",
+    "MissionBrief",
     "MissionManifestV2",
+    "MissionPurpose",
     "RequiredFeatures",
     "SetupSelection",
     "WorkspacePolicy",
     "WorkspaceSelectionV2",
+    "brief_warnings",
     "is_v2",
     "manifest_v2_json_schema",
     "manifest_v2_json_schema_text",

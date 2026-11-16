@@ -34,12 +34,18 @@ from mission_control.application.authoring.manifest_submit import (
     SubmitRequest,
     SubmittedMission,
 )
+from mission_control.contracts.contracts import MissionCommandRequest
 from mission_control.domain.authoring.extensions import ExtensionRegistry
 from mission_control.domain.authoring.manifest import ManifestErrorCode, ManifestIssue
 from mission_control.domain.policies.contracts import ActorContext
 from mission_control.interfaces.cli import main as cli
-from mission_control.interfaces.mcp.coordinator_server import CoordinatorPrincipal, _principal_call
+from mission_control.interfaces.mcp.coordinator_server import (
+    CoordinatorPrincipal,
+    _call,
+    _principal_call,
+)
 from mission_control.interfaces.mcp.mission_tools import (
+    REQUEST_ID_NOT_UUID,
     START_TOOL,
     SUBMIT_TOOL,
     ScopedManifests,
@@ -294,3 +300,86 @@ def test_cli_submit_and_start(
     started = json.loads(capsys.readouterr().out)
     assert started["workflow_id"] == "wf:run-1"
     assert lifecycle.started[-1] == ("run-1", {"run_id": "run-1"})
+    # A request id that is not a UUID is refused before any request, in words that say so.
+    admitted = len(lifecycle.submitted)
+    assert cli.main(["mission", "submit", str(MINIMAL), "--request-id", "proof-1"]) == 2
+    refused = json.loads(capsys.readouterr().err)
+    assert refused["error"].startswith("--request-id must be a UUID (for example ")
+    assert len(lifecycle.submitted) == admitted
+    assert cli.request_uuid(request_id) == request_id
+    assert str(UUID(cli.request_uuid(None))) != request_id
+
+
+@pytest.mark.asyncio
+async def test_a_submit_request_id_is_published_as_a_uuid_and_refused_in_those_words() -> None:
+    lifecycle = FakeLifecycle()
+    # HTTP: the body model publishes the format and its refusal names the field.
+    app = http_app(await manifests(lifecycle), AUTHOR)
+    published = app.openapi()["components"]["schemas"]["SubmitBody"]["properties"]["request_id"]
+    assert (published["type"], published["format"]) == ("string", "uuid")
+    over_http = TestClient(app).post(
+        "/v1/applications/biotech/missions:submit",
+        json={"manifest_yaml": "m: 1", "request_id": "proof-1"},
+    )
+    assert over_http.status_code == 422
+    (detail,) = over_http.json()["detail"]
+    assert detail["loc"] == ["body", "request_id"] and "valid UUID" in detail["msg"]
+    # MCP: the same format in `tools/list`, and the envelope says what to send.
+    server = FastMCP("manifest-request-id-test")
+    register_manifest_tools(
+        server,
+        ScopedManifests({SCOPE: await manifests(lifecycle)}),
+        Principals(frozenset({"mission.author", "mission.start"})),
+        call=_principal_call,
+    )
+    async with Client(server) as client:
+        tools = {tool.name: tool for tool in await client.list_tools()}
+        assert tools[SUBMIT_TOOL].inputSchema["properties"]["request_id"] == {
+            "format": "uuid",
+            "type": "string",
+        }
+        assert "`request_id` is a UUID you choose" in (tools[SUBMIT_TOOL].description or "")
+        refused = await client.call_tool(
+            SUBMIT_TOOL, {"manifest_yaml": "m: 1", "request_id": "proof-1"}
+        )
+    envelope = refused.structured_content
+    assert envelope is not None and envelope["ok"] is False
+    error = envelope["error"]
+    assert (error["code"], error["message"]) == ("INVALID_ARGUMENT", REQUEST_ID_NOT_UUID)
+    assert error["details"] == {"argument": "request_id", "expected": "uuid"}
+    assert REQUEST_ID_NOT_UUID.startswith("request_id must be a UUID (for example ")
+    assert lifecycle.submitted == {}
+
+
+@pytest.mark.asyncio
+async def test_a_request_model_that_refuses_a_request_id_names_the_field() -> None:
+    async def command() -> object:
+        return MissionCommandRequest.model_validate(
+            {
+                "request_id": "proof run superseded",
+                "expected_version": 9,
+                "expected_generation": 1,
+                "target": {"kind": "run", "id": "run-1"},
+                "kind": "cancel",
+                "payload": {"urgency": "normal"},
+                "reason": "proof run superseded",
+            }
+        )
+
+    async def other() -> object:
+        return MissionCommandRequest.model_validate({"request_id": str(uuid4())})
+
+    refused = await _call(command)
+    assert refused["error"] == {
+        "code": "INVALID_ARGUMENT",
+        "message": "request arguments are invalid: request_id must be a UUID",
+        "retryable": False,
+        "details": {"argument": "request_id", "expected": "uuid"},
+    }
+    # Any other refusal keeps its one line and echoes nothing the caller wrote.
+    assert (await _call(other))["error"] == {
+        "code": "INVALID_ARGUMENT",
+        "message": "request arguments are invalid",
+        "retryable": False,
+        "details": {},
+    }

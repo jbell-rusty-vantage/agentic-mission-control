@@ -7,7 +7,9 @@ Read a run's current state: lifecycle, phase, outcome and its control sections.
 
 Call it before mission_command_send (it gives the `version` and `execution_generation` a Command must name) and afterwards to see the delivery. To read what the run did, use mission_run_transcript.
 
-Returns `lifecycle` (pending, running, paused, completed), `phase`, `execution_outcome` (how execution ended, not whether the mission was accepted) and, where the run has them, `lane`, `sessions`, `mailbox`, `delivery_reports`, `frames_cursor`, `chain`, `stop_fence`, `points_incomplete`, `unit_failures`, `budget`, `cost` and fork `lineage`.
+Returns `lifecycle` (pending, running, paused, completed), `phase`, `execution_outcome` (how execution ended, not whether the mission was accepted) and, where the run has them, `lane`, `sessions`, `mailbox`, `delivery_reports`, `frames_cursor`, `chain`, `stop_fence`, `points_incomplete`, `unit_failures`, `budget`, `cost`, `brief` and fork `lineage`.
+
+`brief` is the interview's result as the run's mission revision seals it: `purpose` (`research`, `content`, `system` or `other`), the user's `request`, the `answers` (question and answer pairs), `done_means`, `out_of_scope` and `requested_by`. It is read from the committed mission definition, never from a transcript; a fork's is its source run's. It is left out for a mission whose manifest has no `brief` block.
 
 `cost` (`mc.run_cost.v1`) is what the run's recorded model calls cost at this installation's Model Catalog list prices: `estimated_micros` (US dollar micros), `estimated_usd`, the calls and tokens, and `by_model`. It is an estimate: every input token is priced at the list price (a provider's cache discount is not applied, so it is an upper bound where prompts were cached) and it is not an invoice. `disposition` is `estimated` when every call was priced, `partial` when some calls name a model the catalog does not price (`unpriced_calls`; never counted as zero) and `unknown` when no call could be priced.
 

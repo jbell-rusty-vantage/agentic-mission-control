@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Sequence
 from enum import StrEnum
 from typing import Annotated, ClassVar, Final, Literal
 
@@ -147,6 +148,65 @@ class PromptSegment(Contract):
         if sha256_digest(self.content) != self.rendered_digest:
             raise ValueError("prompt segment content does not match its rendered digest")
         return self
+
+
+# The Purpose Card (`application/authoring/purpose_card.py`): the one instruction segment
+# the host itself assembles, for every node, from the mission's sealed facts. It names no
+# published Prompt, so run authority admits it by this exact source, class and opening line.
+PURPOSE_CARD_SOURCE_REF: Final = "host:purpose-card"
+PURPOSE_CARD_REVISION: Final = 1
+PURPOSE_CARD_HEADER: Final = "# Purpose card"
+INSTRUCTION_TRUST_CLASSES: Final = frozenset(
+    {PromptTrustClass.SYSTEM_AUTHORITY, PromptTrustClass.AUTHORED_INSTRUCTION}
+)
+
+
+def purpose_card_segment(text: str) -> PromptSegment:
+    """The Purpose Card as the segment a launch template carries (its digest travels with
+    the template and with every attempt's bound prompt sources)."""
+
+    return PromptSegment(
+        source_ref=PURPOSE_CARD_SOURCE_REF,
+        source_revision=PURPOSE_CARD_REVISION,
+        trust_class=PromptTrustClass.AUTHORED_INSTRUCTION,
+        content=text,
+        rendered_digest=sha256_digest(text),
+    )
+
+
+def is_purpose_card(segment: PromptSegment) -> bool:
+    return segment.source_ref == PURPOSE_CARD_SOURCE_REF
+
+
+def purpose_card_problem(segments: Sequence[PromptSegment]) -> str | None:
+    """Why the Purpose Card among ``segments`` is not the host's, or ``None`` (none, or one
+    well-formed card). Nothing else may borrow the card's source to gain instruction class."""
+
+    cards = [segment for segment in segments if is_purpose_card(segment)]
+    if not cards:
+        return None
+    if len(cards) > 1:
+        return "an operation carries at most one purpose card"
+    card = cards[0]
+    if (
+        card.trust_class is not PromptTrustClass.AUTHORED_INSTRUCTION
+        or card.source_revision != PURPOSE_CARD_REVISION
+        or not card.content.startswith(PURPOSE_CARD_HEADER + "\n")
+    ):
+        return "the purpose card is the host's authored instruction, opened by its header"
+    return None
+
+
+def instruction_segments(segments: Sequence[PromptSegment]) -> tuple[PromptSegment, ...]:
+    """The segments a lane's instruction channel carries (authority and authored
+    instructions), the Purpose Card first and the rest in their order. Every lane reads its
+    trusted mission instructions through this one selection."""
+
+    privileged = [item for item in segments if item.trust_class in INSTRUCTION_TRUST_CLASSES]
+    return (
+        *(item for item in privileged if is_purpose_card(item)),
+        *(item for item in privileged if not is_purpose_card(item)),
+    )
 
 
 class ModelPolicy(Contract):

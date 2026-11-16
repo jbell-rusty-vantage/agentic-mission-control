@@ -13,6 +13,7 @@ import re
 from typing import get_args
 
 import pytest
+import yaml
 
 from mission_control.application.guide.mission_templates import TEMPLATE_IDS
 from mission_control.application.guide.operations import SURFACES, Surface
@@ -28,6 +29,14 @@ from mission_control.application.guide.tool_docs import TOOL_DOCS, tool_document
 from mission_control.application.resolution.lane_listing import describe_lane
 from mission_control.application.resolution.model_listing import describe_model
 from mission_control.application.resolution.registries import LaneRegistry, ModelCatalog
+from mission_control.domain.authoring.brief import (
+    BRIEF_ANSWERS_MAX,
+    BRIEF_DONE_MEANS_MAX,
+    BRIEF_REQUEST_MAX,
+    BriefAnswer,
+    MissionBrief,
+    MissionPurpose,
+)
 from mission_control.domain.execution.lanes import DELIVERY_COMMANDS, LANE_PROFILES
 from tests.architecture.test_package_boundaries import APPLICATION_NEEDLES
 from tests.conformance.lanes.compile.stub import NARROW_DECLARATION, STUB_DECLARATION
@@ -149,7 +158,25 @@ async def test_the_interview_page_names_the_brief_and_real_manifest_fields() -> 
 
     assert "## 3. The brief, and where each part goes" in text
     assert "Record each answer in the user's own words" in text
-    assert "No interview record is persisted yet" in text
+    # The interview is recorded: it ends in the manifest's `brief` block, the user's words.
+    assert "No interview record is persisted" not in text
+    assert "The interview ends in the `brief` block under `mission`" in text
+    assert "The user's words go there verbatim" in text
+    # The exact block, every field a field of the model, and its limits from the model.
+    fenced = re.search(r"```yaml\n(.*?)\n```", text, re.DOTALL)
+    assert fenced is not None
+    block = yaml.safe_load(fenced.group(1))
+    brief = MissionBrief.model_validate(block["brief"])
+    assert set(block["brief"]) == set(MissionBrief.model_fields) - {"requested_by"}
+    assert set(block["brief"]["answers"][0]) == set(BriefAnswer.model_fields)
+    assert brief.purpose is MissionPurpose.RESEARCH
+    assert "`purpose` is one of " + ", ".join(f"`{item.value}`" for item in MissionPurpose) in text
+    assert f"`request` {BRIEF_REQUEST_MAX:,}" in text
+    assert f"`done_means` {BRIEF_DONE_MEANS_MAX:,}" in text
+    assert f"{BRIEF_ANSWERS_MAX} `answers`" in text
+    assert "`requested_by` defaults to the submitting principal" in text
+    assert "`mission_run_inspect` returns it as `brief`" in text
+    assert "compile warns `brief_missing`" in text
     for purpose in ("Research", "Building content", "Improving the system"):
         assert f"- {purpose}:" in text
     # Every manifest field the mapping names exists on the manifest models. The table names

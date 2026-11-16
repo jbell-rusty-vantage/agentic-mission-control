@@ -32,6 +32,6 @@ Invariants:
 - A contract request cannot inject trusted actor, pool or installation authority.
 Explained by (docs/knowledge): capabilities, events-and-commands, hook-contributions, mission-control, mission-stream
 Decided by (docs/adr): ADR-0004, ADR-0001, ADR-0002, ADR-0005, ADR-0007
-Depends on: domain, domain.programs, domain.execution, domain.authoring · Used by: adapters.postgres, application, adapters.temporal, interfaces.mcp, application.missions, interfaces.http (+12)
+Depends on: domain, domain.programs, domain.authoring, domain.execution · Used by: adapters.postgres, application, adapters.temporal, interfaces.mcp, application.missions, interfaces.http (+12)
 Verify: uv run pytest tests/unit/run_control tests/conformance
 <!-- END:sdlc-module -->

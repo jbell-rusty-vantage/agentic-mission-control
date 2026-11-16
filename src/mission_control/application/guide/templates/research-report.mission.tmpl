@@ -14,6 +14,21 @@ slots:
   title:
     description: A one-line title.
     example: What published sources say about agent memory
+  request:
+    description: The user's request in their own words, verbatim, one line.
+    example: Find out what is known about long-term memory for coding agents, with sources I can check.
+  question:
+    description: One question you asked in the interview. Add one `answers` entry for each further question.
+    example: Which sources count as evidence, and how recent must they be?
+  answer:
+    description: The user's answer to that question, verbatim, one line.
+    example: Published papers and vendor documentation from the last two years.
+  done_means:
+    description: What the user said finished looks like, verbatim, one line.
+    example: A report where I can follow every finding to its source.
+  out_of_scope:
+    description: What the user ruled out, verbatim, one line. Delete the `out_of_scope` entry when they ruled out nothing.
+    example: No benchmarks of our own.
   goal:
     description: The research question in the user's words, one line. Name the sources that count and how recent they must be.
     example: What do published sources from the last two years say about long-term memory for coding agents?
@@ -37,6 +52,7 @@ notes:
   - How to search, cite and register is in the skills of the knowledge cognition plugin and in each tool's own description; the goal text carries the question only.
   - The report is judged by the installation's trusted assessment. A start is refused with `trusted_assessment_unavailable` where none is composed.
   - The web research plugin needs its servers' secrets; preflight lists the ones that are missing.
+  - The `brief` block is the interview's result in the user's words. The executor and the verifier are both told the purpose, the request, what done means, what each was given and each criterion whose `evidence` names an output.
 ---
 manifest: mission/v2
 mission:
@@ -46,6 +62,20 @@ mission:
     {{title}}
   description: >-
     {{goal}}
+  brief:
+    purpose: research
+    request: >-
+      {{request}}
+    answers:
+      - question: >-
+          {{question}}
+        answer: >-
+          {{answer}}
+    done_means: >-
+      {{done_means}}
+    out_of_scope:
+      - >-
+        {{out_of_scope}}
   goals:
     - key: sourced_report
       description: >-

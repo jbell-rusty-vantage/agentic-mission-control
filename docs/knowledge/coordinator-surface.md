@@ -75,6 +75,11 @@ guide's start page alone (2026-11-16; `scripts/consumer_surface_eval.py --run-id
   list-price estimate that charges no budget ([budgets and usage](budgets-and-usage.md)).
 - **What a run did:** `mission_run_transcript` answers structured `entries`, 20 a page; `mission_run_state_as_of`
   reads the point service the API composed with its time-travel registry, as the HTTP route does.
+- **Why a run exists and what its nodes were told:** the interview ends in the manifest's `brief` block
+  ([mission manifest](mission-manifest.md#the-mission-brief-and-the-purpose-card)); `mission_run_inspect` returns
+  it as `brief`, read from the committed definition. `mission_run_transcript` with `full: true` inlines the
+  bodies a `model_request` names (the system prompt and messages, through the artifact body reader the HTTP
+  route's `full=true` uses), so the node's Purpose Card is read back as the model received it.
 - **A listing read every session:** `tools/list` drops bare `outputSchema` and empty `_meta` (`OperatorMCP`) and
   stays under 9,000 tokens (`tests/unit/guide/test_guide_surface.py`); long descriptions are `tool:<name>` notes.
 - **What the catalog lacks:** `catalog_tools.py` adds `pin_capability`, and `discover_mcp_servers`,

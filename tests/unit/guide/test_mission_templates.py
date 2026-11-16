@@ -22,8 +22,9 @@ from mission_control.application.guide.mission_templates import (
 )
 from mission_control.application.guide.service import GuideRefused
 from mission_control.application.selection.workspace import SelectionSearchRequest
+from mission_control.domain.authoring.brief import MissionBrief
 from mission_control.domain.authoring.manifest import load_manifest_yaml
-from mission_control.domain.authoring.manifest_v2 import MANIFEST_V2_LITERAL
+from mission_control.domain.authoring.manifest_v2 import BRIEF_MISSING, MANIFEST_V2_LITERAL
 from tests.architecture.test_package_boundaries import APPLICATION_NEEDLES
 from tests.unit.authoring.test_manifest_compile import scope, service
 from tests.unit.guide.support import SANDBOXES, full_guide
@@ -45,6 +46,10 @@ COMMON_SLOTS = {
 }
 # A template is application-neutral and installation-neutral: these values are the test's.
 TEST_VALUES = {"application_id": APPLICATION, "sandbox_profile": next(iter(SANDBOXES))}
+# The interview's result: the slots that fill a template's `brief` block.
+BRIEF_SLOTS = {"request", "question", "answer", "done_means", "out_of_scope"}
+# The purpose a template fixes where the kind of work is obvious; the others take a slot.
+FIXED_PURPOSES = {"research-report": "research", "system-improvement": "system"}
 
 
 def filled(template: MissionTemplate) -> str:
@@ -80,6 +85,31 @@ def test_a_template_names_no_application_and_pins_no_digest() -> None:
         assert "sha256:" not in template.manifest
 
 
+def test_every_template_carries_a_brief_in_the_users_words() -> None:
+    for template in mission_templates():
+        names = {slot.name for slot in template.slots}
+        fixed = FIXED_PURPOSES.get(template.id)
+        assert names >= BRIEF_SLOTS, template.id
+        assert ("purpose" in names) == (fixed is None), template.id
+        examples = template.examples()
+        document = load_manifest_yaml(filled(template))
+        brief = MissionBrief.model_validate(document["mission"]["brief"])
+        assert brief.purpose.value == (fixed or examples["purpose"]), template.id
+        assert brief.request == examples["request"]
+        assert [(item.question, item.answer) for item in brief.answers] == [
+            (examples["question"], examples["answer"])
+        ]
+        assert brief.done_means == examples["done_means"]
+        assert brief.out_of_scope == (examples["out_of_scope"],)
+        # An instruction says the task; the node's purpose card carries the rest (why the
+        # mission exists, what the node owes and to whom, what it was given, when to stop).
+        nodes = document["mission"]["program"].get("nodes", ())
+        for node in nodes:
+            if node["behavior"] == "agent_executor":
+                assert "Stop after its receipt" not in node["instruction"], template.id
+                assert f'"{node["key"]}.{node["outputs"][0]["name"]}"' in node["instruction"]
+
+
 @pytest.mark.asyncio
 @pytest.mark.parametrize("template_id", EXPECTED)
 async def test_every_filled_template_compiles_and_would_start(template_id: str) -> None:
@@ -92,6 +122,12 @@ async def test_every_filled_template_compiles_and_would_start(template_id: str) 
     report = compilation.report
     assert report.blockers == (), report.blockers
     assert compilation.ok
+    # The brief is sealed in the definition and read back in the report; who asked is the
+    # principal the compile ran for.
+    (definition,) = compilation.definitions
+    assert definition.brief is not None and definition.brief.requested_by == "owner"
+    assert report.definitions[0].brief == definition.brief
+    assert BRIEF_MISSING not in {item.reason for item in report.warnings}
     # A start refuses nothing the compile accepted: no acceptance without an evaluator.
     assert report.start_blockers == (), report.start_blockers
     assert report.startable is True

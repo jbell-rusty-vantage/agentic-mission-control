@@ -109,7 +109,10 @@ from mission_control.application.execution.harness.retention import (
 from mission_control.domain.execution.bindings import ClaudeManagedOptions, ProviderExecutionBinding
 from mission_control.domain.execution.budget_controls import ManagedBudgetSnapshot
 from mission_control.domain.execution.cognition_points import CognitionPointObservation
-from mission_control.domain.execution.contracts import OperationExecutionRequest
+from mission_control.domain.execution.contracts import (
+    OperationExecutionRequest,
+    instruction_segments,
+)
 from mission_control.domain.execution.history_reconciliation import (
     MAX_HISTORY_FRAMES,
     HistoryReplayIncomplete,
@@ -307,10 +310,9 @@ class ClaudeManagedHarness(RemoteSessionLane[_ManagedSession], UnsupportedHarnes
                 **self._labels,
             },
         }
+        # The instruction channel: the Purpose Card first, then the authored instructions.
         instructions = "\n\n".join(
-            segment.content
-            for segment in session.operation.prompt_segments
-            if segment.trust_class.value in {"system_authority", "authored_instruction"}
+            segment.content for segment in instruction_segments(session.operation.prompt_segments)
         )
         if instructions:
             body["agent"] = {

@@ -11,7 +11,7 @@ questions:
   - What does each manifest root behavior lower to?
   - Why does start fail with 409 start_unavailable?
   - Where do I search for capabilities and lanes before authoring?
-updated: 2026-11-02
+updated: 2026-11-16
 ---
 
 # Mission Manifest
@@ -95,7 +95,28 @@ for `claude_agent_sdk` and `codex`; `mc.cursor_binding.v2` for Cursor, pins `cla
 (`adapters/codex/describe.py:67`), `cursor-sdk 1.0.37`) are specified in [provider lanes](provider-lanes.md) and
 [cursor lane](cursor-lane.md); checked examples in `tests/fixtures/manifests/multi-provider/`.
 
-Built / specified / goal: compile, submit and start for Stage Graph and Goal Loop roots built and tested on PostgreSQL and Temporal, integrated on paid Deep Agents fixtures; Swarm and EO nodes parse and are refused at compile (`behavior_not_built`, OVE-215); mid-run manifest mutation is a goal ([revisions](revisions.md)).
+## The Mission Brief and the Purpose Card
+
+A `mission/v2` block may carry `brief`, the [Mission Brief](../../GLOSSARY.md) (`domain/authoring/brief.py`): `purpose`
+(`research`, `content`, `system`, `other`), the user's `request`, `answers` (question and answer pairs), `done_means`,
+`out_of_scope` and `requested_by`. Sizes are bounded and text shaped like a credential is refused at its pointer. It is part of
+the manifest digest and of `MissionDefinition@1` (additive: absent, the dump and digest are unchanged), so it is sealed with the
+Revision; compile sets `requested_by` to the principal it runs for (the submitter at submit) before lowering. A v2 mission
+without one compiles with the warning `brief_missing`. It is read back in the compile report (`definitions[].brief`) and in
+`mc.inspection.v1` (`brief`, `application/authoring/run_brief.py`; a fork's is its source run's).
+
+At launch the author builds one [Purpose Card](../../GLOSSARY.md) per node role (`application/authoring/purpose_card.py`, pure):
+why (title, purpose, the request and done-means quoted in fenced `data` blocks, up to three ruled-out items; the interview's
+answers stay off it), the node's part (key, behaviour, objectives, outputs with form and consumer, and under each output an
+"Accepted when" line for up to three criteria whose `evidence` names it: how it is decided in plain words, then the criterion
+quoted), what it was given (one catalog line per bound skill, tool, MCP server, plugin or subagent, then budget and governors)
+and four fixed rules. It is at most 700 estimated tokens: the "given" list is cut with an explicit count, then quotes and lists
+shorten (`QUOTE_LEVELS`, four levels; the last fits with every key at its 128-character maximum), every cut stated. It is
+frozen in the template as the one host-assembled instruction segment (`host:purpose-card`), which run authority admits by
+source, class and header; its digest travels in each attempt's bound `prompt_sources`. Every lane reads it first in its
+instruction channel ([instruction layering](instruction-layering.md), [Deep Agents lane](deep-agents-lane.md#instruction-channel)).
+
+Built / specified / goal: compile, submit and start for Stage Graph and Goal Loop roots built and tested on PostgreSQL and Temporal, integrated on paid Deep Agents fixtures; the brief and the Purpose Card are built, unit-tested and observed in two paid Deep Agents Stage Graph runs on the local AI Engineer installation (2026-11-16, [Deep Agents CHANGES](../specs/provider-consolidation-2026-10/providers/deep_agents/CHANGES.md)), with no other lane and no Goal Loop run; Swarm and EO nodes parse and are refused at compile (`behavior_not_built`, OVE-215); mid-run manifest mutation is a goal ([revisions](revisions.md)).
 
 # Citations
 
@@ -107,8 +128,10 @@ Built / specified / goal: compile, submit and start for Stage Graph and Goal Loo
   [submit and start](../../src/mission_control/application/authoring/manifest_submit.py), [launch author](../../src/mission_control/application/authoring/manifest_launch_inputs.py),
   [provider launch](../../src/mission_control/application/authoring/provider_launch.py), [composition](../../src/mission_control/bootstrap/manifests.py),
   [PostgreSQL submit](../../src/mission_control/adapters/postgres/control_plane/manifest_submission.py), [routes](../../src/mission_control/interfaces/http/missions.py),
-  [MCP tools](../../src/mission_control/interfaces/mcp/mission_tools.py).
+  [MCP tools](../../src/mission_control/interfaces/mcp/mission_tools.py), [brief](../../src/mission_control/domain/authoring/brief.py),
+  [purpose card](../../src/mission_control/application/authoring/purpose_card.py), [run brief](../../src/mission_control/application/authoring/run_brief.py).
 - Tests: [schema](../../tests/unit/authoring/test_manifest_schema.py), [mission/v2](../../tests/unit/authoring/test_manifest_v2.py), [compile](../../tests/unit/authoring/test_manifest_compile.py),
   [v2 launch](../../tests/unit/authoring/test_manifest_v2_launch.py), [Cursor launch](../../tests/unit/authoring/test_manifest_cursor_launch.py), [interfaces](../../tests/unit/authoring/test_manifest_interfaces.py),
   [submit in PostgreSQL](../../tests/integration/postgres/test_manifest_submit.py), [v2 provider launch](../../tests/integration/temporal/test_manifest_v2_provider_launch.py),
-  [lifecycle acceptance](../../tests/acceptance/mission_control/test_manifest_lifecycle.py); fixtures `tests/fixtures/manifests/`, goldens `tests/golden/manifests/`.
+  [lifecycle acceptance](../../tests/acceptance/mission_control/test_manifest_lifecycle.py), [brief](../../tests/unit/authoring/test_mission_brief.py),
+  [purpose card](../../tests/unit/authoring/test_purpose_card.py), [card at launch](../../tests/unit/authoring/test_purpose_card_launch.py); fixtures `tests/fixtures/manifests/`, goldens `tests/golden/manifests/`.

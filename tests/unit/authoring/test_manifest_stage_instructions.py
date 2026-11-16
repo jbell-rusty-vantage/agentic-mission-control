@@ -17,7 +17,7 @@ from mission_control.application.execution.operations.operation_execution import
 from mission_control.bootstrap.host_projection import HOST_PROJECTORS
 from mission_control.domain.authoring.canonical import sha256_digest
 from mission_control.domain.execution.bindings import ProviderExecutionBinding
-from mission_control.domain.execution.contracts import PromptTrustClass
+from mission_control.domain.execution.contracts import PromptTrustClass, is_purpose_card
 from mission_control.domain.execution.lanes import CursorExecutionBinding
 from tests.unit.authoring.test_manifest_v2_launch import (
     compiled_ok,
@@ -145,8 +145,10 @@ def test_legacy_stage_without_instruction_keeps_the_original_prompt_bytes() -> N
     )
     templates = templates_of(program, definition, None)
     template = next(value for key, value in templates.items() if key.startswith(node.key + "/"))
-    assert len(template.prompt_segments) == 1
-    objective = template.prompt_segments[0]
+    # The objective keeps its bytes and its place; the only other segment is the node's
+    # Purpose Card, which travels in the instruction channel and never in the first send.
+    objective, card = template.prompt_segments
+    assert is_purpose_card(card) and card.content not in turn_text(template)
     assert objective.source_ref == f"input:{node.pointer}"
     assert objective.trust_class is PromptTrustClass.ADMITTED_INPUT
     assert objective.rendered_digest == sha256_digest(objective.content)

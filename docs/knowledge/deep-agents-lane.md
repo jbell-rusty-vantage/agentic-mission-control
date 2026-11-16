@@ -10,7 +10,7 @@ questions:
   - Which sandbox backends does Deep Agents actually support?
   - Why did a Deep Agents turn stop before the model answered?
   - What is mc.extension_profile.v1 and is it built?
-updated: 2026-11-02
+updated: 2026-11-16
 ---
 
 # Deep Agents lane
@@ -52,6 +52,8 @@ a sandbox upload, or the `files` channel on the text-only State backend) and for
 plan holds (`adapter.py:370-376`, `knowledge_tools.py`). Every root checkpoint is a cognition point
 (`cognition_points.py::collect_points`); `time_travel.py` reads state as of a point and seeds a fork at R3
 ([recovery](recovery.md), [precise fork](precise-fork.md)).
+
+<a id="instruction-channel"></a>**Instruction channel.** `adapter.py::_prompts` splits the operation's segments by trust class. The system prompt is the instruction segments (`instruction_segments`, `domain/execution/contracts.py`): the [Purpose Card](../../GLOSSARY.md) first (why the mission exists, the node's part, what it was given, four rules; [mission manifest](mission-manifest.md#the-mission-brief-and-the-purpose-card)), then any published instruction segment, then the fixed host-authority line; deepagents appends its own sections after it. The user prompt is every admitted input in order: the stage objective, the node's `instruction`, the output contract and the Context Packet, whose operator instructions keep their own final section. Each `model_request` frame records the system message's digest and a `frame-body://` reference (`frames.py::model_request_capture`); a transcript read with `full` inlines it. Before the card a manifest run's system prompt was the host line alone.
 
 ## Runtime and capability configuration
 

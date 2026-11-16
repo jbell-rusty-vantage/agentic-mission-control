@@ -17,6 +17,7 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict, Field
 
 from mission_control.application.environments.requirements import readiness_requirements
+from mission_control.domain.authoring.brief import MissionBrief
 from mission_control.domain.authoring.contracts import ExactDefinitionRef
 from mission_control.domain.authoring.manifest import (
     Environment,
@@ -25,7 +26,10 @@ from mission_control.domain.authoring.manifest import (
     ManifestRejected,
     resolve_environments,
 )
-from mission_control.domain.authoring.manifest_v2 import parse_manifest_yaml_versioned
+from mission_control.domain.authoring.manifest_v2 import (
+    brief_warnings,
+    parse_manifest_yaml_versioned,
+)
 from mission_control.domain.authoring.mission_definition import (
     DefinitionCapability,
     manifest_to_definition,
@@ -159,6 +163,9 @@ class DefinitionSummary(ReportModel):
     pointer: str
     definition_digest: str
     is_resolved: bool
+    # The mission's brief as its definition seals it (purpose, the request, who asked); left
+    # out for a mission that records none.
+    brief: MissionBrief | None = Field(default=None, exclude_if=lambda value: value is None)
 
 
 class CompiledProgramSummary(ReportModel):
@@ -215,7 +222,7 @@ class ManifestStructureService:
             for pointer, block in manifest.mission_blocks()
         ]
         blockers = structure.blockers + chain.blockers
-        warnings = structure.warnings + chain.warnings
+        warnings = structure.warnings + chain.warnings + brief_warnings(manifest)
         resolution = ManifestResolution(
             manifest_digest=structure.manifest_digest,
             capabilities=tuple(
@@ -251,6 +258,7 @@ class ManifestStructureService:
                     pointer=item.manifest_pointer,
                     definition_digest=item.digest,
                     is_resolved=item.is_resolved,
+                    brief=item.brief,
                 )
                 for item in definitions
             ),

@@ -134,6 +134,7 @@ from mission_control.domain.execution.checkpoint_lineage import (
 from mission_control.domain.execution.cognition_points import CognitionPointObservation
 from mission_control.domain.execution.contracts import (
     IN_TURN_RUN_DIMENSIONS,
+    INSTRUCTION_TRUST_CLASSES,
     AsyncSubagentContract,
     CapturedWorkspaceCandidate,
     DeepAgentExecutionBinding,
@@ -143,6 +144,7 @@ from mission_control.domain.execution.contracts import (
     RuntimeResult,
     RuntimeUsage,
     SealedAsyncChildBinding,
+    instruction_segments,
 )
 from mission_control.domain.execution.errors import (
     DeepAgentMaterializationError,
@@ -2053,13 +2055,15 @@ def _structured_output(value: object, output_text: str) -> object:
 
 
 def _prompts(invocation: RuntimeInvocation) -> tuple[str, str]:
-    system_parts: list[str] = []
-    user_parts: list[str] = []
-    for segment in invocation.prompt_segments:
-        if segment.trust_class.value in {"system_authority", "authored_instruction"}:
-            system_parts.append(segment.content)
-        else:
-            user_parts.append(segment.content)
+    """The system prompt (the instruction segments, the Purpose Card first, then the fixed
+    host-authority line) and the user prompt (every admitted input, in order)."""
+
+    system_parts = [segment.content for segment in instruction_segments(invocation.prompt_segments)]
+    user_parts = [
+        segment.content
+        for segment in invocation.prompt_segments
+        if segment.trust_class not in INSTRUCTION_TRUST_CLASSES
+    ]
     if not user_parts:
         raise DeepAgentMaterializationError("Deep Agent invocation has no admitted user objective")
     system_parts.append(

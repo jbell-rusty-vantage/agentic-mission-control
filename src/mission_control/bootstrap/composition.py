@@ -78,6 +78,8 @@ from mission_control.adapters.postgres.runtime.stage3_kernel_repository import (
 from mission_control.application.authoring.manifest_fork_admission import (
     ManifestForkAdmissionProvenance,
 )
+from mission_control.application.authoring.manifest_submit import StoredForkSources
+from mission_control.application.authoring.run_brief import ManifestRunBriefs
 from mission_control.application.authoring.service import ControlPlaneService
 from mission_control.application.context.continuation import (
     ContinuationCommands,
@@ -413,6 +415,12 @@ async def compose_application_services(
                     )
                     if usage_prices is not None
                     else None
+                ),
+                # The Interview's result on `run inspect`: the brief the run's revision
+                # seals (a fork-derived run's is its source run's).
+                brief=ManifestRunBriefs(
+                    PostgresManifestSubmissionRepository(runtime_pool),
+                    fork_sources=StoredForkSources(materializations, fork_receipts),
                 ),
             ),
             # MP-11: an admitted cancel closes the run's open approval tasks.

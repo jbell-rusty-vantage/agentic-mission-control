@@ -24,7 +24,11 @@ from mission_control.adapters.deep_agents.knowledge_tools import (
     knowledge_tools,
 )
 from mission_control.domain.authoring.mission_definition import MissionDefinition
-from mission_control.domain.execution.contracts import OperationExecutionRequest, PromptTrustClass
+from mission_control.domain.execution.contracts import (
+    OperationExecutionRequest,
+    PromptTrustClass,
+    is_purpose_card,
+)
 from tests.fixtures.mission_control_common_db import canonical_scope
 from tests.unit.authoring.manifest_launch_fixture import fixture_bindings, fixture_served
 from tests.unit.authoring.test_experiment_loop_fixtures import rendered
@@ -118,9 +122,15 @@ async def test_e1_verifier_prompt_has_rubric_procedure_verdict_not_executor_step
     assert "Return output_refs" not in verifier
     assert "(not the objective reference above)" not in verifier
     # Admitted input, not a privileged segment (no published Prompt source; trust model kept).
+    # The one instruction segment is the host's Purpose Card, which names the goal the
+    # verifier judges and never quotes its text (the executor's procedure, checked above).
+    (card,) = [item for item in templates["verifier"].prompt_segments if is_purpose_card(item)]
+    assert "role verifier: you judge the executor's work and do not do it." in card.content
+    assert f"- Objectives you judge: `{definition.goals[0].key}`.\n" in card.content
     assert all(
         segment.trust_class == PromptTrustClass.ADMITTED_INPUT
         for segment in templates["verifier"].prompt_segments
+        if segment is not card
     )
 
 

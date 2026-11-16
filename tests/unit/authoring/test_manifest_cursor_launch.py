@@ -530,9 +530,14 @@ def test_mission_two_research_launches_on_cursor_cloud_with_its_hook(
     )
     assert projection.file(".mission/hooks/hook.citation-check/hook.py")
     assert projection.file(".cursor/skills/mission-control-observe/SKILL.md")
-    # The independent verifier is its own sealed unit on the same lane and admission.
+    # The independent verifier is its own sealed unit on the same lane and admission. Its
+    # projection differs in the rule file alone: each role's rule carries its own Purpose Card.
     verifier = CursorExecutionBinding.carried_by(templates["verifier"])
-    assert verifier is not None and verifier.projections == executor.projections
+    assert verifier is not None
+    assert verifier.projections.rules_digest != executor.projections.rules_digest
+    assert verifier.projections == executor.projections.model_copy(
+        update={"rules_digest": verifier.projections.rules_digest}
+    )
 
 
 def test_a_v1_cloud_node_without_a_reviewed_v1_environment_is_refused() -> None:

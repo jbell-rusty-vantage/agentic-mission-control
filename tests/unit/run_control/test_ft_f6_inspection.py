@@ -146,6 +146,9 @@ def test_existing_clients_keep_parsing_the_inspection_body() -> None:
         "budget",
         # The run's estimated model cost (`mc.run_cost.v1`): optional, absent when not composed.
         "cost",
+        # The Mission Brief the run's revision seals: optional, absent when the mission
+        # records none or the source is not composed.
+        "brief",
     }
     assert set(PreF6Inspection.model_fields) == fields - added
     for name in added:

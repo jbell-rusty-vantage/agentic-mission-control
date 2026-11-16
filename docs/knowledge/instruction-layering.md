@@ -10,7 +10,7 @@ questions:
   - Is the repository byte-identical after a local lane run?
   - Does Deep Agents layer instructions into a repository?
   - What ambient cognition does the inventory report?
-updated: 2026-11-01
+updated: 2026-11-16
 ---
 
 # Instruction layering and structural config merge
@@ -34,6 +34,14 @@ The mission's operating contract goes through each lane's additive channel
 | `claude_cloud` | `.claude/rules/mc-mission.md` |
 | `codex` | `send_options.developer_instructions`, sent as `thread/start.developerInstructions` |
 | `codex_cloud` | `AGENTS.override.md`: the repository's `AGENTS.md` verbatim, then a delimited mission section; over 32 KiB the section is a pointer at `.mission/operating-contract.md` |
+
+**What the overlay says.** The overlay's text is the operating contract
+(`application/agentic_components/placement.py::operating_contract_text`): the operation's instruction segments, then a
+pointer at the Context Packet on disk. On a manifest run the one instruction segment is the node's
+[Purpose Card](../../GLOSSARY.md), built at launch from sealed facts and placed first
+([mission manifest](mission-manifest.md#the-mission-brief-and-the-purpose-card)); the launch author renders the same text to
+pin the projection digest, so the card is covered by the sealed binding. The hosted agent API lanes (`claude_managed`,
+`codex_agents`) read the same segments into the session's system instructions.
 
 **Structural merge.** `application/agentic_components/layering.py::layer_projection` takes the
 projection, a `RepoView` (`DirectoryView` over the worktree on local lanes, `TreeView` over the
@@ -77,7 +85,7 @@ The ambient inventory is built (MO-33): `application/agentic_components/ambient.
 following symlinks, and `materialization.py` carries the result (`ambient`, `ambient_home`). Not yet: the persisted lane describes still name `CLAUDE.md`/`AGENTS.md` instruction channels for
 `claude_agent_sdk`, `claude_cloud` and `codex_cloud` (a lane-describe migration).
 
-**Deep Agents has no layering.** It places no files in a repository: its instruction channel is the `system_prompt` (`adapters/deep_agents/describe.py:105`) and its Host Projection writer
+**Deep Agents has no layering.** It places no files in a repository: its instruction channel is the `system_prompt` (`adapters/deep_agents/describe.py:105`), which opens with the Purpose Card ([Deep Agents lane](deep-agents-lane.md#instruction-channel)), and its Host Projection writer
 (`host_files.py`) generates configuration for other hosts only ([Deep Agents lane](deep-agents-lane.md)). Layering applies to the three local lanes, `cursor_local`, `claude_agent_sdk` and `codex` ([cursor lane](cursor-lane.md), [provider lanes](provider-lanes.md)).
 
 Built / specified / goal: layering, restore and ambient inventory built and tested with FIXTURE transports; no live repository run is cited here.

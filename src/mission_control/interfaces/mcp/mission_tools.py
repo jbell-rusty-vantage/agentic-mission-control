@@ -18,11 +18,11 @@ from __future__ import annotations
 
 import json
 from collections.abc import Mapping
-from typing import Any, Literal, Protocol
+from typing import Annotated, Any, Literal, Protocol
 from uuid import UUID
 
 from fastmcp import Context, FastMCP
-from pydantic import BaseModel, GetJsonSchemaHandler
+from pydantic import BaseModel, Field, GetJsonSchemaHandler
 from pydantic.json_schema import JsonSchemaValue
 from pydantic_core import CoreSchema
 
@@ -51,6 +51,13 @@ from mission_control.domain.policies.contracts import ActorContext
 
 CHAIN_RESOURCE = "mc://applications/{application_id}/chains/{chain_id}"
 CHAIN_TOOL = "mission_chain_inspect"
+# A submit's idempotency key, as `POST /missions:submit` takes it: published as a UUID in
+# `tools/list` and refused in these words when it is not one.
+RequestId = Annotated[str, Field(json_schema_extra={"format": "uuid"})]
+REQUEST_ID_NOT_UUID = (
+    "request_id must be a UUID (for example 3f1c2a9e-5b7d-4e8a-9c0f-6d2b1a4e7c85): choose a "
+    "new one for each submit and repeat it to retry that submit"
+)
 READ_GRANTS = frozenset({"workflow_run.read", "mission.read", "workflow.result.read"})
 
 
@@ -272,10 +279,18 @@ class ScopedManifests:
         """As `POST /missions:submit`: the deployment's and the principal's own sponsorships."""
 
         try:
+            submit_id = UUID(request_id)
+        except ValueError:
+            raise CoordinatorDomainError(
+                code=CoordinatorErrorCode.INVALID_ARGUMENT,
+                message=REQUEST_ID_NOT_UUID,
+                details={"argument": "request_id", "expected": "uuid"},
+            ) from None
+        try:
             receipt, replayed = await self._lifecycle(principal).submit(
                 SubmitRequest(
                     manifest_yaml=manifest_yaml,
-                    request_id=UUID(request_id),
+                    request_id=submit_id,
                     actor=self._actor(principal),
                     sponsorship_refs=self._sponsorships | principal.sponsorship_refs,
                     approval_refs=self._approvals | principal.approval_refs,
@@ -367,9 +382,10 @@ def register_manifest_tools(
         tags={"consequential"},
     )
     async def mission_manifest_submit(
-        manifest_yaml: str, request_id: str, context: Context
+        manifest_yaml: str, request_id: RequestId, context: Context
     ) -> dict[str, object]:
-        """Commit the manifest as a revision and admit its run (or chain); never starts."""
+        """Commit the manifest as a revision and admit its run (or chain); never starts.
+        `request_id` is a UUID you choose: repeating it returns the first receipt."""
 
         async def invoke(principal: Any) -> object:
             return await manifests.submit(principal, manifest_yaml, request_id)

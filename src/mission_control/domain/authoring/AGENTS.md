@@ -12,12 +12,12 @@ Entrypoints:
 - mission_environment.py — The mission/v2 environment additions: Environment Kit pin, variables, secrets…
 - environment_kits.py — Environment Kits and the mission layer they render
 - mission_watchers.py — A mission's watchers: controls.watchers, controls.notifications and event_wait…
-Also: provider_options.py, stagegraph_builder.py, canonical.py, nested_lowering.py, fixtures.py, nested_bodies.py, extensions.py, errors.py, identity.py
+Also: provider_options.py, brief.py, stagegraph_builder.py, canonical.py, nested_lowering.py, fixtures.py, nested_bodies.py, extensions.py, errors.py, identity.py
 Tests: tests/unit/authoring, tests/unit/chains, tests/unit/control_plane
 Invariants:
 - Definitions are immutable once compiled; identifiers derive from the parts that identify a record.
 Explained by (docs/knowledge): mission-manifest, environments, stage-graph, evaluator-optimizer, parallel-swarm, revisions
 Decided by (docs/adr): ADR-0068, ADR-0010, ADR-0022, ADR-0034, ADR-0063
-Depends on: domain.programs, domain.execution · Used by: application, application.authoring, adapters.postgres, application.programs, adapters.deep_agents, domain.execution (+16)
+Depends on: domain.programs, domain.execution, domain.frames · Used by: application, application.authoring, adapters.postgres, application.programs, adapters.deep_agents, domain.execution (+17)
 Verify: uv run pytest tests/unit/authoring tests/unit/chains
 <!-- END:sdlc-module -->

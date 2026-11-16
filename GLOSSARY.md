@@ -730,6 +730,14 @@ _Avoid_: interview session
 **Interview**:
 The question-asking mode of an authoring session, used before research, ingestion, content and coding missions alike.
 
+**Mission Brief**:
+The Interview's result as the Mission Manifest records it (`mission.brief`): the kind of work, the user's request and what done means in their own words, the questions asked and the answers given, what was ruled out and who asked. It is sealed with the Revision and read back with the run.
+_Avoid_: interview record, requirements, prompt
+
+**Purpose Card**:
+The short text Mission Control assembles for every node from sealed facts and places where the node's lane puts trusted mission instructions: why the mission exists, the node's part, what it was given and four fixed rules. The Mission Brief's words are quoted inside it as data, never merged into it.
+_Avoid_: preamble, node brief, system prompt
+
 **Draft**:
 An editable, not yet compiled mission definition.
 

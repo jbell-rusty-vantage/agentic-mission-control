@@ -150,6 +150,7 @@ from mission_control.domain.authoring.manifest_lowering import (
 )
 from mission_control.domain.authoring.manifest_v2 import (
     EnvironmentV2,
+    brief_warnings,
     is_v2,
     parse_manifest_yaml_versioned,
 )
@@ -692,7 +693,11 @@ class ManifestCompileService:
         chain = compile_chain(manifest)
         blockers: list[ManifestIssue] = [*structure.blockers, *chain.blockers]
         blockers += self._lane_option_blockers(structure)
-        warnings: list[ManifestIssue] = [*structure.warnings, *chain.warnings]
+        warnings: list[ManifestIssue] = [
+            *structure.warnings,
+            *chain.warnings,
+            *brief_warnings(manifest),
+        ]
         environments = {item.pointer: item for item in structure.missions}
         missions: list[_MissionState] = []
         for pointer, block in manifest.mission_blocks():
@@ -721,6 +726,13 @@ class ManifestCompileService:
             definition = manifest_to_definition(
                 block, pointer=pointer, digest=structure.manifest_digest, environments=env
             )
+            if definition.brief is not None and scope.actor_id != COMPILE_ACTOR_FALLBACK:
+                # The brief names who asked. Left out, it is the principal this compile runs
+                # for: at submit, the submitting principal. Set before lowering, so the
+                # committed definition and its Compiled Program agree.
+                definition = definition.model_copy(
+                    update={"brief": definition.brief.requested_by_default(scope.actor_id)}
+                )
             missions.append(
                 _MissionState(
                     pointer=pointer,
@@ -983,6 +995,7 @@ class ManifestCompileService:
                     pointer=mission.pointer,
                     definition_digest=mission.definition.digest,
                     is_resolved=mission.definition.is_resolved,
+                    brief=mission.definition.brief,
                 )
                 for mission in missions
             ),

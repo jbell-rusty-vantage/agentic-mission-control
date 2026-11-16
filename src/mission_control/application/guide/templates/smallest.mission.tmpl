@@ -14,6 +14,24 @@ slots:
   title:
     description: A one-line title.
     example: Hello from a first mission
+  purpose:
+    description: "What kind of work this is: `research`, `content`, `system` or `other`."
+    example: other
+  request:
+    description: The user's request in their own words, verbatim, one line.
+    example: Show me that a first mission runs end to end here.
+  question:
+    description: One question you asked in the interview. Add one `answers` entry for each further question.
+    example: What should the text be about?
+  answer:
+    description: The user's answer to that question, verbatim, one line.
+    example: What a Mission Manifest is, in three sentences.
+  done_means:
+    description: What the user said finished looks like, verbatim, one line.
+    example: I read three clear sentences and approve them.
+  out_of_scope:
+    description: What the user ruled out, verbatim, one line. Delete the `out_of_scope` entry when they ruled out nothing.
+    example: No web research.
   goal:
     description: The outcome in the user's words, one line.
     example: Write three sentences that explain what a Mission Manifest is.
@@ -35,6 +53,7 @@ slots:
 notes:
   - The run stops at `review` and waits. Its inbox notification is `review_required`. Only the named reviewer can resolve the Human Task (that actor, or a principal holding `reviewer:<role>`); anyone else is refused `not_reviewer`.
   - The agent submits through the `submit_output` tool, pinned at its latest admitted revision.
+  - The `brief` block is the interview's result in the user's words. Every node is told the purpose, the request, what done means, what it was given and each criterion whose `evidence` names an output it owes, so an `instruction` holds the task alone.
 ---
 manifest: mission/v2
 mission:
@@ -44,6 +63,20 @@ mission:
     {{title}}
   description: >-
     {{goal}}
+  brief:
+    purpose: {{purpose}}
+    request: >-
+      {{request}}
+    answers:
+      - question: >-
+          {{question}}
+        answer: >-
+          {{answer}}
+    done_means: >-
+      {{done_means}}
+    out_of_scope:
+      - >-
+        {{out_of_scope}}
   goals:
     - key: result
       description: >-
@@ -90,8 +123,7 @@ mission:
         objectives: [write_result]
         instruction: >-
           {{goal}}
-          Submit the text with the submit_output tool: one call, obligation "write.result",
-          one inline text item. Stop after its receipt.
+          Submit the text as "write.result" with the submit_output tool, as one inline text item.
         outputs:
           - name: result
             form: text

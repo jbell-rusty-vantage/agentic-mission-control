@@ -48,6 +48,7 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_valida
 from pydantic_core import to_jsonable_python
 
 from mission_control.application.agentic_components.projections import HostProjectors
+from mission_control.application.authoring.capability_summaries import CapabilitySummariesPort
 from mission_control.application.authoring.cursor_launch import (
     CURSOR_PROFILES,
     CURSOR_PROJECTED_KINDS,
@@ -76,6 +77,11 @@ from mission_control.application.authoring.provider_launch import (
     materialization_digest,
     model_vendor,
 )
+from mission_control.application.authoring.purpose_card import (
+    given_capabilities,
+    pin_text,
+)
+from mission_control.application.authoring.purpose_card import purpose_card as render_purpose_card
 from mission_control.application.authoring.service import ControlPlaneService
 from mission_control.application.authoring.subagent_discriminator import (
     seed_owner,
@@ -176,6 +182,7 @@ from mission_control.domain.execution.contracts import (
     WorkspaceOwner,
     WorkspaceOwnerKind,
     WorkspaceSlotBinding,
+    purpose_card_segment,
 )
 from mission_control.domain.execution.data_class import (
     DATA_CLASSES,
@@ -1934,6 +1941,7 @@ class ManifestLaunchResolver:
         *,
         rows: Mapping[str, ResolvedCapability] | None = None,
         kit_egress: Mapping[str, Sequence[str]] | None = None,
+        capability_summaries: Mapping[str, str] | None = None,
     ) -> dict[str, OperationExecutionRequest]:
         blueprint = admitted.blueprint
         if not isinstance(blueprint, StageGraphBlueprint):
@@ -1951,6 +1959,10 @@ class ManifestLaunchResolver:
             node = path[-1]
             objective = _stage_objective(definition, node)
             instruction = _stage_authored_instruction(node)
+            # Why the mission exists and this stage's part, the same on every lane.
+            card = node_purpose_card(
+                definition, path, verifier=False, summaries=capability_summaries
+            )
             namespace = f"workspace-namespace:{{run_id}}:stage:{stage.stage_id}"
             workspace_id = f"workspace:{{run_id}}:stage:{stage.stage_id}"
             owner = WorkspaceOwner(
@@ -1988,6 +2000,7 @@ class ManifestLaunchResolver:
                             operation_contract_ref=variant.operation_contract_ref,
                             output_schema=None,
                             authored_instruction=instruction,
+                            purpose_card=card,
                         )
                 continue
             if _lane_of(path, verifier=False) in CURSOR_LANE_PROFILES:
@@ -2022,6 +2035,7 @@ class ManifestLaunchResolver:
                             operation_contract_ref=variant.operation_contract_ref,
                             output_schema=None,
                             authored_instruction=instruction,
+                            purpose_card=card,
                         )
                 continue
             resolved = self.deep_agents_node(
@@ -2054,6 +2068,7 @@ class ManifestLaunchResolver:
                         operation_contract_ref=variant.operation_contract_ref,
                         output_schema=None,
                         authored_instruction=instruction,
+                        purpose_card=card,
                     )
         for stage in blueprint.stages:
             bound = [slot for slot in stage.output_slots if slot.validation_schema is not None]
@@ -2156,6 +2171,7 @@ class ManifestLaunchResolver:
         *,
         rows: Mapping[str, ResolvedCapability] | None = None,
         kit_egress: Mapping[str, Sequence[str]] | None = None,
+        capability_summaries: Mapping[str, str] | None = None,
     ) -> dict[str, OperationExecutionRequest]:
         blueprint = admitted.blueprint
         if not isinstance(blueprint, GoalDirectedBlueprint):
@@ -2166,6 +2182,10 @@ class ManifestLaunchResolver:
         executor_submits = False
         for role in GOAL_ROLES:
             verifier = role == "verifier"
+            # Why the mission exists and this role's part, the same on every lane.
+            card = node_purpose_card(
+                definition, (root,), verifier=verifier, summaries=capability_summaries
+            )
             objective = (
                 f"Mission {definition.mission_key} Goal Loop {role}: {blueprint.objective_contract}"
             )
@@ -2232,6 +2252,7 @@ class ManifestLaunchResolver:
                     ),
                     operation_contract_ref=f"operation:{base_id}:goal-{role}@1",
                     output_schema=output_schema,
+                    purpose_card=card,
                 )
                 continue
             if _lane_of((root,), verifier=verifier) in CURSOR_LANE_PROFILES:
@@ -2259,6 +2280,7 @@ class ManifestLaunchResolver:
                     ),
                     operation_contract_ref=f"operation:{base_id}:goal-{role}@1",
                     output_schema=output_schema,
+                    purpose_card=card,
                 )
                 continue
             resolved = self.deep_agents_node(
@@ -2312,6 +2334,7 @@ class ManifestLaunchResolver:
                 ),
                 operation_contract_ref=f"operation:{base_id}:goal-{role}@1",
                 output_schema=output_schema,
+                purpose_card=card,
             )
             base = templates[role].transfer
             outputs = tuple((root.key, output.key) for output in root.outputs)
@@ -2388,6 +2411,7 @@ class ManifestLaunchResolver:
         output_schema: StructuredOutputBinding | None,
         model_pointer: str,
         authored_instruction: PromptSegment | None = None,
+        purpose_card: PromptSegment | None = None,
     ) -> OperationExecutionRequest:
         """One Deep Agents template: the neutral request around the lane's sealed binding.
 
@@ -2442,7 +2466,9 @@ class ManifestLaunchResolver:
             effective_configuration_digest=admitted.configuration_digest,
             run_control_revision=TEMPLATE_REVISION,
             operation_contract_ref=operation_contract_ref,
-            prompt_segments=_request_prompt_segments(objective, source, authored_instruction),
+            prompt_segments=_request_prompt_segments(
+                objective, source, authored_instruction, purpose_card
+            ),
             model_policy=part.model_policy,
             output_schema=output_schema,
             agent_profile_ref=part.agent_profile_ref,
@@ -2479,11 +2505,12 @@ class ManifestLaunchResolver:
         operation_contract_ref: str,
         output_schema: StructuredOutputBinding | None,
         authored_instruction: PromptSegment | None = None,
+        purpose_card: PromptSegment | None = None,
     ) -> OperationExecutionRequest:
         """A claude/codex template: a sealed ``mc.execution_binding.v2`` routed to its lane."""
 
         lane = provider.lane
-        segments = _request_prompt_segments(objective, source, authored_instruction)
+        segments = _request_prompt_segments(objective, source, authored_instruction, purpose_card)
         try:
             if provider.profile in HOSTED_API_PROFILES:
                 if self._hosted_digest is None or lane.hosted_projection is None:
@@ -2567,6 +2594,7 @@ class ManifestLaunchResolver:
         operation_contract_ref: str,
         output_schema: StructuredOutputBinding | None,
         authored_instruction: PromptSegment | None = None,
+        purpose_card: PromptSegment | None = None,
     ) -> OperationExecutionRequest:
         """A Cursor template: a sealed ``mc.cursor_binding.v2`` routed to its lane queue, whose
         projection digests are those the harness re-renders at ``prepare``."""
@@ -2592,7 +2620,7 @@ class ManifestLaunchResolver:
                     f"{outputs.evidence_channel or outputs.collect[0]}. "
                     "Register output custody; execution completion is not mission acceptance."
                 )
-        segments = _request_prompt_segments(objective, source, authored_instruction)
+        segments = _request_prompt_segments(objective, source, authored_instruction, purpose_card)
         try:
             projection = cursor_projection(
                 cursor.rows,
@@ -3137,8 +3165,15 @@ def _stage_authored_instruction(node: DefinitionNode) -> PromptSegment | None:
 
 
 def _request_prompt_segments(
-    objective: str, source: str, authored_instruction: PromptSegment | None
+    objective: str,
+    source: str,
+    authored_instruction: PromptSegment | None,
+    purpose_card: PromptSegment | None = None,
 ) -> tuple[PromptSegment, ...]:
+    """A template's segments: the objective, the node's authored instruction and the Purpose
+    Card. The card is the one instruction-class segment; each lane places it first in its
+    instruction channel whatever its position here (`instruction_segments`)."""
+
     objective_segment = PromptSegment(
         source_ref=source,
         source_revision=1,
@@ -3146,10 +3181,53 @@ def _request_prompt_segments(
         content=objective,
         rendered_digest=sha256_digest(objective),
     )
-    return (
-        (objective_segment, authored_instruction)
-        if authored_instruction is not None
-        else (objective_segment,)
+    return tuple(
+        segment
+        for segment in (objective_segment, authored_instruction, purpose_card)
+        if segment is not None
+    )
+
+
+def node_purpose_card(
+    definition: MissionDefinition,
+    path: Sequence[DefinitionNode],
+    *,
+    verifier: bool,
+    summaries: Mapping[str, str] | None = None,
+) -> PromptSegment:
+    """One node role's Purpose Card as its template segment (`purpose_card.py`): built from
+    the committed definition and what the role's effective environment binds. An independent
+    verifier is never given the producer's tools (W1 D27), so its card does not list them."""
+
+    selected = [
+        item
+        for item in _selected_capabilities(definition, path, verifier=verifier)
+        if not (
+            verifier
+            and (pin := item.resolved or item.pin) is not None
+            and pin.capability_id in PRODUCER_TOOL_CAPABILITIES
+        )
+    ]
+    card = render_purpose_card(
+        definition,
+        path,
+        verifier=verifier,
+        given=given_capabilities(selected, summaries),
+    )
+    return purpose_card_segment(card.text)
+
+
+def purpose_card_pins(definition: MissionDefinition) -> tuple[str, ...]:
+    """The exact pins whose catalog description a Purpose Card of this definition may quote."""
+
+    return tuple(
+        dict.fromkeys(
+            pin_text(pin)
+            for item in definition.capabilities
+            if item.role in {"capability", "skill", "agent", "plugin"}
+            and (pin := item.resolved or item.pin) is not None
+            and pin.digest is not None
+        )
     )
 
 
@@ -3267,8 +3345,12 @@ class ManifestLaunchInputAuthor:
         kits: KitRequirementsPort | None = None,
         dependent_inputs_admitted: bool = True,
         trusted_assessment_pin: str = TRUSTED_ASSESSMENT_PIN,
+        capability_summaries: CapabilitySummariesPort | None = None,
     ) -> None:
         self._resolver = resolver
+        # One line of catalog description per bound capability, for each node's Purpose Card;
+        # without it a card lists its capabilities by name alone.
+        self._capability_summaries = capability_summaries
         # OVE-169: whether this installation promotes outputs (a trusted settlement composes).
         self._dependent_inputs_admitted = dependent_inputs_admitted
         # W1 D30: the application's trusted assessment pin; a promise requiring it is refused
@@ -3560,9 +3642,18 @@ class ManifestLaunchInputAuthor:
             raise ManifestCompletionUnavailable(issues[0].pointer, issues[0].message)
         rows = await self._rows(definition)
         kit_egress = await self._kit_egress(definition)
+        summaries = (
+            await self._capability_summaries(purpose_card_pins(definition))
+            if self._capability_summaries is not None
+            else {}
+        )
         if isinstance(admitted.blueprint, StageGraphBlueprint):
             templates = self._resolver.stage_templates(
-                definition, admitted, rows=rows, kit_egress=kit_egress
+                definition,
+                admitted,
+                rows=rows,
+                kit_egress=kit_egress,
+                capability_summaries=summaries,
             )
             await self._stages.persist_templates(
                 request_scope=request_scope,
@@ -3572,7 +3663,11 @@ class ManifestLaunchInputAuthor:
             )
             return templates
         templates = self._resolver.goal_templates(
-            definition, admitted, rows=rows, kit_egress=kit_egress
+            definition,
+            admitted,
+            rows=rows,
+            kit_egress=kit_egress,
+            capability_summaries=summaries,
         )
         await self._goals.persist_templates(
             request_scope=request_scope,

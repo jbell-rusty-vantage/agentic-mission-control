@@ -33,9 +33,10 @@ from mission_control.domain.context.render import (
 )
 from mission_control.domain.execution.bindings import ProviderExecutionBinding
 from mission_control.domain.execution.contracts import (
+    INSTRUCTION_TRUST_CLASSES,
     OperationExecutionRequest,
     PromptSegment,
-    PromptTrustClass,
+    instruction_segments,
 )
 from mission_control.domain.execution.lanes import CursorExecutionBinding
 from mission_control.domain.programs.runtime_units import goal_unit_workspace_root
@@ -52,9 +53,7 @@ MISSION_CONTEXT_POINTER: Final = (
     "Mission context: read .mission/context.md (the context index) and .mission/inputs.json "
     "before acting; inputs are under inputs/ (read-only); write declared outputs under outputs/."
 )
-_INSTRUCTION_CLASSES: Final = frozenset(
-    {PromptTrustClass.SYSTEM_AUTHORITY, PromptTrustClass.AUTHORED_INSTRUCTION}
-)
+_INSTRUCTION_CLASSES: Final = INSTRUCTION_TRUST_CLASSES
 
 
 class LaneProjectionError(ValueError):
@@ -80,12 +79,13 @@ RowsResolver = Callable[[OperationExecutionRequest], Awaitable[Sequence[Resolved
 
 def operating_contract_text(segments: Sequence[PromptSegment]) -> str:
     """The authority and authored instructions of ``segments``: the lanes' instruction
-    channel. Launch authors render it from a template's segments to pin the same digest."""
+    channel, the Purpose Card first (``instruction_segments``). Launch authors render it from
+    a template's segments to pin the same digest."""
 
     parts = [
         segment.content.strip()
-        for segment in segments
-        if segment.trust_class in _INSTRUCTION_CLASSES and segment.content.strip()
+        for segment in instruction_segments(segments)
+        if segment.content.strip()
     ]
     # The packet index changes per turn; the pinned projection points at it on disk instead of
     # inlining it, so the rule digest stays the binding's.

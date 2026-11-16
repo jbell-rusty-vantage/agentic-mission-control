@@ -10,7 +10,7 @@ A template is a whole Mission Manifest with named slots. Start from one; write a
 ## Fill one
 
 1. Read it with {op:describe_template}: its slots, its notes and the manifest.
-2. Replace every slot with the user's answer from the interview (topic `interview`). Take `application_id` from the start page, `model_profile` from topic `models`, `sandbox_profile` from topic `manifest` and, to review the result yourself, `reviewer` from {op:whoami} (`actor_id`).
+2. Replace every slot with the user's answer from the interview (topic `interview`). The `request`, `question`, `answer`, `done_means` and `out_of_scope` slots fill the `brief` block: write the user's words verbatim and add one `answers` entry for each further question. Take `application_id` from the start page, `model_profile` from topic `models`, `sandbox_profile` from topic `manifest` and, to review the result yourself, `reviewer` from {op:whoami} (`actor_id`).
 3. Change what the brief needs changed: the budget, the governors, the capabilities (topic `capabilities`). Keep the keys consistent (topic `manifest`).
 4. Compile until the report has no blockers and says `startable: true` (topic `launch`).
 

@@ -11,6 +11,6 @@ Entrypoints:
 Tests: tests/unit/mission_control, tests/unit/run_control, tests/integration/postgres/test_mission_control_lifecycle_postgres.py
 Explained by (docs/knowledge): events-and-commands, lifecycle, budgets-and-usage, interventions, mission-control, recovery
 Decided by (docs/adr): ADR-0032, ADR-0004, ADR-0008, ADR-0011, ADR-0001
-Depends on: contracts, domain, application.recovery, domain.execution, application.programs, domain.frames (+1) · Used by: bootstrap, interfaces.http, interfaces.mcp, adapters.postgres, adapters.temporal, interfaces
+Depends on: contracts, domain, application.recovery, domain.execution, application.programs, domain.authoring (+2) · Used by: bootstrap, interfaces.http, interfaces.mcp, adapters.postgres, adapters.temporal, interfaces
 Verify: uv run pytest tests/unit/mission_control tests/unit/run_control
 <!-- END:sdlc-module -->

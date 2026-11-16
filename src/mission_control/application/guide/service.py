@@ -73,6 +73,16 @@ from mission_control.application.selection.workspace import (
 from mission_control.application.subscriptions.coordinator import DEFAULT_KINDS
 from mission_control.application.subscriptions.coordinator_service import MAX_WAIT_SECONDS
 from mission_control.contracts.contracts import MissionCommandRequest
+from mission_control.domain.authoring.brief import (
+    BRIEF_ANSWER_MAX,
+    BRIEF_ANSWERS_MAX,
+    BRIEF_DONE_MEANS_MAX,
+    BRIEF_OUT_OF_SCOPE_ITEM_MAX,
+    BRIEF_OUT_OF_SCOPE_MAX,
+    BRIEF_QUESTION_MAX,
+    BRIEF_REQUEST_MAX,
+    MissionPurpose,
+)
 from mission_control.domain.authoring.contracts import DefinitionKind, PublishedDefinition
 from mission_control.domain.authoring.manifest import MissionManifest
 from mission_control.domain.authoring.manifest_lowering import manifest_lowered_refs
@@ -239,6 +249,7 @@ class GuideService:
         }
         # A page's further generated sections, by the name of their marker.
         self._named_sections: dict[str, dict[str, Callable[[], Awaitable[str]]]] = {
+            "interview": {"brief": self._brief_section},
             "workflows": {"types": self._workflow_types_section},
         }
 
@@ -347,6 +358,23 @@ class GuideService:
             f"Three fields are fixed: the first line is {versions.replace(', ', ' or ')}; "
             "`mission.key` is a stable slug; `mission.application` is "
             f"`{self._application_id}`."
+        )
+
+    async def _brief_section(self) -> str:
+        """What the `brief` block admits, from its model: the purposes with what each means,
+        the limits, who it names and where it is read back."""
+
+        purposes = _spans(purpose.value for purpose in MissionPurpose)
+        return (
+            f"`purpose` is one of {purposes}. Limits, in characters: `request` "
+            f"{BRIEF_REQUEST_MAX:,}, `done_means` {BRIEF_DONE_MEANS_MAX:,}, "
+            f"{BRIEF_ANSWERS_MAX} `answers` (`question` {BRIEF_QUESTION_MAX}, `answer` "
+            f"{BRIEF_ANSWER_MAX:,}), {BRIEF_OUT_OF_SCOPE_MAX} `out_of_scope` lines "
+            f"({BRIEF_OUT_OF_SCOPE_ITEM_MAX} each); text shaped like a credential is refused. "
+            "`requested_by` defaults to the submitting principal. The brief is sealed with the "
+            "mission revision: every node is told the purpose, the request, what done means "
+            "and what was ruled out, and {op:inspect} returns it as `brief`. Without one, "
+            "compile warns `brief_missing`."
         )
 
     async def _workflows_section(self) -> str:

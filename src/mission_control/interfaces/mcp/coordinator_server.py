@@ -10,6 +10,7 @@ from uuid import uuid4
 from fastmcp import Context, FastMCP
 from fastmcp.server.auth import AuthProvider
 from fastmcp.server.dependencies import get_http_headers
+from pydantic import ValidationError
 
 from mission_control.application.coordinator.coordinator_facade import (
     COORDINATOR_CORRELATION_ID,
@@ -202,6 +203,23 @@ def _serialize(value: object) -> object:
     return value
 
 
+def _invalid_arguments(error: Exception) -> tuple[str, dict[str, str]]:
+    """What an ``INVALID_ARGUMENT`` refusal says. A request model that refused a field which
+    must be a UUID (a Command's or a fork's ``request_id``) names that field, so a caller
+    that sent a made-up id is told what to send; any other refusal keeps the one line and
+    echoes nothing the caller wrote."""
+
+    if isinstance(error, ValidationError):
+        for item in error.errors(include_url=False, include_context=False, include_input=False):
+            if str(item.get("type", "")).startswith("uuid"):
+                field = ".".join(str(part) for part in item.get("loc", ())) or "argument"
+                return (
+                    f"request arguments are invalid: {field} must be a UUID",
+                    {"argument": field, "expected": "uuid"},
+                )
+    return "request arguments are invalid", {}
+
+
 async def _call(
     operation: Any,
     *,
@@ -231,15 +249,16 @@ async def _call(
                 correlation_id,
                 type(error).__name__,
             )
+            message, details = _invalid_arguments(error)
             return {
                 "ok": False,
                 "schema_version": SCHEMA_VERSION,
                 "correlation_id": correlation_id,
                 "error": {
                     "code": "INVALID_ARGUMENT",
-                    "message": "request arguments are invalid",
+                    "message": message,
                     "retryable": False,
-                    "details": {},
+                    "details": details,
                 },
             }
         except Exception:

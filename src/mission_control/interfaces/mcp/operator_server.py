@@ -186,6 +186,8 @@ def create_operator_server(state: Any) -> FastMCP:
             _by_scope(state.mission_control_transcript_services),
             searches=_by_scope(state.mission_control_transcript_search_services),
             run_lists=_by_scope(state.mission_control_run_list_services),
+            # `full`: the same artifact body readers the HTTP transcript route reads through.
+            artifacts=_by_scope(getattr(state, "mission_control_artifact_body_readers", {})),
         ),
         subscriptions=McpSubscriptionBridge(
             _by_scope(state.mission_control_subscription_services),

@@ -617,6 +617,30 @@
       "title": "AuthSelection",
       "type": "object"
     },
+    "BriefAnswer": {
+      "additionalProperties": false,
+      "description": "One question of the Interview and the user's answer, in the user's words.",
+      "properties": {
+        "answer": {
+          "maxLength": 1200,
+          "minLength": 1,
+          "title": "Answer",
+          "type": "string"
+        },
+        "question": {
+          "maxLength": 400,
+          "minLength": 1,
+          "title": "Question",
+          "type": "string"
+        }
+      },
+      "required": [
+        "question",
+        "answer"
+      ],
+      "title": "BriefAnswer",
+      "type": "object"
+    },
     "Budget": {
       "additionalProperties": false,
       "properties": {
@@ -5046,12 +5070,23 @@
     },
     "MissionBlockV2": {
       "additionalProperties": false,
-      "description": "A v1 mission block with v2 Environments and its Data Class. Lanes that are not\nZDR-eligible admit a mission only by its declared class; a mission without one is\nrefused there (``domain/execution/data_class.py``), never assumed harmless. Its controls\nadd watchers and consumed notifications (SPEC-04 §5, :mod:`mission_watchers`).",
+      "description": "A v1 mission block with v2 Environments and its Data Class. Lanes that are not\nZDR-eligible admit a mission only by its declared class; a mission without one is\nrefused there (``domain/execution/data_class.py``), never assumed harmless. Its controls\nadd watchers and consumed notifications (SPEC-04 §5, :mod:`mission_watchers`). Its\n``brief`` is the Interview's result, sealed with the revision (:mod:`brief`); optional, and\na mission without one compiles with a warning.",
       "properties": {
         "application": {
           "pattern": "^[a-z][a-z0-9-]{0,63}$",
           "title": "Application",
           "type": "string"
+        },
+        "brief": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MissionBrief"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
         },
         "controls": {
           "anyOf": [
@@ -5194,6 +5229,87 @@
       ],
       "title": "MissionBlockV2",
       "type": "object"
+    },
+    "MissionBrief": {
+      "additionalProperties": false,
+      "description": "``mission.brief``: the Interview's result, recorded with the mission it produced.",
+      "properties": {
+        "answers": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/BriefAnswer"
+          },
+          "maxItems": 12,
+          "title": "Answers",
+          "type": "array"
+        },
+        "done_means": {
+          "anyOf": [
+            {
+              "maxLength": 1000,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Done Means"
+        },
+        "out_of_scope": {
+          "default": [],
+          "items": {
+            "maxLength": 400,
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 8,
+          "title": "Out Of Scope",
+          "type": "array"
+        },
+        "purpose": {
+          "$ref": "#/$defs/MissionPurpose"
+        },
+        "request": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "title": "Request",
+          "type": "string"
+        },
+        "requested_by": {
+          "anyOf": [
+            {
+              "maxLength": 200,
+              "minLength": 1,
+              "pattern": "^\\S+$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Requested By"
+        }
+      },
+      "required": [
+        "purpose",
+        "request"
+      ],
+      "title": "MissionBrief",
+      "type": "object"
+    },
+    "MissionPurpose": {
+      "description": "What kind of work a mission is. Every node is told (the Purpose Card).",
+      "enum": [
+        "research",
+        "content",
+        "system",
+        "other"
+      ],
+      "title": "MissionPurpose",
+      "type": "string"
     },
     "ModelSelection": {
       "additionalProperties": false,

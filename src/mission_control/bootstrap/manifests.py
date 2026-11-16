@@ -33,6 +33,9 @@ from mission_control.adapters.postgres.runtime.stage3_kernel_repository import (
     PostgresForkRepository,
 )
 from mission_control.adapters.remote_session.projection import digest as hosted_digest
+from mission_control.application.authoring.capability_summaries import (
+    CatalogCapabilitySummaries,
+)
 from mission_control.application.authoring.manifest_launch_inputs import (
     TRUSTED_ASSESSMENT_PIN,
     CapabilityComponentBinding,
@@ -446,6 +449,12 @@ def compose_manifest_launch_inputs(
         goal_templates=PostgresGoalDirectedDocumentRepository(pool),
         # mission/v2: the catalog rows a claude/codex binding's materialization digest renders.
         projection_rows=compose_projection_rows(pool, settings=settings),
+        # The catalog line of each capability a node's Purpose Card lists (the row alone).
+        capability_summaries=CatalogCapabilitySummaries(
+            PostgresDefinitionRepository(
+                pool, catalog_scope=settings.mission_control_catalog_scope or ""
+            )
+        ),
     )
 
 

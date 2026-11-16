@@ -68,7 +68,10 @@ from mission_control.application.execution.harness.retention import (
 )
 from mission_control.domain.execution.bindings import CodexAgentsOptions, ProviderExecutionBinding
 from mission_control.domain.execution.cognition_points import CognitionPointObservation
-from mission_control.domain.execution.contracts import OperationExecutionRequest
+from mission_control.domain.execution.contracts import (
+    OperationExecutionRequest,
+    instruction_segments,
+)
 from mission_control.domain.execution.history_reconciliation import (
     MAX_HISTORY_FRAMES,
     HistoryReplayIncomplete,
@@ -223,11 +226,10 @@ class CodexAgentsHarness(RemoteSessionLane[_AgentsSession], UnsupportedHarnessOp
                 {
                     "agent_id": session.pack.agent.id,
                     "agent": {
+                        # The instruction channel: the Purpose Card first.
                         "instructions": "\n\n".join(
                             segment.content
-                            for segment in session.operation.prompt_segments
-                            if segment.trust_class.value
-                            in {"system_authority", "authored_instruction"}
+                            for segment in instruction_segments(session.operation.prompt_segments)
                         )
                     },
                     "environment": session.pack.session_environment(),

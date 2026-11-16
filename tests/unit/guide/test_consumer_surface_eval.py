@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import asyncio
 import importlib.util
+import json
 import sys
 from dataclasses import replace
 from pathlib import Path
@@ -61,7 +62,7 @@ from tests.unit.selection.test_selection_workspace import NARROW_WORKFLOW, OPEN_
 ROOT = Path(__file__).resolve().parents[3]
 BOUND_LANES = ("deep_agents", "cursor_local", "claude_agent_sdk")
 # What the evaluation asks without a run id, one check each, beside one compile per template.
-QUESTIONS = 27
+QUESTIONS = 30
 
 
 def _evaluation() -> ModuleType:
@@ -168,7 +169,7 @@ def test_the_evaluation_scores_the_guide_the_listing_and_the_templates() -> None
     assert failed == [], [
         (check.question, check.observed) for check in card.checks if not check.passed
     ]
-    # Without a run id the four checks that read a run are not run.
+    # Without a run id the six checks that read a run are not run.
     assert len(card.checks) == QUESTIONS + len(TEMPLATE_IDS)
     assert evaluation.GUIDE_TOPICS == TOPIC_IDS
 
@@ -225,6 +226,19 @@ def test_the_evaluation_scores_the_guide_the_listing_and_the_templates() -> None
         compiled = observed("mcp", f"Does the `{template_id}` template compile?")
         assert "mission_manifest_compile: ok True, startable True" in compiled, compiled
         assert "sandbox research.standard" in compiled and "blockers: none" in compiled
+    # The interview is recorded: the page shows the block, every template carries one, and
+    # a compile reads the brief back (who asked is the caller) and only warns without one.
+    interview = observed("mcp", "Does the interview end in a recorded brief?")
+    assert "shows a `brief:` block: True; brief fields not named: none" in interview
+    assert "still says no interview record is persisted: False" in interview
+    carried = observed("mcp", "Does every mission template carry a brief?")
+    assert "templates without a `brief` block: none" in carried
+    assert "the brief read back: none" in carried
+    assert "'research-report': 'research'" in carried
+    assert "'system-improvement': 'system'" in carried
+    sealed = observed("mcp", "Is the brief sealed with the mission and read back?")
+    assert "requested_by reader (caller reader)" in sealed
+    assert "without its brief: ok True, warning brief_missing: True, blockers: none" in sealed
     assert "`skill`" in observed("http", "What is in the catalog?")
     assert "4 prose answers and an unknown lane; differing: none" in observed(
         "http", "Does describe say the same thing over HTTP and MCP?"
@@ -234,3 +248,104 @@ def test_the_evaluation_scores_the_guide_the_listing_and_the_templates() -> None
         f"Consumer surface: {QUESTIONS + len(TEMPLATE_IDS)} of "
         f"{QUESTIONS + len(TEMPLATE_IDS)} checks pass (biotech at"
     )
+
+
+class _RunSurface:
+    """One completed run as the evaluation reads it: a canned answer per tool."""
+
+    def __init__(self, system: str, brief: dict[str, Any] | None) -> None:
+        request = {
+            "system": {"ref": "frame-body://sha256:s", "body": {"content": system}},
+            "messages": [],
+        }
+        self.calls: list[tuple[str, dict[str, Any]]] = []
+        self._answers: dict[str, dict[str, Any]] = {
+            "mission_run_outputs": {"obligations": [], "accepted": []},
+            "mission_run_inspect": {"cost": {}, **({"brief": brief} if brief else {})},
+            "mission_run_points": {"entries": []},
+            "mission_run_transcript": {
+                "entries": [{"kind": "model_request", "body_excerpt": json.dumps(request)}]
+            },
+        }
+
+    def call(self, name: str, arguments: dict[str, Any]) -> tuple[str, dict[str, Any]]:
+        self.calls.append((name, arguments))
+        return "", self._answers[name]
+
+    def tool(self, name: str, arguments: dict[str, Any]) -> dict[str, Any]:
+        return self.call(name, arguments)[1]
+
+    def get(self, path: str, params: dict[str, Any] | None = None) -> tuple[int, Any]:
+        return 404, {}
+
+
+def test_a_run_is_scored_on_its_brief_and_on_the_card_its_first_request_carried() -> None:
+    evaluation = _evaluation()
+    brief = {
+        "purpose": "system",
+        "request": "Show me that a first mission runs end to end here.",
+        "answers": [{"question": "Who reviews it?", "answer": "I do."}],
+        "requested_by": "reader",
+    }
+    card = (
+        "# Purpose card\n\nMission Control wrote this card.\n\n## Why\n- Purpose: system (x)\n"
+        f"```data source=brief.request trust=admitted_input\n{brief['request']}\n```\n\n"
+        "## Your part\n- Node `write`\n- Outputs you owe:\n  - `write.result` (text, required)\n"
+        '    - Accepted when (a reviewer accepts it): "Three sentences."\n\n'
+        "## What you were given\n- Budget: none declared.\n\n"
+        "## Rules\n" + "\n".join(evaluation.PURPOSE_CARD_RULES) + "\n\nThe host line."
+    )
+    brief_question = "What was the run asked to do, and by whom?"
+    card_question = "Was the node told why the mission exists and what its part is?"
+
+    def scored(system: str, sealed: dict[str, Any] | None) -> tuple[Any, dict[str, Any]]:
+        surface = _RunSurface(system, sealed)
+        scorecard = evaluation.Scorecard(url="http://testserver", application="biotech")
+        evaluation._evaluate_run(surface, scorecard, "run-1", {})
+        return surface, {check.question: check for check in scorecard.checks}
+
+    surface, told = scored(card, brief)
+    _surface, untold = scored("The host line.", None)
+
+    # Four checks read the run's outputs, cost, transcript and state; two read its brief.
+    assert len(told) == 6
+    assert told[brief_question].passed and told[card_question].passed
+    assert "purpose system" in told[brief_question].observed
+    assert "requested_by reader" in told[brief_question].observed
+    observed = told[card_question].observed
+    assert "opens with the purpose card: True; quotes the brief's request: True" in observed
+    assert "rules present: 4 of 4; names the purpose system: True" in observed
+    # How many of its outputs' acceptance criteria the node was told is recorded, not scored.
+    assert observed.endswith("acceptance lines under its outputs: 1")
+    assert untold[card_question].observed.endswith("acceptance lines under its outputs: 0")
+    # The card is read through the transcript tool: the first model request, bodies inlined.
+    assert (
+        "mission_run_transcript",
+        {"run_id": "run-1", "kinds": ["model_request"], "limit": 1, "full": True},
+    ) in surface.calls
+    # A run without a brief, whose prompt carries no card, fails both and says why.
+    assert not untold[brief_question].passed and not untold[card_question].passed
+    assert "absent (the run's mission records no brief)" in untold[brief_question].observed
+    assert "opens with the purpose card: False" in untold[card_question].observed
+    # A system prompt in content parts reads the same as one string.
+    parts = {
+        "entries": [
+            {
+                "body_excerpt": json.dumps(
+                    {
+                        "system": {
+                            "body": {
+                                "content": [
+                                    {"type": "text", "text": "# Purpose card\n"},
+                                    {"type": "text", "text": "rest"},
+                                ]
+                            }
+                        }
+                    }
+                )
+            }
+        ]
+    }
+    assert evaluation._system_prompt(parts) == "# Purpose card\nrest"
+    assert evaluation._system_prompt({"entries": []}) == ""
+    assert evaluation._system_prompt({"entries": [{"body_excerpt": "not json"}]}) == ""

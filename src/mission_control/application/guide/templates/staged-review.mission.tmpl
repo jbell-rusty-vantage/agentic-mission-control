@@ -14,6 +14,24 @@ slots:
   title:
     description: A one-line title.
     example: A reviewed one-page brief
+  purpose:
+    description: "What kind of work this is: `research`, `content`, `system` or `other`."
+    example: content
+  request:
+    description: The user's request in their own words, verbatim, one line.
+    example: I need a one-page brief that explains how a Stage Graph releases its stages.
+  question:
+    description: One question you asked in the interview. Add one `answers` entry for each further question.
+    example: Who will read it?
+  answer:
+    description: The user's answer to that question, verbatim, one line.
+    example: Engineers who have not used a Stage Graph yet.
+  done_means:
+    description: What the user said finished looks like, verbatim, one line.
+    example: One accurate page I would hand to a new engineer.
+  out_of_scope:
+    description: What the user ruled out, verbatim, one line. Delete the `out_of_scope` entry when they ruled out nothing.
+    example: No comparison with other workflow systems.
   goal:
     description: What to produce, for whom and in which form, one line.
     example: Write a one-page brief on how a Stage Graph releases its stages.
@@ -38,6 +56,7 @@ slots:
 notes:
   - The `review` stage reads the accepted draft through its `from` binding. A start is refused with `dependent_inputs_unavailable` where the installation composes no trusted settlement to accept the draft.
   - Each stage may only narrow the mission budget; the two stage budgets here sum under it.
+  - The `brief` block is the interview's result in the user's words. Every node is told the purpose, the request, what done means, what it was given and each criterion whose `evidence` names an output it owes, so an `instruction` holds the task alone.
 ---
 manifest: mission/v2
 mission:
@@ -47,6 +66,20 @@ mission:
     {{title}}
   description: >-
     {{goal}}
+  brief:
+    purpose: {{purpose}}
+    request: >-
+      {{request}}
+    answers:
+      - question: >-
+          {{question}}
+        answer: >-
+          {{answer}}
+    done_means: >-
+      {{done_means}}
+    out_of_scope:
+      - >-
+        {{out_of_scope}}
   goals:
     - key: deliverable
       description: >-
@@ -99,8 +132,7 @@ mission:
             tool_calls: 15
         instruction: >-
           {{goal}}
-          Submit the draft with the submit_output tool: one call, obligation "produce.draft",
-          one inline text item. Stop after its receipt.
+          Submit the draft as "produce.draft" with the submit_output tool, as one inline text item.
         outputs:
           - name: draft
             form: text
@@ -121,8 +153,8 @@ mission:
         instruction: >-
           Review the draft you received as the input named draft against this goal: {{goal}}
           List each defect with the passage it concerns, or state that you found none.
-          Submit the findings with the submit_output tool: one call, obligation
-          "review.review_notes", one inline text item. Stop after its receipt.
+          Submit the findings as "review.review_notes" with the submit_output tool, as one
+          inline text item.
         outputs:
           - name: review_notes
             form: text

@@ -17,6 +17,61 @@ the experiment-loop iterations ([1](../../sprint-oc/experiments/ITER-1-2026-11-0
 [3](../../sprint-oc/experiments/ITER-3-2026-11-06.md)), [ADR-0070](../../../../adr/0070-operator-instructions-and-the-deep-agents-gentle-steer.md)
 (`OperatorSteerMiddleware`, release 1.15.0) and commit `05ff2c6d` (the loop 8 watch fixture, tests and scripts only).
 
+## 2026-11-16 — the Mission Brief and the Purpose Card
+
+**General:** a `mission/v2` block carries `brief` (`domain/authoring/brief.py`: purpose, the user's request, the
+interview's answers, done-means, out-of-scope, who asked; bounded, credential-shaped text refused). It is sealed in
+`MissionDefinition@1` (additive: absent, dumps and digests are unchanged), read back in the compile report
+(`definitions[].brief`) and in `mc.inspection.v1` (`brief`, `application/authoring/run_brief.py`); a v2 mission without
+one compiles with the warning `brief_missing`. The launch author builds one Purpose Card per node role
+(`application/authoring/purpose_card.py`, pure; `capability_summaries.py` reads each bound capability's catalog line)
+and freezes it in the template as the one host-assembled instruction segment (`host:purpose-card`,
+`domain/execution/contracts.py::purpose_card_segment`). Run authority admits that segment by source, class and header,
+once (`operation_execution.py::_verify_bound_authority`); every other instruction segment must still be an accepted
+configuration source. Every lane reads its instruction channel through `instruction_segments` (card first): the file
+lanes' operating contract (`placement.py::operating_contract_text`, covered by each sealed projection digest) and the
+hosted agent API sessions. `mission_run_transcript` gains `full` on MCP (the HTTP route's `full=true`). No migration,
+no schema version bump.
+
+**Deep Agents:** `adapter.py::_prompts` puts the card at the top of the system prompt, then any published instruction
+segment, then the fixed host-authority line; admitted inputs stay in the user prompt. Before this a manifest run's
+system prompt was the host line alone.
+
+**Acceptance on the card:** under each output a node owes (or judges), one "Accepted when" line for each criterion
+whose `evidence` names that output, three at most and the rest counted: how it is decided in plain words (a reviewer
+accepts it, an approver approves it, it validates against a schema, an assessment scores it at least a threshold, an
+`all` or `any` of those), then the criterion quoted as author text. The 700-token cap holds through four levels of
+shorter quotes and lists (`QUOTE_LEVELS`); the last fits with every key at its 128-character maximum.
+
+**Proof:** `tests/unit/authoring/test_mission_brief.py`, `test_purpose_card.py` (exact text: a Stage Graph agent
+node, both Goal Loop roles, a node with more capabilities than the card holds, every acceptance kind, a brief and
+every key at their maximum sizes held under the 700-token cap), `test_purpose_card_launch.py` (every lane's template,
+the Deep Agents system prompt, a fork), `tests/unit/orchestration/test_purpose_card_authority.py`,
+`tests/unit/run_control/test_inspection_brief.py`, `tests/unit/frames/test_transcript_mcp_full.py`. Implemented and
+unit-tested.
+
+**Integrated twice, live (2026-11-16, local AI Engineer installation, API and worker restarted on this code), each a
+filled `smallest` template driven through the operator MCP mount alone (`producer.fallback`, `claude-haiku-5-5`, two
+model calls):**
+
+- Run `9ffc4da6-878d-56fb-981c-fb38c11d0d55` (estimated USD 0.001895), before acceptance was on the card. The card
+  opened the system prompt of both model requests, equal character for character to the pure function's text (1,552
+  characters, 388 estimated tokens). The agent's three sentences did not name the rules, which the gate's criterion
+  asks for: that criterion never reached the node. Not approved; cancelled afterwards as a superseded proof.
+- Run `d2ed6984-5537-5c65-87c5-1c2bbee4e13b` (estimated USD 0.001803), the same brief with acceptance on the card
+  (1,681 characters, 421 estimated tokens, again equal to the pure function's text). The agent's three sentences name
+  the request, the node's part and the rules; the review was approved as its named reviewer and the run completed.
+  `mission_run_inspect` returns the brief; the consumer-surface evaluation with this run is 40 of 40.
+
+**Not run:** a card on any other lane, a Goal Loop run with a card, the integration and acceptance suites. Not
+qualified: two local runs on one lane, one model. Run `f3f00c28` (in doubt since 2026-10-29) was left as it was across
+the worker restarts.
+
+**Also:** `mission_manifest_submit` publishes `request_id` as a UUID in `tools/list` and refuses anything else with
+`request_id must be a UUID (...)`; a request model that refuses a UUID field (a Command's or a fork's `request_id`)
+names the field in the MCP `INVALID_ARGUMENT` envelope; `missionctl` says `--request-id must be a UUID`. HTTP already
+published the format and named the field in its 422.
+
 ## 2026-10-31 — provenance sprint slices (OVE-204)
 
 Appended 2026-11-01 (OVE-206) from the sprint's [final report](../../../archive/provider-consolidation-2026-10/sprint-oc/provenance-2026-10-31/REPORT.md)

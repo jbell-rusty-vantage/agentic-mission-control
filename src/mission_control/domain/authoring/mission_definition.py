@@ -16,6 +16,7 @@ from typing import Any, Final, Literal
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from mission_control.domain.agentic_components.layering import MaterializationPolicy
+from mission_control.domain.authoring.brief import MissionBrief
 from mission_control.domain.authoring.canonical import stable_json_digest
 from mission_control.domain.authoring.manifest import (
     DEFAULT_SIDE_EFFECTS,
@@ -456,6 +457,12 @@ class MissionDefinition(DefinitionContract):
     data_class: DataClass | None = Field(
         default=None, exclude_if=_absent, json_schema_extra=_ADDITIVE
     )
+    # The `mission/v2` block's brief: the Interview's result, sealed with this revision and
+    # quoted on every node's Purpose Card. Additive: absent (no brief, and every `mission/v1`
+    # definition) it is left out of dumps and digests.
+    brief: MissionBrief | None = Field(
+        default=None, exclude_if=_absent, json_schema_extra=_ADDITIVE
+    )
 
     @property
     def is_resolved(self) -> bool:
@@ -857,6 +864,7 @@ def manifest_to_definition(
         ),
         completion_contract=CompletionContract(goals=tuple(completions)),
         data_class=getattr(block, "data_class", None),
+        brief=getattr(block, "brief", None),
     )
 
 

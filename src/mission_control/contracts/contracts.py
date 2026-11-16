@@ -12,6 +12,7 @@ from uuid import UUID
 
 from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, model_validator
 
+from mission_control.domain.authoring.brief import MissionBrief
 from mission_control.domain.policies.contracts import (
     BoundaryCommandStatus,
     CommandResult,
@@ -410,6 +411,10 @@ class MissionInspection(Contract):
     # The run's model calls priced at the Model Catalog's list prices (an estimate; the
     # budget's currency dimensions are not charged with it), when its source is composed.
     cost: RunCostView | None = Field(default=None, exclude_if=_absent)
+    # The Mission Brief the run's revision seals (the Interview's result: purpose, the
+    # request, the answers, what done means, who asked), when its source is composed and the
+    # mission records one.
+    brief: MissionBrief | None = Field(default=None, exclude_if=_absent)
 
 
 class MissionControlRejected(ValueError):

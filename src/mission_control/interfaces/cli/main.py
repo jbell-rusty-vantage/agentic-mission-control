@@ -460,6 +460,24 @@ def _json(response: httpx.Response) -> dict[str, Any]:
     return payload if isinstance(payload, dict) else {"result": payload}
 
 
+REQUEST_ID_HELP = "a UUID you choose (the idempotency key); one is generated when omitted"
+
+
+def request_uuid(value: str | None) -> str:
+    """`--request-id` as the service takes it: a UUID, or a new one when the flag is absent.
+    A value that is not a UUID is refused here, in words that say so."""
+
+    if not value:
+        return str(uuid4())
+    try:
+        return str(UUID(value))
+    except ValueError:
+        raise ValueError(
+            "--request-id must be a UUID (for example 3f1c2a9e-5b7d-4e8a-9c0f-6d2b1a4e7c85); "
+            "leave it out and one is generated"
+        ) from None
+
+
 def subscription_body(args: argparse.Namespace) -> dict[str, Any]:
     run_id, mission_id = getattr(args, "run", None), getattr(args, "mission", None)
     if (run_id is None) == (mission_id is None):
@@ -714,7 +732,7 @@ def cancel_command_body(client: MissionClient, args: argparse.Namespace) -> dict
     request_id = getattr(args, "request_id", None)
     return {
         "schema_version": "mc.command.v1",
-        "request_id": str(UUID(request_id) if request_id else uuid4()),
+        "request_id": request_uuid(request_id),
         "expected_version": current["version"],
         "expected_generation": current["execution_generation"],
         "target": {"kind": "run", "id": args.run_id},
@@ -1380,7 +1398,7 @@ def build_parser() -> argparse.ArgumentParser:
     cancel.add_argument("run_id")
     cancel.add_argument("--urgency", choices=("normal", "immediate"), default="normal")
     cancel.add_argument("--reason", default="cancelled by missionctl")
-    cancel.add_argument("--request-id")
+    cancel.add_argument("--request-id", help=REQUEST_ID_HELP)
     mission = groups.add_parser("mission", parents=[common])
     mission_commands = mission.add_subparsers(dest="action", required=True)
     schema = mission_commands.add_parser("schema", parents=[common])
@@ -1399,7 +1417,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     submit = mission_commands.add_parser("submit", parents=[common])
     submit.add_argument("file")
-    submit.add_argument("--request-id", dest="request_id_arg")
+    submit.add_argument("--request-id", dest="request_id_arg", help=REQUEST_ID_HELP)
     mission_start = mission_commands.add_parser("start", parents=[common])
     mission_start.add_argument("run_id")
     mission_start.add_argument(
@@ -1559,7 +1577,7 @@ def main(argv: list[str] | None = None) -> int:
         if args.group == "mission" and args.action == "submit":
             body = {
                 "manifest_yaml": Path(args.file).read_text(encoding="utf-8"),
-                "request_id": str(UUID(args.request_id_arg) if args.request_id_arg else uuid4()),
+                "request_id": request_uuid(args.request_id_arg),
             }
         if args.group == "mission" and args.action == "start":
             body = {"run_id": args.run_id, "family_input": body}

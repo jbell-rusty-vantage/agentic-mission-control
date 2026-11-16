@@ -12,7 +12,9 @@ Control already holds, never from a provider call:
 - `chain` and `subscriptions` from the chain and subscription tables;
 - `stop_fence`: the immediate cancel's four-timestamp report (FT-F3);
 - `cost`: the run's recorded model calls priced at the Model Catalog's list prices
-  (`mc.run_cost.v1`, an estimate; the budget account is not charged with it).
+  (`mc.run_cost.v1`, an estimate; the budget account is not charged with it);
+- `brief`: the Mission Brief the run's revision seals (the Interview's result), read from
+  its committed definition.
 
 Each section is present only where its source is composed; an absent section is left out of
 the body, so existing clients keep parsing the same document.
@@ -39,6 +41,7 @@ from mission_control.contracts.contracts import (
     SubscriptionsView,
     UnitFailureView,
 )
+from mission_control.domain.authoring.brief import MissionBrief
 from mission_control.domain.execution.lanes import LaneDescribe
 from mission_control.domain.frames.usage import UsageDisposition, UsageReport
 from mission_control.domain.policies.contracts import (
@@ -96,6 +99,13 @@ class BudgetViewReader(Protocol):
     async def budget(self, request_scope: str, run_id: str) -> BudgetView | None: ...
 
 
+class RunBriefReader(Protocol):
+    """The Mission Brief the run's revision seals (`application/authoring/run_brief.py`);
+    `None` for a run that was not submitted from a manifest or whose mission records none."""
+
+    async def run_brief(self, request_scope: str, run_id: str) -> MissionBrief | None: ...
+
+
 @dataclass(frozen=True)
 class InspectionSources:
     """What the composition makes available to inspection (each optional)."""
@@ -108,6 +118,8 @@ class InspectionSources:
     budget: BudgetViewReader | None = None
     # The run's model calls priced at list prices (`application/frames/cost.py`).
     cost: RunCostReader | None = None
+    # The Interview's result, read back from the run's committed definition.
+    brief: RunBriefReader | None = None
 
 
 def usage_disposition(usage: UsageReport | None) -> str | None:
@@ -203,6 +215,8 @@ async def enrich_inspection(
         update["budget"] = await sources.budget.budget(request_scope, run_id)
     if sources.cost is not None:
         update["cost"] = await sources.cost.run_cost(request_scope, run_id)
+    if sources.brief is not None:
+        update["brief"] = await sources.brief.run_brief(request_scope, run_id)
     if sources.transcripts is not None:
         summary = await sources.transcripts.inspection_summary(run_id, actor=actor)
         sessions = tuple(
@@ -260,6 +274,7 @@ def _declared_describe(lane_profile: str) -> LaneDescribe | None:
 __all__ = [
     "InspectionSectionReader",
     "InspectionSources",
+    "RunBriefReader",
     "delivery_views",
     "enrich_inspection",
     "mailbox_views",
