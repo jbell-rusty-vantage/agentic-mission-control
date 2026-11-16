@@ -40,9 +40,13 @@ repos:
     # Keep in step with the ruff version in uv.lock.
     rev: v0.15.22
     hooks:
+      # Bundle sources and captured skill fixtures are verbatim bytes pinned by digest: a
+      # formatter or an autofix there breaks the seed that pins them.
       - id: ruff-check
         args: [--fix]
+        exclude: ^(tests/fixtures/skills/|packages/mission-control-db-contract/bundle-sources/)
       - id: ruff-format
+        exclude: ^(tests/fixtures/skills/|packages/mission-control-db-contract/bundle-sources/)
 
   - repo: https://github.com/astral-sh/uv-pre-commit
     rev: 0.12.23

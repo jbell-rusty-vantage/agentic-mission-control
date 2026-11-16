@@ -13,7 +13,9 @@ def main() -> int:
         return 2
     root = Path(__file__).resolve().parents[1]
     schema = json.loads(
-        (root / "schemas" / "workflow-launch-proposal.schema.json").read_text(encoding="utf-8")
+        (root / "schemas" / "workflow-launch-proposal.schema.json").read_text(
+            encoding="utf-8"
+        )
     )
     instance = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
     errors = sorted(
