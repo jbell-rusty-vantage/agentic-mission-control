@@ -1,6 +1,8 @@
 # Trusted composition and startup
 
-api.py is the configured FastAPI factory; worker.py selects the app-bound Temporal
+cli.py is the `mission-control` console script, one subcommand per process role (`api`,
+`worker`, `preflight`); it imports a role only when that role starts. api.py is the configured
+FastAPI factory; worker.py selects the app-bound Temporal
 worker; preflight.py performs read-only readiness; common_installation.py verifies
 the installed common release; composition.py wires actual repositories and
 application services. technical_api.py retains optional lower-level

@@ -17,6 +17,10 @@ UV        ?= uv
 RUN       ?= $(UV) run --no-sync
 COMPOSE   ?= docker compose
 COMPOSE_TEMPORAL_ONLY ?= docker compose -f docker-compose.temporal.yml
+COMPOSE_APPLICATION   ?= docker compose -f deployments/docker/compose.yml
+# The one console entrypoint per process role (`mission-control api | worker | preflight`), in
+# its module form so it runs before the environment is re-synced after a pull.
+MISSION_CONTROL ?= $(RUN) python -m mission_control.bootstrap.cli
 
 # --- Application processes --------------------------------------------------------------
 HOST        ?= 127.0.0.1
@@ -44,11 +48,19 @@ OUT_DIR        ?= .scratch/mission-db
 PYTEST_ARGS ?=
 PYTEST      := $(RUN) pytest $(PYTEST_ARGS)
 
-# W1 D3: a SelectorEventLoop on Windows (psycopg async), uvicorn's auto loop elsewhere.
-UVICORN_FLAGS := --factory --loop mission_control.bootstrap.api:api_loop_factory --host $(HOST) --port $(PORT)
+# `mission-control api` serves the uvicorn factory on the API loop factory itself (W1 D3: a
+# SelectorEventLoop on Windows for psycopg async, uvicorn's auto loop elsewhere).
+API_FLAGS := --host $(HOST) --port $(PORT)
 ifeq ($(RELOAD),1)
-UVICORN_FLAGS += --reload --reload-dir src
+API_FLAGS += --reload
 endif
+
+# --- Local production-shaped stack (one application, local infrastructure only) -----------
+# APP defaults to biotech for the mission-db targets; the local stack is ai-engineer unless APP
+# is given on the command line or in the environment.
+LOCAL_APP ?= $(if $(filter command% environment%,$(origin APP)),$(APP),ai-engineer)
+LOCAL_DIR ?= .scratch/local-stack/$(LOCAL_APP)
+WORKER    ?= auto
 
 .PHONY: help \
 	install install-all lock lock-check lock-upgrade outdated tree hooks doctor env-check \
@@ -56,6 +68,7 @@ endif
 	db-up redis-up temporal-up temporal-search-attributes temporal-only-up temporal-only-down temporal-ui temporal \
 	psql psql-temporal redis-cli \
 	preflight server worker agent-server mcp-server health openapi socketio-smoke missionctl \
+	local-infra local-install local-up local-status local-eval local-down local-container-env image \
 	mission-db db-inspect db-plan db-verify db-runtime-plan db-seed-plan db-snapshot db-apply \
 	fmt fmt-check lint lint-fix typecheck typecheck-fast typecheck-watch typecheck-daemon \
 	deps-check audit links precommit arch skills-manifest skills-check manifest-schemas \
@@ -135,6 +148,7 @@ infra-pull: ## Pull the pinned images
 infra-config: ## Validate the compose files
 	$(COMPOSE) config --quiet
 	$(COMPOSE_TEMPORAL_ONLY) config --quiet
+	$(COMPOSE_APPLICATION) config --quiet
 	@echo "compose configuration is valid"
 
 wait: ## Block until compose services are healthy and one-shot jobs have exited 0
@@ -177,14 +191,14 @@ redis-cli: ## Open redis-cli on the compose Redis
 # ========================================================================================
 ##@ Application processes
 
-preflight: ## Read-only validation of the configured Mission Control installation
-	$(RUN) python -m mission_control.bootstrap.preflight
+preflight: ## Read-only validation of the configured Mission Control installation (mission-control preflight; ARGS="..." passes through)
+	$(MISSION_CONTROL) preflight $(ARGS)
 
-server: ## Start the scoped Mission Control API (uvicorn; RELOAD=1 for autoreload)
-	$(RUN) uvicorn mission_control.bootstrap.api:create_app $(UVICORN_FLAGS)
+server: ## Start the scoped Mission Control API (mission-control api; RELOAD=1 for autoreload)
+	$(MISSION_CONTROL) api $(API_FLAGS)
 
-worker: ## Start the installation-bound Temporal worker
-	$(RUN) python -m mission_control.bootstrap.worker
+worker: ## Start the installation-bound Temporal worker (mission-control worker)
+	$(MISSION_CONTROL) worker
 
 agent-server: ## Start the bounded Agent Server (langgraph dev)
 	$(RUN) langgraph dev --config agent_server/langgraph.json --host $(HOST) --port $(AGENT_PORT) --no-browser
@@ -206,6 +220,33 @@ socketio-smoke: ## Run the Socket.IO smoke client against the API
 
 missionctl: ## Run the authenticated CLI, e.g. make missionctl ARGS="run inspect RUN_ID"
 	$(RUN) missionctl $(ARGS)
+
+# ========================================================================================
+##@ Local production-shaped stack (APP=ai-engineer|biotech; local PostgreSQL 17 and Temporal only)
+
+local-infra: ## Start only PostgreSQL 17 + pgvector for the local stack (127.0.0.1:55434) and wait until healthy
+	$(COMPOSE) up -d --wait application-postgres-17
+
+local-install: ## Prepare the local installation of APP under .scratch/local-stack/<app> (rerun verifies and reuses; RECREATE=1 drops and rebuilds its database)
+	$(RUN) python scripts/dev/local_installation.py install --app $(LOCAL_APP) --out $(LOCAL_DIR) $(if $(RECREATE),--recreate,) $(ARGS)
+
+local-up: ## Start the API and one worker of the local installation in the background and wait for /health/ready (PORT=8000; WORKER=auto|on|off)
+	$(RUN) python scripts/dev/local_stack.py up --app $(LOCAL_APP) --dir $(LOCAL_DIR) --host $(HOST) --port $(PORT) --worker $(WORKER)
+
+local-status: ## Show the local stack's recorded processes and the API's readiness
+	$(RUN) python scripts/dev/local_stack.py status --app $(LOCAL_APP) --dir $(LOCAL_DIR)
+
+local-eval: ## Run the consumer-surface evaluation against the running local stack (scorecard under <dir>/eval)
+	$(RUN) python scripts/dev/local_stack.py eval --app $(LOCAL_APP) --dir $(LOCAL_DIR)
+
+local-down: ## Stop only the processes local-up started (by pid file and creation time)
+	$(RUN) python scripts/dev/local_stack.py down --app $(LOCAL_APP) --dir $(LOCAL_DIR)
+
+local-container-env: ## Derive the env and deployment files deployments/docker/compose.yml reads from the local installation
+	$(RUN) python scripts/dev/local_installation.py container --app $(LOCAL_APP) --out $(LOCAL_DIR) $(ARGS)
+
+image: ## Build the application images (api and worker targets) from the uv lockfile
+	$(COMPOSE_APPLICATION) build
 
 # ========================================================================================
 ##@ Database component (mission-db; APP=biotech|ai-engineer, read-only unless stated)

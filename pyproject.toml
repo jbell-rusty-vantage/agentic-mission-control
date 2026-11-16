@@ -58,6 +58,8 @@ dependencies = [
 ]
 
 [project.scripts]
+# One console entrypoint per process role: `mission-control api | worker | preflight`.
+mission-control = "mission_control.bootstrap.cli:main"
 missionctl = "mission_control.interfaces.cli.main:main"
 
 [dependency-groups]

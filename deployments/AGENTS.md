@@ -8,6 +8,7 @@ Entrypoints:
 - cloud_runtime/
 - worker-aws/
 - cognition-profiles/
+- docker/
 - examples/
 - hosted-packs/
 Tests: deployments/cloud_runtime/test_plan.py

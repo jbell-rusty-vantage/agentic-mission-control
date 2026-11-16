@@ -72,12 +72,14 @@ optional groups you added by hand. The Makefile therefore uses `uv run --no-sync
 | Component | Make target | Host endpoint |
 | --- | --- | --- |
 | Application PostgreSQL 16 + pgvector | `make db-up`, `make psql` | `127.0.0.1:55432` (`belllabs/belllabs`) |
+| PostgreSQL 17 + pgvector (local stack; opt-in, TLS on) | `make local-infra` | `127.0.0.1:55434` (`belllabs/belllabs`) |
 | Redis 7.4 | `make redis-up`, `make redis-cli` | `127.0.0.1:16379` |
 | Temporal 1.31 server | `make temporal-up`, `make temporal ARGS="..."` | `127.0.0.1:7233` |
 | Temporal UI | `make temporal-ui` | `http://127.0.0.1:8080` |
 | Temporal-only stack | `make temporal-only-up` | same ports; never alongside the main stack |
-| Mission Control API | `make server`, `make health`, `make openapi` | `http://127.0.0.1:8000` (`/docs`) |
-| Temporal worker | `make worker` | — |
+| Mission Control API (`mission-control api`) | `make server`, `make health`, `make openapi` | `http://127.0.0.1:8000` (`/docs`) |
+| Temporal worker (`mission-control worker`) | `make worker` | — |
+| Local production-shaped stack (API + worker, background) | `make local-install`, `make local-up`, `make local-eval`, `make local-down` | `http://127.0.0.1:<PORT>` |
 | Agent Server (`langgraph dev`) | `make agent-server` | `http://127.0.0.1:2024` |
 | Coordinator MCP (Streamable HTTP) | `make mcp-server` | `http://127.0.0.1:8010/mcp` |
 
@@ -85,6 +87,65 @@ optional groups you added by hand. The Makefile therefore uses `uv run --no-sync
 and prints the per-terminal commands. `make up` chains infra, preflight and the API.
 `make infra-down` removes containers but keeps volumes; there is deliberately no target
 that deletes volumes.
+
+### Process entrypoint
+
+`mission-control` is the one console script for the process roles (`[project.scripts]`,
+`src/mission_control/bootstrap/cli.py`): `mission-control api [--host H] [--port P] [--reload]`
+serves the uvicorn factory `mission_control.bootstrap.api:create_app` on the
+`api_loop_factory` loop, `mission-control worker` runs the installation-bound worker and
+`mission-control preflight [...]` the read-only check with its own arguments. `make server`,
+`make worker` and `make preflight` call it in its module form
+(`python -m mission_control.bootstrap.cli`), which works before the environment is re-synced;
+the bare command exists after `make install`. The container images run the same commands.
+
+### Local production-shaped stack
+
+One application's API and worker, started from the real entrypoints against local
+infrastructure only (a loopback PostgreSQL 17 and the local Temporal server). Nothing reads the
+repository `.env`: the processes get operating-system essentials plus the installation's own
+env file, whose `MISSION_CONTROL_HOME` is the installation directory.
+
+```powershell
+make local-infra                  # only PostgreSQL 17 + pgvector, 127.0.0.1:55434
+make local-install                # APP=ai-engineer (default) or biotech; RECREATE=1 rebuilds
+make local-up PORT=8020           # background API + worker; waits for /health/ready and a poller
+make local-eval                   # consumer-surface scorecard -> <dir>/eval/scorecard.md
+make local-down                   # stops only what local-up started (pid + creation time)
+```
+
+`make local-install` (`scripts/dev/local_installation.py`) writes everything under the ignored
+`.scratch/local-stack/<app>/`: a database `mc_local_<app>` with the common component installed by
+`mission-db` (the release is pinned in the script: the newest with a release integration test),
+the runtime phase, the seed bundles, the restricted logins and the tenant; the lexical capability
+search projection; local bundle custody; a sealed binding, `deployment.json`, a generated
+operator key with its public JWKS and `operator-token.txt`; `mission-control.env`; and the
+Temporal namespace `mc-local-<app>` with the Search Attributes. A rerun verifies and reuses.
+It refuses an admin DSN that is not loopback (`MC_LOCAL_STACK_ADMIN_DSN` names another loopback
+cluster) and an output directory Git does not ignore. Three things to know:
+
+- **PostgreSQL 17 is required.** `mission-db` holds on the compose `application-postgres` (16),
+  so the stack uses the opt-in `application-postgres-17` service.
+- **A plain PostgreSQL has no Supabase Storage.** `seeds/common` carries two Storage bundles and
+  the application's cognition profiles depend on one, so the installer creates a clearly
+  labelled synthetic `storage` schema (the shape the bundle tests use) for the seeds to apply.
+  Local custody is the filesystem (`bundles/`).
+- **The worker needs bytes that are not in this repository:** the capability resource owner's
+  pinned modules (`workspace://.tools/...`, BellLabs `biotech/.tools`), the pinned skill bundle
+  of the checkout's `.runtime/capability-bundles`, and Node. The installer records whether
+  they are present (`installation.json`, `worker.ready`); `make local-up WORKER=auto` (default)
+  starts the worker only then, `WORKER=on` requires it and `WORKER=off` leaves it out.
+
+No provider credential is written (explicit blanks), so the stack answers discovery, compile and
+inspection; a mission that needs a model also needs a key added to the env file by hand and
+operator launch bindings (`MANIFEST_LAUNCH_BINDINGS_PATH`).
+
+Containers: `deployments/docker/Dockerfile` builds the `api` and `worker` targets from the uv
+lockfile (`make image`), and `deployments/docker/compose.yml` runs both from an env file and a
+mounted deployment directory. `make local-container-env` derives those two from a local
+installation (container paths, `sslmode=require` DSNs on the compose network, the Temporal
+address). CI (`.github/workflows/ci.yml`) runs `make ci` and, in a second job, brings this stack
+up on a PostgreSQL 17 service and a Temporal dev server and uploads the scorecard.
 
 ### Temporal SDK 1.34 (FT-G7, 2026-10-07)
 
@@ -142,7 +203,8 @@ Capability Pin does not parse or a tools/list digest drifted. `make lane-qualify
 `CURSOR_API_KEY` and a finite `MC_PAID_BUDGET_USD` (see
 [lane qualification](qualification/lanes/README.md)). Tests marked `common_db` need a disposable
 PostgreSQL 17 with pgvector through `MISSION_CONTROL_TEST_ADMIN_DSN` (the compose
-`application-postgres` is PostgreSQL 16 and cannot install release 1.1.0). The owner mission
+`application-postgres` is PostgreSQL 16 and cannot install release 1.1.0; the opt-in
+`application-postgres-17` of `make local-infra` can). The owner mission
 procedure is in the [owner fixture runbook](specs/archive/fast-track-2026-10/OWNER-FIXTURE-RUNBOOK.md).
 
 ## Helper scripts (`scripts/dev/`)
@@ -153,10 +215,13 @@ procedure is in the [owner fixture runbook](specs/archive/fast-track-2026-10/OWN
 | `wait_for_services.py` | waits for compose health; fails fast on a one-shot job error |
 | `temporal_search_attributes.py` | registers and lists the Search Attributes on the local Temporal namespace |
 | `env_check.py` | compares variable names in `.env` with `.env.example` (never values) |
+| `local_installation.py` | prepares a local production-shaped installation of one application (`make local-install`) |
+| `local_stack.py` | starts, evaluates and stops that installation's API and worker (`make local-up`, `local-eval`, `local-down`) |
 | `clean_caches.py` | removes tool caches and coverage output, never `.venv` or volumes |
 
-All but `temporal_search_attributes.py` (which uses the project environment) are stdlib-only so they run identically from PowerShell, Git Bash, WSL and the Cursor
-cloud image.
+`temporal_search_attributes.py`, `local_installation.py` and `local_stack.py` use the project
+environment; the others are stdlib-only so they run identically from PowerShell, Git Bash, WSL
+and the Cursor cloud image.
 
 ## Canonical workspace resource owner
 

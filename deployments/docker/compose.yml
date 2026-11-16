@@ -1,0 +1,72 @@
+# Mission Control application processes for ONE application: the API and one base worker,
+# from the images of the Dockerfile beside this file.
+#
+# No configuration lives here. Both services read one env file (every name the processes read,
+# with the restricted DSNs) and one mounted deployment directory (deployment.json and its public
+# JWKS, deployments/<app>/{application,models}.toml, the capability pins, bundle custody and
+# payloads). PostgreSQL and Temporal are whatever those two name:
+#
+#   * Local infrastructure (the defaults): the services join the network of the root
+#     docker-compose.yml project, where `application-postgres-17` resolves (and `temporal`, when
+#     that service runs; a Temporal dev server on the host is `host.docker.internal:7233`).
+#     `make local-container-env` derives the env file and the deployment file from a local
+#     installation: container paths, `sslmode=require` DSNs (Mission Control refuses a
+#     non-loopback PostgreSQL endpoint without TLS) and the Temporal address.
+#
+#       make local-infra && make local-install && make local-container-env
+#       docker compose -f deployments/docker/compose.yml up -d --build
+#       docker compose -f deployments/docker/compose.yml down
+#
+#   * A host of its own (the first production host): name the application project's
+#     `sslmode=verify-full` DSNs and TEMPORAL_TARGET=cloud in the env file, and set
+#     MC_ENV_FILE, MC_DEPLOYMENT_DIR, MC_NETWORK=mission-control and MC_NETWORK_EXTERNAL=false.
+#
+# The worker also needs the capability resource owner (the reviewed `.tools` modules its
+# capability pins name), mounted read-only; it refuses to start without those bytes.
+# A missing env file is not a compose error (`config` must validate in a clean checkout): the
+# processes then stop at startup naming MISSION_CONTROL_DEPLOYMENT_FILE.
+name: mission-control
+
+x-role: &role
+  env_file:
+    - path: ${MC_ENV_FILE:-../../.scratch/local-stack/ai-engineer/mission-control.container.env}
+      required: false
+  user: "${MC_UID:-10001}:${MC_GID:-10001}"
+  init: true
+  cap_drop: [ALL]
+  security_opt: ["no-new-privileges:true"]
+  networks: [infrastructure]
+  extra_hosts: ["host.docker.internal:host-gateway"]
+  restart: ${MC_RESTART:-unless-stopped}
+
+services:
+  api:
+    <<: *role
+    image: ${MC_API_IMAGE:-mission-control-api:local}
+    build:
+      context: ../..
+      dockerfile: deployments/docker/Dockerfile
+      target: api
+    command: ["mission-control", "api", "--host", "0.0.0.0", "--port", "8000"]
+    ports:
+      - "${MC_API_BIND:-127.0.0.1}:${MC_API_PORT:-8000}:8000"
+    volumes:
+      - ${MC_DEPLOYMENT_DIR:-../../.scratch/local-stack/ai-engineer}:/var/lib/mission-control
+
+  worker:
+    <<: *role
+    image: ${MC_WORKER_IMAGE:-mission-control-worker:local}
+    build:
+      context: ../..
+      dockerfile: deployments/docker/Dockerfile
+      target: worker
+    command: ["mission-control", "worker"]
+    stop_grace_period: 30s
+    volumes:
+      - ${MC_DEPLOYMENT_DIR:-../../.scratch/local-stack/ai-engineer}:/var/lib/mission-control
+      - ${MC_CAPABILITY_WORKSPACE_ROOT:-../../../../biotech}:/var/lib/mission-control-workspace:ro
+
+networks:
+  infrastructure:
+    name: ${MC_NETWORK:-biotech-research-ingestion-evaluation-system_default}
+    external: ${MC_NETWORK_EXTERNAL:-true}

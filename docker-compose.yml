@@ -24,6 +24,40 @@ services:
       - ./infra/application-postgres/init:/docker-entrypoint-initdb.d:ro
     restart: unless-stopped
 
+  application-postgres-17:
+    # PostgreSQL 17 + pgvector for a local production-shaped installation (`make local-install`).
+    # The common component's releases require PostgreSQL 17 (`mission-db` holds on 16), which is
+    # what the application projects run. Opt-in: `make local-infra` starts only this service and
+    # a plain `docker compose up -d` leaves it out. `application-postgres` (16) is unchanged.
+    # The installer creates its own database, extensions and restricted logins; no init script.
+    # TLS is on with the image's self-signed certificate: Mission Control refuses a non-loopback
+    # PostgreSQL endpoint without TLS, so application containers on this network connect with
+    # `sslmode=require`; host processes on 127.0.0.1 keep `sslmode=disable`.
+    image: pgvector/pgvector:pg17
+    profiles: ["local-stack"]
+    command:
+      - postgres
+      - -c
+      - ssl=on
+      - -c
+      - ssl_cert_file=/etc/ssl/certs/ssl-cert-snakeoil.pem
+      - -c
+      - ssl_key_file=/etc/ssl/private/ssl-cert-snakeoil.key
+    environment:
+      POSTGRES_DB: belllabs
+      POSTGRES_USER: belllabs
+      POSTGRES_PASSWORD: belllabs-local
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U belllabs -d belllabs"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    ports:
+      - "127.0.0.1:${MC_LOCAL_STACK_DB_PORT:-55434}:5432"
+    volumes:
+      - application-postgres-17-data:/var/lib/postgresql/data
+    restart: "no"
+
   redis:
     image: redis:7.4-alpine
     command: ["redis-server", "--appendonly", "yes", "--appendfsync", "everysec"]
@@ -139,5 +173,6 @@ services:
 
 volumes:
   application-postgres-data:
+  application-postgres-17-data:
   redis-data:
   temporal-postgres-data:

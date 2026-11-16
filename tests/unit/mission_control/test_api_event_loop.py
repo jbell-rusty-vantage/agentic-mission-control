@@ -1,8 +1,9 @@
 """W1 D3: the API process runs a selector loop on Windows, as the worker does.
 
 psycopg's async adapter (the LangGraph saver behind time travel) refuses uvicorn's default
-Windows ``ProactorEventLoop``; ``api_loop_factory`` is the uvicorn ``--loop`` the Makefile and
-operator guide pass, and a Proactor loop leaves time travel unset with a log naming the fix.
+Windows ``ProactorEventLoop``; ``api_loop_factory`` is the uvicorn ``--loop`` the
+``mission-control api`` entrypoint (``make server``) and the operator guide pass, and a Proactor
+loop leaves time travel unset with a log naming the fix.
 """
 
 from __future__ import annotations
@@ -17,7 +18,7 @@ import pytest
 from fastapi import FastAPI
 from uvicorn.config import Config
 
-from mission_control.bootstrap import api
+from mission_control.bootstrap import api, cli
 
 ROOT = Path(__file__).resolve().parents[3]
 LOOP = "mission_control.bootstrap.api:api_loop_factory"
@@ -43,10 +44,13 @@ def test_other_platforms_keep_uvicorns_auto_loop(monkeypatch: pytest.MonkeyPatch
         loop.close()
 
 
-def test_uvicorn_resolves_the_loop_flag_and_the_makefile_passes_it() -> None:
+def test_uvicorn_resolves_the_loop_flag_and_the_entrypoint_passes_it() -> None:
     config = Config(app="mission_control.bootstrap.api:create_app", factory=True, loop=LOOP)
     assert config.get_loop_factory() is api.api_loop_factory
-    assert f"--loop {LOOP}" in (ROOT / "Makefile").read_text(encoding="utf-8")
+    # `make server` runs `mission-control api`, which serves on exactly this loop factory.
+    assert cli.API_LOOP_FACTORY == LOOP
+    makefile = (ROOT / "Makefile").read_text(encoding="utf-8")
+    assert "\t$(MISSION_CONTROL) api $(API_FLAGS)\n" in makefile
 
 
 @pytest.mark.skipif(sys.platform != "win32", reason="the Proactor loop exists on Windows only")
