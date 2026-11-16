@@ -1845,7 +1845,7 @@ __all__ = [
 # ------------------------------------------------------------------------------------------
 
 READ_GRANTS = frozenset({"workflow_run.read", "mission.read"})
-CATALOG_GRANTS = frozenset({"catalog:read", "catalog.read"})
+CATALOG_GRANTS = frozenset({"catalog.read"})
 
 
 class ManifestPermissionDenied(PermissionError):

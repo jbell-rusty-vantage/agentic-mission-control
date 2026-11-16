@@ -741,7 +741,7 @@ The configured API includes the application catalog at
 `render`, `publish:prepare`/`publish:complete` and `GET pins/{pin}`. `missionctl catalog`
 provides corresponding `list`, `resolve`, `search`, `discover`, `inspect`, `components`, `pin`,
 `render` and `publish` commands. Requests use the same trusted installation/tenant identity;
-permissions remain explicit (`catalog:read`, `catalog:discover`, `catalog:inspect`).
+permissions remain explicit (`catalog.read`, `capability.discover`, `capability.inspect`).
 
 Default composition supports list/resolve over the admitted application catalog
 without additional provider credentials. Search requires a trusted

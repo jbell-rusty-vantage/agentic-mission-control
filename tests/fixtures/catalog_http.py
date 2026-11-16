@@ -49,7 +49,7 @@ class CatalogHarness:
 def catalog_harness(
     definitions: InMemoryDefinitionRepository,
     search: CapabilitySearchService | None,
-    permissions: frozenset[str] = frozenset({"catalog:read"}),
+    permissions: frozenset[str] = frozenset({"catalog.read"}),
 ) -> CatalogHarness:
     principal = MissionPrincipal(
         installation_id=INSTALLATION,

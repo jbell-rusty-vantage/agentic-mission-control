@@ -25,7 +25,7 @@ def test_cross_application_catalog_denied_before_service_lookup():
         tenant_id=uuid4(),
         issuer="https://issuer.invalid",
         audiences={"authenticated"},
-        actor=ActorContext(actor_id="reader", permissions={"catalog:read"}),
+        actor=ActorContext(actor_id="reader", permissions={"catalog.read"}),
     )
     assert TestClient(app).get("/v1/applications/two/catalog/definitions").status_code == 403
 
@@ -78,7 +78,7 @@ def test_plugin_search_preserves_trust_and_host_filters_and_does_not_install():
         tenant_id=uuid4(),
         issuer="https://issuer.invalid",
         audiences={"authenticated"},
-        actor=ActorContext(actor_id="reader", permissions={"catalog:read"}),
+        actor=ActorContext(actor_id="reader", permissions={"catalog.read"}),
     )
     registry = ApplicationRegistry(
         (

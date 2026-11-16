@@ -116,7 +116,7 @@ class ComponentsResponse(BaseModel):
 
 @router.get("/definitions")
 async def definitions(principal: Principal, service: Service) -> DefinitionsResponse:
-    permitted(principal, "catalog:read")
+    permitted(principal, "catalog.read")
     published = await service.definitions.list_published_definitions()
     return DefinitionsResponse(
         catalog_scope=service.catalog_scope,
@@ -129,7 +129,7 @@ async def definitions(principal: Principal, service: Service) -> DefinitionsResp
 async def resolve(
     ref: ExactDefinitionRef, principal: Principal, service: Service
 ) -> PublishedDefinition:
-    permitted(principal, "catalog:read")
+    permitted(principal, "catalog.read")
     try:
         return await service.definitions.get(ref)
     except DefinitionNotFound:
@@ -155,7 +155,7 @@ def _search_request(raw: dict[str, Any], service: CatalogService) -> CapabilityS
 async def search(
     body: Annotated[dict[str, Any], Body()], principal: Principal, service: Service
 ) -> CapabilitySearchResponse:
-    permitted(principal, "catalog:read")
+    permitted(principal, "catalog.read")
     request = _search_request(body, service)
     if service.search is None:
         raise HTTPException(503, detail={"code": "catalog_search_unavailable"})
@@ -169,7 +169,7 @@ async def search(
 async def discover(
     body: DiscoveryRequest, principal: Principal, service: Service
 ) -> ExternalDiscoveryBatch:
-    permitted(principal, "catalog:discover")
+    permitted(principal, "capability.discover")
     if service.discovery is None:
         raise HTTPException(503, detail={"code": "catalog_discovery_unavailable"})
     if body.source == "mcp":
@@ -183,7 +183,7 @@ async def discover(
 async def inspect(
     body: ExternalCandidateInspectionRequest, principal: Principal, service: Service
 ) -> ExternalCandidateInspectionReport:
-    permitted(principal, "catalog:inspect")
+    permitted(principal, "capability.inspect")
     if service.inspection is None:
         raise HTTPException(503, detail={"code": "catalog_inspection_unavailable"})
     return await service.inspection.inspect(
@@ -200,7 +200,7 @@ async def inspect(
 async def component_search(
     body: ComponentQuery, principal: Principal, service: Service
 ) -> ComponentsResponse:
-    permitted(principal, "catalog:read")
+    permitted(principal, "catalog.read")
     if service.components is None:
         raise HTTPException(503, detail={"code": "component_catalog_unavailable"})
     return ComponentsResponse(components=await service.components.search(body))
@@ -209,7 +209,7 @@ async def component_search(
 def _custody(
     principal: MissionPrincipal, service: CatalogService, body: PublishPrepareRequest
 ) -> BundleCustodyService:
-    permitted(principal, "catalog:publish")
+    permitted(principal, "catalog.publish")
     if service.custody is None:
         raise HTTPException(503, detail={"code": "catalog_publish_unavailable"})
     if body.manifest.application_id != principal.application_id:
@@ -250,7 +250,7 @@ async def publish_complete(
 @router.post("/pin")
 async def pin(body: PinRequest, principal: Principal, service: Service) -> PinResolution:
     """FT-A8: exactly one Capability Pin for a query, or AMBIGUOUS_CAPABILITY (422)."""
-    permitted(principal, "catalog:read")
+    permitted(principal, "catalog.read")
     if service.search is None:
         raise HTTPException(503, detail={"code": "catalog_search_unavailable"})
     request = body.search_request(service.catalog_scope)
@@ -291,7 +291,7 @@ def _search_unavailable(error: CapabilitySearchUnavailable) -> HTTPException:
 @router.get("/pins/{pin:path}")
 async def get_pin(pin: str, principal: Principal, service: Service) -> CapabilityInspection:
     """The published row a pin names: body, host support, secret ref names, plugin members."""
-    permitted(principal, "catalog:read")
+    permitted(principal, "catalog.read")
     try:
         return await inspect_pin(service.definitions, pin)
     except CapabilityPinError as error:
@@ -305,7 +305,7 @@ async def get_pin(pin: str, principal: Principal, service: Service) -> Capabilit
 @router.post("/render")
 async def render(body: RenderRequest, principal: Principal, service: Service) -> RenderPreview:
     """Preview what a pin projects into one lane profile's files (A4 Host Projection)."""
-    permitted(principal, "catalog:read")
+    permitted(principal, "catalog.read")
     try:
         if service.projectors is None:
             raise HTTPException(

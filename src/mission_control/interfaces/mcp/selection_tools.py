@@ -30,9 +30,8 @@ from mission_control.interfaces.mcp.mission_tools import (
 
 SEARCH_TOOL = "mission_search"
 CHECK_TOOL = "selection_check"
-# The coordinator principal's `catalog.read`, or the HTTP-shaped `catalog:read` an operator
-# token carries.
-READ_GRANTS = frozenset({"catalog.read", "catalog:read"})
+# One permission name on every transport (HTTP, CLI, MCP): `catalog.read`.
+READ_GRANTS = frozenset({"catalog.read"})
 
 
 class ScopedSelection:

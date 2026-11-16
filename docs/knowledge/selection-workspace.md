@@ -55,7 +55,7 @@ launch process's deployment facts), served digests, prerequisites and the KS app
 
 | Transport | Search | Check |
 | --- | --- | --- |
-| HTTP (`interfaces/http/selection.py`, `catalog:read`) | `POST /v1/applications/{app}/selection/search` | `POST .../selection/check` |
+| HTTP (`interfaces/http/selection.py`, `catalog.read`) | `POST /v1/applications/{app}/selection/search` | `POST .../selection/check` |
 | missionctl (`interfaces/cli/selection.py`) | `search QUERY [--facet F]... [--lane P] [--limit N]` | `workspace check DRAFT.json\|yaml` (exit 6 when refused) |
 | MCP (`interfaces/mcp/selection_tools.py`, `catalog.read`) | `mission_search` | `selection_check` |
 

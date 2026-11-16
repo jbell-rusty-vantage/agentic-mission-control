@@ -246,7 +246,7 @@ def _publishing_harness() -> tuple[Any, FakeStore, FakeRegistry]:
     harness = catalog_harness(
         InMemoryDefinitionRepository(),
         None,
-        permissions=frozenset({"catalog:read", "catalog:publish"}),
+        permissions=frozenset({"catalog.read", "catalog.publish"}),
     )
     harness.service = harness.service.__class__(
         **{

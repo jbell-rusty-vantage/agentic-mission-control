@@ -352,7 +352,7 @@ class DryRun:
                                     tenant_ids={tenant},
                                     permissions={
                                         "workflow_run.read",
-                                        "catalog:read",
+                                        "catalog.read",
                                         "mission.author",
                                         "mission.start",
                                     },

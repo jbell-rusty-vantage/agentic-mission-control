@@ -4,7 +4,7 @@
 the Model Catalog, sandbox profiles and Workflow Types into one ranked answer;
 `POST .../selection/check` answers whether a draft selection (lane, model profile, family,
 data class, capability pins, sandbox profile, Workflow Type) would be admitted, with typed
-refusals. Both need `catalog:read`, launch nothing and write nothing; the handler is
+refusals. Both need `catalog.read`, launch nothing and write nothing; the handler is
 `application/selection/workspace.py`.
 """
 
@@ -35,7 +35,7 @@ def selection_workspace(
     application_id: str, request: Request, principal: Principal
 ) -> SelectionWorkspace:
     authorize_application(application_id, request, principal)
-    if "catalog:read" not in principal.actor.permissions:
+    if "catalog.read" not in principal.actor.permissions:
         raise HTTPException(403, detail={"code": "catalog_permission_denied"})
     workspace = getattr(request.app.state, "mission_control_selection_workspaces", {}).get(
         (principal.installation_id, application_id, principal.tenant_id)

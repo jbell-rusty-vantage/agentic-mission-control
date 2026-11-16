@@ -132,7 +132,7 @@ async def test_configured_api_authenticates_and_reads_actual_restricted_database
                     subject="test-subject",
                     actor_id="operator",
                     tenant_ids={tenant},
-                    permissions={"workflow_run.read", "catalog:read"},
+                    permissions={"workflow_run.read", "catalog.read"},
                 ),
             ),
         )

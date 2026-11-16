@@ -602,7 +602,7 @@ def http_app(manifests: MissionManifestService, permissions: frozenset[str]) -> 
     return app
 
 
-READER = frozenset({"workflow_run.read", "catalog:read"})
+READER = frozenset({"workflow_run.read", "catalog.read"})
 
 
 @pytest.mark.asyncio
