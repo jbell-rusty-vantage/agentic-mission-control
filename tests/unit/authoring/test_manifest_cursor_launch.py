@@ -692,10 +692,11 @@ def test_the_deep_agents_verifiers_as_authored_are_refused(
     """Both missions author `verifier: {independent: true, environment: {lane: deep_agents}}`.
     The Cursor executor binds; the Deep Agents verifier inherits the mission environment and
     is refused, in order: no sandbox profile; then the inherited MCP servers and Skills, which
-    the example deployment binds no component for; then the inherited hook scripts, which no
-    Deep Agents launch binding can carry (nor plugins). With those dropped, the inherited
-    subagent profile launches: the Deep Agents lane adapter reads it from its catalog row and
-    seals it as an exact child (P1-S3)."""
+    the example deployment binds no component for (a selected plugin's Skill and MCP server
+    members among them: the lane runs a plugin as its members, each needing its own binding);
+    then the inherited hook scripts, which no Deep Agents launch binding can carry. With those
+    dropped, the inherited subagent profile launches: the Deep Agents lane adapter reads it
+    from its catalog row and seals it as an exact child (P1-S3)."""
 
     def refused(*changes: Any) -> ManifestLaunchBindingError:
         def change(document: dict[str, Any]) -> None:
@@ -711,13 +712,23 @@ def test_the_deep_agents_verifiers_as_authored_are_refused(
     assert "no sandbox profile is bound" in str(first)
     second = refused(_verifier_sandboxed)
     assert second.pointer.startswith(
-        ("/mission/environment/capabilities/", "/mission/environment/workspace/skills/")
+        (
+            "/mission/environment/capabilities/",
+            "/mission/environment/workspace/skills/",
+            "/mission/environment/plugins/0/members/",
+        )
     )
     assert "has no deployment component binding" in str(second)
     third = refused(_verifier_sandboxed, _bindable_kinds_dropped)
+    if third.pointer.startswith("/mission/environment/plugins/"):
+        # A mission that keeps a plugin: its Skill and MCP server members are bindable kinds
+        # too (IP-011), so an unbound member is refused, at the member, before any hook.
+        assert "/members/" in third.pointer
+        assert "has no deployment component binding" in str(third)
+        third = refused(_verifier_sandboxed, _bindable_kinds_dropped, _plugins_only_dropped)
     assert third.pointer == "/mission/environment/hooks/0"
     assert " hook " in str(third)
-    assert "plugins and context bundles have no Deep Agents launch binding" in str(third)
+    assert "hook scripts and context bundles have no Deep Agents launch binding" in str(third)
 
     # With nothing left that the lane refuses, the inherited subagent profile is read from
     # its catalog row and becomes an exact in-process child, with a signed receipt.
@@ -741,6 +752,15 @@ def test_the_deep_agents_verifiers_as_authored_are_refused(
     assert verifier.cognitive_state_schema.subagent_slices[0].slice_id == child.state_slice_id
 
 
+def _plugins_only_dropped(document: dict[str, Any]) -> None:
+    """FIXTURE: no plugins, the hook scripts kept (the action space loses the plugin aliases)."""
+
+    mission = document["mission"]
+    dropped = {item.get("as") for item in mission["environment"].pop("plugins", ()) or ()}
+    program = mission["program"]
+    program["action_space"] = [item for item in program["action_space"] if item not in dropped]
+
+
 def _hooks_only_dropped(document: dict[str, Any]) -> None:
     """FIXTURE: no hook scripts, the plugin kept (the action space loses the hook aliases)."""
 
@@ -750,9 +770,12 @@ def _hooks_only_dropped(document: dict[str, Any]) -> None:
     program["action_space"] = [item for item in program["action_space"] if item not in dropped]
 
 
-def test_a_deep_agents_node_plugin_is_refused_at_its_row(custody: BundleMaterializer) -> None:
-    """OC-R1: a node-level plugin has no Deep Agents launch binding; the refusal names the
-    plugin row and its pin, after the hook scripts, as before the resolution seam."""
+def test_a_deep_agents_node_plugins_unbound_member_is_refused_at_the_member(
+    custody: BundleMaterializer,
+) -> None:
+    """IP-011: a node-level plugin on Deep Agents is run as its members. The example
+    deployment binds no component for them, so the refusal names the first unbound member at
+    its own row (`plugins/<n>/members/<m>`) with its pin, like a direct selection."""
 
     def change(document: dict[str, Any]) -> None:
         for item in (
@@ -767,9 +790,12 @@ def test_a_deep_agents_node_plugin_is_refused_at_its_row(custody: BundleMaterial
         _launched_on_cursor(
             _mission(MISSION_THREE, change), _v1_local_bound(), custody, AI_ENGINEER
         )
-    assert raised.value.pointer == "/mission/environment/plugins/0"
-    assert str(raised.value).split(": ", 1)[1].startswith("plugin ")
-    assert "plugins and context bundles have no Deep Agents launch binding" in str(raised.value)
+    assert raised.value.pointer.startswith("/mission/environment/plugins/0/members/")
+    assert not str(raised.value).split(": ", 1)[1].startswith("plugin ")
+    assert "has no deployment component binding" in str(raised.value)
+    assert "hook scripts and context bundles have no Deep Agents launch binding" in str(
+        raised.value
+    )
 
 
 def _refused_in(compilation: Any, bound: ManifestLaunchBindings | None) -> Any:

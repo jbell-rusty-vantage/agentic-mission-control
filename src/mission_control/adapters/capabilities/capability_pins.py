@@ -8,6 +8,15 @@ binding whose digests differ (REQ-CP-DA-005), and `scripts/pin_research_capabili
 is the only writer: it reads the reviewed modules and bundles from the workspace and records
 what it observed. Credentials appear only as environment reference names.
 
+An MCP server is pinned in one of three forms (IP-008). `mcp_servers`: a stdio node module
+(`PinnedMCPServer`), its entry module hashed and run with the deployment's node.
+`remote_mcp_servers`: a remote Streamable HTTP endpoint (`PinnedRemoteMCPServer`); the pin
+states the bound tools and the credential's environment name, and the deployment supplies the
+URL (`MCP_SERVER_ENDPOINTS`). `executable_mcp_servers`: a stdio executable that is not a node
+module (`PinnedExecutableMCPServer`), an absolute path whose bytes are hashed before every
+launch, with fixed arguments. `pinned_mcp_component` derives the one exact component a worker
+may launch or connect from any of them.
+
 Locators are workspace-relative (`workspace://...`, under `MISSION_CONTROL_WORKSPACE_ROOT`), so the
 same pin file is valid on every host that lays the workspace out the same way.
 
@@ -29,11 +38,13 @@ The function returns the verified real path, so bundle readers that refuse links
 from __future__ import annotations
 
 import json
+from collections.abc import Mapping
 from hashlib import sha256
-from pathlib import Path, PurePosixPath
-from typing import Literal
+from pathlib import Path, PurePosixPath, PureWindowsPath
+from typing import Annotated, Literal
+from urllib.parse import urlsplit
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from mission_control.adapters.capabilities.capability_bundles import (
     BundleError,
@@ -56,6 +67,7 @@ from mission_control.domain.execution.contracts import (
 from mission_control.domain.execution.errors import DeepAgentRuntimeDrift
 
 DIGEST_PATTERN = r"^sha256:[0-9a-f]{64}$"
+ENV_NAME_PATTERN = r"^[A-Z][A-Z0-9_]*$"
 WORKSPACE_SCHEME = "workspace://"
 PIN_SCHEMA_VERSION: Literal["belllabs.capability-pins.v1"] = "belllabs.capability-pins.v1"
 MAX_SKILL_BUNDLE_FILES = 64
@@ -163,6 +175,180 @@ class PinnedMCPServer(BaseModel):
             schema_digest=self.schema_digest,
             attachment_target=attachment_target,
         )
+
+
+def _bound_tools(tools: tuple[PinnedMCPTool, ...]) -> tuple[DeepAgentMCPToolComponent, ...]:
+    return tuple(
+        DeepAgentMCPToolComponent(tool_name=tool.tool_name, schema_digest=tool.schema_digest)
+        for tool in tools
+    )
+
+
+def _credential_refs(names: tuple[str, ...]) -> tuple[SecretRef, ...]:
+    return tuple(SecretRef(provider="environment", key=name) for name in names)
+
+
+def remote_endpoint(server_id: str, endpoint: str | None) -> str:
+    """The deployment-supplied endpoint of a pinned remote server, or a refusal that names it.
+
+    A pin file is the same on every host, so it never states a URL: the deployment does
+    (`MCP_SERVER_ENDPOINTS`, keyed by the pin's `server_id`). The URL is `http` or `https`
+    with a host, and carries no credentials or fragment: the credential travels only as the
+    `Authorization` header the pin's `credential_env` names.
+    """
+
+    if not endpoint:
+        raise CapabilityPinError(
+            f"pinned remote MCP server {server_id} has no endpoint in this deployment "
+            f"(MCP_SERVER_ENDPOINTS[{server_id!r}])"
+        )
+    try:
+        parts = urlsplit(endpoint)
+        host = parts.hostname
+    except ValueError:
+        parts, host = None, None
+    if (
+        parts is None
+        or parts.scheme not in ("http", "https")
+        or not host
+        or parts.username is not None
+        or parts.password is not None
+        or parts.fragment
+    ):
+        raise CapabilityPinError(
+            f"the endpoint of pinned remote MCP server {server_id} must be an http(s) URL with a "
+            "host and without credentials or a fragment"
+        )
+    return endpoint
+
+
+class PinnedRemoteMCPServer(BaseModel):
+    """One remote Streamable HTTP MCP server a worker connects to (IP-008).
+
+    Nothing is launched: the worker opens a session to the endpoint the deployment supplies
+    for `server_id` and sends `credential_env`'s value as `Authorization: Bearer`. What the pin
+    fixes is what the agent may be handed: the bound tools with their input-schema digests,
+    and whether the server may list more (`tool_filter`, IP-009). `source` names the reviewed
+    server build the tool list was captured from, for disclosure only.
+    """
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    server_id: str = Field(min_length=1)
+    server_name: str = Field(pattern=r"^[a-z][a-z0-9_-]*$")
+    ref: PinnedExactRef
+    source: str = Field(min_length=1)
+    transport: Literal["streamable_http"] = "streamable_http"
+    schema_digest: str = Field(pattern=DIGEST_PATTERN)
+    credential_env: str | None = Field(default=None, pattern=ENV_NAME_PATTERN)
+    tool_filter: Literal["exact", "allowlist"] = "exact"
+    tools: tuple[PinnedMCPTool, ...] = Field(min_length=1)
+
+    def component(
+        self, *, endpoint: str | None, attachment_target: str = "agent.main"
+    ) -> DeepAgentMCPServerComponent:
+        """The exact Deep Agent MCP component at the deployment's endpoint."""
+
+        return DeepAgentMCPServerComponent(
+            ref=self.ref.as_ref(),
+            server_name=self.server_name,
+            transport=self.transport,
+            endpoint=remote_endpoint(self.server_id, endpoint),
+            credential_refs=_credential_refs(
+                (self.credential_env,) if self.credential_env is not None else ()
+            ),
+            tools=_bound_tools(self.tools),
+            schema_digest=self.schema_digest,
+            attachment_target=attachment_target,
+            tool_filter=self.tool_filter,
+        )
+
+
+class PinnedExecutableMCPServer(BaseModel):
+    """One stdio MCP server that is a native executable, not a node module (IP-008).
+
+    `command` is the executable's absolute path on the worker and `command_digest` the sha256
+    of its bytes, re-read before every launch. `arguments` are fixed and passed as a list:
+    no shell is involved. The subprocess receives the credentials `credential_envs` name and
+    the MCP client's default sanitized environment, nothing else.
+    """
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    server_id: str = Field(min_length=1)
+    server_name: str = Field(pattern=r"^[a-z][a-z0-9_-]*$")
+    ref: PinnedExactRef
+    package_name: str = Field(min_length=1)
+    package_version: str = Field(min_length=1)
+    command: str = Field(min_length=1)
+    command_digest: str = Field(pattern=DIGEST_PATTERN)
+    arguments: tuple[str, ...] = ()
+    schema_digest: str = Field(pattern=DIGEST_PATTERN)
+    credential_envs: tuple[Annotated[str, Field(pattern=ENV_NAME_PATTERN)], ...] = ()
+    tool_filter: Literal["exact", "allowlist"] = "exact"
+    tools: tuple[PinnedMCPTool, ...] = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def absolute_command_and_plain_arguments(self) -> PinnedExecutableMCPServer:
+        absolute = (
+            PurePosixPath(self.command).is_absolute() or PureWindowsPath(self.command).is_absolute()
+        )
+        if not absolute or "\x00" in self.command:
+            raise ValueError(
+                f"pinned MCP executable {self.server_id} needs an absolute command path"
+            )
+        if any("\x00" in argument for argument in self.arguments):
+            raise ValueError(f"pinned MCP executable {self.server_id} has a malformed argument")
+        if len(set(self.credential_envs)) != len(self.credential_envs):
+            raise ValueError(f"pinned MCP executable {self.server_id} names a credential twice")
+        return self
+
+    def verify_executable(self) -> Path:
+        """The executable, after its bytes were hashed and found equal to `command_digest`."""
+
+        executable = Path(self.command)
+        try:
+            if not executable.is_absolute():
+                raise OSError("the pinned command path is not absolute on this host")
+            observed = _file_sha256(executable)
+        except OSError as error:
+            raise CapabilityPinError(
+                f"pinned MCP executable {self.server_id} is unavailable at {self.command}"
+            ) from error
+        if observed != self.command_digest:
+            raise CapabilityPinError(
+                f"pinned MCP executable {self.server_id} at {self.command} has digest "
+                f"{observed}, not its pinned command_digest {self.command_digest}"
+            )
+        return executable
+
+    def component(self, *, attachment_target: str = "agent.main") -> DeepAgentMCPServerComponent:
+        """The exact Deep Agent MCP component: stdio through the verified executable."""
+
+        self.verify_executable()
+        return DeepAgentMCPServerComponent(
+            ref=self.ref.as_ref(),
+            server_name=self.server_name,
+            transport="stdio",
+            command=self.command,
+            arguments=self.arguments,
+            credential_refs=_credential_refs(self.credential_envs),
+            tools=_bound_tools(self.tools),
+            schema_digest=self.schema_digest,
+            attachment_target=attachment_target,
+            tool_filter=self.tool_filter,
+        )
+
+
+def _file_sha256(path: Path) -> str:
+    digest = sha256()
+    with path.open("rb") as stream:
+        for block in iter(lambda: stream.read(1 << 20), b""):
+            digest.update(block)
+    return "sha256:" + digest.hexdigest()
+
+
+type AnyPinnedMCPServer = PinnedMCPServer | PinnedRemoteMCPServer | PinnedExecutableMCPServer
 
 
 class PinnedSkill(BaseModel):
@@ -302,6 +488,10 @@ class CapabilityPins(BaseModel):
 
     schema_version: Literal["belllabs.capability-pins.v1"] = PIN_SCHEMA_VERSION
     mcp_servers: tuple[PinnedMCPServer, ...] = ()
+    # IP-008: the two other forms of MCP server a worker serves. Absent from a pin file
+    # written before them, which reads unchanged.
+    remote_mcp_servers: tuple[PinnedRemoteMCPServer, ...] = ()
+    executable_mcp_servers: tuple[PinnedExecutableMCPServer, ...] = ()
     skills: tuple[PinnedSkill, ...] = ()
     tools: tuple[PinnedTool, ...] = ()
     models: tuple[PinnedModel, ...] = ()
@@ -316,10 +506,44 @@ class CapabilityPins(BaseModel):
         except (OSError, json.JSONDecodeError) as error:
             raise CapabilityPinError(f"capability pins are unavailable: {path}") from error
         pins = cls.model_validate(payload)
-        identities = [item.server_id for item in pins.mcp_servers]
-        if len(identities) != len(set(identities)):
-            raise CapabilityPinError("capability pins name an MCP server twice")
+        servers = pins.all_mcp_servers
+        for what, values in (
+            ("an MCP server", [item.server_id for item in servers]),
+            ("an MCP server name", [item.server_name for item in servers]),
+            ("an MCP server definition digest", [item.ref.digest for item in servers]),
+        ):
+            if len(values) != len(set(values)):
+                raise CapabilityPinError(f"capability pins name {what} twice")
         return pins
+
+    @property
+    def all_mcp_servers(self) -> tuple[AnyPinnedMCPServer, ...]:
+        """Every pinned MCP server, whatever its form: node module, remote, executable."""
+
+        return (*self.mcp_servers, *self.remote_mcp_servers, *self.executable_mcp_servers)
+
+    def pinned_mcp_server(self, server_id: str) -> AnyPinnedMCPServer:
+        for server in self.all_mcp_servers:
+            if server.server_id == server_id:
+                return server
+        raise CapabilityPinError(f"MCP server {server_id} is not pinned")
+
+    def mcp_component(
+        self,
+        server_id: str,
+        *,
+        node_executable: Path | None,
+        endpoints: Mapping[str, str] | None = None,
+        attachment_target: str = "agent.main",
+    ) -> DeepAgentMCPServerComponent:
+        """The exact component of one pinned server, verified for its form."""
+
+        return pinned_mcp_component(
+            self.pinned_mcp_server(server_id),
+            node_executable=node_executable,
+            endpoints=endpoints,
+            attachment_target=attachment_target,
+        )
 
     @classmethod
     def empty(cls) -> CapabilityPins:
@@ -357,7 +581,7 @@ class CapabilityPins(BaseModel):
         raise CapabilityPinError(f"tool {tool_name} is not pinned")
 
     def mcp_schema_digests(self) -> dict[str, str]:
-        return {server.server_id: server.schema_digest for server in self.mcp_servers}
+        return {server.server_id: server.schema_digest for server in self.all_mcp_servers}
 
     def asset_manifest_digests(self) -> dict[str, str]:
         return {
@@ -390,9 +614,83 @@ class CapabilityPins(BaseModel):
                 }
                 for server in self.mcp_servers
             ],
+            **(
+                {
+                    "remote_mcp_servers": [
+                        {
+                            "server_id": server.server_id,
+                            "ref": server.ref.model_dump(mode="json"),
+                            "source": server.source,
+                            "transport": server.transport,
+                            "endpoint": f"deployment:MCP_SERVER_ENDPOINTS[{server.server_id}]",
+                            "schema_digest": server.schema_digest,
+                            "credential_ref": (
+                                f"environment:{server.credential_env}"
+                                if server.credential_env is not None
+                                else None
+                            ),
+                            "tool_filter": server.tool_filter,
+                            "tools": [tool.model_dump(mode="json") for tool in server.tools],
+                            "egress": "worker_remote_session",
+                        }
+                        for server in self.remote_mcp_servers
+                    ]
+                }
+                if self.remote_mcp_servers
+                else {}
+            ),
+            **(
+                {
+                    "executable_mcp_servers": [
+                        {
+                            "server_id": server.server_id,
+                            "ref": server.ref.model_dump(mode="json"),
+                            "package": f"{server.package_name}@{server.package_version}",
+                            "command": server.command,
+                            "command_digest": server.command_digest,
+                            "arguments": list(server.arguments),
+                            "schema_digest": server.schema_digest,
+                            "credential_refs": [
+                                f"environment:{name}" for name in server.credential_envs
+                            ],
+                            "tool_filter": server.tool_filter,
+                            "tools": [tool.model_dump(mode="json") for tool in server.tools],
+                            "egress": "worker_mediated_stdio_subprocess",
+                        }
+                        for server in self.executable_mcp_servers
+                    ]
+                }
+                if self.executable_mcp_servers
+                else {}
+            ),
             "skills": [skill.model_dump(mode="json") for skill in self.skills],
             "tools": [tool.model_dump(mode="json") for tool in self.tools],
         }
+
+
+def pinned_mcp_component(
+    pin: AnyPinnedMCPServer,
+    *,
+    node_executable: Path | None,
+    endpoints: Mapping[str, str] | None = None,
+    attachment_target: str = "agent.main",
+) -> DeepAgentMCPServerComponent:
+    """The exact component a pin describes, after the verification its form requires: the
+    node module's digest and package metadata, the executable's digest, or the presence and
+    shape of the deployment's endpoint. Raises `CapabilityPinError` naming the fact."""
+
+    if isinstance(pin, PinnedRemoteMCPServer):
+        return pin.component(
+            endpoint=(endpoints or {}).get(pin.server_id), attachment_target=attachment_target
+        )
+    if isinstance(pin, PinnedExecutableMCPServer):
+        return pin.component(attachment_target=attachment_target)
+    if node_executable is None:
+        raise CapabilityPinError(
+            f"pinned node-module MCP server {pin.server_id} requires the deployment's node "
+            "(WEB_RESEARCH_AGENT_BROWSER_NODE)"
+        )
+    return pin.component(node_executable=node_executable, attachment_target=attachment_target)
 
 
 def workspace_root() -> Path:

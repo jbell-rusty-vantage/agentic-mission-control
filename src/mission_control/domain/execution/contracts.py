@@ -725,6 +725,16 @@ class DeepAgentMCPServerComponent(Contract):
     tools: tuple[DeepAgentMCPToolComponent, ...] = Field(min_length=1)
     schema_digest: str = Field(pattern=DIGEST_PATTERN)
     attachment_target: str = Field(min_length=1)
+    # IP-009: how the tools the server lists are held against `tools`. `exact`: the server
+    # must list exactly the bound tools, so an extra tool is drift. `allowlist`: the server
+    # may list more (a catalog row with a tool allowlist over a server that cannot narrow its
+    # own list); only the bound tools are attached, a missing bound tool or a changed schema
+    # is still drift, and an unlisted tool never reaches the agent. Declared, never inferred:
+    # absent from the canonical form while `exact`, so bindings sealed before it keep their
+    # digests, and present when `allowlist`, so a sealed binding cannot be loosened afterwards.
+    tool_filter: Literal["exact", "allowlist"] = Field(
+        default="exact", exclude_if=lambda value: value == "exact"
+    )
 
     @model_validator(mode="after")
     def validate_transport(self) -> DeepAgentMCPServerComponent:

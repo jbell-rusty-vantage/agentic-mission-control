@@ -197,9 +197,10 @@ async def test_the_research_report_reads_the_web_and_the_knowledge_base() -> Non
 @pytest.mark.asyncio
 async def test_the_research_report_mounts_the_method_skills_and_the_charter() -> None:
     """On one installation's catalog (its common and application seeds, every revision), the
-    template's `plugin.cognition-knowledge@latest` is revision 2: the research mission mounts
+    template's `plugin.cognition-knowledge@latest` is revision 3: the research mission mounts
     the imported research and evidence skills and the application's charter by exact pin, the
-    charter once, and none of the eight-line knowledge skills revision 1 carried."""
+    charter once, none of the eight-line knowledge skills revision 1 carried, and the capture,
+    GitHub and Context7 servers the method names."""
 
     definitions, search = await fast_track_catalog(directories=("common", APPLICATION))
     charter = f"skill.{APPLICATION}-knowledge-charter"
@@ -218,11 +219,19 @@ async def test_the_research_report_mounts_the_method_skills_and_the_charter() ->
     assert compilation.resolution is not None
     resolved = [item for item in compilation.resolution.resolved if item.result is not None]
     by_id = {item.result.capability_id: item for item in resolved}
-    assert by_id["plugin.cognition-knowledge"].result.version == "2"
+    assert by_id["plugin.cognition-knowledge"].result.version == "3"
     mounted = {"skill.knowledge-research", "skill.knowledge-verify", charter}
     assert mounted <= set(by_id)
     for logical_id in mounted:
         assert by_id[logical_id].provenance == "plugin:knowledge_cognition"
+    # The method says "capture every source you rely on" and names Context7 and GitHub: the
+    # same mission mounts the capture server (revision 2, supported on this lane) through the
+    # knowledge plugin and both code research servers through theirs.
+    capture = by_id["mcp.knowledge-capture"]
+    assert capture.provenance == "plugin:knowledge_cognition"
+    assert capture.result.exact_ref is not None and capture.result.exact_ref.revision == 2
+    for logical_id in ("mcp.context7", "mcp.github"):
+        assert by_id[logical_id].provenance == "plugin:code_research"
     # The compile-time charter mount finds the plugin's member and adds no second row.
     assert [item.result.capability_id for item in resolved].count(charter) == 1
     assert not {name for name in by_id if name.startswith("skill.mc-cognition-")}

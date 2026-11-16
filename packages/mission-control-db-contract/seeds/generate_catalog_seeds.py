@@ -343,6 +343,19 @@ def router_manifest_records() -> list[dict[str, Any]]:
 # by file SHA-256 and never regenerated. Later target facts ship as a new seed version
 # with a new asset version, so nothing is overwritten.
 FROZEN_BUNDLES = {
+    # GitHub, Context7, the capture server at revision 1 and plugin.code-research, frozen when
+    # 1.2.0 published revision 2 of the capture server (supported on the deep_agents lane).
+    "common/mc.catalog.agent-capabilities-1.1.0.json": (
+        "35af9614bfbfd7c1b7f9904f43aab7ef2528fabeba6051719fea3904216d56d8"
+    ),
+    # Revision 2 of the knowledge and mixed plugins over the imported method skills, frozen
+    # when 1.0.2 published revision 3 of the knowledge plugin with the capture server.
+    "biotech/mc.app.biotech.cognition-profiles-1.0.1.json": (
+        "d6078250aa6922b85a6675dc0ecc0d1e5cbcfff07c83c30b0adbe8a5d25632d8"
+    ),
+    "ai-engineer/mc.app.ai-engineer.cognition-profiles-1.0.1.json": (
+        "0188099344ee2045db92c88937c4665866d43bd2d5c542bfee37f7c21db69e1b"
+    ),
     # Tavily, Firecrawl and agent-browser (FT-A6), applied to both Sprint OC remotes (W0);
     # frozen when 1.1.0 added the research capabilities (GitHub, Context7, the Knowledge
     # Services capture server and plugin.code-research) as new ids.
@@ -628,9 +641,11 @@ def agent_capabilities() -> dict[str, dict[str, Any]]:
         key_prefix: str,
         evidence: list[str],
         published_at: datetime = module.AGENT_SEED_TIME,
+        *,
+        revision: int = 1,
     ) -> list[dict[str, Any]]:
         return _published_definition_records(
-            definition, key_prefix, evidence, published_at=published_at
+            definition, key_prefix, evidence, published_at=published_at, revision=revision
         )
 
     return dict(module.bundles(published, SEED_FORMAT, COMPATIBILITY, SEED_ACTOR))

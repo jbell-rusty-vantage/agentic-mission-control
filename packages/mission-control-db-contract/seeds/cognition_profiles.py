@@ -11,7 +11,14 @@ bundle custody and published by ``mc.app.<app>.agent-skills`` (``skill.knowledge
 ``skill.knowledge-verify``) and the application's knowledge charter
 (``skill.<app>-knowledge-charter``), in place of the four eight-line ``mc-cognition-*``
 knowledge skills. ``plugin.cognition-sdlc`` stays at revision 1; mixed stays the union of the
-SDLC and knowledge families (``successor_definitions``).
+SDLC and knowledge families (``successor_definitions``). Frozen by bytes like 1.0.0.
+
+``1.0.2``: revision 3 of ``plugin.cognition-knowledge`` (``capture_definitions``): the
+revision 2 members plus the evidence capture server ``mcp.knowledge-capture`` at its revision 2
+(``mc.catalog.agent-capabilities@1.2.0``), so the mission that mounts the research method also
+mounts the capture tools the method requires. Its host support is its members': supported on
+``deep_agents`` only, because the capture server is. ``plugin.cognition-mixed`` stays at
+revision 2 and is therefore no longer the exact union of the two families.
 """
 
 from __future__ import annotations
@@ -23,9 +30,21 @@ from typing import Any
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 BASE_VERSION = "1.0.0"
-SEED_VERSION = "1.0.1"
+METHOD_VERSION = "1.0.1"
+SEED_VERSION = "1.0.2"
 # Every committed seed version, oldest first; all but the last are frozen.
-SEED_VERSIONS = (BASE_VERSION, SEED_VERSION)
+SEED_VERSIONS = (BASE_VERSION, METHOD_VERSION, SEED_VERSION)
+# Revision 3 of the knowledge plugin (seed 1.0.2): revision 2 plus the capture server.
+CAPTURE_REVISION = 3
+CAPTURE_DESCRIPTION = (
+    "Knowledge work method with its evidence tools: research and verification "
+    "(knowledge-research), evidence capture (knowledge-verify), the application's knowledge "
+    "charter and the Knowledge Services capture server (mcp.knowledge-capture: capture, "
+    "read, locate, source and schema tools), with source-verifier and summarizer subagents. "
+    "Cognition Profile cognition/knowledge, revision 3: exact pins. Supported on the "
+    "deep_agents lane, where the capture server is. The knowledge tools and the Knowledge "
+    "Services binding are selected in the manifest."
+)
 APPS = ("biotech", "ai-engineer")
 APP_KEYS = {app: f"mc.app.{app}.cognition-profiles" for app in APPS}
 KEY_PREFIX = "cognition-profile"
@@ -256,6 +275,74 @@ def successor_definitions(application_id: str) -> list[dict[str, Any]]:
     return entries
 
 
+def _capabilities() -> Any:
+    spec = importlib.util.spec_from_file_location(
+        "mc_cognition_capability_helpers", Path(__file__).with_name("agent_capabilities.py")
+    )
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def capture_definitions(application_id: str) -> list[dict[str, Any]]:
+    """Revision 3 of the knowledge plugin (seed 1.0.2): its revision 2 members, then the
+    capture server between the skills and the subagents. Entries are shaped like
+    :func:`successor_definitions`'s."""
+
+    from mission_control.domain.authoring.contracts import PluginDefinition
+    from mission_control.domain.capabilities.plugins import PluginManifest
+
+    helpers = _skills()
+    capabilities = _capabilities()
+    (prior,) = [
+        entry
+        for entry in successor_definitions(application_id)
+        if entry["definition"].logical_id == "plugin.cognition-knowledge"
+    ]
+    server = capabilities.server_definition(capabilities.CAPTURE_SERVER)
+    capture = {
+        "source": None,
+        "manifest": None,
+        "definition": server,
+        "pin": capabilities.capture_pin(),
+    }
+    capture_key = f"agent-capability:mcp-server:{server.logical_id}/{capabilities.CAPTURE_REVISION}"
+    roles = [member.role.value for member in prior["definition"].manifest.members]
+    members: list[tuple[str, dict[str, Any], str]] = [
+        (role, entry, key) for role, (entry, key) in zip(roles, prior["members"], strict=True)
+    ]
+    position = max(index for index, (role, _e, _k) in enumerate(members) if role == "skill") + 1
+    members.insert(position, ("mcp_server", capture, capture_key))
+    manifest = PluginManifest.model_validate(
+        {"members": [{"pin": entry["pin"], "role": role} for role, entry, _key in members]}
+    )
+    by_pin = {entry["pin"]: entry["definition"] for _role, entry, _key in members}
+    definition = PluginDefinition.model_validate(
+        {
+            "logical_id": "plugin.cognition-knowledge",
+            "title": "cognition/knowledge",
+            "description": CAPTURE_DESCRIPTION,
+            "manifest": manifest.model_dump(mode="json"),
+            # What every member supports: never more than its weakest member declares.
+            "host_support": manifest.host_support(
+                lambda pin: by_pin[pin.render()].host_support
+            ).model_dump(mode="json"),
+            "secret_refs": sorted(server.secret_refs),
+        }
+    )
+    return [
+        {
+            "source": None,
+            "manifest": None,
+            "definition": definition,
+            "pin": helpers.definition_pin(definition, CAPTURE_REVISION),
+            "revision": CAPTURE_REVISION,
+            "members": [(entry, key) for _role, entry, key in members],
+        }
+    ]
+
+
 def current_profiles(application_id: str) -> list[dict[str, Any]]:
     """The three Cognition Profiles a manifest selects today: each plugin at its latest
     revision, with the entries of its members."""
@@ -265,7 +352,11 @@ def current_profiles(application_id: str) -> list[dict[str, Any]]:
     base = application_definitions(application_id)
     by_pin = {entry["pin"]: entry for entry in base}
     successors = {
-        entry["definition"].logical_id: entry for entry in successor_definitions(application_id)
+        entry["definition"].logical_id: entry
+        for entry in (
+            *successor_definitions(application_id),
+            *capture_definitions(application_id),
+        )
     }
     profiles = []
     for entry in base:
@@ -283,13 +374,15 @@ def current_profiles(application_id: str) -> list[dict[str, Any]]:
 def bundles(
     published_records: Any, seed_format: str, compatibility: str, actor: str
 ) -> dict[str, Any]:
-    """Seed 1.0.1: the revision 2 plugins and their member rows. 1.0.0 is frozen bytes."""
+    """Seed 1.0.2: revision 3 of the knowledge plugin and its member rows. 1.0.0 and 1.0.1
+    are frozen bytes."""
 
     helpers = _skills()
+    capabilities = _capabilities()
     result = {}
     for app in APPS:
         records: list[dict[str, Any]] = []
-        for entry in successor_definitions(app):
+        for entry in capture_definitions(app):
             definition = entry["definition"]
             key = f"{KEY_PREFIX}:plugin:{definition.logical_id}/{entry['revision']}"
             records += published_records(
@@ -297,7 +390,8 @@ def bundles(
                 KEY_PREFIX,
                 [
                     "packages/mission-control-db-contract/seeds/cognition_profiles.py",
-                    "packages/mission-control-db-contract/bundle-sources/imported/IMPORTS.json",
+                    "packages/mission-control-db-contract/seeds/agent_capabilities.py",
+                    capabilities.RESEARCH_NOTE,
                 ],
                 revision=entry["revision"],
             )
@@ -323,18 +417,24 @@ def bundles(
             "seed_version": SEED_VERSION,
             "component_compatibility": compatibility,
             "depends_on": [
-                {"seed_key": APP_KEYS[app], "seed_version": BASE_VERSION},
+                {"seed_key": APP_KEYS[app], "seed_version": METHOD_VERSION},
                 {"seed_key": helpers.APP_KEYS[app], "seed_version": helpers.SEED_VERSION},
+                {
+                    "seed_key": capabilities.COMMON_KEY,
+                    "seed_version": capabilities.CAPTURE_SEED_VERSION,
+                },
             ],
             "actor_ref": actor,
             "description": (
-                "Revision 2 of cognition/knowledge and cognition/mixed: the knowledge family "
-                "mounts the imported method skills (skill.knowledge-research, "
-                f"skill.knowledge-verify) and {charter_skill(app)} by exact pin, in place of "
-                "the four eight-line mc-cognition knowledge skills. Each plugin's host support "
-                "is the intersection of its members': supported on the worker-hosted lane "
-                "profiles, unqualified on the provider-hosted ones. cognition/sdlc and every "
-                f"{BASE_VERSION} record are unchanged."
+                "Revision 3 of cognition/knowledge: its revision 2 members (the imported "
+                "method skills skill.knowledge-research and skill.knowledge-verify, "
+                f"{charter_skill(app)}, the source-verifier and summarizer subagents) and the "
+                "evidence capture server mcp.knowledge-capture at its revision 2, by exact "
+                "pin. Its host support is the intersection of its members': supported on "
+                "deep_agents, unqualified on the other worker-hosted lane profiles, "
+                "unsupported on cursor_cloud. cognition/mixed stays at revision 2, cognition/"
+                f"sdlc at revision 1, and every {BASE_VERSION} and {METHOD_VERSION} record is "
+                "unchanged."
             ),
             "records": records,
         }

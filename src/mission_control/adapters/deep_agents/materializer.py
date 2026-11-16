@@ -1104,10 +1104,19 @@ class ExactDeepAgentMaterializer:
         servers: tuple[DeepAgentMCPServerComponent, ...],
         secrets: ResolvedSecrets,
     ) -> tuple[BaseTool, ...]:
+        """The bound MCP tools of `servers`, each server held to its declared tool filter.
+
+        A server bound `exact` must list exactly its bound tools. A server bound `allowlist`
+        (IP-009) may list more: only its bound tools are returned, and the rest are dropped
+        here, before any tool reaches an agent. In both modes a bound tool the server does
+        not list, or one whose input schema differs from the pinned digest, is drift. Tools
+        are listed one server at a time so each list is compared with its own binding.
+        """
+
         if not servers:
             return ()
         connections: dict[str, dict[str, object]] = {}
-        expected = {}
+        expected: dict[str, str] = {}
         for server in servers:
             if server.transport == "stdio":
                 environment = {
@@ -1140,15 +1149,30 @@ class ExactDeepAgentMaterializer:
         # langchain-mcp-adapters 0.3.1 deliberately rejects client-level async
         # context management. get_tools() returns tools that open scoped sessions.
         client = MultiServerMCPClient(cast(Any, connections))
-        tools = await client.get_tools()
-        observed_names = {tool.name for tool in tools}
-        if observed_names != set(expected):
-            raise DeepAgentRuntimeDrift("MCP server tool filter drift")
-        for loaded_tool in tools:
-            observed = _tool_schema_digest(loaded_tool)
-            if observed != expected[loaded_tool.name]:
-                raise DeepAgentRuntimeDrift(f"MCP tool schema drift: {loaded_tool.name}")
-        return tuple(tools)
+        attached: list[BaseTool] = []
+        for server in servers:
+            bound = {tool.tool_name for tool in server.tools}
+            listed = await client.get_tools(server_name=server.server_name)
+            listed_names = {tool.name for tool in listed}
+            missing = sorted(bound - listed_names)
+            if missing:
+                raise DeepAgentRuntimeDrift(
+                    f"MCP server tool filter drift: {server.server_name} does not list "
+                    f"bound tool(s) {', '.join(missing)}"
+                )
+            unbound = sorted(listed_names - bound)
+            if unbound and server.tool_filter == "exact":
+                raise DeepAgentRuntimeDrift(
+                    f"MCP server tool filter drift: {server.server_name} lists tool(s) its "
+                    f"exact binding does not name: {', '.join(unbound)}"
+                )
+            for loaded_tool in listed:
+                if loaded_tool.name not in bound:
+                    continue  # allowlist: an unlisted tool is never handed to the agent
+                if _tool_schema_digest(loaded_tool) != expected[loaded_tool.name]:
+                    raise DeepAgentRuntimeDrift(f"MCP tool schema drift: {loaded_tool.name}")
+                attached.append(loaded_tool)
+        return tuple(attached)
 
 
 def _summarization_overrides(

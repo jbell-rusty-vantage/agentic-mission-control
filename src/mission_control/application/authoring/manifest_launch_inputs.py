@@ -1053,7 +1053,10 @@ class ManifestLaunchResolver:
                     )
                 continue
             config: dict[str, Any]
-            if item.role == "agent" and owner is None and not _plugin_member(item):
+            # IP-011: a subagent member of a plugin the node selected is a child like an
+            # `agents:` entry (its catalog body, no overlay); a plugin seeded into a child
+            # keeps its members with that child.
+            if item.role == "agent" and owner is None:
                 profile = _subagent_profile(item, pinned, available)
                 overlay = item.attributes.get("overlay")
                 config = {

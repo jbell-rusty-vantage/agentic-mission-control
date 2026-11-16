@@ -19,7 +19,12 @@ from collections.abc import Mapping
 from hashlib import sha256
 from pathlib import Path
 
-from mission_control.adapters.capabilities.capability_pins import CapabilityPinError, CapabilityPins
+from mission_control.adapters.capabilities.capability_pins import (
+    CapabilityPinError,
+    CapabilityPins,
+    PinnedMCPServer,
+    pinned_mcp_component,
+)
 from mission_control.application.artifacts.artifact_promotion import ArtifactPayloadAddress
 from mission_control.application.execution.operations.operation_execution import (
     SecretResolutionPort,
@@ -211,6 +216,13 @@ class PinnedCapabilityAssetVerifier:
     harnesses only). A binding that names the pinned schema digest but another command or
     module is refused. Residual: the pin covers the entry module and the package metadata,
     not the package's transitive `node_modules` tree.
+
+    IP-008: a pinned server is one of three forms and each is re-derived the same way: a
+    node module as above; a stdio executable, its bytes re-hashed against `command_digest`
+    with the pinned absolute path and fixed arguments; a remote Streamable HTTP server, at
+    the endpoint this deployment supplies for the pin (`mcp_endpoints`), with the pinned
+    credential reference, tool filter and bound tools. The refusal names the pin and the
+    fact that differs. A child's seeded servers are verified like the parent's.
     """
 
     def __init__(
@@ -219,12 +231,15 @@ class PinnedCapabilityAssetVerifier:
         *,
         node_executable: Path | None = None,
         registered_mcp_servers: Mapping[str, DeepAgentMCPServerComponent] | None = None,
+        mcp_endpoints: Mapping[str, str] | None = None,
     ) -> None:
         self._mcp = dict(pins.mcp_schema_digests())
         self._assets = dict(pins.asset_manifest_digests())
-        self._pinned_servers = {server.ref.digest: server for server in pins.mcp_servers}
+        self._pinned_servers = {server.ref.digest: server for server in pins.all_mcp_servers}
         self._node_executable = node_executable
         self._registered = dict(registered_mcp_servers or {})
+        # IP-008: the deployment's endpoint per pinned remote server (`server_id` -> URL).
+        self._endpoints = dict(mcp_endpoints or {})
 
     async def verify(self, binding: OperationExecutionBinding) -> None:
         for server in binding.mcp_servers:
@@ -245,7 +260,14 @@ class PinnedCapabilityAssetVerifier:
         deep = DeepAgentExecutionBinding.carried_by(binding)
         if deep is None:
             return
-        for component in deep.mcp_servers:
+        # A child's seeded servers are launched for the child by the same materializer path,
+        # so they are held to the same pins as the parent's.
+        seeded = tuple(
+            server
+            for child in getattr(deep, "sync_subagents", ())
+            for server in child.seeded_mcp_servers
+        )
+        for component in (*deep.mcp_servers, *seeded):
             registered = self._registered.get(component.ref.digest)
             if registered is not None:
                 if component != registered:
@@ -256,11 +278,13 @@ class PinnedCapabilityAssetVerifier:
             pin = self._pinned_servers.get(component.ref.digest)
             if pin is None:
                 raise ValueError(f"MCP server {component.server_name} is not pinned")
-            if self._node_executable is None:
+            if isinstance(pin, PinnedMCPServer) and self._node_executable is None:
                 raise ValueError("a pinned stdio MCP server requires the deployment's node")
             try:
-                expected = pin.component(
+                expected = pinned_mcp_component(
+                    pin,
                     node_executable=self._node_executable,
+                    endpoints=self._endpoints,
                     attachment_target=component.attachment_target,
                 )
             except (CapabilityPinError, OSError) as error:
@@ -270,8 +294,38 @@ class PinnedCapabilityAssetVerifier:
             if component != expected:
                 raise ValueError(
                     f"MCP server {component.server_name} launch differs from its pin "
-                    "(command, arguments, credentials, tools or schema)"
+                    f"{pin.server_id}: {_launch_difference(component, expected)}"
                 )
+
+
+def _launch_difference(
+    bound: DeepAgentMCPServerComponent, pinned: DeepAgentMCPServerComponent
+) -> str:
+    """The first fact of a bound MCP component that differs from its pin, by name. Digests
+    and names only: a command, an argument or an endpoint is never echoed from the binding."""
+
+    for name in ("transport", "endpoint", "command", "arguments", "credential_refs"):
+        if getattr(bound, name) != getattr(pinned, name):
+            return f"{name.replace('_', ' ')} differ from the pinned ones"
+    if bound.tool_filter != pinned.tool_filter:
+        return f"tool filter is {bound.tool_filter}, pinned {pinned.tool_filter}"
+    bound_tools = {tool.tool_name: tool.schema_digest for tool in bound.tools}
+    pinned_tools = {tool.tool_name: tool.schema_digest for tool in pinned.tools}
+    unpinned = sorted(set(bound_tools) - set(pinned_tools))
+    if unpinned:
+        return f"tool(s) {', '.join(unpinned)} are bound but not pinned"
+    unbound = sorted(set(pinned_tools) - set(bound_tools))
+    if unbound:
+        return f"pinned tool(s) {', '.join(unbound)} are not bound"
+    for tool_name in sorted(bound_tools):
+        if bound_tools[tool_name] != pinned_tools[tool_name]:
+            return (
+                f"tool {tool_name} is bound at schema digest {bound_tools[tool_name]}, "
+                f"pinned at {pinned_tools[tool_name]}"
+            )
+    if bound.schema_digest != pinned.schema_digest:
+        return f"schema digest is {bound.schema_digest}, pinned {pinned.schema_digest}"
+    return "server name, tool order or attachment differ from the pinned ones"
 
 
 def _verify(content: bytes, content_digest: str, size_bytes: int) -> None:

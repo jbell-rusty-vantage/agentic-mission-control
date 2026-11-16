@@ -433,28 +433,88 @@ def test_without_a_scaffold_every_node_refuses() -> None:
     assert "no scaffold" in refusal.reason
 
 
-def _member(kind: Any, name: str, *, plugin: str = "plugin.browser@1.0.0") -> ConfigurationItem:
+PLUGIN = "plugin.browser@1.0.0"
+
+
+def _member(
+    kind: Any, name: str, *, role: str = "skill", plugin: str = PLUGIN
+) -> ConfigurationItem:
     return ConfigurationItem.create(
         kind=kind,
         name=name,
         pin=f"{name}@1.0.0#" + sha256_digest(name),
         required=True,
         config={
-            item_config.ROLE: "skill",
-            item_config.PLUGIN_MEMBER_ROLE: "skill",
+            item_config.ROLE: role,
+            item_config.PLUGIN_MEMBER_ROLE: role,
             item_config.PLUGIN: plugin,
         },
     )
 
 
-def test_a_node_plugin_is_refused_at_its_row_after_hooks() -> None:
+def _as_member(item: ConfigurationItem, role: str) -> ConfigurationItem:
+    """A canonical item as the member a selected plugin expanded to (same pin, same name)."""
+
+    return ConfigurationItem.create(
+        kind=item.kind,
+        name=item.name,
+        pin=item.pin,
+        required=True,
+        config={**item.config, item_config.PLUGIN_MEMBER_ROLE: role, item_config.PLUGIN: PLUGIN},
+    )
+
+
+def test_a_node_plugins_skill_and_mcp_members_bind_like_direct_selections() -> None:
+    """IP-011: a plugin selected on a Deep Agents node is run as its members. A Skill or MCP
+    server member resolves to the same exact deployment component, in the same sealed
+    profile, as the same pin selected directly."""
+
+    roles = {"skill_bundle": "skill", "mcp_server": "mcp_server"}
+    as_members = tuple(
+        _as_member(item, roles[item.kind]) if item.kind in roles else item for item in SUPPORTED
+    )
+    assert sum(item_config.PLUGIN_MEMBER_ROLE in item.config for item in as_members) >= 2
+    adapter = DeepAgentsCompileAdapter(deep_agents_facts())
+
+    direct, _ = adapter.compile(_agent(), {})
+    expanded, receipt = adapter.compile(_agent(items=as_members), {})
+
+    selected = DeepAgentNodeBinding.model_validate_json(direct.payload).profile
+    members = DeepAgentNodeBinding.model_validate_json(expanded.payload).profile
+    assert members.skills == selected.skills and members.skills
+    assert members.mcp_servers == selected.mcp_servers and members.mcp_servers
+    assert not [item for item in receipt.items if item.verdict == "unsupported"]
+
+
+def test_a_node_plugin_member_without_a_deployment_binding_is_refused_at_the_member() -> None:
     member = _member("skill_bundle", "skill.plugin-member")
     agent = _agent(items=(*SUPPORTED, member))
     refusal = _refusal(agent)
     index = [item.name for item in agent.items].index("skill.plugin-member")
-    assert refusal.pointer == f"/items/{index}/plugin"
-    assert refusal.reason.startswith("plugin plugin.browser@1.0.0 has no deployment component")
+    # The member's own row, like any direct selection the deployment does not bind.
+    assert (refusal.code, refusal.pointer) == ("ITEM_PIN_UNSERVED", f"/items/{index}")
+    assert "skill skill.plugin-member@1.0.0 has no deployment component binding" in refusal.reason
+
+
+@pytest.mark.parametrize(
+    ("kind", "role"),
+    [("hook_script", "hook"), ("context_bundle", "prompt"), ("context_bundle", "resource")],
+)
+def test_a_node_plugin_member_the_lane_cannot_run_is_refused_by_name(kind: str, role: str) -> None:
+    member = _member(kind, f"member.{role}", role=role)
+    agent = _agent(items=(*SUPPORTED, member))
+    refusal = _refusal(agent)
+    index = [item.name for item in agent.items].index(f"member.{role}")
+    assert (refusal.code, refusal.pointer) == ("ITEM_UNSUPPORTED_ON_LANE", f"/items/{index}")
+    assert refusal.reason.startswith(
+        f"{role} member.{role}@1.0.0 is a {role} member of plugin {PLUGIN}"
+    )
+    assert "Skill, MCP server and subagent members only" in refusal.reason
+
+
+def test_a_directly_selected_hook_is_still_refused_before_a_plugins_member() -> None:
     (hook,) = [item for item in CANONICAL_ITEMS if item.kind == "hook_script"]
+    member = _member("hook_script", "member.hook", role="hook")
     both = _agent(items=(*SUPPORTED, member, hook.model_copy(update={"required": True})))
     first = _refusal(both)
     assert first.pointer == f"/items/{[item.name for item in both.items].index('policy')}"

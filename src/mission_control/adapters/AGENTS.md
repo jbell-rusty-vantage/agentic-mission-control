@@ -31,7 +31,7 @@ Entrypoints:
 - capabilities/
 - remote_session/ — Remote Session Lane base: shared machinery for provider session APIs
 - agent_server/ — Import-safe BellLabs Agent Server package exports
-Also: openai_agents/, knowledge/, anthropic_managed/, auth/, workspaces/, storage/, provider_auth/, prerequisites/, supabase_storage/, github/, operations/, secrets/, subscriptions/, langsmith/, agents/, document_models/
+Also: openai_agents/, knowledge/, anthropic_managed/, auth/, workspaces/, storage/, provider_auth/, prerequisites/, supabase_storage/, operations/, github/, secrets/, subscriptions/, langsmith/, agents/, document_models/
 Tests: tests/unit, tests/integration, tests/conformance/lanes
 Invariants:
 - Adapters implement application ports; they cannot invent completion semantics, privileged grants or cross-application routing.

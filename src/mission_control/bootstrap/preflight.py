@@ -58,6 +58,7 @@ from mission_control.adapters.capabilities.capability_pins import (
     CapabilityPinError,
     CapabilityPins,
     read_skill_bundle,
+    remote_endpoint,
     workspace_path,
 )
 from mission_control.adapters.deep_agents.compile import model_pin_mismatch
@@ -533,10 +534,11 @@ def check_bindings(
     for name, sandbox in bindings.sandbox_profiles.items():
         unserved(f"/sandbox_profiles/{name}/ref", "sandbox", sandbox.ref.digest, served.sandboxes)
     pinned = {
-        "mcp_server": {item.server_id for item in pins.mcp_servers},
+        "mcp_server": {item.server_id for item in pins.all_mcp_servers},
         "skill": {item.skill_name for item in pins.skills},
         "tool": {item.tool_name for item in pins.tools},
     }
+    remote = {item.server_id for item in pins.remote_mcp_servers}
     for capability_id, binding in bindings.capabilities.items():
         pointer = f"/capabilities/{capability_id}"
         if binding.pinned is not None:
@@ -548,6 +550,21 @@ def check_bindings(
                         message=f"{binding.kind} {binding.pinned} is not in the capability pins",
                     )
                 )
+            elif binding.kind == "mcp_server" and binding.pinned in remote:
+                # IP-008: a remote pin states no URL; the deployment must (the launch author
+                # and the worker refuse the capability without it).
+                try:
+                    remote_endpoint(
+                        binding.pinned, settings.mcp_server_endpoints.get(binding.pinned)
+                    )
+                except CapabilityPinError as error:
+                    issues.append(
+                        PreflightIssue(
+                            code="MCP_ENDPOINT_UNSET",
+                            pointer=f"{label}#{pointer}/pinned",
+                            message=str(error),
+                        )
+                    )
         elif binding.mcp_server is not None:
             unserved(pointer, "MCP server", binding.mcp_server.ref.digest, served.mcp_servers)
         elif binding.skill is not None:
@@ -705,6 +722,22 @@ def check_pins(pins: CapabilityPins, root: Path, pins_label: str) -> list[Prefli
                 server.module_locator,
                 f"MCP module {server.server_id}",
                 server.module_digest,
+                computed,
+            )
+    for index, executable in enumerate(pins.executable_mcp_servers):
+        # IP-008: an executable pin is an absolute host path, not a workspace locator.
+        pointer = f"/executable_mcp_servers/{index}/command_digest"
+        try:
+            computed = _file_digest(Path(executable.command))
+        except OSError as error:
+            unavailable(pointer, executable.command, error)
+            continue
+        if computed != executable.command_digest:
+            drift(
+                pointer,
+                executable.command,
+                f"MCP executable {executable.server_id}",
+                executable.command_digest,
                 computed,
             )
     for index, tool in enumerate(pins.tools):

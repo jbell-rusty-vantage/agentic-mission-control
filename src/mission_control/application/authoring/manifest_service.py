@@ -39,7 +39,7 @@ from __future__ import annotations
 from collections.abc import Awaitable, Callable, Collection, Iterable, Mapping, Sequence
 from dataclasses import dataclass, field, replace
 from datetime import UTC, datetime
-from typing import Any, Protocol
+from typing import Any, Protocol, cast
 
 from mission_control.application.authoring.completion_support import launch_acceptance_issues
 from mission_control.application.authoring.control_plane_repository import (
@@ -83,7 +83,10 @@ from mission_control.application.chains.service import (
     ResolvedNode,
 )
 from mission_control.application.environments.requirements import readiness_requirements
-from mission_control.application.execution.harness.describe import MISSION_V1_LANE_PROFILES
+from mission_control.application.execution.harness.describe import (
+    MISSION_V1_LANE_PROFILES,
+    declared_lane,
+)
 from mission_control.application.ports.payloads import ContentAddressedPayloadStore
 from mission_control.application.prerequisites.preflight import (
     PreflightReport,
@@ -169,7 +172,11 @@ from mission_control.domain.authoring.mission_watchers import compile_mission_wa
 from mission_control.domain.capabilities.catalog_entry import capability_pin
 from mission_control.domain.capabilities.hooks import HookMode, NativeHook, native_hook
 from mission_control.domain.capabilities.host_support import CapabilityHostSupport, LaneProfile
-from mission_control.domain.capabilities.plugins import PluginMemberRole
+from mission_control.domain.capabilities.plugins import (
+    MEMBER_EXPANDING_LANES,
+    MEMBER_ITEM_KINDS,
+    PluginMemberRole,
+)
 from mission_control.domain.composition.chain import compile_chain
 from mission_control.domain.coordinator.contracts import (
     AuthorizationState,
@@ -255,6 +262,34 @@ MEMBER_ROLES: Mapping[PluginMemberRole, str] = {
     PluginMemberRole.PROMPT: "capability",
     PluginMemberRole.RESOURCE: "context",
 }
+
+
+def _unrunnable_member(
+    plugin_pointer: str, index: int, member: Any, plugin_pin: str, lanes: Sequence[str]
+) -> ManifestIssue | None:
+    """A blocker at the member when a member-expanding lane declares its kind unsupported
+    (a hook script on `deep_agents`): refused at compile, by name, not at launch."""
+
+    kind = MEMBER_ITEM_KINDS[member.role]
+    refusing = sorted(
+        lane
+        for lane in lanes
+        if lane in MEMBER_EXPANDING_LANES
+        and declared_lane(lane).items.get(cast(Any, kind)) == "unsupported"
+    )
+    if not refusing:
+        return None
+    return _issue(
+        ManifestErrorCode.CAPABILITY_UNAVAILABLE,
+        f"{plugin_pointer}/members/{index}",
+        f"{member.pin.render()} is a {member.role.value} member of plugin {plugin_pin}, and "
+        f"lanes {refusing} run no {kind.replace('_', ' ')}: a plugin selected on such a node "
+        "is run as its members, so select the members that lane runs directly, or run the "
+        "node on a lane that carries the plugin",
+        "plugin_member_unsupported_on_lane",
+    )
+
+
 # `mission/v1` admits the FT-G1 profiles only (`describe.MISSION_V1_LANE_PROFILES`); each runs
 # the behaviors its lane package declares (`lane_behaviors`, OC-R3). Every other profile is
 # reserved there and needs `mission/v2`.
@@ -1136,6 +1171,13 @@ class ManifestCompileService:
                     if key in capability.attributes
                 }
                 for member_index, member in enumerate(members):
+                    if SEED_OF_ATTRIBUTE not in inherited:
+                        refused = _unrunnable_member(
+                            capability.pointer, member_index, member, result.pin, lanes
+                        )
+                        if refused is not None:
+                            blockers.append(refused)
+                            continue
                     already = seen.get(member.pin.capability_id)
                     if already is not None and already[1] == member.pin.digest:
                         continue  # duplicate pins collapse

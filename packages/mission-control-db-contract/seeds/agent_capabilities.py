@@ -14,6 +14,9 @@ only, from :data:`RESEARCH_SERVERS` and :data:`CODE_RESEARCH_PLUGIN`: ``mcp.gith
 ``mcp.knowledge-capture`` (the Knowledge Services executor's capture, source, schema and guide
 tools over Streamable HTTP, captured from a running executor) and ``plugin.code-research``
 over the first two. Every binding traces to the dated provider note :data:`RESEARCH_NOTE`.
+1.1.0 is frozen by bytes too. 1.2.0 (2026-11-16, common) publishes revision 2 of
+``mcp.knowledge-capture`` and of its allowlisted tool rows from :data:`CAPTURE_SERVER`: the
+same server and allowlist, supported on the ``deep_agents`` lane.
 """
 
 from __future__ import annotations
@@ -372,6 +375,48 @@ CODE_RESEARCH_PLUGIN: dict[str, Any] = {
     "members": ("mcp.context7", "mcp.github"),
 }
 
+# --- Seed 1.2.0 (2026-11-16): the capture server on the Deep Agents lane -------------------
+# Revision 2 of `mcp.knowledge-capture` only: the same server, endpoint, authentication and
+# 19-tool allowlist, now `supported` on `deep_agents`. Two changes made that true (the note's
+# IP-009 and IP-008): the Deep Agents materializer attaches only the bound tools of a server
+# bound with an allowlist tool filter, and a worker's pin file can describe a remote
+# Streamable HTTP server. The other worker-hosted lanes stay `unqualified` (no proof that
+# their host projection narrows this server's list) and cursor_cloud `unsupported`.
+# `mcp.github` and `mcp.context7` stay at revision 1: their rows already declare the worker
+# lanes supported, and the pin file now describes both forms (an executable, a node module).
+CAPTURE_SEED_VERSION = "1.2.0"
+CAPTURE_REVISION = 2
+CAPTURE_SERVER: dict[str, Any] = {
+    **next(spec for spec in RESEARCH_SERVERS if spec["id"] == "mcp.knowledge-capture"),
+    "description": (
+        "The Knowledge Services executor's MCP endpoint (Streamable HTTP, /mcp) narrowed to "
+        "evidence work: capture a URL or a file as exact bytes, read and search a capture, "
+        "locate a quote that occurs once, export a fragment, register and read artifacts, "
+        "record source discovery and lead selection, read the schema workspace and the "
+        "guidance. The allowlist leaves out every tool that writes knowledge or needs an "
+        "issuer credential (ingest_*, knowledge_operation_*, knowledge_receipt_get, "
+        "knowledge_describe, db_*, checkpoint_*, artifact_get, schema_materialize, "
+        "source_prepare_captured). The endpoint is the executor's local default; a "
+        "deployment binds its own (MCP_SERVER_ENDPOINTS). VERIFY_EXECUTOR_TOKEN names the "
+        "token the executor expects on the Authorization header. Supported on the Deep "
+        "Agents lane: the executor lists all of its tools, and the lane attaches only this "
+        "allowlist, refusing a missing tool or a changed input schema. Unqualified on the "
+        "other worker-hosted lanes, where narrowing this server's list is not proven."
+    ),
+    "host_support": _support(
+        unqualified=("cursor_local", "claude_agent_sdk", "codex"), unsupported=("cursor_cloud",)
+    ),
+}
+
+
+def served_research_specs() -> dict[str, dict[str, Any]]:
+    """``capability_id -> spec`` of each research server at its newest seeded revision: the
+    rows a worker's pin file is written from (``scripts/pin_research_capabilities.py``)."""
+
+    specs = {spec["id"]: spec for spec in RESEARCH_SERVERS}
+    specs[CAPTURE_SERVER["id"]] = CAPTURE_SERVER
+    return specs
+
 
 def _lf(path: Path) -> bytes:
     return path.read_bytes().replace(b"\r\n", b"\n")
@@ -553,7 +598,74 @@ def bundles(published_records: Any, seed_format: str, compatibility: str, actor:
     result[f"common/{COMMON_KEY}-{RESEARCH_SEED_VERSION}.json"] = research_bundle(
         published_records, seed_format, compatibility, actor
     )
+    result[f"common/{COMMON_KEY}-{CAPTURE_SEED_VERSION}.json"] = capture_bundle(
+        published_records, seed_format, compatibility, actor
+    )
     return result
+
+
+def capture_server_ref() -> Any:
+    """The exact ref of ``mcp.knowledge-capture`` revision 2 (seed 1.2.0)."""
+    from mission_control.domain.authoring.canonical import sha256_digest
+    from mission_control.domain.authoring.contracts import DefinitionKind, ExactDefinitionRef
+
+    server = server_definition(CAPTURE_SERVER)
+    return ExactDefinitionRef(
+        kind=DefinitionKind.MCP_SERVER,
+        logical_id=server.logical_id,
+        revision=CAPTURE_REVISION,
+        digest=sha256_digest(server),
+    )
+
+
+def capture_pin() -> str:
+    """The Capability Pin of ``mcp.knowledge-capture`` revision 2."""
+
+    return f"{CAPTURE_SERVER['id']}@{CAPTURE_SERVER['upstream'][1]}#{capture_server_ref().digest}"
+
+
+def capture_bundle(
+    published_records: Any, seed_format: str, compatibility: str, actor: str
+) -> dict[str, Any]:
+    """Seed 1.2.0 (common): revision 2 of ``mcp.knowledge-capture`` and of its 19 allowlisted
+    MCP Tool rows (each names the server revision it belongs to). No earlier record is
+    repeated: revision 1 stays admitted, and ``@latest`` resolves to revision 2."""
+
+    server = server_definition(CAPTURE_SERVER)
+    evidence = [
+        "packages/mission-control-db-contract/seeds/agent_capabilities.py",
+        f"tests/fixtures/mcp/{CAPTURE_SERVER['id']}.tools.json",
+        RESEARCH_NOTE,
+    ]
+    records: list[dict[str, Any]] = published_records(
+        server, "agent-capability", evidence, RESEARCH_SEED_TIME, revision=CAPTURE_REVISION
+    )
+    for tool in tool_definitions(server, capture_server_ref()):
+        records += published_records(
+            tool, "agent-capability", evidence, RESEARCH_SEED_TIME, revision=CAPTURE_REVISION
+        )
+    for record in records:
+        if record["kind"] == "asset_decision":
+            record["fields"]["decided_at"] = "2026-11-16T00:00:00Z"
+    return {
+        "format": seed_format,
+        "seed_key": COMMON_KEY,
+        "seed_version": CAPTURE_SEED_VERSION,
+        "component_compatibility": compatibility,
+        "depends_on": [{"seed_key": COMMON_KEY, "seed_version": RESEARCH_SEED_VERSION}],
+        "actor_ref": actor,
+        "description": (
+            f"Revision {CAPTURE_REVISION} of {CAPTURE_SERVER['id']} and of its "
+            f"{len(CAPTURE_SERVER['allow_tools'])} allowlisted MCP Tool rows: the same "
+            "server, endpoint, authentication and allowlist as revision 1, now supported on "
+            "the deep_agents lane, which attaches only the allowlisted tools of a server that "
+            "lists more and whose workers can pin a remote Streamable HTTP server. The other "
+            "worker-hosted lanes stay unqualified and cursor_cloud unsupported. mcp.github, "
+            "mcp.context7 and plugin.code-research are unchanged at revision 1. No "
+            f"{RESEARCH_SEED_VERSION} record is repeated."
+        ),
+        "records": records,
+    }
 
 
 def research_pins() -> dict[str, str]:

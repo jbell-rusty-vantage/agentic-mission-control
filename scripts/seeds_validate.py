@@ -56,22 +56,25 @@ def published_definitions() -> Iterator[tuple[str, PublishedDefinition]]:
 
 def validate() -> list[str]:
     problems: list[str] = []
-    servers: dict[str, MCPServerDefinition] = {}
+    # A server may be seeded at more than one revision; a tool row belongs to the exact
+    # revision its `server_ref` names (logical id and digest).
+    servers: dict[str, dict[str, MCPServerDefinition]] = {}
     tools: list[tuple[str, MCPToolDefinition]] = []
     for source, published in published_definitions():
         definition = published.definition
         if published.ref.digest != sha256_digest(definition):
             problems.append(f"{source}: {published.ref.logical_id} digest is not exact")
         if isinstance(definition, MCPServerDefinition):
-            servers[definition.logical_id] = definition
+            servers.setdefault(definition.logical_id, {})[published.ref.digest] = definition
             problems += _check_server(source, published, definition)
         elif isinstance(definition, MCPToolDefinition):
             tools.append((source, definition))
     for source, tool in tools:
-        server = servers.get(tool.server_ref.logical_id)
-        if server is None:
+        revisions = servers.get(tool.server_ref.logical_id)
+        server = revisions.get(tool.server_ref.digest) if revisions is not None else None
+        if revisions is None:
             problems.append(f"{source}: {tool.logical_id} has no seeded server")
-        elif tool.server_ref.digest != sha256_digest(server):
+        elif server is None:
             problems.append(f"{source}: {tool.logical_id} points at a stale server digest")
         elif tool.tool_name not in {item.name for item in server.exposed_tools()}:
             problems.append(f"{source}: {tool.logical_id} is not an exposed server tool")

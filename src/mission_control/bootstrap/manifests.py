@@ -8,7 +8,12 @@ from typing import TYPE_CHECKING
 
 import asyncpg
 
-from mission_control.adapters.capabilities.capability_pins import CapabilityPins
+from mission_control.adapters.capabilities.capability_pins import (
+    CapabilityPinError,
+    CapabilityPins,
+    PinnedMCPServer,
+    pinned_mcp_component,
+)
 from mission_control.adapters.deep_agents.compile import deep_agents_lane
 from mission_control.adapters.postgres.chains.exports import PostgresChainStartGate
 from mission_control.adapters.postgres.chains.store import PostgresChainIntentStore
@@ -305,7 +310,7 @@ def served_components(
         | frozenset(settings.deep_agent_checkpointer_digests),
         stores=frozenset(item.ref.digest for item in pins.stores)
         | frozenset(settings.deep_agent_store_digests),
-        mcp_servers=frozenset(item.ref.digest for item in pins.mcp_servers)
+        mcp_servers=frozenset(item.ref.digest for item in pins.all_mcp_servers)
         | frozenset(additional.mcp_servers if additional is not None else ()),
         skills=frozenset(item.bundle_digest for item in pins.skills)
         | frozenset(additional.skill_bundles if additional is not None else ()),
@@ -315,9 +320,18 @@ def served_components(
 
 
 def resolve_pinned_capabilities(
-    bindings: ManifestLaunchBindings, pins: CapabilityPins, *, node_executable: Path | None
+    bindings: ManifestLaunchBindings,
+    pins: CapabilityPins,
+    *,
+    node_executable: Path | None,
+    mcp_endpoints: Mapping[str, str] | None = None,
 ) -> ManifestLaunchBindings:
-    """Expand ``pinned`` capability bindings into the exact components the pin file states."""
+    """Expand ``pinned`` capability bindings into the exact components the pin file states.
+
+    An MCP server pin resolves by its form (IP-008): a node module needs the deployment's
+    node, a remote server its endpoint in ``mcp_endpoints`` (``MCP_SERVER_ENDPOINTS``), an
+    executable its bytes at the pinned digest.
+    """
 
     resolved: dict[str, CapabilityComponentBinding] = {}
     for capability_id, binding in bindings.capabilities.items():
@@ -326,15 +340,21 @@ def resolve_pinned_capabilities(
             continue
         update: dict[str, object]
         if binding.kind == "mcp_server":
-            if node_executable is None:
+            pin = pins.pinned_mcp_server(binding.pinned)
+            if isinstance(pin, PinnedMCPServer) and node_executable is None:
                 raise ValueError(
                     f"{capability_id}: pinned MCP servers need WEB_RESEARCH_AGENT_BROWSER_NODE"
                 )
-            update = {
-                "mcp_server": pins.mcp_server(binding.pinned).component(
-                    node_executable=node_executable
-                )
-            }
+            try:
+                update = {
+                    "mcp_server": pinned_mcp_component(
+                        pin, node_executable=node_executable, endpoints=mcp_endpoints
+                    )
+                }
+            except CapabilityPinError as error:
+                if isinstance(pin, PinnedMCPServer):
+                    raise
+                raise ValueError(f"{capability_id}: {error}") from error
         elif binding.kind == "skill":
             update = {"skill": pins.skill(binding.pinned).component()}
         else:
@@ -403,6 +423,7 @@ def compose_manifest_launch_inputs(
         ManifestLaunchBindings.load(path),
         pins,
         node_executable=settings.web_research_agent_browser_node,
+        mcp_endpoints=settings.mcp_server_endpoints,
     )
     # The Deep Agents node roles resolve through the seam (ADR-0063): the lane package owns
     # the deployment's Deep Agents facts; the application is the installation's profile file

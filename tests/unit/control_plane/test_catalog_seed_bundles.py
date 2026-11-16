@@ -45,6 +45,8 @@ EXPECTED = {
     # The research capabilities (GitHub, Context7, the capture server, plugin.code-research)
     # as new ids, after the applied, frozen 1.0.0.
     ("mc.catalog.agent-capabilities", "1.1.0"),
+    # Revision 2 of the capture server and its tool rows; 1.1.0 is frozen.
+    ("mc.catalog.agent-capabilities", "1.2.0"),
     ("mc.catalog.knowledge-tools", "1.0.0"),
     # OVE-170 submit_output revision 2 (recorded), then OVE-204 slice 4 knowledge_read_intent.
     ("mc.catalog.knowledge-tools", "1.1.0"),
@@ -110,7 +112,11 @@ def test_each_app_installation_set_is_valid_and_dependency_closed(app: str) -> N
     ]
     agent = [("mc.catalog.agent-capabilities", "1.0.0"), (APP_AGENT_KEYS[app], "1.0.0")]
     # The research capabilities: new common ids, after the frozen common 1.0.0.
-    research = [("mc.catalog.agent-capabilities", "1.1.0")]
+    # 1.2.0: revision 2 of the capture server (supported on deep_agents), after the frozen 1.1.0.
+    research = [
+        ("mc.catalog.agent-capabilities", "1.1.0"),
+        ("mc.catalog.agent-capabilities", "1.2.0"),
+    ]
     # FT-A7: skills, the policy hook and the plugin are per application.
     # 1.0.5: the coordinator bundles regenerated from the guide and the imported method skills.
     skill_versions = ("1.0.0", "1.0.1", "1.0.2", "1.0.3", "1.0.4", "1.0.5")
@@ -123,6 +129,9 @@ def test_each_app_installation_set_is_valid_and_dependency_closed(app: str) -> N
     ]
     # Revision 2 of the knowledge and mixed plugins, over the skills agent-skills 1.0.5 publishes.
     observation.append((f"mc.app.{app}.cognition-profiles", "1.0.1"))
+    # Revision 3 of the knowledge plugin, with the capture server agent-capabilities 1.2.0
+    # publishes at revision 2.
+    observation.append((f"mc.app.{app}.cognition-profiles", "1.0.2"))
     storage = [("mc.storage.capability-bundles", "1.0.0"), ("mc.storage.mission-payloads", "1.0.0")]
     # Succession of the applied, frozen approved-assets@1.0.0 (new logical keys only).
     successors = [
@@ -176,6 +185,10 @@ def test_each_app_installation_set_is_valid_and_dependency_closed(app: str) -> N
     # The revision 2 plugins apply after the skills they pin and after their own 1.0.0.
     assert position_of(keys, observation[3]) > position_of(keys, skills[5])
     assert position_of(keys, observation[3]) > position_of(keys, observation[0])
+    # The revision 3 knowledge plugin applies after its 1.0.1 and after the capture server.
+    assert position_of(keys, observation[4]) > position_of(keys, observation[3])
+    assert position_of(keys, observation[4]) > position_of(keys, research[1])
+    assert position_of(keys, research[1]) > position_of(keys, research[0])
     assert position_of(keys, knowledge[2]) > position_of(keys, knowledge[1])
     # The schema successor applies after the frozen 1.0.0 it depends on.
     assert position_of(keys, artifact_schemas[1]) > position_of(keys, artifact_schemas[0])
@@ -618,8 +631,12 @@ def test_published_definition_assets_are_exact_and_repository_readable() -> None
             assert fields["asset_id"] == definition_asset_id(
                 published.ref.kind, published.ref.logical_id
             )
-            # knowledge-tools 1.1.0/1.2.0 carry submit_output at revision 2 (OVE-170).
-            revision = "2" if published.ref.logical_id == "tool.knowledge-submit-output" else "1"
+            # knowledge-tools 1.1.0/1.2.0 carry submit_output at revision 2 (OVE-170), and
+            # agent-capabilities 1.2.0 the capture server and its tool rows at revision 2.
+            second = published.ref.logical_id == "tool.knowledge-submit-output" or (
+                published.ref.logical_id.startswith("mcp.knowledge-capture")
+            )
+            revision = "2" if second else "1"
             assert fields["version"] == str(published.ref.revision)
             assert fields["version"] in {"1", revision}
             seen.add(published.ref.logical_id)

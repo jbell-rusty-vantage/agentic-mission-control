@@ -49,7 +49,9 @@ slots:
     example: "2"
 notes:
   - A Goal Loop of at most two iterations. The verifier's findings return to the executor as repair feedback.
-  - The knowledge cognition plugin mounts the method skills by exact pin, `knowledge-research` (how to search, capture, cite and verify) and `knowledge-verify` (sources as evidence), with this application's knowledge charter (what counts as a source here). The goal text carries the question only; each tool describes itself.
+  - The knowledge cognition plugin mounts the method skills by exact pin, `knowledge-research` (how to search, capture, cite and verify) and `knowledge-verify` (sources as evidence), with this application's knowledge charter (what counts as a source here) and the evidence capture server the method requires (capture a source as exact bytes, read it, locate a quote). The goal text carries the question only; each tool describes itself.
+  - The code research plugin mounts Context7 for a first look at a library's documentation and GitHub, read-only, for the file at a release's commit.
+  - A plugin on this lane is run as its members, so each member needs its own launch binding on the installation. The capture server also needs the installation's endpoint for it, and GitHub a read-only token; topic `capabilities` lists what each one needs.
   - The report is judged by the installation's trusted assessment. A start is refused with `trusted_assessment_unavailable` where none is composed.
   - The web research plugin needs its servers' secrets; preflight lists the ones that are missing.
   - The `brief` block is the interview's result in the user's words. The executor and the verifier are both told the purpose, the request, what done means, what each was given and each criterion whose `evidence` names an output.
@@ -104,6 +106,8 @@ mission:
         as: web_research
       - pin: plugin.cognition-knowledge@latest
         as: knowledge_cognition
+      - pin: plugin.code-research@latest
+        as: code_research
     capabilities:
       - {pin: tool.knowledge-read-intent@latest, kind: tool, as: knowledge_search}
       - {pin: tool.knowledge-read@latest, kind: tool, as: knowledge_read}
@@ -124,7 +128,7 @@ mission:
     key: root
     behavior: goal_loop
     objective: sourced_report
-    action_space: [web_research, knowledge_search, knowledge_read, report_register, submit_output]
+    action_space: [web_research, code_research, knowledge_cognition, knowledge_search, knowledge_read, report_register, submit_output]
     verifier:
       independent: true
       environment:

@@ -236,13 +236,14 @@ async def test_an_independent_verifier_is_not_told_it_has_the_producer_tools() -
         assert f"- tool `{alias}`\n" in executor
     assert "- plugin `web_research`\n" in executor
     assert "- plugin `knowledge_cognition`\n" in executor
+    assert "- plugin `code_research`\n" in executor
     # What the verifier is never given is not on its card.
     assert "- tool `knowledge_read`\n" in verifier
     assert "`report_register`" not in verifier and "`submit_output`" not in verifier
     assert "- Purpose: research (researching for the application)\n" in verifier
     # A plugin is one line: the members compile expanded from it are not listed again.
     given = executor.split("## What you were given\n", 1)[1].split("- Budget:", 1)[0]
-    assert len(given.strip().splitlines()) == 6
+    assert len(given.strip().splitlines()) == 7
 
 
 # -- a fork keeps the card -----------------------------------------------------------------------

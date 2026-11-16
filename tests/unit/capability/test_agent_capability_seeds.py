@@ -116,7 +116,22 @@ def test_research_capabilities_are_new_ids_after_the_frozen_first_version() -> N
         for bundle in load_bundles([SEEDS / "common"])
         if bundle["seed_key"] == COMMON_KEY
     }
-    assert set(by_version) == {"1.0.0", "1.1.0"}
+    assert set(by_version) == {"1.0.0", "1.1.0", "1.2.0"}
+    # 1.2.0: revision 2 of the capture server and of its 19 tool rows, nothing else.
+    capture = by_version["1.2.0"]
+    assert capture["depends_on"] == [{"seed_key": COMMON_KEY, "seed_version": "1.1.0"}]
+    earlier = {
+        record["logical_key"]
+        for version in ("1.0.0", "1.1.0")
+        for record in by_version[version]["records"]
+    }
+    assert not earlier & {record["logical_key"] for record in capture["records"]}
+    revised = [r["fields"]["manifest"] for r in capture["records"] if r["kind"] == "asset_version"]
+    assert {item["ref"]["revision"] for item in revised} == {2}
+    assert [
+        item["ref"]["logical_id"] for item in revised if item["ref"]["kind"] == "mcp_server"
+    ] == ["mcp.knowledge-capture"]
+    assert len([item for item in revised if item["ref"]["kind"] == "mcp_tool"]) == 19
     successor = by_version["1.1.0"]
     assert successor["depends_on"] == [{"seed_key": COMMON_KEY, "seed_version": "1.0.0"}]
     held = {record["logical_key"] for record in by_version["1.0.0"]["records"]}
@@ -179,6 +194,7 @@ def test_research_servers_are_pinned_read_only_and_captured() -> None:
         for item in _published("common")
         if isinstance(item.definition, MCPToolDefinition)
         and item.definition.server_ref.logical_id in RESEARCH
+        and item.ref.revision == 1
     ]
     assert len(rows) == sum(EXPECTED_TOOLS[name] for name in RESEARCH)
     assert {row.annotations["schema_source"] for row in rows} == {"captured"}
@@ -186,8 +202,18 @@ def test_research_servers_are_pinned_read_only_and_captured() -> None:
     assert all(row.input_schema != {"type": "object"} for row in rows)
 
 
-def test_the_capture_server_offers_no_knowledge_write_or_issuer_tool() -> None:
-    capture = _servers("common")["mcp.knowledge-capture"]
+def _capture_revisions() -> dict[int, MCPServerDefinition]:
+    return {
+        item.ref.revision: item.definition
+        for item in _published("common")
+        if isinstance(item.definition, MCPServerDefinition)
+        and item.definition.logical_id == "mcp.knowledge-capture"
+    }
+
+
+@pytest.mark.parametrize("revision", [1, 2])
+def test_the_capture_server_offers_no_knowledge_write_or_issuer_tool(revision: int) -> None:
+    capture = _capture_revisions()[revision]
     assert capture.transport == "streamable_http" and capture.launch_template is None
     assert capture.endpoint == "http://127.0.0.1:4310/mcp"
     assert capture.header_refs == {"Authorization": "VERIFY_EXECUTOR_TOKEN"}
@@ -229,11 +255,25 @@ def test_the_capture_server_offers_no_knowledge_write_or_issuer_tool() -> None:
         "schema_materialize",
         "source_prepare_captured",
     } <= withheld
-    # The executor lists every tool and no lane narrows a server's list to an allowlist, so
-    # no lane may mount it yet: a manifest pin is refused at compile until one qualifies.
-    assert capture.host_support.supported_profiles() == ()
-    assert capture.host_support.status("deep_agents") is HostSupportStatus.UNQUALIFIED
     assert capture.host_support.status("cursor_cloud") is HostSupportStatus.UNSUPPORTED
+    for lane in ("cursor_local", "claude_agent_sdk", "codex"):
+        assert capture.host_support.status(lane) is HostSupportStatus.UNQUALIFIED
+
+
+def test_the_capture_server_is_supported_on_deep_agents_from_revision_two() -> None:
+    """The executor lists every tool. Revision 1 was seeded while no lane narrowed a server's
+    list to an allowlist, so no lane could mount it. Revision 2 is the same server, endpoint,
+    authentication and allowlist, supported on the one lane that now attaches only the
+    allowlisted tools; `@latest` resolves to it."""
+
+    first, second = (_capture_revisions()[revision] for revision in (1, 2))
+    assert first.host_support.supported_profiles() == ()
+    assert first.host_support.status("deep_agents") is HostSupportStatus.UNQUALIFIED
+    assert second.host_support.supported_profiles() == (LaneProfile.DEEP_AGENTS,)
+    assert second.tool_allowlist == first.tool_allowlist and len(second.tool_allowlist or ()) == 19
+    for field in ("transport", "endpoint", "header_refs", "secret_refs", "tools", "package_pin"):
+        assert getattr(second, field) == getattr(first, field), field
+    assert second.source_provenance == first.source_provenance
 
 
 def test_code_research_plugin_pins_its_members_exactly() -> None:

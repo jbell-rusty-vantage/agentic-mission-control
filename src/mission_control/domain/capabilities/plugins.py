@@ -6,7 +6,7 @@ members into the node's environment and ``capability_plugin_member`` records the
 
 from __future__ import annotations
 
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from enum import StrEnum
 from typing import Final, Literal
 
@@ -14,6 +14,7 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from mission_control.domain.capabilities.host_support import (
     CapabilityHostSupport,
+    LaneProfile,
     intersect_host_support,
 )
 from mission_control.domain.capabilities.pins import CapabilityPin
@@ -28,6 +29,22 @@ class PluginMemberRole(StrEnum):
     SUBAGENT = "subagent"
     PROMPT = "prompt"
     RESOURCE = "resource"
+
+
+# The `mc.agent_configuration.v2` item kind each member role becomes when a lane runs a
+# plugin as its members.
+MEMBER_ITEM_KINDS: Final[Mapping[PluginMemberRole, str]] = {
+    PluginMemberRole.SKILL: "skill_bundle",
+    PluginMemberRole.MCP_SERVER: "mcp_server",
+    PluginMemberRole.HOOK: "hook_script",
+    PluginMemberRole.SUBAGENT: "subagent_profile",
+    PluginMemberRole.PROMPT: "context_bundle",
+    PluginMemberRole.RESOURCE: "context_bundle",
+}
+# IP-011: the lane profiles that run a node's plugin as its members (each member bound,
+# verified and pinned like a direct selection), and so can run only the member kinds their
+# declaration carries. The file lanes project a plugin as one unit and are not listed.
+MEMBER_EXPANDING_LANES: Final[frozenset[str]] = frozenset({LaneProfile.DEEP_AGENTS.value})
 
 
 class PluginMember(BaseModel):

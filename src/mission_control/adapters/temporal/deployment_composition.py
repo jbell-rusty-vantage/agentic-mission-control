@@ -1453,6 +1453,7 @@ class ProductionWorkerActivityCompositionFactory:
             registered_mcp_servers=(
                 self._additional.mcp_servers if self._additional is not None else None
             ),
+            mcp_endpoints=settings.mcp_server_endpoints,
         )
         # FT-B2 (ADR-0027): Context Packet files are content-addressed in the payload store;
         # the packer captures producer outputs from custody records and seals into PostgreSQL.

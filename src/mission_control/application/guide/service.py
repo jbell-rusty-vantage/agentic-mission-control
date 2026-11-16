@@ -30,7 +30,7 @@ from __future__ import annotations
 
 import json
 from collections import Counter
-from collections.abc import Awaitable, Callable, Iterable, Mapping
+from collections.abc import Awaitable, Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any, Final, Literal, Protocol, get_args
 
@@ -83,7 +83,12 @@ from mission_control.domain.authoring.brief import (
     BRIEF_REQUEST_MAX,
     MissionPurpose,
 )
-from mission_control.domain.authoring.contracts import DefinitionKind, PublishedDefinition
+from mission_control.domain.authoring.contracts import (
+    DefinitionKind,
+    MCPServerDefinition,
+    PluginDefinition,
+    PublishedDefinition,
+)
 from mission_control.domain.authoring.manifest import MissionManifest
 from mission_control.domain.authoring.manifest_lowering import manifest_lowered_refs
 from mission_control.domain.authoring.manifest_v2 import MissionManifestV2
@@ -91,6 +96,7 @@ from mission_control.domain.capabilities.catalog_entry import capability_pin
 from mission_control.domain.capabilities.features.registry import FeatureRegistry, FeatureStatus
 from mission_control.domain.capabilities.host_support import CapabilityHostSupport
 from mission_control.domain.capabilities.pins import CapabilityPin, is_pin
+from mission_control.domain.capabilities.plugins import MEMBER_EXPANDING_LANES, MEMBER_ITEM_KINDS
 from mission_control.domain.execution.lanes import DEFAULT_LANE_PROFILE, DELIVERY_COMMANDS
 from mission_control.domain.resolution.configuration import FAMILIES
 from mission_control.domain.resolution.profiles import LaneDeclaration
@@ -488,6 +494,110 @@ class GuideService:
                 f"Not counted: {lowered} definitions lowered from submitted manifests (topic "
                 "`workflows`)."
             )
+        mounting = self._mounting(published)
+        if mounting:
+            parts.append(mounting)
+        return "\n\n".join(parts)
+
+    def _mounting(self, published: Sequence[PublishedDefinition]) -> str:
+        """What a node can mount of the catalog's MCP servers and plugins, and what each
+        needs from the installation: read from the newest published revision of each row
+        (lanes, transport, tool allowlist, secret names) and from the lane declarations.
+        Empty when the catalog publishes neither kind."""
+
+        newest: dict[tuple[str, str], PublishedDefinition] = {}
+        for row in published:
+            key = (row.ref.kind.value, row.ref.logical_id)
+            if key not in newest or row.ref.revision > newest[key].ref.revision:
+                newest[key] = row
+        servers = sorted(
+            (row for row in newest.values() if isinstance(row.definition, MCPServerDefinition)),
+            key=lambda row: row.ref.logical_id,
+        )
+        plugins = sorted(
+            (row for row in newest.values() if isinstance(row.definition, PluginDefinition)),
+            key=lambda row: row.ref.logical_id,
+        )
+        if not servers and not plugins:
+            return ""
+        parts: list[str] = [
+            "### What a node can mount\n\n"
+            "The MCP servers and plugins of this catalog at their newest revisions: the lanes "
+            "that support each, how many of a server's tools a node is handed, the names of "
+            "the secrets it needs and what the installation must serve. A server with an "
+            "allowlist lists more tools than a node is handed: the lane attaches only the "
+            "allowlisted ones and refuses the server when one is missing or its input schema "
+            "changed. None of the installation's part is in a manifest: a launch binding per "
+            "capability, the worker's pin for each server (a node module, an executable at an "
+            "absolute path with its digest, or a remote server with its tool list), the "
+            "endpoint of each remote server in `MCP_SERVER_ENDPOINTS`, and a value for each "
+            "secret name."
+        ]
+        if servers:
+            rows = []
+            for row in servers:
+                server = row.definition
+                assert isinstance(server, MCPServerDefinition)
+                listed = len(server.tools) or len(server.allowed_tools)
+                tools = (
+                    f"{len(server.tool_allowlist)} of {listed} (allowlist)"
+                    if server.tool_allowlist is not None
+                    else str(listed)
+                )
+                if server.transport == "stdio":
+                    needs = f"the server on the worker, pinned ({_code(server.package_pin)})"
+                else:
+                    needs = (
+                        "its endpoint in `MCP_SERVER_ENDPOINTS` under "
+                        f"`{row.ref.logical_id}`, pinned as a remote server"
+                    )
+                rows.append(
+                    [
+                        f"`{row.ref.logical_id}` (revision {row.ref.revision})",
+                        _supported_lanes(server.host_support),
+                        tools,
+                        _spans(sorted(server.secret_refs)) or "none",
+                        needs,
+                    ]
+                )
+            parts.append(
+                _table(
+                    ["MCP server", "Lanes that support it", "Tools mounted", "Secrets", "Needs"],
+                    rows,
+                )
+            )
+        if plugins:
+            rows = []
+            for row in plugins:
+                plugin = row.definition
+                assert isinstance(plugin, PluginDefinition)
+                members = ", ".join(
+                    f"`{member.pin.capability_id}` ({member.role.value})"
+                    for member in plugin.manifest.members
+                )
+                rows.append(
+                    [
+                        f"`{row.ref.logical_id}` (revision {row.ref.revision})",
+                        _supported_lanes(plugin.host_support),
+                        members,
+                    ]
+                )
+            parts.append(_table(["Plugin", "Lanes that support it", "Members"], rows))
+        for profile in sorted(MEMBER_EXPANDING_LANES & set(self._lanes.profiles())):
+            declaration = self._declaration(profile)
+            if declaration is None:
+                continue
+            refused = sorted(
+                role.value
+                for role, kind in MEMBER_ITEM_KINDS.items()
+                if declaration.items.get(kind) == "unsupported"  # type: ignore[call-overload]
+            )
+            parts.append(
+                f"On `{profile}` a plugin is run as its members: each member needs its own "
+                "launch binding on the installation, exactly as if the manifest had selected "
+                f"it. A {_spans(refused)} member blocks the compile at that member "
+                "(`plugin_member_unsupported_on_lane`)."
+            )
         return "\n\n".join(parts)
 
     async def _observe_section(self) -> str:
@@ -811,6 +921,27 @@ def _by_exact_ref(
 
 def _spans(names: Iterable[str]) -> str:
     return ", ".join(f"`{name}`" for name in names)
+
+
+def _code(value: object) -> str:
+    return f"`{value}`" if value else "no package pin"
+
+
+def _supported_lanes(support: CapabilityHostSupport | None) -> str:
+    """The lane profiles a row's host support marks `supported`."""
+
+    if support is None or not support.profiles:
+        return "not declared"
+    return (
+        _spans(
+            sorted(
+                profile.value
+                for profile, entry in support.profiles.items()
+                if entry.status.value == "supported"
+            )
+        )
+        or "none"
+    )
 
 
 def _json_block(value: object) -> str:

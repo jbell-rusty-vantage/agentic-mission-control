@@ -109,8 +109,8 @@ COMPONENT_KINDS: Final[frozenset[ConfigurationItemKind]] = frozenset(
 )
 _NO_LAUNCH_BINDING: Final = (
     "MCP servers, Skills and tools bind through mc.manifest_launch_bindings.v1 capabilities "
-    "and subagent profiles through the deep_agents lane adapter; hook scripts, plugins and "
-    "context bundles have no Deep Agents launch binding"
+    "and subagent profiles through the deep_agents lane adapter; hook scripts and context "
+    "bundles have no Deep Agents launch binding"
 )
 
 
@@ -344,6 +344,18 @@ def _node_plugin_member(item: ConfigurationItem) -> bool:
     """A member of a plugin the node itself selected (not a child's plugin seed)."""
 
     return _is_plugin_member(item) and not _is_seed(item)
+
+
+def _bound_plugin_member(item: ConfigurationItem) -> bool:
+    """A node plugin's Skill or MCP server member (IP-011): bound through its own deployment
+    component exactly as if the manifest had selected it under `environment.capabilities`.
+    A subagent member arrives as a child (the launch author gives it its catalog body); every
+    other member role has no launch binding on this lane."""
+
+    return (
+        _node_plugin_member(item)
+        and item.config.get(item_config.PLUGIN_MEMBER_ROLE) in SEEDED_PLUGIN_MEMBER_ROLES
+    )
 
 
 def _is_child(item: ConfigurationItem) -> bool:
@@ -612,7 +624,8 @@ class DeepAgentsCompileAdapter:
         skills: dict[str, DeepAgentSkillComponent] = {}
         tools: dict[str, DeepAgentToolComponent] = {}
         for item in work.agent.items:
-            parent = not (_is_seed(item) or _node_plugin_member(item) or _is_child(item))
+            unbound_member = _node_plugin_member(item) and not _bound_plugin_member(item)
+            parent = not (_is_seed(item) or unbound_member or _is_child(item))
             # A subagent profile without its catalog body was not selected as a child (`agents:`);
             # like any other capability it needs a component binding, which none can be.
             orphan = item.kind == "subagent_profile"
@@ -674,14 +687,20 @@ class DeepAgentsCompileAdapter:
 
     @staticmethod
     def _unsupported(work: _Compilation) -> None:
-        """Kinds declared unsupported, and a node's plugin members: a plugin the node selects
-        has no Deep Agents launch binding (a child's plugin seeds do), so its first member is
-        refused at the plugin row (``/items/<i>/plugin``) with the plugin's pin. A hook script
+        """Kinds declared unsupported, and the plugin members this lane cannot run. A plugin
+        the node selects is run as its members (IP-011): its Skill and MCP server members bind
+        like direct selections and its subagent members are children, so only a member of
+        another role (a hook script, a prompt or resource) is refused, at the member's own
+        row and by name. The manifest compile refuses the same member earlier
+        (`plugin_member_unsupported_on_lane`); this is the launch-time backstop. A hook script
         or context bundle is refused even when its id has a `capabilities` binding. Required:
         refused. Otherwise: an `unsupported` receipt row with the reason (design D9)."""
 
+        def unrunnable_member(item: ConfigurationItem) -> bool:
+            return _node_plugin_member(item) and not _bound_plugin_member(item)
+
         def rank(item: ConfigurationItem) -> int:
-            if _node_plugin_member(item):
+            if unrunnable_member(item):
                 return 2
             return {"context_bundle": 0, "hook_script": 1}.get(item.kind, 3)
 
@@ -689,21 +708,25 @@ class DeepAgentsCompileAdapter:
             (
                 item
                 for item in work.agent.items
-                if _node_plugin_member(item)
+                if unrunnable_member(item)
                 or (
-                    not _is_seed(item) and DEEP_AGENTS_DECLARATION.items[item.kind] == "unsupported"
+                    not _is_seed(item)
+                    and not _bound_plugin_member(item)
+                    and DEEP_AGENTS_DECLARATION.items[item.kind] == "unsupported"
                 )
             ),
             key=lambda item: (rank(item), work.index[item.name]),
         )
         for item in candidates:
             pointer = work.pointer(item)
-            if _node_plugin_member(item):
-                plugin = item.config.get(item_config.PLUGIN) or _label(item)
+            if unrunnable_member(item):
+                plugin = item.config.get(item_config.PLUGIN) or "a selected plugin"
+                role = item.config.get(item_config.PLUGIN_MEMBER_ROLE)
                 reason = (
-                    f"plugin {plugin} has no deployment component binding ({_NO_LAUNCH_BINDING})"
+                    f"{_label(item)} is a {role} member of plugin {plugin}; the deep_agents "
+                    "lane runs a plugin's Skill, MCP server and subagent members only "
+                    f"({_NO_LAUNCH_BINDING})"
                 )
-                pointer = work.pointer(item, "/plugin")
             elif item.kind == "environment_kit":
                 reason = f"{_label(item)}: the deep_agents lane runs no Environment Kit bootstrap"
             else:

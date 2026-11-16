@@ -379,6 +379,11 @@ class Settings(BaseSettings):
     capability_pins_path: Path = (
         PROJECT_ROOT / "infra" / "capability-pins" / "research-capabilities.json"
     )
+    # IP-008: the endpoint of each pinned remote MCP server, keyed by the pin's `server_id`
+    # (`MCP_SERVER_ENDPOINTS={"mcp.knowledge-capture": "http://127.0.0.1:4310/mcp"}`). The pin
+    # file states no URL; a pinned remote server without an entry here is refused by the
+    # launch author and by the worker, both of which must be given the same value.
+    mcp_server_endpoints: dict[str, str] = Field(default_factory=dict)
     # MP-02: the operator-reviewed `mc.manifest_launch_bindings.v1` file (Deep Agent scaffold,
     # model/sandbox profile and catalog capability components) the production manifest launch
     # author resolves node environments against. Unset: manifest start needs a family input.
