@@ -782,9 +782,8 @@ def check_all(graph: Graph, revision_range: str | None) -> list[str]:
     for ident, node in graph.nodes.items():
         kind = node["kind"]
         if kind == "commit":
-            if (in_range is None and not node["since_cutover"]) or (
-                in_range is not None and ident not in in_range
-            ):
+            # Legacy commits (before the cutover) are counted, never flagged, in a range too.
+            if not node["since_cutover"] or (in_range is not None and ident not in in_range):
                 continue
             if node["subject"].startswith("Merge "):
                 continue

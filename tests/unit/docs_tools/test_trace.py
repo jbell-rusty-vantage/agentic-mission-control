@@ -175,6 +175,7 @@ def test_check_flags_new_gaps_and_never_legacy_commits(
     problems = tool.check_all(tool.load(), None)
     assert len(problems) == 1 and problems[0].startswith(f"commit {repo['bare'][:8]}")
     assert tool.check_all(tool.load(), f"{repo['good']}..{repo['bare']}") == problems
+    assert tool.check_all(tool.load(), "HEAD") == problems  # a range over legacy commits too
 
 
 def test_a_completed_issue_needs_a_completion_comment(
