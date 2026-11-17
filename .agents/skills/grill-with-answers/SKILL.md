@@ -40,11 +40,10 @@ it (`Session:` in an issue's `## Provenance`, `Refs:` in a commit).
 
 ## 1a. Start from an idea when there is one
 
-When the topic comes from the owner's ideas workspace (`platform/agentic-sdlc/ideas/`, guide in
-its `README.md`), set the idea's `status: interviewing`, cite its `ID-n` in the instrument's front
-matter (`idea:`) and in every answers row's **Source**, and never edit the owner's itch paragraph.
-After conversion, write the program and answers file path into the idea's `promoted_to` and the
-issue ids into `linear`.
+The owner's ideas workspace (`platform/agentic-sdlc/ideas/`) was deleted on 2026-11-17 (AS-D65).
+Older records cite its ids (`ID-1`) and those citations stay valid. For a new idea, quote the
+owner's words as the first decision's **Answer**; until the owner names a new ideas home, there
+is no idea file to update.
 
 ## 2. Read, then re-verify
 

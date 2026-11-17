@@ -1,7 +1,7 @@
 ---
 type: Specification
 title: "SPEC-02 Provenance chain v1: interview to completion, in Mission Control"
-description: "The lean provenance chain the owner approved on 2026-11-17 (AS-S3, AS-D40..AS-D46): the six record types and their fixed keys, the commit trailer grammar, the Completion comment, the trace tool's commands, graph and check rules, the warn-then-block enforcement, and what was left out. Mission Control first; the tool moves upstream to platform/agentic-sdlc when Knowledge Services adopts it."
+description: "The lean provenance chain the owner approved on 2026-11-17 (AS-S3, AS-D40..AS-D46): the six record types and their fixed keys, the commit trailer grammar, the Completion comment, the trace tool's commands, graph and check rules, the warn-then-block enforcement, and what was left out. Mission Control first; with platform/agentic-sdlc deleted (AS-D65), this copy is the one other repositories take."
 tags: [mission-control, agents, process, sdlc, provenance, spec]
 date: 2026-11-17
 status: accepted
@@ -100,7 +100,7 @@ CI step both run warn-only from 2026-11-17; the switch to `block` waits for the 
 ## 6. Not in v1
 
 The surface is Linear and the CLI (AS-D43); a `/provenance` page in mission-control-web comes later. Not in v1: the other
-repositories, the upstream move to `platform/agentic-sdlc` (when Knowledge Services adopts it), the legacy-bundle and alias
+repositories (they copy this tool when they adopt it; there is no upstream since AS-D65), the legacy-bundle and alias
 backfill, the Linear reconciliation, the remote mirror (SPEC-01 §6.3), feature maps and `dev drive`.
 
 <a id="decisions"></a>

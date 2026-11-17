@@ -4,7 +4,7 @@ General runtime that admits missions, schedules them on Temporal and runs bounde
 ## Read before editing
 - Report against the [owner goal](../../AGENTS.md#owner-goal-and-reporting-directive-2026-10-29) (Deep Agents workflow and agent configuration). Current direction: the Sprint OC checkpoint in [NEXT-SESSION](docs/specs/provider-consolidation-2026-10/sprint-oc/NEXT-SESSION.md); owner directives by date: [decisions](docs/knowledge/decisions.md#owner-directives-by-date).
 - Work lands on `main`, the only branch; check `git status` and `git worktree list --porcelain` and preserve dirty work and ignored `app/personal_code`. History starts at the 2026-11-06 clean-slate baseline on the jbell-rusty-vantage account. Commit IDs in older docs are not in this repository: read them as dated labels and re-verify against live source ([repository history](docs/REPOSITORY-HISTORY.md)).
-- Read the closest module `AGENTS.md` (code map) before editing there. Unshaped ideas: `../agentic-sdlc/ideas/`.
+- Read the closest module `AGENTS.md` (code map) before editing there. Unshaped ideas: tell the owner; the old `agentic-sdlc/ideas/` workspace was deleted on 2026-11-17 (AS-D65).
 
 <!-- BEGIN:sdlc-infra -->
 Data planes, credentials, MCP servers: [workspace registry](../../docs/navigation/DATA-PLANES-AND-CREDENTIALS.md). Tooling: [DEVELOPMENT](docs/DEVELOPMENT.md); API and workers: [operator guide](docs/MISSION_CONTROL_LOCAL_API.md).

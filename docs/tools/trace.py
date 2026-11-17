@@ -4,7 +4,7 @@
 The chain and its record formats are SPEC-02
 (docs/specs/agentic-sdlc-2026-11/SPEC-02-PROVENANCE-CHAIN.md). Git and Markdown are canonical;
 Linear is read from a cached snapshot; the trace is derived and never edited. Standard library
-only, so it runs before ``uv sync`` and moves upstream unchanged (AS-D41).
+only, so it runs before ``uv sync``; this copy is the one other repos take (AS-D41, AS-D65).
 
 Usage:
   python -X utf8 docs/tools/trace.py show OVE-225       # the chain around any id
@@ -138,7 +138,7 @@ class Graph:
     def resolves(self, ident: str) -> bool:
         kind = kind_of(ident)
         if kind == "idea":
-            return True  # ideas live in platform/agentic-sdlc, outside this repository
+            return True  # ideas lived outside this repository (agentic-sdlc, deleted 2026-11-17)
         if kind == "issue":
             snap = self.snapshot
             if snap and snap.get("complete"):

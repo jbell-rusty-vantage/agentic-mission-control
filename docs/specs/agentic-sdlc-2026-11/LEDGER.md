@@ -102,9 +102,12 @@ Status words: `planned` · `draft` · `open` (waiting for an owner decision) · 
 | IA-04 | [AGENTIC-SDLC sitting IV: answers](answers/AGENTIC-SDLC-SITTING-IV-2026-11-17-ANSWERS.md) | done | OVE-233 | AS-S4: the owner's direction for the MC-web target (AS-D47), all-provider mechanics with care for coding harnesses (AS-D48) and the Linear reconciliation (AS-D49); reconciled 2026-11-17: OVE-226..OVE-236 created, 74 → 50 open MC issues. |
 | IA-05 | [AGENTIC-SDLC sitting V: answers](answers/AGENTIC-SDLC-SITTING-V-2026-11-17-ANSWERS.md) | open | OVE-238 | AS-S5: the owner's go to implement the test-suite review with Opus 5.5 agents (AS-D50, AS-D51); decisions 1-4 taken at the recommended defaults (AS-A1..A4). Final when OVE-238 closes. |
 | IA-06 | [AGENTIC-SDLC sitting VI: answers](answers/AGENTIC-SDLC-SITTING-VI-2026-11-17-ANSWERS.md) | done | OVE-239 | AS-S6: dollar budgets held with no placeholder enforcement (AS-D60, OVE-229 rescoped); context-window optimization first (AS-D61, OVE-239); next Knowledge Services, then the AI Engineer service, real missions on one provider (AS-D62). |
+| IA-07 | [AGENTIC-SDLC sitting VII: answers](answers/AGENTIC-SDLC-SITTING-VII-2026-11-17-ANSWERS.md) | done | OVE-240 | AS-S7: complete MC feature maps and `./dev` runners, test them, and make the evaluation a feedback loop (AS-D63); the eleven operability questions (AS-D64); `agentic-sdlc` deleted (AS-D65). |
+| IA-08 | [AGENTIC-SDLC sitting VIII: answers](answers/AGENTIC-SDLC-SITTING-VIII-2026-11-17-ANSWERS.md) | done | OVE-240 | AS-S8: finish and fully migrate the AI Engineer schema first (AS-D66); SE-02 and OVE-240 deferred. |
 
 ## Sessions
 
 | ID | Item | Status | Linear | Progress and next step |
 | --- | --- | --- | --- | --- |
 | SE-01 | [Session: navigation and retrieval quality](SESSION-NAVIGATION-QUALITY.md) | active | OVE-206 | In progress: preparation done (DOC-03..DOC-10), MC truth pass done (DOC-11..DOC-22), KS/BKS/AIDB passes and NAVIGATION-DESIGN.md remain ([handoff](HANDOFF-2026-11-02.md)). |
+| SE-02 | [Session: feature maps, `./dev` runners and an operability evaluation](SESSION-FEATURE-MAPS-AND-RUNNERS.md) | parked | OVE-240 | Deferred by AS-D66 (AI Engineer schema first); resumes after the schema is official. Holds the eleven questions with verified answers, what to build, eleven defects found while mapping, rules and acceptance. |
