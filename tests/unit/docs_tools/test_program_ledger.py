@@ -206,6 +206,21 @@ def test_new_answers_scaffolds_from_the_template(tool: ModuleType, program: Path
     assert tool.new_answers("DEEP-AGENTS", "I", instruction, program, DATE) == 2  # never overwrites
 
 
+def test_new_answers_records_the_session_id_and_harness_session(
+    tool: ModuleType, program: Path
+) -> None:
+    instruction = interview(program)
+    assert (
+        tool.new_answers(
+            "DEEP-AGENTS", "II", instruction, program, DATE, "DA-S2", "claude-code:abc"
+        )
+        == 0
+    )
+    text = read(program / "answers" / "DEEP-AGENTS-SITTING-II-2026-10-23-ANSWERS.md")
+    assert "id: DA-S2\nfamily: DA\nharness_session: claude-code:abc\n" in text.replace("\r\n", "\n")
+    assert tool.new_answers("X", "III", instruction, program, DATE, "DA-D2") == 2  # not a session
+
+
 def answers_file(program: Path, status: str, row: str) -> Path:
     interview(program)
     return write(

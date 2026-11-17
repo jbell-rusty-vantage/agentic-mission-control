@@ -3,6 +3,8 @@ type: Interview Answers
 title: "Sprint OC recovery: architecture approvals and source consolidation"
 description: "Owner architecture approvals and later full recoverable checkout consolidation authorization; source preservation and W1 harness recovery do not qualify runtime behavior."
 tags: [mission-control, interview, answers]
+id: OC-S1
+family: OC
 interview: ../../archive/provider-consolidation-2026-10/sessions/SESSION-CODEX-RESUME-2026-10-29.md
 sitting: "1"
 date: 2026-10-29

@@ -229,6 +229,9 @@ environment or the repository `.env` without echoing it.
 `Docs: proposed-by <provider> <session-id>` (written by `propose --apply`). Existing commits are
 not back-filled.
 
+Amended 2026-11-17 (AS-D42): the reference is a `Refs:` trailer that may cite `OVE-n` or a record id (`AS-S3`, `B08-S29`,
+`AS-D40`); the subject suffix still counts. Grammar and check rules: [SPEC-02 §3](SPEC-02-PROVENANCE-CHAIN.md#trailers).
+
 ### 7.3 Drift (AS-D8)
 
 A registered module drifts when its normalized source hash differs from the hash recorded at the

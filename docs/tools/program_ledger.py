@@ -12,7 +12,8 @@ Usage:
   python docs/tools/program_ledger.py archive <file> --kind sessions --reason "Stage 3 done"
   python docs/tools/program_ledger.py archive-program docs/specs/<program> --reason "..."
   python docs/tools/program_ledger.py move <src> <dest>        # any file or folder, links follow
-  python docs/tools/program_ledger.py new-answers --topic DEEP-AGENTS --sitting I \\
+  python docs/tools/program_ledger.py new-answers --topic DEEP-AGENTS --sitting I --id DA-S1 \\
+      --harness-session claude-code:<session-uuid> \\
       --interview docs/specs/<program>/OWNER-INTERVIEW-<date>.md
 
 Every moving command takes ``--dry-run``. They ``git mv`` tracked files, rewrite every relative
@@ -58,6 +59,8 @@ KINDS = (
 STATUSES = ("planned", "draft", "open", "accepted", "active", "parked", "done", "archived")
 LINEAR_CELL = re.compile(r"^(?:-|—|OVE-\d+(?:\s*,\s*OVE-\d+)*)$")
 EMPTY_CELL = re.compile(r"^(?:|-|—|tbd|\?)$", re.IGNORECASE)
+# A session id names the decision family and the sitting number: AS-S3, OC-S1, B08-S29 (SPEC-02 §2).
+SESSION_ID = re.compile(r"^(?P<family>[A-Z][A-Z0-9]*)-S\d+$")
 
 EXCLUDED_DIRS = {
     ".git", ".venv", ".venv-wsl", "venv", "node_modules", "__pycache__", ".scratch", ".tmp",
@@ -389,8 +392,23 @@ def move(src: Path, dest: Path, dry: bool) -> int:
     return relocate(src, dest, dry)
 
 
-def new_answers(topic: str, sitting: str, interview: Path, program: Path, date: str) -> int:
+def new_answers(
+    topic: str,
+    sitting: str,
+    interview: Path,
+    program: Path,
+    date: str,
+    session_id: str = "",
+    harness_session: str = "unrecorded",
+) -> int:
     template = REPO_ROOT / TEMPLATE
+    match = SESSION_ID.match(session_id) if session_id else None
+    if session_id and not match:
+        print(
+            f"--id {session_id!r} is not a session id; use <FAMILY>-S<n>, e.g. --id AS-S4",
+            file=sys.stderr,
+        )
+        return 2
     interview = interview.resolve()
     if not interview.is_file():
         print(f"{interview} does not exist", file=sys.stderr)
@@ -407,6 +425,9 @@ def new_answers(topic: str, sitting: str, interview: Path, program: Path, date: 
         "{{DATE}}": date,
         "{{INTERVIEW}}": rel_posix(interview, dest.parent),
         "{{INTERVIEW_NAME}}": interview.name,
+        "{{ID}}": session_id or "unassigned",
+        "{{FAMILY}}": match.group("family") if match else "unassigned",
+        "{{HARNESS_SESSION}}": harness_session,
     }.items():
         text = text.replace(key, value)
     dest.parent.mkdir(parents=True, exist_ok=True)
@@ -589,6 +610,14 @@ def main() -> int:
     p_ans.add_argument("--topic", required=True)
     p_ans.add_argument("--sitting", required=True)
     p_ans.add_argument("--interview", type=Path, required=True)
+    p_ans.add_argument(
+        "--id", dest="session_id", required=True, help="session id <FAMILY>-S<n>, e.g. AS-S4"
+    )
+    p_ans.add_argument(
+        "--harness-session",
+        default="unrecorded",
+        help="the harness session, e.g. claude-code:<uuid>, codex:<id>, cursor:<id>",
+    )
     p_ans.add_argument("--program", type=Path, default=DEFAULT_PROGRAM)
     p_ans.add_argument("--date", default=today)
     args = parser.parse_args()
@@ -613,6 +642,8 @@ def main() -> int:
         absolute(args.interview),
         absolute(args.program).resolve(),
         args.date,
+        args.session_id,
+        args.harness_session,
     )
 
 

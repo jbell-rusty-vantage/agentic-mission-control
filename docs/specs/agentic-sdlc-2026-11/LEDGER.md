@@ -7,7 +7,7 @@ tags: [mission-control, agents, process, documentation, sdlc, ledger]
 
 # Agentic SDLC ledger
 
-Last reconciled **2026-11-01**. Active. The convention, status words and closing checklist are in
+Last reconciled **2026-11-01**; SP-02, IS-11 and IA-03 added 2026-11-17. Active. The convention, status words and closing checklist are in
 [docs/agents/program-workspace.md](../../agents/program-workspace.md); check with
 `python docs/tools/program_ledger.py check --program docs/specs/agentic-sdlc-2026-11`.
 
@@ -64,6 +64,7 @@ Status words: `planned` · `draft` · `open` (waiting for an owner decision) · 
 | ID | Item | Status | Linear | Progress and next step |
 | --- | --- | --- | --- | --- |
 | SP-01 | [SPEC-01 Agentic SDLC](SPEC-01-AGENTIC-SDLC.md) | accepted | OVE-205 | Written 2026-11-01 from AS-D1..D20, PR-01 and DOC-01: principle, architecture, stack, every env var and infrastructure location, git-event table, provider adapter, Linear, slices S0..S8 with acceptance, the ten open items of the navigation-quality session (§12). Linear ids added at conversion. |
+| SP-02 | [SPEC-02 Provenance chain v1](SPEC-02-PROVENANCE-CHAIN.md) | active | OVE-225 | Accepted 2026-11-17 (AS-S3, AS-D40..AS-D46): record formats, trailer grammar, Completion comment, `docs/tools/trace.py`, warn-only hook and CI step. Mission Control only; moves upstream when KS adopts it. |
 
 ## Issues
 
@@ -79,6 +80,7 @@ Status words: `planned` · `draft` · `open` (waiting for an owner decision) · 
 | IS-08 | S6 retrieval audits | planned | OVE-212 | after S4 |
 | IS-09 | S7 remote mirror | planned | OVE-213 | after trace works |
 | IS-10 | S8 cloud environments | planned | OVE-214 | last |
+| IS-11 | [Provenance chain v1 in Mission Control (child of S1)](SPEC-02-PROVENANCE-CHAIN.md#chain) | active | OVE-225 | SPEC-02; built in the 2026-11-17 session; closes with a `## Completion` comment |
 
 ## Interview instructions
 
@@ -93,6 +95,8 @@ Status words: `planned` · `draft` · `open` (waiting for an owner decision) · 
 | --- | --- | --- | --- | --- |
 | IA-01 | [AGENTIC-SDLC sitting I: answers](answers/AGENTIC-SDLC-SITTING-I-2026-11-01-ANSWERS.md) | done | OVE-205 | AS-D1..D20 recorded in the owner's words; converted into SP-01, ADR-0064..0067, glossary terms, the Linear project and issues. |
 | IA-02 | [AGENTIC-SDLC sitting II: answers](answers/AGENTIC-SDLC-SITTING-II-2026-11-02-ANSWERS.md) | open | OVE-206 | AS-D21..AS-D39 recorded in the owner's words; conversion pending (NAVIGATION-DESIGN.md, goals charter, Linear issues); see the handoff. |
+| IA-03 | [AGENTIC-SDLC sitting III: answers](answers/AGENTIC-SDLC-SITTING-III-2026-11-17-ANSWERS.md) | done | OVE-225 | AS-S3: the owner approved the provenance plan and its six recommendations (AS-D40..AS-D46); converted into SPEC-02, SPEC-01 §7.2 and OVE-225. |
+| IA-04 | [AGENTIC-SDLC sitting IV: answers](answers/AGENTIC-SDLC-SITTING-IV-2026-11-17-ANSWERS.md) | done | OVE-233 | AS-S4: the owner's direction for the MC-web target (AS-D47), all-provider mechanics with care for coding harnesses (AS-D48) and the Linear reconciliation (AS-D49); reconciled 2026-11-17: OVE-226..OVE-236 created, 74 → 50 open MC issues. |
 
 ## Sessions
 

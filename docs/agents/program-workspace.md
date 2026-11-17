@@ -48,7 +48,8 @@ Archive a document when its work is merged or its decisions are folded into a li
 An interview leaves two records. The instruction is the instrument; the **answers file** is the record, one per sitting, created with the tool so every one has the same shape:
 
 ```text
-python docs/tools/program_ledger.py new-answers --topic DEEP-AGENTS --sitting I --interview <instruction.md>
+python docs/tools/program_ledger.py new-answers --topic DEEP-AGENTS --sitting I --id DA-S1 \
+    --harness-session claude-code:<session-uuid> --interview <instruction.md>
 ```
 
 It scaffolds `answers/<TOPIC>-SITTING-<n>-<date>-ANSWERS.md` from [the template](templates/interview-answers.template) and prints the ledger row to add. The structure serves three needs:
@@ -57,9 +58,9 @@ It scaffolds `answers/<TOPIC>-SITTING-<n>-<date>-ANSWERS.md` from [the template]
 - **Provenance.** *What it changes* is the agent's reading, kept apart from *Answer*, which is the owner's words. The front matter `interview:` links the instruction. Assumptions (asked, not answered) are separate from decisions.
 - **Conversion.** Every decision names where it **becomes** (`ADR-NNNN`, `spec <file> §n`, `GLOSSARY <term>`, `OVE-n`, or `none (reason)`) and where it was **folded** (a link, or `n/a`). While `status: open` the table may be incomplete; `status: final` is allowed only when no decision lacks either entry, and `program_ledger.py check` enforces it. The *Conversion checklist* in the file lists the follow-ups: decision logs, ADRs, glossary terms, Linear comments.
 
-Decision ids keep their family prefix (`OC-D4`, `DP-D2`, `HG-D7`). Answers recorded before this structure existed stay where they are, linked from the ledger.
+Decision ids keep their family prefix (`OC-D4`, `DP-D2`, `HG-D7`). Each sitting has a **session id** `<FAMILY>-S<n>` (`AS-S3`, `OC-S1`) in the front matter `id:`, with `family:` and `harness_session:` (the Claude Code, Codex or Cursor session id): the session is the first link of the provenance chain ([SPEC-02](../specs/agentic-sdlc-2026-11/SPEC-02-PROVENANCE-CHAIN.md#chain)), and issues and commits cite it. Answers recorded before this structure existed stay where they are, linked from the ledger.
 
-The skill that runs a sitting and fills the file is `grill-with-answers` (`.agents/skills/grill-with-answers/`). An interview held outside any program writes the same template to `.scratch/<topic>/ANSWERS.md`; when its decisions turn out to matter it is moved into a program with `program_ledger.py move` and given a row.
+The skill that runs a sitting and fills the file is `grill-with-answers` (`.agents/skills/grill-with-answers/`). Since 2026-11-17 an answers file is always committed: an interview that belongs to no program yet goes into the nearest program it serves (the Agentic SDLC program for process work), never into `.scratch/`, which is not versioned.
 
 ## Rules
 

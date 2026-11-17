@@ -135,6 +135,19 @@ application features "are fed by missions" (Q8). Their goals are carried by thei
 - **Source of both**: [answers file Q8](../specs/agentic-sdlc-2026-11/answers/AGENTIC-SDLC-SITTING-II-2026-11-02-ANSWERS.md); placement
   in [applications](applications.md).
 
+## Vision ids
+
+The 2026-11-17 handoff (`BellLabs/docs/state/2026-11-17/HANDOFF.md` §1.4) names the coordinator journey; an issue's `Goal:` may cite these anchors (`goals#S3`). AI Engineer (`IG1`..`CP7`) and Knowledge Services (`K1`..`K5`) ids are accepted beside them.
+
+- <a id="S0"></a>**S0** entry: the owner's own agent with the Mission Control skill, over the operator MCP or `missionctl`, locally or over HTTPS.
+- <a id="S1"></a>**S1** interview: a stored interview whose brief carries a session id, so a mission's chain starts at the interview.
+- <a id="S2"></a>**S2** discovery: search across workflow types, provider cognition configurations, skills, MCP servers, hooks and models.
+- <a id="S3"></a>**S3** spawn: a template launches unmodified and the dollar budget binds before the first model call.
+- <a id="S4"></a>**S4** operations: inspect, steer, instruct, fork, pass review gates; <a id="S5"></a>**S5** results: run coordinates on every receipt.
+- <a id="P"></a>**P** providers: Deep Agents is the reference lane; the others run behind the same contracts.
+- <a id="L1"></a>**L1** deploy-ready and parkable (`up`, `smoke`, `down`, `up`); <a id="L3"></a>**L3** a paused run finishes on the other side, local or cloud.
+- <a id="SDLC"></a>**SDLC** agent operability: the interview-to-completion provenance chain and the codebase CLI ([SPEC-02](../specs/agentic-sdlc-2026-11/SPEC-02-PROVENANCE-CHAIN.md)).
+
 ## Citations
 
 - Proposals behind the unbuilt goals: [proposals ledger](../specs/proposals-2026-10/LEDGER.md) (provider batch, human review loop, next-stage

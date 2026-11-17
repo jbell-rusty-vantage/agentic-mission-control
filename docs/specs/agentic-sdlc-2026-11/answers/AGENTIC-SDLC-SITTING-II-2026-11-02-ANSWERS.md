@@ -3,6 +3,8 @@ type: Interview Answers
 title: "AGENTIC-SDLC, sitting II: the owner's answers"
 description: "The decisions the owner took in sitting II of INTERVIEW-NAVIGATION-AND-KNOWLEDGE-2026-11-02.md on 2026-11-02, each with its id, the owner's words, what it changes, what it becomes (ADR, spec section, glossary term, Linear issue) and where it was folded in. Open while the sitting runs; final when every decision has a destination."
 tags: [mission-control, interview, answers]
+id: AS-S2
+family: AS
 interview: ../INTERVIEW-NAVIGATION-AND-KNOWLEDGE-2026-11-02.md
 sitting: "II"
 date: 2026-11-02

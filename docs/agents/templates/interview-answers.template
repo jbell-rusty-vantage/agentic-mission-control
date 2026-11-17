@@ -3,6 +3,9 @@ type: Interview Answers
 title: "{{TOPIC}}, sitting {{SITTING}}: the owner's answers"
 description: "The decisions the owner took in sitting {{SITTING}} of {{INTERVIEW_NAME}} on {{DATE}}, each with its id, the owner's words, what it changes, what it becomes (ADR, spec section, glossary term, Linear issue) and where it was folded in. Open while the sitting runs; final when every decision has a destination."
 tags: [mission-control, interview, answers]
+id: {{ID}}
+family: {{FAMILY}}
+harness_session: {{HARNESS_SESSION}}
 interview: {{INTERVIEW}}
 sitting: "{{SITTING}}"
 date: {{DATE}}

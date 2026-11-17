@@ -20,19 +20,21 @@ Nothing is asked before the file exists.
 - **Inside a program** (the topic belongs to a folder under `docs/specs/` with a `LEDGER.md`):
 
   ```text
-  python docs/tools/program_ledger.py new-answers --topic <TOPIC> --sitting <n> \
+  python docs/tools/program_ledger.py new-answers --topic <TOPIC> --sitting <n> --id <FAM>-S<n> \
+      --harness-session claude-code:<session-uuid> \
       --interview <the document under interview> --program docs/specs/<program>
   ```
 
   The `--interview` file is the instrument: an `INTERVIEW-*.md`, or the proposal, spec or
   projection being grilled. Add the ledger row the tool prints (kind *Interview answers*, status
   `open`).
-- **Outside a program:** copy the template to `.scratch/<topic>/ANSWERS.md`, fill the front
-  matter by hand. When the decisions turn out to matter, move the file into a program with
-  `program_ledger.py move` and add its row.
+- **No program fits yet:** use the nearest program the decisions serve (the Agentic SDLC program
+  for process work). Never `.scratch/`: it is not versioned, and the session is the first link of
+  the provenance chain.
 
 Decision ids keep a family prefix (`OC-D4`, `DP-D2`, `HG-D7`); start a new family only for a new
-topic.
+topic. The session id `<FAM>-S<n>` numbers the family's sittings in order; issues and commits cite
+it (`Session:` in an issue's `## Provenance`, `Refs:` in a commit).
 
 **Done when:** the file exists with its front matter resolved, and its ledger row is in place.
 

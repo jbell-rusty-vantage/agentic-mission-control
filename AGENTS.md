@@ -11,6 +11,10 @@ Data planes, credentials, MCP servers: [workspace registry](../../docs/navigatio
 `make dev` (compose up, healthy) · `make check` (fast gate) · `make preflight` (read-only installation check).
 <!-- END:sdlc-infra -->
 
+## Provenance (from 2026-11-17)
+- Start with `./dev status`; before finishing, `./dev check` and `./dev trace check`. Work begins in a committed answers file (session `<FAM>-S<n>`), then a spec and a Linear issue with `Goal:` and the fixed `## Provenance` keys ([issue tracker](docs/agents/issue-tracker.md#provenance)).
+- Every commit ends with `Refs: OVE-n | <FAM>-S<n>` and, when they apply, `Decisions:` and `Docs:`; a finished issue gets a `## Completion` comment. `./dev trace show <id>` prints the chain ([SPEC-02](docs/specs/agentic-sdlc-2026-11/SPEC-02-PROVENANCE-CHAIN.md)); the hook and CI only warn until the owner switches them to block.
+
 ## Environment
 Database variables are `MC_{AIENG,BIOTECH,LOCAL}_DB_*`, one plane per process chosen by `MISSION_CONTROL_APPLICATION`, read only through `Settings.db`; no aliases.
 Names, readers and what breaks when unset: [ENVIRONMENT](docs/ENVIRONMENT.md) and `config/env.registry.yaml` (`make env-check` keeps them in step).

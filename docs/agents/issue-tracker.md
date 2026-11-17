@@ -38,18 +38,46 @@ Work that belongs to a program under `docs/specs/` is filed in Linear before it 
 
 ## Provenance
 
-Every promoted issue carries a `## Provenance` section so the issue knows where its content came from. No separate database is used for this; the links are the record.
+Every issue carries a `## Provenance` section so the issue knows where its content came from. Since 2026-11-17 it is one `Key: value` line per key, so `docs/tools/trace.py` can parse it ([SPEC-02](../specs/agentic-sdlc-2026-11/SPEC-02-PROVENANCE-CHAIN.md#records)). Write the keys that apply; at least one must resolve. No separate database is used for this; the links are the record.
 
 ```markdown
+Goal: platform/mission-control/goals#S3, IG1
+
+...body and acceptance...
+
 ## Provenance
 
-- Conversation: <Claude Code / Codex / Cursor session id, or the handoff file path under .scratch/>
-- Documents: <repo-relative paths with the commit they were read at, e.g. docs/adr/0007-....md @ abc1234>
-- Decisions: <ADR numbers this issue depends on or changes>
-- Terms: <GLOSSARY.md terms the issue relies on>
+Session: AS-S3
+Decisions: AS-D40, AS-D41
+Spec: mission-control:docs/specs/<program>/SPEC-NN-<topic>.md#<anchor>
+ADR: ADR-0064
+Idea: ID-1
+Conversation: claude-code:<session-uuid>
+Terms: <GLOSSARY.md terms the issue relies on>
 ```
 
 When a local draft is promoted, add `Linear: OVE-NNN` near the top of the local file and keep the file; the issue links back to that path. Mission Control's own `authoring_session` records can later cite the Linear identifier for missions that originate from an issue.
+
+<a id="completion"></a>
+## Completion
+
+When an issue's work is done, post one comment before moving it to `Done`. It closes the chain, and `trace check` flags a completed issue without it.
+
+```markdown
+## Completion
+
+Commits: mission-control@abc1234, mission-control@def5678
+Checks: make check passed; uv run pytest tests/unit/docs_tools passed; make test-integration unrun (no stack)
+Evidence: <path, run id, or none (reason)>
+Level: tested
+Verified-by: self
+```
+
+`Level` is one of `implemented`, `tested`, `integrated`, `qualified` (the four labels of the invariants). `Verified-by` is `self` unless an independent session or person checked the evidence.
+
+## Commit trailers
+
+Every commit ends with `Refs:` naming the issue or the record it serves (`OVE-n`, `AS-S3`, `AS-D40`, `ADR-NNNN`, `ID-n`, or `none <reason>` for a chore), plus `Decisions:` and `Docs:` when they apply ([SPEC-02 §3](../specs/agentic-sdlc-2026-11/SPEC-02-PROVENANCE-CHAIN.md#trailers)). The commit-msg hook warns when they are missing.
 
 ## Local drafts
 
@@ -63,7 +91,10 @@ Brainstorms, specs and ticket drafts that are not yet promoted live under `.scra
 
 ## When a skill says "publish to the issue tracker"
 
-Create a Linear issue as above, with a `## Provenance` section. If the user asks for a draft first, write the local file and promote later.
+Create a Linear issue as above, with the `Goal:` line and the `## Provenance` keys. If the user asks for a draft first, write the local file and promote later.
+
+- **A spec** (`to-spec`): write it in the repository first, under the owning program (`docs/specs/<program>/SPEC-NN-<topic>.md`, frontmatter `decisions: [...]` and `linear: [...]`, a ledger row), then create the parent issue whose `Spec:` key points to it. The spec text lives in git, not only in Linear.
+- **Tickets** (`to-tickets`): sub-issues of that parent, each repeating the parent's `Session:` and `Spec:` keys and naming the decisions it implements.
 
 ## When a skill says "fetch the relevant ticket"
 
