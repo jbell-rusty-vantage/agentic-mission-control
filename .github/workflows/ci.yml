@@ -39,6 +39,31 @@ jobs:
       - name: Full offline gate
         run: make ci
 
+  provenance:
+    # SPEC-02 §5: every pushed commit carries `Refs:` naming an issue or a record. Warn-only
+    # (SDLC_TRACE=warn exits 0) until the owner switches it to block.
+    name: Provenance trailers (warn-only)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+      - name: Check the trailers of the pushed commits
+        env:
+          SDLC_TRACE: warn
+          EVENT_BEFORE: ${{ github.event.before }}
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          if [ -n "$BASE_REF" ]; then
+            range="origin/$BASE_REF..HEAD"
+          elif [ -n "$EVENT_BEFORE" ] && git cat-file -e "$EVENT_BEFORE^{commit}" 2>/dev/null; then
+            range="$EVENT_BEFORE..HEAD"
+          else
+            range="HEAD~1..HEAD"
+          fi
+          python3 -X utf8 docs/tools/trace.py check --range "$range"
+
   local-stack:
     name: Local stack (install, up, consumer evaluation)
     runs-on: ubuntu-24.04
