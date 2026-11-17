@@ -14,6 +14,7 @@ import dataclasses
 import json
 import os
 import subprocess
+import sys
 import time
 from collections.abc import Mapping, Sequence
 from importlib.metadata import version
@@ -66,6 +67,9 @@ def _spawn_endpoint(
     # leaves the sidecar independent of the worker's descriptors and event loop.
     log_path = state_root / "mc-bridge-stderr.log"
     descriptor = os.open(log_path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+    creationflags = 0
+    if sys.platform == "win32":  # sys.platform, not os.name: type checkers narrow on it
+        creationflags = subprocess.CREATE_NO_WINDOW
     with os.fdopen(descriptor, "w", encoding="utf-8") as log:
         process = subprocess.Popen(
             argv,
@@ -74,7 +78,7 @@ def _spawn_endpoint(
             stderr=log,
             env=bridge_spawn_environment(environment),
             start_new_session=os.name != "nt",
-            creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0,
+            creationflags=creationflags,
         )
     deadline = time.monotonic() + timeout
     try:

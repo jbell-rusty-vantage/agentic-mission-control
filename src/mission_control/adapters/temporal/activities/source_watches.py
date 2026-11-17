@@ -9,6 +9,7 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import os
+import sys
 from collections.abc import Mapping
 from datetime import datetime
 from pathlib import Path
@@ -77,7 +78,7 @@ def _sample_local(watch: WorkerWatch, registration_id: str, now: datetime) -> So
             return None
         data = {"matched": True}
     elif watch.kind == "process":
-        if os.name == "nt":
+        if sys.platform == "win32":  # sys.platform, not os.name: type checkers narrow on it
             # os.kill(pid, 0) can terminate a Windows process; query only.
             import ctypes
             from ctypes import wintypes
