@@ -103,5 +103,5 @@ Built / specified / goal: Stage Graph group, quorum, coverage and impossibility 
   [groups and coverage](../../src/mission_control/domain/authoring/graph_routes.py), [nested extension point](../../src/mission_control/domain/programs/nested.py),
   [Deep Agents declaration](../../src/mission_control/adapters/deep_agents/describe.py).
 - Tests: [route and group semantics](../../tests/unit/orchestration/test_wi08_graph_routes.py), [lane support matrix](../../tests/unit/authoring/test_manifest_compile.py),
-  [behaviors parse](../../tests/unit/authoring/test_manifest_schema.py); experiments are not the kernel ([experiment](../../tests/experiments/test_dynamic_research_swarm.py)).
+  [behaviors parse](../../tests/unit/authoring/test_manifest_schema.py); experiments are not the kernel ([experiment](../../experiments/dynamic_research_swarm/)).
 - Unreviewed source: branch `sprint-oc-wi14`, commits `cf2575d6`, `4fa865b7`, `6c558096` (see [control board](../specs/provider-consolidation-2026-10/sprint-oc/NEXT-SESSION.md) `:695`).

@@ -133,6 +133,5 @@ Built / specified / goal: Human Gate, run-level waits, `satisfy_wait`, held exha
   [approval gateway](../../src/mission_control/adapters/realtime/postgres_redis.py),
   [kernel decision contracts](../../src/mission_control/domain/graph_runtime/kernel.py).
 - [Human Gates](human-gates.md) for the control activation, service and evidence.
-- [Stage-3 kernel PostgreSQL proof](../../tests/integration/postgres/test_stage3_kernel_postgres_integration.py),
-  [decision tests](../../tests/unit/runtime/test_runtime_decisions_stage3.py).
+- [Stage-3 kernel PostgreSQL proof](../../tests/integration/postgres/test_stage3_kernel_postgres_integration.py).
 - [`0005_commands_effects_recovery.sql`](../../packages/mission-control-db-contract/component/migrations/0005_commands_effects_recovery.sql).

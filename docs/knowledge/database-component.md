@@ -118,7 +118,6 @@ are a goal tied to [deployment](deployment.md).
 - Proof: [W0 release bundle](../specs/provider-consolidation-2026-10/sprint-oc/release/RELEASE-BUNDLE.md),
   [provenance report](../specs/archive/provider-consolidation-2026-10/sprint-oc/provenance-2026-10-31/REPORT.md),
   `BellLabs/docs/navigation/DATA-PLANES-AND-CREDENTIALS.md`.
-- Tests: [release 1.13.0](../../tests/integration/postgres/test_sprint_oc_release_1130.py),
-  [release 1.12.0](../../tests/integration/postgres/test_sprint_oc_release_1120.py),
+- Tests: [release 1.12.0](../../tests/integration/postgres/test_sprint_oc_release_1120.py),
   [release 1.9.0](../../tests/integration/postgres/test_sprint_oc_release_190.py),
   [two-project parity](../../tests/qualification/two_project/test_release_parity.py).
