@@ -38,8 +38,8 @@ for the bounded service fixture that ends at submission.
 Use the primary MC virtualenv and installed dependencies. BKS must have completed its ordinary
 `pnpm build`; KS package outputs must match the source under test. Provide
 `MISSION_CONTROL_TEST_ADMIN_DSN` from the verified **local** disposable PostgreSQL target. The
-runner never reads repository `.env` files. It creates fresh fixture databases through existing
-test helpers and refuses a non-loopback DSN. Do not point it at a remote installation.
+tests create fresh fixture databases through existing test helpers. Do not point them at a
+remote installation.
 
 Build the KS protocol before the host: a host-only rebuild can import a newly added protocol
 export from an older `dist` package and fail before the fixture starts. From the KS repository,
@@ -47,36 +47,15 @@ the protocol command is `corepack pnpm --filter @aiengineer/knowledge-operation-
 then rebuild `@aiengineer/knowledge-host`. A source-mapped TypeScript check alone does not verify
 those runtime package outputs.
 
-```powershell
-.venv/Scripts/python.exe scripts/report_source_proof.py --out .scratch/sprint-oc/foundation-proof-<fresh-label>
-```
-
-The runner executes serially, saves logs and `matrix.json`, preserves nonzero/timeout exits and
-leaves dependent steps unrun after failure. A fresh directory is mandatory. `qualified` is always
-false. The matrix records repository HEADs and dirty state; retain the reviewed source diff with
-the logs when testing an uncommitted candidate. No paid call or mission launch occurs.
-
-Individual context and fixture preparation:
+Context preparation (repeat with `--profile biotech`):
 
 ```powershell
 .venv/Scripts/python.exe scripts/report_source_context.py --profile ai-engineer --out .scratch/foundation-aie-context
-.venv/Scripts/python.exe scripts/report_source_foundation.py --app ai-engineer --shape repair --context .scratch/foundation-aie-context --out .scratch/foundation-aie-repair
 ```
 
-Repeat with `biotech`; use `--shape transfer` for the separate StageGraph producer/consumer shape.
-These generated manifests use the existing `sprint_oc_w1_driver.py` operator routes and pack/model
-substitution. Compile/launch against a configured service only under its explicit run packet.
-The repair shape uses GoalDirected with at most three iterations. It is not nested in StageGraph.
-It explicitly increments a successfully registered held report's revision, binds `supersedes`
-to the prior exact receipt and uses fresh changed-record ids. It does not re-register revision 1.
-The transfer shape selects `produce.report`; it does not link to the repair run automatically.
-The generated manifest includes verified selected context and records its digest. Native
-derive/apply capabilities are excluded.
-
-The inherited replay packs currently contain two model sources for AI Engineer and one label
-for Biotech. `fixture.json` records that narrower scope separately from proposed live limits.
-The requested two-label fixture remains an unmet qualification case; the renderer does not
-manufacture a second label or count the navigation profile as captured evidence.
+The serial proof runner (`scripts/report_source_proof.py`) and the repair/transfer manifest
+generator (`scripts/report_source_foundation.py`) were deleted on 2026-11-17 with their tests
+(OVE-238). Run the layer tests below directly.
 
 ## What each layer establishes
 

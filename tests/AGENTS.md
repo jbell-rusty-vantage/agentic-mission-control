@@ -25,8 +25,8 @@ Entrypoints:
 - fixtures/
 - qualification/
 - architecture/
-- experiments/ — Isolated experiment tests
 - schema_context_helpers.py
+- experiments/ — Isolated experiment tests
 - conftest.py
 Also: golden/
 Tests: tests/architecture/test_package_boundaries.py

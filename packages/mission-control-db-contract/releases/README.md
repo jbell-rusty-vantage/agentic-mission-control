@@ -25,11 +25,11 @@ The sibling `1.4.1/runtime/` preserves the descriptor bytes and its relative pat
 The predecessor fingerprint includes 1.4.0, enabling an attested additive upgrade
 while retaining historical migration receipts.
 
-From the repository root, `scripts/prepare_run2_release.py --out <fresh-directory>`
-reproduces the input tree and refuses existing destinations. It wraps the original
-Codex-only preparer, verifying the frozen 1.4.0 manifest and every input digest.
-The default destination is this exact `releases/1.4.1/` directory; other destinations
-inside the package are refused. Preparation produces no manifest or generated
+The 1.4.1 input tree is committed and frozen. Its one-off preparer,
+`scripts/prepare_run2_release.py`, was deleted on 2026-11-17 (OVE-238); the Codex-only
+`scripts/prepare_codex_describe_successor.py` it wrapped remains, and
+`tests/unit/harness/test_lane_contracts.py` checks that it still renders `0042` exactly.
+Preparation produced no manifest or generated
 contract. Build with the existing installer only against an explicitly authorized
 disposable PostgreSQL 17 server:
 
