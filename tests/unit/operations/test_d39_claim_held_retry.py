@@ -32,7 +32,7 @@ from mission_control.adapters.temporal.workflows import operation as module
 from mission_control.application.execution.operations.operation_execution import (
     OperationClaimHeld,
 )
-from tests.unit.operations.test_operation_execution import _workflow_request
+from tests.support.operations import _workflow_request
 
 NOW = datetime(2026, 11, 2, 20, 0, tzinfo=UTC)
 

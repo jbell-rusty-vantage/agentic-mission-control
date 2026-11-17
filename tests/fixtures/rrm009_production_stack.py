@@ -40,8 +40,8 @@ from tests.acceptance.control_plane.test_wp_cp_040 import (
 from tests.fixtures import rrm009_mcp_server
 from tests.fixtures.lane_bindings import lane_fields
 from tests.fixtures.mission_control_common_db import canonical_scope
+from tests.support.operations import operation_request
 from tests.support.run_control import request as run_request
-from tests.unit.operations.test_operation_execution import operation_request
 
 from mission_control.adapters.capabilities.capability_bundles import bundle_digest
 from mission_control.adapters.deep_agents.materializer import (

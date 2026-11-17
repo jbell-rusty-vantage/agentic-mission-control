@@ -570,7 +570,7 @@ async def test_real_materializer_freezes_the_stage_unit_cognitive_namespace() ->
     """REQ-CP-DA-016: a StageGraph Deep Agent unit owns one namespace per unit generation."""
 
     from tests.acceptance.control_plane.test_wp_cp_040 import exact_fixture
-    from tests.unit.operations.test_operation_execution import operation_request
+    from tests.support.operations import operation_request
 
     graph = _blueprint()
     interpreter = StageGraphInterpreter(graph, effective_max_concurrency=3)

@@ -49,7 +49,7 @@ from mission_control.domain.execution.contracts import (
 )
 from mission_control.domain.execution.lane_turns import MAX_EXCERPT_CHARS, ClosingFacts
 from mission_control.domain.execution.lanes import UsageReport
-from tests.unit.operations.test_operation_execution import operation_request
+from tests.support.operations import operation_request
 
 OWNER = WorkspaceOwner(kind=WorkspaceOwnerKind.STAGE, owner_id="stage:patch")
 REGISTERED = workspace_candidate_ref("candidate-1")

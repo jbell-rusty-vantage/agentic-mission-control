@@ -55,7 +55,7 @@ from tests.fixtures.provider_frames import (
     opened_writer,
 )
 from tests.fixtures.workspace_closures import InMemoryWorkspaceClosures
-from tests.unit.operations.test_operation_execution import operation_request
+from tests.support.operations import operation_request
 
 
 def _unit_binding():  # type: ignore[no-untyped-def]

@@ -32,7 +32,7 @@ from mission_control.interfaces.cli.main import main as missionctl
 from mission_control.interfaces.http import lanes as lanes_http
 from mission_control.interfaces.http.mission_control import get_mission_principal
 from tests.fixtures.lane_bindings import lane_fields
-from tests.unit.operations.test_operation_execution import operation_request, service_fixture
+from tests.support.operations import operation_request, service_fixture
 
 DIGEST = "sha256:" + "c" * 64
 

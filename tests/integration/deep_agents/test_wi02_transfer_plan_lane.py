@@ -24,7 +24,7 @@ from tests.acceptance.control_plane.test_wp_cp_040 import exact_fixture, registr
 from tests.fixtures.checkpoint_lineage import activity_attempt
 from tests.fixtures.knowledge_binding import InMemoryStaging, InMemoryTransferPlanStore
 from tests.fixtures.lane_bindings import lane_fields
-from tests.unit.operations.test_operation_execution import operation_request
+from tests.support.operations import operation_request
 
 from mission_control.adapters.deep_agents.adapter import DeepAgentRuntimeAdapter
 from mission_control.adapters.deep_agents.materializer import ExactDeepAgentMaterializer

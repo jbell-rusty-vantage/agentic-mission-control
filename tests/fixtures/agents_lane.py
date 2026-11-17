@@ -248,7 +248,7 @@ def agents_stack(
     root: Path, scripts: tuple[str, ...] = ("full",), **operation_changes: Any
 ) -> AgentsStack:
     del root
-    from tests.unit.operations.test_operation_execution import operation_request
+    from tests.support.operations import operation_request
 
     pack = load_pack(SHIPPED_PACK)
     api = SessionsApi(scripts=list(scripts))

@@ -250,7 +250,7 @@ async def bound_parent_request(
 ) -> OperationExecutionRequest:
     """Reserve the parent operation's budget and bind one Deep Agent unit with the contract."""
 
-    from tests.unit.operations.test_operation_execution import operation_request
+    from tests.support.operations import operation_request
 
     unit = stage_unit(
         request_scope=SCOPE,

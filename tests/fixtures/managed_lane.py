@@ -88,7 +88,7 @@ def managed_binding(
 def managed_operation(
     binding: ProviderExecutionBinding, *, prompt: str = "Summarize the release notes."
 ) -> OperationExecutionRequest:
-    from tests.unit.operations.test_operation_execution import operation_request
+    from tests.support.operations import operation_request
 
     payload = operation_request(prompt=prompt).model_dump(mode="python")
     payload.update(

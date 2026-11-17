@@ -31,13 +31,9 @@ from langgraph.store.memory import InMemoryStore
 from pydantic import PrivateAttr
 from tests.fixtures.checkpoint_recovery import ScriptedRecoveryModel
 from tests.fixtures.lane_bindings import LANE_REBINDERS, lane_fields
+from tests.support.operations import MCP_DIGEST, SKILL_DIGEST, operation_request
 from tests.support.run_control import ConfigurationVerifier, actor
 from tests.support.run_control import request as run_request
-from tests.unit.operations.test_operation_execution import (
-    MCP_DIGEST,
-    SKILL_DIGEST,
-    operation_request,
-)
 
 from mission_control.adapters.deep_agents import (
     DeepAgentRuntimeAdapter,

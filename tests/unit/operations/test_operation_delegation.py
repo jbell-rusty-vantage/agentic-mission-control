@@ -12,7 +12,7 @@ from mission_control.domain.execution.contracts import (
     OperationExecutionRequest,
 )
 from mission_control.domain.execution.delegation import admit_delegation
-from tests.unit.operations.test_operation_execution import exact, operation_request
+from tests.support.operations import exact, operation_request
 
 
 def _delegation(*, workflow_boundary: bool = False) -> DelegationBinding:

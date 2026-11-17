@@ -23,10 +23,10 @@ from mission_control.interfaces.http.run_control import (
     get_generic_artifact_submitter,
     get_run_control_service,
 )
+from tests.support.operations import operation_request
 from tests.support.run_control import command
 from tests.support.run_control import request as run_request
 from tests.support.run_control import service as run_control_service
-from tests.unit.operations.test_operation_execution import operation_request
 
 
 class RecordingSubmitter:

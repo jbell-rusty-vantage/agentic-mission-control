@@ -15,7 +15,7 @@ from typing import Any
 from uuid import UUID
 
 from tests.fixtures.lane_bindings import lane_fields
-from tests.unit.operations.test_operation_execution import MCP_DIGEST, SKILL_DIGEST
+from tests.support.operations import MCP_DIGEST, SKILL_DIGEST
 
 from mission_control.adapters.cursor.describe import CURSOR_LOCAL_DESCRIBE
 from mission_control.adapters.deep_agents.harness import DeepAgentsHarness
@@ -105,7 +105,7 @@ def cursor_operation(
     binding: CursorExecutionBinding | None = None,
     request_scope: str = SCOPE,
 ) -> OperationExecutionRequest:
-    from tests.unit.operations.test_operation_execution import operation_request
+    from tests.support.operations import operation_request
 
     payload = operation_request().model_dump(mode="python")
     payload.update(

@@ -29,7 +29,7 @@ from tests.fixtures.goal_directed_journaled import (
 )
 from tests.fixtures.lane_bindings import LANE_REBINDERS, lane_fields
 from tests.fixtures.operation_activities import cancelled_operation_result
-from tests.unit.operations.test_operation_execution import operation_request
+from tests.support.operations import operation_request
 
 from mission_control.adapters.deep_agents import (
     DeepAgentRuntimeAdapter,

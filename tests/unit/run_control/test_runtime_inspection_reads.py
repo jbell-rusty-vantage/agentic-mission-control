@@ -743,7 +743,7 @@ def test_redaction_allowlist_keeps_counts_and_names_only() -> None:
 
 
 def test_search_attribute_policy_defaults_to_disabled_and_production_requires_it() -> None:
-    from tests.unit.operations.test_operation_execution import operation_request
+    from tests.support.operations import operation_request
 
     root = BellLabsRunInput(
         schema_version="belllabs.temporal-root.v1",

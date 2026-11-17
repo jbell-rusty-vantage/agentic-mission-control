@@ -57,12 +57,12 @@ from mission_control.domain.programs.contracts import (
     StageOperationRequest,
     StageOperationResult,
 )
+from tests.support.operations import operation_request
 from tests.unit.coordinator.test_coordinator_launch_preparation import (
     NOW,
     SCOPE,
     launch_fixture,
 )
-from tests.unit.operations.test_operation_execution import operation_request
 from tests.unit.schema.test_schema_grounding_services import _reconciliation_fixture
 
 

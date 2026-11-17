@@ -28,7 +28,7 @@ from mission_control.domain.execution.contracts import (
 )
 from tests.acceptance.control_plane.test_wp_cp_040 import exact_fixture
 from tests.fixtures.models import model_binding
-from tests.unit.operations.test_operation_execution import operation_request
+from tests.support.operations import operation_request
 
 FIXTURE_MODEL_PROFILES = ("frontier.default", "frontier.long_context")
 FIXTURE_SANDBOX_PROFILES = ("research.standard", "ingestion.standard")

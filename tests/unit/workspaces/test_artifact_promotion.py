@@ -28,7 +28,7 @@ from mission_control.domain.execution.contracts import (
     WorkspaceSlotBinding,
 )
 from mission_control.domain.policies.errors import IdempotencyConflict
-from tests.unit.operations.test_operation_execution import operation_request, service_fixture
+from tests.support.operations import operation_request, service_fixture
 from tests.unit.workspaces.test_workspace_materialization import RecordingProvisioner
 
 CONTENT = b"# Generic research\n\nInitial finding.\n\nPatched conclusion.\n"

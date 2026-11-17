@@ -38,7 +38,7 @@ from tests.fixtures.mission_control_common_db import (
     create_common_database,
     drop_common_database,
 )
-from tests.unit.operations.test_operation_execution import operation_request
+from tests.support.operations import operation_request
 
 pytestmark = pytest.mark.common_db
 _DATABASES: dict[int, CommonDatabase] = {}

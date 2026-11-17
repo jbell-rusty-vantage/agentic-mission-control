@@ -533,7 +533,7 @@ def projection_rows() -> tuple[ResolvedCapability, ...]:
 
 
 def base_operation() -> OperationExecutionRequest:
-    from tests.unit.operations.test_operation_execution import operation_request
+    from tests.support.operations import operation_request
 
     return operation_request()
 

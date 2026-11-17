@@ -20,7 +20,7 @@ from tests.fixtures.checkpoint_lineage import (
     stage_unit,
 )
 from tests.fixtures.lane_bindings import lane_fields
-from tests.unit.operations.test_operation_execution import operation_request
+from tests.support.operations import operation_request
 
 from mission_control.adapters.deep_agents import (
     DeepAgentRuntimeAdapter,
@@ -973,7 +973,7 @@ def test_create_deep_agent_has_one_non_experiment_production_call_site() -> None
 async def test_operation_service_pins_records_and_links_the_result_checkpoint() -> None:
     """Production seam: `OperationExecutionService` → adapter → transition → settlement."""
 
-    from tests.unit.operations.test_operation_execution import MCP_DIGEST, SKILL_DIGEST
+    from tests.support.operations import MCP_DIGEST, SKILL_DIGEST
 
     from mission_control.adapters.operations.conformance import (
         ConformanceAssetVerifier,

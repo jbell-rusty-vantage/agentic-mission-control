@@ -14,7 +14,7 @@ from mission_control.application.execution.operations.operation_execution import
     bind_operation_execution_request,
 )
 from mission_control.domain.policies.contracts import RunPhase
-from tests.unit.operations.test_operation_execution import _workflow_request
+from tests.support.operations import _workflow_request
 
 
 def failed_activity(kind):

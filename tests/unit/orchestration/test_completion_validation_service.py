@@ -54,8 +54,8 @@ from mission_control.domain.programs.contracts import (
     StageResultObservation,
 )
 from mission_control.domain.programs.interpreter import StageGraphInterpreter
+from tests.support.operations import operation_request
 from tests.support.run_control import ConfigurationVerifier, command, request
-from tests.unit.operations.test_operation_execution import operation_request
 from tests.unit.orchestration.test_artifact_schema_validation import SCHEMA, Custody, captured
 from tests.unit.run_control.test_atomic_family_admission import admission_policies
 

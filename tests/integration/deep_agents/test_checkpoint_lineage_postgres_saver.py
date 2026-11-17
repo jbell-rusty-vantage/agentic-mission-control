@@ -30,14 +30,10 @@ from tests.fixtures.mission_control_common_db import (
     canonical_scope,
     provision_runtime,
 )
+from tests.support.operations import MCP_DIGEST, SKILL_DIGEST, operation_request
 from tests.support.run_control import actor, command
 from tests.support.run_control import request as run_request
 from tests.support.run_control import service as run_control_service
-from tests.unit.operations.test_operation_execution import (
-    MCP_DIGEST,
-    SKILL_DIGEST,
-    operation_request,
-)
 
 from mission_control.adapters.deep_agents import (
     DeepAgentRuntimeAdapter,

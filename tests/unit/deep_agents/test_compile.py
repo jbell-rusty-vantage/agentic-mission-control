@@ -53,7 +53,7 @@ from mission_control.domain.resolution.configuration import AgentConfiguration, 
 from mission_control.domain.resolution.resolved import LaneCompileRefused, SealedLaneBinding
 from tests.conformance.lanes.compile.deep_agents import authored, deep_agents_facts
 from tests.conformance.lanes.compile.fixtures import CANONICAL_ITEMS, canonical_agent
-from tests.unit.operations.test_operation_execution import operation_request, service_fixture
+from tests.support.operations import operation_request, service_fixture
 
 SUPPORTED = tuple(
     item for item in CANONICAL_ITEMS if item.kind not in {"hook_script", "environment_kit"}

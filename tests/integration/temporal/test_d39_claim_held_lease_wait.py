@@ -28,7 +28,7 @@ from mission_control.application.execution.operations.operation_execution import
     OperationClaimHeld,
 )
 from tests.fixtures.temporal_history import patch_ids
-from tests.unit.operations.test_operation_execution import _workflow_request
+from tests.support.operations import _workflow_request
 
 WORKFLOW_QUEUE = "d39-operation-workflows"
 HOLDER_LEASE = timedelta(seconds=240)

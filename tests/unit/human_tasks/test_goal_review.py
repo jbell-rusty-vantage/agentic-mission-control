@@ -20,7 +20,7 @@ from mission_control.domain.programs.human_gate import (
 from mission_control.domain.programs.human_review import apply_goal_review, goal_review_packet
 from tests.fixtures.goal_directed_journaled import goal_template_workspace
 from tests.fixtures.lane_bindings import LANE_REBINDERS
-from tests.unit.operations.test_operation_execution import operation_request
+from tests.support.operations import operation_request
 from tests.unit.orchestration.test_rrm_016_goal_directed_settlement import _preparation
 from tests.unit.orchestration.test_wp_bp_020_goal_directed import (
     _blueprint,

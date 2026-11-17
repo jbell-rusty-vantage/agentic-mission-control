@@ -140,7 +140,7 @@ def codex_binding(**changes: Any) -> ProviderExecutionBinding:
 def codex_operation(
     binding: ProviderExecutionBinding | None = None, *, prompt: str | None = None, **changes: Any
 ) -> OperationExecutionRequest:
-    from tests.unit.operations.test_operation_execution import operation_request
+    from tests.support.operations import operation_request
 
     request = operation_request() if prompt is None else operation_request(prompt=prompt)
     payload = request.model_dump(mode="python")

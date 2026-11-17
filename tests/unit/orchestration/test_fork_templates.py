@@ -17,7 +17,7 @@ from mission_control.domain.policies.forks import (
     RunForkPatch,
     stage_objective_path,
 )
-from tests.unit.operations.test_operation_execution import DIGEST, operation_request
+from tests.support.operations import DIGEST, operation_request
 
 
 class MemoryTemplates:
@@ -144,7 +144,7 @@ async def test_changed_configuration_uses_prepared_exact_capabilities_and_retain
     """A prepared successor supplies the capabilities; the fork never rewrites their pins."""
     from mission_control.domain.authoring.contracts import DefinitionKind
     from mission_control.domain.execution.contracts import ImmutableAssetBinding
-    from tests.unit.operations.test_operation_execution import exact
+    from tests.support.operations import exact
 
     store = MemoryTemplates()
     original = operation_request()

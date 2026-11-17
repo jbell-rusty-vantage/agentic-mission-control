@@ -46,7 +46,7 @@ from mission_control.domain.execution.lanes import (
     StartRequest,
     UsageRequest,
 )
-from tests.unit.operations.test_operation_execution import operation_request
+from tests.support.operations import operation_request
 
 DIGEST = "sha256:" + "b" * 64
 SCOPE = HarnessScope(

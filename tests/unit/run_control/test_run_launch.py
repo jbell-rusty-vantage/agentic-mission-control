@@ -340,7 +340,7 @@ async def test_fork_launch_requires_templates_matching_the_derived_admitted_conf
 ) -> None:
     from mission_control.application.programs.fork_templates import StageGraphForkTemplateDerivation
     from mission_control.domain.policies.forks import ForkPatchChange, RunForkPatch
-    from tests.unit.operations.test_operation_execution import operation_request
+    from tests.support.operations import operation_request
     from tests.unit.orchestration.test_fork_templates import MemoryTemplates
 
     run_control, _ = service()
