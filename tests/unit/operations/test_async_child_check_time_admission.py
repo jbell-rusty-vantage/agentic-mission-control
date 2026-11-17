@@ -78,13 +78,13 @@ from mission_control.domain.execution.contracts import (
 )
 from mission_control.domain.outputs.contracts import OutputForm, SubmissionAck
 from mission_control.domain.outputs.rules import text_digest
-from tests.acceptance.control_plane.test_wp_cp_040 import (
+from tests.fixtures.fake_agent_protocol import FakeAgentProtocolClient, install
+from tests.support.deep_agents import (
+    DeterministicProvider,
     exact_fixture,
     planned_invocation,
     unit_bound,
 )
-from tests.acceptance.control_plane.test_wp_cp_045 import DeterministicProvider
-from tests.fixtures.fake_agent_protocol import FakeAgentProtocolClient, install
 from tests.support.run_control import actor
 from tests.unit.operations.test_async_child_parent_budget import admitted_parent, spawn
 from tests.unit.operations.test_async_child_parent_completion import Lineage

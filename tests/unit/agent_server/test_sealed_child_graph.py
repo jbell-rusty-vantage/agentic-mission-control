@@ -38,7 +38,7 @@ from mission_control.domain.execution.async_subagent_reconciliation import (
 )
 from mission_control.domain.execution.contracts import AsyncSubagentContract
 from mission_control.domain.execution.errors import DeepAgentMaterializationError
-from tests.acceptance.control_plane.test_wp_cp_040 import exact_fixture
+from tests.support.deep_agents import exact_fixture
 from tests.unit.agent_server.test_async_subagent_server_offline import ScriptedChildModel
 from tests.unit.operations.test_async_child_check_time_admission import _sealed_contract
 

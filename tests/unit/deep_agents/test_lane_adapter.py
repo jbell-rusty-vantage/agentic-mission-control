@@ -22,7 +22,7 @@ from mission_control.domain.authoring.canonical import sha256_digest
 from mission_control.domain.capabilities.subagents import SubagentProfile
 from mission_control.domain.execution.contracts import DeepAgentProfile
 from mission_control.domain.execution.materialization import compile_deep_agent_execution_binding
-from tests.acceptance.control_plane.test_wp_cp_040 import exact_fixture
+from tests.support.deep_agents import exact_fixture
 from tests.unit.authoring.manifest_launch_fixture import fixture_bindings
 
 POINTER = "/mission/program/nodes/0"

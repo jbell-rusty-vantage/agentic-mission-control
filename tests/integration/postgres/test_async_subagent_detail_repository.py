@@ -31,9 +31,9 @@ from mission_control.domain.execution.contracts import (
     AsyncSubagentMessage,
     ParentAsyncSubagentLink,
 )
-from tests.acceptance.control_plane.test_wp_cp_045 import contract
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.support.db_builders import scoped_request
+from tests.support.deep_agents import contract
 from tests.support.run_control import service
 
 pytestmark = pytest.mark.common_db

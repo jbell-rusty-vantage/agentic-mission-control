@@ -33,11 +33,7 @@ from mission_control.domain.execution.contracts import (
     DeepAgentSkillComponent,
     SyncSubagentProfile,
 )
-from tests.acceptance.control_plane.test_wp_cp_040 import (
-    SkillReadingModel,
-    exact_fixture,
-    skill_bundle,
-)
+from tests.support.deep_agents import SkillReadingModel, exact_fixture, skill_bundle
 
 
 def _child(prompt: str, **overrides: Any) -> SyncSubagentProfile:

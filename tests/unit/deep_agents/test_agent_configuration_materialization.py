@@ -41,7 +41,7 @@ from mission_control.domain.capabilities.features import (
 )
 from mission_control.domain.execution.contracts import DeepAgentExecutionBinding
 from mission_control.domain.execution.errors import DeepAgentMaterializationError
-from tests.acceptance.control_plane.test_wp_cp_040 import SkillReadingModel, exact_fixture
+from tests.support.deep_agents import SkillReadingModel, exact_fixture
 
 ANTHROPIC_SECRET = {"environment:ANTHROPIC_API_KEY": "test-anthropic-key"}
 

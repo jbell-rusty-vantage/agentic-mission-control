@@ -602,7 +602,7 @@ async def compose_goal_directed(
     compose an executor whose Deep Agent spawns a real async child.
     """
 
-    from tests.acceptance.control_plane.test_wp_cp_040 import exact_fixture
+    from tests.support.deep_agents import exact_fixture
 
     fixture_binding, _profile, bundle = exact_fixture()
     binding = binding or fixture_binding

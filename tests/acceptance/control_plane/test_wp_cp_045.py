@@ -1,9 +1,16 @@
 from __future__ import annotations
 
-from datetime import UTC, datetime
-
 import pytest
 from tests.fixtures.fake_agent_protocol import FakeAgentProtocolClient, install
+from tests.support.deep_agents import (
+    GRAPH_BINDING_DIGEST,
+    NOW,
+    SERVED,
+    DeterministicProvider,
+    checkpoint,
+    contract,
+    request,
+)
 
 from mission_control.adapters.deep_agents.async_subagents import (
     DeepAgentsAsyncSubagentAdapter,
@@ -14,201 +21,17 @@ from mission_control.application.subordinates.service import (
     AsyncSubagentSpawnRequest,
     InMemoryAsyncSubagentAuthority,
     InMemoryAsyncSubagentDetailRepository,
-    ProviderAsyncObservation,
 )
 from mission_control.domain.authoring.canonical import sha256_digest
-from mission_control.domain.execution.async_subagent_reconciliation import (
-    AsyncProviderRunObservation,
-    AsyncProviderRunRecord,
-    AsyncServedGraphIdentity,
-    AsyncSpawnKeyObservation,
-)
 from mission_control.domain.execution.contracts import (
-    AsyncProviderCheckpointKey,
-    AsyncSubagentContract,
     AsyncSubagentDependencyClass,
     AsyncSubagentExecution,
     AsyncSubagentLifecycle,
-    AsyncSubagentMessage,
-    AsyncSubagentUsage,
-    CapabilityGrant,
 )
 from mission_control.domain.execution.delegation import (
     AsyncDelegationBoundary,
     classify_async_delegation,
 )
-
-NOW = datetime(2026, 8, 10, 12, 0, tzinfo=UTC)
-GRAPH_BINDING_DIGEST = sha256_digest("research-graph-binding")
-SERVED = AsyncServedGraphIdentity(
-    graph_id="research-graph",
-    graph_revision="agent.research@1",
-    graph_binding_digest=GRAPH_BINDING_DIGEST,
-    deepagents_version="0.7.5",
-)
-
-
-def contract() -> AsyncSubagentContract:
-    return AsyncSubagentContract.create(
-        contract_id="async-researcher-v1",
-        name="researcher",
-        description="Bounded background research",
-        graph_id="research-graph",
-        graph_revision="agent.research@1",
-        graph_binding_digest=GRAPH_BINDING_DIGEST,
-        agent_protocol_url="https://agent.example.test",
-        deployment_credential_ref="environment:AGENT_SERVER_TOKEN",
-        objective_schema_ref="schema:objective:v1",
-        result_schema_ref="schema:result:v1",
-        context_slice_id="context:child",
-        state_slice_id="state:child",
-        capability_ceiling=CapabilityGrant(capabilities=frozenset({"search"})),
-        authority_refs=("authority:parent-operation",),
-        budget_limits={"model.turns": 1, "tokens.total": 1_000},
-        dependency_classes=frozenset(AsyncSubagentDependencyClass),
-        timeout_seconds=300,
-        cancellation_propagation="required",
-        late_result_policy="quarantine",
-        fallback_policy="degrade",
-        result_admission_policy_ref="policy:async-result:v1",
-    )
-
-
-def request(
-    dependency: AsyncSubagentDependencyClass = AsyncSubagentDependencyClass.REQUIRED_BLOCKING,
-) -> AsyncSubagentSpawnRequest:
-    return AsyncSubagentSpawnRequest(
-        request_scope="tenant-a",
-        parent_run_id="run-1",
-        parent_operation_id="operation-1",
-        parent_binding_id="binding-1",
-        execution_generation=1,
-        contract=contract(),
-        dependency_class=dependency,
-        objective_ref="ref:objective:1",
-        objective="Research the exact bounded question.",
-        context_slice_ref="ref:context-slice:1",
-        reservation_id="reservation-child-1",
-        idempotency_key="spawn-1",
-        requested_at=NOW,
-    )
-
-
-def checkpoint() -> AsyncProviderCheckpointKey:
-    return AsyncProviderCheckpointKey(
-        agent_protocol_url="https://agent.example.test",
-        thread_id="provider-thread-1",
-        checkpoint_id="checkpoint-1",
-        graph_id="research-graph",
-        graph_revision="agent.research@1",
-        graph_binding_digest=GRAPH_BINDING_DIGEST,
-    )
-
-
-class DeterministicProvider:
-    def __init__(self, events: list[str]) -> None:
-        self.events = events
-        self.starts = 0
-        self.next_status = "running"
-
-    async def verify_served_graph(
-        self, _contract: AsyncSubagentContract
-    ) -> AsyncServedGraphIdentity:
-        self.events.append("provider.verify")
-        return SERVED
-
-    async def start(
-        self,
-        _contract: AsyncSubagentContract,
-        _execution: AsyncSubagentExecution,
-        _objective: str,
-    ) -> ProviderAsyncObservation:
-        self.events.append("provider.start")
-        self.starts += 1
-        return self._observation("running")
-
-    async def observe_spawn_key(
-        self, _contract: AsyncSubagentContract, execution: AsyncSubagentExecution
-    ) -> AsyncSpawnKeyObservation:
-        self.events.append("provider.observe")
-        return AsyncSpawnKeyObservation(
-            thread_id=execution.child_execution_id,
-            runs=(
-                (AsyncProviderRunObservation(run_id="provider-run-1", status="running"),)
-                if self.starts
-                else ()
-            ),
-            observed_at=NOW,
-        )
-
-    async def check(
-        self, _contract: AsyncSubagentContract, _execution: AsyncSubagentExecution
-    ) -> ProviderAsyncObservation:
-        self.events.append("provider.check")
-        return self._observation(self.next_status)
-
-    async def update(
-        self,
-        _contract: AsyncSubagentContract,
-        _execution: AsyncSubagentExecution,
-        _message: AsyncSubagentMessage,
-    ) -> ProviderAsyncObservation:
-        self.events.append("provider.update")
-        return self._observation("running", run_id="provider-run-2")
-
-    async def cancel(
-        self, _contract: AsyncSubagentContract, _execution: AsyncSubagentExecution
-    ) -> ProviderAsyncObservation:
-        self.events.append("provider.cancel")
-        return self._observation("cancelled", receipt="provider_acknowledged")
-
-    async def cancel_run(
-        self,
-        _contract: AsyncSubagentContract,
-        execution: AsyncSubagentExecution,
-        run_id: str,
-    ) -> AsyncProviderRunRecord:
-        self.events.append("provider.cancel_run")
-        return AsyncProviderRunRecord(
-            child_execution_id=execution.child_execution_id,
-            provider_thread_id=execution.child_execution_id,
-            provider_run_id=run_id,
-            disposition="duplicate_cancelled",
-            provider_status="interrupted",
-            usage=AsyncSubagentUsage(provider_run_id=run_id, attribution="pending"),
-            observed_at=NOW,
-        )
-
-    async def list(
-        self, executions: tuple[tuple[AsyncSubagentContract, AsyncSubagentExecution], ...]
-    ) -> tuple[ProviderAsyncObservation, ...]:
-        return tuple(self._observation("running") for _ in executions)
-
-    @staticmethod
-    def _observation(
-        status: str, run_id: str = "provider-run-1", receipt: str | None = None
-    ) -> ProviderAsyncObservation:
-        terminal = status == "success"
-        return ProviderAsyncObservation(
-            status=status,  # type: ignore[arg-type]
-            thread_id="provider-thread-1",
-            run_id=run_id,
-            output_ref="ref:output:1" if terminal else None,
-            output_text="canonical child result" if terminal else None,
-            evidence_refs=("ref:evidence:1",) if terminal else (),
-            usage=(
-                AsyncSubagentUsage(
-                    provider_run_id=run_id,
-                    attribution="provider_attributed",
-                    attributed_amounts={"model.turns": 1, "tokens.total": 7},
-                )
-                if terminal
-                else None
-            ),
-            checkpoint=checkpoint() if terminal else None,
-            cancellation_receipt=receipt,  # type: ignore[arg-type]
-            observed_at=NOW,
-        )
 
 
 class OrderedDetails(InMemoryAsyncSubagentDetailRepository):

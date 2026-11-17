@@ -32,14 +32,10 @@ from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, ToolMessage
 from langchain_core.outputs import ChatGeneration, ChatResult
 from langchain_core.tools import BaseTool
-from tests.acceptance.control_plane.test_wp_cp_040 import (
-    MCP_TOOL_SCHEMA_DIGEST,
-    exact,
-    exact_fixture,
-)
 from tests.fixtures import rrm009_mcp_server
 from tests.fixtures.lane_bindings import lane_fields
 from tests.fixtures.mission_control_common_db import canonical_scope
+from tests.support.deep_agents import MCP_TOOL_SCHEMA_DIGEST, exact, exact_fixture
 from tests.support.operations import operation_request
 from tests.support.run_control import request as run_request
 

@@ -63,9 +63,9 @@ from mission_control.domain.policies.contracts import (
     ReserveBudgetAction,
     StartAction,
 )
-from tests.acceptance.control_plane.test_wp_cp_040 import exact_fixture
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.support.db_builders import owner_rows, scoped_command, scoped_request
+from tests.support.deep_agents import exact_fixture
 from tests.support.run_control import actor
 from tests.support.run_control import service as run_control_service
 from tests.unit.operations.test_async_child_check_time_admission import (

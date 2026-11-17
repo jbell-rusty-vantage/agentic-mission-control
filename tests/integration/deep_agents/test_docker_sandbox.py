@@ -11,11 +11,7 @@ from langchain_core.outputs import ChatGeneration, ChatResult
 from langchain_core.tools import BaseTool
 from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.store.memory import InMemoryStore
-from tests.acceptance.control_plane.test_wp_cp_040 import (
-    exact_fixture,
-    planned_invocation,
-    unit_bound,
-)
+from tests.support.deep_agents import exact_fixture, planned_invocation, unit_bound
 
 from mission_control.adapters.deep_agents import (
     DeepAgentRuntimeAdapter,

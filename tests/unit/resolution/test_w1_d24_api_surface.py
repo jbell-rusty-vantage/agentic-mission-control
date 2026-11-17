@@ -105,7 +105,7 @@ async def test_the_lane_model_built_from_the_row_requests_v1_responses() -> None
     from langchain_openai import ChatOpenAI
 
     from mission_control.adapters.deep_agents.materializer import OpenAIExactModelFactory
-    from tests.acceptance.control_plane.test_wp_cp_040 import exact_fixture
+    from tests.support.deep_agents import exact_fixture
 
     catalog = compose_model_catalog(DEPLOYMENTS, "ai-engineer")
     luna = catalog.get("child.fallback")

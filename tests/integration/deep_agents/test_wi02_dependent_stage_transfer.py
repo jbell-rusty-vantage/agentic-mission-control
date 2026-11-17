@@ -15,7 +15,6 @@ from datetime import timedelta
 from typing import Any
 
 import pytest
-from tests.acceptance.control_plane.test_wp_cp_040 import registry
 from tests.fixtures.checkpoint_lineage import activity_attempt
 from tests.fixtures.knowledge_binding import (
     AUDIENCE,
@@ -36,6 +35,7 @@ from tests.integration.deep_agents.test_wi02_transfer_plan_lane import (
     _invocation,
     _selection,
 )
+from tests.support.deep_agents import registry
 from tests.unit.context.test_transfer_materializer import FakeOutputs
 from tests.unit.knowledge.test_gateway import TENANT, origin
 

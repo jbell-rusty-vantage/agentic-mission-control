@@ -40,13 +40,7 @@ from mission_control.domain.execution.contracts import (
     DeepAgentModelComponent,
     SyncSubagentProfile,
 )
-from tests.acceptance.control_plane.test_wp_cp_040 import (
-    exact,
-    exact_fixture,
-    planned_invocation,
-    registry,
-    unit_bound,
-)
+from tests.support.deep_agents import exact, exact_fixture, planned_invocation, registry, unit_bound
 
 CHILD = "technical-child"
 SECRET_ARGUMENT = "do-not-persist-this-argument-value"

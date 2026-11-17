@@ -37,15 +37,9 @@ from mission_control.domain.execution.contracts import (
     AsyncSubagentLifecycle,
     AsyncSubagentUsage,
 )
-from tests.acceptance.control_plane.test_wp_cp_045 import (
-    GRAPH_BINDING_DIGEST,
-    NOW,
-    SERVED,
-    contract,
-    request,
-)
 from tests.fixtures.fake_agent_protocol import FakeAgentProtocolClient, install
 from tests.fixtures.rrm013_live_stack import reconciler
+from tests.support.deep_agents import GRAPH_BINDING_DIGEST, NOW, SERVED, contract, request
 from tests.support.run_control import actor
 from tests.unit.operations.test_async_child_parent_budget import admitted_parent, spawn
 
@@ -411,12 +405,8 @@ async def test_parent_deep_agent_start_async_task_reserves_and_links_before_the_
         InMemoryCheckpointLineageRepository,
     )
     from mission_control.domain.execution.contracts import DeepAgentExecutionBinding
-    from tests.acceptance.control_plane.test_wp_cp_040 import (
-        exact_fixture,
-        planned_invocation,
-        unit_bound,
-    )
     from tests.fixtures.rrm013_live_stack import ParentSpawnModel
+    from tests.support.deep_agents import exact_fixture, planned_invocation, unit_bound
 
     client = FakeAgentProtocolClient(served=SERVED)
     install(monkeypatch, client)

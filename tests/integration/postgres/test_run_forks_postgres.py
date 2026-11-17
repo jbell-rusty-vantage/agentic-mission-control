@@ -631,8 +631,8 @@ async def test_active_async_child_in_rrm013_authority_blocks_the_snapshot(
         RunSnapshotService,
     )
     from mission_control.domain.policies.contracts import StartAction
-    from tests.acceptance.control_plane.test_wp_cp_045 import request as spawn_request
     from tests.fixtures.run_forks import stagegraph_head
+    from tests.support.deep_agents import request as spawn_request
 
     owner = await common_db.pool(max_size=4)
     try:

@@ -33,7 +33,7 @@ from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.outputs import LLMResult
 from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.store.memory import InMemoryStore
-from tests.acceptance.control_plane.test_wp_cp_040 import exact_fixture
+from tests.support.deep_agents import exact_fixture
 
 from mission_control.adapters.deep_agents import (
     ExactComponentRegistry,

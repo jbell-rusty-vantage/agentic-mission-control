@@ -137,7 +137,7 @@ async def test_state_backend_rejects_binary_without_silently_dropping_assets() -
 
     from mission_control.adapters.deep_agents.materializer import ExactDeepAgentMaterializer
     from mission_control.domain.execution.errors import DeepAgentUnsupportedPlacement
-    from tests.acceptance.control_plane.test_wp_cp_040 import exact_fixture, registry
+    from tests.support.deep_agents import exact_fixture, registry
 
     binding, _, original = exact_fixture()
     files = (*original.files, ("asset.bin", b"\xff"))
@@ -160,7 +160,7 @@ async def test_mount_collisions_fail_before_backend_upload() -> None:
     from deepagents.backends import StateBackend
 
     from mission_control.adapters.deep_agents.materializer import ExactDeepAgentMaterializer
-    from tests.acceptance.control_plane.test_wp_cp_040 import exact_fixture, registry
+    from tests.support.deep_agents import exact_fixture, registry
 
     binding, _, bundle = exact_fixture()
     materializer = ExactDeepAgentMaterializer(registry(binding, bundle))

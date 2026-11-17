@@ -569,7 +569,7 @@ async def test_real_materializer_persists_exact_operation_child_intent() -> None
 async def test_real_materializer_freezes_the_stage_unit_cognitive_namespace() -> None:
     """REQ-CP-DA-016: a StageGraph Deep Agent unit owns one namespace per unit generation."""
 
-    from tests.acceptance.control_plane.test_wp_cp_040 import exact_fixture
+    from tests.support.deep_agents import exact_fixture
     from tests.support.operations import operation_request
 
     graph = _blueprint()

@@ -57,7 +57,6 @@ from mission_control.bootstrap.preflight import check_bindings, compose_launch_b
 from mission_control.bootstrap.technical_api import api
 from mission_control.domain.authoring.extensions import ExtensionRegistry
 from mission_control.domain.execution.contracts import DeepAgentExecutionBinding
-from tests.acceptance.control_plane.test_wp_cp_040 import exact_fixture
 from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog, publish_output_schemas
 from tests.fixtures.manifest_runtime import (
     ChainScript,
@@ -92,6 +91,7 @@ from tests.integration.temporal.test_manifest_launch_production import (
     root_executions,
     submit,
 )
+from tests.support.deep_agents import exact_fixture
 from tests.unit.authoring.manifest_launch_fixture import deep_agents_chain, fixture_bindings
 
 pytestmark = pytest.mark.common_db

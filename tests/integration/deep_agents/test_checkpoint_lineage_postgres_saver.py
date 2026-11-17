@@ -22,7 +22,6 @@ from deepagents import create_deep_agent
 from langchain_core.runnables import RunnableConfig
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 from langgraph.store.memory import InMemoryStore
-from tests.acceptance.control_plane.test_wp_cp_040 import SessionProbeModel, exact_fixture
 from tests.fixtures.checkpoint_lineage import bind_unit, goal_unit, stage_unit
 from tests.fixtures.lane_bindings import lane_fields
 from tests.fixtures.mission_control_common_db import (
@@ -30,6 +29,7 @@ from tests.fixtures.mission_control_common_db import (
     canonical_scope,
     provision_runtime,
 )
+from tests.support.deep_agents import SessionProbeModel, exact_fixture
 from tests.support.operations import MCP_DIGEST, SKILL_DIGEST, operation_request
 from tests.support.run_control import actor, command
 from tests.support.run_control import request as run_request

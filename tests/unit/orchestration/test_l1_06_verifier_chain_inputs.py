@@ -130,8 +130,8 @@ async def _service() -> tuple[ContextPackService, FakeChainSupplies]:
 
 
 def _template() -> Any:
-    from tests.acceptance.control_plane.test_wp_cp_040 import exact_fixture
     from tests.fixtures.goal_directed_journaled import goal_templates
+    from tests.support.deep_agents import exact_fixture
 
     binding, _profile, _bundle = exact_fixture()
     return goal_templates(binding)["verifier"]

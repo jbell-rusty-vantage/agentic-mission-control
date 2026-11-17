@@ -17,7 +17,7 @@ from mission_control.domain.execution.contracts import (
     DeepAgentModelComponent,
     DeepAgentProfile,
 )
-from tests.acceptance.control_plane.test_wp_cp_040 import exact_fixture
+from tests.support.deep_agents import exact_fixture
 from tests.unit.deep_agents.test_lane_adapter import POINTER, _inputs
 
 

@@ -50,7 +50,6 @@ from mission_control.domain.capabilities.features import LANE_FEATURES, resolve_
 from mission_control.domain.execution.errors import DeepAgentMaterializationError
 from mission_control.domain.execution.materialization_receipt import MaterializationItem
 from mission_control.domain.resolution.configuration import AgentConfiguration
-from tests.acceptance.control_plane.test_wp_cp_040 import exact_fixture
 from tests.conformance.lanes.compile.deep_agents import (
     AuthoredDeepAgentsAdapter,
     deep_agents_facts,
@@ -58,6 +57,7 @@ from tests.conformance.lanes.compile.deep_agents import (
 from tests.conformance.lanes.compile.fixtures import canonical_agent
 from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog
 from tests.fixtures.models import checked_in_catalog, fixture_model_catalog
+from tests.support.deep_agents import exact_fixture
 from tests.unit.authoring.manifest_launch_fixture import fixture_bindings, fixture_served
 from tests.unit.authoring.test_manifest_launch_inputs import MINIMAL, SCOPE
 

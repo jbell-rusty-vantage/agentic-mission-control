@@ -63,7 +63,6 @@ from mission_control.domain.policies.contracts import (
     ReconcileUnitAction,
 )
 from mission_control.domain.programs.goal_directed import GoalDirectedInterpreter
-from tests.acceptance.control_plane.test_wp_cp_045 import DeterministicProvider
 from tests.fixtures.checkpoint_recovery import (
     CrashingSaver,
     RecoveryHarness,
@@ -84,6 +83,7 @@ from tests.fixtures.goal_directed_journaled import (
     goal_templates,
     preparer,
 )
+from tests.support.deep_agents import DeterministicProvider
 from tests.support.run_control import actor, command
 from tests.unit.operations.test_checkpoint_recovery_classification import (
     AFTER_TOOL_CHECKPOINT,
@@ -597,7 +597,7 @@ async def test_cancel_during_async_work_cancels_the_child_and_leaves_its_usage_p
     privileged `reconcile_usage`; the parent unit settles `cancelled` once."""
 
     from mission_control.domain.execution.contracts import AsyncSubagentContract as Contract
-    from tests.acceptance.control_plane.test_wp_cp_045 import contract as base_contract
+    from tests.support.deep_agents import contract as base_contract
 
     harness = await recovery_harness()
     children, provider, _authority = await _async_children(harness.run_control)
@@ -747,7 +747,7 @@ async def test_child_result_decision_is_crash_safe_and_idempotent(after_write: b
     same decision once, and a repeated decision changes nothing."""
 
     from mission_control.domain.execution.contracts import AsyncSubagentContract as Contract
-    from tests.acceptance.control_plane.test_wp_cp_045 import contract as base_contract
+    from tests.support.deep_agents import contract as base_contract
 
     harness = await recovery_harness()
     events: list[str] = []

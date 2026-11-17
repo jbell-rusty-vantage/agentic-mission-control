@@ -276,7 +276,7 @@ def _child_service(details: Any) -> Any:
         AsyncSubagentService,
         InMemoryAsyncSubagentAuthority,
     )
-    from tests.acceptance.control_plane.test_wp_cp_045 import NOW as CHILD_NOW
+    from tests.support.deep_agents import NOW as CHILD_NOW
 
     return AsyncSubagentService(
         details,
@@ -299,9 +299,9 @@ async def test_active_async_child_from_rrm013_lifecycle_data_prohibits_the_snaps
 ) -> None:
     """RRM-001 §8 #6 / EXEC-016 with RRM-013's real service, lifecycle data and classifier."""
 
-    from tests.acceptance.control_plane.test_wp_cp_045 import SERVED
-    from tests.acceptance.control_plane.test_wp_cp_045 import request as spawn_request
     from tests.fixtures.fake_agent_protocol import FakeAgentProtocolClient, install
+    from tests.support.deep_agents import SERVED
+    from tests.support.deep_agents import request as spawn_request
 
     client = FakeAgentProtocolClient(served=SERVED)
     install(monkeypatch, client)

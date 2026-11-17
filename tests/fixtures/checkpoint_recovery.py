@@ -664,7 +664,7 @@ async def recovery_harness(
     """`run_control` (RRM-016) lets a family's admissions be registered on the harness; its
     repository is then not exposed (`RecoveryHarness.repository` stays `None`)."""
 
-    from tests.acceptance.control_plane.test_wp_cp_040 import exact_fixture
+    from tests.support.deep_agents import exact_fixture
 
     repository: Any = None
     if run_control is None:

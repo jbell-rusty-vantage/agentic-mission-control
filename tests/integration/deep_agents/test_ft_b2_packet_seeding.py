@@ -17,13 +17,9 @@ from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import AIMessage, BaseMessage, ToolMessage
 from langchain_core.outputs import ChatGeneration, ChatResult
 from langchain_core.tools import BaseTool
-from tests.acceptance.control_plane.test_wp_cp_040 import (
-    exact_fixture,
-    registry,
-    unit_bound,
-)
 from tests.fixtures.checkpoint_lineage import activity_attempt
 from tests.fixtures.lane_bindings import lane_fields
+from tests.support.deep_agents import exact_fixture, registry, unit_bound
 from tests.support.operations import operation_request
 
 from mission_control.adapters.deep_agents.adapter import (

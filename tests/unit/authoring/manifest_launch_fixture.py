@@ -26,8 +26,8 @@ from mission_control.domain.execution.contracts import (
     DeepAgentProfile,
     StructuredOutputBinding,
 )
-from tests.acceptance.control_plane.test_wp_cp_040 import exact_fixture
 from tests.fixtures.models import model_binding
+from tests.support.deep_agents import exact_fixture
 from tests.support.operations import operation_request
 
 FIXTURE_MODEL_PROFILES = ("frontier.default", "frontier.long_context")

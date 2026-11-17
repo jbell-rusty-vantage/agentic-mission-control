@@ -41,11 +41,6 @@ from mission_control.domain.execution.contracts import (
 )
 from mission_control.domain.frames.contracts import FrameKind
 from mission_control.domain.subscriptions.streams import StreamScope
-from tests.acceptance.control_plane.test_wp_cp_040 import (
-    SkillReadingModel,
-    exact_fixture,
-    registry,
-)
 from tests.fixtures.checkpoint_lineage import activity_attempt, bind_unit, stage_unit
 from tests.fixtures.lane_bindings import lane_fields
 from tests.fixtures.provider_frames import (
@@ -55,6 +50,7 @@ from tests.fixtures.provider_frames import (
     opened_writer,
 )
 from tests.fixtures.workspace_closures import InMemoryWorkspaceClosures
+from tests.support.deep_agents import SkillReadingModel, exact_fixture, registry
 from tests.support.operations import operation_request
 
 

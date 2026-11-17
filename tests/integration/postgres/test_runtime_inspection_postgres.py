@@ -38,7 +38,6 @@ from mission_control.domain.policies.inspection import (
     InspectionNotFound,
     InvalidInspectionCursor,
 )
-from tests.acceptance.control_plane.test_wp_cp_045 import request as spawn_request
 from tests.fixtures.checkpoint_lineage import CHECKPOINTER
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.fixtures.runtime_inspection import (
@@ -49,6 +48,7 @@ from tests.fixtures.runtime_inspection import (
     SeededRuns,
     seed_inspection_world,
 )
+from tests.support.deep_agents import request as spawn_request
 from tests.support.run_control import service as run_control_service
 
 pytestmark = pytest.mark.common_db

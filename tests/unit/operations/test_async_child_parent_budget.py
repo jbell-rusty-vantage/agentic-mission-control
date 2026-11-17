@@ -29,7 +29,7 @@ from mission_control.domain.policies.contracts import (
     ReserveBudgetAction,
     StartAction,
 )
-from tests.acceptance.control_plane.test_wp_cp_045 import NOW, DeterministicProvider, request
+from tests.support.deep_agents import NOW, DeterministicProvider, request
 from tests.support.run_control import actor, command
 from tests.support.run_control import request as run_request
 from tests.support.run_control import service as run_control_service
