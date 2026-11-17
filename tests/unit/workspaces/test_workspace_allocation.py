@@ -11,8 +11,7 @@ from uuid import UUID, uuid4
 import pytest
 
 from mission_control.adapters.cursor.cloud import parse_branch_snapshot
-from mission_control.adapters.cursor.git_workspaces import run_git
-from mission_control.adapters.workspaces.git_workspaces import GitWorkspaceBackend
+from mission_control.adapters.workspaces.git_workspaces import GitWorkspaceBackend, run_git
 from mission_control.application.execution.harness.leases import StaleWorkspaceLease
 from mission_control.application.workspaces.errors import (
     CHECKPOINT_INVALID,

@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Any
 from uuid import UUID, uuid4
 
-from mission_control.adapters.cursor.git_workspaces import GitWorkspaceBackend, run_git
+from mission_control.adapters.workspaces.git_workspaces import GitWorkspaceBackend, run_git
 from mission_control.application.execution.harness.leases import InMemoryWorkspaceLeaseStore
 from mission_control.application.workspaces.service import AllocationRequest, WorkspaceAllocator
 from mission_control.domain.execution.bindings import WorkspacePolicyPin

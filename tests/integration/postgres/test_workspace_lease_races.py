@@ -10,8 +10,8 @@ from pathlib import Path
 
 import pytest
 
-from mission_control.adapters.cursor.git_workspaces import GitWorkspaceBackend
 from mission_control.adapters.postgres.lanes.workspace_leases import PostgresWorkspaceLeaseStore
+from mission_control.adapters.workspaces.git_workspaces import GitWorkspaceBackend
 from mission_control.application.execution.harness.leases import (
     WorkspaceLease,
     WorkspaceLeaseHeld,

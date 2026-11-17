@@ -8,7 +8,7 @@ Entrypoints:
 - snapshot.py — Emulated snapshot and its restore for cursor_local
 - time_travel.py — Cursor time travel: read_as_of, seed_fork and collect_points over the persisted…
 - bridge.py — The Cursor local bridge behind a port
-Also: environments.py, workspace.py, hooks_callback.py, qualification.py, scm.py, cloud_api.py, frames.py, kernel_hook_script.py, projection.py, describe.py, bridge_spawn.py, cognition_points.py, secrets.py, cost.py, host_files.py, bridge_recovery.py, costs.py, usage.py, discovery.py (+4)
+Also: environments.py, workspace.py, hooks_callback.py, qualification.py, scm.py, cloud_api.py, frames.py, kernel_hook_script.py, projection.py, describe.py, bridge_spawn.py, cognition_points.py, secrets.py, cost.py, host_files.py, bridge_recovery.py, costs.py, usage.py, discovery.py (+3)
 Tests: tests/unit/cursor, tests/integration/cursor, tests/unit/harness
 Invariants:
 - Importing this package imports no SDK; the SDK loads lazily inside the bridge adapter.
