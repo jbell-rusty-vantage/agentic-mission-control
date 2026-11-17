@@ -48,13 +48,7 @@ from tests.integration.temporal.test_wi04_saved_settlement_restart import (
     _scheduled,
     _Stack,
 )
-from tests.unit.knowledge.test_trusted_judgment import (
-    ScriptedRunner,
-    World,
-    evaluators,
-    head_of,
-    world,
-)
+from tests.support.trusted_knowledge import ScriptedRunner, World, evaluators, head_of, world
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.common_db]
 

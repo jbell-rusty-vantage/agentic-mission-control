@@ -7,8 +7,7 @@ import pytest
 
 from mission_control.adapters.deep_agents.knowledge_tools import CURRENT_INVOCATION
 from tests.fixtures.knowledge_binding import report_package
-from tests.unit.knowledge.test_gateway import TENANT
-from tests.unit.knowledge.test_knowledge_tools import lane
+from tests.support.knowledge import TENANT, lane
 
 
 @pytest.mark.parametrize("failure", [None, "digest", "size", "encoding"])

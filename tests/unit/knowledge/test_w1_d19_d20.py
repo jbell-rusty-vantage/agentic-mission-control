@@ -23,8 +23,8 @@ from mission_control.contracts.knowledge_protocol_results import protocol_error
 from mission_control.domain.execution.invocation_settlement import SettlementOutcome, WaitReason
 from mission_control.domain.knowledge.effects import JournalState
 from tests.fixtures.knowledge_binding import model_report
-from tests.unit.knowledge.test_knowledge_tools import lane
-from tests.unit.knowledge.test_trusted_judgment import ScriptedRunner, evaluators, world
+from tests.support.knowledge import lane
+from tests.support.trusted_knowledge import ScriptedRunner, evaluators, world
 
 pytestmark = pytest.mark.asyncio
 

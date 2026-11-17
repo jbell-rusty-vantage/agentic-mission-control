@@ -30,7 +30,7 @@ from mission_control.application.knowledge.judgment import (
 from mission_control.application.ports.outputs import AssessmentSupersessionConflict
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.integration.postgres.test_trusted_judgment_postgres import access_for
-from tests.unit.knowledge.test_trusted_judgment import ScriptedRunner, world
+from tests.support.trusted_knowledge import ScriptedRunner, world
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.common_db]
 

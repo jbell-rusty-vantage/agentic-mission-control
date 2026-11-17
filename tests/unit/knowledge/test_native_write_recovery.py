@@ -251,7 +251,7 @@ async def test_explicit_effect_candidate_from_settlement_can_fulfill_a_named_pro
     from mission_control.application.knowledge.effect_receipts import JournalEffectReceipts
     from mission_control.application.knowledge.toolset import InlineItem, _candidate
     from mission_control.domain.outputs.contracts import OutputForm
-    from tests.unit.knowledge.test_gateway import call, harness
+    from tests.support.knowledge import call, harness
     from tests.unit.outputs.scenario import fulfillment, obligation
     from tests.unit.outputs.test_output_fulfillment import make_stack
 
@@ -282,7 +282,8 @@ async def test_native_effect_inspection_survives_json_serialization_and_lane_set
         NativeSettlement,
         NativeWriteOutcome,
     )
-    from tests.unit.knowledge.test_knowledge_tools import TOOL_NAMES, _runtime_invocation, lane
+    from mission_control.application.knowledge.toolset import TOOL_NAMES
+    from tests.support.knowledge import _runtime_invocation, lane
 
     stack = await accepted_report()
     bridge = Bridge(InMemoryUseDecisionStore())

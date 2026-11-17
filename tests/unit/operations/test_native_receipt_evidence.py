@@ -200,7 +200,7 @@ async def test_actual_native_outcome_accepts_canonical_opaque_receipt_identifier
     from mission_control.application.ports.knowledge import RecordedUseDecision
     from mission_control.contracts.knowledge_protocol import digest_canonical
     from mission_control.contracts.knowledge_protocol_results import OperationReceipt
-    from tests.unit.knowledge.test_gateway import call, harness
+    from tests.support.knowledge import call, harness
 
     h = harness()
     result = await h.gateway.invoke(call(), h.access())

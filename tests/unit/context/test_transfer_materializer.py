@@ -71,7 +71,7 @@ from tests.fixtures.knowledge_binding import (
     knowledge_port,
     report_package,
 )
-from tests.unit.knowledge.test_gateway import TENANT, origin
+from tests.support.knowledge import TENANT, origin
 
 RUN = "22222222-2222-4222-8222-222222222222"
 OVERHEAD = HostOverhead(host_state_tokens=800, tool_schema_tokens=400, skill_tokens=100)

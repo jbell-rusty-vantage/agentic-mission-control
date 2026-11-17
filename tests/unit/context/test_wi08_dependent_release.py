@@ -26,13 +26,13 @@ from mission_control.domain.programs.contracts import (
     StageReleasedBy,
 )
 from tests.fixtures.knowledge_binding import report_package
+from tests.support.knowledge import TENANT
 from tests.unit.context.test_transfer_materializer import (
     RUN,
     FakeBackend,
     dependent,
     seam,
 )
-from tests.unit.knowledge.test_gateway import TENANT
 from tests.unit.outputs.scenario import obligation, promises
 
 

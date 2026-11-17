@@ -48,8 +48,7 @@ from tests.fixtures.knowledge_binding import (
     InMemoryRetainedReadStore,
     read_intent_answer,
 )
-from tests.unit.knowledge.test_gateway import TENANT, TRANSPORTS, harness
-from tests.unit.knowledge.test_knowledge_tools import RUN, lane
+from tests.support.knowledge import RUN, TENANT, TRANSPORTS, harness, lane
 
 GOVERNORS = Governors.model_validate(
     {

@@ -37,7 +37,7 @@ from tests.fixtures.knowledge_binding import model_report
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.integration.postgres.test_knowledge_gateway_postgres import stack
 from tests.support.db_builders import admit_unit_attempt, owner_rows
-from tests.unit.knowledge.test_knowledge_tools import _runtime_invocation
+from tests.support.knowledge import _runtime_invocation
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.common_db]
 

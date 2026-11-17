@@ -24,8 +24,7 @@ from mission_control.application.knowledge.report_registration import (
 )
 from mission_control.contracts.knowledge_protocol import Origin, digest_bytes, digest_canonical
 from tests.fixtures.knowledge_binding import BINDING, model_content, model_report
-from tests.unit.knowledge.test_gateway import TENANT
-from tests.unit.knowledge.test_knowledge_tools import lane
+from tests.support.knowledge import TENANT, lane
 
 PARITY = json.loads(
     (Path(__file__).resolve().parents[2] / "fixtures" / "knowledge_protocol")

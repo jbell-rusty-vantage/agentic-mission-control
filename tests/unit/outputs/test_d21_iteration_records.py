@@ -24,7 +24,7 @@ from mission_control.domain.outputs.contracts import (
     Requirement,
 )
 from tests.fixtures.output_contracts import InMemoryOutputContractStore
-from tests.unit.knowledge.test_gateway import origin
+from tests.support.knowledge import origin
 from tests.unit.outputs.scenario import Stack, build_stack, codes, fulfillment, obligation, text
 
 pytestmark = pytest.mark.asyncio

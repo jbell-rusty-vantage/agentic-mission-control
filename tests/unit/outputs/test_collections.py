@@ -33,7 +33,7 @@ from mission_control.domain.outputs.contracts import (
 )
 from mission_control.domain.outputs.current_set import build_current_set_index
 from tests.fixtures.output_contracts import InMemoryOutputContractStore
-from tests.unit.knowledge.test_gateway import origin
+from tests.support.knowledge import origin
 from tests.unit.outputs.scenario import (
     TRUSTED_VALIDATORS,
     Stack,

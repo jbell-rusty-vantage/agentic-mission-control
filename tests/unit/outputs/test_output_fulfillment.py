@@ -55,9 +55,9 @@ from mission_control.domain.outputs.successors import (
     classify_successor,
 )
 from tests.fixtures.output_contracts import InMemoryOutputContractStore
-from tests.unit.knowledge.test_gateway import call as gateway_call
-from tests.unit.knowledge.test_gateway import harness as gateway_harness
-from tests.unit.knowledge.test_gateway import origin
+from tests.support.knowledge import call as gateway_call
+from tests.support.knowledge import harness as gateway_harness
+from tests.support.knowledge import origin
 from tests.unit.outputs.scenario import (
     CLAIMS_SCHEMA,
     INDEX_SCHEMA,

@@ -10,7 +10,6 @@ client over the in-process K01 HTTP surface (``http``), so the transport adds no
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass
 from datetime import timedelta
 from pathlib import Path
 
@@ -25,7 +24,6 @@ from mission_control.adapters.knowledge.credentials import (
 from mission_control.application.knowledge.access import (
     CredentialMismatch,
     InvocationAccess,
-    RecoveryAccess,
     RecoveryGrant,
     to_wire_origin,
     verify_credential_claims,
@@ -34,7 +32,6 @@ from mission_control.application.knowledge.gateway import KnowledgeGateway
 from mission_control.application.knowledge.operations import KnowledgeCall, KnowledgeRefused
 from mission_control.application.ports.knowledge import CredentialRequest, KnowledgeProtocolRefusal
 from mission_control.contracts.knowledge_protocol import (
-    Governors,
     Origin,
     bind_effect,
     bound_effect_digest,
@@ -53,19 +50,16 @@ from tests.fixtures.knowledge_binding import (
     Issuer,
     RecordingMinter,
     SteppingClock,
-    http_client_over,
     knowledge_port,
 )
+from tests.support.knowledge import TENANT, TRANSPORTS, call, harness, origin
 
 FIXTURES = Path(__file__).resolve().parents[2] / "fixtures" / "knowledge_protocol"
 GOLDEN = json.loads(
     (FIXTURES / "knowledge-operation-protocol.v2.golden.json").read_text(encoding="utf-8")
 )
 VECTORS = {vector["id"]: vector for vector in GOLDEN["vectors"]}
-INSTALLATION = "00000000-0000-7000-8000-000000000001"
-TENANT = "00000000-0000-7000-8000-0000000000aa"
 P, D, U = JournalState.PREPARED, JournalState.DISPATCHED, JournalState.UNCERTAIN
-TRANSPORTS = ["direct", "http"]
 
 
 def schema(name: str) -> dict[str, object]:
@@ -77,106 +71,6 @@ def recovery_schema_is_effect_scoped() -> bool:
 
     recovery = json.dumps(schema("credential-claims")["properties"]["recovery"])  # type: ignore[index]
     return '"scope"' in recovery
-
-
-def origin(attempt: int = 1, **updates: object) -> InvocationOrigin:
-    values: dict[str, object] = {
-        "issuer": "mission-control",
-        "installation_id": INSTALLATION,
-        "application_id": "biotech",
-        "tenant_id": TENANT,
-        "mission_id": "11111111-1111-4111-8111-111111111111",
-        "run_id": "22222222-2222-4222-8222-222222222222",
-        "activation_id": "33333333-3333-4333-8333-333333333333",
-        "operation_id": "op-research-1",
-        "attempt": attempt,
-        "generation": 1,
-        "lane": "deep_agents",
-        **updates,
-    }
-    return InvocationOrigin.model_validate(values)
-
-
-@dataclass
-class Harness:
-    clock: SteppingClock
-    issuer: Issuer
-    minter: RecordingMinter
-    client: FakeKnowledgeBinding
-    journal: InMemoryKnowledgeJournal
-    handles: InMemoryKnowledgeHandleStore
-    gateway: KnowledgeGateway
-    sleeps: list[float]
-
-    def access(
-        self, attempt: int = 1, grant: RecoveryGrant | None = None, invocation: str = "inv-0001"
-    ) -> InvocationAccess:
-        return InvocationAccess(
-            origin=origin(attempt),
-            subject="mission-control-runtime",
-            invocation_id=invocation,
-            authenticated_at=self.clock.now,
-            recovery_grant=grant,
-        )
-
-    def recovery(self, issuer: str = "mission-control") -> RecoveryAccess:
-        return RecoveryAccess(
-            installation_id=INSTALLATION,
-            application_id="biotech",
-            tenant_id=TENANT,
-            issuer=issuer,
-            subject="mission-control-reconciler",
-            authority_ref="recovery-grant-7",
-            invocation_id="inv-0009",
-            authenticated_at=self.clock.now,
-        )
-
-    async def transitions(self, effect_key: str) -> list[tuple[object, object]]:
-        return list(await self.journal.transitions(self.access().scope, effect_key))
-
-
-def harness(transport: str = "direct", max_polls: int = 3, **drift: object) -> Harness:
-    clock = SteppingClock()
-    issuer = Issuer(clock=clock)
-    minter = RecordingMinter(issuer.minter(), drift=dict(drift))
-    fake = FakeKnowledgeBinding(verifier=issuer.verifier(), clock=clock)
-    journal = InMemoryKnowledgeJournal()
-    handles = InMemoryKnowledgeHandleStore()
-    sleeps: list[float] = []
-
-    async def sleep(seconds: float) -> None:
-        sleeps.append(seconds)
-
-    client = fake if transport == "direct" else http_client_over(fake, sleep=sleep)
-    gateway = KnowledgeGateway(
-        client=client,
-        journal=journal,
-        handles=handles,
-        minter=minter,
-        knowledge=knowledge_port(BINDING),
-        audience=AUDIENCE,
-        max_polls=max_polls,
-        clock=clock,
-        sleep=sleep,
-    )
-    return Harness(clock, issuer, minter, fake, journal, handles, gateway, sleeps)
-
-
-def call(payload: object | None = None, **updates: object) -> KnowledgeCall:
-    values: dict[str, object] = {
-        "operation": "knowledge.apply",
-        "capability_pin": "ai-engineer.research@1:knowledge.apply",
-        "native_contract": {"name": "knowledge-ingestion-intent", "version": "v1"},
-        "payload": {"intent": "add", "claims": ["c-1"]} if payload is None else payload,
-        "governors": Governors(
-            deadline="2026-10-24T20:10:00Z",
-            maxItems=64,
-            partialResults="forbid",
-            budget={"calls": 10, "tokens": 1000, "costUsd": "0.50"},
-        ),
-        **updates,
-    }
-    return KnowledgeCall.model_validate(values)
 
 
 # ---------------------------------------------------------------- origin mapping

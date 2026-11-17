@@ -32,14 +32,15 @@ from mission_control.application.outputs.fulfillment import OutputFulfillmentSer
 from mission_control.application.outputs.submission_service import SubmissionService
 from mission_control.domain.graph_runtime.identities import GoalDirectedUnitLocation
 from mission_control.domain.outputs.contracts import OutputForm
+from tests.fixtures.knowledge_binding import BINDING
 from tests.fixtures.lane_bindings import lane_fields
 from tests.fixtures.output_contracts import InMemoryOutputContractStore
+from tests.support.knowledge import RUN, lane
 from tests.unit.authoring.test_manifest_launch_inputs import (  # noqa: F401 (fixture)
     admitted,
     chain,
     pubmed_resolver,
 )
-from tests.unit.knowledge.test_knowledge_tools import BINDING, RUN, lane
 from tests.unit.outputs.scenario import host_access, obligation, promises
 
 REPORT = {

@@ -35,7 +35,7 @@ from mission_control.application.knowledge.trusted_settlement import TrustedPlan
 from mission_control.contracts.knowledge_assessment import DecisionResolution
 from mission_control.contracts.knowledge_protocol import Ref, bound_effect_digest, canonical_json
 from mission_control.domain.knowledge.judgment import CognitionIdentity
-from tests.unit.knowledge.test_gateway import TENANT, origin
+from tests.support.knowledge import TENANT, origin
 from tests.unit.outputs.scenario import digest_of
 from tests.unit.outputs.test_w1_d28_d29 import (
     HANDLE,
@@ -329,7 +329,7 @@ async def test_the_ks_plan_preview_is_one_synchronous_nonce_per_call_and_records
 
     from mission_control.contracts.knowledge_protocol import KnowledgePlanPreview as Answer
     from mission_control.contracts.knowledge_protocol import digest_canonical
-    from tests.unit.knowledge.test_gateway import harness
+    from tests.support.knowledge import harness
 
     h = harness()
     empty = digest_canonical({})
@@ -401,7 +401,7 @@ async def test_the_toolset_answers_pending_review_and_its_settlement_applies() -
     from dataclasses import replace as dc_replace
 
     from mission_control.application.knowledge.toolset import LiveInvocation, ReadScope
-    from tests.unit.knowledge.test_knowledge_tools import lane
+    from tests.support.knowledge import lane
 
     stack = await accepted_report()
     bridge = Bridge(InMemoryUseDecisionStore(), pending=True)

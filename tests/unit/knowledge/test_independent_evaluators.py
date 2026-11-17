@@ -62,7 +62,7 @@ from mission_control.domain.knowledge.judgment import (
     evaluator_refusals,
 )
 from mission_control.domain.outputs.contracts import ExactOutput
-from tests.unit.knowledge.test_gateway import TENANT, origin
+from tests.support.knowledge import TENANT, origin
 
 pytestmark = pytest.mark.asyncio
 NOW = datetime(2026, 10, 28, 12, tzinfo=UTC)

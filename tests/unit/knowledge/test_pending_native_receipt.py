@@ -9,7 +9,7 @@ from mission_control.application.ports.knowledge import RecordedUseDecision
 from mission_control.contracts.knowledge_protocol import digest_canonical
 from mission_control.domain.knowledge.effects import JournalState, mint_effect_key
 from tests.fixtures.knowledge_binding import BINDING
-from tests.unit.knowledge.test_gateway import TENANT, call, harness
+from tests.support.knowledge import TENANT, call, harness
 
 pytestmark = pytest.mark.asyncio
 PIN = "knowledge.knowledge_apply@1"

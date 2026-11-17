@@ -40,7 +40,7 @@ from mission_control.domain.outputs.current_set import (
 )
 from tests.fixtures.knowledge_binding import InMemoryStaging, InMemoryTransferPlanStore
 from tests.fixtures.output_contracts import InMemoryOutputContractStore
-from tests.unit.knowledge.test_gateway import origin
+from tests.support.knowledge import origin
 from tests.unit.outputs.scenario import (
     TRUSTED_VALIDATORS,
     Stack,

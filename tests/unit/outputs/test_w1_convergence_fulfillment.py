@@ -23,7 +23,7 @@ from mission_control.application.programs.goal_directed import bind_fulfillment
 from mission_control.domain.outputs.contracts import Enforcement, OutputForm, Requirement
 from mission_control.domain.programs.goal_directed_runtime import GoalVerifierObservation
 from tests.fixtures.output_contracts import InMemoryOutputContractStore
-from tests.unit.knowledge.test_gateway import origin
+from tests.support.knowledge import origin
 from tests.unit.outputs.scenario import (
     Stack,
     build_stack,

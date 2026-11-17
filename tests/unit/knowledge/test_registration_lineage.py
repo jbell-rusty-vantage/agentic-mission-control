@@ -8,7 +8,7 @@ import pytest
 from mission_control.application.ports.knowledge import LineageEntry
 from mission_control.domain.knowledge.lineage import ActorKind, LineageFact, ProvenanceRole
 from tests.fixtures.knowledge_binding import InMemoryLineageStore, model_report, report_package
-from tests.unit.knowledge.test_knowledge_tools import lane
+from tests.support.knowledge import lane
 from tests.unit.knowledge.test_w1_tool_boundary import _calls
 
 

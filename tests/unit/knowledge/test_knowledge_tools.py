@@ -10,11 +10,7 @@ completion hands the selected report to the independent assessment.
 
 from __future__ import annotations
 
-import json
 from collections import deque
-from dataclasses import dataclass
-from datetime import timedelta
-from types import SimpleNamespace
 from typing import Any
 
 import pytest
@@ -32,151 +28,19 @@ from mission_control.adapters.deep_agents.materializer import (
     ExactComponentRegistry,
     ExactDeepAgentMaterializer,
 )
-from mission_control.adapters.knowledge.decisions import InMemoryUseDecisionStore
 from mission_control.adapters.knowledge.invocation_locator import InMemoryInvocationLocator
-from mission_control.application.knowledge.gateway import KnowledgeGateway
 from mission_control.application.knowledge.toolset import (
     TOOL_NAMES,
-    KnowledgeToolset,
     LiveInvocation,
 )
-from mission_control.application.outputs.submission_service import SubmissionService
-from mission_control.application.ports.knowledge import RecordedUseDecision
 from mission_control.contracts.knowledge_protocol import digest_bytes
 from mission_control.domain.knowledge.effects import JournalState
 from mission_control.domain.knowledge.origin import MissionIdentityUnavailable
 from tests.fixtures.knowledge_binding import (
-    AUDIENCE,
     BINDING,
-    FakeKnowledgeBinding,
-    InMemoryKnowledgeHandleStore,
-    InMemoryKnowledgeJournal,
-    InMemoryLineageStore,
-    InMemorySubmissionStore,
-    Issuer,
-    RecordingMinter,
-    SteppingClock,
-    knowledge_port,
     model_report,
 )
-from tests.fixtures.lane_bindings import lane_fields
-from tests.unit.knowledge.test_gateway import INSTALLATION, TENANT
-
-RUN = "22222222-2222-4222-8222-222222222222"
-# Provenance slice 1: the run's ledger mission and the activation row of its runtime unit.
-MISSION = "44444444-4444-4444-8444-444444444444"
-UNIT = "unit:stage/draft"
-ACTIVATION = "55555555-5555-4555-8555-555555555555"
-
-
-@dataclass
-class Lane:
-    clock: SteppingClock
-    fake: FakeKnowledgeBinding
-    journal: InMemoryKnowledgeJournal
-    store: InMemorySubmissionStore
-    minter: RecordingMinter
-    support: KnowledgeLaneSupport
-    toolset: KnowledgeToolset
-    decisions: InMemoryUseDecisionStore
-    sleeps: list[float]
-    locator: InMemoryInvocationLocator
-
-    def live(self, attempt: int = 1, generation: int = 1) -> LiveInvocation:
-        """The located live attempt (the ids the locator resolves for RUN and UNIT)."""
-
-        return LiveInvocation(
-            request_scope=f"mc/{INSTALLATION}/biotech/{TENANT}",
-            run_id=RUN,
-            operation_id="stage/draft",
-            operation_attempt=attempt,
-            execution_generation=generation,
-            lane="deep_agents",
-            obligations=("report",),
-            mission_id=MISSION,
-            activation_id=ACTIVATION,
-            unit_key=UNIT,
-        )
-
-    async def decide(self, name: str) -> str:
-        """The host records an exact use decision (a trusted step); the agent gets its handle."""
-
-        handle = f"kh:{BINDING}/decision/{name}@use-decision.v1"
-        await self.decisions.record(
-            self.toolset.access(self.live()).scope,
-            RecordedUseDecision(
-                handle=handle,
-                binding_id=BINDING,
-                tenant_id=TENANT,
-                use_decision_id=name,
-                bound_effect_digest=digest_bytes(name.encode()),
-                processed_epoch=0,
-                plan={
-                    "schemaVersion": "knowledge-ingestion-intent.v1",
-                    "intentId": name,
-                    "context": {"tenantId": TENANT},
-                    "proposals": [{"kind": "claim.add", "claim": name}],
-                },
-                normalized_values_digest=digest_bytes(b"normalized"),
-            ),
-        )
-        return handle
-
-    async def call(self, name: str, args: dict[str, Any], call_id: str) -> dict[str, Any]:
-        message = await self.support.tools[name].ainvoke(
-            {"name": name, "args": args, "id": call_id, "type": "tool_call"}
-        )
-        return json.loads(message.content)
-
-
-def lane() -> Lane:
-    clock = SteppingClock(step=timedelta(milliseconds=1))
-    issuer = Issuer(clock=clock)
-    fake = FakeKnowledgeBinding(verifier=issuer.verifier(), clock=clock)
-    journal = InMemoryKnowledgeJournal()
-    minter = RecordingMinter(issuer.minter())
-
-    sleeps: list[float] = []
-
-    async def sleep(seconds: float) -> None:
-        sleeps.append(seconds)
-
-    decisions = InMemoryUseDecisionStore()
-    gateway = KnowledgeGateway(
-        client=fake,
-        journal=journal,
-        handles=InMemoryKnowledgeHandleStore(),
-        minter=minter,
-        content=fake,
-        decisions=decisions,
-        knowledge=knowledge_port(BINDING),
-        audience=AUDIENCE,
-        clock=clock,
-        sleep=sleep,
-    )
-    store = InMemorySubmissionStore()
-    locator = InMemoryInvocationLocator({RUN: MISSION}, {(RUN, UNIT): ACTIVATION})
-    toolset = KnowledgeToolset(
-        gateway=gateway,
-        submissions=SubmissionService(store, assessor=gateway, clock=clock),
-        issuer="mission-control",
-        clock=clock,
-        lineage=InMemoryLineageStore(),
-        sleep=sleep,
-        locator=locator,
-    )
-    return Lane(
-        clock,
-        fake,
-        journal,
-        store,
-        minter,
-        KnowledgeLaneSupport(toolset),
-        toolset,
-        decisions,
-        sleeps,
-        locator,
-    )
+from tests.support.knowledge import ACTIVATION, MISSION, RUN, UNIT, Lane, _runtime_invocation, lane
 
 
 def test_model_facing_schemas_have_no_origin_and_refuse_one() -> None:
@@ -319,24 +183,6 @@ def test_the_live_invocation_is_the_bound_attempt() -> None:
     assert CURRENT_INVOCATION.get() is None
     plain = _runtime_invocation(h.live(), tool_names=("write_file",))
     assert not h.support.uses_knowledge(plain)  # type: ignore[arg-type]
-
-
-def _runtime_invocation(live: LiveInvocation, *, tool_names: tuple[str, ...]) -> Any:
-    deep = SimpleNamespace(
-        execution_generation=live.execution_generation,
-        tools=tuple(SimpleNamespace(tool_name=name) for name in tool_names),
-    )
-    return SimpleNamespace(
-        binding=SimpleNamespace(
-            request_scope=live.request_scope,
-            run_id=live.run_id,
-            operation_id=live.operation_id,
-            operation_attempt=live.operation_attempt,
-            transfer=None,
-            runtime_unit=None if live.unit_key is None else SimpleNamespace(unit_key=live.unit_key),
-            **lane_fields(deep),
-        )
-    )
 
 
 async def test_stop_during_review_cancels_and_completion_reconciles_uncertain_effects() -> None:

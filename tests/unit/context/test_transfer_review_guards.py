@@ -19,6 +19,7 @@ from mission_control.domain.outputs.contracts import (
     OutputForm,
     OutputObligation,
 )
+from tests.support.knowledge import lane
 from tests.unit.context.test_transfer_materializer import (
     REPORT_INPUT,
     RUN,
@@ -26,7 +27,6 @@ from tests.unit.context.test_transfer_materializer import (
     dependent,
     seam,
 )
-from tests.unit.knowledge.test_knowledge_tools import lane
 
 # ---------------------------------------------------------------- B1 evaluator isolation
 

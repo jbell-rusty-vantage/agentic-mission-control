@@ -24,8 +24,8 @@ from mission_control.application.ports.knowledge import RecordedUseDecision
 from mission_control.contracts.knowledge_protocol import Ref
 from tests.fixtures.knowledge_binding import BINDING, SteppingClock
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.unit.knowledge.test_gateway import origin
-from tests.unit.knowledge.test_trusted_judgment import ScriptedRunner, evaluators, head_of, world
+from tests.support.knowledge import origin
+from tests.support.trusted_knowledge import ScriptedRunner, evaluators, head_of, world
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.common_db]
 

@@ -24,8 +24,8 @@ from mission_control.domain.authoring.stagegraph_builder import (
 )
 from mission_control.domain.outputs.contracts import AllOf, Enforcement, OutputForm
 from tests.fixtures.output_contracts import InMemoryOutputContractStore
+from tests.support.knowledge import origin
 from tests.unit.authoring.test_manifest_compile import minimal, reasons, scope, service, text
-from tests.unit.knowledge.test_gateway import origin
 from tests.unit.outputs.scenario import Stack, fulfillment, host_access
 from tests.unit.outputs.scenario import text as text_candidate
 

@@ -18,6 +18,7 @@ from dataclasses import replace
 import pytest
 
 from mission_control.adapters.deep_agents.knowledge_tools import CURRENT_INVOCATION
+from mission_control.application.knowledge.toolset import TOOL_NAMES
 from mission_control.application.outputs.fulfillment import OutputFulfillmentService
 from mission_control.application.outputs.submission_service import SubmissionService
 from mission_control.domain.execution.invocation_settlement import WaitReason
@@ -26,12 +27,7 @@ from mission_control.domain.outputs.contracts import OutputForm
 from mission_control.domain.outputs.rules import code_change_digest
 from tests.fixtures.knowledge_binding import model_report
 from tests.fixtures.output_contracts import InMemoryOutputContractStore
-from tests.unit.knowledge.test_knowledge_tools import (
-    RUN,
-    TOOL_NAMES,
-    _runtime_invocation,
-    lane,
-)
+from tests.support.knowledge import RUN, _runtime_invocation, lane
 from tests.unit.outputs.scenario import (
     BASE,
     CLAIMS_SCHEMA,

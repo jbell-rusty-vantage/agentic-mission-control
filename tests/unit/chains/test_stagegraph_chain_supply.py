@@ -20,8 +20,8 @@ from mission_control.domain.authoring.contracts import StageGraphBlueprint
 from mission_control.domain.authoring.manifest_lowering import output_promises
 from mission_control.domain.composition.chain import compile_chain
 from tests.fixtures.output_contracts import InMemoryOutputContractStore
+from tests.support.knowledge import RUN, lane
 from tests.unit.authoring.test_experiment_loop_fixtures import FIXTURES, compiled
-from tests.unit.knowledge.test_knowledge_tools import RUN, lane
 from tests.unit.outputs.scenario import host_access
 
 pytestmark = pytest.mark.asyncio

@@ -6,7 +6,7 @@ from mission_control.application.knowledge.effect_receipts import JournalEffectR
 from mission_control.application.knowledge.toolset import InlineItem, _candidate
 from mission_control.application.programs.goal_directed import bind_fulfillment
 from mission_control.domain.outputs.contracts import Enforcement, OutputForm
-from tests.unit.knowledge.test_gateway import call, harness
+from tests.support.knowledge import call, harness
 from tests.unit.orchestration.test_wp_bp_020_goal_directed import (
     _blueprint,
     _claim,

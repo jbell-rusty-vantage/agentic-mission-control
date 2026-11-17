@@ -47,14 +47,8 @@ from mission_control.interfaces.mcp.knowledge_review_tools import (
     ScopedKnowledgeReviews,
     register_knowledge_review_tools,
 )
-from tests.unit.knowledge.test_gateway import INSTALLATION, TENANT
-from tests.unit.knowledge.test_trusted_judgment import (
-    PRODUCER,
-    ScriptedRunner,
-    evaluators,
-    head_of,
-    world,
-)
+from tests.support.knowledge import INSTALLATION, TENANT
+from tests.support.trusted_knowledge import PRODUCER, ScriptedRunner, evaluators, head_of, world
 from tests.unit.subscriptions.test_mo43_wake_channels import missionctl  # noqa: F401 (fixture)
 
 pytestmark = pytest.mark.asyncio

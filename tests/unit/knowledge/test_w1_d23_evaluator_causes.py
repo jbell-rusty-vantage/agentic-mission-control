@@ -45,17 +45,9 @@ from tests.fixtures.knowledge_binding import (
     knowledge_port,
 )
 from tests.fixtures.trusted_knowledge import TrustedKnowledgeDouble
+from tests.support.trusted_knowledge import JUDGE_PIN, PROFILES, ScriptedRunner, World, world
+from tests.support.trusted_knowledge import evaluators as trusted_evaluators
 from tests.unit.knowledge.test_independent_evaluators import JUDGE_CREDENTIAL, bindings
-from tests.unit.knowledge.test_trusted_judgment import (
-    JUDGE_PIN,
-    PROFILES,
-    ScriptedRunner,
-    World,
-    world,
-)
-from tests.unit.knowledge.test_trusted_judgment import (
-    evaluators as trusted_evaluators,
-)
 
 pytestmark = pytest.mark.asyncio
 

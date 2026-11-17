@@ -113,8 +113,8 @@ from tests.integration.postgres.test_manifest_submit import (
     RecordingSubmitter,
 )
 from tests.integration.postgres.test_manifest_submit import request as submit_request
+from tests.support.knowledge import MISSION, lane
 from tests.unit.context.test_wi07_current_set_transfer import OVERHEAD, SANDBOX, Backend, bounds
-from tests.unit.knowledge.test_knowledge_tools import MISSION, lane
 from tests.unit.orchestration.test_stagegraph_v2 import operation_slot
 from tests.unit.outputs.scenario import host_access, obligation, promises, text
 

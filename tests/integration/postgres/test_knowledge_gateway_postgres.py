@@ -51,6 +51,8 @@ from mission_control.domain.context.transfer import ReceiverAttempt, ReceiverRef
 from mission_control.domain.knowledge.effects import EffectConflict, JournalState
 from mission_control.domain.outputs.contracts import ExactOutput, OutputForm
 from tests.fixtures.knowledge_binding import (
+    AUDIENCE,
+    BINDING,
     FakeKnowledgeBinding,
     InMemoryStaging,
     Issuer,
@@ -62,7 +64,7 @@ from tests.fixtures.knowledge_binding import (
 )
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.support.db_builders import owner_rows
-from tests.unit.knowledge.test_gateway import AUDIENCE, BINDING, call, origin
+from tests.support.knowledge import call, origin
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.common_db]
 

@@ -41,9 +41,9 @@ from mission_control.application.outputs.submission_service import SubmissionSer
 from mission_control.application.ports.knowledge import KnowledgeProtocolRefusal
 from mission_control.contracts.knowledge_protocol import digest_canonical
 from mission_control.domain.outputs.contracts import OutputForm
-from tests.fixtures.knowledge_binding import model_report
+from tests.fixtures.knowledge_binding import BINDING, model_report
 from tests.fixtures.output_contracts import InMemoryOutputContractStore
-from tests.unit.knowledge.test_knowledge_tools import BINDING, RUN, Lane, lane
+from tests.support.knowledge import RUN, Lane, lane
 from tests.unit.outputs.scenario import host_access, obligation, promises
 
 pytestmark = pytest.mark.asyncio

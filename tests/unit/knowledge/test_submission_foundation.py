@@ -17,7 +17,7 @@ from mission_control.adapters.deep_agents.knowledge_tools import (
 from mission_control.application.outputs.fulfillment import OutputSetRef, PromoteOutput
 from mission_control.domain.outputs.contracts import OutputForm
 from tests.fixtures.output_contracts import InMemoryOutputContractStore
-from tests.unit.knowledge.test_knowledge_tools import lane
+from tests.support.knowledge import lane
 from tests.unit.outputs.scenario import build_stack, obligation, schema
 
 pytestmark = pytest.mark.asyncio

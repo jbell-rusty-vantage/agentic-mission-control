@@ -34,7 +34,7 @@ from tests.fixtures.knowledge_binding import (
     knowledge_port,
     report_package,
 )
-from tests.unit.knowledge.test_gateway import TENANT, origin
+from tests.support.knowledge import TENANT, origin
 
 
 @pytest.mark.parametrize(

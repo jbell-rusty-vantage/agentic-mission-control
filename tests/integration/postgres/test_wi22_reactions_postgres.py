@@ -85,6 +85,7 @@ from tests.fixtures.mission_control_common_db import (
     migration_paths_with,
 )
 from tests.support.db_builders import scoped_request
+from tests.support.knowledge import origin
 from tests.support.run_control import service
 from tests.unit.context.test_transfer_plan import (
     OVERHEAD,
@@ -93,7 +94,6 @@ from tests.unit.context.test_transfer_plan import (
     report_members,
     selection,
 )
-from tests.unit.knowledge.test_gateway import origin
 from tests.unit.outputs.scenario import (
     REPO,
     Stack,
