@@ -216,7 +216,7 @@ capture server's revision 3 and the first research mission that mounted it.
 | --- | --- | --- | --- | --- |
 | Tavily | `mcp.tavily@0.2.22` (seed 1.0.0, unchanged) | transcribed 2026-10-07 | `TAVILY_API_KEY` | as before; the local installation binds no launch component for it and its worker holds no key, so `plugin.web-research` does not launch there |
 | Firecrawl, with the developer and paper indexes | `mcp.firecrawl@3.28.2` (seed 1.0.0, unchanged) | transcribed 2026-10-07 | `FIRECRAWL_API_KEY` | as Tavily |
-| Browser | `mcp.agent-browser@0.38.2`, `skill.agent-browser` (unchanged) | transcribed 2026-10-07 | none | as before; no launch binding on the local installation (the first member a `research-report` start refuses) |
+| Browser | `mcp.agent-browser@0.38.2`, `skill.agent-browser` (unchanged) | transcribed 2026-10-07 | none | `mcp.agent-browser` is the plugin's one optional member: unbound, it is recorded `unsupported` on the node (preflight degradation, launch receipt row) and not mounted, no longer refused. `skill.agent-browser` is required and has no launch binding on the local installation, so `plugin.web-research` still does not launch there |
 | GitHub, read-only | `mcp.github@2.1.0#sha256:8a9527386e0634359e8c61114aac0d9439ffdc2646b8d44b2875a6ef0d15a60a` (seed 1.1.0, unchanged) | captured 2026-11-16, 22 tools | `GITHUB_PERSONAL_ACCESS_TOKEN` (a read-only token) | a Deep Agents node, directly or through `plugin.code-research`, where a worker pins the binary. **Not pinned on this machine**: no release binary is on disk (`--github-mcp-server` names none; nothing is downloaded) |
 | Context7 | `mcp.context7@4.7.0#sha256:47e93031a67707b5085404eeb1d5d535556c59b0246bdac0c25814c12671ddf4` (seed 1.1.0, unchanged) | captured 2026-11-16, 2 tools (`resolve-library-id`, `query-docs`) | `CONTEXT7_API_KEY` (optional upstream; pinned keyless unless named) | as GitHub, from a node-module pin. **Not pinned on this machine**: `@upstash/context7-mcp@4.7.0` is not installed under the workspace `.tools` |
 | GitHub and Context7 with one pin | `plugin.code-research@1#sha256:8f6606886307e700bf19dc807189234511240274f601a6cc0593d5f787b1ad88` (unchanged) | - | the two above | a Deep Agents node, where both members are pinned and bound |
@@ -235,7 +235,11 @@ captured `https://pypi.org/pypi/deepagents/0.7.38/json`, made it quotable (`sour
 recorded the proposed claim `01a1e709-df52-7bac-9f21-7d12fd8909a5` anchored to an exact quote
 (`chain_write` `record_claim`, written as `pipeline_agent`), was refused
 `VERIFIED_CLAIM_REQUIRES_ADMITTED_USE` when it asked for `status: verified`, and its review was
-accepted. Not done: the node cannot submit a promised output on an installation without a Knowledge
-Services knowledge binding (`submit_output` is one of the knowledge tools), the receipts carry no
-Mission Control coordinates, GitHub and Context7 are not pinned on this machine, and no remote
-installation holds any of these seeds.
+accepted. Not done then: the node could not submit its promised output without a Knowledge Services
+knowledge binding. Since then `submit_output` is served on every installation (output promises are
+Mission Control's own records; the other knowledge tools still need the binding), and a reproduction on
+an installation recreated from empty (run `ed90bf44-4368-5e64-8876-56d299d226e5`, USD 0.0386, the
+`deepagents` 0.7.39 `requires_python` field, claim `01a1e79a-1966-739d-a0c8-acb2b961ef52`) delivered
+its report as an accepted, fulfilled output (integration, not qualification). Still not done: the receipts carry no Mission Control
+coordinates, GitHub and Context7 are not pinned on this machine, and no remote installation holds any
+of these seeds.

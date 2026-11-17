@@ -65,6 +65,7 @@ import os
 import re
 import secrets
 import shutil
+import stat
 import subprocess
 import sys
 import tempfile
@@ -208,6 +209,30 @@ def _seed_module(name: str) -> ModuleType:
     sys.modules[key] = module
     spec.loader.exec_module(module)
     return module
+
+
+def _writable_then_retry(function: Any, path: str, _error: BaseException) -> None:
+    """``shutil.rmtree`` error handler: clear the read-only bit and retry the one removal."""
+
+    Path(path).chmod(stat.S_IWRITE | stat.S_IREAD)
+    function(path)
+
+
+def knowledge_tool_digest(capability: str) -> str:
+    """The published catalog digest of one knowledge tool row (its highest revision) in the
+    knowledge-tools seed the installation applies; never typed by hand."""
+
+    seed = _seed_module("knowledge_tools")
+    path = PACKAGE / "seeds" / "common" / f"{seed.SEED_KEY}-{seed.SEED_VERSION}.json"
+    refs = [
+        record["fields"]["manifest"]["ref"]
+        for record in json.loads(path.read_text(encoding="utf-8"))["records"]
+        if isinstance(record["fields"].get("manifest"), dict)
+        and record["fields"]["manifest"].get("ref", {}).get("logical_id") == capability
+    ]
+    if not refs:
+        raise Refused("KNOWLEDGE_TOOL_NOT_SEEDED", f"{capability} is not in {path.name}")
+    return str(max(refs, key=lambda ref: int(ref["revision"]))["digest"])
 
 
 # The Sprint OC generators own the shared refusals, the ignore guard, the owner-only writer, the
@@ -584,6 +609,20 @@ def container_dsn(dsn: str, host: str, port: int) -> str:
     )
 
 
+def saver_address(entries: list[tuple[str, str]]) -> str | None:
+    """``host:port`` of the host env file's checkpoint DSN (its runtime DSN when blank, the
+    fallback Settings applies), as the host processes name the saver's server."""
+
+    for suffix in ("_DB_CHECKPOINT_DSN", "_DB_RUNTIME_DSN"):
+        dsn = next((value for name, value in entries if name.endswith(suffix) and value), None)
+        if dsn is None:
+            continue
+        parts = urlsplit(dsn)
+        host = (parts.hostname or "127.0.0.1").lower()
+        return f"{host}:{parts.port or 5432}"
+    return None
+
+
 def container_environment(
     entries: list[tuple[str, str]],
     *,
@@ -605,6 +644,12 @@ def container_environment(
         "TEMPORAL_ADDRESS": temporal_address,
         "REDIS_URL": redis_url,
     }
+    # The container reaches the saver's server by its network name; the host processes that
+    # write the cognition points name it by their DSN's host and port. The container names
+    # it the same way (LANGGRAPH_CHECKPOINT_LOCATOR), so state-as-of reads the points.
+    locator = saver_address(entries)
+    if locator is not None:
+        fixed["LANGGRAPH_CHECKPOINT_LOCATOR"] = locator
     result: list[tuple[str, str]] = []
     for name, value in entries:
         if name in fixed:
@@ -833,7 +878,9 @@ class Installer:
         for name in GENERATED:
             path = self.out / name
             if path.is_dir():
-                shutil.rmtree(path)
+                # A run's workspaces hold read-only files (sealed inputs, `.mission/context.md`);
+                # Windows refuses to unlink those until the read-only bit is cleared.
+                shutil.rmtree(path, onexc=_writable_then_retry)
             elif path.exists():
                 path.unlink()
         self.record("recreate", **dropped)
@@ -1033,6 +1080,22 @@ class Installer:
             capabilities[server_id] = CapabilityComponentBinding(
                 catalog_digest=sha256_digest(definition), kind="mcp_server", pinned=server_id
             ).model_dump(mode="json", exclude_none=True)
+        # Output submission is Mission Control's own act (the output-contract store): bound on
+        # every installation. The other knowledge tools need a knowledge binding; none here.
+        from mission_control.adapters.deep_agents.knowledge_tools import (
+            OUTPUT_TOOL,
+            knowledge_capability_id,
+            knowledge_launch_bindings,
+            served_tool_definitions,
+        )
+
+        output_capability = knowledge_capability_id(OUTPUT_TOOL)
+        output = knowledge_launch_bindings(
+            {output_capability: knowledge_tool_digest(output_capability)},
+            served_tool_definitions(),
+        )
+        for capability, binding in output.items():
+            capabilities[capability] = binding.model_dump(mode="json", exclude_none=True)
         document = {
             "schema_version": "mc.manifest_launch_bindings.v1",
             "deep_agents": scaffold,

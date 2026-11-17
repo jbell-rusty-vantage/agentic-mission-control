@@ -96,7 +96,6 @@ def compose_external_discovery(
     from mission_control.application.capabilities.external_candidate_inspection import (
         InspectionBounds,
     )
-    from mission_control.bootstrap.settings import PROJECT_ROOT
 
     workspace = Path(tempfile.gettempdir()) / "mission-control" / "external-discovery"
     candidates = PostgresExternalCandidateRepository(pool, catalog_scope=catalog_scope)
@@ -122,12 +121,10 @@ def compose_external_discovery(
         candidates=candidates,
         max_results=settings.external_discovery_max_results,
     )
-    # The scanner is a repository script: beside the source checkout this code runs from, since
-    # an installation's MISSION_CONTROL_HOME (PROJECT_ROOT) holds no scripts; else under it.
-    checkout = Path(__file__).resolve().parents[3] / "scripts" / "quarantine_static_scan.py"
-    scanner = (
-        checkout if checkout.is_file() else PROJECT_ROOT / "scripts" / "quarantine_static_scan.py"
-    )
+    # The scanner ships inside the package (an installed image has no repository scripts).
+    from mission_control.adapters.capabilities import quarantine_static_scan
+
+    scanner = Path(quarantine_static_scan.__file__).resolve()
     if not scanner.is_file():
         _LOG.warning("external candidate inspection is not composed: no scanner script")
         return discovery, None

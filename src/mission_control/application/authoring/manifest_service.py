@@ -584,6 +584,55 @@ class _MissionState:
     capabilities: list[DefinitionCapability] = field(default_factory=list)
 
 
+OUTPUT_SUBMISSION_CAPABILITY = "tool.knowledge-submit-output"
+
+
+def _undeliverable_outputs(mission: _MissionState) -> list[ManifestIssue]:
+    """A Deep Agents executor that promises a text output delivers it only with ``submit_output``.
+
+    Its final message is transcript evidence, never a submission: without the tool the text
+    promise stays unmet. A warning, since an optional promise may be left unmet on purpose."""
+
+    # Text is delivered only as an inline `submit_output` item; a structured output can also be
+    # published through the artifact custody tools, so only text promises are checked here.
+    promised = {
+        visit.pointer: visit.node
+        for visit in walk_program(mission.block.program, f"{mission.pointer}/program")
+        if any(getattr(item, "form", None) == "text" for item in visit.node.outputs)
+    }
+    issues: list[ManifestIssue] = []
+    for node in mission.nodes:
+        program_node = promised.get(node.pointer)
+        if (
+            program_node is None
+            or node.role != "node"
+            or node.lane is not Lane.DEEP_AGENTS
+            or node.behavior is not Behavior.AGENT_EXECUTOR
+        ):
+            continue
+        selections = node.effective_environment.capabilities or ()
+        if any(
+            (item.pin or "").startswith(OUTPUT_SUBMISSION_CAPABILITY) or item.as_ == "submit_output"
+            for item in selections
+        ):
+            continue
+        names = ", ".join(
+            item.name for item in program_node.outputs if getattr(item, "form", None) == "text"
+        )
+        issues.append(
+            _issue(
+                ManifestErrorCode.CAPABILITY_UNAVAILABLE,
+                f"{node.pointer}/outputs",
+                f"{node.node_key} promises {names} but has no submit_output tool; its final "
+                "message is not a submission, so the promise stays unmet. Add "
+                f"{{pin: {OUTPUT_SUBMISSION_CAPABILITY}@latest, kind: tool, as: submit_output}} "
+                "to its environment capabilities",
+                "output_submission_missing",
+            )
+        )
+    return issues
+
+
 class ManifestCompileService:
     def __init__(
         self,
@@ -807,6 +856,7 @@ class ManifestCompileService:
         for mission in missions:
             self._lanes(mission, lane_support, hook_events, blockers, warnings, v2=v2)
             self._coverage(mission, blockers, warnings)
+            warnings.extend(_undeliverable_outputs(mission))
             if v2:
                 # V01: every node role's `requires` against its lane's declared matrix, and
                 # its environment kit and configuration references (MO-10).
@@ -2059,6 +2109,24 @@ class MissionManifestService:
                 ready=False, blockers=("Owner prerequisite checks are not composed",)
             )
         report = await self.prerequisites.assess(self._scope, compilation.definitions)
+        gaps = self.prerequisites.launch_gaps
+        if gaps is not None and compilation.ok:
+            # What this installation's launch bindings leave unbound on a Deep Agents node:
+            # a required selection blocks; an optional plugin member degrades by name.
+            blocked: list[str] = []
+            degraded: list[str] = []
+            for definition in compilation.definitions:
+                found_blockers, found_degradations = gaps(definition)
+                blocked.extend(found_blockers)
+                degraded.extend(found_degradations)
+            if blocked or degraded:
+                report = report.model_copy(
+                    update={
+                        "ready": report.ready and not blocked,
+                        "blockers": tuple(dict.fromkeys((*report.blockers, *blocked))),
+                        "degradations": tuple(dict.fromkeys((*report.degradations, *degraded))),
+                    }
+                )
         if not compilation.ok:
             return report.model_copy(
                 update={

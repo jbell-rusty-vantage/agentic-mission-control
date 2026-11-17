@@ -3,11 +3,11 @@ id: interview
 title: Interview the user before a mission
 summary: Look up what exists, ask what only the user can decide, record the brief in the manifest, map the rest to its fields.
 ---
-The interview is the question-asking part of authoring. It ends when the user has confirmed a brief and you have written it into the Mission Manifest draft: its `brief` block holds the user's words, its other fields say how the mission runs.
+The interview is the question-asking part of authoring. It ends when the user has confirmed a brief and you have written it into the Mission Manifest draft (section 3).
 
 ## 1. Look up before you ask
 
-Search what this server already has with {op:search}, list a kind with {op:list_kind}, and read one hit with {op:describe}. Then ask only what you could not find and what only the user can decide: the outcome, the bar for done, the money, the side effects.
+Search what this server already has with {op:search}, list a kind with {op:list_kind}, and read one hit with {op:describe}. Then ask only what you could not find and only the user can decide: the outcome, the bar for done, the money, the side effects.
 
 ## 2. Ask by purpose
 
@@ -40,7 +40,7 @@ brief:
 
 {{generated:brief}}
 
-Then map the rest. Start from a template (topic `templates`): its slots are the answers below. Every goal, objective, criterion and node, and the program itself, has a `key`, a slug you choose.
+Then map the rest. Start from a template (topic `templates`): its slots are the answers below. Every goal, objective, criterion, node and program has a `key`, a slug you choose.
 
 | Brief | Manifest field under `mission` |
 | --- | --- |
@@ -48,7 +48,7 @@ Then map the rest. Start from a template (topic `templates`): its slots are the 
 | Goal | `goals[]`: `key`, `description`, `importance` (`primary`, `secondary` or `optional`), `objectives[]` (`key`, `description`) |
 | Success criteria | `goals[].criteria[]`: `key`, `description` (the node owing the evidence is told it), `evidence` (a list of output names), `acceptance` (a typed expression such as `human: review_accept`; topic `manifest` says which can start) |
 | Inputs | `inputs[]` of a `program` node (`name` with `artifact`, `value` or `from`); `environment.workspace.context` |
-| Outputs promised | `outputs[]` of a `program` node: `name`, then `form` (`text` for prose) or a `schema`; `requirements` |
+| Outputs promised | `outputs[]` of a `program` node: `name`, then `form` (`text` for prose) or a `schema`; `requirements`; delivered only via `submit_output` (topic `manifest`) |
 | Budget | `environment.budget` (`usd`, `tokens`, `wall_clock`, `tool_calls`) and `environment.governors` (`depth`, `fan_out`, `iterations`, `rounds`, `patience`, `transfers`); both are required |
 | Side effects allowed | `environment.side_effects`: `read_only`, `workspace_write`, `external_write_reversible`, `external_write_irreversible`, `spend` |
 | Lane and model | `environment.lane`, `environment.model.profile`, and `environment.sandbox.profile` where the lane requires a sandbox (topics `lanes`, `models`, `manifest`) |

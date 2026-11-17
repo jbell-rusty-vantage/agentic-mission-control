@@ -163,7 +163,10 @@ async def compose_runtime_control(
     )
     readiness["runtime_persistence"] = evidence.schema
     persistence = await stack.enter_async_context(
-        StandalonePersistenceLifespan(settings.langgraph_checkpoint_dsn)
+        StandalonePersistenceLifespan(
+            settings.langgraph_checkpoint_dsn,
+            locator_address=settings.langgraph_checkpoint_locator,
+        )
     )
     pins = CapabilityPins.from_settings(settings)
     checkpointers = {item.ref.digest: persistence.saver for item in pins.checkpointers}

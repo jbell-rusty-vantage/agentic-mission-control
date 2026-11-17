@@ -124,7 +124,9 @@ def test_each_app_installation_set_is_valid_and_dependency_closed(app: str) -> N
     # FT-A7: skills, the policy hook and the plugin are per application.
     # 1.0.5: the coordinator bundles regenerated from the guide and the imported method skills.
     # 1.0.6: the method skills re-imported at Knowledge Services 1a451fd and AI Engineer 080e9f0.
-    skill_versions = ("1.0.0", "1.0.1", "1.0.2", "1.0.3", "1.0.4", "1.0.5", "1.0.6")
+    # 1.0.7: mission-control-author 0.4.1, whose guide pages say when a promised output can be
+    # delivered.
+    skill_versions = ("1.0.0", "1.0.1", "1.0.2", "1.0.3", "1.0.4", "1.0.5", "1.0.6", "1.0.7")
     skills = [(f"mc.app.{app}.agent-skills", version) for version in skill_versions]
     # MO-12: starter Environment Kits, per application like the skills.
     kits = [(f"mc.app.{app}.environment-kits", "1.0.0")]

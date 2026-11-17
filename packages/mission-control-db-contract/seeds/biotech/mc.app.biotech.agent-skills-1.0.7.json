@@ -1,0 +1,204 @@
+{
+  "actor_ref": "seed:mission-control-catalog",
+  "component_compatibility": ">=1.0.0 <2.0.0",
+  "depends_on": [
+    {
+      "seed_key": "mc.app.biotech.agent-skills",
+      "seed_version": "1.0.6"
+    }
+  ],
+  "description": "The coordinator authoring bundle regenerated from the guide, which now says when a promised output can be delivered (a Deep Agents node submits it with submit_output, served on every installation, with or without a knowledge binding), in 'biotech': skill.mission-control-author. A changed bundle takes its next revision; all earlier 1.0.0, 1.0.1, 1.0.2, 1.0.3, 1.0.4, 1.0.5, 1.0.6 records and custody bytes are preserved.",
+  "format": "mission-control-seed/v1",
+  "records": [
+    {
+      "fields": {
+        "asset_id": "definition:skill:skill.mission-control-author",
+        "contract": "mission-control.published-definition/1",
+        "host_support": {
+          "profiles": {
+            "claude_agent_sdk": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "codex": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "cursor_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "cursor_local": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "deep_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            }
+          },
+          "schema_version": "mc.capability_host_support.v1"
+        },
+        "kind": "skill_bundle",
+        "manifest": {
+          "definition": {
+            "attachment_targets": [
+              "agent.main"
+            ],
+            "body_summary": "Interview the user and author a Mission Manifest with missionctl - fill a template, record the brief, compile, preflight, submit and start. Use for a new mission, an edit to a manifest, a refused compile or a launch.",
+            "bundle_ref": {
+              "digest": "sha256:a69d9a622964d1d415ed1b32e571a014677baae22b3fdcbfc0f3ee0790c452af",
+              "media_type": "application/vnd.mc.capability-bundle+json",
+              "size_bytes": 21647,
+              "uri": "capability-bundles://biotech/skill_bundle/skill.mission-control-author/0.4.1/a69d9a622964d1d415ed1b32e571a014677baae22b3fdcbfc0f3ee0790c452af"
+            },
+            "compatibility": {
+              "executables": [],
+              "network_capabilities": [],
+              "runtimes": [],
+              "workspace_capabilities": []
+            },
+            "compatible_compiler_versions": [
+              "control-plane-definitions/1"
+            ],
+            "conflicts_with": [],
+            "description": "Interview the user and author a Mission Manifest with missionctl - fill a template, record the brief, compile, preflight, submit and start. Use for a new mission, an edit to a manifest, a refused compile or a launch.",
+            "file_manifest": [
+              {
+                "digest": "sha256:910e45e95f5270e9ed1d4548b675f80858c2145572e5f7bb70f26db5cf2a5cbe",
+                "executable": false,
+                "path": "SKILL.md",
+                "size_bytes": 3486
+              },
+              {
+                "digest": "sha256:4d8ef38a091f5f9f5b3e66dbd2efb573c3778bc8e911fa466a03920b73651584",
+                "executable": false,
+                "path": "manifest.json",
+                "size_bytes": 701
+              },
+              {
+                "digest": "sha256:02c3ce7cdbc30c753841eb5fec3100103d22b06d55275c64bfa2acc354b2b0a2",
+                "executable": false,
+                "path": "references/guide-interview.md",
+                "size_bytes": 5361
+              },
+              {
+                "digest": "sha256:7da4be2213b6a3609096906ab0f0f156cce3bcd4d039cc65d128bc473637c940",
+                "executable": false,
+                "path": "references/guide-launch.md",
+                "size_bytes": 3254
+              },
+              {
+                "digest": "sha256:1f9275286fc8a34bf27d5fd1f947a6a4bfb2eaf6b8d1704f0abbeba8a9e052d3",
+                "executable": false,
+                "path": "references/guide-manifest.md",
+                "size_bytes": 6213
+              },
+              {
+                "digest": "sha256:7842d6b50bb28d24750c378c64f9996ea192bb27e794e388a4e5a4b035fcf137",
+                "executable": false,
+                "path": "references/guide-templates.md",
+                "size_bytes": 2632
+              }
+            ],
+            "frontmatter": {
+              "description": "Interview the user and author a Mission Manifest with missionctl - fill a template, record the brief, compile, preflight, submit and start. Use for a new mission, an edit to a manifest, a refused compile or a launch.",
+              "name": "mission-control-author"
+            },
+            "host_support": {
+              "profiles": {
+                "claude_agent_sdk": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "codex": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "cursor_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "cursor_local": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "deep_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                }
+              },
+              "schema_version": "mc.capability_host_support.v1"
+            },
+            "kind": "skill",
+            "logical_id": "skill.mission-control-author",
+            "manifest_digest": "sha256:a69d9a622964d1d415ed1b32e571a014677baae22b3fdcbfc0f3ee0790c452af",
+            "maturity": "qualified",
+            "required_capabilities": [],
+            "review_status": "approved",
+            "schema_version": "1",
+            "skill_name": "mission-control-author",
+            "source_provenance": {
+              "commit_digest": null,
+              "license": "proprietary",
+              "locator": "repo://skills/mission-control-author",
+              "source": "local",
+              "upstream_identity": "skill.mission-control-author",
+              "upstream_version": "0.4.1"
+            },
+            "title": "mission-control-author"
+          },
+          "published_at": "2026-10-14T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:6f9950085a380b30c5a575b34d451eabc20556d7f0449999eecb77da30eb593e",
+            "kind": "skill",
+            "lifecycle_status": "published",
+            "logical_id": "skill.mission-control-author",
+            "payload_ref": null,
+            "revision": 6,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:fb0b77fb95b7533c3ddc1011691a66815de2ec14976e2e5fe6c7291a68541208",
+        "manifest_ref": "mc-catalog://definition/skill/skill.mission-control-author/6",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "6"
+      },
+      "kind": "asset_version",
+      "logical_key": "agent-skill:skill:skill.mission-control-author/6"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "agent-skill:skill:skill.mission-control-author/6",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/agent_skills.py",
+          "skills/mission-control-author"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "agent-skill:skill:skill.mission-control-author/6:admit"
+    }
+  ],
+  "seed_key": "mc.app.biotech.agent-skills",
+  "seed_version": "1.0.7"
+}

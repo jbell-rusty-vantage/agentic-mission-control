@@ -11,6 +11,7 @@ from uuid import uuid4
 
 from pydantic import ValidationError
 
+from mission_control.adapters.capabilities import quarantine_static_scan
 from mission_control.adapters.capabilities.capability_embeddings import (
     OpenAICapabilityEmbeddingAdapter,
 )
@@ -53,7 +54,7 @@ from mission_control.application.capabilities.external_capability_discovery impo
     ExternalDiscoveryBatch,
 )
 from mission_control.bootstrap.catalog_scope import configured_catalog_scope
-from mission_control.bootstrap.settings import PROJECT_ROOT, Settings, get_settings
+from mission_control.bootstrap.settings import Settings, get_settings
 from mission_control.domain.authoring.canonical import sha256_digest
 from mission_control.domain.authoring.contracts import DefinitionKind, ExactDefinitionRef
 from mission_control.domain.coordinator.contracts import (
@@ -65,6 +66,7 @@ from mission_control.domain.coordinator.errors import CoordinatorDomainError
 from mission_control.domain.coordinator.policy import evaluate_selection, require_selectable
 
 MISSING_CAPABILITY = "external.experimental.workspace-file-analysis"
+SCANNER_SCRIPT = Path(quarantine_static_scan.__file__).resolve()
 INTERNAL_GAP_QUERY = (
     "a governed workspace file analysis capability that is not yet reviewed "
     "or promoted into the internal catalog"
@@ -133,7 +135,7 @@ async def run_scenario_b_live(
             payloads=SanitizedCandidateMetadataPayloadProvider(),
             process_runner=AsyncioQuarantineSubprocessRunner(),
             python_executable=python_executable,
-            scanner_script=PROJECT_ROOT / "scripts" / "quarantine_static_scan.py",
+            scanner_script=SCANNER_SCRIPT,
             workspace_root=workspace_root / "inspection",
         )
         inspection = ExternalCandidateInspectionService(

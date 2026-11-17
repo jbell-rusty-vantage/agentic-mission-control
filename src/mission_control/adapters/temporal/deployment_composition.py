@@ -1265,6 +1265,8 @@ class ProductionWorkerActivityCompositionFactory:
         # installation id) and the composed knowledge lane with its startup receipt.
         self.application_id: str | None = None
         self.knowledge: Any = None
+        # Without a knowledge binding: the output submission lane (`compose_output_lane`).
+        self.outputs: Any = None
         self._knowledge_lane = knowledge_lane
         self.session_deleters: dict = {}
         self._async_result_policies = dict(
@@ -1315,6 +1317,14 @@ class ProductionWorkerActivityCompositionFactory:
             installation_id=self.installation_id,
         )
 
+    def _compose_outputs(self, settings: Settings, pool: asyncpg.Pool) -> Any:
+        if self._knowledge_lane is not None or self.application_id is None:
+            # An injected knowledge lane (a test double) owns the lane tools entirely.
+            return None
+        from mission_control.bootstrap.composition import compose_output_lane
+
+        return compose_output_lane(settings, pool, application_id=self.application_id)
+
     async def _build(
         self,
         resources: AsyncExitStack,
@@ -1336,6 +1346,7 @@ class ProductionWorkerActivityCompositionFactory:
                 StandalonePersistenceLifespan(
                     settings.langgraph_checkpoint_dsn,
                     run_setup=settings.langgraph_checkpoint_setup,
+                    locator_address=settings.langgraph_checkpoint_locator,
                 )
             )
         pins = self._pins if self._pins is not None else CapabilityPins.from_settings(settings)
@@ -1365,10 +1376,20 @@ class ProductionWorkerActivityCompositionFactory:
         # as a preflight inside the composition, which fails closed when misconfigured.
         knowledge = await self._compose_knowledge(settings, postgres_pool)
         self.knowledge = knowledge
+        # Output submission is Mission Control's own act: without a knowledge binding the
+        # Deep Agents lane still serves `submit_output` over the output-contract store.
+        outputs = self._compose_outputs(settings, postgres_pool) if knowledge is None else None
+        self.outputs = outputs
+        lane_support = (
+            knowledge.support
+            if knowledge is not None
+            else (None if outputs is None else outputs.support)
+        )
         additional = self._additional
-        if knowledge is not None:
+        served_lane = knowledge if knowledge is not None else outputs
+        if served_lane is not None:
             base = additional or DeploymentCapabilityComponents()
-            additional = replace(base, tools={**base.tools, **knowledge.registry_tools})
+            additional = replace(base, tools={**base.tools, **served_lane.registry_tools})
         capabilities = None
         if persistence is not None:
             capabilities = build_deployment_capability_registry(
@@ -1517,7 +1538,7 @@ class ProductionWorkerActivityCompositionFactory:
                         }
                     ),
                     points_walk_budget_ms=settings.mission_control_points_walk_budget_ms,
-                    knowledge=None if knowledge is None else knowledge.support,
+                    knowledge=lane_support,
                     transfer=transfer,
                     # OVE-204 slice 5: every attempt's Workspace Closure at its settled
                     # boundary, bodies in the content-addressed payload store.

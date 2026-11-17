@@ -692,9 +692,18 @@ def _utcnow() -> datetime:
     return datetime.now(UTC)
 
 
+NO_KNOWLEDGE_BINDING: Final = (
+    "this installation composes no knowledge binding; only submit_output is served here"
+)
+
+
 @dataclass
 class KnowledgeToolset:
-    gateway: KnowledgeGateway
+    # ``None``: the installation has no knowledge binding. Output submission is Mission
+    # Control's own act (the output-contract store), so ``submit_output`` still records,
+    # pins and finalizes; no knowledge effect can exist, and every other tool is refused
+    # ``CAPABILITY_UNAVAILABLE`` (it is never composed for a node on such an installation).
+    gateway: KnowledgeGateway | None
     submissions: SubmissionService
     issuer: str
     subject: str = "mission-control-runtime"
@@ -729,6 +738,13 @@ class KnowledgeToolset:
     # OVE-204 slice 4: where every `knowledge_read_intent` read is recorded (one
     # `retained_read_observation` per result operation). Absent: the tool is refused.
     retained_reads: RetainedReadStore | None = None
+
+    def bound_gateway(self) -> KnowledgeGateway:
+        """The knowledge binding's gateway, or a typed refusal where none is composed."""
+
+        if self.gateway is None:
+            raise KnowledgeRefused("CAPABILITY_UNAVAILABLE", NO_KNOWLEDGE_BINDING)
+        return self.gateway
 
     async def locate(self, live: LiveInvocation) -> LiveInvocation:
         """The live attempt with its ledger mission and activation ids (once per attempt).
@@ -842,6 +858,9 @@ class KnowledgeToolset:
         access = self.access(live)  # refreshed at every dispatch
         if isinstance(parsed, SubmitArgs):
             return await self._submit(parsed, access, tool_call_id, live.position)
+        if self.gateway is None:
+            return _refusal(tool, "CAPABILITY_UNAVAILABLE", NO_KNOWLEDGE_BINDING)
+        gateway = self.gateway
         if isinstance(parsed, ReadIntentArgs):
             return await self._read_intent(parsed, access, tool_call_id)
         try:
@@ -853,19 +872,17 @@ class KnowledgeToolset:
             elif isinstance(parsed, ApplyArgs):
                 # The host resolves the recorded use decision; the agent named its handle only.
                 assert parsed.decision is not None
-                result = await self.gateway.apply_decision(
+                result = await gateway.apply_decision(
                     parsed.decision,
                     access,
                     capability_pin=self.capability_pins.get(tool, f"knowledge.{tool}@1"),
                     governors=self._governors(),
                 )
             elif isinstance(parsed, RegisterArgs):
-                result = await self.gateway.invoke(
-                    await self._register_call(parsed, access), access
-                )
+                result = await gateway.invoke(await self._register_call(parsed, access), access)
             else:
                 call = self._call(tool, parsed, access, live.read_scope)
-                result = await self.gateway.invoke(call, access)
+                result = await gateway.invoke(call, access)
         except RegistrationRefused as error:
             return _refusal(tool, error.code, str(error))
         except ReadOutOfScope as error:
@@ -883,7 +900,7 @@ class KnowledgeToolset:
         document = result.document()
         if isinstance(parsed, ReadArgs) and result.refusal_code is None:
             try:
-                resolved = await ContentResolutionService(self.gateway).resolve_result(
+                resolved = await ContentResolutionService(gateway).resolve_result(
                     SelectedItem(kind="handle", ref=parsed.handle, digest=parsed.digest),
                     access,
                     SelectedReportRead.model_validate(call.payload),
@@ -947,7 +964,7 @@ class KnowledgeToolset:
         from mission_control.application.knowledge.read_intent import read_intent_request_key
 
         try:
-            result = await self.gateway.read_intent(
+            result = await self.bound_gateway().read_intent(
                 request,
                 access,
                 observations=self.retained_reads,
@@ -993,7 +1010,8 @@ class KnowledgeToolset:
             await self.submissions.pin_invocation(access, actor_ref="mission-control:toolset")
             # WI-04: the finalization iterates the pinned promises this position owns.
             live = await self.with_declared_obligations(live)
-        if live.operation_attempt <= 1:
+        if live.operation_attempt <= 1 or self.gateway is None:
+            # No knowledge binding: no earlier attempt can have left a knowledge effect.
             return live
         rows = await self.gateway.open_effects_for_operation(
             access.scope, run_id=live.run_id, operation_ref=live.operation_id
@@ -1065,7 +1083,7 @@ class KnowledgeToolset:
     def _applier(self, access: InvocationAccess) -> Callable[..., Awaitable[KnowledgeResult]]:
         async def apply(handle: str, *, admission: Ref | None = None) -> KnowledgeResult:
             if admission is not None:
-                return await self.gateway.apply_native_decision(
+                return await self.bound_gateway().apply_native_decision(
                     handle,
                     access,
                     admission=admission,
@@ -1074,7 +1092,7 @@ class KnowledgeToolset:
                     ),
                     governors=self._governors(),
                 )
-            return await self.gateway.apply_decision(
+            return await self.bound_gateway().apply_decision(
                 handle,
                 access,
                 capability_pin=self.capability_pins.get(
@@ -1117,7 +1135,7 @@ class KnowledgeToolset:
             "result": {
                 "state": "pending_review",
                 "decision": outcome.decision.handle,
-                "effect_key": await self.gateway.decision_effect_key(
+                "effect_key": await self.bound_gateway().decision_effect_key(
                     outcome.decision.handle,
                     access,
                     capability_pin=self.capability_pins.get(
@@ -1210,6 +1228,8 @@ class KnowledgeToolset:
         live = await self.locate(live)
         access = self.access(live)
         request_id = f"stop:{live.run_id}:{live.operation_id}:{live.operation_attempt}"
+        if self.gateway is None:
+            return []  # no knowledge binding: no knowledge handle can be open
         return await self.gateway.cancel(access, request_id)
 
     async def reconcile(self, live: LiveInvocation) -> list[KnowledgeResult]:
@@ -1225,7 +1245,9 @@ class KnowledgeToolset:
                 break
             recovery = self._recovery(live)
             for row in rows:
-                results[row.effect_key] = await self.gateway.reconcile(row.effect_key, recovery)
+                results[row.effect_key] = await self.bound_gateway().reconcile(
+                    row.effect_key, recovery
+                )
             if all(results[row.effect_key].state in JOURNAL_TERMINAL for row in rows):
                 break
             if attempt + 1 < self.reconcile_attempts:
@@ -1234,6 +1256,8 @@ class KnowledgeToolset:
         return list(results.values())
 
     async def _open_effects(self, live: LiveInvocation) -> list[JournalRecord]:
+        if self.gateway is None:
+            return []  # no knowledge binding: nothing was journaled for this attempt
         access = self.access(live)
         coordinates = access.coordinates()
         rows = await self.gateway.open_effects(
@@ -1351,11 +1375,12 @@ class KnowledgeToolset:
                 "REGISTRATION_MALFORMED", f"the content is not canonical JSON: {error}"
             ) from None
         effect_key = mint_effect_key(access.origin, pin, content_digest)
-        producer = await self.gateway.originating_origin(access.scope, effect_key)
+        gateway = self.bound_gateway()
+        producer = await gateway.originating_origin(access.scope, effect_key)
         payload = canonical_registration(
             content,
             tenant=access.origin.tenant_id,
-            binding=self.gateway.binding,
+            binding=gateway.binding,
             producer=producer or access.wire_origin(),
         )
         use, audience = _declared_use(payload)
@@ -1406,7 +1431,7 @@ class KnowledgeToolset:
                 retryable=False,
             )
         try:
-            lookup = await self.gateway.receipt(key, self._recovery(live))
+            lookup = await self.bound_gateway().receipt(key, self._recovery(live))
         except KnowledgeRefused as error:
             return refused(
                 "RECEIPT_UNAVAILABLE",

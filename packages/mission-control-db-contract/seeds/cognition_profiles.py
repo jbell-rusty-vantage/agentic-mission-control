@@ -39,6 +39,8 @@ BASE_VERSION = "1.0.0"
 METHOD_VERSION = "1.0.1"
 CAPTURE_SEED_VERSION = "1.0.2"
 SEED_VERSION = "1.0.3"
+# The agent-skills seed version 1.0.3 depends on (its plugin members are rows of 1.0.6).
+SKILLS_SEED_VERSION = "1.0.6"
 # Every committed seed version, oldest first; all but the last are frozen.
 SEED_VERSIONS = (BASE_VERSION, METHOD_VERSION, CAPTURE_SEED_VERSION, SEED_VERSION)
 # Revision 3 of the knowledge plugin (seed 1.0.2): revision 2 plus the capture server.
@@ -463,7 +465,8 @@ def bundles(
             "component_compatibility": compatibility,
             "depends_on": [
                 {"seed_key": APP_KEYS[app], "seed_version": CAPTURE_SEED_VERSION},
-                {"seed_key": helpers.APP_KEYS[app], "seed_version": helpers.SEED_VERSION},
+                # 1.0.3 was released against agent-skills 1.0.6 (later skill seeds add rows).
+                {"seed_key": helpers.APP_KEYS[app], "seed_version": SKILLS_SEED_VERSION},
                 {
                     "seed_key": capabilities.COMMON_KEY,
                     "seed_version": capabilities.CAPTURE_R3_SEED_VERSION,

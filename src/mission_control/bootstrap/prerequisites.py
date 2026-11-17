@@ -1,5 +1,6 @@
 """Compose trusted owner verification using installation configuration and restricted pools."""
 
+from collections.abc import Callable
 from contextlib import AsyncExitStack
 
 import asyncpg
@@ -9,7 +10,10 @@ from mission_control.adapters.postgres.control_plane.definition_repository impor
 )
 from mission_control.adapters.postgres.prerequisites import PostgresOwnerPrerequisiteRepository
 from mission_control.adapters.prerequisites.probes import ProviderOwnerProbeExecutor
-from mission_control.application.authoring.manifest_launch_inputs import ManifestLaunchBindings
+from mission_control.application.authoring.manifest_launch_inputs import (
+    ManifestLaunchBindings,
+    deep_agents_binding_gaps,
+)
 from mission_control.application.environments.kits import EnvironmentKitCatalog
 from mission_control.application.installations.registry import ApplicationBinding
 from mission_control.application.prerequisites.oauth import CatalogOAuthRequirements
@@ -26,6 +30,7 @@ from mission_control.bootstrap.bundle_custody import compose_bundle_materializer
 from mission_control.bootstrap.common_installation import inspect_common_installation
 from mission_control.bootstrap.settings import Settings
 from mission_control.bootstrap.signals import configured_network_hosts
+from mission_control.domain.authoring.mission_definition import MissionDefinition
 from mission_control.domain.prerequisites import OwnerPrerequisiteRecord
 
 
@@ -112,4 +117,18 @@ def compose_prerequisite_preflight(
             PostgresDefinitionRepository(pool, catalog_scope=scope), seed_urls=seed_urls
         ),
         native_identity=BoundLocalPrerequisiteIdentity(bindings) if bindings else None,
+        launch_gaps=_launch_gaps(bindings),
     )
+
+
+def _launch_gaps(
+    bindings: ManifestLaunchBindings | None,
+) -> Callable[[MissionDefinition], tuple[tuple[str, ...], tuple[str, ...]]] | None:
+    if bindings is None or bindings.deep_agents is None:
+        return None
+    bound = bindings
+
+    def gaps(definition: MissionDefinition) -> tuple[tuple[str, ...], tuple[str, ...]]:
+        return deep_agents_binding_gaps(definition, bound)
+
+    return gaps

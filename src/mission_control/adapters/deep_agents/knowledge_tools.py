@@ -296,6 +296,34 @@ def served_knowledge_tools() -> dict[str, BaseTool]:
     return knowledge_registry_tools({name: _tool(unbound, name) for name in TOOL_NAMES})
 
 
+OUTPUT_TOOL: Final = "submit_output"
+
+
+def output_registry_tools(tools: Mapping[str, BaseTool]) -> dict[str, BaseTool]:
+    """The registry entries of ``submit_output`` alone (its current and admitted v1 digests).
+
+    Output submission is Mission Control's own act over the output-contract store; an
+    installation without a knowledge binding serves exactly these entries, with the same
+    definition digests a knowledge-bound installation serves for the tool."""
+
+    every = knowledge_registry_tools({**served_tool_definitions(), **tools})
+    return {digest: tool for digest, tool in every.items() if tool.name == OUTPUT_TOOL}
+
+
+def served_tool_definitions() -> dict[str, BaseTool]:
+    """Definition-only tools by name (never dispatched)."""
+
+    unbound = cast(KnowledgeToolset, _DefinitionOnly())
+    return {name: _tool(unbound, name) for name in TOOL_NAMES}
+
+
+def served_output_tools() -> dict[str, BaseTool]:
+    """The served definition of ``submit_output`` where no knowledge binding is configured
+    (definition digest -> tool), the subset of :func:`served_knowledge_tools` for that tool."""
+
+    return output_registry_tools(served_tool_definitions())
+
+
 def knowledge_capability_id(tool_name: str) -> str:
     """The catalog capability id of a knowledge tool (seed ``mc.catalog.knowledge-tools``)."""
 
@@ -343,9 +371,23 @@ def knowledge_launch_bindings(
 class KnowledgeLaneSupport:
     """Binds the live invocation for the tools and finalizes it at node completion."""
 
-    def __init__(self, toolset: KnowledgeToolset) -> None:
+    def __init__(self, toolset: KnowledgeToolset, *, outputs_only: bool = False) -> None:
+        """``outputs_only``: the installation has no knowledge binding (``toolset.gateway`` is
+        ``None``); only ``submit_output`` is projected, and an invocation is bound, pinned and
+        finalized exactly as with the binding."""
+
         self._toolset = toolset
-        self.tools = knowledge_tools(toolset)
+        tools = knowledge_tools(toolset)
+        self.tools = {OUTPUT_TOOL: tools[OUTPUT_TOOL]} if outputs_only else tools
+        self.outputs_only = outputs_only
+
+    @property
+    def registry_tools(self) -> dict[str, BaseTool]:
+        """``ExactComponentRegistry.tools`` entries of the projected tools."""
+
+        if self.outputs_only:
+            return output_registry_tools(self.tools)
+        return knowledge_registry_tools(self.tools)
 
     async def begin(self, invocation: RuntimeInvocation) -> LiveInvocation:
         """Before the agent starts: host recovery grants for a retry attempt (R2-MC D2).
@@ -505,6 +547,7 @@ __all__ = [
     "CURRENT_INVOCATION",
     "KNOWLEDGE_TOOL_LOGICAL_PREFIX",
     "LANE",
+    "OUTPUT_TOOL",
     "KnowledgeLaneSupport",
     "KnowledgeStructuredTool",
     "is_evaluator",
@@ -514,5 +557,8 @@ __all__ = [
     "knowledge_tool_components",
     "knowledge_tools",
     "live_invocation",
+    "output_registry_tools",
     "served_knowledge_tools",
+    "served_output_tools",
+    "served_tool_definitions",
 ]

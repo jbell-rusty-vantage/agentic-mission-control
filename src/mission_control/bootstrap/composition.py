@@ -639,11 +639,82 @@ def knowledge_served_tools(settings: Settings, *, application_id: str) -> dict[s
     none, so a manifest selecting a knowledge tool is refused truthfully.
     """
 
-    if knowledge_configuration(settings, application_id=application_id) is None:
-        return {}
-    from mission_control.adapters.deep_agents.knowledge_tools import served_knowledge_tools
+    from mission_control.adapters.deep_agents.knowledge_tools import (
+        served_knowledge_tools,
+        served_output_tools,
+    )
 
+    if knowledge_configuration(settings, application_id=application_id) is None:
+        # Output submission is Mission Control's own act: served on every installation, as
+        # the worker composes it without a binding (`compose_output_lane`).
+        return served_output_tools()
     return served_knowledge_tools()
+
+
+@dataclass(frozen=True)
+class OutputLaneComposition:
+    """What the worker mounts where no knowledge binding is configured: ``submit_output``
+    alone, over the output-contract store (no gateway, issuer key or executor)."""
+
+    toolset: Any
+    support: Any
+    registry_tools: dict[str, Any]
+
+
+def compose_output_lane(
+    settings: Settings,
+    runtime_pool: asyncpg.Pool,
+    *,
+    application_id: str,
+    clock: Callable[[], datetime] | None = None,
+) -> OutputLaneComposition:
+    """The Deep Agents output submission of an installation without a knowledge binding.
+
+    A node whose manifest promises outputs submits them with ``submit_output``; the act, the
+    invocation pin and the finalization are recorded in Mission Control's output-contract store
+    (release 1.7.0) exactly as with a binding. Nothing reaches Knowledge Services: a selected
+    report handle cannot exist here, and a promise pinned to the application's trusted
+    assessment waits with its actionable cause (``UncomposedTrustedSettlement``)."""
+
+    from mission_control.adapters.deep_agents.knowledge_tools import (
+        KnowledgeLaneSupport,
+        served_output_tools,
+    )
+    from mission_control.adapters.postgres.knowledge.invocation_locator import (
+        PostgresInvocationLocator,
+    )
+    from mission_control.adapters.postgres.knowledge.output_contracts import (
+        PostgresOutputContractStore,
+    )
+    from mission_control.application.knowledge.toolset import KnowledgeToolset
+    from mission_control.application.knowledge.trusted_settlement import (
+        UncomposedTrustedSettlement,
+    )
+    from mission_control.application.outputs.submission_service import SubmissionService
+    from mission_control.bootstrap.application_profiles import trusted_assessment_validators
+
+    now = clock or (lambda: datetime.now(UTC))
+    store = PostgresOutputContractStore(runtime_pool)
+    toolset = KnowledgeToolset(
+        gateway=None,
+        submissions=SubmissionService(store, contracts=store, clock=now),
+        # Attribution of the submission rows only; no credential is minted for it.
+        issuer=f"mission-control.{application_id}",
+        clock=now,
+        locator=PostgresInvocationLocator(runtime_pool),
+    )
+    pins = trusted_assessment_validators(settings.deployments_root, application_id)
+    toolset.uncomposed_trusted = UncomposedTrustedSettlement(
+        store=store,
+        assessment_pin=next(iter(pins)) if pins else "knowledge.report.assess@1",
+    )
+    support = KnowledgeLaneSupport(toolset, outputs_only=True)
+    registry_tools = support.registry_tools
+    if set(registry_tools) != set(served_output_tools()):
+        raise KnowledgeConfigurationError(
+            "the worker's submit_output differs from the served output tool definition"
+        )
+    return OutputLaneComposition(toolset=toolset, support=support, registry_tools=registry_tools)
 
 
 @dataclass(frozen=True)

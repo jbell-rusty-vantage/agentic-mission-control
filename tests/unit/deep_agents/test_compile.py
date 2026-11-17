@@ -497,6 +497,35 @@ def test_a_node_plugin_member_without_a_deployment_binding_is_refused_at_the_mem
 
 
 @pytest.mark.parametrize(
+    ("kind", "role"), [("skill_bundle", "skill"), ("mcp_server", "mcp_server")]
+)
+def test_an_optional_plugin_member_without_a_binding_is_unsupported_and_not_mounted(
+    kind: str, role: str
+) -> None:
+    """A member its plugin marks optional (the author's `required=False`) that this deployment
+    does not bind is not mounted: the receipt names it `unsupported` with the reason, and the
+    rest of the node compiles. The same member required refuses the launch, by name."""
+
+    name = f"member.optional-{role}"
+    optional = _member(kind, name, role=role).model_copy(update={"required": False})
+    sealed, receipt = DeepAgentsCompileAdapter(deep_agents_facts()).compile(
+        _agent(items=(*SUPPORTED, optional)), {}
+    )
+    (row,) = [item for item in receipt.items if item.name == name]
+    assert row.verdict == "unsupported"
+    assert row.reason is not None
+    assert row.reason.startswith("optional: ")
+    assert "has no deployment component binding" in row.reason
+    profile = DeepAgentNodeBinding.model_validate_json(sealed.payload).profile
+    mounted = {item.ref.logical_id for item in (*profile.skills, *profile.mcp_servers)}
+    assert name not in mounted
+    required = _member(kind, name, role=role)
+    refusal = _refusal(_agent(items=(*SUPPORTED, required)))
+    assert refusal.code == "ITEM_PIN_UNSERVED"
+    assert name in refusal.reason
+
+
+@pytest.mark.parametrize(
     ("kind", "role"),
     [("hook_script", "hook"), ("context_bundle", "prompt"), ("context_bundle", "resource")],
 )

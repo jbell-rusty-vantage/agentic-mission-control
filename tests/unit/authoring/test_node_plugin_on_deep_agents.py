@@ -330,3 +330,144 @@ async def test_a_hook_member_is_refused_at_compile_by_name() -> None:
         if item.result is not None
     }
     assert "skill.knowledge-research" in resolved and "hook.shell-policy" not in resolved
+
+
+async def test_an_optional_member_without_a_launch_binding_is_unsupported_not_refused() -> None:
+    """A member its plugin marks optional, unbound on this installation: the launch records it
+    `unsupported` in the node's receipt, by name and reason, and does not mount it; the
+    preflight's launch-binding check names it as a degradation, not a blocker."""
+
+    from mission_control.application.authoring.manifest_launch_inputs import (
+        deep_agents_binding_gaps,
+    )
+
+    definitions, _search = await fast_track_catalog(directories=("common", APPLICATION))
+    by_id = {item.ref.logical_id: item for item in await definitions.list_published_definitions()}
+    skill = by_id["skill.knowledge-research"]
+    github = by_id["mcp.github"]
+    plugin = PluginDefinition(
+        logical_id="plugin.optional-code",
+        title="Research with optional code search",
+        description="The research method skill and an optional GitHub server.",
+        manifest=PluginManifest(
+            members=(
+                PluginMember(pin=capability_pin(skill), role=PluginMemberRole.SKILL),
+                PluginMember(
+                    pin=capability_pin(github), role=PluginMemberRole.MCP_SERVER, optional=True
+                ),
+            )
+        ),
+        host_support=skill.definition.host_support,
+    )
+    compilation, published = await compiled(
+        ({"pin": "plugin.optional-code@latest", "as": "code"},), extra=(plugin,)
+    )
+    assert compilation.report.blockers == (), compilation.report.blockers
+    (definition,) = compilation.definitions
+    (program,) = compilation.programs
+    bindings, served = bound(definition, published)
+    unbound = bindings.model_copy(
+        update={
+            "capabilities": {
+                key: value for key, value in bindings.capabilities.items() if key != "mcp.github"
+            }
+        }
+    )
+
+    blockers, degradations = deep_agents_binding_gaps(definition, unbound)
+    assert blockers == ()
+    assert degradations and all("mcp.github@" in item for item in degradations)
+    assert all("optional member of plugin plugin.optional-code" in item for item in degradations)
+    assert deep_agents_binding_gaps(definition, bindings) == ((), ())
+
+    templates = resolver(unbound, served=served).stage_templates(
+        definition,
+        AdmittedLaunch.from_configuration(SCOPE, "run-optional", program.configuration),
+        rows=subagent_rows(definition, published),
+    )
+    for template in templates.values():
+        deep = DeepAgentExecutionBinding.carried_by(template)
+        assert deep is not None
+        assert "mcp.github" not in {server.ref.logical_id for server in deep.mcp_servers}
+        assert {skill.ref.logical_id for skill in deep.skills} == {"skill.knowledge-research"}
+        receipt = deep.materialization_receipt
+        assert receipt is not None
+        (row,) = [item for item in receipt.items if item.verdict == "unsupported"]
+        assert row.name.startswith("mcp.github")
+        assert row.reason is not None and row.reason.startswith("optional: ")
+
+    # Required, the same unbound member refuses the launch at the member, by name.
+    required = PluginDefinition.model_validate(
+        {
+            **plugin.model_dump(mode="python"),
+            "logical_id": "plugin.required-code",
+            "manifest": PluginManifest(
+                members=(
+                    PluginMember(pin=capability_pin(skill), role=PluginMemberRole.SKILL),
+                    PluginMember(pin=capability_pin(github), role=PluginMemberRole.MCP_SERVER),
+                )
+            ),
+        }
+    )
+    compilation, published = await compiled(
+        ({"pin": "plugin.required-code@latest", "as": "code"},), extra=(required,)
+    )
+    (definition,) = compilation.definitions
+    (program,) = compilation.programs
+    bindings, served = bound(definition, published)
+    unbound = bindings.model_copy(
+        update={
+            "capabilities": {
+                key: value for key, value in bindings.capabilities.items() if key != "mcp.github"
+            }
+        }
+    )
+    blockers, degradations = deep_agents_binding_gaps(definition, unbound)
+    assert blockers and degradations == ()
+    with pytest.raises(ManifestLaunchBindingError) as refused:
+        resolver(unbound, served=served).stage_templates(
+            definition,
+            AdmittedLaunch.from_configuration(SCOPE, "run-required", program.configuration),
+            rows=subagent_rows(definition, published),
+        )
+    assert "mcp.github" in refused.value.reason
+
+
+async def test_a_deep_agents_executor_promising_outputs_without_submit_output_is_warned() -> None:
+    """Its final message is not a submission: compile names the node and the remedy. Only a
+    text promise is checked (a structured one can also be published through artifact custody)."""
+
+    definitions, search = await fast_track_catalog(directories=("common", APPLICATION))
+    service = ManifestCompileService(
+        definitions=definitions,
+        search=search,
+        programs=ManifestProgramCompiler(definitions, ExtensionRegistry(), InMemoryPayloadStore()),
+    )
+
+    async def warnings(document: dict[str, Any]) -> list[Any]:
+        compilation = await service.compile(
+            canonical_manifest_bytes(document).decode("utf-8"),
+            ManifestScope(
+                request_scope=SCOPE, actor_id="owner", at=datetime(2026, 11, 16, tzinfo=UTC)
+            ),
+        )
+        return [
+            item
+            for item in compilation.report.warnings
+            if item.reason == "output_submission_missing"
+        ]
+
+    document = yaml.safe_load(manifest(PLUGINS))
+    # The schema outputs of the minimal manifest are not checked.
+    assert await warnings(document) == []
+    synthesize = document["mission"]["program"]["nodes"][1]
+    synthesize["outputs"].append({"name": "summary", "form": "text"})
+    (warning,) = await warnings(document)
+    assert warning.pointer == "/mission/program/nodes/1/outputs"
+    assert "synthesize promises summary" in warning.message
+    assert "tool.knowledge-submit-output@latest" in warning.message
+
+    document["mission"]["environment"]["capabilities"] = [
+        {"pin": "tool.knowledge-submit-output@latest", "kind": "tool", "as": "submit_output"}
+    ]
+    assert await warnings(document) == []

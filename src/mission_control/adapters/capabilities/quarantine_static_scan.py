@@ -1,3 +1,9 @@
+"""The static quarantine scanner of external candidate inspection, run as its own process.
+
+Shipped inside the package (an installed image has no `scripts/`): the inspection runner starts
+`python <this file> --input <payload.json>` with the API's interpreter. Standard library only.
+"""
+
 from __future__ import annotations
 
 import argparse
@@ -5,6 +11,7 @@ import base64
 import hashlib
 import json
 import re
+import sys
 from pathlib import Path, PurePosixPath
 from typing import Any
 
@@ -185,7 +192,7 @@ def main() -> None:
     args = _arguments()
     with Path(args.input).open(encoding="utf-8") as stream:
         payload = json.load(stream)
-    print(json.dumps(_scan(payload), sort_keys=True, separators=(",", ":")))
+    sys.stdout.write(json.dumps(_scan(payload), sort_keys=True, separators=(",", ":")) + "\n")
 
 
 if __name__ == "__main__":

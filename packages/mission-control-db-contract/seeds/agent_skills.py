@@ -56,11 +56,11 @@ from typing import Any
 REPO_ROOT = Path(__file__).resolve().parents[3]
 SEEDS_ROOT = Path(__file__).resolve().parent
 AGENT_SKILL_SEED_TIME = datetime(2026, 10, 14, tzinfo=UTC)
-SEED_VERSION = "1.0.6"
+SEED_VERSION = "1.0.7"
 # Every committed seed version, oldest first; all but the last are frozen with their sources
 # under bundle-sources/agent-skills-<version>/. An imported skill's frozen source is its own
 # import directory, which is immutable (one directory per source commit).
-SEED_VERSIONS = ("1.0.0", "1.0.1", "1.0.2", "1.0.3", "1.0.4", "1.0.5", SEED_VERSION)
+SEED_VERSIONS = ("1.0.0", "1.0.1", "1.0.2", "1.0.3", "1.0.4", "1.0.5", "1.0.6", SEED_VERSION)
 FROZEN_SEED_VERSIONS = SEED_VERSIONS[:-1]
 FROZEN_SOURCES = SEEDS_ROOT.parent / "bundle-sources" / "agent-skills-1.0.0"
 APPS = ("biotech", "ai-engineer")
@@ -143,7 +143,9 @@ IMPORTS_RECORD = SEEDS_ROOT.parent / "bundle-sources" / "imported" / "IMPORTS.js
 # service 080e9f0 of the five skills that changed upstream: the research method and the
 # executor's capture skill now route a capture through `source_prepare_captured`,
 # `evidence_units` and `chain_write`. The four unchanged Knowledge Services skills keep their
-# 7bc4aee import (same bytes, same row).
+# 7bc4aee import (same bytes, same row). Seed 1.0.7 changes no import: it publishes
+# `mission-control-author` 0.4.1 from `skills/` (seed 1.0.6 published imported rows only, so
+# it archives no `skills/` source).
 IMPORTED_SKILLS: dict[str, tuple[str, tuple[str, ...]]] = {
     "knowledge-research": ("2026.11.17-1a451fd", APPS),
     "knowledge-verify": ("2026.11.17-1a451fd", APPS),
@@ -715,13 +717,12 @@ def bundles(published_records: Any, seed_format: str, compatibility: str, actor:
             "depends_on": [{"seed_key": APP_KEYS[app], "seed_version": FROZEN_SEED_VERSIONS[-1]}],
             "actor_ref": actor,
             "description": (
-                "The method skills re-imported from their owning repositories at Knowledge "
-                "Services 1a451fd and the AI Engineer service 080e9f0 (belllabs identifiers, "
-                "pinned to a source commit), whose research and capture method routes a "
-                "capture through source_prepare_captured, evidence_units and chain_write, in "
-                f"'{app}': {', '.join(names)}. A changed bundle takes its next revision; all "
-                f"earlier {', '.join(FROZEN_SEED_VERSIONS)} records and custody bytes are "
-                "preserved."
+                "The coordinator authoring bundle regenerated from the guide, which now says "
+                "when a promised output can be delivered (a Deep Agents node submits it with "
+                "submit_output, served on every installation, with or without a knowledge "
+                f"binding), in '{app}': {', '.join(names)}. A changed bundle takes its next "
+                f"revision; all earlier {', '.join(FROZEN_SEED_VERSIONS)} records and custody "
+                "bytes are preserved."
             ),
             "records": records,
         }

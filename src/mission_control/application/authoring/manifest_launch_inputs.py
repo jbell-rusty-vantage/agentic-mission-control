@@ -996,9 +996,9 @@ class ManifestLaunchResolver:
 
         The author checks what admission fixed (an exact catalog revision the admitted runtime
         profile pins) and reads each subagent profile's catalog body; which component serves a
-        pin is the lane's question. Every item is ``required``: an unbound selection refuses
-        the launch (the manifest has no optional selections yet, and plugin members marked
-        ``optional`` are not distinguished either).
+        pin is the lane's question. Every item is ``required`` (an unbound selection refuses
+        the launch) except a plugin member its plugin marks ``optional``: the lane records an
+        unbound optional member as ``unsupported`` in the receipt and does not mount it.
         """
 
         node = path[-1]
@@ -1122,7 +1122,12 @@ class ManifestLaunchResolver:
                         kind=kind,
                         name=unique,
                         pin=f"{pin.capability_id}@{pin.version}#{pin.digest}",
-                        required=True,
+                        # A plugin member its plugin marks optional: unbound on this deployment,
+                        # the lane records it unsupported and mounts nothing (a required one
+                        # refuses the launch by name).
+                        required=not (
+                            _plugin_member(item) and item.attributes.get("optional") is True
+                        ),
                         config=config,
                     ),
                     item.pointer,
@@ -2747,6 +2752,72 @@ def provider_roles(
         for path, verifier in roles
         if _lane_of(path, verifier=verifier) in PROVIDER_PROFILES | CURSOR_LANE_PROFILES
     )
+
+
+def deep_agents_binding_gaps(
+    definition: MissionDefinition, bindings: ManifestLaunchBindings
+) -> tuple[tuple[str, ...], tuple[str, ...]]:
+    """``(blockers, degradations)``: the skill, MCP server and tool selections of the Deep
+    Agents node roles that this installation's launch bindings do not bind at their pinned
+    catalog revision.
+
+    A required selection is a blocker, by node and capability; a plugin member its plugin
+    marks ``optional`` is a degradation (the lane records it ``unsupported`` and mounts
+    nothing). The start's lane compile stays the authority (it also checks that the workers
+    serve each bound component); this reads the bindings file only, before anything is sealed.
+    """
+
+    root = definition.program
+    if root.behavior is Behavior.GOAL_LOOP:
+        roles: list[tuple[tuple[DefinitionNode, ...], bool]] = [
+            ((root,), verifier) for verifier in (False, True)
+        ]
+    else:
+        children = root.nodes if root.behavior is Behavior.STAGE_GRAPH else (root,)
+        roles = [(((root, child) if child is not root else (root,)), False) for child in children]
+    blockers: list[str] = []
+    degradations: list[str] = []
+    for path, verifier in roles:
+        node = path[-1]
+        if node.behavior not in (Behavior.AGENT_EXECUTOR, Behavior.GOAL_LOOP):
+            continue
+        if _lane_of(path, verifier=verifier) != DEEP_AGENTS_LANE:
+            continue
+        role = f"{node.key}{' verifier' if verifier else ''}"
+        for item in _selected_capabilities(definition, path, verifier=verifier):
+            if item.role in {"plugin", "agent"}:
+                continue
+            if _item_kind(item) not in {"skill_bundle", "mcp_server", "tool"}:
+                continue
+            pin = item.resolved or item.pin
+            if pin is None or pin.digest is None:
+                continue
+            if verifier and pin.capability_id in PRODUCER_TOOL_CAPABILITIES:
+                continue
+            bound = bindings.capabilities.get(pin.capability_id)
+            if bound is not None and bound.catalog_digest == pin.digest:
+                continue
+            reason = (
+                "has no launch binding on this installation"
+                if bound is None
+                else f"is bound at another catalog revision ({bound.catalog_digest})"
+            )
+            label = f"{role}: {pin.capability_id}@{pin.version} {reason}"
+            if _plugin_member(item) and item.attributes.get("optional") is True:
+                row_pointer = item.pointer.split("/members/", 1)[0]
+                row = next(
+                    (entry for entry in definition.capabilities if entry.pointer == row_pointer),
+                    None,
+                )
+                row_pin = None if row is None else (row.resolved or row.pin)
+                plugin = "" if row_pin is None else row_pin.capability_id
+                degradations.append(
+                    f"{label}; optional member of plugin {plugin or 'selected'}: recorded "
+                    "unsupported at launch and not mounted"
+                )
+            else:
+                blockers.append(f"{label} ({item.pointer})")
+    return tuple(dict.fromkeys(blockers)), tuple(dict.fromkeys(degradations))
 
 
 def _included_kit_pins(definition: MissionDefinition) -> tuple[str, ...]:

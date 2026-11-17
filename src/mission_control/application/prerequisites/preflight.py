@@ -388,8 +388,14 @@ class PrerequisitePreflight:
         oauth_requirements: Callable[[MissionDefinition], Awaitable[tuple[OAuthRequirement, ...]]]
         | None = None,
         native_identity: Callable[[DefinitionNode, bool], Mapping[str, object]] | None = None,
+        launch_gaps: Callable[[MissionDefinition], tuple[tuple[str, ...], tuple[str, ...]]]
+        | None = None,
     ) -> None:
         self.repository = repository
+        # The Deep Agents selections the launch bindings do not bind (`(blockers,
+        # degradations)`), reported by the manifest preflight only; the start's lane compile
+        # stays the authority and refuses or records them itself.
+        self.launch_gaps = launch_gaps
         self._kits = kits
         self._bundles = bundles
         self._hosts = network_hosts or NetworkHosts()

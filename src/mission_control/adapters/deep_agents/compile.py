@@ -631,7 +631,27 @@ class DeepAgentsCompileAdapter:
             orphan = item.kind == "subagent_profile"
             if not parent or (item.kind not in COMPONENT_KINDS and not orphan):
                 continue
-            binding = cls._component(work, facts, item)
+            try:
+                binding = cls._component(work, facts, item)
+            except LaneCompileRefused as refused:
+                if (
+                    item.required
+                    or not _node_plugin_member(item)
+                    or refused.refusal.code != "ITEM_PIN_UNSERVED"
+                ):
+                    raise
+                # An optional selection (a plugin member marked optional) this deployment does
+                # not serve is not mounted: an `unsupported` receipt row names it and why.
+                work.unsupported.append(
+                    MaterializationItem(
+                        kind=item.receipt_kind,
+                        name=item.name,
+                        verdict="unsupported",
+                        digest=item.digest,
+                        reason=f"optional: {refused.refusal.reason}",
+                    )
+                )
+                continue
             _collect(binding, mcp, skills, tools)
         return (
             tuple(mcp[key] for key in sorted(mcp)),

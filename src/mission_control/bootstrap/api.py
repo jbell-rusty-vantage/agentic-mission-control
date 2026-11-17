@@ -572,7 +572,11 @@ async def compose_time_travel(application: FastAPI, settings: Any, stack: AsyncE
         )
     else:
         try:
-            persistence = await stack.enter_async_context(StandalonePersistenceLifespan(dsn))
+            persistence = await stack.enter_async_context(
+                StandalonePersistenceLifespan(
+                    dsn, locator_address=settings.langgraph_checkpoint_locator
+                )
+            )
             pins = CapabilityPins.from_settings(settings)
             checkpointers = {item.ref.digest: persistence.saver for item in pins.checkpointers}
         except Exception:

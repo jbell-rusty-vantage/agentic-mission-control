@@ -342,6 +342,13 @@ class Settings(BaseSettings):
         default=RUNTIME_CHECKPOINT_SCHEMA, pattern=r"^[a-z_][a-z0-9_]{0,62}$"
     )
     langgraph_checkpoint_setup: bool = False
+    # `host:port` the runtime saver is named by in recorded points (`saver_locator_digest`),
+    # set where this process reaches the saver's server by another route than the processes
+    # that wrote the points (a container beside host processes). Unset: the checkpoint DSN's
+    # own host and port.
+    langgraph_checkpoint_locator: str | None = Field(
+        default=None, pattern=r"^[A-Za-z0-9.\-\[\]:]+:[0-9]{1,5}$"
+    )
     # The exact checkpointer/store definition digests the deployment serves with that saver
     # and store (`ExactComponentRegistry` keys); bindings naming any other digest refuse.
     deep_agent_checkpointer_digests: tuple[str, ...] = ()

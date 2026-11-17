@@ -7,6 +7,7 @@ from pathlib import Path
 
 import pytest
 
+from mission_control.adapters.capabilities import quarantine_static_scan
 from mission_control.adapters.capabilities.quarantine_inspection import (
     AsyncioQuarantineSubprocessRunner,
     InMemoryStaticCandidatePayloadProvider,
@@ -39,7 +40,7 @@ from mission_control.application.capabilities.external_capability_discovery impo
 NOW = datetime(2026, 7, 26, 20, 0, tzinfo=UTC)
 RAW_DIGEST = f"sha256:{'a' * 64}"
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
-SCANNER = PROJECT_ROOT / "scripts" / "quarantine_static_scan.py"
+SCANNER = Path(quarantine_static_scan.__file__).resolve()
 PYTHON_EXECUTABLE = Path(sys.executable).resolve()
 
 

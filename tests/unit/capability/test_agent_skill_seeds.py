@@ -294,7 +294,15 @@ async def test_applied_skill_sources_remain_fetchable_beside_successors(
     )
     store = FilesystemBundleObjectStore(tmp_path / "store")
     await PUBLISH.publish_application(app, store)
-    assert SKILLS.FROZEN_SEED_VERSIONS == ("1.0.0", "1.0.1", "1.0.2", "1.0.3", "1.0.4", "1.0.5")
+    assert SKILLS.FROZEN_SEED_VERSIONS == (
+        "1.0.0",
+        "1.0.1",
+        "1.0.2",
+        "1.0.3",
+        "1.0.4",
+        "1.0.5",
+        "1.0.6",
+    )
     for entry in [
         entry
         for version in SKILLS.FROZEN_SEED_VERSIONS
@@ -482,7 +490,8 @@ def test_seed_106_publishes_the_re_imported_method_skills(app: str) -> None:
     research method it publishes routes a capture through the tools the capture server
     revision 3 allowlists."""
 
-    successor = GENERATOR.agent_skills()[f"{app}/mc.app.{app}.agent-skills-1.0.6.json"]
+    # Frozen since 1.0.7: its recorded bytes.
+    successor = GENERATOR.frozen_bundle(f"{app}/mc.app.{app}.agent-skills-1.0.6.json")
     assert successor["depends_on"] == [
         {"seed_key": f"mc.app.{app}.agent-skills", "seed_version": "1.0.5"}
     ]
@@ -493,9 +502,10 @@ def test_seed_106_publishes_the_re_imported_method_skills(app: str) -> None:
     }
     expected = REIMPORTED | (REIMPORTED_AI_ENGINEER if app == "ai-engineer" else {})
     assert {logical_id: row["fields"]["version"] for logical_id, row in rows.items()} == expected
+    earlier = SKILLS.FROZEN_SEED_VERSIONS[: SKILLS.FROZEN_SEED_VERSIONS.index("1.0.6")]
     held = {
         record["logical_key"]
-        for version in SKILLS.FROZEN_SEED_VERSIONS
+        for version in earlier
         for record in GENERATOR.frozen_bundle(f"{app}/mc.app.{app}.agent-skills-{version}.json")[
             "records"
         ]
@@ -585,3 +595,30 @@ def test_charter_admission_follows_the_application_profile_rule() -> None:
         assert f"skill.{name}" == charter_skill_id(app) == CHARTERS[app]
         profile = load_application_profile(ROOT / "deployments", app).profile
         assert profile.knowledge.charter_skill == CHARTERS[app]
+
+
+@pytest.mark.parametrize("app", ["biotech", "ai-engineer"])
+def test_seed_107_publishes_the_regenerated_authoring_bundle_only(app: str) -> None:
+    """Seed 1.0.7: the coordinator authoring bundle regenerated from the guide (when a promised
+    output can be delivered), at the next revision of its id; no import changes."""
+
+    successor = GENERATOR.agent_skills()[f"{app}/mc.app.{app}.agent-skills-1.0.7.json"]
+    assert successor["depends_on"] == [
+        {"seed_key": f"mc.app.{app}.agent-skills", "seed_version": "1.0.6"}
+    ]
+    rows = {
+        row["fields"]["manifest"]["definition"]["logical_id"]: row
+        for row in successor["records"]
+        if row["kind"] == "asset_version"
+    }
+    assert set(rows) == {"skill.mission-control-author"}
+    held = {
+        record["logical_key"]
+        for version in SKILLS.FROZEN_SEED_VERSIONS
+        for record in GENERATOR.frozen_bundle(f"{app}/mc.app.{app}.agent-skills-{version}.json")[
+            "records"
+        ]
+    }
+    assert not held & {record["logical_key"] for record in successor["records"]}
+    definition = rows["skill.mission-control-author"]["fields"]["manifest"]["definition"]
+    assert definition["source_provenance"]["upstream_version"] == "0.4.1"

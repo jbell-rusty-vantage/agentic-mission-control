@@ -168,9 +168,13 @@ def test_the_production_author_admits_a_manifest_selecting_report_register(
     assert bindings.capabilities[REGISTER].tool == registered["report_register"]
 
 
-def test_without_a_knowledge_binding_no_knowledge_tool_is_served(
+def test_without_a_knowledge_binding_only_output_submission_is_served(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, compiled: tuple[Any, Any]
 ) -> None:
+    """Output submission is Mission Control's own act: `submit_output` is served on every
+    installation; the other knowledge tools only where a knowledge binding is configured."""
+
+    from mission_control.adapters.deep_agents.knowledge_tools import served_output_tools
     from mission_control.application.authoring.manifest_launch_inputs import (
         ManifestLaunchBindingError,
     )
@@ -180,7 +184,9 @@ def test_without_a_knowledge_binding_no_knowledge_tool_is_served(
         manifest_launch_bindings_path=path, mission_control_catalog_scope=CATALOG
     )
     served = served_by_production_author(monkeypatch, settings)
-    assert not set(served_knowledge_tools()) & served.tools
+    knowledge_only = set(served_knowledge_tools()) - set(served_output_tools())
+    assert not knowledge_only & served.tools
+    assert set(served_output_tools()) <= served.tools
     definition, program = compiled
     with pytest.raises(ManifestLaunchBindingError, match="does not serve"):
         resolver(

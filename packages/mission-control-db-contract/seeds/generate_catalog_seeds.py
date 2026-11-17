@@ -366,6 +366,15 @@ FROZEN_BUNDLES = {
     "ai-engineer/mc.app.ai-engineer.agent-skills-1.0.5.json": (
         "cbb5ba157b37c54afff4796ccd498b9554f5df873099d453bff6c53c9c94248f"
     ),
+    # The method skills re-imported at Knowledge Services 1a451fd and the AI Engineer service
+    # 080e9f0, frozen when 1.0.7 published the regenerated mission-control-author bundle. It
+    # published imported rows only, so no `skills/` source is archived for it.
+    "biotech/mc.app.biotech.agent-skills-1.0.6.json": (
+        "a84845ac59a70ee54472946bb2ee71f96b02eb078ace7000cf9076ad2bd17069"
+    ),
+    "ai-engineer/mc.app.ai-engineer.agent-skills-1.0.6.json": (
+        "0e1e3aead175e4f987176b8f5853e5e6f2fb981c7e32a53eb76f055592c24ef0"
+    ),
     # GitHub, Context7, the capture server at revision 1 and plugin.code-research, frozen when
     # 1.2.0 published revision 2 of the capture server (supported on the deep_agents lane).
     "common/mc.catalog.agent-capabilities-1.1.0.json": (

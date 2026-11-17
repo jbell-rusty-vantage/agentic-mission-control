@@ -80,7 +80,9 @@ def runtime_checkpoint_conninfo(dsn: str, schema: str = RUNTIME_SCHEMA) -> str:
     return make_conninfo(dsn, options=runtime_search_path_option(schema))
 
 
-def saver_locator_digest(conninfo: str, schema: str = RUNTIME_SCHEMA) -> str:
+def saver_locator_digest(
+    conninfo: str, schema: str = RUNTIME_SCHEMA, *, address: str | None = None
+) -> str:
     """P6.2 (1.4.4): `sha256(host, port, dbname, schema)` of a bound conninfo.
 
     A pin revision names where its saver lives without carrying the DSN; moving the saver
@@ -93,6 +95,11 @@ def saver_locator_digest(conninfo: str, schema: str = RUNTIME_SCHEMA) -> str:
     one host, spelled `127.0.0.1` as the local stack's DSNs do (so their recorded digests
     are unchanged); the default port is 5432. Two names of one remote server (a DNS alias
     and an address) still give two digests: configure both processes with the same host.
+
+    ``address`` (``host:port``, ``LANGGRAPH_CHECKPOINT_LOCATOR``) names the server instead of
+    the DSN's host and port, for a process that reaches the same server by another route (a
+    container on a Docker network beside a host process on a published port); the database
+    and schema still come from the conninfo.
     """
 
     try:
@@ -100,10 +107,16 @@ def saver_locator_digest(conninfo: str, schema: str = RUNTIME_SCHEMA) -> str:
     except ProgrammingError as error:
         raise RuntimeConninfoError(f"invalid runtime conninfo: {error}") from error
     host = str(parsed.get("host") or "").strip().lower()
+    port = str(parsed.get("port") or "5432").strip()
+    if address is not None:
+        named_host, separator, named_port = address.strip().rpartition(":")
+        if not separator or not named_host or not named_port.isdigit():
+            raise RuntimeConninfoError("the saver locator address must be host:port")
+        host, port = named_host.lower(), named_port
     return sha256_digest(
         {
             "host": LOOPBACK_HOST if host in _LOOPBACK_ALIASES else host,
-            "port": str(parsed.get("port") or "5432").strip(),
+            "port": port,
             "dbname": str(parsed.get("dbname") or parsed.get("user") or ""),
             "schema": conninfo_search_path_schema(conninfo) or schema,
         }
@@ -171,6 +184,7 @@ class StandalonePersistenceLifespan:
         run_setup: bool = False,
         saver_factory: PersistenceFactory | None = None,
         store_factory: PersistenceFactory | None = None,
+        locator_address: str | None = None,
     ) -> None:
         if run_setup:
             schema = conninfo_search_path_schema(conn_string)
@@ -180,6 +194,7 @@ class StandalonePersistenceLifespan:
                     "mission_control_runtime is provisioned only by mission-db runtime-apply"
                 )
         self._conn_string = conn_string
+        self._locator_address = locator_address
         self._test_only_vendor_setup = run_setup
         self._saver_factory = saver_factory or AsyncPostgresSaver.from_conn_string
         self._store_factory = store_factory or AsyncPostgresStore.from_conn_string
@@ -199,7 +214,11 @@ class StandalonePersistenceLifespan:
                 await saver.setup()
                 await store.setup()
             return StandalonePersistence(
-                saver=saver, store=store, locator_digest=saver_locator_digest(self._conn_string)
+                saver=saver,
+                store=store,
+                locator_digest=saver_locator_digest(
+                    self._conn_string, address=self._locator_address
+                ),
             )
         except BaseException:
             await stack.aclose()

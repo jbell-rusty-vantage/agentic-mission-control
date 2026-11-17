@@ -416,7 +416,17 @@ def test_the_container_variant_changes_only_paths_and_network_names(tmp_path: Pa
         )
     )
     values = dict(host)
-    assert set(derived) == set(values)
+    # The one added name: the container names the saver's server as the host processes do.
+    assert set(derived) == set(values) | {"LANGGRAPH_CHECKPOINT_LOCATOR"}
+    checkpoint = next(name for name in values if name.endswith("_DB_CHECKPOINT_DSN"))
+    written = urlsplit(values[checkpoint])
+    assert derived["LANGGRAPH_CHECKPOINT_LOCATOR"] == f"{written.hostname}:{written.port}"
+    from mission_control.adapters.deep_agents.persistence import saver_locator_digest
+
+    assert saver_locator_digest(
+        derived[checkpoint], address=derived["LANGGRAPH_CHECKPOINT_LOCATOR"]
+    ) == saver_locator_digest(values[checkpoint])
+    assert saver_locator_digest(derived[checkpoint]) != saver_locator_digest(values[checkpoint])
     assert derived["MISSION_CONTROL_HOME"] == script.CONTAINER_HOME
     assert derived["MISSION_CONTROL_DEPLOYMENT_FILE"] == (
         f"{script.CONTAINER_HOME}/{script.CONTAINER_DEPLOYMENT}"
