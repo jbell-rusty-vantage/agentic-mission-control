@@ -15,9 +15,15 @@ from mission_control.domain.policies.contracts import (
     CommandStatus,
     RunPhase,
 )
+from tests.support.boundary_commands import (
+    TARGET,
+    ScriptedTransport,
+    _status,
+    pause,
+    started,
+    states,
+)
 from tests.support.run_control import command, service
-from tests.unit.run_control.test_boundary_commands import TARGET, pause, started, states
-from tests.unit.run_control.test_boundary_interventions import ScriptedTransport, _status
 
 
 @pytest.mark.asyncio

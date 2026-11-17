@@ -30,8 +30,8 @@ from mission_control.domain.subscriptions.contracts import (
     verify_signature,
 )
 from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.boundary_commands import TARGET
 from tests.support.run_control import command, request, service
-from tests.unit.run_control.test_boundary_commands import TARGET
 
 pytestmark = pytest.mark.common_db
 

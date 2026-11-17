@@ -381,12 +381,7 @@ async def test_rrm007_ledger_pending_command_blocks_the_snapshot_and_is_never_co
     makes the snapshot not quiescent; once the boundary applies it, the snapshot is taken,
     and the fork copies neither the command nor its receipts."""
 
-    from tests.unit.run_control.test_boundary_commands import (
-        TARGET,
-        apply,
-        boundary_command,
-        pause,
-    )
+    from tests.support.boundary_commands import TARGET, apply, boundary_command, pause
 
     harness, forks, _units = await _world()
     run_control = harness.run_control

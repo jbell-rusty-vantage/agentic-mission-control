@@ -25,8 +25,8 @@ from mission_control.contracts.contracts import MissionCommandRequest
 from mission_control.domain.policies.contracts import ActorContext, StartAction
 from mission_control.domain.policies.mailbox import MailboxState
 from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.boundary_commands import TARGET
 from tests.support.run_control import actor, command, request, service
-from tests.unit.run_control.test_boundary_commands import TARGET
 
 pytestmark = pytest.mark.common_db
 

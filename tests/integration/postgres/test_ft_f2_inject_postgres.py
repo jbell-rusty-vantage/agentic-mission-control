@@ -28,8 +28,8 @@ from mission_control.domain.policies.contracts import StartAction
 from mission_control.domain.policies.mailbox import MailboxState
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.integration.postgres.test_command_mailbox_postgres import _request, operator
+from tests.support.boundary_commands import TARGET
 from tests.support.run_control import command, request, service
-from tests.unit.run_control.test_boundary_commands import TARGET
 
 pytestmark = pytest.mark.common_db
 

@@ -11,6 +11,7 @@ from typing import Any
 
 import httpx
 import pytest
+from tests.support.boundary_commands import TARGET, pause
 from tests.support.run_control import (
     ALL_PERMISSIONS,
     actor,
@@ -20,7 +21,6 @@ from tests.support.run_control import (
     request,
     service,
 )
-from tests.unit.run_control.test_boundary_commands import TARGET, pause
 
 from mission_control.application.execution.boundary_interventions import (
     BoundaryCommandDeliveryService,

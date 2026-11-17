@@ -19,15 +19,9 @@ from mission_control.contracts.contracts import (
 )
 from mission_control.domain.policies.contracts import ActorContext, RunPhase, SetWaitAction
 from mission_control.domain.policies.errors import IdempotencyConflict, RunControlNotFound
+from tests.support.boundary_commands import TARGET, declared_wait, pause, resume, started
 from tests.support.run_control import actor as control_actor
 from tests.support.run_control import command, service
-from tests.unit.run_control.test_boundary_commands import (
-    TARGET,
-    declared_wait,
-    pause,
-    resume,
-    started,
-)
 
 
 def actor() -> ActorContext:

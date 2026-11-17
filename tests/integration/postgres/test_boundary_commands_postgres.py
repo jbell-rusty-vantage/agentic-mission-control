@@ -29,9 +29,7 @@ from mission_control.domain.policies.contracts import (
 )
 from mission_control.domain.policies.errors import ReceiptTransitionRejected
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.support.db_builders import owner_rows, scoped_command, scoped_request
-from tests.support.run_control import service
-from tests.unit.run_control.test_boundary_commands import (
+from tests.support.boundary_commands import (
     TARGET,
     apply,
     boundary_command,
@@ -41,6 +39,8 @@ from tests.unit.run_control.test_boundary_commands import (
     resume,
     states,
 )
+from tests.support.db_builders import owner_rows, scoped_command, scoped_request
+from tests.support.run_control import service
 
 pytestmark = pytest.mark.common_db
 

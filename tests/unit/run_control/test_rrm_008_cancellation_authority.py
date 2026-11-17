@@ -33,6 +33,19 @@ from mission_control.domain.policies.contracts import (
     TerminalizeAction,
 )
 from mission_control.domain.programs.contracts import CancelAck, CancelDelivery
+from tests.support.boundary_commands import (
+    FAMILY_WORKFLOW_ID,
+    ROOT_WORKFLOW_ID,
+    TARGET,
+    ScriptedClient,
+    ScriptedHandle,
+    ScriptedTransport,
+    _status,
+    declared_wait,
+    pause,
+    started,
+    states,
+)
 from tests.support.run_control import (
     EMPTY_EVIDENCE_DIGEST,
     INITIAL_EVIDENCE_FRONTIER,
@@ -44,21 +57,6 @@ from tests.support.run_control import (
     reconciler_command,
     request,
     service,
-)
-from tests.unit.run_control.test_boundary_commands import (
-    FAMILY_WORKFLOW_ID,
-    ROOT_WORKFLOW_ID,
-    TARGET,
-    declared_wait,
-    started,
-    states,
-)
-from tests.unit.run_control.test_boundary_interventions import (
-    ScriptedClient,
-    ScriptedHandle,
-    ScriptedTransport,
-    _status,
-    pause,
 )
 
 

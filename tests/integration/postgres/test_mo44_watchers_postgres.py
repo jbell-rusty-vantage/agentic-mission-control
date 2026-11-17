@@ -82,8 +82,8 @@ from tests.integration.postgres.test_mp15_coordinator_inbox_postgres import (
     owner_fetch,
     subscribe,
 )
+from tests.support.boundary_commands import declared_wait, states
 from tests.support.db_builders import admit_unit_attempt, scoped_command
-from tests.unit.run_control.test_boundary_commands import declared_wait, states
 from tests.unit.watchers.fakes import T0
 from tests.unit.watchers.test_watcher_manifest import definition, event_wait_document
 

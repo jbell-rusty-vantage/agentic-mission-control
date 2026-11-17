@@ -690,12 +690,7 @@ async def test_active_async_child_in_rrm013_authority_blocks_the_snapshot(
 
         # RRM-007's durable ledger (0023): an accepted, unapplied pause on a run with a family
         # execution target is a pending command; once applied the snapshot is taken.
-        from tests.unit.run_control.test_boundary_commands import (
-            TARGET,
-            apply,
-            boundary_command,
-            pause,
-        )
+        from tests.support.boundary_commands import TARGET, apply, boundary_command, pause
 
         targeted = await run_control.admit(run_request(request_id="rrm006-ledger"))
         assert targeted.run_id is not None

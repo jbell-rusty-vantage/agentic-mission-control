@@ -17,34 +17,38 @@ from mission_control.domain.policies.boundary_commands import (
     run_control_boundary_receipts,
 )
 from mission_control.domain.policies.contracts import (
-    ApplyBoundaryCommandAction,
-    BoundaryCommandReceipt,
     BoundaryCommandStatus,
     BoundaryTarget,
     CancelAction,
     CommandStatus,
-    ExecutionTarget,
-    LifecycleCommand,
     ObserveQuiescenceAction,
     PauseAction,
     PauseDecision,
     ReceiptState,
     RecordUsageAction,
     ReserveBudgetAction,
-    ResumeAction,
-    ResumeDecision,
     RunOutcome,
     RunPhase,
     SatisfyWaitAction,
     SetWaitAction,
-    StartAction,
     TerminalizationProposal,
     TerminalizeAction,
-    WaitCondition,
 )
 from mission_control.domain.policies.errors import ReceiptTransitionRejected
+from tests.support.boundary_commands import (
+    FAMILY_WORKFLOW_ID,
+    ROOT_WORKFLOW_ID,
+    TARGET,
+    apply,
+    boundary_command,
+    declared_wait,
+    delivered,
+    pause,
+    resume,
+    started,
+    states,
+)
 from tests.support.run_control import (
-    ALL_PERMISSIONS,
     EMPTY_EVIDENCE_DIGEST,
     INITIAL_EVIDENCE_FRONTIER,
     NOW,
@@ -54,119 +58,8 @@ from tests.support.run_control import (
     operator_wait,
     reconcile,
     reconciler_command,
-    request,
     service,
 )
-
-FAMILY_WORKFLOW_ID = "family/run-boundary/1"
-ROOT_WORKFLOW_ID = "belllabs-run/run-boundary"
-TARGET = ExecutionTarget(
-    family="GoalDirected",
-    family_workflow_id=FAMILY_WORKFLOW_ID,
-    root_workflow_id=ROOT_WORKFLOW_ID,
-    execution_epoch=1,
-)
-BOUNDARY_PERMISSIONS = ALL_PERMISSIONS | {"workflow_run.apply_boundary_command"}
-
-
-def pause(decision_id: str = "pause-1", *, runnable: bool = False) -> PauseAction:
-    return PauseAction(
-        decision=PauseDecision(
-            decision_id=decision_id,
-            scope=frozenset({"run"}),
-            reason="operator hold",
-            authority_ref="authority:lifecycle",
-        ),
-        runnable_work_remains=runnable,
-    )
-
-
-def resume(pause_decision_id: str = "pause-1", decision_id: str = "resume-1") -> ResumeAction:
-    return ResumeAction(
-        decision=ResumeDecision(
-            decision_id=decision_id,
-            pause_decision_id=pause_decision_id,
-            reason="operator release",
-            authority_ref="authority:lifecycle",
-        )
-    )
-
-
-def declared_wait(condition_id: str = "stagegraph-wait:release") -> WaitCondition:
-    return WaitCondition(
-        condition_id=condition_id,
-        kind="approval",
-        scope=frozenset({"workflow:graph"}),
-        verification_ref=f"stagegraph-wait:{condition_id}",
-        timeout_policy_ref="timeout:none",
-    )
-
-
-def boundary_command(
-    run_id: str, version: int, command_id: str, action: object, **extra: object
-) -> LifecycleCommand:
-    """The family boundary's command: the orchestration identity, not the operator's."""
-
-    return command(run_id, version, command_id, action, **extra).model_copy(
-        update={
-            "actor": actor().model_copy(
-                update={
-                    "actor_id": "orchestration-authority",
-                    "authority_refs": frozenset({"orchestration-authority"}),
-                    "permissions": BOUNDARY_PERMISSIONS,
-                }
-            ),
-            "idempotency_issuer": "goal-directed-worker",
-        }
-    )
-
-
-def apply(
-    command_id: str,
-    action: PauseAction | ResumeAction | SatisfyWaitAction,
-    *,
-    runnable: bool = False,
-    boundary_ref: str = FAMILY_WORKFLOW_ID,
-    reservation: dict[str, int] | None = None,
-    state: dict[str, object] | None = None,
-) -> ApplyBoundaryCommandAction:
-    return ApplyBoundaryCommandAction(
-        command_id=command_id,
-        command_issuer="operator",
-        action=action,
-        boundary_ref=boundary_ref,
-        runnable_work_remains=runnable,
-        resume_reservation=reservation or {},
-        boundary_state=state or {},
-    )
-
-
-def states(status: BoundaryCommandStatus) -> list[str]:
-    return [item.state.value for item in status.receipts]
-
-
-def delivered(status: BoundaryCommandStatus) -> BoundaryCommandReceipt:
-    return BoundaryCommandReceipt(
-        command_id=status.command.command_id,
-        idempotency_issuer=status.command.idempotency_issuer,
-        run_id=status.command.run_id,
-        request_scope=status.command.request_scope,
-        ordinal=1,
-        state=ReceiptState.DELIVERED,
-        recorded_by="delivery-service",
-        transport_ref=f"{FAMILY_WORKFLOW_ID}@segment:1",
-        recorded_at=NOW,
-    )
-
-
-async def started(run_service, request_id: str, target: ExecutionTarget | None):  # type: ignore[no-untyped-def]
-    admitted = await run_service.admit(request(request_id=request_id))
-    assert admitted.run_id is not None
-    started = await run_service.execute(
-        command(admitted.run_id, 1, "start", StartAction(execution_target=target))
-    )
-    assert started.status == CommandStatus.ACCEPTED
-    return admitted.run_id
 
 
 @pytest.mark.asyncio

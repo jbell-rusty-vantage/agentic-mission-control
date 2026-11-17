@@ -53,9 +53,9 @@ from tests.fixtures.continuation import (
     trigger,
 )
 from tests.fixtures.provider_frames import INSTALLATION, TENANT
+from tests.support.boundary_commands import TARGET, started
 from tests.support.run_control import actor as control_actor
 from tests.support.run_control import service
-from tests.unit.run_control.test_boundary_commands import TARGET, started
 
 PERMISSIONS = {
     "workflow_run.read",

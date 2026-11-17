@@ -8,7 +8,6 @@ is safe because receipts never transition twice. Stale targets are terminal reje
 
 from __future__ import annotations
 
-from types import SimpleNamespace
 from typing import Any
 
 import pytest
@@ -20,12 +19,10 @@ from mission_control.adapters.temporal.boundary_commands import (
 from mission_control.application.execution.boundary_interventions import (
     BoundaryCommandApplicationService,
     BoundaryCommandDeliveryService,
-    BoundaryDeliveryResult,
     BoundaryInterventionService,
 )
 from mission_control.domain.policies.contracts import (
     ActorContext,
-    BoundaryCommandStatus,
     CancelAction,
     CommandStatus,
     RecordUsageAction,
@@ -37,6 +34,20 @@ from mission_control.domain.policies.contracts import (
     TerminalizeAction,
 )
 from mission_control.domain.programs.contracts import BoundaryCommandAck, WorkflowMessageReceipt
+from tests.support.boundary_commands import (
+    BOUNDARY_PERMISSIONS,
+    FAMILY_WORKFLOW_ID,
+    ROOT_WORKFLOW_ID,
+    TARGET,
+    ScriptedClient,
+    ScriptedHandle,
+    ScriptedTransport,
+    _status,
+    declared_wait,
+    pause,
+    started,
+    states,
+)
 from tests.support.run_control import (
     EMPTY_EVIDENCE_DIGEST,
     INITIAL_EVIDENCE_FRONTIER,
@@ -45,32 +56,6 @@ from tests.support.run_control import (
     command,
     service,
 )
-from tests.unit.run_control.test_boundary_commands import (
-    BOUNDARY_PERMISSIONS,
-    FAMILY_WORKFLOW_ID,
-    ROOT_WORKFLOW_ID,
-    TARGET,
-    declared_wait,
-    pause,
-    started,
-    states,
-)
-
-
-class ScriptedTransport:
-    """A transport that records deliveries and follows a per-command script."""
-
-    def __init__(self, script: dict[str, str | Exception] | None = None) -> None:
-        self.script = script or {}
-        self.deliveries: list[str] = []
-
-    async def deliver(self, status: BoundaryCommandStatus) -> BoundaryDeliveryResult:
-        command_id = status.command.command_id
-        outcome = self.script.get(command_id, "delivered")
-        if isinstance(outcome, Exception):
-            raise outcome
-        self.deliveries.append(command_id)
-        return BoundaryDeliveryResult(outcome, f"{FAMILY_WORKFLOW_ID}@segment:1", "scripted")
 
 
 def boundary_actor() -> ActorContext:
@@ -231,12 +216,6 @@ async def test_application_service_binds_the_current_version_and_replays_idempot
     )
 
 
-async def _status(run_service, run_id: str, command_id: str) -> BoundaryCommandStatus:  # type: ignore[no-untyped-def]
-    status = await run_service.get_boundary_command("tenant-1", run_id, "operator", command_id)
-    assert status is not None
-    return status
-
-
 class RacingRunControl:
     """Run control whose version moves between the boundary's read and its execute (F2)."""
 
@@ -363,28 +342,6 @@ async def test_cancel_is_delivered_in_its_own_space_and_terminal_runs_reject() -
         "delivered",
         "applied",
     ]
-
-
-class ScriptedHandle:
-    def __init__(self, status: str, updates: list[Any]) -> None:
-        self._status = status
-        self._updates = list(updates)
-        self.calls: list[tuple[str, Any]] = []
-
-    async def describe(self) -> Any:
-        return SimpleNamespace(status=SimpleNamespace(name=self._status))
-
-    async def execute_update(self, name: str, argument: Any, *, result_type: Any = None) -> Any:
-        self.calls.append((name, argument))
-        return self._updates.pop(0)
-
-
-class ScriptedClient:
-    def __init__(self, handles: dict[str, ScriptedHandle]) -> None:
-        self.handles = handles
-
-    def get_workflow_handle(self, workflow_id: str, **_: Any) -> ScriptedHandle:
-        return self.handles[workflow_id]
 
 
 @pytest.mark.asyncio
