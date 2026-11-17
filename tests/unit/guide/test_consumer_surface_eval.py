@@ -48,6 +48,7 @@ from mission_control.interfaces.mcp.operator_server import (
     create_operator_server,
 )
 from tests.conformance.resolution.fixtures import APPLICATIONS, MODELS
+from tests.fixtures.capability_search_catalog import seeded_published
 from tests.fixtures.catalog.fast_track_catalog import NOW, fast_track_catalog
 from tests.fixtures.catalog_http import INSTALLATION, TENANT, catalog_harness
 from tests.unit.guide.support import (
@@ -62,7 +63,7 @@ from tests.unit.selection.test_selection_workspace import NARROW_WORKFLOW, OPEN_
 ROOT = Path(__file__).resolve().parents[3]
 BOUND_LANES = ("deep_agents", "cursor_local", "claude_agent_sdk")
 # What the evaluation asks without a run id, one check each, beside one compile per template.
-QUESTIONS = 30
+QUESTIONS = 32
 
 
 def _evaluation() -> ModuleType:
@@ -81,6 +82,17 @@ async def _catalog() -> tuple[Any, Any]:
     definitions, search = await fast_track_catalog()
     for row in (OPEN_WORKFLOW, NARROW_WORKFLOW, *lowered_rows()):
         await definitions.publish(row.definition, "fixture", NOW, 0)
+    # The capture server's later revisions, as an installation holds them: a Deep Agents node
+    # mounts its newest revision's allowlist.
+    # An id a later revision added (chain_write's row) is already its first published row here.
+    first = {
+        item.ref.logical_id for item in seeded_published(("common",)) if item.ref.revision == 1
+    }
+    for item in seeded_published(("common",), every_revision=True):
+        logical_id = item.ref.logical_id
+        if logical_id.startswith("mcp.knowledge-capture") and item.ref.revision > 1:
+            if logical_id in first:
+                await definitions.publish(item.definition, "seed", NOW, item.ref.revision - 1)
     return definitions, search
 
 
@@ -194,6 +206,13 @@ def test_the_evaluation_scores_the_guide_the_listing_and_the_templates() -> None
     )
     assert "absent of" in discovery and ": none; mission_whoami" in discovery
     assert "server.external_discovery: composed" in discovery
+    mounting = observed("mcp", "Which Knowledge Services tools can a research node mount?")
+    assert (
+        "row: revision 3; lanes `deep_agents`" in mounting and "tools mounted 23 of 42" in mounting
+    )
+    assert "research tools missing: none" in mounting and "withheld tools handed: none" in mounting
+    serving = observed("mcp", "What must the installation serve for the capture server?")
+    assert "MCP_SERVER_ENDPOINTS" in serving and "VERIFY_EXECUTOR_TOKEN" in serving
     sandbox = observed("mcp", "What does each sandbox profile give me?")
     assert "sandbox:research.standard: backend docker" in sandbox
     assert "no line in mission_guide('manifest'): none" in sandbox

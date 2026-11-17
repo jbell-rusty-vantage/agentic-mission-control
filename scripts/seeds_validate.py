@@ -89,7 +89,15 @@ def _check_server(
 ) -> list[str]:
     problems: list[str] = []
     name = server.logical_id
-    fixture_path = FIXTURES / f"{name}.tools.json"
+    # The snapshot ref names the fixture a revision was captured into (a later revision of the
+    # same server may have its own); a row without one reads `<id>.tools.json`.
+    uri = server.schema_snapshot_ref.uri
+    fixture_name = (
+        uri.rsplit("/", 1)[-1]
+        if uri.startswith("repo://tests/fixtures/mcp/")
+        else f"{name}.tools.json"
+    )
+    fixture_path = FIXTURES / fixture_name
     if server.package_pin is None:
         return problems  # pre-0025 server definitions carry no package pin
     if not fixture_path.is_file():

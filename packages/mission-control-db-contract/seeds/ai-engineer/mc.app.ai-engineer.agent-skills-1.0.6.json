@@ -1,0 +1,1130 @@
+{
+  "actor_ref": "seed:mission-control-catalog",
+  "component_compatibility": ">=1.0.0 <2.0.0",
+  "depends_on": [
+    {
+      "seed_key": "mc.app.ai-engineer.agent-skills",
+      "seed_version": "1.0.5"
+    }
+  ],
+  "description": "The method skills re-imported from their owning repositories at Knowledge Services 1a451fd and the AI Engineer service 080e9f0 (belllabs identifiers, pinned to a source commit), whose research and capture method routes a capture through source_prepare_captured, evidence_units and chain_write, in 'ai-engineer': skill.knowledge-research, skill.knowledge-verify, skill.knowledge-ingest, skill.ai-engineer-knowledge-charter, skill.content-authoring. A changed bundle takes its next revision; all earlier 1.0.0, 1.0.1, 1.0.2, 1.0.3, 1.0.4, 1.0.5 records and custody bytes are preserved.",
+  "format": "mission-control-seed/v1",
+  "records": [
+    {
+      "fields": {
+        "asset_id": "definition:skill:skill.knowledge-research",
+        "contract": "mission-control.published-definition/1",
+        "host_support": {
+          "profiles": {
+            "claude_agent_sdk": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "claude_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "claude_managed": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "codex_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "cursor_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "cursor_local": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "deep_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            }
+          },
+          "schema_version": "mc.capability_host_support.v1"
+        },
+        "kind": "skill_bundle",
+        "manifest": {
+          "definition": {
+            "attachment_targets": [
+              "agent.main"
+            ],
+            "body_summary": "Research method and verification for a knowledge base, loaded before a task searches for sources, captures evidence, states or checks a claim, or hands research back.",
+            "bundle_ref": {
+              "digest": "sha256:fe532fb4798021ac9cca1e3eef7643e6313b89422366daee2008290cad85d031",
+              "media_type": "application/vnd.mc.capability-bundle+json",
+              "size_bytes": 99061,
+              "uri": "capability-bundles://ai-engineer/skill_bundle/skill.knowledge-research/2026.11.17-1a451fd/fe532fb4798021ac9cca1e3eef7643e6313b89422366daee2008290cad85d031"
+            },
+            "compatibility": {
+              "executables": [],
+              "network_capabilities": [],
+              "runtimes": [],
+              "workspace_capabilities": []
+            },
+            "compatible_compiler_versions": [
+              "control-plane-definitions/1"
+            ],
+            "conflicts_with": [],
+            "description": "Research method and verification for a knowledge base, loaded before a task searches for sources, captures evidence, states or checks a claim, or hands research back.",
+            "file_manifest": [
+              {
+                "digest": "sha256:916c718a6bb6b8d68e1f6dbb468ebcac46c2252f99c2a99dbeb629229b70bebe",
+                "executable": false,
+                "path": "SKILL.md",
+                "size_bytes": 9470
+              },
+              {
+                "digest": "sha256:b3f7e0076f9845e6d92af6f09efe66a8c35c7b26e0f2ca32e28a70becd65ddd0",
+                "executable": false,
+                "path": "references/handback.md",
+                "size_bytes": 7602
+              },
+              {
+                "digest": "sha256:ad5a9c4e72df73595965387ce79c52533f69e800779f8ebc3e10d9a40005f868",
+                "executable": false,
+                "path": "references/method.md",
+                "size_bytes": 10551
+              },
+              {
+                "digest": "sha256:53430c11fe9e91d9f8a91cc2377998cf383b906e51444de6e1d19c81fc38687e",
+                "executable": false,
+                "path": "references/sources.md",
+                "size_bytes": 8937
+              },
+              {
+                "digest": "sha256:79097b0d65145bc5d342ef5f49db53a760a8175dc1c1793bf69ee3ef8da1d97f",
+                "executable": false,
+                "path": "references/tools/arxiv.md",
+                "size_bytes": 5617
+              },
+              {
+                "digest": "sha256:bd0dc51359440ebac289205761acbf860d42206333fa14387bd89b88b74b1b1c",
+                "executable": false,
+                "path": "references/tools/browser.md",
+                "size_bytes": 5215
+              },
+              {
+                "digest": "sha256:040f034e48d78e6c3be87234b734ad78f7fd4833e403480b7dda65c6b0bcc0f3",
+                "executable": false,
+                "path": "references/tools/context7.md",
+                "size_bytes": 4166
+              },
+              {
+                "digest": "sha256:f693470d741f3b4a64ac9676ed4ea29a18c708a9339b0207fc03fbfe8ade6ec2",
+                "executable": false,
+                "path": "references/tools/firecrawl.md",
+                "size_bytes": 7515
+              },
+              {
+                "digest": "sha256:4ff1ee464460e28d57897978c4742c0b9d8298767638be561e3690adb5170a98",
+                "executable": false,
+                "path": "references/tools/github.md",
+                "size_bytes": 5449
+              },
+              {
+                "digest": "sha256:776954844e7cba8f8b1816eb0a79216d77d372053be37f603378f8d80a757b56",
+                "executable": false,
+                "path": "references/tools/routing.md",
+                "size_bytes": 8497
+              },
+              {
+                "digest": "sha256:fd1ef0cad6f762ffc33ee03a6bb4ff357b3fec8b1f3145b0db4892b0d1776bff",
+                "executable": false,
+                "path": "references/tools/tavily.md",
+                "size_bytes": 5874
+              },
+              {
+                "digest": "sha256:02235084c9b5a79cf723eba63e5d785576f005199d5a2892f6350c7c3f4e94de",
+                "executable": false,
+                "path": "references/verification.md",
+                "size_bytes": 20168
+              }
+            ],
+            "frontmatter": {
+              "description": "Research method and verification for a knowledge base, loaded before a task searches for sources, captures evidence, states or checks a claim, or hands research back.",
+              "name": "knowledge-research"
+            },
+            "host_support": {
+              "profiles": {
+                "claude_agent_sdk": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "claude_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "claude_managed": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "codex_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "cursor_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "cursor_local": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "deep_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                }
+              },
+              "schema_version": "mc.capability_host_support.v1"
+            },
+            "kind": "skill",
+            "logical_id": "skill.knowledge-research",
+            "manifest_digest": "sha256:fe532fb4798021ac9cca1e3eef7643e6313b89422366daee2008290cad85d031",
+            "maturity": "experimental",
+            "required_capabilities": [],
+            "review_status": "approved",
+            "schema_version": "1",
+            "skill_name": "knowledge-research",
+            "source_provenance": {
+              "commit_digest": "1a451fde077b3b29b990cb5170018421e7765d96",
+              "license": "proprietary",
+              "locator": "https://github.com/jbell-rusty-vantage/agent-knowledge-services/tree/1a451fde077b3b29b990cb5170018421e7765d96/skills/knowledge-research",
+              "source": "belllabs",
+              "upstream_identity": "knowledge-services/knowledge-research",
+              "upstream_version": "2026.11.17-1a451fd"
+            },
+            "title": "knowledge-research"
+          },
+          "published_at": "2026-10-14T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:2998dc2230a416a5829f0c477fe68b3942ddc79289ad885e959a107fa8495418",
+            "kind": "skill",
+            "lifecycle_status": "published",
+            "logical_id": "skill.knowledge-research",
+            "payload_ref": null,
+            "revision": 2,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:615a31efe59c3ab885a22c06ec0589ba5ecba292357c70c470fcdc06f82b2521",
+        "manifest_ref": "mc-catalog://definition/skill/skill.knowledge-research/2",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "2"
+      },
+      "kind": "asset_version",
+      "logical_key": "agent-skill:skill:skill.knowledge-research/2"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "agent-skill:skill:skill.knowledge-research/2",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/agent_skills.py",
+          "packages/mission-control-db-contract/bundle-sources/imported/knowledge-services/1a451fd/knowledge-research"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "agent-skill:skill:skill.knowledge-research/2:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:skill:skill.knowledge-verify",
+        "contract": "mission-control.published-definition/1",
+        "host_support": {
+          "profiles": {
+            "claude_agent_sdk": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "claude_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "claude_managed": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "codex_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "cursor_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "cursor_local": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "deep_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            }
+          },
+          "schema_version": "mc.capability_host_support.v1"
+        },
+        "kind": "skill_bundle",
+        "manifest": {
+          "definition": {
+            "attachment_targets": [
+              "agent.main"
+            ],
+            "body_summary": "Use when a task needs source-attributed evidence: capture sources as immutable evidence (including PDF, DOCX, XLSX, CSV and other documents), read and search captures, locate exact quotes, and register or read artifacts through the knowledge-verify CLI. The executor's verification chain (verify-claims, judge, policy, seal, check-report, status) is retired.",
+            "bundle_ref": {
+              "digest": "sha256:9203a2e8fa3b2449dc5933e939bebe6c441861bacddb7004399fe0d481ac1a93",
+              "media_type": "application/vnd.mc.capability-bundle+json",
+              "size_bytes": 17837,
+              "uri": "capability-bundles://ai-engineer/skill_bundle/skill.knowledge-verify/2026.11.17-1a451fd/9203a2e8fa3b2449dc5933e939bebe6c441861bacddb7004399fe0d481ac1a93"
+            },
+            "compatibility": {
+              "executables": [],
+              "network_capabilities": [],
+              "runtimes": [],
+              "workspace_capabilities": []
+            },
+            "compatible_compiler_versions": [
+              "control-plane-definitions/1"
+            ],
+            "conflicts_with": [],
+            "description": "Use when a task needs source-attributed evidence: capture sources as immutable evidence (including PDF, DOCX, XLSX, CSV and other documents), read and search captures, locate exact quotes, and register or read artifacts through the knowledge-verify CLI. The executor's verification chain (verify-claims, judge, policy, seal, check-report, status) is retired.",
+            "file_manifest": [
+              {
+                "digest": "sha256:fc84118db5af58d0dc4d5ed4110c23a3d2cba532649049c28341f2d15dfc131e",
+                "executable": false,
+                "path": "SKILL.md",
+                "size_bytes": 7874
+              },
+              {
+                "digest": "sha256:2130a433d1cee6b8d627aec96059d865672c3052d38a42495f2daa85dc255263",
+                "executable": false,
+                "path": "examples/offline.mjs",
+                "size_bytes": 3236
+              },
+              {
+                "digest": "sha256:47a0b45d18178dba8c6162197d3fd6f6754a8b82c9b266e05358cef5ab5e2e31",
+                "executable": false,
+                "path": "references/capabilities.md",
+                "size_bytes": 3188
+              },
+              {
+                "digest": "sha256:5c4e970732bb6a9534f0417e29bd4485f2774def462e917b7cfe05962b165aaa",
+                "executable": false,
+                "path": "references/failure-playbook.md",
+                "size_bytes": 2952
+              },
+              {
+                "digest": "sha256:b7b9599926946ee80f78bf0dd7c8ee315b4e77efad06149ada1ca119b1c68849",
+                "executable": false,
+                "path": "references/intents.md",
+                "size_bytes": 587
+              }
+            ],
+            "frontmatter": {
+              "name": "knowledge-verify"
+            },
+            "host_support": {
+              "profiles": {
+                "claude_agent_sdk": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "claude_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "claude_managed": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "codex_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "cursor_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "cursor_local": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "deep_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                }
+              },
+              "schema_version": "mc.capability_host_support.v1"
+            },
+            "kind": "skill",
+            "logical_id": "skill.knowledge-verify",
+            "manifest_digest": "sha256:9203a2e8fa3b2449dc5933e939bebe6c441861bacddb7004399fe0d481ac1a93",
+            "maturity": "experimental",
+            "required_capabilities": [],
+            "review_status": "approved",
+            "schema_version": "1",
+            "skill_name": "knowledge-verify",
+            "source_provenance": {
+              "commit_digest": "1a451fde077b3b29b990cb5170018421e7765d96",
+              "license": "proprietary",
+              "locator": "https://github.com/jbell-rusty-vantage/agent-knowledge-services/tree/1a451fde077b3b29b990cb5170018421e7765d96/apps/verification-executor/skills/knowledge-verify",
+              "source": "belllabs",
+              "upstream_identity": "knowledge-services/knowledge-verify",
+              "upstream_version": "2026.11.17-1a451fd"
+            },
+            "title": "knowledge-verify"
+          },
+          "published_at": "2026-10-14T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:fa577e5b2b2e7405affb6f287c80557d9c5854865a05d8b3e6e28f41be53965e",
+            "kind": "skill",
+            "lifecycle_status": "published",
+            "logical_id": "skill.knowledge-verify",
+            "payload_ref": null,
+            "revision": 2,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:623234090e6853c3d5a003d1abd9e4e6b5fa2d8f7b1c5314756ce5f55b8640b1",
+        "manifest_ref": "mc-catalog://definition/skill/skill.knowledge-verify/2",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "2"
+      },
+      "kind": "asset_version",
+      "logical_key": "agent-skill:skill:skill.knowledge-verify/2"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "agent-skill:skill:skill.knowledge-verify/2",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/agent_skills.py",
+          "packages/mission-control-db-contract/bundle-sources/imported/knowledge-services/1a451fd/knowledge-verify"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "agent-skill:skill:skill.knowledge-verify/2:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:skill:skill.knowledge-ingest",
+        "contract": "mission-control.published-definition/1",
+        "host_support": {
+          "profiles": {
+            "claude_agent_sdk": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "claude_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "claude_managed": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "codex_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "cursor_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "cursor_local": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "deep_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            }
+          },
+          "schema_version": "mc.capability_host_support.v1"
+        },
+        "kind": "skill_bundle",
+        "manifest": {
+          "definition": {
+            "attachment_targets": [
+              "agent.main"
+            ],
+            "body_summary": "Use when verified facts must be written into the shared knowledge database: compose a knowledge-ingestion intent (entities, aliases, identifiers, relationships, two-clock facts, events, evidence support, staged candidates, reports) from a sealed verification run and a knowledge-db snapshot, dry-run it, apply it through the deterministic executor, inspect the receipt, recover from stale-head or validation failures, and verify by re-reading. You never write to the database yourself; the executor does, as executor_service.",
+            "bundle_ref": {
+              "digest": "sha256:fa560975a1fe0d1186113b81cff53725ca181c2df1a4a16c76964d2e6587bba1",
+              "media_type": "application/vnd.mc.capability-bundle+json",
+              "size_bytes": 13984,
+              "uri": "capability-bundles://ai-engineer/skill_bundle/skill.knowledge-ingest/2026.11.17-1a451fd/fa560975a1fe0d1186113b81cff53725ca181c2df1a4a16c76964d2e6587bba1"
+            },
+            "compatibility": {
+              "executables": [],
+              "network_capabilities": [],
+              "runtimes": [],
+              "workspace_capabilities": []
+            },
+            "compatible_compiler_versions": [
+              "control-plane-definitions/1"
+            ],
+            "conflicts_with": [],
+            "description": "Use when verified facts must be written into the shared knowledge database: compose a knowledge-ingestion intent (entities, aliases, identifiers, relationships, two-clock facts, events, evidence support, staged candidates, reports) from a sealed verification run and a knowledge-db snapshot, dry-run it, apply it through the deterministic executor, inspect the receipt, recover from stale-head or validation failures, and verify by re-reading. You never write to the database yourself; the executor does, as executor_service.",
+            "file_manifest": [
+              {
+                "digest": "sha256:cee013f1a35aee4eef47d16e584a24ffe22d8561b16f08c54a1ea47835712649",
+                "executable": false,
+                "path": "SKILL.md",
+                "size_bytes": 13984
+              }
+            ],
+            "frontmatter": {
+              "name": "knowledge-ingest"
+            },
+            "host_support": {
+              "profiles": {
+                "claude_agent_sdk": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "claude_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "claude_managed": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "codex_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "cursor_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "cursor_local": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "deep_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                }
+              },
+              "schema_version": "mc.capability_host_support.v1"
+            },
+            "kind": "skill",
+            "logical_id": "skill.knowledge-ingest",
+            "manifest_digest": "sha256:fa560975a1fe0d1186113b81cff53725ca181c2df1a4a16c76964d2e6587bba1",
+            "maturity": "experimental",
+            "required_capabilities": [],
+            "review_status": "approved",
+            "schema_version": "1",
+            "skill_name": "knowledge-ingest",
+            "source_provenance": {
+              "commit_digest": "1a451fde077b3b29b990cb5170018421e7765d96",
+              "license": "proprietary",
+              "locator": "https://github.com/jbell-rusty-vantage/agent-knowledge-services/tree/1a451fde077b3b29b990cb5170018421e7765d96/skills/knowledge-ingest",
+              "source": "belllabs",
+              "upstream_identity": "knowledge-services/knowledge-ingest",
+              "upstream_version": "2026.11.17-1a451fd"
+            },
+            "title": "knowledge-ingest"
+          },
+          "published_at": "2026-10-14T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:64d38d180cbddb08ceb575356cdc3f19ac6abff60ae2f83fbcd195a56bb96c1a",
+            "kind": "skill",
+            "lifecycle_status": "published",
+            "logical_id": "skill.knowledge-ingest",
+            "payload_ref": null,
+            "revision": 2,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:07e0c2ee638e81d6728dcbd95587bdbc8fcfbdc2258f9a31170dd451402e9361",
+        "manifest_ref": "mc-catalog://definition/skill/skill.knowledge-ingest/2",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "2"
+      },
+      "kind": "asset_version",
+      "logical_key": "agent-skill:skill:skill.knowledge-ingest/2"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "agent-skill:skill:skill.knowledge-ingest/2",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/agent_skills.py",
+          "packages/mission-control-db-contract/bundle-sources/imported/knowledge-services/1a451fd/knowledge-ingest"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "agent-skill:skill:skill.knowledge-ingest/2:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:skill:skill.ai-engineer-knowledge-charter",
+        "contract": "mission-control.published-definition/1",
+        "host_support": {
+          "profiles": {
+            "claude_agent_sdk": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "claude_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "claude_managed": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "codex_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "cursor_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "cursor_local": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "deep_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            }
+          },
+          "schema_version": "mc.capability_host_support.v1"
+        },
+        "kind": "skill_bundle",
+        "manifest": {
+          "definition": {
+            "attachment_targets": [
+              "agent.main"
+            ],
+            "body_summary": "AI Engineer knowledge base purpose, source tiers, repository rules and paper levels, loaded before researching, verifying or ingesting AI engineering knowledge and paired with knowledge-research for the method.",
+            "bundle_ref": {
+              "digest": "sha256:36abffcdfd67c7aa284e5b41b42e591ae749df9e854f1b5b37c4ef3e070678c2",
+              "media_type": "application/vnd.mc.capability-bundle+json",
+              "size_bytes": 10625,
+              "uri": "capability-bundles://ai-engineer/skill_bundle/skill.ai-engineer-knowledge-charter/2026.11.16-080e9f0/36abffcdfd67c7aa284e5b41b42e591ae749df9e854f1b5b37c4ef3e070678c2"
+            },
+            "compatibility": {
+              "executables": [],
+              "network_capabilities": [],
+              "runtimes": [],
+              "workspace_capabilities": []
+            },
+            "compatible_compiler_versions": [
+              "control-plane-definitions/1"
+            ],
+            "conflicts_with": [],
+            "description": "AI Engineer knowledge base purpose, source tiers, repository rules and paper levels, loaded before researching, verifying or ingesting AI engineering knowledge and paired with knowledge-research for the method.",
+            "file_manifest": [
+              {
+                "digest": "sha256:d9dfa7b8ef77109347e48276fa98da439b8d19317b4ad45a51aad5806994e3b3",
+                "executable": false,
+                "path": "SKILL.md",
+                "size_bytes": 10625
+              }
+            ],
+            "frontmatter": {
+              "description": "AI Engineer knowledge base purpose, source tiers, repository rules and paper levels, loaded before researching, verifying or ingesting AI engineering knowledge and paired with knowledge-research for the method.",
+              "name": "ai-engineer-knowledge-charter"
+            },
+            "host_support": {
+              "profiles": {
+                "claude_agent_sdk": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "claude_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "claude_managed": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "codex_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "cursor_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "cursor_local": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "deep_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                }
+              },
+              "schema_version": "mc.capability_host_support.v1"
+            },
+            "kind": "skill",
+            "logical_id": "skill.ai-engineer-knowledge-charter",
+            "manifest_digest": "sha256:36abffcdfd67c7aa284e5b41b42e591ae749df9e854f1b5b37c4ef3e070678c2",
+            "maturity": "experimental",
+            "required_capabilities": [],
+            "review_status": "approved",
+            "schema_version": "1",
+            "skill_name": "ai-engineer-knowledge-charter",
+            "source_provenance": {
+              "commit_digest": "080e9f0f8d49e43a5946b7ae4a7c7881ddee228c",
+              "license": "proprietary",
+              "locator": "https://github.com/jbell-rusty-vantage/ai-engineer-services/tree/080e9f0f8d49e43a5946b7ae4a7c7881ddee228c/skills/ai-engineer-knowledge-charter",
+              "source": "belllabs",
+              "upstream_identity": "ai-engineer-service/ai-engineer-knowledge-charter",
+              "upstream_version": "2026.11.16-080e9f0"
+            },
+            "title": "ai-engineer-knowledge-charter"
+          },
+          "published_at": "2026-10-14T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:bbb6fd0d0e170cb2705d70685225c3eb7b4604c55fe7e45faa05a2ec9bb9ab5b",
+            "kind": "skill",
+            "lifecycle_status": "published",
+            "logical_id": "skill.ai-engineer-knowledge-charter",
+            "payload_ref": null,
+            "revision": 3,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:7b1c3372b3e4f3abbec7314b44971eee5d7c5b09b39078d7a6e1a26f75e9a4ac",
+        "manifest_ref": "mc-catalog://definition/skill/skill.ai-engineer-knowledge-charter/3",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "3"
+      },
+      "kind": "asset_version",
+      "logical_key": "agent-skill:skill:skill.ai-engineer-knowledge-charter/3"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "agent-skill:skill:skill.ai-engineer-knowledge-charter/3",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/agent_skills.py",
+          "packages/mission-control-db-contract/bundle-sources/imported/ai-engineer-service/080e9f0/ai-engineer-knowledge-charter"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "agent-skill:skill:skill.ai-engineer-knowledge-charter/3:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:skill:skill.content-authoring",
+        "contract": "mission-control.published-definition/1",
+        "host_support": {
+          "profiles": {
+            "claude_agent_sdk": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "claude_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "claude_managed": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "codex_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "cursor_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "cursor_local": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            },
+            "deep_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            }
+          },
+          "schema_version": "mc.capability_host_support.v1"
+        },
+        "kind": "skill_bundle",
+        "manifest": {
+          "definition": {
+            "attachment_targets": [
+              "agent.main"
+            ],
+            "body_summary": "Author AI Engineer teaching content from verified knowledge - load when designing, drafting, running, revising, handing over for review or keeping current a course, curriculum, module, lesson, activity or course artifact.",
+            "bundle_ref": {
+              "digest": "sha256:a133d71dad4079aedbf68afeb9bd9988b775007cebcb52295ad75290eba1ddfb",
+              "media_type": "application/vnd.mc.capability-bundle+json",
+              "size_bytes": 83678,
+              "uri": "capability-bundles://ai-engineer/skill_bundle/skill.content-authoring/2026.11.16-080e9f0/a133d71dad4079aedbf68afeb9bd9988b775007cebcb52295ad75290eba1ddfb"
+            },
+            "compatibility": {
+              "executables": [],
+              "network_capabilities": [],
+              "runtimes": [],
+              "workspace_capabilities": []
+            },
+            "compatible_compiler_versions": [
+              "control-plane-definitions/1"
+            ],
+            "conflicts_with": [],
+            "description": "Author AI Engineer teaching content from verified knowledge - load when designing, drafting, running, revising, handing over for review or keeping current a course, curriculum, module, lesson, activity or course artifact.",
+            "file_manifest": [
+              {
+                "digest": "sha256:a6fd26a27ae57263292d603bdd6cdc8ab29ef6cf1b2afcf7ddc90c1694d26302",
+                "executable": false,
+                "path": "SKILL.md",
+                "size_bytes": 11125
+              },
+              {
+                "digest": "sha256:701efc8a7a55a284d7fa68545e6379019a37c8b4b0b556840952a2923669d915",
+                "executable": false,
+                "path": "SOURCES.md",
+                "size_bytes": 31306
+              },
+              {
+                "digest": "sha256:72dff8b3325ca3e4fbb0675dcb2c6fa0a8d785448def78d95709ed8538a81c22",
+                "executable": false,
+                "path": "references/evidence-binding.md",
+                "size_bytes": 7423
+              },
+              {
+                "digest": "sha256:4507f33c50446e58e1904a7ae1c4f98099c42aae5d0de58a5d90722f6d02d7ee",
+                "executable": false,
+                "path": "references/lesson-craft.md",
+                "size_bytes": 7787
+              },
+              {
+                "digest": "sha256:ec542c3dcb649bf03bbe470a8bccfd02afad77325854389b538b7c564819e6df",
+                "executable": false,
+                "path": "references/review-and-release.md",
+                "size_bytes": 7839
+              },
+              {
+                "digest": "sha256:ac8c1c83dd9cd641b2119ab20e1eb6789b8d44ac53434f19a25b45edee60ee17",
+                "executable": false,
+                "path": "references/structure.md",
+                "size_bytes": 8386
+              },
+              {
+                "digest": "sha256:ce5577db0fed83139d64b3ed73f8e51023c4959de31fdb7df7c3f261008e222d",
+                "executable": false,
+                "path": "references/worked-example.md",
+                "size_bytes": 9812
+              }
+            ],
+            "frontmatter": {
+              "description": "Author AI Engineer teaching content from verified knowledge - load when designing, drafting, running, revising, handing over for review or keeping current a course, curriculum, module, lesson, activity or course artifact.",
+              "name": "content-authoring"
+            },
+            "host_support": {
+              "profiles": {
+                "claude_agent_sdk": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "claude_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "claude_managed": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "codex_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "cursor_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "cursor_local": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                },
+                "deep_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                }
+              },
+              "schema_version": "mc.capability_host_support.v1"
+            },
+            "kind": "skill",
+            "logical_id": "skill.content-authoring",
+            "manifest_digest": "sha256:a133d71dad4079aedbf68afeb9bd9988b775007cebcb52295ad75290eba1ddfb",
+            "maturity": "experimental",
+            "required_capabilities": [],
+            "review_status": "approved",
+            "schema_version": "1",
+            "skill_name": "content-authoring",
+            "source_provenance": {
+              "commit_digest": "080e9f0f8d49e43a5946b7ae4a7c7881ddee228c",
+              "license": "proprietary",
+              "locator": "https://github.com/jbell-rusty-vantage/ai-engineer-services/tree/080e9f0f8d49e43a5946b7ae4a7c7881ddee228c/skills/content-authoring",
+              "source": "belllabs",
+              "upstream_identity": "ai-engineer-service/content-authoring",
+              "upstream_version": "2026.11.16-080e9f0"
+            },
+            "title": "content-authoring"
+          },
+          "published_at": "2026-10-14T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:802bb38fa082590e47777f9c22ea06c715d961bad4811795ab47bc49b543122d",
+            "kind": "skill",
+            "lifecycle_status": "published",
+            "logical_id": "skill.content-authoring",
+            "payload_ref": null,
+            "revision": 2,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:b8aa6834de8dd7cfd268eb87de40f72c2e927bbf1c2cccd172833edce974456e",
+        "manifest_ref": "mc-catalog://definition/skill/skill.content-authoring/2",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "2"
+      },
+      "kind": "asset_version",
+      "logical_key": "agent-skill:skill:skill.content-authoring/2"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "agent-skill:skill:skill.content-authoring/2",
+        "decided_at": "2026-10-03T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/agent_skills.py",
+          "packages/mission-control-db-contract/bundle-sources/imported/ai-engineer-service/080e9f0/content-authoring"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "agent-skill:skill:skill.content-authoring/2:admit"
+    }
+  ],
+  "seed_key": "mc.app.ai-engineer.agent-skills",
+  "seed_version": "1.0.6"
+}

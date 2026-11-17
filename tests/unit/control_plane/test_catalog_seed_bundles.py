@@ -47,6 +47,8 @@ EXPECTED = {
     ("mc.catalog.agent-capabilities", "1.1.0"),
     # Revision 2 of the capture server and its tool rows; 1.1.0 is frozen.
     ("mc.catalog.agent-capabilities", "1.2.0"),
+    # Revision 3, recaptured at Knowledge Services 1a451fd; 1.2.0 is frozen.
+    ("mc.catalog.agent-capabilities", "1.3.0"),
     ("mc.catalog.knowledge-tools", "1.0.0"),
     # OVE-170 submit_output revision 2 (recorded), then OVE-204 slice 4 knowledge_read_intent.
     ("mc.catalog.knowledge-tools", "1.1.0"),
@@ -113,13 +115,16 @@ def test_each_app_installation_set_is_valid_and_dependency_closed(app: str) -> N
     agent = [("mc.catalog.agent-capabilities", "1.0.0"), (APP_AGENT_KEYS[app], "1.0.0")]
     # The research capabilities: new common ids, after the frozen common 1.0.0.
     # 1.2.0: revision 2 of the capture server (supported on deep_agents), after the frozen 1.1.0.
+    # 1.3.0: revision 3 of the capture server (the chain tools allowlisted), after the frozen 1.2.0.
     research = [
         ("mc.catalog.agent-capabilities", "1.1.0"),
         ("mc.catalog.agent-capabilities", "1.2.0"),
+        ("mc.catalog.agent-capabilities", "1.3.0"),
     ]
     # FT-A7: skills, the policy hook and the plugin are per application.
     # 1.0.5: the coordinator bundles regenerated from the guide and the imported method skills.
-    skill_versions = ("1.0.0", "1.0.1", "1.0.2", "1.0.3", "1.0.4", "1.0.5")
+    # 1.0.6: the method skills re-imported at Knowledge Services 1a451fd and AI Engineer 080e9f0.
+    skill_versions = ("1.0.0", "1.0.1", "1.0.2", "1.0.3", "1.0.4", "1.0.5", "1.0.6")
     skills = [(f"mc.app.{app}.agent-skills", version) for version in skill_versions]
     # MO-12: starter Environment Kits, per application like the skills.
     kits = [(f"mc.app.{app}.environment-kits", "1.0.0")]
@@ -132,6 +137,8 @@ def test_each_app_installation_set_is_valid_and_dependency_closed(app: str) -> N
     # Revision 3 of the knowledge plugin, with the capture server agent-capabilities 1.2.0
     # publishes at revision 2.
     observation.append((f"mc.app.{app}.cognition-profiles", "1.0.2"))
+    # Revision 4: the re-imported method skills and the capture server revision 3.
+    observation.append((f"mc.app.{app}.cognition-profiles", "1.0.3"))
     storage = [("mc.storage.capability-bundles", "1.0.0"), ("mc.storage.mission-payloads", "1.0.0")]
     # Succession of the applied, frozen approved-assets@1.0.0 (new logical keys only).
     successors = [
@@ -632,13 +639,18 @@ def test_published_definition_assets_are_exact_and_repository_readable() -> None
                 published.ref.kind, published.ref.logical_id
             )
             # knowledge-tools 1.1.0/1.2.0 carry submit_output at revision 2 (OVE-170), and
-            # agent-capabilities 1.2.0 the capture server and its tool rows at revision 2.
-            second = published.ref.logical_id == "tool.knowledge-submit-output" or (
-                published.ref.logical_id.startswith("mcp.knowledge-capture")
+            # agent-capabilities 1.2.0 and 1.3.0 the capture server and its tool rows at
+            # revisions 2 and 3.
+            capture = published.ref.logical_id.startswith("mcp.knowledge-capture")
+            allowed = (
+                {"1", "2"}
+                if published.ref.logical_id == "tool.knowledge-submit-output"
+                else {"1", "2", "3"}
+                if capture
+                else {"1"}
             )
-            revision = "2" if second else "1"
             assert fields["version"] == str(published.ref.revision)
-            assert fields["version"] in {"1", revision}
+            assert fields["version"] in allowed
             seen.add(published.ref.logical_id)
     assert {
         "skill.mission-control-coordinator",

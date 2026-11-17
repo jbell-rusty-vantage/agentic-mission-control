@@ -569,16 +569,20 @@ async def test_schema_guide_and_relation_paths_stay_in_the_workspace(tmp_path: P
     # A workspace of this test's own: the generated AI Engineer contract workspace is another
     # repository's, whose relations are renamed on its own schedule.
     workspace = tmp_path / "aidb-workspace"
-    page = workspace / "relations" / "corpus" / "library.md"
+    page = workspace / "relations" / "catalog" / "entity.md"
     page.parent.mkdir(parents=True)
-    page.write_text("# corpus.library\n\nOne row per library.\n", encoding="utf-8")
+    page.write_text("# catalog.entity\n\nOne row per canonical identity.\n", encoding="utf-8")
     (tmp_path / "outside.md").write_text("outside the workspace", encoding="utf-8")
     worker.workspace = workspace.resolve()
     guide = json.loads(await worker.aieng_schema())
     assert guide["total_chars"] > 0
-    relation = json.loads(await worker.aieng_schema(section="relation", name="corpus/library"))
-    assert "corpus.library" in relation["content"]
-    assert relation["schema_source"] == str(Path("relations") / "corpus" / "library.md")
+    relation = json.loads(await worker.aieng_schema(section="relation", name="catalog/entity"))
+    assert "catalog.entity" in relation["content"]
+    assert relation["schema_source"] == str(Path("relations") / "catalog" / "entity.md")
+    guide_text = guide["content"]
+    assert guide["next_offset_chars"] == guide["total_chars"]
+    assert "typedPayload" not in guide_text and "corpus/" not in guide_text
+    assert "attributes_schema" in guide_text and "catalog/entity" in guide_text
     refused = json.loads(await worker.aieng_schema(section="relation", name=""))
     assert refused["status"] == "refused"
     escaped = json.loads(await worker.aieng_schema(section="relation", name="../../outside"))

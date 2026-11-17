@@ -539,3 +539,31 @@ def test_a_daytona_sandbox_without_a_served_factory_refuses_at_compile() -> None
     refusal = refused.value.refusal
     assert refusal.code == "ITEM_PIN_UNSERVED"
     assert "is not served by this deployment" in refusal.reason
+
+
+def test_a_node_mcp_servers_credentials_are_resolved_before_cognition() -> None:
+    """A server the node mounts names its credential (a remote server's bearer token); the
+    sealed node binding lists it with the operation's secret references, or the materializer
+    could never resolve it and refuses the launch ("required credential reference was not
+    resolved"). Found running the capture server on a Deep Agents node, 2026-11-16."""
+
+    from mission_control.domain.authoring.contracts import SecretRef
+
+    facts = deep_agents_facts()
+    token = SecretRef(provider="environment", key="VERIFY_EXECUTOR_TOKEN")
+    capabilities = dict(facts.capabilities)
+    key, binding = next(
+        (key, value)
+        for key, value in capabilities.items()
+        if value.mcp_server is not None and value.mcp_server.transport == "streamable_http"
+    )
+    assert binding.mcp_server is not None
+    server = binding.mcp_server.model_copy(update={"credential_refs": (token,)})
+    capabilities[key] = binding.model_copy(update={"mcp_server": server})
+    facts = replace(facts, capabilities=capabilities)
+    sealed, _receipt = DeepAgentsCompileAdapter(facts).compile(_agent(), {})
+    node = DeepAgentNodeBinding.model_validate_json(sealed.payload)
+
+    mounted = {ref for item in node.profile.mcp_servers for ref in item.credential_refs}
+    assert token in mounted
+    assert mounted <= set(node.secret_refs)

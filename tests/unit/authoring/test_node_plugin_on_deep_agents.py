@@ -229,7 +229,10 @@ async def test_every_member_of_a_node_plugin_is_bound_on_the_deep_agents_lane() 
             assert server == bindings.capabilities[logical_id].mcp_server
         capture = servers["mcp.knowledge-capture"]
         assert (capture.transport, capture.tool_filter) == ("streamable_http", "allowlist")
-        assert len(capture.tools) == 19
+        assert len(capture.tools) == 23
+        assert {"source_prepare_captured", "evidence_units", "chain_write"} <= {
+            tool.tool_name for tool in capture.tools
+        }
         assert not {"ingest_apply", "db_sql_readonly"} & {tool.tool_name for tool in capture.tools}
         assert (
             servers["mcp.github"].tool_filter == "exact" and len(servers["mcp.github"].tools) == 22

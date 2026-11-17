@@ -98,6 +98,12 @@ class ExternalCapabilityDiscoveryDisabled(RuntimeError):
     pass
 
 
+class ExternalCapabilityDiscoveryUnavailable(RuntimeError):
+    """A discovery dependency could not answer: the MCP registry, or the pinned `npx skills`
+    subprocess (for example on a host whose event loop cannot start one). The message names the
+    dependency and is safe to return; it never carries a response body or a credential."""
+
+
 class ExternalCapabilityDiscoveryService:
     """Gate discovery and persist candidate-only records through application ports."""
 

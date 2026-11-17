@@ -16,7 +16,10 @@ tools over Streamable HTTP, captured from a running executor) and ``plugin.code-
 over the first two. Every binding traces to the dated provider note :data:`RESEARCH_NOTE`.
 1.1.0 is frozen by bytes too. 1.2.0 (2026-11-16, common) publishes revision 2 of
 ``mcp.knowledge-capture`` and of its allowlisted tool rows from :data:`CAPTURE_SERVER`: the
-same server and allowlist, supported on the ``deep_agents`` lane.
+same server and allowlist, supported on the ``deep_agents`` lane; it is frozen by bytes.
+1.3.0 (2026-11-16, common) publishes revision 3 from :data:`CAPTURE_SERVER_R3`, recaptured
+from the executor at Knowledge Services 1a451fd into its own fixture, with the chain tools
+allowlisted.
 """
 
 from __future__ import annotations
@@ -409,12 +412,75 @@ CAPTURE_SERVER: dict[str, Any] = {
 }
 
 
+# --- Seed 1.3.0 (2026-11-16): the capture server recaptured at Knowledge Services 1a451fd ----
+# Revision 3 of `mcp.knowledge-capture`: the executor built from 1a451fd lists 42 tools (its
+# large input schemas in a short form, so every tool's digest differs from revision 2's), among
+# them the governed verification-chain writes (`chain_write`), the unit-to-capture read an
+# anchor needs (`evidence_units`) and `source_prepare_captured`, which now registers one of the
+# executor's own captures as a quotable database capture. A research agent needs all three to
+# run the method from capture to an anchored, proposed claim, and `knowledge_describe`, whose
+# `tool:` and `operation:` references need only the executor token (its binding descriptor,
+# without a reference, refuses without the issuer credential). Still withheld: knowledge
+# ingestion and its ledger (`ingest_*`), direct database reads (`db_*`), host session state
+# (`checkpoint_*`), `schema_materialize` (writes a directory on the executor host),
+# `artifact_get` (ledger rows), and the issuer-credential tools (`knowledge_operation_*`,
+# `knowledge_receipt_get`). The tool list is its own fixture, so the revisions before it keep
+# theirs.
+CAPTURE_R3_SEED_VERSION = "1.3.0"
+CAPTURE_R3_REVISION = 3
+_KNOWLEDGE_SERVICES_R3_COMMIT = "1a451fde077b3b29b990cb5170018421e7765d96"
+CAPTURE_R3_ADDED = (
+    "chain_write",
+    "evidence_units",
+    "knowledge_describe",
+    "source_prepare_captured",
+)
+CAPTURE_SERVER_R3: dict[str, Any] = {
+    **CAPTURE_SERVER,
+    "fixture": "mcp.knowledge-capture.1a451fd.tools.json",
+    "description": (
+        "The Knowledge Services executor's MCP endpoint (Streamable HTTP, /mcp) narrowed to "
+        "the research method from capture to a proposed claim: capture a URL or a file as "
+        "exact bytes, read and search a capture, locate a quote that occurs once, export a "
+        "fragment, register and read artifacts, make a capture quotable as a database capture "
+        "(source_prepare_captured), find quotable content units (evidence_units), write one "
+        "governed step of the verification chain (chain_write: a claim anchored to a quote, a "
+        "probe, a verdict proposal; never a verification and never a person's judgment), "
+        "record source discovery and lead selection, read the schema workspace, a tool's or a "
+        "chain operation's full description (knowledge_describe) and the guidance. Withheld: "
+        "ingest_*, db_*, checkpoint_*, schema_materialize, artifact_get, "
+        "knowledge_operation_* and knowledge_receipt_get. The endpoint is the executor's local "
+        "default; a deployment binds its own (MCP_SERVER_ENDPOINTS). VERIFY_EXECUTOR_TOKEN "
+        "names the token the executor expects on the Authorization header. Supported on the "
+        "Deep Agents lane, which attaches only this allowlist; unqualified on the other "
+        "worker-hosted lanes."
+    ),
+    "upstream": (
+        "knowledge-services/verification-executor",
+        "0.1.0-1a451fd",
+        f"{_KNOWLEDGE_SERVICES}/tree/{_KNOWLEDGE_SERVICES_R3_COMMIT}/apps/verification-executor",
+        "proprietary",
+    ),
+    "commit_digest": _KNOWLEDGE_SERVICES_R3_COMMIT,
+    "package_pin": (
+        f"git:{_KNOWLEDGE_SERVICES}@{_KNOWLEDGE_SERVICES_R3_COMMIT}#apps/verification-executor"
+    ),
+    "allow_tools": sorted([*CAPTURE_SERVER["allow_tools"], *CAPTURE_R3_ADDED]),
+}
+# revision -> spec of every published revision of the capture server after the first.
+CAPTURE_REVISIONS: dict[int, dict[str, Any]] = {
+    CAPTURE_REVISION: CAPTURE_SERVER,
+    CAPTURE_R3_REVISION: CAPTURE_SERVER_R3,
+}
+LATEST_CAPTURE_REVISION = CAPTURE_R3_REVISION
+
+
 def served_research_specs() -> dict[str, dict[str, Any]]:
     """``capability_id -> spec`` of each research server at its newest seeded revision: the
     rows a worker's pin file is written from (``scripts/pin_research_capabilities.py``)."""
 
     specs = {spec["id"]: spec for spec in RESEARCH_SERVERS}
-    specs[CAPTURE_SERVER["id"]] = CAPTURE_SERVER
+    specs[CAPTURE_SERVER["id"]] = CAPTURE_REVISIONS[LATEST_CAPTURE_REVISION]
     return specs
 
 
@@ -432,8 +498,15 @@ def tools_list_digest(tools: list[dict[str, Any]]) -> str:
     return _sha256(encoded.encode("utf-8"))
 
 
-def fixture(server_id: str) -> tuple[dict[str, Any], bytes]:
-    path = FIXTURES / f"{server_id}.tools.json"
+def fixture_name(spec: dict[str, Any]) -> str:
+    """The tools fixture a spec's tool list is read from: ``<id>.tools.json`` unless the spec
+    names its own (a later revision captured from another build of the same server)."""
+
+    return str(spec.get("fixture", f"{spec['id']}.tools.json"))
+
+
+def fixture(server_id: str, name: str | None = None) -> tuple[dict[str, Any], bytes]:
+    path = FIXTURES / (name or f"{server_id}.tools.json")
     payload = _lf(path)
     return json.loads(payload), payload
 
@@ -441,7 +514,7 @@ def fixture(server_id: str) -> tuple[dict[str, Any], bytes]:
 def server_definition(spec: dict[str, Any]) -> Any:
     from mission_control.domain.authoring.contracts import MCPServerDefinition
 
-    document, payload = fixture(spec["id"])
+    document, payload = fixture(spec["id"], fixture_name(spec))
     tools = document["tools"]
     names = [tool["name"] for tool in tools]
     excluded = set(spec.get("exclude_tools", ()))
@@ -471,7 +544,7 @@ def server_definition(spec: dict[str, Any]) -> Any:
             **recipe,
             "allowed_tools": [name for name in names if name not in excluded],
             "schema_snapshot_ref": {
-                "uri": f"repo://tests/fixtures/mcp/{spec['id']}.tools.json",
+                "uri": f"repo://tests/fixtures/mcp/{fixture_name(spec)}",
                 "digest": _sha256(payload),
                 "media_type": "application/json",
                 "size_bytes": len(payload),
@@ -512,7 +585,7 @@ def server_definition(spec: dict[str, Any]) -> Any:
 def tool_definitions(server: Any, server_ref: Any) -> list[Any]:
     from mission_control.domain.authoring.contracts import MCPToolDefinition
 
-    document, _ = fixture(server.logical_id)
+    document, _ = fixture(server.logical_id, server.schema_snapshot_ref.uri.rsplit("/", 1)[-1])
     definitions = []
     for tool in document["tools"]:
         if server.tool_allowlist is not None and tool["name"] not in server.tool_allowlist:
@@ -601,27 +674,81 @@ def bundles(published_records: Any, seed_format: str, compatibility: str, actor:
     result[f"common/{COMMON_KEY}-{CAPTURE_SEED_VERSION}.json"] = capture_bundle(
         published_records, seed_format, compatibility, actor
     )
+    result[f"common/{COMMON_KEY}-{CAPTURE_R3_SEED_VERSION}.json"] = capture_r3_bundle(
+        published_records, seed_format, compatibility, actor
+    )
     return result
 
 
-def capture_server_ref() -> Any:
-    """The exact ref of ``mcp.knowledge-capture`` revision 2 (seed 1.2.0)."""
+def capture_server_ref(revision: int = CAPTURE_REVISION) -> Any:
+    """The exact ref of ``mcp.knowledge-capture`` at ``revision`` (2: seed 1.2.0, 3: 1.3.0)."""
     from mission_control.domain.authoring.canonical import sha256_digest
     from mission_control.domain.authoring.contracts import DefinitionKind, ExactDefinitionRef
 
-    server = server_definition(CAPTURE_SERVER)
+    server = server_definition(CAPTURE_REVISIONS[revision])
     return ExactDefinitionRef(
         kind=DefinitionKind.MCP_SERVER,
         logical_id=server.logical_id,
-        revision=CAPTURE_REVISION,
+        revision=revision,
         digest=sha256_digest(server),
     )
 
 
-def capture_pin() -> str:
-    """The Capability Pin of ``mcp.knowledge-capture`` revision 2."""
+def capture_pin(revision: int = CAPTURE_REVISION) -> str:
+    """The Capability Pin of ``mcp.knowledge-capture`` at ``revision`` (default 2)."""
 
-    return f"{CAPTURE_SERVER['id']}@{CAPTURE_SERVER['upstream'][1]}#{capture_server_ref().digest}"
+    spec = CAPTURE_REVISIONS[revision]
+    return f"{spec['id']}@{spec['upstream'][1]}#{capture_server_ref(revision).digest}"
+
+
+def capture_r3_bundle(
+    published_records: Any, seed_format: str, compatibility: str, actor: str
+) -> dict[str, Any]:
+    """Seed 1.3.0 (common): revision 3 of ``mcp.knowledge-capture`` and of its allowlisted MCP
+    Tool rows, from the recapture at Knowledge Services 1a451fd. A tool row revision 2 held
+    is that id's revision 3; a tool this revision adds (``chain_write``'s, for one) is a new id
+    and starts at revision 1, as the catalog numbers every id's revisions from 1 without a gap.
+    Every row's ``server_ref`` names server revision 3."""
+
+    server = server_definition(CAPTURE_SERVER_R3)
+    evidence = [
+        "packages/mission-control-db-contract/seeds/agent_capabilities.py",
+        f"tests/fixtures/mcp/{fixture_name(CAPTURE_SERVER_R3)}",
+        RESEARCH_NOTE,
+    ]
+    records: list[dict[str, Any]] = published_records(
+        server, "agent-capability", evidence, RESEARCH_SEED_TIME, revision=CAPTURE_R3_REVISION
+    )
+    earlier = set(CAPTURE_SERVER["allow_tools"])
+    for tool in tool_definitions(server, capture_server_ref(CAPTURE_R3_REVISION)):
+        revision = CAPTURE_R3_REVISION if tool.tool_name in earlier else 1
+        records += published_records(
+            tool, "agent-capability", evidence, RESEARCH_SEED_TIME, revision=revision
+        )
+    for record in records:
+        if record["kind"] == "asset_decision":
+            record["fields"]["decided_at"] = "2026-11-16T00:00:00Z"
+    allowed = CAPTURE_SERVER_R3["allow_tools"]
+    return {
+        "format": seed_format,
+        "seed_key": COMMON_KEY,
+        "seed_version": CAPTURE_R3_SEED_VERSION,
+        "component_compatibility": compatibility,
+        "depends_on": [{"seed_key": COMMON_KEY, "seed_version": CAPTURE_SEED_VERSION}],
+        "actor_ref": actor,
+        "description": (
+            f"Revision {CAPTURE_R3_REVISION} of {CAPTURE_SERVER_R3['id']} and of its "
+            f"{len(allowed)} allowlisted MCP Tool rows, from a recapture of the Knowledge "
+            "Services executor at 1a451fd (42 tools, large input schemas in their published "
+            "short form). The allowlist is revision 2's plus "
+            f"{', '.join(CAPTURE_R3_ADDED)}, so a research agent can make its capture "
+            "quotable and record a claim anchored to a quote; knowledge ingestion, direct "
+            "database reads, checkpoints, schema_materialize, artifact_get and the "
+            "issuer-credential tools stay withheld. Host support is revision 2's. No "
+            f"{CAPTURE_SEED_VERSION} record is repeated."
+        ),
+        "records": records,
+    }
 
 
 def capture_bundle(

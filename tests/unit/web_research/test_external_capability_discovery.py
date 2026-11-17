@@ -2,15 +2,18 @@ from __future__ import annotations
 
 import json
 from datetime import UTC, datetime
+from pathlib import Path
 
 import pytest
 
 from mission_control.adapters.capabilities.mcp_registry import (
     MCPRegistryAdapter,
+    MCPRegistryDependencyError,
     MCPRegistryHttpRequest,
     MCPRegistryHttpResponse,
 )
 from mission_control.adapters.capabilities.npx_skills_discovery import (
+    AsyncioSkillDiscoverySubprocessRunner,
     NpxSkillsDiscoveryAdapter,
     SkillDiscoveryDependencyError,
     SkillDiscoverySubprocessRequest,
@@ -23,6 +26,7 @@ from mission_control.application.capabilities.external_capability_discovery impo
     ExternalCandidateRepository,
     ExternalCapabilityDiscoveryDisabled,
     ExternalCapabilityDiscoveryService,
+    ExternalCapabilityDiscoveryUnavailable,
     ExternalDiscoveryBatch,
     ExternalDiscoveryCandidate,
 )
@@ -264,3 +268,38 @@ async def test_npx_adapter_enforces_output_limit_after_injected_runner() -> None
     )
     with pytest.raises(SkillDiscoveryDependencyError, match="output limit"):
         await skills_adapter(runner).search("search", limit=5)
+
+
+async def test_a_loop_that_cannot_start_a_subprocess_is_a_dependency_refusal(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """On a Windows API host the event loop is a selector loop, which cannot start the pinned
+    `npx skills` subprocess: the runner refuses as a discovery dependency (nothing started, no
+    package fetched), and the coordinator answers dependency_unavailable with that reason, never
+    an internal error."""
+
+    from mission_control.application.coordinator.coordinator_facade import (
+        _translate_dependency_error,
+    )
+    from mission_control.domain.coordinator.errors import CoordinatorErrorCode
+
+    async def cannot_spawn(*_args: object, **_kwargs: object) -> object:
+        raise NotImplementedError
+
+    monkeypatch.setattr("asyncio.create_subprocess_exec", cannot_spawn)
+    with pytest.raises(SkillDiscoveryDependencyError, match="cannot start") as raised:
+        await AsyncioSkillDiscoverySubprocessRunner().run(
+            SkillDiscoverySubprocessRequest(
+                executable="npx",
+                arguments=("--yes", "skills@1.5.20", "find", "research"),
+                working_directory=tmp_path,
+                environment={},
+                timeout_seconds=5,
+                max_output_bytes=4_096,
+            )
+        )
+    for error in (raised.value, MCPRegistryDependencyError("MCP Registry request failed")):
+        assert isinstance(error, ExternalCapabilityDiscoveryUnavailable)
+        translated = _translate_dependency_error(error)
+        assert translated.code is CoordinatorErrorCode.DEPENDENCY_UNAVAILABLE
+        assert str(error) in str(translated)

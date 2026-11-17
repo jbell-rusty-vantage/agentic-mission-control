@@ -62,6 +62,23 @@ each row are evidenced in the
   `environment.capabilities`; the plugin serves the file lanes and a child's seeds.
 - No arXiv server is seeded (see the rejected candidates and the provider note).
 
+### The capture server recaptured (2026-11-16, `mc.catalog.agent-capabilities@1.3.0`)
+
+Revision 3 of `mcp.knowledge-capture` (`0.1.0-1a451fd`), from the `tools/list` of the executor built
+from Knowledge Services `1a451fd` (`scripts/capture_mcp_tool_snapshot.py --url`), in its own fixture
+`tests/fixtures/mcp/mcp.knowledge-capture.1a451fd.tools.json`; revisions 1 and 2 keep theirs. 42 tools
+are listed, every input schema in the executor's published form. The allowlist is revision 2's 19 plus
+`chain_write`, `evidence_units`, `source_prepare_captured` and `knowledge_describe` (23). Withheld:
+`ingest_*` (knowledge writes and their ledger), `db_*` (direct database reads; the recorded read is the
+governed `tool.knowledge-read-intent`), `checkpoint_*` (host session state), `schema_materialize`
+(writes a directory on the executor host), `artifact_get` (ledger rows) and `knowledge_operation_*`
+with `knowledge_receipt_get` (they need the issuer credential). `chain_write` is classified
+`bounded_write`: one governed proposal per call under a fixed bounded role, never a verification.
+`knowledge_describe` is kept because its `tool:` and `operation:` references need the executor token
+only; without a reference it refuses without the issuer credential. Host support is revision 2's.
+`plugin.cognition-knowledge` revision 4 (`mc.app.<app>.cognition-profiles@1.0.3`) pins it with the
+method skills of `mc.app.<app>.agent-skills@1.0.6`.
+
 ## Rejected candidates
 
 | Candidate | Why |
@@ -149,3 +166,22 @@ description is the frontmatter description on one line.
 - The Knowledge Services skills name that service's own CLIs and MCP tools (`ks`, `knowledge`,
   `knowledge-verify`, `verify_*`). Mounting a skill grants none of them: a mission still selects
   its tools and its Knowledge Services binding.
+
+### Re-imported method skills (2026-11-16, `mc.app.<app>.agent-skills@1.0.6`)
+
+The five imports that changed upstream, each at the next revision of its id; 1.0.5 is frozen by
+bytes (its coordinator sources archived under `bundle-sources/agent-skills-1.0.5/`, its imported
+sources in their own import directories, which never change).
+
+| Capability | Version | Revision | Applications |
+| --- | --- | --- | --- |
+| `skill.knowledge-research` | `2026.11.17-1a451fd` | 2 | both |
+| `skill.knowledge-verify` | `2026.11.17-1a451fd` | 2 | both |
+| `skill.knowledge-ingest` | `2026.11.17-1a451fd` | 2 | both |
+| `skill.ai-engineer-knowledge-charter` | `2026.11.16-080e9f0` | 3 | ai-engineer |
+| `skill.content-authoring` | `2026.11.16-080e9f0` | 2 | ai-engineer |
+
+The research method now routes a capture through `source_prepare_captured`, `evidence_units` and
+`chain_write`. A Deep Agents research mission loaded it from bundle custody on 2026-11-16 (local
+installation, run `3b51d56c-89d5-5d9b-bacf-e21c14911bdb`). The four unchanged Knowledge Services
+skills keep their `7bc4aee` rows.

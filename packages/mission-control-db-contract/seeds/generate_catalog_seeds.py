@@ -343,6 +343,29 @@ def router_manifest_records() -> list[dict[str, Any]]:
 # by file SHA-256 and never regenerated. Later target facts ship as a new seed version
 # with a new asset version, so nothing is overwritten.
 FROZEN_BUNDLES = {
+    # Revision 2 of the capture server (19 tools of Knowledge Services 7bc4aee), frozen when
+    # 1.3.0 published revision 3 from a recapture of the executor at 1a451fd.
+    "common/mc.catalog.agent-capabilities-1.2.0.json": (
+        "4d2080f2b99efb2090d5da6a76e653f6a04e3bdbb65a3208ea15907260b9d8b1"
+    ),
+    # Revision 3 of the knowledge plugin (capture server revision 2, method skills at 7bc4aee),
+    # frozen when 1.0.3 published revision 4 over the re-imported skills and server revision 3.
+    "biotech/mc.app.biotech.cognition-profiles-1.0.2.json": (
+        "8a5f2fbc1e5f1790fb8d7a0b4b23c6d68965b37926a6033d6170e76d09c6a7d8"
+    ),
+    "ai-engineer/mc.app.ai-engineer.cognition-profiles-1.0.2.json": (
+        "b1fd179e1efdba0c4e251ed85bf83ac6fe4854473577fad2480a6a87fea5112e"
+    ),
+    # The coordinator bundles regenerated from the guide and the method skills imported at
+    # Knowledge Services 7bc4aee and the AI Engineer service b7e6e21, frozen when 1.0.6
+    # published the imports at 1a451fd and 080e9f0. Its coordinator sources are archived under
+    # bundle-sources/agent-skills-1.0.5/; its imported sources are their import directories.
+    "biotech/mc.app.biotech.agent-skills-1.0.5.json": (
+        "55f295250d89296f1c49c22470427b6ad9908f510b68d4e1dd5670c77869f472"
+    ),
+    "ai-engineer/mc.app.ai-engineer.agent-skills-1.0.5.json": (
+        "cbb5ba157b37c54afff4796ccd498b9554f5df873099d453bff6c53c9c94248f"
+    ),
     # GitHub, Context7, the capture server at revision 1 and plugin.code-research, frozen when
     # 1.2.0 published revision 2 of the capture server (supported on the deep_agents lane).
     "common/mc.catalog.agent-capabilities-1.1.0.json": (

@@ -12,6 +12,7 @@ import httpx
 from pydantic import BaseModel, ConfigDict, Field
 
 from mission_control.application.capabilities.external_capability_discovery import (
+    ExternalCapabilityDiscoveryUnavailable,
     ExternalDiscoveryBatch,
     ExternalDiscoveryCandidate,
     ExternalDiscoveryEvidence,
@@ -39,7 +40,7 @@ class MCPRegistryHttpRunner(Protocol):
     async def get(self, request: MCPRegistryHttpRequest) -> MCPRegistryHttpResponse: ...
 
 
-class MCPRegistryDependencyError(RuntimeError):
+class MCPRegistryDependencyError(ExternalCapabilityDiscoveryUnavailable):
     pass
 
 

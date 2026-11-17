@@ -18,7 +18,13 @@ revision 2 members plus the evidence capture server ``mcp.knowledge-capture`` at
 (``mc.catalog.agent-capabilities@1.2.0``), so the mission that mounts the research method also
 mounts the capture tools the method requires. Its host support is its members': supported on
 ``deep_agents`` only, because the capture server is. ``plugin.cognition-mixed`` stays at
-revision 2 and is therefore no longer the exact union of the two families.
+revision 2 and is therefore no longer the exact union of the two families. Frozen by bytes.
+
+``1.0.3``: revision 4 of ``plugin.cognition-knowledge``: the same member shape over the
+method skills re-imported at Knowledge Services 1a451fd (``mc.app.<app>.agent-skills@1.0.6``),
+the application's charter at its current revision and ``mcp.knowledge-capture`` at revision 3
+(``mc.catalog.agent-capabilities@1.3.0``), whose allowlist carries the tools that method names
+(``source_prepare_captured``, ``evidence_units``, ``chain_write``).
 """
 
 from __future__ import annotations
@@ -31,11 +37,27 @@ from typing import Any
 REPO_ROOT = Path(__file__).resolve().parents[3]
 BASE_VERSION = "1.0.0"
 METHOD_VERSION = "1.0.1"
-SEED_VERSION = "1.0.2"
+CAPTURE_SEED_VERSION = "1.0.2"
+SEED_VERSION = "1.0.3"
 # Every committed seed version, oldest first; all but the last are frozen.
-SEED_VERSIONS = (BASE_VERSION, METHOD_VERSION, SEED_VERSION)
+SEED_VERSIONS = (BASE_VERSION, METHOD_VERSION, CAPTURE_SEED_VERSION, SEED_VERSION)
 # Revision 3 of the knowledge plugin (seed 1.0.2): revision 2 plus the capture server.
 CAPTURE_REVISION = 3
+# Revision 4 (seed 1.0.3): the re-imported method skills and the capture server revision 3.
+CHAIN_REVISION = 4
+# knowledge plugin revision -> the capture server revision it pins.
+CAPTURE_SERVER_REVISIONS = {CAPTURE_REVISION: 2, CHAIN_REVISION: 3}
+CHAIN_DESCRIPTION = (
+    "Knowledge work method with its evidence tools, from capture to a proposed claim: research "
+    "and verification (knowledge-research), evidence capture (knowledge-verify), the "
+    "application's knowledge charter and the Knowledge Services capture server "
+    "(mcp.knowledge-capture revision 3: capture, read, locate, make a capture quotable, find "
+    "quotable units, write one governed step of the verification chain, source and schema "
+    "tools), with source-verifier and summarizer subagents. Cognition Profile "
+    "cognition/knowledge, revision 4: exact pins. Supported on the deep_agents lane, where the "
+    "capture server is. The knowledge tools and the Knowledge Services binding are selected in "
+    "the manifest."
+)
 CAPTURE_DESCRIPTION = (
     "Knowledge work method with its evidence tools: research and verification "
     "(knowledge-research), evidence capture (knowledge-verify), the application's knowledge "
@@ -210,12 +232,20 @@ def charter_skill(application_id: str) -> str:
     return f"skill.{application_id}-knowledge-charter"
 
 
-def successor_definitions(application_id: str) -> list[dict[str, Any]]:
+# The agent-skill seed version that was current when 1.0.1 and 1.0.2 shipped: their method
+# skill members are that version's rows, rebuilt from its frozen bytes.
+METHOD_SKILLS_AS_OF = "1.0.5"
+
+
+def successor_definitions(
+    application_id: str, skills_as_of: str | None = METHOD_SKILLS_AS_OF
+) -> list[dict[str, Any]]:
     """Revision 2 of the knowledge and mixed plugins (seed 1.0.1).
 
     Each entry carries its ``members``: the member's entry (definition, pin, custody source)
     and the seed logical key of the member's row, in member order. Skill members come from the
-    agent-skill seeds; the SDLC skills and the subagents are the 1.0.0 rows.
+    agent-skill seeds as they stood at ``skills_as_of`` (``None``: the current rows); the SDLC
+    skills and the subagents are the 1.0.0 rows.
     """
 
     from mission_control.domain.authoring.contracts import PluginDefinition
@@ -227,9 +257,17 @@ def successor_definitions(application_id: str) -> list[dict[str, Any]]:
     }
     skills = {
         entry["definition"].logical_id: entry
-        for entry in helpers.application_definitions(application_id)
+        for entry in (
+            helpers.application_definitions(application_id)
+            if skills_as_of is None
+            else helpers.definitions_as_of(application_id, skills_as_of)
+        )
     }
-    skill_keys = helpers.seed_keys(application_id)
+    skill_keys = (
+        helpers.seed_keys(application_id)
+        if skills_as_of is None
+        else helpers.seed_keys_as_of(application_id, skills_as_of)
+    )
 
     def base_key(logical_id: str) -> str:
         kind = base[logical_id]["definition"].kind.value.replace("_", "-")
@@ -285,10 +323,14 @@ def _capabilities() -> Any:
     return module
 
 
-def capture_definitions(application_id: str) -> list[dict[str, Any]]:
-    """Revision 3 of the knowledge plugin (seed 1.0.2): its revision 2 members, then the
-    capture server between the skills and the subagents. Entries are shaped like
-    :func:`successor_definitions`'s."""
+def capture_definitions(
+    application_id: str, revision: int = CHAIN_REVISION
+) -> list[dict[str, Any]]:
+    """The knowledge plugin at ``revision`` 3 (seed 1.0.2) or 4 (seed 1.0.3): the method
+    skills, charter and subagents of revision 2's shape, then the capture server at the
+    revision it pins between the skills and the subagents. Revision 3's skills are the rows of
+    agent-skills 1.0.5 (it reproduces its frozen bytes); revision 4's are the current rows.
+    Entries are shaped like :func:`successor_definitions`'s."""
 
     from mission_control.domain.authoring.contracts import PluginDefinition
     from mission_control.domain.capabilities.plugins import PluginManifest
@@ -297,17 +339,20 @@ def capture_definitions(application_id: str) -> list[dict[str, Any]]:
     capabilities = _capabilities()
     (prior,) = [
         entry
-        for entry in successor_definitions(application_id)
+        for entry in successor_definitions(
+            application_id, METHOD_SKILLS_AS_OF if revision == CAPTURE_REVISION else None
+        )
         if entry["definition"].logical_id == "plugin.cognition-knowledge"
     ]
-    server = capabilities.server_definition(capabilities.CAPTURE_SERVER)
+    server_revision = CAPTURE_SERVER_REVISIONS[revision]
+    server = capabilities.server_definition(capabilities.CAPTURE_REVISIONS[server_revision])
     capture = {
         "source": None,
         "manifest": None,
         "definition": server,
-        "pin": capabilities.capture_pin(),
+        "pin": capabilities.capture_pin(server_revision),
     }
-    capture_key = f"agent-capability:mcp-server:{server.logical_id}/{capabilities.CAPTURE_REVISION}"
+    capture_key = f"agent-capability:mcp-server:{server.logical_id}/{server_revision}"
     roles = [member.role.value for member in prior["definition"].manifest.members]
     members: list[tuple[str, dict[str, Any], str]] = [
         (role, entry, key) for role, (entry, key) in zip(roles, prior["members"], strict=True)
@@ -322,7 +367,7 @@ def capture_definitions(application_id: str) -> list[dict[str, Any]]:
         {
             "logical_id": "plugin.cognition-knowledge",
             "title": "cognition/knowledge",
-            "description": CAPTURE_DESCRIPTION,
+            "description": CHAIN_DESCRIPTION if revision == CHAIN_REVISION else CAPTURE_DESCRIPTION,
             "manifest": manifest.model_dump(mode="json"),
             # What every member supports: never more than its weakest member declares.
             "host_support": manifest.host_support(
@@ -336,8 +381,8 @@ def capture_definitions(application_id: str) -> list[dict[str, Any]]:
             "source": None,
             "manifest": None,
             "definition": definition,
-            "pin": helpers.definition_pin(definition, CAPTURE_REVISION),
-            "revision": CAPTURE_REVISION,
+            "pin": helpers.definition_pin(definition, revision),
+            "revision": revision,
             "members": [(entry, key) for _role, entry, key in members],
         }
     ]
@@ -374,15 +419,15 @@ def current_profiles(application_id: str) -> list[dict[str, Any]]:
 def bundles(
     published_records: Any, seed_format: str, compatibility: str, actor: str
 ) -> dict[str, Any]:
-    """Seed 1.0.2: revision 3 of the knowledge plugin and its member rows. 1.0.0 and 1.0.1
-    are frozen bytes."""
+    """Seed 1.0.3: revision 4 of the knowledge plugin and its member rows. 1.0.0, 1.0.1 and
+    1.0.2 are frozen bytes."""
 
     helpers = _skills()
     capabilities = _capabilities()
     result = {}
     for app in APPS:
         records: list[dict[str, Any]] = []
-        for entry in capture_definitions(app):
+        for entry in capture_definitions(app, CHAIN_REVISION):
             definition = entry["definition"]
             key = f"{KEY_PREFIX}:plugin:{definition.logical_id}/{entry['revision']}"
             records += published_records(
@@ -417,24 +462,24 @@ def bundles(
             "seed_version": SEED_VERSION,
             "component_compatibility": compatibility,
             "depends_on": [
-                {"seed_key": APP_KEYS[app], "seed_version": METHOD_VERSION},
+                {"seed_key": APP_KEYS[app], "seed_version": CAPTURE_SEED_VERSION},
                 {"seed_key": helpers.APP_KEYS[app], "seed_version": helpers.SEED_VERSION},
                 {
                     "seed_key": capabilities.COMMON_KEY,
-                    "seed_version": capabilities.CAPTURE_SEED_VERSION,
+                    "seed_version": capabilities.CAPTURE_R3_SEED_VERSION,
                 },
             ],
             "actor_ref": actor,
             "description": (
-                "Revision 3 of cognition/knowledge: its revision 2 members (the imported "
-                "method skills skill.knowledge-research and skill.knowledge-verify, "
-                f"{charter_skill(app)}, the source-verifier and summarizer subagents) and the "
-                "evidence capture server mcp.knowledge-capture at its revision 2, by exact "
-                "pin. Its host support is the intersection of its members': supported on "
-                "deep_agents, unqualified on the other worker-hosted lane profiles, "
-                "unsupported on cursor_cloud. cognition/mixed stays at revision 2, cognition/"
-                f"sdlc at revision 1, and every {BASE_VERSION} and {METHOD_VERSION} record is "
-                "unchanged."
+                "Revision 4 of cognition/knowledge: the method skills skill.knowledge-research "
+                "and skill.knowledge-verify re-imported at Knowledge Services 1a451fd, "
+                f"{charter_skill(app)}, the source-verifier and summarizer subagents and the "
+                "evidence capture server mcp.knowledge-capture at its revision 3 (the chain "
+                "tools allowlisted), by exact pin. Its host support is the intersection of its "
+                "members': supported on deep_agents, unqualified on the other worker-hosted "
+                "lane profiles, unsupported on cursor_cloud. cognition/mixed stays at revision "
+                f"2, cognition/sdlc at revision 1, and every {BASE_VERSION}, {METHOD_VERSION} "
+                f"and {CAPTURE_SEED_VERSION} record is unchanged."
             ),
             "records": records,
         }

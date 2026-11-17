@@ -26,6 +26,18 @@ directory (default ``.scratch/local-stack/<app>/``):
 6. the Temporal namespace on the loopback server (default ``127.0.0.1:7233``, namespace
    ``mc-local-<app>``, created when absent) with the Search Attributes registered.
 
+7. what a Deep Agents research node launches with: the worker pin rows the pin writer writes
+   (the application's imported method skills, published into ``bundles/``; the Knowledge Services
+   capture server from ``--knowledge-capture-endpoint`` as a remote pin; Context7 and GitHub only
+   where their artifacts are on this host, else reported not pinned),
+   ``manifest-launch-bindings.json``
+   (``MANIFEST_LAUNCH_BINDINGS_PATH``: the reviewed Deep Agents scaffold, every Model Profile a
+   pinned model serves, the scaffold's pinned sandbox profiles and one binding per pinned skill and
+   server at its catalog digest), ``MCP_SERVER_ENDPOINTS`` and
+   ``EXTERNAL_CAPABILITY_DISCOVERY_ENABLED`` (``--external-discovery``). A credential the processes
+   need (``--credential NAME=FILE``, for example the executor token and the model key) is a blank in
+   the env file; ``local_stack.py`` reads its value from that ignored file when it starts a role.
+
 A second run on the same directory verifies and reuses (every installer step is idempotent);
 ``--recreate`` drops the local database and its logins and builds a new installation. ``token``
 re-mints the operator bearer. ``container`` derives, from the installed files, the env file and
@@ -100,6 +112,22 @@ ENV_FILE = "mission-control.env"
 LOGINS_ENV = "logins.env"
 MINTED_ENV = "minted.env"
 PINS = "capability-pins/research-capabilities.json"
+# The deployment's `mc.manifest_launch_bindings.v1` (MANIFEST_LAUNCH_BINDINGS_PATH): the Deep
+# Agent scaffold, Model and sandbox profiles and capability components a manifest launches with.
+LAUNCH_BINDINGS = "manifest-launch-bindings.json"
+LAUNCH_SCAFFOLD = (
+    ROOT / "deployments" / "examples" / "manifest-launch-bindings.deep-agents.example.json"
+)
+# What the example scaffold leaves to the operator (`OWNER-SELECT:`), named for this installation.
+LAUNCH_REFS = {
+    "authority_refs": ["authority:local-stack-operator"],
+    "redaction_policy_ref": "policy:local-stack-redaction",
+    "tracing_policy_ref": "policy:local-stack-tracing",
+    "sensitive_data_policy_ref": "policy:local-stack-internal-data",
+    "snapshot_policy_ref": "policy:local-stack-snapshot",
+}
+KNOWLEDGE_CAPTURE_ID = "mcp.knowledge-capture"
+CREDENTIAL_NAME = re.compile(r"^[A-Z][A-Z0-9_]*$")
 # The container variant of an installation (`container`): where deployments/docker/compose.yml
 # mounts the deployment directory and the capability resource owner, and the worker image's Node.
 CONTAINER_HOME = "/var/lib/mission-control"
@@ -117,6 +145,7 @@ GENERATED = (
     MINTED_ENV,
     CONTAINER_ENV_FILE,
     CONTAINER_DEPLOYMENT,
+    LAUNCH_BINDINGS,
     "deployment.json",
     "operator-issuer.jwk.json",
     "operator-jwks.json",
@@ -163,6 +192,20 @@ def _script(name: str) -> ModuleType:
     assert spec is not None and spec.loader is not None
     module = importlib.util.module_from_spec(spec)
     sys.modules[name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+def _seed_module(name: str) -> ModuleType:
+    """A catalog seed module (``packages/.../seeds/<name>.py``), loaded as the generator does."""
+
+    key = f"local_installation_seed_{name}"
+    if key in sys.modules:
+        return sys.modules[key]
+    spec = importlib.util.spec_from_file_location(key, PACKAGE / "seeds" / f"{name}.py")
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[key] = module
     spec.loader.exec_module(module)
     return module
 
@@ -457,9 +500,15 @@ def runtime_environment(
     namespace: str,
     node: str | None,
     hook_callback_port: int = HOOK_CALLBACK_PORT,
+    launch_bindings: Path | None = None,
+    mcp_endpoints: dict[str, str] | None = None,
+    external_discovery: bool = False,
+    credential_names: tuple[str, ...] = (),
 ) -> list[tuple[str, str]]:
     """Every name the API and the worker read, in file order: explicit values, then explicit
-    blanks for every other database variable and every credential."""
+    blanks for every other database variable and every credential. A credential the
+    installation references (``credential_names``) is a blank here too: the stack supplies its
+    value from the referenced file when it starts a process, so no secret is written here."""
 
     installation = profile["installation"]
     names = {role: gen.db_name(app, role) for role in ("RUNTIME_DSN", "FAMILY_WRITER_DSN")}
@@ -510,8 +559,17 @@ def runtime_environment(
     ]
     if node:
         entries.append(("WEB_RESEARCH_AGENT_BROWSER_NODE", Path(node).as_posix()))
+    if launch_bindings is not None:
+        entries.append(("MANIFEST_LAUNCH_BINDINGS_PATH", launch_bindings.as_posix()))
+    # The API and the worker need the same endpoints (`MCP_SERVER_ENDPOINTS`, IP-008).
+    entries.append(
+        ("MCP_SERVER_ENDPOINTS", json.dumps(dict(sorted((mcp_endpoints or {}).items()))))
+    )
+    entries.append(
+        ("EXTERNAL_CAPABILITY_DISCOVERY_ENABLED", "true" if external_discovery else "false")
+    )
     named = {name for name, _value in entries}
-    blanks = (*gen.MC_DB_BLANKED, *gen.MC_BLANKED, *CREDENTIAL_BLANKS)
+    blanks = (*gen.MC_DB_BLANKED, *gen.MC_BLANKED, *CREDENTIAL_BLANKS, *credential_names)
     return entries + [(name, "") for name in dict.fromkeys(blanks) if name not in named]
 
 
@@ -805,6 +863,201 @@ class Installer:
         pins = self.out / PINS
         pins.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(ROOT / "infra" / "capability-pins" / "research-capabilities.json", pins)
+
+    def credentials(self) -> dict[str, Path]:
+        """``--credential NAME=FILE``: each name and the ignored dotenv file that holds it. The
+        file is read when a process starts (``local_stack.py``), never copied; only the name and
+        the path are recorded."""
+
+        found: dict[str, Path] = {}
+        for item in self.args.credential or ():
+            name, separator, file = item.partition("=")
+            if not separator or not CREDENTIAL_NAME.fullmatch(name) or not file:
+                raise Refused("CREDENTIAL_INVALID", f"--credential takes NAME=FILE, not {name!r}")
+            path = Path(file).resolve()
+            if not path.is_file():
+                raise Refused("CREDENTIAL_FILE_MISSING", f"{name}: {path} does not exist")
+            gen.assert_ignored(path)
+            if not read_env_file(path).get(name):
+                raise Refused("CREDENTIAL_UNSET", f"{path} holds no value for {name}")
+            found[name] = path
+        return found
+
+    def credential_environment(self, credentials: dict[str, Path], *names: str) -> dict[str, str]:
+        """The values of ``names`` from their referenced files, for one child process only."""
+
+        return {
+            name: read_env_file(credentials[name])[name] for name in names if name in credentials
+        }
+
+    def pin_installation(
+        self, credentials: dict[str, Path], node: str | None, workspace_root: Path
+    ) -> dict[str, Any]:
+        """The worker pin file rows a Deep Agents research node needs, through the pin writer:
+        the method skills the application imports (published into the custody root the worker
+        reads), and the research servers from what is on this host: the capture server at
+        ``--knowledge-capture-endpoint`` (a remote pin; the URL goes to MCP_SERVER_ENDPOINTS,
+        never into the pin), Context7 and GitHub only where their artifacts are present."""
+
+        token_env = self.args.knowledge_capture_token_env
+        command = [
+            sys.executable,
+            "scripts/pin_research_capabilities.py",
+            "--output",
+            str(self.out / PINS),
+            "--add-catalog-skills",
+            self.app,
+            "--skill-custody-root",
+            str(self.out / "bundles"),
+        ]
+        environment = {
+            "MISSION_CONTROL_HOME": self.out.as_posix(),
+            "MISSION_CONTROL_APPLICATION": self.app,
+            "MISSION_CONTROL_WORKSPACE_ROOT": workspace_root.as_posix(),
+            "PYTHONIOENCODING": "utf-8",
+        }
+        endpoint = self.args.knowledge_capture_endpoint
+        if endpoint:
+            command += [
+                "--add-research",
+                "--knowledge-capture-endpoint",
+                endpoint,
+                "--knowledge-capture-credential-env",
+                token_env or "none",
+            ]
+            if node:
+                command += ["--node", node]
+            if self.args.github_mcp_server:
+                command += ["--github-mcp-server", str(self.args.github_mcp_server)]
+            if token_env:
+                if token_env not in credentials:
+                    raise Refused(
+                        "CREDENTIAL_MISSING",
+                        f"--knowledge-capture-token-env {token_env} needs --credential "
+                        f"{token_env}=<ignored env file>",
+                    )
+                environment.update(self.credential_environment(credentials, token_env))
+        code, stdout = self.run(command, environment)
+        body = self._json(stdout)
+        pinned = sorted((body.get("pinned") or {}).keys())
+        not_pinned = body.get("not_pinned") or {}
+        self.record(
+            "capability-pins",
+            exit=code,
+            skills=len(body.get("skills") or {}),
+            pinned=",".join(pinned) or "none",
+            not_pinned=",".join(sorted(not_pinned)) or "none",
+        )
+        if code != 0:
+            raise Refused("CAPABILITY_PINS", f"the pin writer failed (exit {code})")
+        return {"skills": body.get("skills") or {}, "pinned": pinned, "not_pinned": not_pinned}
+
+    def write_launch_bindings(self) -> dict[str, Any]:
+        """``mc.manifest_launch_bindings.v1`` generated from the catalog seeds, the installation's
+        pin file and Model Catalog, and the reviewed Deep Agents scaffold: every Model Profile a
+        pinned model serves, the scaffold's sandbox profiles whose sandbox is pinned, and one
+        capability binding per pinned method skill and pinned research server, each at the
+        catalog digest of the revision its seed publishes. No digest is typed here."""
+
+        from mission_control.adapters.capabilities.capability_pins import CapabilityPins
+        from mission_control.application.authoring.manifest_launch_inputs import (
+            CapabilityComponentBinding,
+            ManifestLaunchBindings,
+        )
+        from mission_control.domain.authoring.canonical import sha256_digest
+        from mission_control.domain.execution.contracts import DeepAgentProfile
+
+        pins = CapabilityPins.load(self.out / PINS)
+        example = json.loads(LAUNCH_SCAFFOLD.read_text(encoding="utf-8"))
+        served = {(item.provider, item.model_id): item.ref for item in pins.models}
+        rows = tomllib.loads((self.deployment_dir / "models.toml").read_text(encoding="utf-8"))[
+            "models"
+        ]
+
+        def model_ref(vendor: str, model_id: str) -> dict[str, Any] | None:
+            ref = served.get((vendor, model_id))
+            if ref is None:
+                return None
+            return {
+                **ref.model_dump(mode="json"),
+                "lifecycle_status": "published",
+                "payload_ref": None,
+                "schema_version": "1",
+            }
+
+        model_profiles = {
+            row["profile"]: {"ref": ref, "settings": {"max_tokens": 16000}}
+            for row in rows
+            if (ref := model_ref(row["vendor"], row["model_id"])) is not None
+        }
+        scaffold = example["deep_agents"]
+        scaffold.update(LAUNCH_REFS)
+        scaffold["workspace"]["provider"] = "local-state-backend"
+        default = next(row for row in rows if row["profile"] == "producer.default")
+        ref = model_ref(default["vendor"], default["model_id"])
+        if ref is None:
+            raise Refused("MODEL_NOT_PINNED", "producer.default's model is not pinned")
+        profile = scaffold["profile"]
+        profile["model"].update(
+            {"provider": default["vendor"], "model_name": default["model_id"], "ref": ref}
+        )
+        draft = DeepAgentProfile.model_validate(profile, context={"allow_placeholder_digest": True})
+        sealed = sha256_digest(draft.model_dump(mode="python", exclude={"profile_digest"}))
+        scaffold["profile"] = DeepAgentProfile.model_validate(
+            {**profile, "profile_digest": sealed}
+        ).model_dump(mode="json")
+        pinned_sandboxes = {item.ref.digest for item in pins.sandboxes}
+        sandbox_profiles = {
+            name: value
+            for name, value in example["sandbox_profiles"].items()
+            if value["ref"]["digest"] in pinned_sandboxes
+        }
+        capabilities: dict[str, Any] = {}
+        skills = _seed_module("agent_skills")
+        pinned_skills = {skill.skill_name for skill in pins.skills}
+        for entry, _revision, _changed in skills.revised_definitions(self.app):
+            definition = entry["definition"]
+            if getattr(definition, "skill_name", None) in pinned_skills and entry["source"]:
+                if definition.source_provenance.source != "belllabs":
+                    continue  # only the imported method skills are pinned from the catalog
+                capabilities[definition.logical_id] = CapabilityComponentBinding(
+                    catalog_digest=sha256_digest(definition),
+                    kind="skill",
+                    pinned=definition.skill_name,
+                ).model_dump(mode="json", exclude_none=True)
+        catalog = _seed_module("agent_capabilities")
+        for server_id, spec in catalog.served_research_specs().items():
+            if server_id not in {item.server_id for item in pins.all_mcp_servers}:
+                continue
+            definition = catalog.server_definition(spec)
+            capabilities[server_id] = CapabilityComponentBinding(
+                catalog_digest=sha256_digest(definition), kind="mcp_server", pinned=server_id
+            ).model_dump(mode="json", exclude_none=True)
+        document = {
+            "schema_version": "mc.manifest_launch_bindings.v1",
+            "deep_agents": scaffold,
+            "model_profiles": model_profiles,
+            "sandbox_profiles": sandbox_profiles,
+            "capabilities": dict(sorted(capabilities.items())),
+        }
+        ManifestLaunchBindings.model_validate(document)
+        gen.write_text(
+            self.out / LAUNCH_BINDINGS,
+            json.dumps(document, indent=2, sort_keys=True) + "\n",
+            secret=False,
+        )
+        self.record(
+            "launch-bindings",
+            file=LAUNCH_BINDINGS,
+            model_profiles=len(model_profiles),
+            sandbox_profiles=",".join(sandbox_profiles) or "none",
+            capabilities=len(capabilities),
+        )
+        return {
+            "model_profiles": sorted(model_profiles),
+            "sandbox_profiles": sorted(sandbox_profiles),
+            "capabilities": sorted(capabilities),
+        }
 
     def install_component(self, state: dict[str, Any], dsn: str, component: Path) -> None:
         common = ["--deployment-dir", str(self.deployment_dir), *RUNTIME_VERSIONS]
@@ -1131,6 +1384,14 @@ class Installer:
         self.rebuild_projection(state, dsn, workspace_root)
         self.publish_bundles()
         node = shutil.which("node")
+        credentials = self.credentials()
+        pinning = self.pin_installation(credentials, node, workspace_root)
+        launch = self.write_launch_bindings()
+        endpoints = (
+            {KNOWLEDGE_CAPTURE_ID: self.args.knowledge_capture_endpoint}
+            if KNOWLEDGE_CAPTURE_ID in pinning["pinned"]
+            else {}
+        )
         worker = self.worker_prerequisites(workspace_root, node)
         binding = document["applications"][0]["authentication"]["binding"]
         entries = runtime_environment(
@@ -1146,6 +1407,10 @@ class Installer:
             namespace=state["temporal"]["namespace"],
             node=node,
             hook_callback_port=self.args.hook_callback_port or hook_callback_port(self.app),
+            launch_bindings=self.out / LAUNCH_BINDINGS,
+            mcp_endpoints=endpoints,
+            external_discovery=self.args.external_discovery == "on",
+            credential_names=tuple(sorted(credentials)),
         )
         gen.write_text(
             self.out / ENV_FILE,
@@ -1170,6 +1435,12 @@ class Installer:
             {
                 "binding_digest": binding["binding_digest"],
                 "worker": worker,
+                # Names and paths only: `local_stack.py` reads each value when it starts a role.
+                "credentials": {
+                    name: path.as_posix() for name, path in sorted(credentials.items())
+                },
+                "capabilities": {**pinning, "launch_bindings": launch, "mcp_endpoints": endpoints},
+                "external_discovery": self.args.external_discovery == "on",
                 "installed_at": datetime.now(UTC).isoformat(timespec="seconds"),
             }
         )
@@ -1190,6 +1461,8 @@ class Installer:
                 "operator_token": token.as_posix(),
             },
             "worker": worker,
+            "capabilities": state["capabilities"],
+            "credentials": sorted(credentials),
             "steps": self.steps,
         }
 
@@ -1322,6 +1595,38 @@ def build_parser() -> argparse.ArgumentParser:
         "--hook-callback-port", type=int, help=f"default {HOOK_CALLBACK_PORT} + application index"
     )
     parser.add_argument("--token-ttl-minutes", type=int, default=TOKEN_TTL_MINUTES)
+    capabilities = parser.add_argument_group("capabilities a Deep Agents research node mounts")
+    capabilities.add_argument(
+        "--knowledge-capture-endpoint",
+        help="the Knowledge Services executor's MCP endpoint (http(s)://host:port/mcp): the "
+        "capture server is pinned from its tools/list and served at this URL "
+        "(MCP_SERVER_ENDPOINTS); unset: the capture server is not served",
+    )
+    capabilities.add_argument(
+        "--knowledge-capture-token-env",
+        default="VERIFY_EXECUTOR_TOKEN",
+        help="NAME of the executor token's variable (default VERIFY_EXECUTOR_TOKEN, the catalog "
+        "row's secret reference; empty for an executor without a token); give its file with "
+        "--credential",
+    )
+    capabilities.add_argument(
+        "--github-mcp-server",
+        type=Path,
+        help="absolute path of the reviewed github-mcp-server binary; unset: GitHub not pinned",
+    )
+    capabilities.add_argument(
+        "--credential",
+        action="append",
+        metavar="NAME=FILE",
+        help="a credential the API and worker receive, by name, from an ignored dotenv FILE that "
+        "the stack reads at start (never copied into the installation); repeatable",
+    )
+    capabilities.add_argument(
+        "--external-discovery",
+        choices=("on", "off"),
+        default="off",
+        help="EXTERNAL_CAPABILITY_DISCOVERY_ENABLED for this installation (default off)",
+    )
     container = parser.add_argument_group("container (deployments/docker/compose.yml)")
     container.add_argument("--container-db-host", default="application-postgres-17")
     container.add_argument("--container-db-port", type=int, default=5432)

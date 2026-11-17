@@ -294,7 +294,7 @@ async def test_applied_skill_sources_remain_fetchable_beside_successors(
     )
     store = FilesystemBundleObjectStore(tmp_path / "store")
     await PUBLISH.publish_application(app, store)
-    assert SKILLS.FROZEN_SEED_VERSIONS == ("1.0.0", "1.0.1", "1.0.2", "1.0.3", "1.0.4")
+    assert SKILLS.FROZEN_SEED_VERSIONS == ("1.0.0", "1.0.1", "1.0.2", "1.0.3", "1.0.4", "1.0.5")
     for entry in [
         entry
         for version in SKILLS.FROZEN_SEED_VERSIONS
@@ -399,13 +399,26 @@ def _imports() -> dict[str, dict[str, Any]]:
     return {f"skill.{name}": record for name, record in SKILLS.imported_records().items()}
 
 
+def _import_record(logical_id: str, version: str) -> dict[str, Any]:
+    """The import record of one id at one version (an earlier import stays recorded)."""
+
+    records = json.loads(SKILLS.IMPORTS_RECORD.read_bytes())["imports"]
+    (record,) = [
+        item
+        for item in records
+        if (item["capability_id"], item["version"]) == (logical_id, version)
+    ]
+    return dict(record)
+
+
 @pytest.mark.parametrize("app", ["biotech", "ai-engineer"])
 def test_seed_105_publishes_the_regenerated_coordinator_bundles_and_the_imports(app: str) -> None:
     """Seed 1.0.5: each coordinator bundle at its next revision, each imported method skill as
-    a new id, and the AI Engineer charter as the next revision of its id. Nothing a frozen
-    version holds is published again, and the retired coordinator skill is not in it."""
+    a new id, and the AI Engineer charter as the next revision of its id. Nothing an earlier
+    version holds is published again, and the retired coordinator skill is not in it. Frozen by
+    bytes since 1.0.6 re-imported the method skills."""
 
-    successor = GENERATOR.agent_skills()[f"{app}/mc.app.{app}.agent-skills-1.0.5.json"]
+    successor = GENERATOR.frozen_bundle(f"{app}/mc.app.{app}.agent-skills-1.0.5.json")
     assert successor["depends_on"] == [
         {"seed_key": f"mc.app.{app}.agent-skills", "seed_version": "1.0.4"}
     ]
@@ -423,16 +436,17 @@ def test_seed_105_publishes_the_regenerated_coordinator_bundles_and_the_imports(
         assert definition["source_provenance"]["upstream_version"] == version
     held = {
         record["logical_key"]
-        for version in SKILLS.FROZEN_SEED_VERSIONS
+        for version in SKILLS.FROZEN_SEED_VERSIONS[: SKILLS.FROZEN_SEED_VERSIONS.index("1.0.5")]
         for record in GENERATOR.frozen_bundle(f"{app}/mc.app.{app}.agent-skills-{version}.json")[
             "records"
         ]
     }
     assert not held & {record["logical_key"] for record in successor["records"]}
-    records = _imports()
     for logical_id in imported:
-        row, record = rows[logical_id], records[logical_id]
+        row = rows[logical_id]
         definition = row["fields"]["manifest"]["definition"]
+        version = definition["source_provenance"]["upstream_version"]
+        record = _import_record(logical_id, version)
         # A new id is revision 1; the charter succeeds the 0.1.0 row seed 1.0.4 published.
         assert row["fields"]["version"] == ("2" if logical_id == CHARTERS["ai-engineer"] else "1")
         assert definition["description"] == record["description"]
@@ -450,7 +464,62 @@ def test_seed_105_publishes_the_regenerated_coordinator_bundles_and_the_imports(
         }
         assert record["version"].endswith("-" + origin["commit"][:7])
         assert definition["maturity"] == "experimental"
-        assert capability_pin(_published(app)[logical_id]).version == record["version"]
+
+
+# The method skills seed 1.0.6 re-imports (changed upstream), with each revision it publishes.
+REIMPORTED = {
+    "skill.knowledge-research": "2",
+    "skill.knowledge-verify": "2",
+    "skill.knowledge-ingest": "2",
+}
+REIMPORTED_AI_ENGINEER = {CHARTERS["ai-engineer"]: "3", "skill.content-authoring": "2"}
+
+
+@pytest.mark.parametrize("app", ["biotech", "ai-engineer"])
+def test_seed_106_publishes_the_re_imported_method_skills(app: str) -> None:
+    """Seed 1.0.6: the five imported skills that changed upstream (Knowledge Services 1a451fd,
+    the AI Engineer service 080e9f0), each at the next revision of its id and nothing else. The
+    research method it publishes routes a capture through the tools the capture server
+    revision 3 allowlists."""
+
+    successor = GENERATOR.agent_skills()[f"{app}/mc.app.{app}.agent-skills-1.0.6.json"]
+    assert successor["depends_on"] == [
+        {"seed_key": f"mc.app.{app}.agent-skills", "seed_version": "1.0.5"}
+    ]
+    rows = {
+        row["fields"]["manifest"]["definition"]["logical_id"]: row
+        for row in successor["records"]
+        if row["kind"] == "asset_version"
+    }
+    expected = REIMPORTED | (REIMPORTED_AI_ENGINEER if app == "ai-engineer" else {})
+    assert {logical_id: row["fields"]["version"] for logical_id, row in rows.items()} == expected
+    held = {
+        record["logical_key"]
+        for version in SKILLS.FROZEN_SEED_VERSIONS
+        for record in GENERATOR.frozen_bundle(f"{app}/mc.app.{app}.agent-skills-{version}.json")[
+            "records"
+        ]
+    }
+    assert not held & {record["logical_key"] for record in successor["records"]}
+    records = _imports()
+    for logical_id in expected:
+        definition = rows[logical_id]["fields"]["manifest"]["definition"]
+        commit = records[logical_id]["source"]["commit"]
+        assert commit.startswith(("1a451fd", "080e9f0"))
+        assert definition["source_provenance"]["commit_digest"] == commit
+        assert capability_pin(_published(app)[logical_id]).version == records[logical_id]["version"]
+    research = dict(_frozen_or_current(app, "skill.knowledge-research"))
+    text = b"".join(research.values()).decode("utf-8")
+    for tool in ("source_prepare_captured", "evidence_units", "chain_write"):
+        assert tool in text
+
+
+def _frozen_or_current(app: str, logical_id: str) -> list[tuple[str, bytes]]:
+    return next(
+        entry["source"]["files"]
+        for entry in SKILLS.application_definitions(app)
+        if entry["definition"].logical_id == logical_id
+    )
 
 
 def test_imported_bundles_are_the_recorded_bytes_and_nothing_else() -> None:
@@ -489,7 +558,7 @@ def test_the_stale_ai_engineer_charter_is_no_longer_a_live_source() -> None:
     stale = _frozen_files("ai-engineer", "1.0.4", CHARTERS["ai-engineer"])
     assert b"version" in stale["manifest.json"]
     latest = _published("ai-engineer")[CHARTERS["ai-engineer"]]
-    assert latest.ref.revision == 2
+    assert latest.ref.revision == 3
     assert latest.definition.source_provenance.source == "belllabs"
     assert latest.definition.source_provenance.upstream_identity == (
         "ai-engineer-service/ai-engineer-knowledge-charter"

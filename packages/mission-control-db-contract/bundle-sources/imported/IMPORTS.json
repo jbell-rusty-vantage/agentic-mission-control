@@ -8,6 +8,96 @@
         "scheme": "belllabs",
         "value": "ai-engineer-service/ai-engineer-knowledge-charter"
       },
+      "version": "2026.11.16-080e9f0",
+      "description": "AI Engineer knowledge base purpose, source tiers, repository rules and paper levels, loaded before researching, verifying or ingesting AI engineering knowledge and paired with knowledge-research for the method.",
+      "license": "proprietary",
+      "source": {
+        "name": "ai-engineer-service",
+        "repository": "https://github.com/jbell-rusty-vantage/ai-engineer-services",
+        "commit": "080e9f0f8d49e43a5946b7ae4a7c7881ddee228c",
+        "committed_at": "2026-11-16T23:18:52Z",
+        "path": "skills/ai-engineer-knowledge-charter"
+      },
+      "directory": "packages/mission-control-db-contract/bundle-sources/imported/ai-engineer-service/080e9f0/ai-engineer-knowledge-charter",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "sha256:d9dfa7b8ef77109347e48276fa98da439b8d19317b4ad45a51aad5806994e3b3",
+          "git_blob": "8d87ace6b09902ccbc6ef59ea97fe5bd0014912e",
+          "size_bytes": 10625
+        }
+      ]
+    },
+    {
+      "skill": "content-authoring",
+      "capability_id": "skill.content-authoring",
+      "identifier": {
+        "scheme": "belllabs",
+        "value": "ai-engineer-service/content-authoring"
+      },
+      "version": "2026.11.16-080e9f0",
+      "description": "Author AI Engineer teaching content from verified knowledge - load when designing, drafting, running, revising, handing over for review or keeping current a course, curriculum, module, lesson, activity or course artifact.",
+      "license": "proprietary",
+      "source": {
+        "name": "ai-engineer-service",
+        "repository": "https://github.com/jbell-rusty-vantage/ai-engineer-services",
+        "commit": "080e9f0f8d49e43a5946b7ae4a7c7881ddee228c",
+        "committed_at": "2026-11-16T23:18:52Z",
+        "path": "skills/content-authoring"
+      },
+      "directory": "packages/mission-control-db-contract/bundle-sources/imported/ai-engineer-service/080e9f0/content-authoring",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "sha256:a6fd26a27ae57263292d603bdd6cdc8ab29ef6cf1b2afcf7ddc90c1694d26302",
+          "git_blob": "5a7b6691f4e3aae23ff035fe55583c4f427bf9f0",
+          "size_bytes": 11125
+        },
+        {
+          "path": "SOURCES.md",
+          "sha256": "sha256:701efc8a7a55a284d7fa68545e6379019a37c8b4b0b556840952a2923669d915",
+          "git_blob": "e50da4cf9c8ff885e49ed5b5c507944881a0b86e",
+          "size_bytes": 31306
+        },
+        {
+          "path": "references/evidence-binding.md",
+          "sha256": "sha256:72dff8b3325ca3e4fbb0675dcb2c6fa0a8d785448def78d95709ed8538a81c22",
+          "git_blob": "3306d08bf9ec456a9bef731e12f5dfc6dc388bef",
+          "size_bytes": 7423
+        },
+        {
+          "path": "references/lesson-craft.md",
+          "sha256": "sha256:4507f33c50446e58e1904a7ae1c4f98099c42aae5d0de58a5d90722f6d02d7ee",
+          "git_blob": "d8cad23ebb6d7f200c7068ba3c13fceec02ee42a",
+          "size_bytes": 7787
+        },
+        {
+          "path": "references/review-and-release.md",
+          "sha256": "sha256:ec542c3dcb649bf03bbe470a8bccfd02afad77325854389b538b7c564819e6df",
+          "git_blob": "d734d202cf7166b313adec895e2fd50844cf3005",
+          "size_bytes": 7839
+        },
+        {
+          "path": "references/structure.md",
+          "sha256": "sha256:ac8c1c83dd9cd641b2119ab20e1eb6789b8d44ac53434f19a25b45edee60ee17",
+          "git_blob": "ca104fc5c7c04c5fc497d134fa4592514d6c6e3f",
+          "size_bytes": 8386
+        },
+        {
+          "path": "references/worked-example.md",
+          "sha256": "sha256:ce5577db0fed83139d64b3ed73f8e51023c4959de31fdb7df7c3f261008e222d",
+          "git_blob": "24ea56bd9c98246e288fdfe00eac7ef99460d6f4",
+          "size_bytes": 9812
+        }
+      ]
+    },
+    {
+      "skill": "ai-engineer-knowledge-charter",
+      "capability_id": "skill.ai-engineer-knowledge-charter",
+      "identifier": {
+        "scheme": "belllabs",
+        "value": "ai-engineer-service/ai-engineer-knowledge-charter"
+      },
       "version": "2026.11.16-b7e6e21",
       "description": "AI Engineer knowledge base purpose, source tiers, repository rules and paper levels, loaded before researching, verifying or ingesting AI engineering knowledge and paired with knowledge-research for the method.",
       "license": "proprietary",
@@ -88,6 +178,177 @@
           "sha256": "sha256:ce5577db0fed83139d64b3ed73f8e51023c4959de31fdb7df7c3f261008e222d",
           "git_blob": "24ea56bd9c98246e288fdfe00eac7ef99460d6f4",
           "size_bytes": 9812
+        }
+      ]
+    },
+    {
+      "skill": "knowledge-ingest",
+      "capability_id": "skill.knowledge-ingest",
+      "identifier": {
+        "scheme": "belllabs",
+        "value": "knowledge-services/knowledge-ingest"
+      },
+      "version": "2026.11.17-1a451fd",
+      "description": "Use when verified facts must be written into the shared knowledge database: compose a knowledge-ingestion intent (entities, aliases, identifiers, relationships, two-clock facts, events, evidence support, staged candidates, reports) from a sealed verification run and a knowledge-db snapshot, dry-run it, apply it through the deterministic executor, inspect the receipt, recover from stale-head or validation failures, and verify by re-reading. You never write to the database yourself; the executor does, as executor_service.",
+      "license": "proprietary",
+      "source": {
+        "name": "knowledge-services",
+        "repository": "https://github.com/jbell-rusty-vantage/agent-knowledge-services",
+        "commit": "1a451fde077b3b29b990cb5170018421e7765d96",
+        "committed_at": "2026-11-17T00:12:43Z",
+        "path": "skills/knowledge-ingest"
+      },
+      "directory": "packages/mission-control-db-contract/bundle-sources/imported/knowledge-services/1a451fd/knowledge-ingest",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "sha256:cee013f1a35aee4eef47d16e584a24ffe22d8561b16f08c54a1ea47835712649",
+          "git_blob": "f462441d73664f943ece2472b3547082445e4e44",
+          "size_bytes": 13984
+        }
+      ]
+    },
+    {
+      "skill": "knowledge-research",
+      "capability_id": "skill.knowledge-research",
+      "identifier": {
+        "scheme": "belllabs",
+        "value": "knowledge-services/knowledge-research"
+      },
+      "version": "2026.11.17-1a451fd",
+      "description": "Research method and verification for a knowledge base, loaded before a task searches for sources, captures evidence, states or checks a claim, or hands research back.",
+      "license": "proprietary",
+      "source": {
+        "name": "knowledge-services",
+        "repository": "https://github.com/jbell-rusty-vantage/agent-knowledge-services",
+        "commit": "1a451fde077b3b29b990cb5170018421e7765d96",
+        "committed_at": "2026-11-17T00:12:43Z",
+        "path": "skills/knowledge-research"
+      },
+      "directory": "packages/mission-control-db-contract/bundle-sources/imported/knowledge-services/1a451fd/knowledge-research",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "sha256:916c718a6bb6b8d68e1f6dbb468ebcac46c2252f99c2a99dbeb629229b70bebe",
+          "git_blob": "f234d673e7653260efda8e34f445cf52dc0a49bb",
+          "size_bytes": 9470
+        },
+        {
+          "path": "references/handback.md",
+          "sha256": "sha256:b3f7e0076f9845e6d92af6f09efe66a8c35c7b26e0f2ca32e28a70becd65ddd0",
+          "git_blob": "94d4240223f36f3918bcfe39383612146ccf9b14",
+          "size_bytes": 7602
+        },
+        {
+          "path": "references/method.md",
+          "sha256": "sha256:ad5a9c4e72df73595965387ce79c52533f69e800779f8ebc3e10d9a40005f868",
+          "git_blob": "aa56107e27eac76c0419d975a9c3f4ef6d36cc98",
+          "size_bytes": 10551
+        },
+        {
+          "path": "references/sources.md",
+          "sha256": "sha256:53430c11fe9e91d9f8a91cc2377998cf383b906e51444de6e1d19c81fc38687e",
+          "git_blob": "ac68ae7961becdfdafae0f2146149797c09b0169",
+          "size_bytes": 8937
+        },
+        {
+          "path": "references/tools/arxiv.md",
+          "sha256": "sha256:79097b0d65145bc5d342ef5f49db53a760a8175dc1c1793bf69ee3ef8da1d97f",
+          "git_blob": "984c7f7e18fe80dbfdf0986638474bc819678796",
+          "size_bytes": 5617
+        },
+        {
+          "path": "references/tools/browser.md",
+          "sha256": "sha256:bd0dc51359440ebac289205761acbf860d42206333fa14387bd89b88b74b1b1c",
+          "git_blob": "6c76520e3b1244a1f7118d8ea211d43e4569e218",
+          "size_bytes": 5215
+        },
+        {
+          "path": "references/tools/context7.md",
+          "sha256": "sha256:040f034e48d78e6c3be87234b734ad78f7fd4833e403480b7dda65c6b0bcc0f3",
+          "git_blob": "961859b50d73b6236796df7867b4f6dccbb1fdda",
+          "size_bytes": 4166
+        },
+        {
+          "path": "references/tools/firecrawl.md",
+          "sha256": "sha256:f693470d741f3b4a64ac9676ed4ea29a18c708a9339b0207fc03fbfe8ade6ec2",
+          "git_blob": "ecf4afe018011bf8e43320a3031073e984040f00",
+          "size_bytes": 7515
+        },
+        {
+          "path": "references/tools/github.md",
+          "sha256": "sha256:4ff1ee464460e28d57897978c4742c0b9d8298767638be561e3690adb5170a98",
+          "git_blob": "659fc2ffe5ca3b31980e5dd4b1598db22b2fc766",
+          "size_bytes": 5449
+        },
+        {
+          "path": "references/tools/routing.md",
+          "sha256": "sha256:776954844e7cba8f8b1816eb0a79216d77d372053be37f603378f8d80a757b56",
+          "git_blob": "f135302bbadbe0588c88c2203855c919ce9bb93e",
+          "size_bytes": 8497
+        },
+        {
+          "path": "references/tools/tavily.md",
+          "sha256": "sha256:fd1ef0cad6f762ffc33ee03a6bb4ff357b3fec8b1f3145b0db4892b0d1776bff",
+          "git_blob": "4aac0e69a3f074be9d53fa64dc23a61ff82e4f7b",
+          "size_bytes": 5874
+        },
+        {
+          "path": "references/verification.md",
+          "sha256": "sha256:02235084c9b5a79cf723eba63e5d785576f005199d5a2892f6350c7c3f4e94de",
+          "git_blob": "39f7b4607d5584e57652ebb1c96dc8e603ceeac1",
+          "size_bytes": 20168
+        }
+      ]
+    },
+    {
+      "skill": "knowledge-verify",
+      "capability_id": "skill.knowledge-verify",
+      "identifier": {
+        "scheme": "belllabs",
+        "value": "knowledge-services/knowledge-verify"
+      },
+      "version": "2026.11.17-1a451fd",
+      "description": "Use when a task needs source-attributed evidence: capture sources as immutable evidence (including PDF, DOCX, XLSX, CSV and other documents), read and search captures, locate exact quotes, and register or read artifacts through the knowledge-verify CLI. The executor's verification chain (verify-claims, judge, policy, seal, check-report, status) is retired.",
+      "license": "proprietary",
+      "source": {
+        "name": "knowledge-services",
+        "repository": "https://github.com/jbell-rusty-vantage/agent-knowledge-services",
+        "commit": "1a451fde077b3b29b990cb5170018421e7765d96",
+        "committed_at": "2026-11-17T00:12:43Z",
+        "path": "apps/verification-executor/skills/knowledge-verify"
+      },
+      "directory": "packages/mission-control-db-contract/bundle-sources/imported/knowledge-services/1a451fd/knowledge-verify",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "sha256:fc84118db5af58d0dc4d5ed4110c23a3d2cba532649049c28341f2d15dfc131e",
+          "git_blob": "322a8deae3c55530f6b8aaa8c2ac0ef42557ae79",
+          "size_bytes": 7874
+        },
+        {
+          "path": "examples/offline.mjs",
+          "sha256": "sha256:2130a433d1cee6b8d627aec96059d865672c3052d38a42495f2daa85dc255263",
+          "git_blob": "a64e6f1010823c81174b22c1006e2d42a47cc59a",
+          "size_bytes": 3236
+        },
+        {
+          "path": "references/capabilities.md",
+          "sha256": "sha256:47a0b45d18178dba8c6162197d3fd6f6754a8b82c9b266e05358cef5ab5e2e31",
+          "git_blob": "2501167cb19d363574414deb3271cae69a67fc7e",
+          "size_bytes": 3188
+        },
+        {
+          "path": "references/failure-playbook.md",
+          "sha256": "sha256:5c4e970732bb6a9534f0417e29bd4485f2774def462e917b7cfe05962b165aaa",
+          "git_blob": "9e059e0f76c191c46e527b4be6ad290e952aa1a0",
+          "size_bytes": 2952
+        },
+        {
+          "path": "references/intents.md",
+          "sha256": "sha256:b7b9599926946ee80f78bf0dd7c8ee315b4e77efad06149ada1ca119b1c68849",
+          "git_blob": "d260b16292fd1da1f0db2443c228996a4ba0c912",
+          "size_bytes": 587
         }
       ]
     },

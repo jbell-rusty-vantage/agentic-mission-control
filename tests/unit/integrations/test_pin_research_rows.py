@@ -32,6 +32,8 @@ from tests.fixtures.lane_bindings import lane_fields
 
 PINS = PROJECT_ROOT / "infra" / "capability-pins" / "research-capabilities.json"
 FIXTURES = PROJECT_ROOT / "tests" / "fixtures" / "mcp"
+# The capture server's newest revision (3) was captured into its own fixture.
+CAPTURE_FIXTURE = "mcp.knowledge-capture.1a451fd.tools.json"
 ENDPOINT = "http://127.0.0.1:4310/mcp"
 VERSION_LINE = (
     "Version: 2.1.0, Commit: 4bcdcdf8d7beee98c9448e73e257308280924cc4, "
@@ -55,8 +57,11 @@ def rows(tool: ModuleType) -> dict[str, Any]:
     return dict(tool.catalog_rows())
 
 
-def _names(server_id: str) -> list[str]:
-    document = json.loads((FIXTURES / f"{server_id}.tools.json").read_text(encoding="utf-8"))
+def _names(server_id: str, fixture: str | None = None) -> list[str]:
+    """The tools the server's captured fixture lists (the newest revision's own fixture)."""
+
+    name = fixture or f"{server_id}.tools.json"
+    document = json.loads((FIXTURES / name).read_text(encoding="utf-8"))
     return [item["name"] for item in document["tools"]]
 
 
@@ -89,7 +94,7 @@ async def _never(connection: Mapping[str, Any]) -> Sequence[BaseTool]:
 async def test_the_capture_row_pins_the_catalog_allowlist_of_a_server_that_lists_more(
     tool: ModuleType, rows: dict[str, Any]
 ) -> None:
-    listed = _names("mcp.knowledge-capture")
+    listed = _names("mcp.knowledge-capture", CAPTURE_FIXTURE)
     lister = Lister(listed)
 
     pin = await tool.pin_knowledge_capture(
@@ -97,7 +102,7 @@ async def test_the_capture_row_pins_the_catalog_allowlist_of_a_server_that_lists
     )
 
     assert isinstance(pin, PinnedRemoteMCPServer)
-    assert len(listed) == 40 and len(pin.tools) == 19
+    assert len(listed) == 42 and len(pin.tools) == 23
     assert {item.tool_name for item in pin.tools} == set(
         rows["mcp.knowledge-capture"].tool_allowlist
     )
@@ -109,11 +114,11 @@ async def test_the_capture_row_pins_the_catalog_allowlist_of_a_server_that_lists
     ]
     assert "127.0.0.1" not in pin.model_dump_json()
     assert (
-        pin.source.startswith("git:") and "7bc4aeec77c645f41bb0f550f6a9626c3ef24cf0" in pin.source
+        pin.source.startswith("git:") and "1a451fde077b3b29b990cb5170018421e7765d96" in pin.source
     )
     # What the writer pins is what the worker admits at the deployment's endpoint.
     component = pin.component(endpoint=ENDPOINT)
-    assert component.tool_filter == "allowlist" and len(component.tools) == 19
+    assert component.tool_filter == "allowlist" and len(component.tools) == 23
     PinnedCapabilityAssetVerifier(
         CapabilityPins(remote_mcp_servers=(pin,)),
         mcp_endpoints={"mcp.knowledge-capture": ENDPOINT},
@@ -137,14 +142,18 @@ async def test_the_capture_row_is_not_pinned_without_an_endpoint_a_token_or_a_li
     assert isinstance(no_token, tool.NotPinned)
     assert "VERIFY_EXECUTOR_TOKEN is required" in no_token.reason
 
-    fewer = [name for name in _names("mcp.knowledge-capture") if name != "verify_locate_quote"]
+    fewer = [
+        name
+        for name in _names("mcp.knowledge-capture", CAPTURE_FIXTURE)
+        if name != "verify_locate_quote"
+    ]
     narrowed = await tool.pin_knowledge_capture(
         ENDPOINT, row, credential_env=None, lister=Lister(fewer)
     )
     assert isinstance(narrowed, tool.NotPinned) and "verify_locate_quote" in narrowed.reason
 
     monkeypatch.setenv("VERIFY_EXECUTOR_TOKEN", "executor-token-value")
-    lister = Lister(_names("mcp.knowledge-capture"))
+    lister = Lister(_names("mcp.knowledge-capture", CAPTURE_FIXTURE))
     pinned = await tool.pin_knowledge_capture(
         ENDPOINT, row, credential_env="VERIFY_EXECUTOR_TOKEN", lister=lister
     )
@@ -281,7 +290,9 @@ async def test_add_research_changes_only_the_research_rows_and_reports_the_rest(
     )
 
     pinned, not_pinned = await tool.research_rows(
-        args, lister=Lister(_names("mcp.knowledge-capture")), version_reader=lambda _path: ""
+        args,
+        lister=Lister(_names("mcp.knowledge-capture", CAPTURE_FIXTURE)),
+        version_reader=lambda _path: "",
     )
     tool.add_research_rows(output, pinned)
 

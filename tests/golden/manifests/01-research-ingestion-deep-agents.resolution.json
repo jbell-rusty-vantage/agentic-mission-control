@@ -1357,9 +1357,9 @@
    "candidates": [
     "mcp.biotech-kg.tool.kg-ingest@1#sha256:42556301c12678c72220f5c564979e9b4550e340c867b2517191af98c99a0704",
     "mcp.knowledge-capture.tool.knowledge-guide@1#sha256:3acf0fb3cb12e96d84748a7d64b82bd0a3e9611bad89da720a546b9fb4f087f7",
-    "mcp.knowledge-capture.tool.schema-get@1#sha256:fa1315e6e125fe922f5ff76eac9c5799ba20c507f32b21c4bd06911991dd689f",
-    "mcp.knowledge-capture.tool.schema-manifest@1#sha256:47cee363bc40c6ca964dbe99b449cf36dcdf8ee0f20244337f6e7bb9eb1abcc6",
-    "mcp.knowledge-capture.tool.schema-search@1#sha256:63237972cc025198f74a81a8e6271da64672a3aefcd6a58fa3d8525c25d862fb"
+    "mcp.knowledge-capture.tool.knowledge-describe@1#sha256:96f7539d1c9282eadbbd0fed8da40f205d90f49534bf5ed0cf340a7266d25ad8",
+    "mcp.knowledge-capture.tool.chain-write@1#sha256:a9dd8a872324a9f956b2d5fab8c892a451a647253c5fba2d02b60006ef1a8b23",
+    "mcp.knowledge-capture.tool.schema-get@1#sha256:fa1315e6e125fe922f5ff76eac9c5799ba20c507f32b21c4bd06911991dd689f"
    ],
    "lanes": [
     "deep_agents"
@@ -1474,9 +1474,9 @@
    "candidates": [
     "mcp.biotech-kg.tool.kg-ingest@1#sha256:42556301c12678c72220f5c564979e9b4550e340c867b2517191af98c99a0704",
     "mcp.knowledge-capture.tool.knowledge-guide@1#sha256:3acf0fb3cb12e96d84748a7d64b82bd0a3e9611bad89da720a546b9fb4f087f7",
-    "mcp.knowledge-capture.tool.schema-get@1#sha256:fa1315e6e125fe922f5ff76eac9c5799ba20c507f32b21c4bd06911991dd689f",
-    "mcp.knowledge-capture.tool.schema-manifest@1#sha256:47cee363bc40c6ca964dbe99b449cf36dcdf8ee0f20244337f6e7bb9eb1abcc6",
-    "mcp.knowledge-capture.tool.schema-search@1#sha256:63237972cc025198f74a81a8e6271da64672a3aefcd6a58fa3d8525c25d862fb"
+    "mcp.knowledge-capture.tool.knowledge-describe@1#sha256:96f7539d1c9282eadbbd0fed8da40f205d90f49534bf5ed0cf340a7266d25ad8",
+    "mcp.knowledge-capture.tool.chain-write@1#sha256:a9dd8a872324a9f956b2d5fab8c892a451a647253c5fba2d02b60006ef1a8b23",
+    "mcp.knowledge-capture.tool.schema-get@1#sha256:fa1315e6e125fe922f5ff76eac9c5799ba20c507f32b21c4bd06911991dd689f"
    ],
    "lanes": [
     "deep_agents"
@@ -1513,18 +1513,6 @@
  "schema_version": "mc.manifest_resolution.v1",
  "tenant_id": "9287e246-224b-5814-bc00-44bb5396e0c5",
  "warnings": [
-  {
-   "code": "CAPABILITY_UNAVAILABLE",
-   "message": "search 'knowledge graph ingestion claims' is ambiguous between mcp.biotech-kg.tool.kg-ingest@1#sha256:42556301c12678c72220f5c564979e9b4550e340c867b2517191af98c99a0704 and mcp.knowledge-capture.tool.knowledge-guide@1#sha256:3acf0fb3cb12e96d84748a7d64b82bd0a3e9611bad89da720a546b9fb4f087f7; the top hit was pinned",
-   "pointer": "/mission/environment/capabilities/3",
-   "reason": "ambiguous_search"
-  },
-  {
-   "code": "CAPABILITY_UNAVAILABLE",
-   "message": "search 'knowledge graph ingestion claims' is ambiguous between mcp.biotech-kg.tool.kg-ingest@1#sha256:42556301c12678c72220f5c564979e9b4550e340c867b2517191af98c99a0704 and mcp.knowledge-capture.tool.knowledge-guide@1#sha256:3acf0fb3cb12e96d84748a7d64b82bd0a3e9611bad89da720a546b9fb4f087f7; the top hit was pinned",
-   "pointer": "/mission/program/nodes/3/environment/capabilities/0",
-   "reason": "ambiguous_search"
-  },
   {
    "code": "UNSUPPORTED_BEHAVIOR",
    "message": "controls.notifications is consumed only by mission/v2 (as notify watchers); mission/v1 ignores it",

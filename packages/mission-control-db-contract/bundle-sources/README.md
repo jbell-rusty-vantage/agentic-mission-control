@@ -33,6 +33,14 @@ Engineer charter left `skills/` with that seed: revision 2 of its id is the copy
 imported from the AI Engineer service. Seed 1.0.4's bytes are pinned in
 `FROZEN_BUNDLES`.
 
+`agent-skills-1.0.5/` preserves the six coordinator bundles seed 1.0.5 references
+(`mission-control` and the five `mission-control-*` skills), LF bytes from `skills/` at
+`0ddd02a8`, frozen when seed 1.0.6 re-imported the method skills at Knowledge Services `1a451fd`
+and the AI Engineer service `080e9f0`. Its imported skills are not copied here: their sources are
+their own directories under `imported/`, one per source commit, which are never edited, and
+`agent_skills.frozen_application_definitions` reads them from the import record. Seed 1.0.5's
+bytes are pinned in `FROZEN_BUNDLES`.
+
 The frozen seed JSON pins each manifest. `agent_skills.frozen_application_definitions`
 rebuilds manifests from these bytes and rejects any mismatch. The bundle publisher
 includes all these historical versions and the current successor, deduplicating

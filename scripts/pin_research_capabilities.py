@@ -51,6 +51,11 @@ pin keeps its bytes:
       --node "C:/Program Files/nodejs/node.exe" \\
       --github-mcp-server "C:/tools/github-mcp-server/github-mcp-server.exe" \\
       --knowledge-capture-endpoint http://127.0.0.1:4310/mcp
+
+Method skills (``--add-catalog-skills <application> --skill-custody-root <dir>``): a `bytes_v1`
+custody Skill pin for each method skill the application's agent-skill seed imports, at the revision
+the seed publishes, its recorded import bytes published into the custody root the worker reads
+(`CAPABILITY_BUNDLE_LOCAL_ROOT`). Combinable with `--add-research`; other pins keep their bytes.
 """
 
 from __future__ import annotations
@@ -112,7 +117,10 @@ AGENT_BROWSER_SKILL_NAME = "agent-browser"
 AGENT_BROWSER_SKILL_VERSION = 1
 CUSTODY_SCHEME = "capability-bundles://"
 DEFAULT_OUTPUT = PROJECT_ROOT / "infra" / "capability-pins" / "research-capabilities.json"
-CATALOG_SEEDS = PROJECT_ROOT / "packages" / "mission-control-db-contract" / "seeds"
+# The catalog seeds and their bundle sources are this checkout's, wherever MISSION_CONTROL_HOME
+# (and with it PROJECT_ROOT) points for the deployment being pinned.
+REPOSITORY = Path(__file__).resolve().parents[1]
+CATALOG_SEEDS = REPOSITORY / "packages" / "mission-control-db-contract" / "seeds"
 CONTEXT7_ID = "mcp.context7"
 CONTEXT7_MODULE = "workspace://.tools/node_modules/@upstash/context7-mcp/dist/index.js"
 GITHUB_ID = "mcp.github"
@@ -182,10 +190,26 @@ def _arguments() -> argparse.Namespace:
         "--context7-credential-env",
         help="environment name of the Context7 key; omitted: the server is pinned keyless",
     )
+    parser.add_argument(
+        "--add-catalog-skills",
+        metavar="APPLICATION",
+        choices=("ai-engineer", "biotech"),
+        help="add or replace the Skill pins of the method skills the application's agent-skill "
+        "seed imports (current revision of each), published into --skill-custody-root; every "
+        "other pin keeps its bytes",
+    )
+    parser.add_argument(
+        "--skill-custody-root",
+        type=Path,
+        help="the local bundle custody root the worker reads (CAPABILITY_BUNDLE_LOCAL_ROOT)",
+    )
     args = parser.parse_args()
     if args.upgrade_skill_custody and args.skill_custody is None:
         parser.error("--upgrade-skill-custody needs --skill-custody <directory>")
-    if not (args.upgrade_skill_custody or args.add_research) and args.node is None:
+    if args.add_catalog_skills and args.skill_custody_root is None:
+        parser.error("--add-catalog-skills needs --skill-custody-root <directory>")
+    adding = args.add_research or args.add_catalog_skills
+    if not (args.upgrade_skill_custody or adding) and args.node is None:
         parser.error("--node is required")
     return args
 
@@ -502,6 +526,69 @@ def add_research_rows(output: Path, pinned: Sequence[AnyPinnedMCPServer]) -> Non
     )
 
 
+def _agent_skills() -> Any:
+    spec = importlib.util.spec_from_file_location(
+        "mc_pin_agent_skills", CATALOG_SEEDS / "agent_skills.py"
+    )
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def catalog_skill_rows(application_id: str, custody_root: Path) -> list[PinnedSkill]:
+    """A `bytes_v1` custody Skill pin for every method skill the application's agent-skill
+    seed imports, at the revision the seed publishes: its recorded import bytes are published
+    into ``custody_root`` under that id and revision (idempotent: the same bytes are the same
+    version), and the pin names the custody manifest. Nothing is downloaded."""
+
+    from mission_control.adapters.capabilities.capability_bundles import DirectoryBundleStore
+
+    module = _agent_skills()
+    imported = {
+        record["capability_id"]
+        for name, record in module.imported_records().items()
+        if application_id in module.IMPORTED_SKILLS[name][1]
+    }
+    store = DirectoryBundleStore(custody_root)
+    rows: list[PinnedSkill] = []
+    for entry, revision, _changed in module.revised_definitions(application_id):
+        definition = entry["definition"]
+        if definition.logical_id not in imported:
+            continue
+        directory = REPOSITORY / entry["source"]["directory"]
+        manifest = store.publish(directory, asset_id=definition.logical_id, version=revision)
+        skill_md = dict(directory_files(directory))["SKILL.md"]
+        rows.append(
+            PinnedSkill(
+                ref=_ref(
+                    DefinitionKind.SKILL, definition.logical_id, revision, manifest.bundle_digest
+                ),
+                skill_name=definition.skill_name,
+                source_locator=CUSTODY_SCHEME + manifest.digest,
+                digest_format="bytes_v1",
+                bundle_digest=manifest.bundle_digest,
+                skill_md_digest=bytes_digest(skill_md),
+                mount_root=f"/skills/{definition.skill_name}",
+            )
+        )
+    return rows
+
+
+def add_skill_rows(output: Path, skills: Sequence[PinnedSkill]) -> None:
+    """Add or replace only the Skill pins named by ``skills`` (by skill name) in ``output``."""
+
+    document = json.loads(output.read_text(encoding="utf-8"))
+    CapabilityPins.model_validate(document)
+    names = {skill.skill_name for skill in skills}
+    kept = [item for item in document.get("skills", ()) if item["skill_name"] not in names]
+    document["skills"] = [*kept, *(skill.model_dump(mode="json") for skill in skills)]
+    CapabilityPins.model_validate(document)
+    output.write_text(
+        json.dumps(document, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n"
+    )
+
+
 def research_report(
     pinned: Sequence[AnyPinnedMCPServer], not_pinned: Sequence[NotPinned]
 ) -> dict[str, Any]:
@@ -654,15 +741,17 @@ async def main() -> int:
             )
         )
         return 0
-    if args.add_research:
-        pinned, not_pinned = await research_rows(args)
-        add_research_rows(args.output, pinned)
-        print(
-            json.dumps(
-                {"output": str(args.output), **research_report(pinned, not_pinned)},
-                sort_keys=True,
-            )
-        )
+    if args.add_research or args.add_catalog_skills:
+        report: dict[str, Any] = {"output": str(args.output)}
+        if args.add_research:
+            pinned, not_pinned = await research_rows(args)
+            add_research_rows(args.output, pinned)
+            report.update(research_report(pinned, not_pinned))
+        if args.add_catalog_skills:
+            skills = catalog_skill_rows(args.add_catalog_skills, args.skill_custody_root)
+            add_skill_rows(args.output, skills)
+            report["skills"] = {skill.skill_name: skill.ref.revision for skill in skills}
+        print(json.dumps(report, sort_keys=True))
         return 0
     node = args.node.resolve(strict=True)
     servers: list[PinnedMCPServer] = []

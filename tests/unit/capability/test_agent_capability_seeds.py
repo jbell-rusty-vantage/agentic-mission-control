@@ -26,7 +26,7 @@ FIXTURES = ROOT / "tests" / "fixtures" / "mcp"
 COMMON_KEY = "mc.catalog.agent-capabilities"
 # The servers seed 1.1.0 added (2026-11-16), each with a tool list captured from the server.
 RESEARCH = ("mcp.github", "mcp.context7", "mcp.knowledge-capture")
-# The tools each server exposes (its allowlist where it has one).
+# The tools each server exposes at its newest revision (its allowlist where it has one).
 EXPECTED_TOOLS = {
     "mcp.tavily": 5,
     "mcp.firecrawl": 27,
@@ -36,7 +36,16 @@ EXPECTED_TOOLS = {
     "mcp.edgartools": 13,
     "mcp.github": 22,
     "mcp.context7": 2,
-    "mcp.knowledge-capture": 19,
+    "mcp.knowledge-capture": 23,
+}
+# The capture server's allowlist at revisions 1 and 2 (Knowledge Services 7bc4aee).
+CAPTURE_R1_TOOLS = 19
+# What revision 3 (seed 1.3.0, Knowledge Services 1a451fd) adds to that allowlist.
+CAPTURE_R3_ADDED = {
+    "chain_write",
+    "evidence_units",
+    "knowledge_describe",
+    "source_prepare_captured",
 }
 ADMISSION = {
     "common": {"mcp.tavily", "mcp.firecrawl", "mcp.agent-browser", *RESEARCH},
@@ -116,7 +125,22 @@ def test_research_capabilities_are_new_ids_after_the_frozen_first_version() -> N
         for bundle in load_bundles([SEEDS / "common"])
         if bundle["seed_key"] == COMMON_KEY
     }
-    assert set(by_version) == {"1.0.0", "1.1.0", "1.2.0"}
+    assert set(by_version) == {"1.0.0", "1.1.0", "1.2.0", "1.3.0"}
+    # 1.3.0: revision 3 of the capture server and of its 23 tool rows, nothing else.
+    recapture = by_version["1.3.0"]
+    assert recapture["depends_on"] == [{"seed_key": COMMON_KEY, "seed_version": "1.2.0"}]
+    before = {
+        record["logical_key"]
+        for version in ("1.0.0", "1.1.0", "1.2.0")
+        for record in by_version[version]["records"]
+    }
+    assert not before & {record["logical_key"] for record in recapture["records"]}
+    third = [r["fields"]["manifest"] for r in recapture["records"] if r["kind"] == "asset_version"]
+    # The 19 tools revision 2 held take their revision 3; the four it adds are new ids at 1.
+    tools = [item for item in third if item["ref"]["kind"] == "mcp_tool"]
+    assert len(tools) == 23
+    assert sorted(item["ref"]["revision"] for item in tools) == [1] * 4 + [3] * 19
+    assert {item["definition"]["server_ref"]["revision"] for item in tools} == {3}
     # 1.2.0: revision 2 of the capture server and of its 19 tool rows, nothing else.
     capture = by_version["1.2.0"]
     assert capture["depends_on"] == [{"seed_key": COMMON_KEY, "seed_version": "1.1.0"}]
@@ -194,9 +218,10 @@ def test_research_servers_are_pinned_read_only_and_captured() -> None:
         for item in _published("common")
         if isinstance(item.definition, MCPToolDefinition)
         and item.definition.server_ref.logical_id in RESEARCH
-        and item.ref.revision == 1
+        and item.definition.server_ref.revision == 1
     ]
-    assert len(rows) == sum(EXPECTED_TOOLS[name] for name in RESEARCH)
+    first = {**EXPECTED_TOOLS, "mcp.knowledge-capture": CAPTURE_R1_TOOLS}
+    assert len(rows) == sum(first[name] for name in RESEARCH)
     assert {row.annotations["schema_source"] for row in rows} == {"captured"}
     # A captured row carries the server's own input schema, not the transcription placeholder.
     assert all(row.input_schema != {"type": "object"} for row in rows)
@@ -267,6 +292,7 @@ def test_the_capture_server_is_supported_on_deep_agents_from_revision_two() -> N
     allowlisted tools; `@latest` resolves to it."""
 
     first, second = (_capture_revisions()[revision] for revision in (1, 2))
+    assert len(first.tool_allowlist or ()) == CAPTURE_R1_TOOLS
     assert first.host_support.supported_profiles() == ()
     assert first.host_support.status("deep_agents") is HostSupportStatus.UNQUALIFIED
     assert second.host_support.supported_profiles() == (LaneProfile.DEEP_AGENTS,)
@@ -274,6 +300,48 @@ def test_the_capture_server_is_supported_on_deep_agents_from_revision_two() -> N
     for field in ("transport", "endpoint", "header_refs", "secret_refs", "tools", "package_pin"):
         assert getattr(second, field) == getattr(first, field), field
     assert second.source_provenance == first.source_provenance
+
+
+def test_revision_three_is_a_recapture_with_the_chain_tools_allowlisted() -> None:
+    """Revision 3 lists what the executor at Knowledge Services 1a451fd lists (42 tools, every
+    input schema in its published form) and allowlists the tools the research method needs to
+    go from a capture to a proposed, anchored claim. Knowledge ingestion, direct database
+    reads, checkpoints and the issuer-credential tools stay withheld."""
+
+    second, third = (_capture_revisions()[revision] for revision in (2, 3))
+    assert third.source_provenance.upstream_version == "0.1.0-1a451fd"
+    assert third.source_provenance.commit_digest == "1a451fde077b3b29b990cb5170018421e7765d96"
+    assert third.schema_snapshot_ref.uri.endswith("mcp.knowledge-capture.1a451fd.tools.json")
+    assert second.schema_snapshot_ref.uri.endswith("mcp.knowledge-capture.tools.json")
+    assert third.schema_digest != second.schema_digest
+    listed = {tool.name for tool in third.tools}
+    exposed = {tool.name for tool in third.exposed_tools()}
+    assert len(listed) == 42 and third.allowed_tools == exposed
+    assert exposed == set(second.tool_allowlist or ()) | CAPTURE_R3_ADDED
+    withheld = listed - exposed
+    assert {
+        name for name in withheld if not name.startswith(("ingest_", "db_", "checkpoint_"))
+    } == {
+        "artifact_get",
+        "schema_materialize",
+        "knowledge_operation_invoke",
+        "knowledge_operation_get",
+        "knowledge_operation_cancel",
+        "knowledge_receipt_get",
+    }
+    for field in ("transport", "endpoint", "header_refs", "secret_refs", "host_support"):
+        assert getattr(third, field) == getattr(second, field), field
+    rows = {
+        item.definition.tool_name: item
+        for item in _published("common")
+        if isinstance(item.definition, MCPToolDefinition)
+        and item.definition.server_ref.logical_id == "mcp.knowledge-capture"
+        and item.definition.server_ref.revision == 3
+    }
+    assert set(rows) == exposed
+    assert {name for name, item in rows.items() if item.ref.revision == 1} == CAPTURE_R3_ADDED
+    assert rows["chain_write"].definition.side_effect_class == "bounded_write"
+    assert rows["evidence_units"].definition.side_effect_class == "read_only"
 
 
 def test_code_research_plugin_pins_its_members_exactly() -> None:
@@ -324,9 +392,8 @@ def test_pins_parse_and_tool_digests_match_fixtures() -> None:
             assert CapabilityPin.parse(pin.render()) == pin
             definition = published.definition
             if isinstance(definition, MCPServerDefinition):
-                document = json.loads(
-                    (FIXTURES / f"{definition.logical_id}.tools.json").read_bytes()
-                )
+                fixture = definition.schema_snapshot_ref.uri.rsplit("/", 1)[-1]
+                document = json.loads((FIXTURES / fixture).read_bytes())
                 encoded = json.dumps(
                     document["tools"], sort_keys=True, separators=(",", ":"), ensure_ascii=False
                 ).encode()

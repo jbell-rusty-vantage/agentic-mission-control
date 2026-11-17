@@ -88,11 +88,11 @@ def test_seed_members_are_exact_and_bounded_and_manifest_selectable(app: str) ->
             for lane in LaneProfile
             if plugin.host_support.status(lane) is HostSupportStatus.UNSUPPORTED
         }
-        # Revision 3 of the knowledge family also pins the capture server, which no cloud lane
-        # can reach, so it is unsupported on cursor_cloud too in both applications.
+        # Revisions 3 and 4 of the knowledge family also pin the capture server, which no cloud
+        # lane can reach, so they are unsupported on cursor_cloud too in both applications.
         expected = (
             HOSTED | {LaneProfile.CURSOR_CLOUD}
-            if entry["revision"] == 3
+            if entry["revision"] in (3, 4)
             else HOSTED
             if (app, entry["revision"]) == ("biotech", 2)
             else set()
@@ -123,7 +123,7 @@ def test_seed_members_are_exact_and_bounded_and_manifest_selectable(app: str) ->
             for version in PROFILES.SEED_VERSIONS
         ]
     )
-    assert len(bundles) == 3
+    assert len(bundles) == len(PROFILES.SEED_VERSIONS)
 
 
 @pytest.mark.parametrize("family", ["sdlc", "knowledge", "mixed"])
@@ -187,9 +187,11 @@ def test_revision_two_of_the_knowledge_family_mounts_the_method_skills(app: str)
             ["reviewer", "test-runner", "source-verifier", "summarizer"],
         ),
     }
+    # The rows of the agent-skill seed that was current when 1.0.1 shipped (1.0.5, frozen
+    # since 1.0.6 re-imported the method skills).
     skill_pins = {
         entry["definition"].logical_id: entry["pin"]
-        for entry in PROFILES._skills().application_definitions(app)
+        for entry in PROFILES._skills().definitions_as_of(app, "1.0.5")
     }
     for logical_id, (sdlc, agents) in expected.items():
         item = published[logical_id]
@@ -229,20 +231,72 @@ def test_revision_two_of_the_knowledge_family_mounts_the_method_skills(app: str)
     )
 
 
+def _plugin(relative: str, logical_id: str) -> PublishedDefinition:
+    (item,) = [
+        PublishedDefinition.model_validate(row["fields"]["manifest"])
+        for row in GENERATOR.frozen_bundle(relative)["records"]
+        if row["kind"] == "asset_version"
+        and row["fields"]["manifest"]["ref"]["logical_id"] == logical_id
+    ]
+    return item
+
+
 @pytest.mark.parametrize("app", PROFILES.APPS)
 def test_revision_three_of_the_knowledge_family_also_mounts_the_capture_server(app: str) -> None:
     """Seed 1.0.2: `plugin.cognition-knowledge` at revision 3 is revision 2 plus the evidence
     capture server at its revision 2, by exact pin, between the skills and the subagents. The
     mission that mounts the research method ("capture every source you rely on") mounts the
-    capture tools with it. Supported where the capture server is: `deep_agents`."""
+    capture tools with it. Supported where the capture server is: `deep_agents`. Frozen by bytes
+    since 1.0.3 published revision 4."""
 
     relative = f"{app}/{PROFILES.APP_KEYS[app]}-1.0.2.json"
     committed = json.loads((SEEDS / relative).read_bytes())
-    assert committed == GENERATOR.cognition_profiles()[relative]
+    assert committed == GENERATOR.frozen_bundle(relative)
     assert committed["depends_on"] == [
         {"seed_key": f"mc.app.{app}.cognition-profiles", "seed_version": "1.0.1"},
         {"seed_key": f"mc.app.{app}.agent-skills", "seed_version": "1.0.5"},
         {"seed_key": "mc.catalog.agent-capabilities", "seed_version": "1.2.0"},
+    ]
+    item = _plugin(relative, "plugin.cognition-knowledge")
+    plugin = item.definition
+    assert isinstance(plugin, PluginDefinition)
+    assert item.ref.revision == 3
+    prior = _plugin(
+        f"{app}/{PROFILES.APP_KEYS[app]}-1.0.1.json", "plugin.cognition-knowledge"
+    ).definition
+    assert isinstance(prior, PluginDefinition)
+    capture_pin = PROFILES._capabilities().capture_pin(2)
+    added = [m for m in plugin.manifest.members if m not in prior.manifest.members]
+    assert [(m.pin.render(), m.role.value, m.optional) for m in added] == [
+        (capture_pin, "mcp_server", False)
+    ]
+    assert [m for m in plugin.manifest.members if m.role.value != "mcp_server"] == list(
+        prior.manifest.members
+    )
+    assert plugin.host_support.supported_profiles() == (LaneProfile.DEEP_AGENTS,)
+    rows = [row for row in committed["records"] if row["kind"] == "capability_plugin_member"]
+    assert [row["fields"]["member"] for row in rows if row["fields"]["role"] == "mcp_server"] == [
+        "agent-capability:mcp-server:mcp.knowledge-capture/2"
+    ]
+
+
+@pytest.mark.parametrize("app", PROFILES.APPS)
+def test_revision_four_of_the_knowledge_family_mounts_the_chain_method_and_tools(
+    app: str,
+) -> None:
+    """Seed 1.0.3: `plugin.cognition-knowledge` at revision 4 has revision 3's member shape
+    over the method skills re-imported at Knowledge Services 1a451fd (agent-skills 1.0.6) and
+    the capture server at revision 3 (agent-capabilities 1.3.0), whose allowlist carries the
+    tools that method names. The mission that mounts the research method mounts the tools it
+    routes a capture through: source_prepare_captured, evidence_units and chain_write."""
+
+    relative = f"{app}/{PROFILES.APP_KEYS[app]}-1.0.3.json"
+    committed = json.loads((SEEDS / relative).read_bytes())
+    assert committed == GENERATOR.cognition_profiles()[relative]
+    assert committed["depends_on"] == [
+        {"seed_key": f"mc.app.{app}.cognition-profiles", "seed_version": "1.0.2"},
+        {"seed_key": f"mc.app.{app}.agent-skills", "seed_version": "1.0.6"},
+        {"seed_key": "mc.catalog.agent-capabilities", "seed_version": "1.3.0"},
     ]
     (item,) = [
         PublishedDefinition.model_validate(row["fields"]["manifest"])
@@ -251,40 +305,56 @@ def test_revision_three_of_the_knowledge_family_also_mounts_the_capture_server(a
     ]
     plugin = item.definition
     assert isinstance(plugin, PluginDefinition)
-    assert (item.ref.logical_id, item.ref.revision) == ("plugin.cognition-knowledge", 3)
-    (prior,) = [
-        entry["definition"]
-        for entry in PROFILES.successor_definitions(app)
-        if entry["definition"].logical_id == "plugin.cognition-knowledge"
-    ]
-    capture_pin = PROFILES._capabilities().capture_pin()
-    added = [m for m in plugin.manifest.members if m not in prior.manifest.members]
-    assert [(m.pin.render(), m.role.value, m.optional) for m in added] == [
-        (capture_pin, "mcp_server", False)
-    ]
-    assert [m for m in plugin.manifest.members if m.role.value != "mcp_server"] == list(
-        prior.manifest.members
-    )
+    assert (item.ref.logical_id, item.ref.revision) == ("plugin.cognition-knowledge", 4)
+    third = _plugin(
+        f"{app}/{PROFILES.APP_KEYS[app]}-1.0.2.json", "plugin.cognition-knowledge"
+    ).definition
+    assert isinstance(third, PluginDefinition)
     assert [m.role.value for m in plugin.manifest.members] == [
-        "skill",
-        "skill",
-        "skill",
-        "mcp_server",
-        "subagent",
-        "subagent",
+        m.role.value for m in third.manifest.members
     ]
+    assert [m.pin.capability_id for m in plugin.manifest.members] == [
+        m.pin.capability_id for m in third.manifest.members
+    ]
+    skills = PROFILES._skills()
+    current = {
+        entry["definition"].logical_id: entry["pin"]
+        for entry in skills.application_definitions(app)
+    }
+    charter = f"skill.{app}-knowledge-charter"
+    for member in plugin.manifest.members:
+        if member.role.value == "skill":
+            assert member.pin.render() == current[member.pin.capability_id]
+    (capture,) = [m for m in plugin.manifest.members if m.role.value == "mcp_server"]
+    capabilities = PROFILES._capabilities()
+    assert capture.pin.render() == capabilities.capture_pin(3)
+    server = capabilities.server_definition(capabilities.CAPTURE_SERVER_R3)
+    assert {"source_prepare_captured", "evidence_units", "chain_write"} <= set(
+        server.tool_allowlist or ()
+    )
+    research = next(
+        entry
+        for entry in skills.application_definitions(app)
+        if entry["definition"].logical_id == "skill.knowledge-research"
+    )
+    text = b"".join(content for _path, content in research["source"]["files"]).decode("utf-8")
+    for tool in ("source_prepare_captured", "evidence_units", "chain_write"):
+        assert tool in text
     assert plugin.host_support.supported_profiles() == (LaneProfile.DEEP_AGENTS,)
     assert plugin.host_support.status("cursor_cloud") is HostSupportStatus.UNSUPPORTED
     assert plugin.secret_refs == ("VERIFY_EXECUTOR_TOKEN",)
     assert len(plugin.description.splitlines()) == 1
-    # The member row names the capture server's revision 2 row in the common seed, inside the
-    # dependency closure of this application's seeds.
     order_bundles(load_bundles([SEEDS / "common", SEEDS / app]), already_applied=set())
     rows = [row for row in committed["records"] if row["kind"] == "capability_plugin_member"]
-    assert [row["fields"]["member"] for row in rows if row["fields"]["role"] == "mcp_server"] == [
-        "agent-capability:mcp-server:mcp.knowledge-capture/2"
+    members = [row["fields"]["member"] for row in rows]
+    assert members[:3] == [
+        "agent-skill:skill:skill.knowledge-research/2",
+        "agent-skill:skill:skill.knowledge-verify/2",
+        f"agent-skill:skill:{charter}/{3 if app == 'ai-engineer' else 1}",
     ]
-    # `plugin.cognition-mixed` is not published again: it stays at revision 2.
+    assert [row["fields"]["member"] for row in rows if row["fields"]["role"] == "mcp_server"] == [
+        "agent-capability:mcp-server:mcp.knowledge-capture/3"
+    ]
     assert {row["fields"]["plugin"] for row in rows} == {
-        "cognition-profile:plugin:plugin.cognition-knowledge/3"
+        "cognition-profile:plugin:plugin.cognition-knowledge/4"
     }

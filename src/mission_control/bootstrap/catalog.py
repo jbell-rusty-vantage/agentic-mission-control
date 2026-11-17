@@ -122,7 +122,12 @@ def compose_external_discovery(
         candidates=candidates,
         max_results=settings.external_discovery_max_results,
     )
-    scanner = PROJECT_ROOT / "scripts" / "quarantine_static_scan.py"
+    # The scanner is a repository script: beside the source checkout this code runs from, since
+    # an installation's MISSION_CONTROL_HOME (PROJECT_ROOT) holds no scripts; else under it.
+    checkout = Path(__file__).resolve().parents[3] / "scripts" / "quarantine_static_scan.py"
+    scanner = (
+        checkout if checkout.is_file() else PROJECT_ROOT / "scripts" / "quarantine_static_scan.py"
+    )
     if not scanner.is_file():
         _LOG.warning("external candidate inspection is not composed: no scanner script")
         return discovery, None

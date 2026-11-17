@@ -137,6 +137,23 @@ DISCOVERY_TOOLS = (
 )
 # What a sandbox profile's describe must say beyond its name.
 SANDBOX_FACTS = ("backend", "execution", "network")
+# The Knowledge Services capture server: the tools the research method routes a capture
+# through (each must be mountable) and two that write knowledge or read the database directly
+# (neither may be).
+CAPTURE_SERVER = "mcp.knowledge-capture"
+RESEARCH_TOOLS = (
+    "verify_capture_source",
+    "source_prepare_captured",
+    "evidence_units",
+    "chain_write",
+)
+WITHHELD_TOOLS = ("ingest_apply", "db_sql_readonly")
+# Its row in the capabilities page's "What a node can mount" table.
+_MOUNT_ROW = re.compile(
+    r"^\| `mcp\.knowledge-capture` \(revision (\d+)\) \| (.*?) \| (\d+)(?: of (\d+) "
+    r"\(allowlist\))? \| (.*?) \| (.*?) \|$",
+    re.MULTILINE,
+)
 # A tool whose arguments the listing types in full: describe must answer for it too.
 TYPED_TOOL = "mission_manifest_compile"
 # `tools/list` is read on every session: the owner's ceiling, in tokens.
@@ -918,6 +935,7 @@ def evaluate(surface: Surface, card: Scorecard, *, run_id: str | None = None) ->
         "search mode answered",
     )
 
+    _evaluate_research_mounting(surface, card)
     if run_id is not None:
         _evaluate_run(surface, card, run_id, who)
 
@@ -1019,6 +1037,71 @@ def evaluate(surface: Surface, card: Scorecard, *, run_id: str | None = None) ->
         f"lane; differing: {unequal or 'none'}",
         "the same document, its Markdown as the MCP text content and as the HTTP body for "
         "`Accept: text/markdown`, and a refusal on both for an unknown ref",
+    )
+
+
+def _listing(surface: Surface, kind: str, page: int = 100) -> list[dict[str, Any]]:
+    """Every hit of one kind's listing, paged with `offset` (`mission_search` without a query)."""
+
+    hits: list[dict[str, Any]] = []
+    while True:
+        data = surface.tool("mission_search", {"kinds": [kind], "limit": page, "offset": len(hits)})
+        batch = data.get("hits") or []
+        hits += batch
+        if not batch or len(hits) >= int(data.get("total") or 0):
+            return hits
+
+
+def _evaluate_research_mounting(surface: Surface, card: Scorecard) -> None:
+    """What a research node can mount from Knowledge Services, and what the installation must
+    serve for it: the capabilities page's row for the capture server against the catalog's own
+    MCP Tool rows of that server (one id per tool it allowlisted at any revision; a revision
+    that added a tool added its id). Read-only."""
+
+    text, _data = surface.call("mission_guide", {"topic": "capabilities"})
+    row = _MOUNT_ROW.search(text)
+    prefix = f"{CAPTURE_SERVER}.tool."
+    names = sorted(
+        {
+            str(hit.get("ref", "")).removeprefix(prefix).partition("@")[0].replace("-", "_")
+            for hit in _listing(surface, "mcp_tool")
+            if str(hit.get("ref", "")).startswith(prefix)
+        }
+    )
+    lanes = row.group(2) if row else ""
+    mounted = int(row.group(3)) if row else 0
+    missing = [name for name in RESEARCH_TOOLS if name not in names]
+    handed = [name for name in WITHHELD_TOOLS if name in names]
+    card.add(
+        "Which Knowledge Services tools can a research node mount?",
+        "mcp",
+        row is not None
+        and "`deep_agents`" in lanes
+        and mounted == len(names)
+        and not missing
+        and not handed,
+        f"mission_guide('capabilities') row: "
+        f"{'revision ' + row.group(1) if row else 'absent'}; lanes {lanes or 'none'}; tools "
+        f"mounted {mounted} of {row.group(4) if row and row.group(4) else mounted}; "
+        f"mission_search(kinds=['mcp_tool']) tool ids of the server: {len(names)} "
+        f"({', '.join(names) or 'none'}); research tools missing: {missing or 'none'}; "
+        f"withheld tools handed: {handed or 'none'}",
+        "a deep_agents node mounts the capture server's allowlist, whose tool rows the catalog "
+        f"lists: {', '.join(RESEARCH_TOOLS)} among them, {', '.join(WITHHELD_TOOLS)} not",
+    )
+    secrets = row.group(5) if row else ""
+    needs = row.group(6) if row else ""
+    card.add(
+        "What must the installation serve for the capture server?",
+        "mcp",
+        row is not None
+        and "MCP_SERVER_ENDPOINTS" in needs
+        and "remote server" in needs
+        and "VERIFY_EXECUTOR_TOKEN" in secrets,
+        f"mission_guide('capabilities') row for {CAPTURE_SERVER}: secrets {secrets or 'none'}; "
+        f"needs {needs or 'none'}",
+        "the endpoint in MCP_SERVER_ENDPOINTS, the server pinned as a remote server on the "
+        "worker and a value for VERIFY_EXECUTOR_TOKEN",
     )
 
 

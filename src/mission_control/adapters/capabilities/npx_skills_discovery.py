@@ -13,6 +13,7 @@ from typing import Protocol
 from pydantic import BaseModel, ConfigDict, Field
 
 from mission_control.application.capabilities.external_capability_discovery import (
+    ExternalCapabilityDiscoveryUnavailable,
     ExternalDiscoveryBatch,
     ExternalDiscoveryCandidate,
     ExternalDiscoveryEvidence,
@@ -55,7 +56,7 @@ class SkillDiscoverySubprocessRunner(Protocol):
     ) -> SkillDiscoverySubprocessResult: ...
 
 
-class SkillDiscoveryDependencyError(RuntimeError):
+class SkillDiscoveryDependencyError(ExternalCapabilityDiscoveryUnavailable):
     pass
 
 
@@ -66,15 +67,24 @@ class AsyncioSkillDiscoverySubprocessRunner:
         self,
         request: SkillDiscoverySubprocessRequest,
     ) -> SkillDiscoverySubprocessResult:
-        process = await asyncio.create_subprocess_exec(
-            request.executable,
-            *request.arguments,
-            cwd=request.working_directory,
-            env=request.environment,
-            stdin=asyncio.subprocess.DEVNULL,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-        )
+        try:
+            process = await asyncio.create_subprocess_exec(
+                request.executable,
+                *request.arguments,
+                cwd=request.working_directory,
+                env=request.environment,
+                stdin=asyncio.subprocess.DEVNULL,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+            )
+        except NotImplementedError as error:
+            # A selector event loop cannot start a subprocess on Windows, and the API runs one
+            # there (psycopg's async adapter needs it): nothing was started or downloaded.
+            raise SkillDiscoveryDependencyError(
+                "this host's event loop cannot start the pinned npx skills subprocess (a "
+                "selector event loop, as the API runs on Windows); run agent-skill discovery "
+                "where the API's event loop can start one"
+            ) from error
         assert process.stdout is not None
         assert process.stderr is not None
         try:

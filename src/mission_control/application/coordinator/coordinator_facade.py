@@ -53,6 +53,7 @@ from mission_control.application.capabilities.external_candidate_repository impo
 from mission_control.application.capabilities.external_capability_discovery import (
     ExternalCapabilityDiscoveryDisabled,
     ExternalCapabilityDiscoveryService,
+    ExternalCapabilityDiscoveryUnavailable,
 )
 from mission_control.application.coordinator.coordinator_launch import (
     CoordinatorLaunchPreparationService,
@@ -1459,6 +1460,10 @@ def _translate_dependency_error(error: Exception) -> CoordinatorDomainError:
         return CoordinatorDomainError(code, "launch ticket is unavailable")
     if isinstance(error, ExternalCapabilityDiscoveryDisabled):
         return ProductionCoordinatorFacade._dependency("external capability discovery is disabled")
+    if isinstance(error, ExternalCapabilityDiscoveryUnavailable):
+        # The registry or the pinned `npx skills` could not answer: a dependency refusal that
+        # names it, never an internal error (the message carries no body or credential).
+        return ProductionCoordinatorFacade._dependency(str(error))
     if isinstance(error, (TypeError, ValueError)):
         return ProductionCoordinatorFacade._invalid("coordinator request is invalid")
     return CoordinatorDomainError(

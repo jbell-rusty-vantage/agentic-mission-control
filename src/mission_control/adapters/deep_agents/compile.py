@@ -861,10 +861,13 @@ class DeepAgentsCompileAdapter:
             }
         )
         # The references the operation resolves before cognition besides the model's: the
-        # sandbox's, the children's seeded MCP credentials and the async deployment credentials
-        # the parent mints its Agent Server scope claims from (P1 WP-S2).
+        # sandbox's, the node's own MCP servers' (a remote server's bearer token, a stdio
+        # server's environment; the materializer refuses one that was not resolved), the
+        # children's seeded MCP credentials and the async deployment credentials the parent
+        # mints its Agent Server scope claims from (P1 WP-S2).
         secrets = (
             *sandbox.credential_refs,
+            *(ref for server in mcp for ref in server.credential_refs),
             *(
                 ref
                 for child in adaptation.sync_subagents

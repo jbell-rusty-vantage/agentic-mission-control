@@ -1,0 +1,1620 @@
+{
+  "capture": {
+    "command": "uv run --no-sync python scripts/capture_mcp_tool_snapshot.py --url http://127.0.0.1:4311/mcp --bearer-env <token variable> --output <snapshot>",
+    "credential": "VERIFY_EXECUTOR_TOKEN (the executor ran with a token; value not recorded)",
+    "reported_server": "knowledge-verification-executor",
+    "reported_version": "0.1.0",
+    "source_checkout": "1a451fde077b3b29b990cb5170018421e7765d96 (clean, dist built; the server reports no commit)",
+    "tool": "scripts/capture_mcp_tool_snapshot.py",
+    "tool_count": 42
+  },
+  "capture_method": "captured",
+  "captured_on": "2026-11-16",
+  "environment": {},
+  "note": "tools/list of the Knowledge Services executor built from 1a451fd and started on this machine against the AI Engineer lab database at head 20261116150000 with the contract schema workspace (so the schema_*, db_*, ingest_*, chain_write, evidence_units, checkpoint_*, source_* and artifact_get tools are registered) and without the ks.knowledge_operation.v2 issuer (the knowledge_operation_* tools and knowledge_receipt_get are still listed and refuse without its credential). Large input schemas are the executor's published short form; knowledge_describe returns the full one. The executor publishes no annotations, so read_only_hint is null and side_effect_class is Mission Control's classification of each description. Titles are not kept.",
+  "package_pin": "git:https://github.com/jbell-rusty-vantage/agent-knowledge-services@1a451fde077b3b29b990cb5170018421e7765d96#apps/verification-executor",
+  "schema_version": "mc.mcp_tools_fixture.v1",
+  "server": "mcp.knowledge-capture",
+  "source": "docs/specs/provider-consolidation-2026-10/providers/research-capabilities/RESEARCH-CAPABILITIES-SURFACE-2026-11-16.md (Knowledge Services executor 0.1.0 at 1a451fd)",
+  "tools": [
+    {
+      "description": "Return an orchestration.artifact row (intent, snapshot, plan, receipt, report) with its JSON or text body when the bytes are available.",
+      "input_schema": {
+        "properties": {
+          "artifactId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "tenantId": {
+            "description": "Tenant; defaults to the executor's configured tenant.",
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "artifactId"
+        ],
+        "type": "object"
+      },
+      "name": "artifact_get",
+      "read_only_hint": null,
+      "side_effect_class": "read_only"
+    },
+    {
+      "description": "One governed write: record_claim, restate_claim, record_triage, register_probe, record_probe_run, propose_verdict, record_source_assessment, raise_attention_sweep, settle_attention_sweep. Proposals only: never verifies a claim, never a person's judgment. Read knowledge_describe operation:<name>.",
+      "input_schema": {
+        "description": "Short form. Full schema: knowledge_describe {\"ref\":\"tool:chain_write\"}.",
+        "properties": {
+          "request": {
+            "properties": {
+              "idempotency_key": {
+                "type": "string"
+              },
+              "input": {
+                "type": "object"
+              },
+              "operation": {
+                "enum": [
+                  "record_claim",
+                  "restate_claim",
+                  "record_triage",
+                  "register_probe",
+                  "record_probe_run",
+                  "propose_verdict",
+                  "record_source_assessment",
+                  "raise_attention_sweep",
+                  "settle_attention_sweep"
+                ]
+              }
+            },
+            "required": [
+              "operation",
+              "idempotency_key",
+              "input"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "request"
+        ],
+        "type": "object"
+      },
+      "name": "chain_write",
+      "read_only_hint": null,
+      "side_effect_class": "bounded_write"
+    },
+    {
+      "description": "Verify complete remote artifact closure and atomically advance the expected scoped checkpoint head.",
+      "input_schema": {
+        "description": "Short form. Full schema: knowledge_describe {\"ref\":\"tool:checkpoint_commit\"}.",
+        "properties": {
+          "request": {
+            "properties": {
+              "expectedHead": {},
+              "idempotencyKey": {
+                "type": "string"
+              },
+              "manifest": {
+                "properties": {
+                  "boundary": {
+                    "type": "string"
+                  },
+                  "capabilityProfileDigest": {
+                    "type": "string"
+                  },
+                  "capabilityProfileVersion": {
+                    "type": "string"
+                  },
+                  "files": {
+                    "type": "array"
+                  },
+                  "mode": {
+                    "type": "string"
+                  },
+                  "parentCheckpointId": {},
+                  "pendingOperations": {
+                    "type": "array"
+                  },
+                  "requiredArtifacts": {
+                    "type": "array"
+                  },
+                  "retentionPolicyDigest": {
+                    "type": "string"
+                  },
+                  "retentionPolicyVersion": {
+                    "type": "string"
+                  },
+                  "schemaVersion": {
+                    "const": "scoped-checkpoint.v1"
+                  },
+                  "scope": {
+                    "type": "object"
+                  },
+                  "storageProfileDigest": {
+                    "type": "string"
+                  },
+                  "storageProfileVersion": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "schemaVersion",
+                  "scope",
+                  "parentCheckpointId",
+                  "storageProfileVersion",
+                  "storageProfileDigest",
+                  "retentionPolicyVersion",
+                  "retentionPolicyDigest",
+                  "capabilityProfileVersion",
+                  "capabilityProfileDigest",
+                  "mode",
+                  "boundary",
+                  "files",
+                  "requiredArtifacts",
+                  "pendingOperations"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "idempotencyKey",
+              "expectedHead",
+              "manifest"
+            ],
+            "type": "object"
+          },
+          "tenantId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "request"
+        ],
+        "type": "object"
+      },
+      "name": "checkpoint_commit",
+      "read_only_hint": null,
+      "side_effect_class": "bounded_write"
+    },
+    {
+      "description": "Host adapter for approved files, executor state and tool observations. Returns a verified durable receipt; continuation remains blocked on unresolved owner work.",
+      "input_schema": {
+        "description": "Short form. Full schema: knowledge_describe {\"ref\":\"tool:checkpoint_harness\"}.",
+        "properties": {
+          "request": {
+            "properties": {
+              "action": {
+                "enum": [
+                  "restore",
+                  "commit",
+                  "observe"
+                ]
+              },
+              "profilePins": {
+                "properties": {
+                  "capabilityProfileDigest": {
+                    "type": "string"
+                  },
+                  "capabilityProfileVersion": {
+                    "type": "string"
+                  },
+                  "retentionPolicyDigest": {
+                    "type": "string"
+                  },
+                  "retentionPolicyVersion": {
+                    "type": "string"
+                  },
+                  "storageProfileDigest": {
+                    "type": "string"
+                  },
+                  "storageProfileVersion": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "storageProfileVersion",
+                  "storageProfileDigest",
+                  "retentionPolicyVersion",
+                  "retentionPolicyDigest",
+                  "capabilityProfileVersion",
+                  "capabilityProfileDigest"
+                ],
+                "type": "object"
+              },
+              "scopeContext": {
+                "properties": {
+                  "namespace": {
+                    "type": "string"
+                  },
+                  "producerAttemptId": {
+                    "type": "string"
+                  },
+                  "runId": {
+                    "type": "string"
+                  },
+                  "tenantId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "tenantId",
+                  "runId",
+                  "producerAttemptId",
+                  "namespace"
+                ],
+                "type": "object"
+              },
+              "session": {
+                "properties": {
+                  "sandboxId": {
+                    "type": "string"
+                  },
+                  "sessionId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "sessionId",
+                  "sandboxId"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "action",
+              "session",
+              "scopeContext",
+              "profilePins"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "request"
+        ],
+        "type": "object"
+      },
+      "name": "checkpoint_harness",
+      "read_only_hint": null,
+      "side_effect_class": "bounded_write"
+    },
+    {
+      "description": "Read the latest committed receipt for an exact standalone session scope.",
+      "input_schema": {
+        "description": "Short form. Full schema: knowledge_describe {\"ref\":\"tool:checkpoint_head\"}.",
+        "properties": {
+          "scope": {
+            "properties": {
+              "namespace": {
+                "type": "string"
+              },
+              "producerAttemptId": {
+                "type": "string"
+              },
+              "runId": {
+                "type": "string"
+              },
+              "sandboxId": {
+                "type": "string"
+              },
+              "sessionId": {
+                "type": "string"
+              },
+              "tenantId": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "tenantId",
+              "runId",
+              "producerAttemptId",
+              "sessionId",
+              "sandboxId",
+              "namespace"
+            ],
+            "type": "object"
+          },
+          "tenantId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "scope"
+        ],
+        "type": "object"
+      },
+      "name": "checkpoint_head",
+      "read_only_hint": null,
+      "side_effect_class": "read_only"
+    },
+    {
+      "description": "Verify archived bytes and manifest without resuming work.",
+      "input_schema": {
+        "description": "Short form. Full schema: knowledge_describe {\"ref\":\"tool:checkpoint_read\"}.",
+        "properties": {
+          "request": {
+            "properties": {
+              "checkpointId": {
+                "type": "string"
+              },
+              "expectedProfilePins": {
+                "properties": {
+                  "capabilityProfileDigest": {
+                    "type": "string"
+                  },
+                  "capabilityProfileVersion": {
+                    "type": "string"
+                  },
+                  "retentionPolicyDigest": {
+                    "type": "string"
+                  },
+                  "retentionPolicyVersion": {
+                    "type": "string"
+                  },
+                  "storageProfileDigest": {
+                    "type": "string"
+                  },
+                  "storageProfileVersion": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "storageProfileVersion",
+                  "storageProfileDigest",
+                  "retentionPolicyVersion",
+                  "retentionPolicyDigest",
+                  "capabilityProfileVersion",
+                  "capabilityProfileDigest"
+                ],
+                "type": "object"
+              },
+              "expectedScope": {
+                "properties": {
+                  "namespace": {
+                    "type": "string"
+                  },
+                  "producerAttemptId": {
+                    "type": "string"
+                  },
+                  "runId": {
+                    "type": "string"
+                  },
+                  "sandboxId": {
+                    "type": "string"
+                  },
+                  "sessionId": {
+                    "type": "string"
+                  },
+                  "tenantId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "tenantId",
+                  "runId",
+                  "producerAttemptId",
+                  "sessionId",
+                  "sandboxId",
+                  "namespace"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "checkpointId",
+              "expectedScope",
+              "expectedProfilePins"
+            ],
+            "type": "object"
+          },
+          "tenantId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "request"
+        ],
+        "type": "object"
+      },
+      "name": "checkpoint_read",
+      "read_only_hint": null,
+      "side_effect_class": "read_only"
+    },
+    {
+      "description": "Verify checkpoint closure and reconcile pending work through its existing owner before continuation.",
+      "input_schema": {
+        "description": "Short form. Full schema: knowledge_describe {\"ref\":\"tool:checkpoint_restore\"}.",
+        "properties": {
+          "request": {
+            "properties": {
+              "checkpointId": {
+                "type": "string"
+              },
+              "expectedProfilePins": {
+                "properties": {
+                  "capabilityProfileDigest": {
+                    "type": "string"
+                  },
+                  "capabilityProfileVersion": {
+                    "type": "string"
+                  },
+                  "retentionPolicyDigest": {
+                    "type": "string"
+                  },
+                  "retentionPolicyVersion": {
+                    "type": "string"
+                  },
+                  "storageProfileDigest": {
+                    "type": "string"
+                  },
+                  "storageProfileVersion": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "storageProfileVersion",
+                  "storageProfileDigest",
+                  "retentionPolicyVersion",
+                  "retentionPolicyDigest",
+                  "capabilityProfileVersion",
+                  "capabilityProfileDigest"
+                ],
+                "type": "object"
+              },
+              "expectedScope": {
+                "properties": {
+                  "namespace": {
+                    "type": "string"
+                  },
+                  "producerAttemptId": {
+                    "type": "string"
+                  },
+                  "runId": {
+                    "type": "string"
+                  },
+                  "sandboxId": {
+                    "type": "string"
+                  },
+                  "sessionId": {
+                    "type": "string"
+                  },
+                  "tenantId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "tenantId",
+                  "runId",
+                  "producerAttemptId",
+                  "sessionId",
+                  "sandboxId",
+                  "namespace"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "checkpointId",
+              "expectedScope",
+              "expectedProfilePins"
+            ],
+            "type": "object"
+          },
+          "tenantId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "request"
+        ],
+        "type": "object"
+      },
+      "name": "checkpoint_restore",
+      "read_only_hint": null,
+      "side_effect_class": "bounded_write"
+    },
+    {
+      "description": "Apply reference-aware retirement after the canonical minimum orphan age; referenced artifacts cannot be retired.",
+      "input_schema": {
+        "properties": {
+          "request": {
+            "additionalProperties": false,
+            "properties": {
+              "artifactId": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "reason": {
+                "maxLength": 2000,
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "artifactId",
+              "reason"
+            ],
+            "type": "object"
+          },
+          "tenantId": {
+            "description": "Tenant; defaults to the executor's configured tenant.",
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "request"
+        ],
+        "type": "object"
+      },
+      "name": "checkpoint_tombstone",
+      "read_only_hint": null,
+      "side_effect_class": "consequential"
+    },
+    {
+      "description": "Return the JSON query plan (no ANALYZE) for one SELECT/WITH statement as pipeline_agent. Use it to check cost before running a heavy read.",
+      "input_schema": {
+        "properties": {
+          "params": {
+            "items": {},
+            "maxItems": 32,
+            "type": "array"
+          },
+          "sql": {
+            "maxLength": 20000,
+            "minLength": 1,
+            "type": "string"
+          },
+          "tenantId": {
+            "description": "Tenant; defaults to the executor's configured tenant.",
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "sql"
+        ],
+        "type": "object"
+      },
+      "name": "db_explain",
+      "read_only_hint": null,
+      "side_effect_class": "read_only"
+    },
+    {
+      "description": "Return the tenant's knowledge_seq (the head every snapshot and ingestion intent cites) and the database migration head.",
+      "input_schema": {
+        "properties": {
+          "tenantId": {
+            "description": "Tenant; defaults to the executor's configured tenant.",
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "db_head",
+      "read_only_hint": null,
+      "side_effect_class": "read_only"
+    },
+    {
+      "description": "Execute named catalog queries in one read-only transaction at one knowledge head and return a knowledge-read-snapshot.v1 with per-op and snapshot digests. persist:true stores intent+snapshot as artifacts.",
+      "input_schema": {
+        "properties": {
+          "intent": {
+            "additionalProperties": {},
+            "propertyNames": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "persist": {
+            "default": false,
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "intent"
+        ],
+        "type": "object"
+      },
+      "name": "db_read_intent",
+      "read_only_hint": null,
+      "side_effect_class": "bounded_write"
+    },
+    {
+      "description": "Run ONE SELECT/WITH statement as pipeline_agent in a read-only transaction with a statement timeout and row cap. No writes, no set_config. Prefer catalog queries (db_read_intent) when one fits.",
+      "input_schema": {
+        "properties": {
+          "limit": {
+            "maximum": 2000,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "params": {
+            "items": {},
+            "maxItems": 32,
+            "type": "array"
+          },
+          "sql": {
+            "maxLength": 20000,
+            "minLength": 1,
+            "type": "string"
+          },
+          "statementTimeoutMs": {
+            "maximum": 60000,
+            "minimum": 100,
+            "type": "integer"
+          },
+          "tenantId": {
+            "description": "Tenant; defaults to the executor's configured tenant.",
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "sql"
+        ],
+        "type": "object"
+      },
+      "name": "db_sql_readonly",
+      "read_only_hint": null,
+      "side_effect_class": "read_only"
+    },
+    {
+      "description": "Find content units of the knowledge base by capture, document, unit, URL or text, each with the capture it was read from. A row's anchor {capture_id, node_id} plus a verbatim quote of its text is an evidence anchor for chain_write record_claim. Name at least one filter.",
+      "input_schema": {
+        "description": "Short form. Full schema: knowledge_describe {\"ref\":\"tool:evidence_units\"}.",
+        "properties": {
+          "captureId": {
+            "type": "string"
+          },
+          "documentId": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer"
+          },
+          "maxTextChars": {
+            "type": "integer"
+          },
+          "nodeId": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "evidence_units",
+      "read_only_hint": null,
+      "side_effect_class": "read_only"
+    },
+    {
+      "description": "Plan, then apply admitted proposals in one transaction as executor_service via temporal.begin_batch/assert_*/commit_batch; return a knowledge-ingestion-receipt.v1. Same bytes ⇒ same receipt (duplicateOf). REBASE_REQUIRED when the head moved.",
+      "input_schema": {
+        "properties": {
+          "expectedHead": {
+            "description": "Overrides intent.expectedKnowledgeHead.",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "intent": {
+            "additionalProperties": {},
+            "propertyNames": {
+              "type": "string"
+            },
+            "type": "object"
+          }
+        },
+        "required": [
+          "intent"
+        ],
+        "type": "object"
+      },
+      "name": "ingest_apply",
+      "read_only_hint": null,
+      "side_effect_class": "consequential"
+    },
+    {
+      "description": "Validate a knowledge-ingestion-intent.v1 against vocabularies, rules, evidence, and the current head; return a knowledge-ingestion-plan.v1 with per-proposal outcomes. Writes nothing.",
+      "input_schema": {
+        "properties": {
+          "expectedHead": {
+            "description": "Overrides intent.expectedKnowledgeHead.",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "intent": {
+            "additionalProperties": {},
+            "propertyNames": {
+              "type": "string"
+            },
+            "type": "object"
+          }
+        },
+        "required": [
+          "intent"
+        ],
+        "type": "object"
+      },
+      "name": "ingest_plan",
+      "read_only_hint": null,
+      "side_effect_class": "read_only"
+    },
+    {
+      "description": "Return the stored knowledge-ingestion-receipt.v1 for a receiptId (orchestration.operation_receipt.id).",
+      "input_schema": {
+        "properties": {
+          "receiptId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "tenantId": {
+            "description": "Tenant; defaults to the executor's configured tenant.",
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "receiptId"
+        ],
+        "type": "object"
+      },
+      "name": "ingest_receipt",
+      "read_only_hint": null,
+      "side_effect_class": "read_only"
+    },
+    {
+      "description": "ref tool:<name>: the full input schema of one tool of this server. ref operation:<name>: one verification-chain operation of chain_write (input, rules, example, role). No ref: binding-descriptor.v2 of the credential's binding (protocol, operations, report kinds, guarantees).",
+      "input_schema": {
+        "properties": {
+          "ref": {
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "knowledge_describe",
+      "read_only_hint": null,
+      "side_effect_class": "read_only"
+    },
+    {
+      "description": "Read the guidance as Markdown: the start page, or one skill or one reference of a skill.\nCall it first, without a topic, for the jobs, the skill and the tools of each job and the rules that always hold.\nReturns one Markdown page that ends with the topics it links to. Read a skill, then only the reference the step you are on needs.",
+      "input_schema": {
+        "properties": {
+          "topic": {
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "knowledge_guide",
+      "read_only_hint": null,
+      "side_effect_class": "read_only"
+    },
+    {
+      "description": "Idempotent cancellation by cancelRequestId: the first request id is kept; queued operations cancel, running or waiting_review ones move to cancelling and settle cancelled.",
+      "input_schema": {
+        "properties": {
+          "cancelRequestId": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@-]{0,199}$",
+            "type": "string"
+          },
+          "operationId": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@-]{0,199}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "operationId",
+          "cancelRequestId"
+        ],
+        "type": "object"
+      },
+      "name": "knowledge_operation_cancel",
+      "read_only_hint": null,
+      "side_effect_class": "bounded_write"
+    },
+    {
+      "description": "Poll one operation handle by operationId (scope from the credential). Returns operation-status.v2 with a bounded retryAfterMs while not terminal.",
+      "input_schema": {
+        "properties": {
+          "operationId": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@-]{0,199}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "operationId"
+        ],
+        "type": "object"
+      },
+      "name": "knowledge_operation_get",
+      "read_only_hint": null,
+      "side_effect_class": "read_only"
+    },
+    {
+      "description": "Send one ks.knowledge_operation.v2 operation-envelope.v2. Returns operation-receipt.v2 for a synchronous effect (report.register, knowledge.apply), knowledge-plan-preview.v1 for the read-only knowledge.plan_preview, knowledge-read-intent-result.v1 for the recorded read-only knowledge.read_intent (allowlisted named queries and schema reads), or operation-handle.v2 (knowledge.read, report.assess, report.derive, report.observe, report.seal, report.decide, report.review, decision.resolve). A binding serves only the operations its knowledge_describe descriptor lists. Refusals are protocol-error.v2.",
+      "input_schema": {
+        "properties": {
+          "envelope": {
+            "additionalProperties": {},
+            "propertyNames": {
+              "type": "string"
+            },
+            "type": "object"
+          }
+        },
+        "required": [
+          "envelope"
+        ],
+        "type": "object"
+      },
+      "name": "knowledge_operation_invoke",
+      "read_only_hint": null,
+      "side_effect_class": "consequential"
+    },
+    {
+      "description": "Receipt-first recovery: receipt-lookup.v2 for one effect key (found, not_found or unresolved). A negative lookup after an uncertain dispatch is not proof that nothing was applied.",
+      "input_schema": {
+        "properties": {
+          "effectKey": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@-]{0,199}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "effectKey"
+        ],
+        "type": "object"
+      },
+      "name": "knowledge_receipt_get",
+      "read_only_hint": null,
+      "side_effect_class": "read_only"
+    },
+    {
+      "description": "Return a workspace page by id (rel:<schema>.<name>, dom:<slug>, task:<slug>, fn:<schema>.<name>) or relative path, capped in size. Search before reading; read the domain page before a relation page; ≤4 reads to an operation.",
+      "input_schema": {
+        "properties": {
+          "id": {
+            "maxLength": 300,
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxBytes": {
+            "maximum": 256000,
+            "minimum": 256,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "schema_get",
+      "read_only_hint": null,
+      "side_effect_class": "read_only"
+    },
+    {
+      "description": "Return the workspace manifest (fingerprint, migration head, scope) plus the connected database's migration head and whether they match.",
+      "input_schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "schema_manifest",
+      "read_only_hint": null,
+      "side_effect_class": "read_only"
+    },
+    {
+      "description": "Copy a scoped workspace bundle (workspace-scopes/<scope>.json) into an empty directory, via the db-contract CLI when present, else an in-process filter.",
+      "input_schema": {
+        "properties": {
+          "outDir": {
+            "maxLength": 1000,
+            "minLength": 1,
+            "type": "string"
+          },
+          "scope": {
+            "maxLength": 120,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "scope",
+          "outDir"
+        ],
+        "type": "object"
+      },
+      "name": "schema_materialize",
+      "read_only_hint": null,
+      "side_effect_class": "bounded_write"
+    },
+    {
+      "description": "Find tables, functions, domains, tasks, queries, and terms in the pinned schema workspace. Ranked: exact alias > name > tokens. Search before reading; read the domain page before a relation page; ≤4 reads to an operation.",
+      "input_schema": {
+        "properties": {
+          "domain": {
+            "type": "string"
+          },
+          "kinds": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "limit": {
+            "maximum": 50,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "query": {
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "schema_search",
+      "read_only_hint": null,
+      "side_effect_class": "read_only"
+    },
+    {
+      "description": "Read the original source attempt and its provenance trust. Terminal leads require verified remote receipt custody. An unfinished attempt returns no leads and must be reconciled before any new provider dispatch.",
+      "input_schema": {
+        "properties": {
+          "attemptId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "limit": {
+            "maximum": 200,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "offset": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "tenantId": {
+            "description": "Tenant; defaults to the executor's configured tenant.",
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "attemptId"
+        ],
+        "type": "object"
+      },
+      "name": "source_attempt",
+      "read_only_hint": null,
+      "side_effect_class": "read_only"
+    },
+    {
+      "description": "Dispatch a configured search provider after durable request registration; preserve output before returning its receipt. Snippets remain untrusted discovery material. Reuse the idempotency key to recover the original attempt.",
+      "input_schema": {
+        "description": "Short form. Full schema: knowledge_describe {\"ref\":\"tool:source_discover\"}.",
+        "properties": {
+          "request": {
+            "properties": {
+              "idempotencyKey": {
+                "type": "string"
+              },
+              "parameters": {},
+              "providerCode": {
+                "type": "string"
+              },
+              "purpose": {
+                "type": "string"
+              },
+              "queryText": {
+                "type": "string"
+              },
+              "requestedUrls": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "schemaVersion": {
+                "const": "source-discovery-managed-request.v1"
+              }
+            },
+            "required": [
+              "providerCode",
+              "queryText",
+              "purpose",
+              "parameters",
+              "requestedUrls",
+              "schemaVersion",
+              "idempotencyKey"
+            ],
+            "type": "object"
+          },
+          "tenantId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "request"
+        ],
+        "type": "object"
+      },
+      "name": "source_discover",
+      "read_only_hint": null,
+      "side_effect_class": "bounded_write"
+    },
+    {
+      "description": "Account for externally executed provider attempts using already preserved receipt artifacts. Imported metadata is self-reported and never gains managed-provider authority.",
+      "input_schema": {
+        "description": "Short form. Full schema: knowledge_describe {\"ref\":\"tool:source_import\"}.",
+        "properties": {
+          "receipt": {
+            "properties": {
+              "externalReceiptArtifact": {
+                "properties": {
+                  "artifactId": {
+                    "type": "string"
+                  },
+                  "byteLength": {
+                    "type": "integer"
+                  },
+                  "createdAt": {
+                    "type": "string"
+                  },
+                  "dataClassification": {
+                    "type": "string"
+                  },
+                  "digest": {
+                    "type": "string"
+                  },
+                  "encryptionClass": {
+                    "type": "string"
+                  },
+                  "mediaType": {
+                    "type": "string"
+                  },
+                  "objectKey": {
+                    "type": "string"
+                  },
+                  "parentArtifactIds": {
+                    "type": "array"
+                  },
+                  "producerActivityId": {
+                    "type": "string"
+                  },
+                  "producerVersion": {
+                    "type": "string"
+                  },
+                  "retentionClass": {
+                    "type": "string"
+                  },
+                  "tenantId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "artifactId",
+                  "tenantId",
+                  "digest",
+                  "mediaType",
+                  "byteLength",
+                  "objectKey",
+                  "createdAt",
+                  "producerActivityId",
+                  "producerVersion",
+                  "encryptionClass",
+                  "retentionClass",
+                  "dataClassification",
+                  "parentArtifactIds"
+                ],
+                "type": "object"
+              },
+              "idempotencyKey": {
+                "type": "string"
+              },
+              "occurredAt": {
+                "type": "string"
+              },
+              "parameters": {},
+              "providerCode": {
+                "type": "string"
+              },
+              "purpose": {
+                "type": "string"
+              },
+              "queryText": {
+                "type": "string"
+              },
+              "requestedUrls": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "results": {
+                "items": {
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "schemaVersion": {
+                "const": "source-discovery-import-receipt.v1"
+              },
+              "selfReported": {
+                "const": true
+              },
+              "state": {
+                "enum": [
+                  "succeeded",
+                  "failed",
+                  "uncertain",
+                  "cancelled"
+                ]
+              }
+            },
+            "required": [
+              "providerCode",
+              "queryText",
+              "purpose",
+              "parameters",
+              "requestedUrls",
+              "schemaVersion",
+              "idempotencyKey",
+              "occurredAt",
+              "selfReported",
+              "externalReceiptArtifact",
+              "state",
+              "results"
+            ],
+            "type": "object"
+          },
+          "tenantId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "receipt"
+        ],
+        "type": "object"
+      },
+      "name": "source_import",
+      "read_only_hint": null,
+      "side_effect_class": "bounded_write"
+    },
+    {
+      "description": "Register a capture you made (verify_capture_source or verify_capture_file) as an evidence capture with quotable units, so chain_write can anchor to it. Text, Markdown, HTML, JSON; other types refused. Same bytes: same capture. quotes: get anchors back.",
+      "input_schema": {
+        "description": "Short form. Full schema: knowledge_describe {\"ref\":\"tool:source_prepare_captured\"}.",
+        "properties": {
+          "captureId": {
+            "type": "string"
+          },
+          "documentType": {
+            "type": "string"
+          },
+          "maxUnits": {
+            "type": "integer"
+          },
+          "quotes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "sourceRole": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "captureId"
+        ],
+        "type": "object"
+      },
+      "name": "source_prepare_captured",
+      "read_only_hint": null,
+      "side_effect_class": "bounded_write"
+    },
+    {
+      "description": "Recover an original managed attempt from verified completion custody under a fresh fence. Does not call the provider again. Refuses a live dispatch lease; missing completion custody yields an explicit uncertain outcome.",
+      "input_schema": {
+        "properties": {
+          "attemptId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "tenantId": {
+            "description": "Tenant; defaults to the executor's configured tenant.",
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "attemptId"
+        ],
+        "type": "object"
+      },
+      "name": "source_reconcile",
+      "read_only_hint": null,
+      "side_effect_class": "bounded_write"
+    },
+    {
+      "description": "Preserve explicit selected, omitted or duplicate lead decisions and reasons in an immutable selection receipt. Does not rewrite provider output, admit evidence or authorize publication.",
+      "input_schema": {
+        "description": "Short form. Full schema: knowledge_describe {\"ref\":\"tool:source_select\"}.",
+        "properties": {
+          "request": {
+            "properties": {
+              "attemptId": {
+                "type": "string"
+              },
+              "decisions": {
+                "items": {
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "idempotencyKey": {
+                "type": "string"
+              },
+              "schemaVersion": {
+                "const": "source-discovery-selection.v1"
+              }
+            },
+            "required": [
+              "schemaVersion",
+              "attemptId",
+              "idempotencyKey",
+              "decisions"
+            ],
+            "type": "object"
+          },
+          "tenantId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "request"
+        ],
+        "type": "object"
+      },
+      "name": "source_select",
+      "read_only_hint": null,
+      "side_effect_class": "bounded_write"
+    },
+    {
+      "description": "Capture bytes instead of a URL: markdown/text/json inline as `text`, or any supported document (pdf, docx, doc, odt, rtf, xlsx, xls, pptx, ppt, epub, csv, html) as `base64`. The executor converts the document to markdown itself (Firecrawl parse) and stores the original bytes beside the text, so the capture is trustworthy evidence. Sandbox files are normally pushed through the HTTP POST /captures route instead of inlining base64.",
+      "input_schema": {
+        "description": "Short form. Full schema: knowledge_describe {\"ref\":\"tool:verify_capture_file\"}.",
+        "properties": {
+          "base64": {
+            "type": "string"
+          },
+          "captureId": {
+            "type": "string"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "mediaType": {
+            "type": "string"
+          },
+          "runId": {
+            "type": "string"
+          },
+          "sourceUri": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "filename"
+        ],
+        "type": "object"
+      },
+      "name": "verify_capture_file",
+      "read_only_hint": null,
+      "side_effect_class": "bounded_write"
+    },
+    {
+      "description": "Resolve a unique quote against an exact representation digest and return a research-core.fragment.v2 with original capture custody and acquisition-time provenance. Requires durable artifact custody. Tenant is host-owned; rights are producer-declared and registration/admission remain separate.",
+      "input_schema": {
+        "description": "Short form. Full schema: knowledge_describe {\"ref\":\"tool:verify_capture_fragment\"}.",
+        "properties": {
+          "access": {
+            "properties": {
+              "limits": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "rights": {
+                "enum": [
+                  "public",
+                  "licensed",
+                  "restricted",
+                  "private"
+                ]
+              }
+            },
+            "required": [
+              "rights",
+              "limits"
+            ],
+            "type": "object"
+          },
+          "binding": {
+            "type": "string"
+          },
+          "captureId": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "quote": {
+            "type": "string"
+          },
+          "representationDigest": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "binding",
+          "captureId",
+          "representationDigest",
+          "quote",
+          "access"
+        ],
+        "type": "object"
+      },
+      "name": "verify_capture_fragment",
+      "read_only_hint": null,
+      "side_effect_class": "bounded_write"
+    },
+    {
+      "description": "Fetch a URL (Firecrawl when configured, otherwise HTTPS GET), store the captured text as an immutable content-addressed artifact, and return a captureId plus a preview. Quotes used in intents must be exact substrings of this captured text.",
+      "input_schema": {
+        "properties": {
+          "captureId": {
+            "description": "Optional stable id; defaults to a digest-derived id.",
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          },
+          "method": {
+            "enum": [
+              "auto",
+              "firecrawl",
+              "https_get"
+            ],
+            "type": "string"
+          },
+          "runId": {
+            "description": "Agent-chosen run id; capture steps are logged as non-authoritative step receipts under it.",
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          },
+          "url": {
+            "format": "uri",
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ],
+        "type": "object"
+      },
+      "name": "verify_capture_source",
+      "read_only_hint": null,
+      "side_effect_class": "bounded_write"
+    },
+    {
+      "description": "Fetch a stored artifact by artifactId or digest (as text, json or just the handle).",
+      "input_schema": {
+        "properties": {
+          "artifactId": {
+            "type": "string"
+          },
+          "as": {
+            "enum": [
+              "text",
+              "json",
+              "handle"
+            ],
+            "type": "string"
+          },
+          "digest": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "verify_get_artifact",
+      "read_only_hint": null,
+      "side_effect_class": "read_only"
+    },
+    {
+      "description": "List every capture in the store with its digest and size.",
+      "input_schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "verify_list_captures",
+      "read_only_hint": null,
+      "side_effect_class": "read_only"
+    },
+    {
+      "description": "Resolve a candidate quote as a text_quote selector on the captured bytes. status=resolved means it occurs exactly once and is safe to put in an intent; ambiguous/not_found include suggestions.",
+      "input_schema": {
+        "properties": {
+          "captureId": {
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          },
+          "quote": {
+            "maxLength": 4000,
+            "minLength": 1,
+            "type": "string"
+          },
+          "runId": {
+            "description": "Agent-chosen run id; capture steps are logged as non-authoritative step receipts under it.",
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "captureId",
+          "quote"
+        ],
+        "type": "object"
+      },
+      "name": "verify_locate_quote",
+      "read_only_hint": null,
+      "side_effect_class": "read_only"
+    },
+    {
+      "description": "Read a window of the exact captured text (default 6000 chars, max 20000). Use this to inspect the source before choosing quotes.",
+      "input_schema": {
+        "properties": {
+          "captureId": {
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          },
+          "length": {
+            "exclusiveMinimum": 0,
+            "maximum": 20000,
+            "type": "integer"
+          },
+          "offset": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "runId": {
+            "description": "Agent-chosen run id; capture steps are logged as non-authoritative step receipts under it.",
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "captureId"
+        ],
+        "type": "object"
+      },
+      "name": "verify_read_capture",
+      "read_only_hint": null,
+      "side_effect_class": "read_only"
+    },
+    {
+      "description": "Store text (an intent file, a report, notes) as a content-addressed artifact and get back its artifactId/digest. Sandbox files are normally pushed via the HTTP /artifacts route instead.",
+      "input_schema": {
+        "properties": {
+          "label": {
+            "maxLength": 80,
+            "type": "string"
+          },
+          "mediaType": {
+            "default": "application/json",
+            "maxLength": 120,
+            "minLength": 1,
+            "type": "string"
+          },
+          "runId": {
+            "description": "Agent-chosen run id; capture steps are logged as non-authoritative step receipts under it.",
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          },
+          "text": {
+            "maxLength": 2000000,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "type": "object"
+      },
+      "name": "verify_register_artifact",
+      "read_only_hint": null,
+      "side_effect_class": "bounded_write"
+    },
+    {
+      "description": "Find where a phrase (or the words of a phrase) occurs in a capture. Returns exact substrings with context and their occurrence counts so you can build a unique quote.",
+      "input_schema": {
+        "properties": {
+          "captureId": {
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          },
+          "limit": {
+            "exclusiveMinimum": 0,
+            "maximum": 25,
+            "type": "integer"
+          },
+          "query": {
+            "maxLength": 400,
+            "minLength": 1,
+            "type": "string"
+          },
+          "runId": {
+            "description": "Agent-chosen run id; capture steps are logged as non-authoritative step receipts under it.",
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "captureId",
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "verify_search_capture",
+      "read_only_hint": null,
+      "side_effect_class": "read_only"
+    },
+    {
+      "description": "List every content type the executor can capture and how each is converted to the text representation quotes are selected from.",
+      "input_schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "verify_supported_media_types",
+      "read_only_hint": null,
+      "side_effect_class": "read_only"
+    }
+  ]
+}

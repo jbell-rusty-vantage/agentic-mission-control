@@ -204,6 +204,7 @@ GUIDE = {
                 "kind": "organization",
                 "displayName": "AUTHOR_ACTUAL_ORGANIZATION_NAME",
                 "identifiers": [{"scheme": "github", "value": "AUTHOR_ACTUAL_GITHUB_ORG"}],
+                "attributes": {},
                 "onMatch": "use_existing",
                 "evidence": [{"claimId": "COPY_A_FULLY_SUPPORTED_ASSERTION_ID"}],
             }
@@ -229,11 +230,15 @@ GUIDE = {
     "rules": [
         "Placeholders are not facts. Every value must be justified by a selected claim.",
         "Relationship kinds constrain endpoint entity kinds: read section='relationship_kinds'.",
-        "Entity kinds and their typed payload columns: section='entity_kinds' and "
-        "section='relation', name='corpus/<kind>'.",
-        "A new subject carries its kind's NOT NULL typed columns in typedPayload, taken from "
-        "evidence (for example paper.title; repository name, owner and host). Read "
-        "section='relation', name='corpus/<kind>'; the host refuses a new subject without them.",
+        "Entity kinds and their attribute schemas: section='entity_kinds' (each kind's "
+        "attributes_schema and canonical table). Every kind is one catalog.entity row "
+        "(section='relation', name='catalog/entity'); a work kind (paper, talk, media_work, "
+        "story, case_study) also has its bibliographic row (name='catalog/work').",
+        "A new subject carries its kind's attributes in attributes, a JSON object taken from "
+        "evidence and checked against that kind's attributes_schema (for example repository "
+        "requires host, owner and name; library_release requires version_label). The plan "
+        "reports a missing required key before any write; numbers that change over time are "
+        "facts, never attributes.",
         "Never cite search/discovery listings; only judged assertions are evidence.",
         "verify_evidence is evaluation, not admission. aieng_ingest returns held/refused "
         "feedback unless exact-use admission, native apply and row readback all succeed.",
@@ -766,7 +771,7 @@ class AiengKnowledgeBridge(QualiaKnowledgeBridge):
                         dispatched=False,
                         repair="This exact effect was refused before commit and stays fenced; no "
                         "row was written. Correct native_input from the feedback (for a "
-                        "constraint violation, supply the named typedPayload column from "
+                        "constraint violation, supply the named attributes key from "
                         "evidence or drop that subject), preview again, then apply.",
                     )
                     return bounded_result(refusal)
@@ -904,9 +909,10 @@ def build_aieng_knowledge_tools(
         (
             "aieng_schema",
             AiengSchemaInput,
-            "Read the AI Engineer native-input guide, entity kinds, relationship kinds (with "
-            "endpoint kinds), ingestion rules or one relation's columns (section='relation', "
-            "name='corpus/library'). Character pagination; no database access or model call.",
+            "Read the AI Engineer native-input guide, entity kinds (with each kind's "
+            "attributes schema), relationship kinds (with endpoint kinds), ingestion rules or one "
+            "relation's columns (section='relation', name='catalog/entity'). Character "
+            "pagination; no database access or model call.",
         ),
     )
     tools: dict[str, BaseTool] = {}

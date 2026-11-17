@@ -275,9 +275,17 @@ class Stack:
         self.record_path = self.directory / STACK
 
     def environment(self) -> dict[str, str]:
+        """The env file, then each credential the installation references (``--credential``):
+        its value read from its ignored file now, by name, so the installation holds none."""
+
         values = installation.read_env_file(self.directory / installation.ENV_FILE)
         if not values.get("MISSION_CONTROL_DEPLOYMENT_FILE"):
             raise StackError(f"{installation.ENV_FILE} is missing or incomplete; rerun the install")
+        for name, file in sorted((self.state.get("credentials") or {}).items()):
+            value = installation.read_env_file(Path(file)).get(name)
+            if not value:
+                raise StackError(f"credential {name} has no value in its referenced file {file}")
+            values[name] = value
         return installation.base_environment(values)
 
     def temporal(self) -> dict[str, str]:

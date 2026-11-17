@@ -49,9 +49,9 @@ async def test_the_page_lists_each_server_at_its_newest_revision_with_what_it_ne
     assert "### What a node can mount" in page
 
     capture = _row(page, "mcp.knowledge-capture")
-    assert capture[0] == "`mcp.knowledge-capture` (revision 2)"
+    assert capture[0] == "`mcp.knowledge-capture` (revision 3)"
     assert capture[1] == "`deep_agents`"
-    assert capture[2] == "19 of 40 (allowlist)"
+    assert capture[2] == "23 of 42 (allowlist)"
     assert capture[3] == "`VERIFY_EXECUTOR_TOKEN`"
     assert "`MCP_SERVER_ENDPOINTS` under `mcp.knowledge-capture`" in capture[4]
     assert "remote server" in capture[4]
@@ -72,7 +72,7 @@ async def test_the_page_names_each_plugins_members_and_the_member_rule() -> None
     page = await _capabilities_page()
 
     knowledge = _row(page, "plugin.cognition-knowledge")
-    assert knowledge[0] == "`plugin.cognition-knowledge` (revision 3)"
+    assert knowledge[0] == "`plugin.cognition-knowledge` (revision 4)"
     assert knowledge[1] == "`deep_agents`"
     for member in (
         "`skill.knowledge-research` (skill)",

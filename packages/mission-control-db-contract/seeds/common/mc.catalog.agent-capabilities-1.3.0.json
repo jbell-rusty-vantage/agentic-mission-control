@@ -1,0 +1,2973 @@
+{
+  "actor_ref": "seed:mission-control-catalog",
+  "component_compatibility": ">=1.0.0 <2.0.0",
+  "depends_on": [
+    {
+      "seed_key": "mc.catalog.agent-capabilities",
+      "seed_version": "1.2.0"
+    }
+  ],
+  "description": "Revision 3 of mcp.knowledge-capture and of its 23 allowlisted MCP Tool rows, from a recapture of the Knowledge Services executor at 1a451fd (42 tools, large input schemas in their published short form). The allowlist is revision 2's plus chain_write, evidence_units, knowledge_describe, source_prepare_captured, so a research agent can make its capture quotable and record a claim anchored to a quote; knowledge ingestion, direct database reads, checkpoints, schema_materialize, artifact_get and the issuer-credential tools stay withheld. Host support is revision 2's. No 1.2.0 record is repeated.",
+  "format": "mission-control-seed/v1",
+  "records": [
+    {
+      "fields": {
+        "asset_id": "definition:mcp_server:mcp.knowledge-capture",
+        "contract": "mission-control.published-definition/1",
+        "host_support": {
+          "profiles": {
+            "claude_agent_sdk": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "codex": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "cursor_cloud": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unsupported"
+            },
+            "cursor_local": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "unqualified"
+            },
+            "deep_agents": {
+              "evidence_ref": null,
+              "overlay": {},
+              "status": "supported"
+            }
+          },
+          "schema_version": "mc.capability_host_support.v1"
+        },
+        "kind": "mcp_server",
+        "manifest": {
+          "definition": {
+            "allowed_tools": [
+              "chain_write",
+              "evidence_units",
+              "knowledge_describe",
+              "knowledge_guide",
+              "schema_get",
+              "schema_manifest",
+              "schema_search",
+              "source_attempt",
+              "source_discover",
+              "source_import",
+              "source_prepare_captured",
+              "source_reconcile",
+              "source_select",
+              "verify_capture_file",
+              "verify_capture_fragment",
+              "verify_capture_source",
+              "verify_get_artifact",
+              "verify_list_captures",
+              "verify_locate_quote",
+              "verify_read_capture",
+              "verify_register_artifact",
+              "verify_search_capture",
+              "verify_supported_media_types"
+            ],
+            "approval_policy": {},
+            "attachment_targets": [
+              "agent.main"
+            ],
+            "compatible_compiler_versions": [
+              "control-plane-definitions/1"
+            ],
+            "conflicts_with": [],
+            "credential_refs": [],
+            "description": "The Knowledge Services executor's MCP endpoint (Streamable HTTP, /mcp) narrowed to the research method from capture to a proposed claim: capture a URL or a file as exact bytes, read and search a capture, locate a quote that occurs once, export a fragment, register and read artifacts, make a capture quotable as a database capture (source_prepare_captured), find quotable content units (evidence_units), write one governed step of the verification chain (chain_write: a claim anchored to a quote, a probe, a verdict proposal; never a verification and never a person's judgment), record source discovery and lead selection, read the schema workspace, a tool's or a chain operation's full description (knowledge_describe) and the guidance. Withheld: ingest_*, db_*, checkpoint_*, schema_materialize, artifact_get, knowledge_operation_* and knowledge_receipt_get. The endpoint is the executor's local default; a deployment binds its own (MCP_SERVER_ENDPOINTS). VERIFY_EXECUTOR_TOKEN names the token the executor expects on the Authorization header. Supported on the Deep Agents lane, which attaches only this allowlist; unqualified on the other worker-hosted lanes.",
+            "endpoint": "http://127.0.0.1:4310/mcp",
+            "header_refs": {
+              "Authorization": "VERIFY_EXECUTOR_TOKEN"
+            },
+            "host_support": {
+              "profiles": {
+                "claude_agent_sdk": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "codex": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "cursor_cloud": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unsupported"
+                },
+                "cursor_local": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "unqualified"
+                },
+                "deep_agents": {
+                  "evidence_ref": null,
+                  "overlay": {},
+                  "status": "supported"
+                }
+              },
+              "schema_version": "mc.capability_host_support.v1"
+            },
+            "kind": "mcp_server",
+            "launch_template": null,
+            "logical_id": "mcp.knowledge-capture",
+            "maturity": "experimental",
+            "network_requirements": [],
+            "package_pin": "git:https://github.com/jbell-rusty-vantage/agent-knowledge-services@1a451fde077b3b29b990cb5170018421e7765d96#apps/verification-executor",
+            "review_status": "approved",
+            "schema_digest": "sha256:f4dd5caa4b18280fc4462f575665f876bfd18c4d67a5c2ba69be3709cdfa073e",
+            "schema_snapshot_ref": {
+              "digest": "sha256:73625fdbb7bbaf6550f1fdae7d1bee7d21ba707b32362168f440c462e6bb4e96",
+              "media_type": "application/json",
+              "size_bytes": 51836,
+              "uri": "repo://tests/fixtures/mcp/mcp.knowledge-capture.1a451fd.tools.json"
+            },
+            "schema_version": "1",
+            "secret_refs": [
+              "VERIFY_EXECUTOR_TOKEN"
+            ],
+            "source_provenance": {
+              "commit_digest": "1a451fde077b3b29b990cb5170018421e7765d96",
+              "license": "proprietary",
+              "locator": "https://github.com/jbell-rusty-vantage/agent-knowledge-services/tree/1a451fde077b3b29b990cb5170018421e7765d96/apps/verification-executor",
+              "source": "belllabs",
+              "upstream_identity": "knowledge-services/verification-executor",
+              "upstream_version": "0.1.0-1a451fd"
+            },
+            "title": "Knowledge Services evidence capture: capture, locate, source and schema tools",
+            "tool_allowlist": [
+              "chain_write",
+              "evidence_units",
+              "knowledge_describe",
+              "knowledge_guide",
+              "schema_get",
+              "schema_manifest",
+              "schema_search",
+              "source_attempt",
+              "source_discover",
+              "source_import",
+              "source_prepare_captured",
+              "source_reconcile",
+              "source_select",
+              "verify_capture_file",
+              "verify_capture_fragment",
+              "verify_capture_source",
+              "verify_get_artifact",
+              "verify_list_captures",
+              "verify_locate_quote",
+              "verify_read_capture",
+              "verify_register_artifact",
+              "verify_search_capture",
+              "verify_supported_media_types"
+            ],
+            "tools": [
+              {
+                "description": "Return an orchestration.artifact row (intent, snapshot, plan, receipt, report) with its JSON or text body when the bytes are available.",
+                "name": "artifact_get",
+                "read_only_hint": null,
+                "side_effect_class": "read_only"
+              },
+              {
+                "description": "One governed write: record_claim, restate_claim, record_triage, register_probe, record_probe_run, propose_verdict, record_source_assessment, raise_attention_sweep, settle_attention_sweep. Proposals only: never verifies a claim, never a person's judgment. Read knowledge_describe operation:<name>.",
+                "name": "chain_write",
+                "read_only_hint": null,
+                "side_effect_class": "bounded_write"
+              },
+              {
+                "description": "Verify complete remote artifact closure and atomically advance the expected scoped checkpoint head.",
+                "name": "checkpoint_commit",
+                "read_only_hint": null,
+                "side_effect_class": "bounded_write"
+              },
+              {
+                "description": "Host adapter for approved files, executor state and tool observations. Returns a verified durable receipt; continuation remains blocked on unresolved owner work.",
+                "name": "checkpoint_harness",
+                "read_only_hint": null,
+                "side_effect_class": "bounded_write"
+              },
+              {
+                "description": "Read the latest committed receipt for an exact standalone session scope.",
+                "name": "checkpoint_head",
+                "read_only_hint": null,
+                "side_effect_class": "read_only"
+              },
+              {
+                "description": "Verify archived bytes and manifest without resuming work.",
+                "name": "checkpoint_read",
+                "read_only_hint": null,
+                "side_effect_class": "read_only"
+              },
+              {
+                "description": "Verify checkpoint closure and reconcile pending work through its existing owner before continuation.",
+                "name": "checkpoint_restore",
+                "read_only_hint": null,
+                "side_effect_class": "bounded_write"
+              },
+              {
+                "description": "Apply reference-aware retirement after the canonical minimum orphan age; referenced artifacts cannot be retired.",
+                "name": "checkpoint_tombstone",
+                "read_only_hint": null,
+                "side_effect_class": "consequential"
+              },
+              {
+                "description": "Return the JSON query plan (no ANALYZE) for one SELECT/WITH statement as pipeline_agent. Use it to check cost before running a heavy read.",
+                "name": "db_explain",
+                "read_only_hint": null,
+                "side_effect_class": "read_only"
+              },
+              {
+                "description": "Return the tenant's knowledge_seq (the head every snapshot and ingestion intent cites) and the database migration head.",
+                "name": "db_head",
+                "read_only_hint": null,
+                "side_effect_class": "read_only"
+              },
+              {
+                "description": "Execute named catalog queries in one read-only transaction at one knowledge head and return a knowledge-read-snapshot.v1 with per-op and snapshot digests. persist:true stores intent+snapshot as artifacts.",
+                "name": "db_read_intent",
+                "read_only_hint": null,
+                "side_effect_class": "bounded_write"
+              },
+              {
+                "description": "Run ONE SELECT/WITH statement as pipeline_agent in a read-only transaction with a statement timeout and row cap. No writes, no set_config. Prefer catalog queries (db_read_intent) when one fits.",
+                "name": "db_sql_readonly",
+                "read_only_hint": null,
+                "side_effect_class": "read_only"
+              },
+              {
+                "description": "Find content units of the knowledge base by capture, document, unit, URL or text, each with the capture it was read from. A row's anchor {capture_id, node_id} plus a verbatim quote of its text is an evidence anchor for chain_write record_claim. Name at least one filter.",
+                "name": "evidence_units",
+                "read_only_hint": null,
+                "side_effect_class": "read_only"
+              },
+              {
+                "description": "Plan, then apply admitted proposals in one transaction as executor_service via temporal.begin_batch/assert_*/commit_batch; return a knowledge-ingestion-receipt.v1. Same bytes ⇒ same receipt (duplicateOf). REBASE_REQUIRED when the head moved.",
+                "name": "ingest_apply",
+                "read_only_hint": null,
+                "side_effect_class": "consequential"
+              },
+              {
+                "description": "Validate a knowledge-ingestion-intent.v1 against vocabularies, rules, evidence, and the current head; return a knowledge-ingestion-plan.v1 with per-proposal outcomes. Writes nothing.",
+                "name": "ingest_plan",
+                "read_only_hint": null,
+                "side_effect_class": "read_only"
+              },
+              {
+                "description": "Return the stored knowledge-ingestion-receipt.v1 for a receiptId (orchestration.operation_receipt.id).",
+                "name": "ingest_receipt",
+                "read_only_hint": null,
+                "side_effect_class": "read_only"
+              },
+              {
+                "description": "ref tool:<name>: the full input schema of one tool of this server. ref operation:<name>: one verification-chain operation of chain_write (input, rules, example, role). No ref: binding-descriptor.v2 of the credential's binding (protocol, operations, report kinds, guarantees).",
+                "name": "knowledge_describe",
+                "read_only_hint": null,
+                "side_effect_class": "read_only"
+              },
+              {
+                "description": "Read the guidance as Markdown: the start page, or one skill or one reference of a skill.\nCall it first, without a topic, for the jobs, the skill and the tools of each job and the rules that always hold.\nReturns one Markdown page that ends with the topics it links to. Read a skill, then only the reference the step you are on needs.",
+                "name": "knowledge_guide",
+                "read_only_hint": null,
+                "side_effect_class": "read_only"
+              },
+              {
+                "description": "Idempotent cancellation by cancelRequestId: the first request id is kept; queued operations cancel, running or waiting_review ones move to cancelling and settle cancelled.",
+                "name": "knowledge_operation_cancel",
+                "read_only_hint": null,
+                "side_effect_class": "bounded_write"
+              },
+              {
+                "description": "Poll one operation handle by operationId (scope from the credential). Returns operation-status.v2 with a bounded retryAfterMs while not terminal.",
+                "name": "knowledge_operation_get",
+                "read_only_hint": null,
+                "side_effect_class": "read_only"
+              },
+              {
+                "description": "Send one ks.knowledge_operation.v2 operation-envelope.v2. Returns operation-receipt.v2 for a synchronous effect (report.register, knowledge.apply), knowledge-plan-preview.v1 for the read-only knowledge.plan_preview, knowledge-read-intent-result.v1 for the recorded read-only knowledge.read_intent (allowlisted named queries and schema reads), or operation-handle.v2 (knowledge.read, report.assess, report.derive, report.observe, report.seal, report.decide, report.review, decision.resolve). A binding serves only the operations its knowledge_describe descriptor lists. Refusals are protocol-error.v2.",
+                "name": "knowledge_operation_invoke",
+                "read_only_hint": null,
+                "side_effect_class": "consequential"
+              },
+              {
+                "description": "Receipt-first recovery: receipt-lookup.v2 for one effect key (found, not_found or unresolved). A negative lookup after an uncertain dispatch is not proof that nothing was applied.",
+                "name": "knowledge_receipt_get",
+                "read_only_hint": null,
+                "side_effect_class": "read_only"
+              },
+              {
+                "description": "Return a workspace page by id (rel:<schema>.<name>, dom:<slug>, task:<slug>, fn:<schema>.<name>) or relative path, capped in size. Search before reading; read the domain page before a relation page; ≤4 reads to an operation.",
+                "name": "schema_get",
+                "read_only_hint": null,
+                "side_effect_class": "read_only"
+              },
+              {
+                "description": "Return the workspace manifest (fingerprint, migration head, scope) plus the connected database's migration head and whether they match.",
+                "name": "schema_manifest",
+                "read_only_hint": null,
+                "side_effect_class": "read_only"
+              },
+              {
+                "description": "Copy a scoped workspace bundle (workspace-scopes/<scope>.json) into an empty directory, via the db-contract CLI when present, else an in-process filter.",
+                "name": "schema_materialize",
+                "read_only_hint": null,
+                "side_effect_class": "bounded_write"
+              },
+              {
+                "description": "Find tables, functions, domains, tasks, queries, and terms in the pinned schema workspace. Ranked: exact alias > name > tokens. Search before reading; read the domain page before a relation page; ≤4 reads to an operation.",
+                "name": "schema_search",
+                "read_only_hint": null,
+                "side_effect_class": "read_only"
+              },
+              {
+                "description": "Read the original source attempt and its provenance trust. Terminal leads require verified remote receipt custody. An unfinished attempt returns no leads and must be reconciled before any new provider dispatch.",
+                "name": "source_attempt",
+                "read_only_hint": null,
+                "side_effect_class": "read_only"
+              },
+              {
+                "description": "Dispatch a configured search provider after durable request registration; preserve output before returning its receipt. Snippets remain untrusted discovery material. Reuse the idempotency key to recover the original attempt.",
+                "name": "source_discover",
+                "read_only_hint": null,
+                "side_effect_class": "bounded_write"
+              },
+              {
+                "description": "Account for externally executed provider attempts using already preserved receipt artifacts. Imported metadata is self-reported and never gains managed-provider authority.",
+                "name": "source_import",
+                "read_only_hint": null,
+                "side_effect_class": "bounded_write"
+              },
+              {
+                "description": "Register a capture you made (verify_capture_source or verify_capture_file) as an evidence capture with quotable units, so chain_write can anchor to it. Text, Markdown, HTML, JSON; other types refused. Same bytes: same capture. quotes: get anchors back.",
+                "name": "source_prepare_captured",
+                "read_only_hint": null,
+                "side_effect_class": "bounded_write"
+              },
+              {
+                "description": "Recover an original managed attempt from verified completion custody under a fresh fence. Does not call the provider again. Refuses a live dispatch lease; missing completion custody yields an explicit uncertain outcome.",
+                "name": "source_reconcile",
+                "read_only_hint": null,
+                "side_effect_class": "bounded_write"
+              },
+              {
+                "description": "Preserve explicit selected, omitted or duplicate lead decisions and reasons in an immutable selection receipt. Does not rewrite provider output, admit evidence or authorize publication.",
+                "name": "source_select",
+                "read_only_hint": null,
+                "side_effect_class": "bounded_write"
+              },
+              {
+                "description": "Capture bytes instead of a URL: markdown/text/json inline as `text`, or any supported document (pdf, docx, doc, odt, rtf, xlsx, xls, pptx, ppt, epub, csv, html) as `base64`. The executor converts the document to markdown itself (Firecrawl parse) and stores the original bytes beside the text, so the capture is trustworthy evidence. Sandbox files are normally pushed through the HTTP POST /captures route instead of inlining base64.",
+                "name": "verify_capture_file",
+                "read_only_hint": null,
+                "side_effect_class": "bounded_write"
+              },
+              {
+                "description": "Resolve a unique quote against an exact representation digest and return a research-core.fragment.v2 with original capture custody and acquisition-time provenance. Requires durable artifact custody. Tenant is host-owned; rights are producer-declared and registration/admission remain separate.",
+                "name": "verify_capture_fragment",
+                "read_only_hint": null,
+                "side_effect_class": "bounded_write"
+              },
+              {
+                "description": "Fetch a URL (Firecrawl when configured, otherwise HTTPS GET), store the captured text as an immutable content-addressed artifact, and return a captureId plus a preview. Quotes used in intents must be exact substrings of this captured text.",
+                "name": "verify_capture_source",
+                "read_only_hint": null,
+                "side_effect_class": "bounded_write"
+              },
+              {
+                "description": "Fetch a stored artifact by artifactId or digest (as text, json or just the handle).",
+                "name": "verify_get_artifact",
+                "read_only_hint": null,
+                "side_effect_class": "read_only"
+              },
+              {
+                "description": "List every capture in the store with its digest and size.",
+                "name": "verify_list_captures",
+                "read_only_hint": null,
+                "side_effect_class": "read_only"
+              },
+              {
+                "description": "Resolve a candidate quote as a text_quote selector on the captured bytes. status=resolved means it occurs exactly once and is safe to put in an intent; ambiguous/not_found include suggestions.",
+                "name": "verify_locate_quote",
+                "read_only_hint": null,
+                "side_effect_class": "read_only"
+              },
+              {
+                "description": "Read a window of the exact captured text (default 6000 chars, max 20000). Use this to inspect the source before choosing quotes.",
+                "name": "verify_read_capture",
+                "read_only_hint": null,
+                "side_effect_class": "read_only"
+              },
+              {
+                "description": "Store text (an intent file, a report, notes) as a content-addressed artifact and get back its artifactId/digest. Sandbox files are normally pushed via the HTTP /artifacts route instead.",
+                "name": "verify_register_artifact",
+                "read_only_hint": null,
+                "side_effect_class": "bounded_write"
+              },
+              {
+                "description": "Find where a phrase (or the words of a phrase) occurs in a capture. Returns exact substrings with context and their occurrence counts so you can build a unique quote.",
+                "name": "verify_search_capture",
+                "read_only_hint": null,
+                "side_effect_class": "read_only"
+              },
+              {
+                "description": "List every content type the executor can capture and how each is converted to the text representation quotes are selected from.",
+                "name": "verify_supported_media_types",
+                "read_only_hint": null,
+                "side_effect_class": "read_only"
+              }
+            ],
+            "tools_list_digest": "sha256:f4dd5caa4b18280fc4462f575665f876bfd18c4d67a5c2ba69be3709cdfa073e",
+            "transport": "streamable_http"
+          },
+          "published_at": "2026-11-16T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:a50c732566546291714dd987e7c6cea74d8112ccaaeba931ce8fec1e9eb9354c",
+            "kind": "mcp_server",
+            "lifecycle_status": "published",
+            "logical_id": "mcp.knowledge-capture",
+            "payload_ref": null,
+            "revision": 3,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:799d9fdb79e6d674ca5934f38ad819c608f326f36ba74786c21dcf7ca6c2f8b3",
+        "manifest_ref": "mc-catalog://definition/mcp_server/mcp.knowledge-capture/3",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "secret_refs": [
+          "VERIFY_EXECUTOR_TOKEN"
+        ],
+        "status": "admitted",
+        "version": "3"
+      },
+      "kind": "asset_version",
+      "logical_key": "agent-capability:mcp-server:mcp.knowledge-capture/3"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "agent-capability:mcp-server:mcp.knowledge-capture/3",
+        "decided_at": "2026-11-16T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/agent_capabilities.py",
+          "tests/fixtures/mcp/mcp.knowledge-capture.1a451fd.tools.json",
+          "docs/specs/provider-consolidation-2026-10/providers/research-capabilities/RESEARCH-CAPABILITIES-SURFACE-2026-11-16.md"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "agent-capability:mcp-server:mcp.knowledge-capture/3:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:mcp_tool:mcp.knowledge-capture.tool.chain-write",
+        "contract": "mission-control.published-definition/1",
+        "kind": "mcp_tool",
+        "manifest": {
+          "definition": {
+            "annotations": {
+              "readOnlyHint": null,
+              "schema_source": "captured"
+            },
+            "attachment_targets": [
+              "agent.main"
+            ],
+            "compatible_compiler_versions": [
+              "control-plane-definitions/1"
+            ],
+            "conflicts_with": [],
+            "description": "One governed write: record_claim, restate_claim, record_triage, register_probe, record_probe_run, propose_verdict, record_source_assessment, raise_attention_sweep, settle_attention_sweep. Proposals only: never verifies a claim, never a person's judgment. Read knowledge_describe operation:<name>.",
+            "input_schema": {
+              "description": "Short form. Full schema: knowledge_describe {\"ref\":\"tool:chain_write\"}.",
+              "properties": {
+                "request": {
+                  "properties": {
+                    "idempotency_key": {
+                      "type": "string"
+                    },
+                    "input": {
+                      "type": "object"
+                    },
+                    "operation": {
+                      "enum": [
+                        "record_claim",
+                        "restate_claim",
+                        "record_triage",
+                        "register_probe",
+                        "record_probe_run",
+                        "propose_verdict",
+                        "record_source_assessment",
+                        "raise_attention_sweep",
+                        "settle_attention_sweep"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "operation",
+                    "idempotency_key",
+                    "input"
+                  ],
+                  "type": "object"
+                }
+              },
+              "required": [
+                "request"
+              ],
+              "type": "object"
+            },
+            "kind": "mcp_tool",
+            "logical_id": "mcp.knowledge-capture.tool.chain-write",
+            "maturity": "experimental",
+            "output_schema": null,
+            "schema_digest": "sha256:72e16062cfc957af63d77e16bb90404c3fceb5841581ced6c0ca2460075d1bdf",
+            "schema_version": "1",
+            "server_ref": {
+              "digest": "sha256:a50c732566546291714dd987e7c6cea74d8112ccaaeba931ce8fec1e9eb9354c",
+              "kind": "mcp_server",
+              "lifecycle_status": "published",
+              "logical_id": "mcp.knowledge-capture",
+              "payload_ref": null,
+              "revision": 3,
+              "schema_version": "1"
+            },
+            "side_effect_class": "bounded_write",
+            "title": "chain_write",
+            "tool_name": "chain_write"
+          },
+          "published_at": "2026-11-16T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:a9dd8a872324a9f956b2d5fab8c892a451a647253c5fba2d02b60006ef1a8b23",
+            "kind": "mcp_tool",
+            "lifecycle_status": "published",
+            "logical_id": "mcp.knowledge-capture.tool.chain-write",
+            "payload_ref": null,
+            "revision": 1,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:e311e19dc66fbb5b6910b7654a0e16aec43158ead6f6d43cc8ff3aaef5925c83",
+        "manifest_ref": "mc-catalog://definition/mcp_tool/mcp.knowledge-capture.tool.chain-write/1",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "1"
+      },
+      "kind": "asset_version",
+      "logical_key": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.chain-write/1"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.chain-write/1",
+        "decided_at": "2026-11-16T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/agent_capabilities.py",
+          "tests/fixtures/mcp/mcp.knowledge-capture.1a451fd.tools.json",
+          "docs/specs/provider-consolidation-2026-10/providers/research-capabilities/RESEARCH-CAPABILITIES-SURFACE-2026-11-16.md"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.chain-write/1:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:mcp_tool:mcp.knowledge-capture.tool.evidence-units",
+        "contract": "mission-control.published-definition/1",
+        "kind": "mcp_tool",
+        "manifest": {
+          "definition": {
+            "annotations": {
+              "readOnlyHint": null,
+              "schema_source": "captured"
+            },
+            "attachment_targets": [
+              "agent.main"
+            ],
+            "compatible_compiler_versions": [
+              "control-plane-definitions/1"
+            ],
+            "conflicts_with": [],
+            "description": "Find content units of the knowledge base by capture, document, unit, URL or text, each with the capture it was read from. A row's anchor {capture_id, node_id} plus a verbatim quote of its text is an evidence anchor for chain_write record_claim. Name at least one filter.",
+            "input_schema": {
+              "description": "Short form. Full schema: knowledge_describe {\"ref\":\"tool:evidence_units\"}.",
+              "properties": {
+                "captureId": {
+                  "type": "string"
+                },
+                "documentId": {
+                  "type": "string"
+                },
+                "limit": {
+                  "type": "integer"
+                },
+                "maxTextChars": {
+                  "type": "integer"
+                },
+                "nodeId": {
+                  "type": "string"
+                },
+                "text": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "kind": "mcp_tool",
+            "logical_id": "mcp.knowledge-capture.tool.evidence-units",
+            "maturity": "experimental",
+            "output_schema": null,
+            "schema_digest": "sha256:7a6e97ebd5248aac6724184749eba5a18655eb583a63469e584d5ab8663368ce",
+            "schema_version": "1",
+            "server_ref": {
+              "digest": "sha256:a50c732566546291714dd987e7c6cea74d8112ccaaeba931ce8fec1e9eb9354c",
+              "kind": "mcp_server",
+              "lifecycle_status": "published",
+              "logical_id": "mcp.knowledge-capture",
+              "payload_ref": null,
+              "revision": 3,
+              "schema_version": "1"
+            },
+            "side_effect_class": "read_only",
+            "title": "evidence_units",
+            "tool_name": "evidence_units"
+          },
+          "published_at": "2026-11-16T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:6104a8a658589a5c198e037740e3622a6c643275a8e859b79c52ff06b2a72a0b",
+            "kind": "mcp_tool",
+            "lifecycle_status": "published",
+            "logical_id": "mcp.knowledge-capture.tool.evidence-units",
+            "payload_ref": null,
+            "revision": 1,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:9a1494ae07b4d002273fc60acc9f34968044630bc18aadf30fe01138cb655537",
+        "manifest_ref": "mc-catalog://definition/mcp_tool/mcp.knowledge-capture.tool.evidence-units/1",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "1"
+      },
+      "kind": "asset_version",
+      "logical_key": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.evidence-units/1"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.evidence-units/1",
+        "decided_at": "2026-11-16T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/agent_capabilities.py",
+          "tests/fixtures/mcp/mcp.knowledge-capture.1a451fd.tools.json",
+          "docs/specs/provider-consolidation-2026-10/providers/research-capabilities/RESEARCH-CAPABILITIES-SURFACE-2026-11-16.md"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.evidence-units/1:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:mcp_tool:mcp.knowledge-capture.tool.knowledge-describe",
+        "contract": "mission-control.published-definition/1",
+        "kind": "mcp_tool",
+        "manifest": {
+          "definition": {
+            "annotations": {
+              "readOnlyHint": null,
+              "schema_source": "captured"
+            },
+            "attachment_targets": [
+              "agent.main"
+            ],
+            "compatible_compiler_versions": [
+              "control-plane-definitions/1"
+            ],
+            "conflicts_with": [],
+            "description": "ref tool:<name>: the full input schema of one tool of this server. ref operation:<name>: one verification-chain operation of chain_write (input, rules, example, role). No ref: binding-descriptor.v2 of the credential's binding (protocol, operations, report kinds, guarantees).",
+            "input_schema": {
+              "properties": {
+                "ref": {
+                  "maxLength": 200,
+                  "minLength": 1,
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "kind": "mcp_tool",
+            "logical_id": "mcp.knowledge-capture.tool.knowledge-describe",
+            "maturity": "experimental",
+            "output_schema": null,
+            "schema_digest": "sha256:6227b8a788d4c8693b952a862262bdfcc65b828bdfc6a02e90aa9507ad8f5838",
+            "schema_version": "1",
+            "server_ref": {
+              "digest": "sha256:a50c732566546291714dd987e7c6cea74d8112ccaaeba931ce8fec1e9eb9354c",
+              "kind": "mcp_server",
+              "lifecycle_status": "published",
+              "logical_id": "mcp.knowledge-capture",
+              "payload_ref": null,
+              "revision": 3,
+              "schema_version": "1"
+            },
+            "side_effect_class": "read_only",
+            "title": "knowledge_describe",
+            "tool_name": "knowledge_describe"
+          },
+          "published_at": "2026-11-16T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:96f7539d1c9282eadbbd0fed8da40f205d90f49534bf5ed0cf340a7266d25ad8",
+            "kind": "mcp_tool",
+            "lifecycle_status": "published",
+            "logical_id": "mcp.knowledge-capture.tool.knowledge-describe",
+            "payload_ref": null,
+            "revision": 1,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:2a3576017aae992cddc140d249c51669c1087a876a6084692a71b41386254881",
+        "manifest_ref": "mc-catalog://definition/mcp_tool/mcp.knowledge-capture.tool.knowledge-describe/1",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "1"
+      },
+      "kind": "asset_version",
+      "logical_key": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.knowledge-describe/1"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.knowledge-describe/1",
+        "decided_at": "2026-11-16T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/agent_capabilities.py",
+          "tests/fixtures/mcp/mcp.knowledge-capture.1a451fd.tools.json",
+          "docs/specs/provider-consolidation-2026-10/providers/research-capabilities/RESEARCH-CAPABILITIES-SURFACE-2026-11-16.md"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.knowledge-describe/1:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:mcp_tool:mcp.knowledge-capture.tool.knowledge-guide",
+        "contract": "mission-control.published-definition/1",
+        "kind": "mcp_tool",
+        "manifest": {
+          "definition": {
+            "annotations": {
+              "readOnlyHint": null,
+              "schema_source": "captured"
+            },
+            "attachment_targets": [
+              "agent.main"
+            ],
+            "compatible_compiler_versions": [
+              "control-plane-definitions/1"
+            ],
+            "conflicts_with": [],
+            "description": "Read the guidance as Markdown: the start page, or one skill or one reference of a skill.\nCall it first, without a topic, for the jobs, the skill and the tools of each job and the rules that always hold.\nReturns one Markdown page that ends with the topics it links to. Read a skill, then only the reference the step you are on needs.",
+            "input_schema": {
+              "properties": {
+                "topic": {
+                  "maxLength": 200,
+                  "minLength": 1,
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "kind": "mcp_tool",
+            "logical_id": "mcp.knowledge-capture.tool.knowledge-guide",
+            "maturity": "experimental",
+            "output_schema": null,
+            "schema_digest": "sha256:176725b0ea77680a502025e3df8b0281c641f4a712a90b22806f7c50164fa0e4",
+            "schema_version": "1",
+            "server_ref": {
+              "digest": "sha256:a50c732566546291714dd987e7c6cea74d8112ccaaeba931ce8fec1e9eb9354c",
+              "kind": "mcp_server",
+              "lifecycle_status": "published",
+              "logical_id": "mcp.knowledge-capture",
+              "payload_ref": null,
+              "revision": 3,
+              "schema_version": "1"
+            },
+            "side_effect_class": "read_only",
+            "title": "knowledge_guide",
+            "tool_name": "knowledge_guide"
+          },
+          "published_at": "2026-11-16T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:bdd8dc4ce49c36a582266bf6087e622e9685392d84d950c1c754361289c8ec17",
+            "kind": "mcp_tool",
+            "lifecycle_status": "published",
+            "logical_id": "mcp.knowledge-capture.tool.knowledge-guide",
+            "payload_ref": null,
+            "revision": 3,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:c31fa786ca32d3afa39e4ffe485742b90cb32da1e5b69bdf4d0842cd7518c80c",
+        "manifest_ref": "mc-catalog://definition/mcp_tool/mcp.knowledge-capture.tool.knowledge-guide/3",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "3"
+      },
+      "kind": "asset_version",
+      "logical_key": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.knowledge-guide/3"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.knowledge-guide/3",
+        "decided_at": "2026-11-16T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/agent_capabilities.py",
+          "tests/fixtures/mcp/mcp.knowledge-capture.1a451fd.tools.json",
+          "docs/specs/provider-consolidation-2026-10/providers/research-capabilities/RESEARCH-CAPABILITIES-SURFACE-2026-11-16.md"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.knowledge-guide/3:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:mcp_tool:mcp.knowledge-capture.tool.schema-get",
+        "contract": "mission-control.published-definition/1",
+        "kind": "mcp_tool",
+        "manifest": {
+          "definition": {
+            "annotations": {
+              "readOnlyHint": null,
+              "schema_source": "captured"
+            },
+            "attachment_targets": [
+              "agent.main"
+            ],
+            "compatible_compiler_versions": [
+              "control-plane-definitions/1"
+            ],
+            "conflicts_with": [],
+            "description": "Return a workspace page by id (rel:<schema>.<name>, dom:<slug>, task:<slug>, fn:<schema>.<name>) or relative path, capped in size. Search before reading; read the domain page before a relation page; ≤4 reads to an operation.",
+            "input_schema": {
+              "properties": {
+                "id": {
+                  "maxLength": 300,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "maxBytes": {
+                  "maximum": 256000,
+                  "minimum": 256,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "id"
+              ],
+              "type": "object"
+            },
+            "kind": "mcp_tool",
+            "logical_id": "mcp.knowledge-capture.tool.schema-get",
+            "maturity": "experimental",
+            "output_schema": null,
+            "schema_digest": "sha256:9219f7009f625898560fc2ddff500b835c53fd412e7f0e36e3cba26e1e2784a4",
+            "schema_version": "1",
+            "server_ref": {
+              "digest": "sha256:a50c732566546291714dd987e7c6cea74d8112ccaaeba931ce8fec1e9eb9354c",
+              "kind": "mcp_server",
+              "lifecycle_status": "published",
+              "logical_id": "mcp.knowledge-capture",
+              "payload_ref": null,
+              "revision": 3,
+              "schema_version": "1"
+            },
+            "side_effect_class": "read_only",
+            "title": "schema_get",
+            "tool_name": "schema_get"
+          },
+          "published_at": "2026-11-16T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:69acaf9d3e906fed16a2d9bc0f87c27b57b308f2a2b832a9a8c887aed99bd7ad",
+            "kind": "mcp_tool",
+            "lifecycle_status": "published",
+            "logical_id": "mcp.knowledge-capture.tool.schema-get",
+            "payload_ref": null,
+            "revision": 3,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:8908f8de6f42c5980b506ccc3b499becd75d6591621d968e4627f5c6e66c090c",
+        "manifest_ref": "mc-catalog://definition/mcp_tool/mcp.knowledge-capture.tool.schema-get/3",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "3"
+      },
+      "kind": "asset_version",
+      "logical_key": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.schema-get/3"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.schema-get/3",
+        "decided_at": "2026-11-16T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/agent_capabilities.py",
+          "tests/fixtures/mcp/mcp.knowledge-capture.1a451fd.tools.json",
+          "docs/specs/provider-consolidation-2026-10/providers/research-capabilities/RESEARCH-CAPABILITIES-SURFACE-2026-11-16.md"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.schema-get/3:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:mcp_tool:mcp.knowledge-capture.tool.schema-manifest",
+        "contract": "mission-control.published-definition/1",
+        "kind": "mcp_tool",
+        "manifest": {
+          "definition": {
+            "annotations": {
+              "readOnlyHint": null,
+              "schema_source": "captured"
+            },
+            "attachment_targets": [
+              "agent.main"
+            ],
+            "compatible_compiler_versions": [
+              "control-plane-definitions/1"
+            ],
+            "conflicts_with": [],
+            "description": "Return the workspace manifest (fingerprint, migration head, scope) plus the connected database's migration head and whether they match.",
+            "input_schema": {
+              "properties": {},
+              "type": "object"
+            },
+            "kind": "mcp_tool",
+            "logical_id": "mcp.knowledge-capture.tool.schema-manifest",
+            "maturity": "experimental",
+            "output_schema": null,
+            "schema_digest": "sha256:b1ec54f6fb8e559a8e224daecdf1c17ae4f6cbda719eca7ccaeee0d2274141db",
+            "schema_version": "1",
+            "server_ref": {
+              "digest": "sha256:a50c732566546291714dd987e7c6cea74d8112ccaaeba931ce8fec1e9eb9354c",
+              "kind": "mcp_server",
+              "lifecycle_status": "published",
+              "logical_id": "mcp.knowledge-capture",
+              "payload_ref": null,
+              "revision": 3,
+              "schema_version": "1"
+            },
+            "side_effect_class": "read_only",
+            "title": "schema_manifest",
+            "tool_name": "schema_manifest"
+          },
+          "published_at": "2026-11-16T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:52b4324b51781a83f270eadc05afa8021db3cff85f2ab7f9f855917ea2d32e28",
+            "kind": "mcp_tool",
+            "lifecycle_status": "published",
+            "logical_id": "mcp.knowledge-capture.tool.schema-manifest",
+            "payload_ref": null,
+            "revision": 3,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:543a2d90064a60007aea9c0ca24710390c272cc274f89e2f5726c0184a2af1aa",
+        "manifest_ref": "mc-catalog://definition/mcp_tool/mcp.knowledge-capture.tool.schema-manifest/3",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "3"
+      },
+      "kind": "asset_version",
+      "logical_key": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.schema-manifest/3"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.schema-manifest/3",
+        "decided_at": "2026-11-16T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/agent_capabilities.py",
+          "tests/fixtures/mcp/mcp.knowledge-capture.1a451fd.tools.json",
+          "docs/specs/provider-consolidation-2026-10/providers/research-capabilities/RESEARCH-CAPABILITIES-SURFACE-2026-11-16.md"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.schema-manifest/3:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:mcp_tool:mcp.knowledge-capture.tool.schema-search",
+        "contract": "mission-control.published-definition/1",
+        "kind": "mcp_tool",
+        "manifest": {
+          "definition": {
+            "annotations": {
+              "readOnlyHint": null,
+              "schema_source": "captured"
+            },
+            "attachment_targets": [
+              "agent.main"
+            ],
+            "compatible_compiler_versions": [
+              "control-plane-definitions/1"
+            ],
+            "conflicts_with": [],
+            "description": "Find tables, functions, domains, tasks, queries, and terms in the pinned schema workspace. Ranked: exact alias > name > tokens. Search before reading; read the domain page before a relation page; ≤4 reads to an operation.",
+            "input_schema": {
+              "properties": {
+                "domain": {
+                  "type": "string"
+                },
+                "kinds": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "limit": {
+                  "maximum": 50,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "query": {
+                  "maxLength": 200,
+                  "minLength": 1,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "query"
+              ],
+              "type": "object"
+            },
+            "kind": "mcp_tool",
+            "logical_id": "mcp.knowledge-capture.tool.schema-search",
+            "maturity": "experimental",
+            "output_schema": null,
+            "schema_digest": "sha256:68573a1c46942d2eb38c9fe7da8d2514e7082fff5cad1cd8cd016228b833b88c",
+            "schema_version": "1",
+            "server_ref": {
+              "digest": "sha256:a50c732566546291714dd987e7c6cea74d8112ccaaeba931ce8fec1e9eb9354c",
+              "kind": "mcp_server",
+              "lifecycle_status": "published",
+              "logical_id": "mcp.knowledge-capture",
+              "payload_ref": null,
+              "revision": 3,
+              "schema_version": "1"
+            },
+            "side_effect_class": "read_only",
+            "title": "schema_search",
+            "tool_name": "schema_search"
+          },
+          "published_at": "2026-11-16T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:55c7e80af6249249b418197c5e0e2ccf9a95b1ea46b233c524cccad7eea59f4d",
+            "kind": "mcp_tool",
+            "lifecycle_status": "published",
+            "logical_id": "mcp.knowledge-capture.tool.schema-search",
+            "payload_ref": null,
+            "revision": 3,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:4bcc5e0762159022b84b16c63e33a1cb56f92707f3df2d3a14726df6cfc41dd3",
+        "manifest_ref": "mc-catalog://definition/mcp_tool/mcp.knowledge-capture.tool.schema-search/3",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "3"
+      },
+      "kind": "asset_version",
+      "logical_key": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.schema-search/3"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.schema-search/3",
+        "decided_at": "2026-11-16T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/agent_capabilities.py",
+          "tests/fixtures/mcp/mcp.knowledge-capture.1a451fd.tools.json",
+          "docs/specs/provider-consolidation-2026-10/providers/research-capabilities/RESEARCH-CAPABILITIES-SURFACE-2026-11-16.md"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.schema-search/3:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:mcp_tool:mcp.knowledge-capture.tool.source-attempt",
+        "contract": "mission-control.published-definition/1",
+        "kind": "mcp_tool",
+        "manifest": {
+          "definition": {
+            "annotations": {
+              "readOnlyHint": null,
+              "schema_source": "captured"
+            },
+            "attachment_targets": [
+              "agent.main"
+            ],
+            "compatible_compiler_versions": [
+              "control-plane-definitions/1"
+            ],
+            "conflicts_with": [],
+            "description": "Read the original source attempt and its provenance trust. Terminal leads require verified remote receipt custody. An unfinished attempt returns no leads and must be reconciled before any new provider dispatch.",
+            "input_schema": {
+              "properties": {
+                "attemptId": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "limit": {
+                  "maximum": 200,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "offset": {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "tenantId": {
+                  "description": "Tenant; defaults to the executor's configured tenant.",
+                  "format": "uuid",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "attemptId"
+              ],
+              "type": "object"
+            },
+            "kind": "mcp_tool",
+            "logical_id": "mcp.knowledge-capture.tool.source-attempt",
+            "maturity": "experimental",
+            "output_schema": null,
+            "schema_digest": "sha256:8c1e1dc81fa70cc14a06717b983b34e8052a3acb4e75d1323b37d0d817c5346e",
+            "schema_version": "1",
+            "server_ref": {
+              "digest": "sha256:a50c732566546291714dd987e7c6cea74d8112ccaaeba931ce8fec1e9eb9354c",
+              "kind": "mcp_server",
+              "lifecycle_status": "published",
+              "logical_id": "mcp.knowledge-capture",
+              "payload_ref": null,
+              "revision": 3,
+              "schema_version": "1"
+            },
+            "side_effect_class": "read_only",
+            "title": "source_attempt",
+            "tool_name": "source_attempt"
+          },
+          "published_at": "2026-11-16T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:c6a74e33ecb21c4e60c261b70561aee66dee97766e31dff7704b6073a9fa9919",
+            "kind": "mcp_tool",
+            "lifecycle_status": "published",
+            "logical_id": "mcp.knowledge-capture.tool.source-attempt",
+            "payload_ref": null,
+            "revision": 3,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:0e8b543109ac82079f8f33c0477e3540edc691bf505061d9ae3db1a0d8b9d2e6",
+        "manifest_ref": "mc-catalog://definition/mcp_tool/mcp.knowledge-capture.tool.source-attempt/3",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "3"
+      },
+      "kind": "asset_version",
+      "logical_key": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.source-attempt/3"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.source-attempt/3",
+        "decided_at": "2026-11-16T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/agent_capabilities.py",
+          "tests/fixtures/mcp/mcp.knowledge-capture.1a451fd.tools.json",
+          "docs/specs/provider-consolidation-2026-10/providers/research-capabilities/RESEARCH-CAPABILITIES-SURFACE-2026-11-16.md"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.source-attempt/3:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:mcp_tool:mcp.knowledge-capture.tool.source-discover",
+        "contract": "mission-control.published-definition/1",
+        "kind": "mcp_tool",
+        "manifest": {
+          "definition": {
+            "annotations": {
+              "readOnlyHint": null,
+              "schema_source": "captured"
+            },
+            "attachment_targets": [
+              "agent.main"
+            ],
+            "compatible_compiler_versions": [
+              "control-plane-definitions/1"
+            ],
+            "conflicts_with": [],
+            "description": "Dispatch a configured search provider after durable request registration; preserve output before returning its receipt. Snippets remain untrusted discovery material. Reuse the idempotency key to recover the original attempt.",
+            "input_schema": {
+              "description": "Short form. Full schema: knowledge_describe {\"ref\":\"tool:source_discover\"}.",
+              "properties": {
+                "request": {
+                  "properties": {
+                    "idempotencyKey": {
+                      "type": "string"
+                    },
+                    "parameters": {},
+                    "providerCode": {
+                      "type": "string"
+                    },
+                    "purpose": {
+                      "type": "string"
+                    },
+                    "queryText": {
+                      "type": "string"
+                    },
+                    "requestedUrls": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "schemaVersion": {
+                      "const": "source-discovery-managed-request.v1"
+                    }
+                  },
+                  "required": [
+                    "providerCode",
+                    "queryText",
+                    "purpose",
+                    "parameters",
+                    "requestedUrls",
+                    "schemaVersion",
+                    "idempotencyKey"
+                  ],
+                  "type": "object"
+                },
+                "tenantId": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "request"
+              ],
+              "type": "object"
+            },
+            "kind": "mcp_tool",
+            "logical_id": "mcp.knowledge-capture.tool.source-discover",
+            "maturity": "experimental",
+            "output_schema": null,
+            "schema_digest": "sha256:17eace2ab113959ad28cf0ed9f845db56e56a8a10bce7f174a416f351fbc17f8",
+            "schema_version": "1",
+            "server_ref": {
+              "digest": "sha256:a50c732566546291714dd987e7c6cea74d8112ccaaeba931ce8fec1e9eb9354c",
+              "kind": "mcp_server",
+              "lifecycle_status": "published",
+              "logical_id": "mcp.knowledge-capture",
+              "payload_ref": null,
+              "revision": 3,
+              "schema_version": "1"
+            },
+            "side_effect_class": "bounded_write",
+            "title": "source_discover",
+            "tool_name": "source_discover"
+          },
+          "published_at": "2026-11-16T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:61bf005b07e03ba8cacb268ea13f9c90850f6973d46601f7116d6a1b7084320c",
+            "kind": "mcp_tool",
+            "lifecycle_status": "published",
+            "logical_id": "mcp.knowledge-capture.tool.source-discover",
+            "payload_ref": null,
+            "revision": 3,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:6256ef21dcbbd076b4ae965e0e3e74bfe4755d5d1b09349a8fa5b8e9c5b8495f",
+        "manifest_ref": "mc-catalog://definition/mcp_tool/mcp.knowledge-capture.tool.source-discover/3",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "3"
+      },
+      "kind": "asset_version",
+      "logical_key": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.source-discover/3"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.source-discover/3",
+        "decided_at": "2026-11-16T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/agent_capabilities.py",
+          "tests/fixtures/mcp/mcp.knowledge-capture.1a451fd.tools.json",
+          "docs/specs/provider-consolidation-2026-10/providers/research-capabilities/RESEARCH-CAPABILITIES-SURFACE-2026-11-16.md"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.source-discover/3:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:mcp_tool:mcp.knowledge-capture.tool.source-import",
+        "contract": "mission-control.published-definition/1",
+        "kind": "mcp_tool",
+        "manifest": {
+          "definition": {
+            "annotations": {
+              "readOnlyHint": null,
+              "schema_source": "captured"
+            },
+            "attachment_targets": [
+              "agent.main"
+            ],
+            "compatible_compiler_versions": [
+              "control-plane-definitions/1"
+            ],
+            "conflicts_with": [],
+            "description": "Account for externally executed provider attempts using already preserved receipt artifacts. Imported metadata is self-reported and never gains managed-provider authority.",
+            "input_schema": {
+              "description": "Short form. Full schema: knowledge_describe {\"ref\":\"tool:source_import\"}.",
+              "properties": {
+                "receipt": {
+                  "properties": {
+                    "externalReceiptArtifact": {
+                      "properties": {
+                        "artifactId": {
+                          "type": "string"
+                        },
+                        "byteLength": {
+                          "type": "integer"
+                        },
+                        "createdAt": {
+                          "type": "string"
+                        },
+                        "dataClassification": {
+                          "type": "string"
+                        },
+                        "digest": {
+                          "type": "string"
+                        },
+                        "encryptionClass": {
+                          "type": "string"
+                        },
+                        "mediaType": {
+                          "type": "string"
+                        },
+                        "objectKey": {
+                          "type": "string"
+                        },
+                        "parentArtifactIds": {
+                          "type": "array"
+                        },
+                        "producerActivityId": {
+                          "type": "string"
+                        },
+                        "producerVersion": {
+                          "type": "string"
+                        },
+                        "retentionClass": {
+                          "type": "string"
+                        },
+                        "tenantId": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "artifactId",
+                        "tenantId",
+                        "digest",
+                        "mediaType",
+                        "byteLength",
+                        "objectKey",
+                        "createdAt",
+                        "producerActivityId",
+                        "producerVersion",
+                        "encryptionClass",
+                        "retentionClass",
+                        "dataClassification",
+                        "parentArtifactIds"
+                      ],
+                      "type": "object"
+                    },
+                    "idempotencyKey": {
+                      "type": "string"
+                    },
+                    "occurredAt": {
+                      "type": "string"
+                    },
+                    "parameters": {},
+                    "providerCode": {
+                      "type": "string"
+                    },
+                    "purpose": {
+                      "type": "string"
+                    },
+                    "queryText": {
+                      "type": "string"
+                    },
+                    "requestedUrls": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "results": {
+                      "items": {
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "schemaVersion": {
+                      "const": "source-discovery-import-receipt.v1"
+                    },
+                    "selfReported": {
+                      "const": true
+                    },
+                    "state": {
+                      "enum": [
+                        "succeeded",
+                        "failed",
+                        "uncertain",
+                        "cancelled"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "providerCode",
+                    "queryText",
+                    "purpose",
+                    "parameters",
+                    "requestedUrls",
+                    "schemaVersion",
+                    "idempotencyKey",
+                    "occurredAt",
+                    "selfReported",
+                    "externalReceiptArtifact",
+                    "state",
+                    "results"
+                  ],
+                  "type": "object"
+                },
+                "tenantId": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "receipt"
+              ],
+              "type": "object"
+            },
+            "kind": "mcp_tool",
+            "logical_id": "mcp.knowledge-capture.tool.source-import",
+            "maturity": "experimental",
+            "output_schema": null,
+            "schema_digest": "sha256:66528ca3d89378a4cf21e3af01b8a1622acc128fd0fe7a462df8010c0a6f85f7",
+            "schema_version": "1",
+            "server_ref": {
+              "digest": "sha256:a50c732566546291714dd987e7c6cea74d8112ccaaeba931ce8fec1e9eb9354c",
+              "kind": "mcp_server",
+              "lifecycle_status": "published",
+              "logical_id": "mcp.knowledge-capture",
+              "payload_ref": null,
+              "revision": 3,
+              "schema_version": "1"
+            },
+            "side_effect_class": "bounded_write",
+            "title": "source_import",
+            "tool_name": "source_import"
+          },
+          "published_at": "2026-11-16T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:beb952b0a611ebfd484ac19105a37c4d8c3eb32462ff1865108900197941fce2",
+            "kind": "mcp_tool",
+            "lifecycle_status": "published",
+            "logical_id": "mcp.knowledge-capture.tool.source-import",
+            "payload_ref": null,
+            "revision": 3,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:51e7bb7e0f2ad458018aec07212fdfb8bf23f3bf5ccebdbe46a67c6714e0be17",
+        "manifest_ref": "mc-catalog://definition/mcp_tool/mcp.knowledge-capture.tool.source-import/3",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "3"
+      },
+      "kind": "asset_version",
+      "logical_key": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.source-import/3"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.source-import/3",
+        "decided_at": "2026-11-16T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/agent_capabilities.py",
+          "tests/fixtures/mcp/mcp.knowledge-capture.1a451fd.tools.json",
+          "docs/specs/provider-consolidation-2026-10/providers/research-capabilities/RESEARCH-CAPABILITIES-SURFACE-2026-11-16.md"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.source-import/3:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:mcp_tool:mcp.knowledge-capture.tool.source-prepare-captured",
+        "contract": "mission-control.published-definition/1",
+        "kind": "mcp_tool",
+        "manifest": {
+          "definition": {
+            "annotations": {
+              "readOnlyHint": null,
+              "schema_source": "captured"
+            },
+            "attachment_targets": [
+              "agent.main"
+            ],
+            "compatible_compiler_versions": [
+              "control-plane-definitions/1"
+            ],
+            "conflicts_with": [],
+            "description": "Register a capture you made (verify_capture_source or verify_capture_file) as an evidence capture with quotable units, so chain_write can anchor to it. Text, Markdown, HTML, JSON; other types refused. Same bytes: same capture. quotes: get anchors back.",
+            "input_schema": {
+              "description": "Short form. Full schema: knowledge_describe {\"ref\":\"tool:source_prepare_captured\"}.",
+              "properties": {
+                "captureId": {
+                  "type": "string"
+                },
+                "documentType": {
+                  "type": "string"
+                },
+                "maxUnits": {
+                  "type": "integer"
+                },
+                "quotes": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "sourceRole": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "version": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "captureId"
+              ],
+              "type": "object"
+            },
+            "kind": "mcp_tool",
+            "logical_id": "mcp.knowledge-capture.tool.source-prepare-captured",
+            "maturity": "experimental",
+            "output_schema": null,
+            "schema_digest": "sha256:5edc47ee1237db25335fd99c24205665977c695adfea49796400de0544da89b7",
+            "schema_version": "1",
+            "server_ref": {
+              "digest": "sha256:a50c732566546291714dd987e7c6cea74d8112ccaaeba931ce8fec1e9eb9354c",
+              "kind": "mcp_server",
+              "lifecycle_status": "published",
+              "logical_id": "mcp.knowledge-capture",
+              "payload_ref": null,
+              "revision": 3,
+              "schema_version": "1"
+            },
+            "side_effect_class": "bounded_write",
+            "title": "source_prepare_captured",
+            "tool_name": "source_prepare_captured"
+          },
+          "published_at": "2026-11-16T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:7a8b7c8d07b6bc8ee257b6ead0735b9f4c0121b5fd44a4c49be6b69eca883f4a",
+            "kind": "mcp_tool",
+            "lifecycle_status": "published",
+            "logical_id": "mcp.knowledge-capture.tool.source-prepare-captured",
+            "payload_ref": null,
+            "revision": 1,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:cfd4c9c7bc0a11cd3b1f65d6987976384df3d27bca673d87951a06b1d8e9f671",
+        "manifest_ref": "mc-catalog://definition/mcp_tool/mcp.knowledge-capture.tool.source-prepare-captured/1",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "1"
+      },
+      "kind": "asset_version",
+      "logical_key": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.source-prepare-captured/1"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.source-prepare-captured/1",
+        "decided_at": "2026-11-16T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/agent_capabilities.py",
+          "tests/fixtures/mcp/mcp.knowledge-capture.1a451fd.tools.json",
+          "docs/specs/provider-consolidation-2026-10/providers/research-capabilities/RESEARCH-CAPABILITIES-SURFACE-2026-11-16.md"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.source-prepare-captured/1:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:mcp_tool:mcp.knowledge-capture.tool.source-reconcile",
+        "contract": "mission-control.published-definition/1",
+        "kind": "mcp_tool",
+        "manifest": {
+          "definition": {
+            "annotations": {
+              "readOnlyHint": null,
+              "schema_source": "captured"
+            },
+            "attachment_targets": [
+              "agent.main"
+            ],
+            "compatible_compiler_versions": [
+              "control-plane-definitions/1"
+            ],
+            "conflicts_with": [],
+            "description": "Recover an original managed attempt from verified completion custody under a fresh fence. Does not call the provider again. Refuses a live dispatch lease; missing completion custody yields an explicit uncertain outcome.",
+            "input_schema": {
+              "properties": {
+                "attemptId": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "tenantId": {
+                  "description": "Tenant; defaults to the executor's configured tenant.",
+                  "format": "uuid",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "attemptId"
+              ],
+              "type": "object"
+            },
+            "kind": "mcp_tool",
+            "logical_id": "mcp.knowledge-capture.tool.source-reconcile",
+            "maturity": "experimental",
+            "output_schema": null,
+            "schema_digest": "sha256:d3a9584f7a4cd41ec94ca33a7ce4cff108d3e5519eed7e788736b36fd17e6eb5",
+            "schema_version": "1",
+            "server_ref": {
+              "digest": "sha256:a50c732566546291714dd987e7c6cea74d8112ccaaeba931ce8fec1e9eb9354c",
+              "kind": "mcp_server",
+              "lifecycle_status": "published",
+              "logical_id": "mcp.knowledge-capture",
+              "payload_ref": null,
+              "revision": 3,
+              "schema_version": "1"
+            },
+            "side_effect_class": "bounded_write",
+            "title": "source_reconcile",
+            "tool_name": "source_reconcile"
+          },
+          "published_at": "2026-11-16T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:63b62a50261d2d515964ec1136ccc72ac4f3ae4ef20ae83d766ce6ec8d0e5a97",
+            "kind": "mcp_tool",
+            "lifecycle_status": "published",
+            "logical_id": "mcp.knowledge-capture.tool.source-reconcile",
+            "payload_ref": null,
+            "revision": 3,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:c29d86914d6a441f9a644990c079eef33b6b7c7d63af6b462dc50407e30432e5",
+        "manifest_ref": "mc-catalog://definition/mcp_tool/mcp.knowledge-capture.tool.source-reconcile/3",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "3"
+      },
+      "kind": "asset_version",
+      "logical_key": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.source-reconcile/3"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.source-reconcile/3",
+        "decided_at": "2026-11-16T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/agent_capabilities.py",
+          "tests/fixtures/mcp/mcp.knowledge-capture.1a451fd.tools.json",
+          "docs/specs/provider-consolidation-2026-10/providers/research-capabilities/RESEARCH-CAPABILITIES-SURFACE-2026-11-16.md"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.source-reconcile/3:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:mcp_tool:mcp.knowledge-capture.tool.source-select",
+        "contract": "mission-control.published-definition/1",
+        "kind": "mcp_tool",
+        "manifest": {
+          "definition": {
+            "annotations": {
+              "readOnlyHint": null,
+              "schema_source": "captured"
+            },
+            "attachment_targets": [
+              "agent.main"
+            ],
+            "compatible_compiler_versions": [
+              "control-plane-definitions/1"
+            ],
+            "conflicts_with": [],
+            "description": "Preserve explicit selected, omitted or duplicate lead decisions and reasons in an immutable selection receipt. Does not rewrite provider output, admit evidence or authorize publication.",
+            "input_schema": {
+              "description": "Short form. Full schema: knowledge_describe {\"ref\":\"tool:source_select\"}.",
+              "properties": {
+                "request": {
+                  "properties": {
+                    "attemptId": {
+                      "type": "string"
+                    },
+                    "decisions": {
+                      "items": {
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "idempotencyKey": {
+                      "type": "string"
+                    },
+                    "schemaVersion": {
+                      "const": "source-discovery-selection.v1"
+                    }
+                  },
+                  "required": [
+                    "schemaVersion",
+                    "attemptId",
+                    "idempotencyKey",
+                    "decisions"
+                  ],
+                  "type": "object"
+                },
+                "tenantId": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "request"
+              ],
+              "type": "object"
+            },
+            "kind": "mcp_tool",
+            "logical_id": "mcp.knowledge-capture.tool.source-select",
+            "maturity": "experimental",
+            "output_schema": null,
+            "schema_digest": "sha256:504b9640a2c807fdbaca3da7c5ff7fdffa95c6fb6d5641e36181fc94c6b0dd07",
+            "schema_version": "1",
+            "server_ref": {
+              "digest": "sha256:a50c732566546291714dd987e7c6cea74d8112ccaaeba931ce8fec1e9eb9354c",
+              "kind": "mcp_server",
+              "lifecycle_status": "published",
+              "logical_id": "mcp.knowledge-capture",
+              "payload_ref": null,
+              "revision": 3,
+              "schema_version": "1"
+            },
+            "side_effect_class": "bounded_write",
+            "title": "source_select",
+            "tool_name": "source_select"
+          },
+          "published_at": "2026-11-16T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:60808182f622d254f5f5fe5142a1feaf57df237145b225c095a570f4023ec9ca",
+            "kind": "mcp_tool",
+            "lifecycle_status": "published",
+            "logical_id": "mcp.knowledge-capture.tool.source-select",
+            "payload_ref": null,
+            "revision": 3,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:ce7ffb5493383e2549ba57818f6353be6517d56f13b6ac25e705c734c4b0dcc1",
+        "manifest_ref": "mc-catalog://definition/mcp_tool/mcp.knowledge-capture.tool.source-select/3",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "3"
+      },
+      "kind": "asset_version",
+      "logical_key": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.source-select/3"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.source-select/3",
+        "decided_at": "2026-11-16T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/agent_capabilities.py",
+          "tests/fixtures/mcp/mcp.knowledge-capture.1a451fd.tools.json",
+          "docs/specs/provider-consolidation-2026-10/providers/research-capabilities/RESEARCH-CAPABILITIES-SURFACE-2026-11-16.md"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.source-select/3:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:mcp_tool:mcp.knowledge-capture.tool.verify-capture-file",
+        "contract": "mission-control.published-definition/1",
+        "kind": "mcp_tool",
+        "manifest": {
+          "definition": {
+            "annotations": {
+              "readOnlyHint": null,
+              "schema_source": "captured"
+            },
+            "attachment_targets": [
+              "agent.main"
+            ],
+            "compatible_compiler_versions": [
+              "control-plane-definitions/1"
+            ],
+            "conflicts_with": [],
+            "description": "Capture bytes instead of a URL: markdown/text/json inline as `text`, or any supported document (pdf, docx, doc, odt, rtf, xlsx, xls, pptx, ppt, epub, csv, html) as `base64`. The executor converts the document to markdown itself (Firecrawl parse) and stores the original bytes beside the text, so the capture is trustworthy evidence. Sandbox files are normally pushed through the HTTP POST /captures route instead of inlining base64.",
+            "input_schema": {
+              "description": "Short form. Full schema: knowledge_describe {\"ref\":\"tool:verify_capture_file\"}.",
+              "properties": {
+                "base64": {
+                  "type": "string"
+                },
+                "captureId": {
+                  "type": "string"
+                },
+                "filename": {
+                  "type": "string"
+                },
+                "mediaType": {
+                  "type": "string"
+                },
+                "runId": {
+                  "type": "string"
+                },
+                "sourceUri": {
+                  "type": "string"
+                },
+                "text": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "filename"
+              ],
+              "type": "object"
+            },
+            "kind": "mcp_tool",
+            "logical_id": "mcp.knowledge-capture.tool.verify-capture-file",
+            "maturity": "experimental",
+            "output_schema": null,
+            "schema_digest": "sha256:ce6264d0b02eea46a0a841b57cb14c4cbe4b9341d3ab2b087bf87bdd14e3e91f",
+            "schema_version": "1",
+            "server_ref": {
+              "digest": "sha256:a50c732566546291714dd987e7c6cea74d8112ccaaeba931ce8fec1e9eb9354c",
+              "kind": "mcp_server",
+              "lifecycle_status": "published",
+              "logical_id": "mcp.knowledge-capture",
+              "payload_ref": null,
+              "revision": 3,
+              "schema_version": "1"
+            },
+            "side_effect_class": "bounded_write",
+            "title": "verify_capture_file",
+            "tool_name": "verify_capture_file"
+          },
+          "published_at": "2026-11-16T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:10369df61f8919cacb4b5b0580c66327643a4e3385c237ae2d0879427bfd17c2",
+            "kind": "mcp_tool",
+            "lifecycle_status": "published",
+            "logical_id": "mcp.knowledge-capture.tool.verify-capture-file",
+            "payload_ref": null,
+            "revision": 3,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:dc38ccf2408fdb0e0ed45d646840a1e935fce015fe95badbf94e44fe000c0525",
+        "manifest_ref": "mc-catalog://definition/mcp_tool/mcp.knowledge-capture.tool.verify-capture-file/3",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "3"
+      },
+      "kind": "asset_version",
+      "logical_key": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.verify-capture-file/3"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.verify-capture-file/3",
+        "decided_at": "2026-11-16T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/agent_capabilities.py",
+          "tests/fixtures/mcp/mcp.knowledge-capture.1a451fd.tools.json",
+          "docs/specs/provider-consolidation-2026-10/providers/research-capabilities/RESEARCH-CAPABILITIES-SURFACE-2026-11-16.md"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.verify-capture-file/3:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:mcp_tool:mcp.knowledge-capture.tool.verify-capture-fragment",
+        "contract": "mission-control.published-definition/1",
+        "kind": "mcp_tool",
+        "manifest": {
+          "definition": {
+            "annotations": {
+              "readOnlyHint": null,
+              "schema_source": "captured"
+            },
+            "attachment_targets": [
+              "agent.main"
+            ],
+            "compatible_compiler_versions": [
+              "control-plane-definitions/1"
+            ],
+            "conflicts_with": [],
+            "description": "Resolve a unique quote against an exact representation digest and return a research-core.fragment.v2 with original capture custody and acquisition-time provenance. Requires durable artifact custody. Tenant is host-owned; rights are producer-declared and registration/admission remain separate.",
+            "input_schema": {
+              "description": "Short form. Full schema: knowledge_describe {\"ref\":\"tool:verify_capture_fragment\"}.",
+              "properties": {
+                "access": {
+                  "properties": {
+                    "limits": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "rights": {
+                      "enum": [
+                        "public",
+                        "licensed",
+                        "restricted",
+                        "private"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "rights",
+                    "limits"
+                  ],
+                  "type": "object"
+                },
+                "binding": {
+                  "type": "string"
+                },
+                "captureId": {
+                  "type": "string"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "quote": {
+                  "type": "string"
+                },
+                "representationDigest": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "binding",
+                "captureId",
+                "representationDigest",
+                "quote",
+                "access"
+              ],
+              "type": "object"
+            },
+            "kind": "mcp_tool",
+            "logical_id": "mcp.knowledge-capture.tool.verify-capture-fragment",
+            "maturity": "experimental",
+            "output_schema": null,
+            "schema_digest": "sha256:8124ddf008365ae365e79172df64116ca2d9a40502af32e91f76610e169536fc",
+            "schema_version": "1",
+            "server_ref": {
+              "digest": "sha256:a50c732566546291714dd987e7c6cea74d8112ccaaeba931ce8fec1e9eb9354c",
+              "kind": "mcp_server",
+              "lifecycle_status": "published",
+              "logical_id": "mcp.knowledge-capture",
+              "payload_ref": null,
+              "revision": 3,
+              "schema_version": "1"
+            },
+            "side_effect_class": "bounded_write",
+            "title": "verify_capture_fragment",
+            "tool_name": "verify_capture_fragment"
+          },
+          "published_at": "2026-11-16T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:768a7fa07e79add6d0333cb938bef0cacccf53e3587924338aa258363e910085",
+            "kind": "mcp_tool",
+            "lifecycle_status": "published",
+            "logical_id": "mcp.knowledge-capture.tool.verify-capture-fragment",
+            "payload_ref": null,
+            "revision": 3,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:3a42900bcf3eadd4c89387a4beab96f8fd23ea763304cfddbc8ab97310f87a96",
+        "manifest_ref": "mc-catalog://definition/mcp_tool/mcp.knowledge-capture.tool.verify-capture-fragment/3",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "3"
+      },
+      "kind": "asset_version",
+      "logical_key": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.verify-capture-fragment/3"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.verify-capture-fragment/3",
+        "decided_at": "2026-11-16T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/agent_capabilities.py",
+          "tests/fixtures/mcp/mcp.knowledge-capture.1a451fd.tools.json",
+          "docs/specs/provider-consolidation-2026-10/providers/research-capabilities/RESEARCH-CAPABILITIES-SURFACE-2026-11-16.md"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.verify-capture-fragment/3:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:mcp_tool:mcp.knowledge-capture.tool.verify-capture-source",
+        "contract": "mission-control.published-definition/1",
+        "kind": "mcp_tool",
+        "manifest": {
+          "definition": {
+            "annotations": {
+              "readOnlyHint": null,
+              "schema_source": "captured"
+            },
+            "attachment_targets": [
+              "agent.main"
+            ],
+            "compatible_compiler_versions": [
+              "control-plane-definitions/1"
+            ],
+            "conflicts_with": [],
+            "description": "Fetch a URL (Firecrawl when configured, otherwise HTTPS GET), store the captured text as an immutable content-addressed artifact, and return a captureId plus a preview. Quotes used in intents must be exact substrings of this captured text.",
+            "input_schema": {
+              "properties": {
+                "captureId": {
+                  "description": "Optional stable id; defaults to a digest-derived id.",
+                  "maxLength": 255,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "method": {
+                  "enum": [
+                    "auto",
+                    "firecrawl",
+                    "https_get"
+                  ],
+                  "type": "string"
+                },
+                "runId": {
+                  "description": "Agent-chosen run id; capture steps are logged as non-authoritative step receipts under it.",
+                  "maxLength": 200,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "url": {
+                  "format": "uri",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "url"
+              ],
+              "type": "object"
+            },
+            "kind": "mcp_tool",
+            "logical_id": "mcp.knowledge-capture.tool.verify-capture-source",
+            "maturity": "experimental",
+            "output_schema": null,
+            "schema_digest": "sha256:8f8ff95e2b5a58f52f43ee307dde36df312943283caa845031f4f89162c02817",
+            "schema_version": "1",
+            "server_ref": {
+              "digest": "sha256:a50c732566546291714dd987e7c6cea74d8112ccaaeba931ce8fec1e9eb9354c",
+              "kind": "mcp_server",
+              "lifecycle_status": "published",
+              "logical_id": "mcp.knowledge-capture",
+              "payload_ref": null,
+              "revision": 3,
+              "schema_version": "1"
+            },
+            "side_effect_class": "bounded_write",
+            "title": "verify_capture_source",
+            "tool_name": "verify_capture_source"
+          },
+          "published_at": "2026-11-16T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:07bc0ac9f9161163a1ffb3518d81bb85b33d80529d812f5a1d6d50337208c49e",
+            "kind": "mcp_tool",
+            "lifecycle_status": "published",
+            "logical_id": "mcp.knowledge-capture.tool.verify-capture-source",
+            "payload_ref": null,
+            "revision": 3,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:644a6e5841cc743069f15d9b27f99463170cf0729c771af4809a5dc041db771d",
+        "manifest_ref": "mc-catalog://definition/mcp_tool/mcp.knowledge-capture.tool.verify-capture-source/3",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "3"
+      },
+      "kind": "asset_version",
+      "logical_key": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.verify-capture-source/3"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.verify-capture-source/3",
+        "decided_at": "2026-11-16T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/agent_capabilities.py",
+          "tests/fixtures/mcp/mcp.knowledge-capture.1a451fd.tools.json",
+          "docs/specs/provider-consolidation-2026-10/providers/research-capabilities/RESEARCH-CAPABILITIES-SURFACE-2026-11-16.md"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.verify-capture-source/3:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:mcp_tool:mcp.knowledge-capture.tool.verify-get-artifact",
+        "contract": "mission-control.published-definition/1",
+        "kind": "mcp_tool",
+        "manifest": {
+          "definition": {
+            "annotations": {
+              "readOnlyHint": null,
+              "schema_source": "captured"
+            },
+            "attachment_targets": [
+              "agent.main"
+            ],
+            "compatible_compiler_versions": [
+              "control-plane-definitions/1"
+            ],
+            "conflicts_with": [],
+            "description": "Fetch a stored artifact by artifactId or digest (as text, json or just the handle).",
+            "input_schema": {
+              "properties": {
+                "artifactId": {
+                  "type": "string"
+                },
+                "as": {
+                  "enum": [
+                    "text",
+                    "json",
+                    "handle"
+                  ],
+                  "type": "string"
+                },
+                "digest": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "kind": "mcp_tool",
+            "logical_id": "mcp.knowledge-capture.tool.verify-get-artifact",
+            "maturity": "experimental",
+            "output_schema": null,
+            "schema_digest": "sha256:a7ea2bc95d070c3858ddefffb7014f8e0c49df8658d96b55d0e540d38451336c",
+            "schema_version": "1",
+            "server_ref": {
+              "digest": "sha256:a50c732566546291714dd987e7c6cea74d8112ccaaeba931ce8fec1e9eb9354c",
+              "kind": "mcp_server",
+              "lifecycle_status": "published",
+              "logical_id": "mcp.knowledge-capture",
+              "payload_ref": null,
+              "revision": 3,
+              "schema_version": "1"
+            },
+            "side_effect_class": "read_only",
+            "title": "verify_get_artifact",
+            "tool_name": "verify_get_artifact"
+          },
+          "published_at": "2026-11-16T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:f0a36b23c033f6d387115bae5147450185e1689919213ea28986bf2836c1ee1c",
+            "kind": "mcp_tool",
+            "lifecycle_status": "published",
+            "logical_id": "mcp.knowledge-capture.tool.verify-get-artifact",
+            "payload_ref": null,
+            "revision": 3,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:2a9b158d0aaae51db2fa1a24962602c873951602a2676afc7cbc1b232cc16839",
+        "manifest_ref": "mc-catalog://definition/mcp_tool/mcp.knowledge-capture.tool.verify-get-artifact/3",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "3"
+      },
+      "kind": "asset_version",
+      "logical_key": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.verify-get-artifact/3"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.verify-get-artifact/3",
+        "decided_at": "2026-11-16T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/agent_capabilities.py",
+          "tests/fixtures/mcp/mcp.knowledge-capture.1a451fd.tools.json",
+          "docs/specs/provider-consolidation-2026-10/providers/research-capabilities/RESEARCH-CAPABILITIES-SURFACE-2026-11-16.md"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.verify-get-artifact/3:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:mcp_tool:mcp.knowledge-capture.tool.verify-list-captures",
+        "contract": "mission-control.published-definition/1",
+        "kind": "mcp_tool",
+        "manifest": {
+          "definition": {
+            "annotations": {
+              "readOnlyHint": null,
+              "schema_source": "captured"
+            },
+            "attachment_targets": [
+              "agent.main"
+            ],
+            "compatible_compiler_versions": [
+              "control-plane-definitions/1"
+            ],
+            "conflicts_with": [],
+            "description": "List every capture in the store with its digest and size.",
+            "input_schema": {
+              "properties": {},
+              "type": "object"
+            },
+            "kind": "mcp_tool",
+            "logical_id": "mcp.knowledge-capture.tool.verify-list-captures",
+            "maturity": "experimental",
+            "output_schema": null,
+            "schema_digest": "sha256:e907a7c6db41dce572958b7918d39856a98ef71d5e8a4c1470a25a5e1a4d17bc",
+            "schema_version": "1",
+            "server_ref": {
+              "digest": "sha256:a50c732566546291714dd987e7c6cea74d8112ccaaeba931ce8fec1e9eb9354c",
+              "kind": "mcp_server",
+              "lifecycle_status": "published",
+              "logical_id": "mcp.knowledge-capture",
+              "payload_ref": null,
+              "revision": 3,
+              "schema_version": "1"
+            },
+            "side_effect_class": "read_only",
+            "title": "verify_list_captures",
+            "tool_name": "verify_list_captures"
+          },
+          "published_at": "2026-11-16T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:79de9d6b834fe0f00e4bae6e4c116a920a4a67a704e3eacdefe812c52dc712be",
+            "kind": "mcp_tool",
+            "lifecycle_status": "published",
+            "logical_id": "mcp.knowledge-capture.tool.verify-list-captures",
+            "payload_ref": null,
+            "revision": 3,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:84732e14bfa87a5154f7c620e12b18da51d08fe4ed3866a2155b56cb81330395",
+        "manifest_ref": "mc-catalog://definition/mcp_tool/mcp.knowledge-capture.tool.verify-list-captures/3",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "3"
+      },
+      "kind": "asset_version",
+      "logical_key": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.verify-list-captures/3"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.verify-list-captures/3",
+        "decided_at": "2026-11-16T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/agent_capabilities.py",
+          "tests/fixtures/mcp/mcp.knowledge-capture.1a451fd.tools.json",
+          "docs/specs/provider-consolidation-2026-10/providers/research-capabilities/RESEARCH-CAPABILITIES-SURFACE-2026-11-16.md"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.verify-list-captures/3:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:mcp_tool:mcp.knowledge-capture.tool.verify-locate-quote",
+        "contract": "mission-control.published-definition/1",
+        "kind": "mcp_tool",
+        "manifest": {
+          "definition": {
+            "annotations": {
+              "readOnlyHint": null,
+              "schema_source": "captured"
+            },
+            "attachment_targets": [
+              "agent.main"
+            ],
+            "compatible_compiler_versions": [
+              "control-plane-definitions/1"
+            ],
+            "conflicts_with": [],
+            "description": "Resolve a candidate quote as a text_quote selector on the captured bytes. status=resolved means it occurs exactly once and is safe to put in an intent; ambiguous/not_found include suggestions.",
+            "input_schema": {
+              "properties": {
+                "captureId": {
+                  "maxLength": 255,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "quote": {
+                  "maxLength": 4000,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "runId": {
+                  "description": "Agent-chosen run id; capture steps are logged as non-authoritative step receipts under it.",
+                  "maxLength": 200,
+                  "minLength": 1,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "captureId",
+                "quote"
+              ],
+              "type": "object"
+            },
+            "kind": "mcp_tool",
+            "logical_id": "mcp.knowledge-capture.tool.verify-locate-quote",
+            "maturity": "experimental",
+            "output_schema": null,
+            "schema_digest": "sha256:81d0e5a8159c5f886934133f82e82c0bbc071b3033b636046ccbf5bcb921b096",
+            "schema_version": "1",
+            "server_ref": {
+              "digest": "sha256:a50c732566546291714dd987e7c6cea74d8112ccaaeba931ce8fec1e9eb9354c",
+              "kind": "mcp_server",
+              "lifecycle_status": "published",
+              "logical_id": "mcp.knowledge-capture",
+              "payload_ref": null,
+              "revision": 3,
+              "schema_version": "1"
+            },
+            "side_effect_class": "read_only",
+            "title": "verify_locate_quote",
+            "tool_name": "verify_locate_quote"
+          },
+          "published_at": "2026-11-16T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:28fc1b75d2019cbe2835704d25ad4cc8e9ae0f60b5a29d1c461fda81b97c3c68",
+            "kind": "mcp_tool",
+            "lifecycle_status": "published",
+            "logical_id": "mcp.knowledge-capture.tool.verify-locate-quote",
+            "payload_ref": null,
+            "revision": 3,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:edf250aedb70a5fd5f0eb28d30a30a87a8a4471353df0ab13d8eec64841a639b",
+        "manifest_ref": "mc-catalog://definition/mcp_tool/mcp.knowledge-capture.tool.verify-locate-quote/3",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "3"
+      },
+      "kind": "asset_version",
+      "logical_key": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.verify-locate-quote/3"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.verify-locate-quote/3",
+        "decided_at": "2026-11-16T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/agent_capabilities.py",
+          "tests/fixtures/mcp/mcp.knowledge-capture.1a451fd.tools.json",
+          "docs/specs/provider-consolidation-2026-10/providers/research-capabilities/RESEARCH-CAPABILITIES-SURFACE-2026-11-16.md"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.verify-locate-quote/3:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:mcp_tool:mcp.knowledge-capture.tool.verify-read-capture",
+        "contract": "mission-control.published-definition/1",
+        "kind": "mcp_tool",
+        "manifest": {
+          "definition": {
+            "annotations": {
+              "readOnlyHint": null,
+              "schema_source": "captured"
+            },
+            "attachment_targets": [
+              "agent.main"
+            ],
+            "compatible_compiler_versions": [
+              "control-plane-definitions/1"
+            ],
+            "conflicts_with": [],
+            "description": "Read a window of the exact captured text (default 6000 chars, max 20000). Use this to inspect the source before choosing quotes.",
+            "input_schema": {
+              "properties": {
+                "captureId": {
+                  "maxLength": 255,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "length": {
+                  "exclusiveMinimum": 0,
+                  "maximum": 20000,
+                  "type": "integer"
+                },
+                "offset": {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "runId": {
+                  "description": "Agent-chosen run id; capture steps are logged as non-authoritative step receipts under it.",
+                  "maxLength": 200,
+                  "minLength": 1,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "captureId"
+              ],
+              "type": "object"
+            },
+            "kind": "mcp_tool",
+            "logical_id": "mcp.knowledge-capture.tool.verify-read-capture",
+            "maturity": "experimental",
+            "output_schema": null,
+            "schema_digest": "sha256:834ca0a6545c8a6a84ee9d78e6b2db2815cd58529280584bc2d5ab553f4c9af7",
+            "schema_version": "1",
+            "server_ref": {
+              "digest": "sha256:a50c732566546291714dd987e7c6cea74d8112ccaaeba931ce8fec1e9eb9354c",
+              "kind": "mcp_server",
+              "lifecycle_status": "published",
+              "logical_id": "mcp.knowledge-capture",
+              "payload_ref": null,
+              "revision": 3,
+              "schema_version": "1"
+            },
+            "side_effect_class": "read_only",
+            "title": "verify_read_capture",
+            "tool_name": "verify_read_capture"
+          },
+          "published_at": "2026-11-16T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:2523ead91200166d2331c69cbdc193c17ec0c653248d1642f2b9935f5cce4f99",
+            "kind": "mcp_tool",
+            "lifecycle_status": "published",
+            "logical_id": "mcp.knowledge-capture.tool.verify-read-capture",
+            "payload_ref": null,
+            "revision": 3,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:61e43ca153985dce4ff20814bf2465d15f20bbda1cca217b9dc2c3b18e050f17",
+        "manifest_ref": "mc-catalog://definition/mcp_tool/mcp.knowledge-capture.tool.verify-read-capture/3",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "3"
+      },
+      "kind": "asset_version",
+      "logical_key": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.verify-read-capture/3"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.verify-read-capture/3",
+        "decided_at": "2026-11-16T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/agent_capabilities.py",
+          "tests/fixtures/mcp/mcp.knowledge-capture.1a451fd.tools.json",
+          "docs/specs/provider-consolidation-2026-10/providers/research-capabilities/RESEARCH-CAPABILITIES-SURFACE-2026-11-16.md"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.verify-read-capture/3:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:mcp_tool:mcp.knowledge-capture.tool.verify-register-artifact",
+        "contract": "mission-control.published-definition/1",
+        "kind": "mcp_tool",
+        "manifest": {
+          "definition": {
+            "annotations": {
+              "readOnlyHint": null,
+              "schema_source": "captured"
+            },
+            "attachment_targets": [
+              "agent.main"
+            ],
+            "compatible_compiler_versions": [
+              "control-plane-definitions/1"
+            ],
+            "conflicts_with": [],
+            "description": "Store text (an intent file, a report, notes) as a content-addressed artifact and get back its artifactId/digest. Sandbox files are normally pushed via the HTTP /artifacts route instead.",
+            "input_schema": {
+              "properties": {
+                "label": {
+                  "maxLength": 80,
+                  "type": "string"
+                },
+                "mediaType": {
+                  "default": "application/json",
+                  "maxLength": 120,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "runId": {
+                  "description": "Agent-chosen run id; capture steps are logged as non-authoritative step receipts under it.",
+                  "maxLength": 200,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "text": {
+                  "maxLength": 2000000,
+                  "minLength": 1,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "text"
+              ],
+              "type": "object"
+            },
+            "kind": "mcp_tool",
+            "logical_id": "mcp.knowledge-capture.tool.verify-register-artifact",
+            "maturity": "experimental",
+            "output_schema": null,
+            "schema_digest": "sha256:8dffb7cbfb8a03cd0e92f5e76bba8a71e24158c4a679ce3ae9b71e7350cccaf6",
+            "schema_version": "1",
+            "server_ref": {
+              "digest": "sha256:a50c732566546291714dd987e7c6cea74d8112ccaaeba931ce8fec1e9eb9354c",
+              "kind": "mcp_server",
+              "lifecycle_status": "published",
+              "logical_id": "mcp.knowledge-capture",
+              "payload_ref": null,
+              "revision": 3,
+              "schema_version": "1"
+            },
+            "side_effect_class": "bounded_write",
+            "title": "verify_register_artifact",
+            "tool_name": "verify_register_artifact"
+          },
+          "published_at": "2026-11-16T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:26cd1c26fb149e957c017dc56f770e300ba83e932c2fa1adca132aed195e6b8f",
+            "kind": "mcp_tool",
+            "lifecycle_status": "published",
+            "logical_id": "mcp.knowledge-capture.tool.verify-register-artifact",
+            "payload_ref": null,
+            "revision": 3,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:00af6a6f350da19fc722e7c9fb0a3d3d17f2e43cc801e1995360bed2891477f0",
+        "manifest_ref": "mc-catalog://definition/mcp_tool/mcp.knowledge-capture.tool.verify-register-artifact/3",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "3"
+      },
+      "kind": "asset_version",
+      "logical_key": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.verify-register-artifact/3"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.verify-register-artifact/3",
+        "decided_at": "2026-11-16T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/agent_capabilities.py",
+          "tests/fixtures/mcp/mcp.knowledge-capture.1a451fd.tools.json",
+          "docs/specs/provider-consolidation-2026-10/providers/research-capabilities/RESEARCH-CAPABILITIES-SURFACE-2026-11-16.md"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.verify-register-artifact/3:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:mcp_tool:mcp.knowledge-capture.tool.verify-search-capture",
+        "contract": "mission-control.published-definition/1",
+        "kind": "mcp_tool",
+        "manifest": {
+          "definition": {
+            "annotations": {
+              "readOnlyHint": null,
+              "schema_source": "captured"
+            },
+            "attachment_targets": [
+              "agent.main"
+            ],
+            "compatible_compiler_versions": [
+              "control-plane-definitions/1"
+            ],
+            "conflicts_with": [],
+            "description": "Find where a phrase (or the words of a phrase) occurs in a capture. Returns exact substrings with context and their occurrence counts so you can build a unique quote.",
+            "input_schema": {
+              "properties": {
+                "captureId": {
+                  "maxLength": 255,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "limit": {
+                  "exclusiveMinimum": 0,
+                  "maximum": 25,
+                  "type": "integer"
+                },
+                "query": {
+                  "maxLength": 400,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "runId": {
+                  "description": "Agent-chosen run id; capture steps are logged as non-authoritative step receipts under it.",
+                  "maxLength": 200,
+                  "minLength": 1,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "captureId",
+                "query"
+              ],
+              "type": "object"
+            },
+            "kind": "mcp_tool",
+            "logical_id": "mcp.knowledge-capture.tool.verify-search-capture",
+            "maturity": "experimental",
+            "output_schema": null,
+            "schema_digest": "sha256:29543594263572bdc4475f6b110b6c009f3d07e9047748af9ad503d7c819c417",
+            "schema_version": "1",
+            "server_ref": {
+              "digest": "sha256:a50c732566546291714dd987e7c6cea74d8112ccaaeba931ce8fec1e9eb9354c",
+              "kind": "mcp_server",
+              "lifecycle_status": "published",
+              "logical_id": "mcp.knowledge-capture",
+              "payload_ref": null,
+              "revision": 3,
+              "schema_version": "1"
+            },
+            "side_effect_class": "read_only",
+            "title": "verify_search_capture",
+            "tool_name": "verify_search_capture"
+          },
+          "published_at": "2026-11-16T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:547e4737d3e7e7f8be785eefdf34d960215ca575fb5d847685438205f947af30",
+            "kind": "mcp_tool",
+            "lifecycle_status": "published",
+            "logical_id": "mcp.knowledge-capture.tool.verify-search-capture",
+            "payload_ref": null,
+            "revision": 3,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:806a1f5703890bd2ac0365dce6bf7048d42a06c7189cd9eb7b52325cc423d01e",
+        "manifest_ref": "mc-catalog://definition/mcp_tool/mcp.knowledge-capture.tool.verify-search-capture/3",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "3"
+      },
+      "kind": "asset_version",
+      "logical_key": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.verify-search-capture/3"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.verify-search-capture/3",
+        "decided_at": "2026-11-16T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/agent_capabilities.py",
+          "tests/fixtures/mcp/mcp.knowledge-capture.1a451fd.tools.json",
+          "docs/specs/provider-consolidation-2026-10/providers/research-capabilities/RESEARCH-CAPABILITIES-SURFACE-2026-11-16.md"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.verify-search-capture/3:admit"
+    },
+    {
+      "fields": {
+        "asset_id": "definition:mcp_tool:mcp.knowledge-capture.tool.verify-supported-media-types",
+        "contract": "mission-control.published-definition/1",
+        "kind": "mcp_tool",
+        "manifest": {
+          "definition": {
+            "annotations": {
+              "readOnlyHint": null,
+              "schema_source": "captured"
+            },
+            "attachment_targets": [
+              "agent.main"
+            ],
+            "compatible_compiler_versions": [
+              "control-plane-definitions/1"
+            ],
+            "conflicts_with": [],
+            "description": "List every content type the executor can capture and how each is converted to the text representation quotes are selected from.",
+            "input_schema": {
+              "properties": {},
+              "type": "object"
+            },
+            "kind": "mcp_tool",
+            "logical_id": "mcp.knowledge-capture.tool.verify-supported-media-types",
+            "maturity": "experimental",
+            "output_schema": null,
+            "schema_digest": "sha256:f256794e5c7103dc31e731a7a5ca57b30a8aa578aa22086b4889a5fa42a8024b",
+            "schema_version": "1",
+            "server_ref": {
+              "digest": "sha256:a50c732566546291714dd987e7c6cea74d8112ccaaeba931ce8fec1e9eb9354c",
+              "kind": "mcp_server",
+              "lifecycle_status": "published",
+              "logical_id": "mcp.knowledge-capture",
+              "payload_ref": null,
+              "revision": 3,
+              "schema_version": "1"
+            },
+            "side_effect_class": "read_only",
+            "title": "verify_supported_media_types",
+            "tool_name": "verify_supported_media_types"
+          },
+          "published_at": "2026-11-16T00:00:00Z",
+          "published_by": "seed:mission-control-catalog",
+          "ref": {
+            "digest": "sha256:c67be8ca861a3f46b1188e5c267cd562cdd6fa4f620f16ebaa4f3bbbfa34f1ba",
+            "kind": "mcp_tool",
+            "lifecycle_status": "published",
+            "logical_id": "mcp.knowledge-capture.tool.verify-supported-media-types",
+            "payload_ref": null,
+            "revision": 3,
+            "schema_version": "1"
+          },
+          "retired_at": null
+        },
+        "manifest_digest": "sha256:243f7f49e309da6b89c4bc7b4a778bfeca26c4b7fb7854413cbb4c17dfc58b22",
+        "manifest_ref": "mc-catalog://definition/mcp_tool/mcp.knowledge-capture.tool.verify-supported-media-types/3",
+        "required_compatibility": [
+          ">=1.0.0 <2.0.0"
+        ],
+        "status": "admitted",
+        "version": "3"
+      },
+      "kind": "asset_version",
+      "logical_key": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.verify-supported-media-types/3"
+    },
+    {
+      "fields": {
+        "actor_ref": "seed:mission-control-catalog",
+        "asset_version": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.verify-supported-media-types/3",
+        "decided_at": "2026-11-16T00:00:00Z",
+        "decision": "admit",
+        "disposition": "seeded-from-reviewed-source",
+        "evidence_refs": [
+          "packages/mission-control-db-contract/seeds/agent_capabilities.py",
+          "tests/fixtures/mcp/mcp.knowledge-capture.1a451fd.tools.json",
+          "docs/specs/provider-consolidation-2026-10/providers/research-capabilities/RESEARCH-CAPABILITIES-SURFACE-2026-11-16.md"
+        ],
+        "policy_ref": "mission-control.seed-admission/1"
+      },
+      "kind": "asset_decision",
+      "logical_key": "agent-capability:mcp-tool:mcp.knowledge-capture.tool.verify-supported-media-types/3:admit"
+    }
+  ],
+  "seed_key": "mc.catalog.agent-capabilities",
+  "seed_version": "1.3.0"
+}

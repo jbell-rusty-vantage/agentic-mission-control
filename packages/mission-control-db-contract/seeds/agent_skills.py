@@ -56,10 +56,11 @@ from typing import Any
 REPO_ROOT = Path(__file__).resolve().parents[3]
 SEEDS_ROOT = Path(__file__).resolve().parent
 AGENT_SKILL_SEED_TIME = datetime(2026, 10, 14, tzinfo=UTC)
-SEED_VERSION = "1.0.5"
+SEED_VERSION = "1.0.6"
 # Every committed seed version, oldest first; all but the last are frozen with their sources
-# under bundle-sources/agent-skills-<version>/.
-SEED_VERSIONS = ("1.0.0", "1.0.1", "1.0.2", "1.0.3", "1.0.4", SEED_VERSION)
+# under bundle-sources/agent-skills-<version>/. An imported skill's frozen source is its own
+# import directory, which is immutable (one directory per source commit).
+SEED_VERSIONS = ("1.0.0", "1.0.1", "1.0.2", "1.0.3", "1.0.4", "1.0.5", SEED_VERSION)
 FROZEN_SEED_VERSIONS = SEED_VERSIONS[:-1]
 FROZEN_SOURCES = SEEDS_ROOT.parent / "bundle-sources" / "agent-skills-1.0.0"
 APPS = ("biotech", "ai-engineer")
@@ -137,16 +138,22 @@ APPLICATION_SKILLS: dict[str, tuple[str, ...]] = {
 # changes nothing here until a new seed version names it. The AI Engineer charter keeps its
 # catalog id (``charter_skill_id``) and is published as that id's next revision.
 IMPORTS_RECORD = SEEDS_ROOT.parent / "bundle-sources" / "imported" / "IMPORTS.json"
+#
+# Seed 1.0.6 (2026-11-16) names the imports at Knowledge Services 1a451fd and the AI Engineer
+# service 080e9f0 of the five skills that changed upstream: the research method and the
+# executor's capture skill now route a capture through `source_prepare_captured`,
+# `evidence_units` and `chain_write`. The four unchanged Knowledge Services skills keep their
+# 7bc4aee import (same bytes, same row).
 IMPORTED_SKILLS: dict[str, tuple[str, tuple[str, ...]]] = {
-    "knowledge-research": ("2026.11.16-7bc4aee", APPS),
-    "knowledge-verify": ("2026.11.16-7bc4aee", APPS),
+    "knowledge-research": ("2026.11.17-1a451fd", APPS),
+    "knowledge-verify": ("2026.11.17-1a451fd", APPS),
     "knowledge-acquisition-and-vetting": ("1.3.0-7bc4aee", APPS),
     "knowledge-verification": ("1.5.0-7bc4aee", APPS),
-    "knowledge-ingest": ("2026.11.16-7bc4aee", APPS),
+    "knowledge-ingest": ("2026.11.17-1a451fd", APPS),
     "knowledge-db": ("2026.11.16-7bc4aee", APPS),
     "schema-explore": ("2026.11.16-7bc4aee", APPS),
-    "ai-engineer-knowledge-charter": ("2026.11.16-b7e6e21", ("ai-engineer",)),
-    "content-authoring": ("2026.11.16-b7e6e21", ("ai-engineer",)),
+    "ai-engineer-knowledge-charter": ("2026.11.16-080e9f0", ("ai-engineer",)),
+    "content-authoring": ("2026.11.16-080e9f0", ("ai-engineer",)),
 }
 # Where a frozen seed version's bundle sources sit under its archive, for the capability ids
 # whose source has since left the path the repository held when that version shipped.
@@ -546,6 +553,12 @@ def frozen_application_definitions(
     directories.update({f"skill.{name}": f"skills/{name}" for name in APPLICATION_SKILLS})
     directories.update(FROZEN_DIRECTORIES)
     directories[HOOK["id"]] = HOOK["directory"]
+    # An imported skill's bytes stay in its own import directory (one per source commit),
+    # never copied into an archive: the import record of that id and version names it.
+    imports = {
+        (entry["capability_id"], entry["version"]): entry["directory"]
+        for entry in json.loads(IMPORTS_RECORD.read_bytes())["imports"]
+    }
     entries = []
     for record in records:
         if record["kind"] != "asset_version":
@@ -555,13 +568,21 @@ def frozen_application_definitions(
         source = None
         manifest = None
         if getattr(definition, "bundle_ref", None) is not None:
-            directory = directories[definition.logical_id]
+            version = definition.source_provenance.upstream_version
+            imported = (
+                imports.get((definition.logical_id, version))
+                if definition.source_provenance.source == "belllabs"
+                else None
+            )
+            directory = imported or directories[definition.logical_id]
             source = {
                 "id": definition.logical_id,
                 "kind": "hook_script" if definition.logical_id == HOOK["id"] else "skill_bundle",
-                "version": definition.source_provenance.upstream_version,
+                "version": version,
                 "directory": directory,
-                "files": directory_files(directory, lf=False, source_root=source_root),
+                "files": directory_files(
+                    directory, lf=False, source_root=REPO_ROOT if imported else source_root
+                ),
             }
             manifest = bundle_manifest(source, application_id)
             if manifest.digest != definition.manifest_digest:
@@ -576,6 +597,31 @@ def frozen_application_definitions(
             }
         )
     return entries
+
+
+def definitions_as_of(application_id: str, seed_version: str) -> list[dict[str, Any]]:
+    """The latest row of every id the frozen seed versions up to ``seed_version`` published:
+    the catalog as it stood when that version was current, rebuilt from archived bytes."""
+
+    if seed_version not in FROZEN_SEED_VERSIONS:
+        raise ValueError("only a frozen skill seed version has a fixed state")
+    latest: dict[str, dict[str, Any]] = {}
+    for version in FROZEN_SEED_VERSIONS[: FROZEN_SEED_VERSIONS.index(seed_version) + 1]:
+        for entry in frozen_application_definitions(application_id, version):
+            latest[entry["definition"].logical_id] = entry
+    return list(latest.values())
+
+
+def seed_keys_as_of(application_id: str, seed_version: str) -> dict[str, str]:
+    """Like :func:`seed_keys`, for the rows :func:`definitions_as_of` returns."""
+
+    return {
+        entry["definition"].logical_id: (
+            f"{KEY_PREFIX}:{entry['definition'].kind.value.replace('_', '-')}:"
+            f"{entry['definition'].logical_id}/{entry['revision']}"
+        )
+        for entry in definitions_as_of(application_id, seed_version)
+    }
 
 
 def custody_definitions(application_id: str) -> list[dict[str, Any]]:
@@ -669,11 +715,13 @@ def bundles(published_records: Any, seed_format: str, compatibility: str, actor:
             "depends_on": [{"seed_key": APP_KEYS[app], "seed_version": FROZEN_SEED_VERSIONS[-1]}],
             "actor_ref": actor,
             "description": (
-                "The coordinator skill bundles regenerated from the guide and the method "
-                "skills imported from their owning repositories (belllabs identifiers, pinned "
-                f"to a source commit) in '{app}': {', '.join(names)}. A new skill id starts at "
-                "revision 1 and a changed bundle takes its next revision; all earlier "
-                f"{', '.join(FROZEN_SEED_VERSIONS)} records and custody bytes are preserved."
+                "The method skills re-imported from their owning repositories at Knowledge "
+                "Services 1a451fd and the AI Engineer service 080e9f0 (belllabs identifiers, "
+                "pinned to a source commit), whose research and capture method routes a "
+                "capture through source_prepare_captured, evidence_units and chain_write, in "
+                f"'{app}': {', '.join(names)}. A changed bundle takes its next revision; all "
+                f"earlier {', '.join(FROZEN_SEED_VERSIONS)} records and custody bytes are "
+                "preserved."
             ),
             "records": records,
         }

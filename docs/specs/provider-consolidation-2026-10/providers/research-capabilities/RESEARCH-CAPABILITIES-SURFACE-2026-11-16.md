@@ -209,24 +209,33 @@ Registered in the [improvement register](../../PROVIDER-RESEARCH-RUNNING-PROPOSA
 
 For the upstream research skill (the imported copies in this repository are exact and are not edited
 here). "Seeded" means a catalog row in the seed bundle; a mission attaches one only if its manifest
-selects it, its lane supports it and the deployment serves it.
+selects it, its lane supports it and the deployment serves it. State as of 2026-11-16, after the
+capture server's revision 3 and the first research mission that mounted it.
 
 | Tool | Catalog pin | Tool list | Credential name | Reachable by a mission |
 | --- | --- | --- | --- | --- |
-| Tavily | `mcp.tavily@0.2.22` (seed 1.0.0, unchanged) | transcribed 2026-10-07 | `TAVILY_API_KEY` | as before |
-| Firecrawl, with the developer and paper indexes | `mcp.firecrawl@3.28.2` (seed 1.0.0, unchanged) | transcribed 2026-10-07 | `FIRECRAWL_API_KEY` | as before |
-| Browser | `mcp.agent-browser@0.38.2`, `skill.agent-browser` (unchanged) | transcribed 2026-10-07 | none | as before |
-| GitHub, read-only | `mcp.github@2.1.0#sha256:8a9527386e0634359e8c61114aac0d9439ffdc2646b8d44b2875a6ef0d15a60a` (seed 1.1.0, unchanged) | captured 2026-11-16, 22 tools | `GITHUB_PERSONAL_ACCESS_TOKEN` (a read-only token) | a Deep Agents node, directly or through `plugin.code-research`; a worker serves it from an executable pin (absolute path, sha256 of the binary, the row's read-only arguments). **Not pinned on this machine**: the release binary of the probe is no longer on disk |
-| Context7 | `mcp.context7@4.7.0#sha256:47e93031a67707b5085404eeb1d5d535556c59b0246bdac0c25814c12671ddf4` (seed 1.1.0, unchanged) | captured 2026-11-16, 2 tools (`resolve-library-id`, `query-docs`) | `CONTEXT7_API_KEY` (optional upstream; pinned keyless unless named) | a Deep Agents node, directly or through `plugin.code-research`; a worker serves it from a node-module pin. **Not pinned on this machine**: the package is not installed under the workspace `.tools` |
-| GitHub and Context7 with one pin | `plugin.code-research@1#sha256:8f6606886307e700bf19dc807189234511240274f601a6cc0593d5f787b1ad88` (unchanged) | - | the two above | a Deep Agents node too: the lane runs the plugin as its members, each bound like a direct selection |
+| Tavily | `mcp.tavily@0.2.22` (seed 1.0.0, unchanged) | transcribed 2026-10-07 | `TAVILY_API_KEY` | as before; the local installation binds no launch component for it and its worker holds no key, so `plugin.web-research` does not launch there |
+| Firecrawl, with the developer and paper indexes | `mcp.firecrawl@3.28.2` (seed 1.0.0, unchanged) | transcribed 2026-10-07 | `FIRECRAWL_API_KEY` | as Tavily |
+| Browser | `mcp.agent-browser@0.38.2`, `skill.agent-browser` (unchanged) | transcribed 2026-10-07 | none | as before; no launch binding on the local installation (the first member a `research-report` start refuses) |
+| GitHub, read-only | `mcp.github@2.1.0#sha256:8a9527386e0634359e8c61114aac0d9439ffdc2646b8d44b2875a6ef0d15a60a` (seed 1.1.0, unchanged) | captured 2026-11-16, 22 tools | `GITHUB_PERSONAL_ACCESS_TOKEN` (a read-only token) | a Deep Agents node, directly or through `plugin.code-research`, where a worker pins the binary. **Not pinned on this machine**: no release binary is on disk (`--github-mcp-server` names none; nothing is downloaded) |
+| Context7 | `mcp.context7@4.7.0#sha256:47e93031a67707b5085404eeb1d5d535556c59b0246bdac0c25814c12671ddf4` (seed 1.1.0, unchanged) | captured 2026-11-16, 2 tools (`resolve-library-id`, `query-docs`) | `CONTEXT7_API_KEY` (optional upstream; pinned keyless unless named) | as GitHub, from a node-module pin. **Not pinned on this machine**: `@upstash/context7-mcp@4.7.0` is not installed under the workspace `.tools` |
+| GitHub and Context7 with one pin | `plugin.code-research@1#sha256:8f6606886307e700bf19dc807189234511240274f601a6cc0593d5f787b1ad88` (unchanged) | - | the two above | a Deep Agents node, where both members are pinned and bound |
 | arXiv's own interface | not seeded | - | - | the Firecrawl paper index, then a capture of arXiv's record; a first-party tool is IP-012 |
-| Capture, locate, source and schema tools of the executor | `mcp.knowledge-capture@0.1.0-7bc4aee#sha256:836511b2882f025111d65a34e35e2e371ee61808f6d00d562d94017cc928f960`, revision 2 (seed 1.2.0); revision 1 (`…#sha256:101392d0…b742`, seed 1.1.0) stays admitted and `unqualified` | captured 2026-11-16, 19 of 40 allowlisted | `VERIFY_EXECUTOR_TOKEN` (omitted from the pin for an executor that runs without a token) | **a Deep Agents node**, directly or through `plugin.cognition-knowledge` revision 3: the lane attaches only the 19 allowlisted tools and a worker serves it from a remote pin at the deployment's `MCP_SERVER_ENDPOINTS["mcp.knowledge-capture"]`. `unqualified` on cursor_local, claude_agent_sdk and codex; `unsupported` on cursor_cloud |
-| The research method with its capture tools, one pin | `plugin.cognition-knowledge@3` per application (seed `mc.app.<app>.cognition-profiles@1.0.2`): the revision 2 members and `mcp.knowledge-capture` revision 2 | - | `VERIFY_EXECUTOR_TOKEN` | a Deep Agents node; the `research-report` template selects it at `@latest` with `plugin.code-research` and `plugin.web-research` |
+| Capture, quotable capture, anchored claim, source and schema tools of the executor | `mcp.knowledge-capture@0.1.0-1a451fd#sha256:a50c732566546291714dd987e7c6cea74d8112ccaaeba931ce8fec1e9eb9354c`, revision 3 (seed 1.3.0, fixture `mcp.knowledge-capture.1a451fd.tools.json`); revisions 2 (`…7bc4aee#sha256:836511b2…f928f960`, seed 1.2.0) and 1 stay admitted | captured 2026-11-16 from the executor at Knowledge Services `1a451fd`, 23 of 42 allowlisted: revision 2's 19 plus `chain_write`, `evidence_units`, `source_prepare_captured` and `knowledge_describe` | `VERIFY_EXECUTOR_TOKEN` | **a Deep Agents node**, directly or through `plugin.cognition-knowledge` revision 4: the lane attaches the 23 tools, the worker connects to `MCP_SERVER_ENDPOINTS["mcp.knowledge-capture"]` from a remote pin, and the node's sealed secret references now carry the token (it had carried only the children's). Withheld: `ingest_*`, `db_*`, `checkpoint_*`, `schema_materialize`, `artifact_get`, `knowledge_operation_*`, `knowledge_receipt_get`. `unqualified` on cursor_local, claude_agent_sdk and codex; `unsupported` on cursor_cloud |
+| The research method with its capture tools, one pin | `plugin.cognition-knowledge@4` per application (seed `mc.app.<app>.cognition-profiles@1.0.3`): `skill.knowledge-research` and `skill.knowledge-verify` revision 2 (imported at `1a451fd`, seed `mc.app.<app>.agent-skills@1.0.6`), the application's charter, `mcp.knowledge-capture` revision 3 and the two subagents | - | `VERIFY_EXECUTOR_TOKEN` | a Deep Agents node. Run on the local installation (below); the `research-report` template still selects it at `@latest` beside two plugins and four knowledge tools that installation does not serve |
 | SEC filings | `mcp.edgartools@5.61.1` (one application, unchanged) | transcribed 2026-10-07 | `EDGAR_IDENTITY` | as before |
 
-State on 2026-11-16 after the capture path change (IP-008, IP-009, IP-011 and IP-013 are built; IP-010
-and IP-012 are not): implemented and unit-tested, and the tool narrowing was run once, read-only, against
-the executor on this machine (40 tools listed, the 19 allowlisted attached, `ingest_apply` and
-`db_sql_readonly` not attached; `scripts/prove_mcp_allowlist.py`). Not yet done: none of the seeds 1.1.0,
-1.2.0 or cognition-profiles 1.0.2 has been applied to an installation, no worker pin file carries any of
-the three servers, no launch binding names them, and no mission has mounted one.
+State on 2026-11-16. Implemented and unit-tested: revision 3 and its seeds, the local installation
+writing the worker pin rows (capture server and the nine imported method skills), the launch bindings
+and `MCP_SERVER_ENDPOINTS`. Integrated once, on the local production-shaped installation (not
+qualified): a mission submitted and started through the operator MCP mount only (run
+`3b51d56c-89d5-5d9b-bacf-e21c14911bdb`, Deep Agents, Claude Haiku 5.5, estimated USD 0.028) mounted the
+method skills and the 23 capture tools against an executor attached to the AI Engineer lab database. It
+captured `https://pypi.org/pypi/deepagents/0.7.38/json`, made it quotable (`source_prepare_captured`),
+recorded the proposed claim `01a1e709-df52-7bac-9f21-7d12fd8909a5` anchored to an exact quote
+(`chain_write` `record_claim`, written as `pipeline_agent`), was refused
+`VERIFIED_CLAIM_REQUIRES_ADMITTED_USE` when it asked for `status: verified`, and its review was
+accepted. Not done: the node cannot submit a promised output on an installation without a Knowledge
+Services knowledge binding (`submit_output` is one of the knowledge tools), the receipts carry no
+Mission Control coordinates, GitHub and Context7 are not pinned on this machine, and no remote
+installation holds any of these seeds.
