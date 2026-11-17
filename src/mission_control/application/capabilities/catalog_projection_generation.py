@@ -222,6 +222,12 @@ class InMemoryProjectionGenerationRepository:
 
 
 def projection_source_set_digest(refs: tuple[ExactDefinitionRef, ...]) -> str:
+    """The source-set digest of a projection generation: one ``kind|id|revision|digest`` line
+    per reference in codepoint order (= byte order of UTF-8), revision numerically.
+    ``mission_control_search.activate_generation`` recomputes it in the database and must sort
+    every text key with ``COLLATE "C"`` (component 1.16.0, migration 0075): a locale collation
+    such as ``en_US.utf8`` orders ``list-issues`` before ``list-issue-types``."""
+
     material = "\n".join(
         f"{ref.kind.value}|{ref.logical_id}|{ref.revision}|{ref.digest}"
         for ref in sorted(

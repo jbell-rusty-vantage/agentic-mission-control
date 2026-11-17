@@ -389,6 +389,8 @@ class PostgresCatalogSearchRepository:
         *,
         kinds: frozenset[DefinitionKind] = frozenset(),
     ) -> tuple[CapabilitySearchDocument, ...]:
+        # Byte order (`COLLATE "C"`), the order of `projection_source_set_digest` and of the
+        # 1.16.0 `activate_generation` digest, whatever the database's default collation.
         async with self._scope.session(tenant_scope) as (connection, installation, app):
             rows = await connection.fetch(
                 """
@@ -402,7 +404,8 @@ class PostgresCatalogSearchRepository:
                       cardinality($3::text[]) = 0
                       OR asset_kind = ANY($3::text[])
                   )
-                ORDER BY asset_kind, logical_id, revision, source_digest
+                ORDER BY asset_kind COLLATE "C", logical_id COLLATE "C", revision,
+                    source_digest COLLATE "C"
                 """,
                 tenant_scope,
                 projection_generation,

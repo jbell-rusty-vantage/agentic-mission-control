@@ -84,6 +84,13 @@ jobs:
         run: make local-up PORT="${API_PORT}" WORKER=auto
       - name: Consumer-surface evaluation (a scorecard, not a gate)
         run: make local-eval
+      - name: Component release proof on a locale database (real PostgreSQL)
+        # The newest release installs fresh and over 1.15.0, and a capability search generation
+        # whose ids sort differently under `en_US.utf8` and byte order activates (0075). It uses
+        # throwaway `mct_*` databases on the same service container.
+        env:
+          MISSION_CONTROL_TEST_ADMIN_DSN: postgresql://belllabs:belllabs-local@127.0.0.1:55434/belllabs
+        run: uv run --no-sync pytest tests/integration/postgres/test_capability_search_release_1160.py -q
       - name: Publish the scorecard in the job summary
         if: always()
         run: |

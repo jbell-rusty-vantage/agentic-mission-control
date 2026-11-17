@@ -68,9 +68,11 @@ SCRIPTS = ROOT / "scripts"
 PACKAGE = ROOT / "packages" / "mission-control-db-contract"
 APPLICATIONS = ("ai-engineer", "biotech")
 DEFAULT_APPLICATION = "ai-engineer"
-# The newest release with a release integration test (releases/README.md, 2026-11-15:
-# tests/integration/postgres/test_cross_provider_release_1140.py; 1.15.0 has none yet).
-COMPONENT_VERSION = "1.14.0"
+# The newest release with a release integration test (releases/README.md, 2026-11-16:
+# tests/integration/postgres/test_capability_search_release_1160.py). Releases before 1.16.0
+# cannot activate the capability search projection on a locale database (`en_US.utf8`) once
+# the 1.1.0 capability seed is applied (0075).
+COMPONENT_VERSION = "1.16.0"
 RUNTIME_VERSIONS = (
     "--reader-version",
     "mission-control-runtime/1",

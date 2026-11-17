@@ -9,7 +9,7 @@ database. Read the root `GLOSSARY.md` and `docs/knowledge/persistence.md` first.
 | Concern | Start |
 | --- | --- |
 | CLI commands (release-build, lock, inspect, plan, apply, verify, seed-plan/apply, runtime-plan/apply, login-plan/apply, tenant-plan/apply, snapshot, compare, qualify) | src/mission_control_db_contract/cli.py; restricted LOGIN roles in logins.py; deployment tenants in tenants.py |
-| Releases (the only release authority; new SQL = a new version directory) | releases/<version>/component/ (newest built 1.14.0; newest deployment locks 1.9.0), releases/README.md; release inputs in ../../scripts/release_1130/ and release_1140/ |
+| Releases (the only release authority; new SQL = a new version directory) | releases/<version>/component/ (newest built 1.16.0; newest deployment locks 1.9.0), releases/README.md; release inputs in ../../scripts/release_<version>/ with scripts/prepare_release_<version>.py |
 | Retired input (frozen 1.4.0; never build, lock or install from it) | component/ |
 | Generated contract, manifest, fingerprint | releases/<version>/component/{generated,manifest.json}, src/.../fingerprint.py, release.py |
 | Seeds per application and qualification | seeds/common, seeds/biotech, seeds/ai-engineer, seeds/qualification |

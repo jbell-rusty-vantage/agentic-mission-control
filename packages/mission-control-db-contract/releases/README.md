@@ -396,6 +396,29 @@ the Deep Agents describe declares `interrupt_and_inject: cooperative_inject` (AD
 prepared by `scripts/prepare_release_1150.py`; 65 ordered migrations in the manifest. No release-specific integration test
 (unlike 1.14.0), no deployment lock and no remote install yet.
 
+## 1.16.0
+
+`1.16.0/component/` is the built 1.15.0 prefix (0001..0074, verified against the 1.15.0 manifest) plus
+`0075_capability_search_byte_order_digest.sql` (MC-F, 2026-11-16): `mission_control_search.activate_generation`
+sorts every text key of its source-set digest with `COLLATE "C"`, the byte order the application's
+`projection_source_set_digest` uses. Before it the keys sorted under the database's default collation; on an
+`en_US.utf8` database (the compose server, the CI service container, Supabase projects) the
+`mc.catalog.agent-capabilities@1.1.0` ids `mcp.github.tool.list-issue-fields` / `list-issues` / `list-issue-types`
+sort differently and every rebuild failed with `projection generation count or source digest verification failed`.
+Function body only: signature, `SECURITY INVOKER`, search path and grants unchanged; no table or row changes.
+Minor; reader/writer protocol unchanged. `scripts/prepare_release_1160.py` reproduces the input tree. Built
+2026-11-16 on the disposable PostgreSQL 17: schema fingerprint
+`sha256:5a4d6983a3b8f0ec702bc1a17e3b5d2054b4b0f64cdce4b358156067b6ed66d5`, contract `sha256:65fb7633…00b7`,
+manifest file `sha256:314445c0…7d07`; 66 ordered migrations. Proof:
+`tests/integration/postgres/test_capability_search_release_1160.py` (fresh and upgrade from 1.15.0 planning
+exactly 0075 with earlier receipts kept, grants, verify, replay; activation of those three ids on a
+`LC_COLLATE 'en_US.utf8'` database succeeds on 1.16.0 and is refused on 1.15.0), the package's
+`tests/test_release_1160_prefix.py` and `tests/unit/capability/test_projection_digest_byte_order.py` (no
+database: every ordered aggregate of the newest release sorts text with `COLLATE "C"`). An installation on an
+earlier release receives it with `mission-db plan` / `apply` against `releases/1.16.0/component` (one pending
+migration from 1.15.0). `scripts/dev/local_installation.py` installs 1.16.0. No deployment lock and no remote
+install yet.
+
 ## Colliding branch keys
 
 Since the 2026-11-06 clean-slate move these branches exist only in the owner's private history bundle

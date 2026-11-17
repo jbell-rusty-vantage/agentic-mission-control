@@ -280,14 +280,27 @@ async def create_common_database(
     paths: list[Path] | None = None,
     server_dsn: str | None = None,
     component_version: str = COMPONENT_VERSION,
+    locale: str | None = None,
 ) -> CommonDatabase:
+    """``locale`` creates the database from ``template0`` with that LC_COLLATE and LC_CTYPE
+    (e.g. ``en_US.utf8``, the default of Supabase and the compose server); None keeps the
+    server default."""
+
     server = server_dsn or admin_dsn()
     suffix = secrets.token_hex(5)
     name = f"mct_{suffix}"
     installation_id, project_ref = INSTALLATIONS[application_id]
+    if locale is not None and not re.fullmatch(r"[A-Za-z0-9_.@-]{1,64}", locale):
+        raise ValueError("unexpected locale name")
     admin = await asyncpg.connect(server)
     try:
-        await admin.execute(f'CREATE DATABASE "{name}"')
+        if locale is None:
+            await admin.execute(f'CREATE DATABASE "{name}"')
+        else:
+            await admin.execute(
+                f"CREATE DATABASE \"{name}\" TEMPLATE template0 ENCODING 'UTF8' "
+                f"LC_COLLATE '{locale}' LC_CTYPE '{locale}'"
+            )
         login_roles: dict[str, str] = {}
         passwords: dict[str, str] = {}
         for capability in CAPABILITY_ROLES:
