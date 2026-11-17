@@ -16,6 +16,6 @@ Invariants:
 - Settlement is by saved result and reducer; execution completion is not mission acceptance.
 Explained by (docs/knowledge): lanes-and-harness, environment-preparation, environments, application-profile, budgets-and-usage, completion
 Decided by (docs/adr): ADR-0005, ADR-0006, ADR-0010, ADR-0011, ADR-0017
-Depends on: domain.authoring, domain.programs · Used by: application, adapters, adapters.deep_agents, adapters.temporal, adapters.postgres, adapters.cursor (+16)
+Depends on: domain.authoring, domain.programs · Used by: application, adapters, adapters.deep_agents, adapters.postgres, adapters.temporal, adapters.cursor (+16)
 Verify: uv run pytest tests/unit/operations tests/architecture
 <!-- END:sdlc-module -->

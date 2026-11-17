@@ -12,7 +12,7 @@ Entrypoints:
 - purpose_card.py — The Purpose Card: why the mission exists and what this node's part is, for every…
 - subagent_discriminator.py — Compile-time subagent discriminator: one profile, every lane it may run on, a…
 - run_brief.py — Reading a run's Mission Brief back: the brief its revision's definition seals
-Also: control_plane_repository.py, goal_verifier_objective.py, completion_support.py, manifest_fork_admission.py, subagent_support.py, capability_summaries.py, lanes/
+Also: control_plane_repository.py, goal_verifier_objective.py, completion_support.py, manifest_fork_admission.py, subagent_support.py, capability_summaries.py
 Tests: tests/unit/authoring, tests/unit/control_plane, tests/unit/deep_agents
 Invariants:
 - Fail closed at fresh launch when authored acceptance has no runtime evaluator.

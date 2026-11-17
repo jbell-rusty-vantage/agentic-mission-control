@@ -4,9 +4,9 @@ Per-application and per-environment deployment inputs, not code. Holds applicati
 Entrypoints:
 - biotech/
 - ai-engineer/
-- ingress-vercel/
 - cloud_runtime/
 - worker-aws/
+- ingress-vercel/
 - cognition-profiles/
 - docker/
 - examples/

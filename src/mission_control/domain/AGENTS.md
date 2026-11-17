@@ -33,6 +33,6 @@ Invariants:
 - Determinism and immutable content identity hold across retries and forks.
 Explained by (docs/knowledge): capabilities, completion, output-contracts, context-and-continuation, budgets-and-usage, durable-controls
 Decided by (docs/adr): ADR-0010, ADR-0007, ADR-0008, ADR-0011, ADR-0013
-Depends on: contracts · Used by: application, adapters.postgres, adapters.deep_agents, application.recovery, application.authoring, adapters.temporal (+16)
+Depends on: contracts · Used by: application, adapters.postgres, adapters.deep_agents, application.recovery, application.authoring, application.programs (+16)
 Verify: make test-arch; uv run pytest tests/unit/orchestration tests/unit/operations
 <!-- END:sdlc-module -->

@@ -30,14 +30,14 @@ Entrypoints:
 - realtime/
 - capabilities/
 - remote_session/ — Remote Session Lane base: shared machinery for provider session APIs
-- agent_server/ — Import-safe BellLabs Agent Server package exports
-Also: openai_agents/, knowledge/, anthropic_managed/, auth/, workspaces/, storage/, provider_auth/, prerequisites/, supabase_storage/, operations/, github/, secrets/, subscriptions/, langsmith/, agents/, document_models/
+- openai_agents/ — The codex_agents lane: the OpenAI Agents API running the Codex harness
+Also: agent_server/, knowledge/, anthropic_managed/, auth/, workspaces/, provider_auth/, prerequisites/, supabase_storage/, storage/, operations/, github/, secrets/, subscriptions/, langsmith/, agents/, document_models/
 Tests: tests/unit, tests/integration, tests/conformance/lanes
 Invariants:
 - Adapters implement application ports; they cannot invent completion semantics, privileged grants or cross-application routing.
 - No paid provider experiment without finite authorization.
 Explained by (docs/knowledge): mission-stream, hosted-api-lanes, knowledge-services, cross-provider-control, cursor-lane, durable-controls
 Decided by (docs/adr): ADR-0007, ADR-0008, ADR-0016, ADR-0018, ADR-0019
-Depends on: application, domain.execution, domain, domain.authoring, domain.frames, bootstrap (+3) · Used by: bootstrap, application, interfaces.cli, interfaces.http, interfaces.mcp
+Depends on: application, domain.execution, domain, domain.authoring, domain.frames, bootstrap (+2) · Used by: bootstrap, application, interfaces.cli, interfaces.http, interfaces.mcp
 Verify: make check; make test-integration (needs compose services)
 <!-- END:sdlc-module -->

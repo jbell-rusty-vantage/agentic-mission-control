@@ -9,6 +9,7 @@ Entrypoints:
 - quarantine_inspection.py
 - mcp_registry.py
 - npx_skills_discovery.py
+- quarantine_static_scan.py — The static quarantine scanner of external candidate inspection, run as its own…
 - browser_subprocess.py — Bounded, framework-neutral subprocess transport for admitted browser capabilities
 - agentic_components/ — Persistence and provider adapters for the Agentic Components harness
 Tests: tests/unit/capability

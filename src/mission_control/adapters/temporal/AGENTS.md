@@ -25,7 +25,7 @@ Entrypoints:
 - provider_lane_composition.py — Production composition of the local provider lanes and their native approvals
 - worker.py
 - reaction_dispatch.py — Start a reaction's ordinary operation workflow on Temporal
-Also: boundary_commands.py, versioning.py, watcher_composition.py, watcher_starter.py, closed_workflow.py, linked_run_workflow.py, coordinator_runtime.py, pending_family_inputs.py, operation_activities.py, search_attributes.py, submission.py, orchestration_activities.py, registration/ (+17)
+Also: boundary_commands.py, versioning.py, watcher_composition.py, watcher_starter.py, closed_workflow.py, linked_run_workflow.py, coordinator_runtime.py, operation_activities.py, search_attributes.py, submission.py, orchestration_activities.py, registration/, continuation_composition.py (+16)
 Tests: tests/unit/temporal, tests/unit/runtime, tests/integration/temporal, tests/acceptance/mission_control
 Invariants:
 - Workflow code is deterministic; activities call application services.
