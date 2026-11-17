@@ -100,11 +100,11 @@ from mission_control.domain.programs.human_gate import (
     packet_item,
 )
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.runtime_common import common_db, owner_rows  # noqa: F401
 from tests.integration.temporal.test_wp_bp_010_temporal import FakeStageGraphActivities
 from tests.integration.temporal.test_wp_bp_010_temporal import _operation as stage_operation
 from tests.integration.temporal.test_wp_bp_020_temporal import FakeGoalDirectedActivities
 from tests.integration.temporal.test_wp_bp_020_temporal import _run_input as goal_input
+from tests.support.db_builders import owner_rows
 from tests.support.run_control import request, service
 
 pytestmark = pytest.mark.common_db
@@ -442,7 +442,7 @@ def _worker(
 
 
 async def test_stage_graph_review_survives_worker_restart_and_remediates_once(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
 ) -> None:
     client = await Client.connect(ADDRESS, namespace=NAMESPACE)
     pool = await common_db.pool(max_size=6)
@@ -556,7 +556,7 @@ async def test_stage_graph_review_survives_worker_restart_and_remediates_once(
 
 
 async def test_goal_directed_review_survives_worker_restart_and_feeds_the_next_executor(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
 ) -> None:
     client = await Client.connect(ADDRESS, namespace=NAMESPACE)
     pool = await common_db.pool(max_size=6)
@@ -648,7 +648,7 @@ async def test_goal_directed_review_survives_worker_restart_and_feeds_the_next_e
 
 
 async def test_gate_deadlines_lost_wakes_and_cancel_on_real_timers(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
 ) -> None:
     """`stop` expires on a real timer; `keep_waiting` passes its deadline and still needs a
     human; a resolution whose wake-up hint is never sent is observed by the bounded poll;

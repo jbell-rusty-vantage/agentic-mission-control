@@ -35,16 +35,15 @@ from mission_control.application.outputs.submission_service import SubmissionSer
 from mission_control.domain.knowledge.origin import MissionIdentityUnavailable
 from tests.fixtures.knowledge_binding import model_report
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.frames_common import admit_unit_attempt
-from tests.integration.postgres.runtime_common import common_db, owner_rows  # noqa: F401
 from tests.integration.postgres.test_knowledge_gateway_postgres import stack
+from tests.support.db_builders import admit_unit_attempt, owner_rows
 from tests.unit.knowledge.test_knowledge_tools import _runtime_invocation
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.common_db]
 
 
 @pytest_asyncio.fixture
-async def pool(common_db: CommonDatabase) -> AsyncIterator[asyncpg.Pool]:  # noqa: F811
+async def pool(common_db: CommonDatabase) -> AsyncIterator[asyncpg.Pool]:
     created = await common_db.pool()
     try:
         yield created
@@ -53,7 +52,7 @@ async def pool(common_db: CommonDatabase) -> AsyncIterator[asyncpg.Pool]:  # noq
 
 
 async def test_the_deep_agents_origin_names_the_ledger_mission_and_activation(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     pool: asyncpg.Pool,
 ) -> None:
     admitted = await admit_unit_attempt(pool, common_db)

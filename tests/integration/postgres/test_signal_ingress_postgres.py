@@ -69,8 +69,7 @@ from tests.fixtures.provider_webhooks import (
     standard_headers,
 )
 from tests.fixtures.scoped_api_stack import serve_loopback
-from tests.integration.postgres.frames_common import admit_unit_attempt
-from tests.integration.postgres.runtime_common import common_db  # noqa: F401
+from tests.support.db_builders import admit_unit_attempt
 
 pytestmark = pytest.mark.common_db
 
@@ -132,7 +131,7 @@ class Ingress:
 
 
 @pytest_asyncio.fixture
-async def ingress(common_db: CommonDatabase) -> AsyncIterator[Ingress]:  # noqa: F811
+async def ingress(common_db: CommonDatabase) -> AsyncIterator[Ingress]:
     runtime = await common_db.pool("mission_control_runtime")
     edge = await asyncpg.create_pool(
         await ingress_login(common_db), min_size=1, max_size=4, statement_cache_size=0

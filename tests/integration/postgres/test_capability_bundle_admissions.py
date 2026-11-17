@@ -17,12 +17,7 @@ from mission_control.adapters.capabilities.capability_pins import CapabilityPins
 from mission_control.adapters.postgres.capability_bundles import PostgresCapabilityBundleAdmissions
 from mission_control.adapters.postgres.scope import apply_catalog_scope_string
 from mission_control.adapters.supabase_storage.bundles import SupabaseCapabilityBundleStore
-from tests.integration.postgres.catalog_common import AI_ENGINEER_CATALOG, BIOTECH_CATALOG
-from tests.integration.postgres.catalog_common import catalog_db as catalog_db
-from tests.integration.postgres.catalog_common import (
-    catalog_writer_pool as catalog_writer_pool,
-)
-from tests.integration.postgres.catalog_common import runtime_pool as runtime_pool
+from tests.support.db_builders import AI_ENGINEER_CATALOG, BIOTECH_CATALOG
 from tests.unit.integrations.test_capability_directory_bundles import source
 
 pytestmark = pytest.mark.common_db
@@ -30,8 +25,8 @@ ROOT = Path(__file__).resolve().parents[3]
 
 
 @pytest_asyncio.fixture
-async def document_pool(runtime_pool: asyncpg.Pool) -> asyncpg.Pool:
-    return runtime_pool
+async def document_pool(catalog_runtime_pool: asyncpg.Pool) -> asyncpg.Pool:
+    return catalog_runtime_pool
 
 
 @pytest.fixture

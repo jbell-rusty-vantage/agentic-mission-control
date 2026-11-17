@@ -1,4 +1,3 @@
-# ruff: noqa: F811
 """Runtime-role active orphan inspection retains custody and serializes with owner/acquisition."""
 
 import asyncio
@@ -19,8 +18,7 @@ from mission_control.application.execution.run_launch import TemporalClusterIden
 from mission_control.application.workspaces.errors import WorkspaceLeaseHeld
 from mission_control.application.workspaces.policy import slot_path
 from mission_control.domain.frames.contracts import LaneProfile
-from tests.integration.postgres.frames_common import admit_unit_attempt
-from tests.integration.postgres.runtime_common import common_db  # noqa: F401
+from tests.support.db_builders import admit_unit_attempt
 from tests.unit.workspaces.lease_scenarios import claim
 
 pytestmark = pytest.mark.common_db

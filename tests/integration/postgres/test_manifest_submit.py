@@ -61,7 +61,6 @@ from mission_control.domain.coordinator.launch import BlueprintFamily, WorkflowS
 from mission_control.domain.policies.contracts import ActorContext
 from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog
 from tests.fixtures.mission_control_common_db import CommonDatabase, catalog_scope
-from tests.integration.postgres.runtime_common import common_db as common_db
 
 pytestmark = pytest.mark.common_db
 

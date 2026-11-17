@@ -37,17 +37,13 @@ from tests.fixtures.lane_bindings import lane_fields
 from tests.fixtures.lane_turns import lane_stack
 from tests.fixtures.managed_lane import managed_stack
 from tests.integration.anthropic_managed import test_session_lifecycle_live as lifecycle
-from tests.integration.postgres.frames_common import admit_unit_attempt
-from tests.integration.postgres.runtime_common import (
-    common_db,  # noqa: F401
-    owner_rows,
-)
+from tests.support.db_builders import admit_unit_attempt, owner_rows
 from tests.unit.prerequisites.test_owner_bootstrap import probe_template
 
 
 @pytest.mark.common_db
 async def test_bootstrap_dispatch_runs_real_workflow_and_reuses_completed_probe(
-    common_db,  # noqa: F811
+    common_db,
     tmp_path,
     monkeypatch,
 ):

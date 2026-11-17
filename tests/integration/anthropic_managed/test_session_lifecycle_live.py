@@ -80,8 +80,7 @@ from tests.fixtures.lane_turns import lane_stack
 from tests.fixtures.managed_lane import LANE_QUEUE, PROFILE, managed_binding, managed_operation
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.fixtures.session_retention import RecordingDeletionScheduler
-from tests.integration.postgres.frames_common import admit_unit_attempt
-from tests.integration.postgres.runtime_common import common_db  # noqa: F401
+from tests.support.db_builders import admit_unit_attempt
 
 ADDRESS: Final = os.environ.get("MC_TEMPORAL_TEST_ADDRESS", "127.0.0.1:7233")
 NAMESPACE: Final = os.environ.get("MC_TEMPORAL_TEST_NAMESPACE", "default")
@@ -195,7 +194,7 @@ async def _frames(frames: PostgresFrameRepository, operation: OperationExecution
 
 @pytest.mark.common_db
 async def test_a_live_session_runs_is_interrupted_and_ends_archived_then_deleted(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     tmp_path: Path,
 ) -> None:
     evidence_path = os.environ.get("MC_CLAUDE_MANAGED_EVIDENCE")

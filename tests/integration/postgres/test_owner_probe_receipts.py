@@ -22,8 +22,7 @@ from mission_control.domain.execution.environment_preparation import (
 )
 from mission_control.domain.frames.contracts import LaneProfile
 from tests.fixtures.mission_control_common_db import CommonDatabase, tenant_id
-from tests.integration.postgres.frames_common import admit_unit_attempt
-from tests.integration.postgres.runtime_common import common_db  # noqa: F401
+from tests.support.db_builders import admit_unit_attempt
 from tests.unit.prerequisites.test_trusted_probes import record_for
 
 pytestmark = pytest.mark.common_db
@@ -34,7 +33,7 @@ pytestmark = pytest.mark.common_db
     ("operation", "code"), [("signed_webhook", "ma2"), ("signal_receipt", "m1")]
 )
 async def test_receipt_requires_exact_scoped_binding_and_current_generation(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     operation: str,
     code: str,
 ) -> None:

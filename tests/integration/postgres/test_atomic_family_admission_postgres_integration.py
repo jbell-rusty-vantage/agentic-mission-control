@@ -28,12 +28,7 @@ from mission_control.domain.policies.errors import (
 )
 from mission_control.domain.policies.family_admission import FamilyAdmissionReceipt
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.runtime_common import common_db as common_db
-from tests.integration.postgres.runtime_common import (
-    owner_rows,
-    scoped_command,
-    scoped_request,
-)
+from tests.support.db_builders import owner_rows, scoped_command, scoped_request
 from tests.unit.run_control.test_atomic_family_admission import (
     authority_batch,
     family_service,

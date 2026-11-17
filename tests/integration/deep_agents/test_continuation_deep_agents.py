@@ -21,9 +21,7 @@ from tests.fixtures.continuation import FakeStaging, NoArtifacts, StepClock, fac
 from tests.fixtures.continuation_graph import TASK, compaction_agent, stream_turn
 from tests.fixtures.mission_control_common_db import CommonDatabase, provision_runtime
 from tests.fixtures.provider_frames import StepClock as FrameClock
-from tests.integration.postgres.frames_common import admit_unit_attempt
-from tests.integration.postgres.runtime_common import common_db as common_db
-from tests.integration.postgres.runtime_common import owner_rows
+from tests.support.db_builders import admit_unit_attempt, owner_rows
 from tests.support.run_control import ALL_PERMISSIONS, actor
 
 from mission_control.adapters.deep_agents.compaction import (

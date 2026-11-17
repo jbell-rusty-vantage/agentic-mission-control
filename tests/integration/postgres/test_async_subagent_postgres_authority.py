@@ -31,9 +31,8 @@ from mission_control.domain.execution.contracts import (
 )
 from tests.acceptance.control_plane.test_wp_cp_045 import request as spawn_request
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.runtime_common import common_db as common_db
-from tests.integration.postgres.runtime_common import owner_rows
 from tests.integration.postgres.test_checkpoint_lineage_postgres import RUNTIME_ROLE, admit_run
+from tests.support.db_builders import owner_rows
 
 pytestmark = pytest.mark.common_db
 

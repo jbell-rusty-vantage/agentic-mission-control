@@ -52,8 +52,6 @@ from mission_control.domain.execution.contracts import CapturedWorkspaceCandidat
 from mission_control.domain.policies.errors import IdempotencyConflict
 from tests.fixtures.lane_bindings import LANE_REBINDERS
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.catalog_common import catalog_db as catalog_db
-from tests.integration.postgres.catalog_common import runtime_pool as runtime_pool
 from tests.integration.temporal.test_wp_bp_010_temporal import RecordingOperationBindings
 from tests.unit.operations.test_ft_b2_stage_handoff import (
     _compiled_template,
@@ -89,15 +87,15 @@ async def _capture_producer_output(
 
 @pytest.mark.asyncio
 async def test_handoff_packet_materializes_the_producers_output_into_the_consumer_workspace(
-    catalog_db: CommonDatabase, runtime_pool: asyncpg.Pool, tmp_path: Path
+    catalog_db: CommonDatabase, catalog_runtime_pool: asyncpg.Pool, tmp_path: Path
 ) -> None:
     scope = catalog_db.scope("tenant-1")
     payloads = FilesystemArtifactPayloadStore(tmp_path / "payloads")
-    ref = await _capture_producer_output(runtime_pool, payloads, scope)
+    ref = await _capture_producer_output(catalog_runtime_pool, payloads, scope)
     request = replace(_downstream_request([ref]), request_scope=scope)
     template = _compiled_template(request).model_copy(update={"request_scope": scope})
     context_files = PayloadContextFiles(payloads)
-    selections = PostgresContextSelectionRepository(runtime_pool)
+    selections = PostgresContextSelectionRepository(catalog_runtime_pool)
     preparation = StageGraphOperationPreparationService(
         lane_bindings=LANE_REBINDERS,
         templates=StaticStageGraphOperationTemplateProvider(
@@ -105,7 +103,7 @@ async def test_handoff_packet_materializes_the_producers_output_into_the_consume
         ),
         operation_bindings=RecordingOperationBindings(),  # type: ignore[arg-type]
         context_packs=ContextPackService(
-            artifacts=PostgresArtifactBytes(runtime_pool, payloads),
+            artifacts=PostgresArtifactBytes(catalog_runtime_pool, payloads),
             selections=selections,
             staging=context_files,
         ),
@@ -119,7 +117,7 @@ async def test_handoff_packet_materializes_the_producers_output_into_the_consume
     )
     packet_digest = packet_segment.source_ref.removeprefix("context-packet:")
     # The selection row was written with matching digests.
-    async with runtime_pool.acquire() as connection, connection.transaction():
+    async with catalog_runtime_pool.acquire() as connection, connection.transaction():
         await apply_scope(connection, scope)
         row = await connection.fetchrow(
             """SELECT packet_key, packet_digest, prompt_plan_digest, file_plan_digest, purpose,
@@ -143,7 +141,7 @@ async def test_handoff_packet_materializes_the_producers_output_into_the_consume
     # The unchanged workspace materializer fetches and digest-verifies every packet input.
     provisioner = FilesystemWorkspaceProvisioner(tmp_path / "workspaces")
     service = WorkspaceMaterializationService(
-        manifests=PostgresWorkspaceManifestRepository(runtime_pool, request_scope=scope),
+        manifests=PostgresWorkspaceManifestRepository(catalog_runtime_pool, request_scope=scope),
         provisioner=provisioner,
         durable_inputs=context_files,
     )

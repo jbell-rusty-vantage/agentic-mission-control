@@ -89,14 +89,12 @@ from mission_control_db_contract.seeds import load_bundles, order_bundles
 from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog
 from tests.fixtures.layering_repo import REPO_FILES, repository_bytes, write_repository_files
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.catalog_common import (
+from tests.support.db_builders import (
     BIOTECH_CATALOG,
     SEEDS,
     apply_seed_bundle,
     seeds_publish_module,
 )
-from tests.integration.postgres.catalog_common import catalog_db as catalog_db
-from tests.integration.postgres.catalog_common import runtime_pool as runtime_pool
 from tests.unit.authoring.test_manifest_cursor_launch import LOCAL
 from tests.unit.authoring.test_manifest_v2_launch import (
     AT,
@@ -199,7 +197,7 @@ def assert_materialized(workspace: Path, published: PublishedDefinition, directo
 async def materialized_through_production(
     lane: str,
     catalog_db: CommonDatabase,
-    runtime_pool: asyncpg.Pool,
+    catalog_runtime_pool: asyncpg.Pool,
     tmp_path: Path,
     *,
     policy: str | None = None,
@@ -210,7 +208,7 @@ async def materialized_through_production(
     composition, then let each template's lane rows re-render and materialize it into its own
     workspace (seeded with the fixture repository first when ``repository``)."""
 
-    published = await seeded_catalog(catalog_db, runtime_pool)
+    published = await seeded_catalog(catalog_db, catalog_runtime_pool)
     settings = custody_settings(tmp_path / "bundles")
     bundles = compose_bundle_materializer(settings)
     assert bundles is not None
@@ -234,7 +232,7 @@ async def materialized_through_production(
     # Launch: the author's composed rows, then the resolver seals each binding from them.
     pins = provider_capability_pins(definition)
     assert pins == ((skill, hook, plugin_pin) if plugin else (skill, hook))
-    rows = await compose_projection_rows(runtime_pool, settings=settings)(pins)
+    rows = await compose_projection_rows(catalog_runtime_pool, settings=settings)(pins)
     admitted = AdmittedLaunch.from_configuration(SCOPE, "run-mo01", program.configuration)
     templates: dict[str, OperationExecutionRequest] = (
         dict(resolver().stage_templates(definition, admitted, rows=rows))
@@ -257,7 +255,7 @@ async def materialized_through_production(
             assert binding.projections.plugin_pins == ((plugin_pin,) if plugin else ())
             assert (binding.projections.plugin_expansion_digest is not None) is plugin
             source = RenderedProjectionSource(
-                cursor_catalog_rows(settings, runtime_pool, bundles),
+                cursor_catalog_rows(settings, catalog_runtime_pool, bundles),
                 kernel_hooks=CURSOR_KERNEL_HOOKS[lane],
                 projectors=HOST_PROJECTORS,
             )
@@ -267,7 +265,7 @@ async def materialized_through_production(
         else:
             provider = ProviderExecutionBinding.carried_by(template)
             assert provider is not None and provider.lane_profile == lane
-            rows_resolver = execution_binding_rows(settings, runtime_pool, bundles)
+            rows_resolver = execution_binding_rows(settings, catalog_runtime_pool, bundles)
             source = RenderedProjectionSource(rows_resolver, projectors=HOST_PROJECTORS)
             projection = await source.project(template, profile=lane, packet_index=None)
             expected, sealed = provider.materialization_digest, provider.materialization
@@ -283,10 +281,10 @@ async def materialized_through_production(
 @pytest.mark.asyncio
 @pytest.mark.parametrize("lane", sorted(LANE_EXAMPLES))
 async def test_a_skill_bundle_and_hook_script_materialize_through_production_composition(
-    lane: str, catalog_db: CommonDatabase, runtime_pool: asyncpg.Pool, tmp_path: Path
+    lane: str, catalog_db: CommonDatabase, catalog_runtime_pool: asyncpg.Pool, tmp_path: Path
 ) -> None:
     published, placed = await materialized_through_production(
-        lane, catalog_db, runtime_pool, tmp_path
+        lane, catalog_db, catalog_runtime_pool, tmp_path
     )
     for workspace, _materialization in placed:
         assert_materialized(workspace, published[HOOK], f"{HOOKS_ROOT}/{HOOK}")
@@ -295,14 +293,14 @@ async def test_a_skill_bundle_and_hook_script_materialize_through_production_com
 
 @pytest.mark.asyncio
 async def test_a_plugin_expands_on_cursor_local_through_production_composition(
-    catalog_db: CommonDatabase, runtime_pool: asyncpg.Pool, tmp_path: Path
+    catalog_db: CommonDatabase, catalog_runtime_pool: asyncpg.Pool, tmp_path: Path
 ) -> None:
     """MO-31: `mc.cursor_binding.v2` pins the plugin whole with its expansion digest; the
     worker's `CatalogRows` re-expands it over custody to the same members (else
     `CAPABILITY_DRIFT`) and its Skill member lands with its pinned digests."""
 
     published, placed = await materialized_through_production(
-        "cursor_local", catalog_db, runtime_pool, tmp_path, plugin=True
+        "cursor_local", catalog_db, catalog_runtime_pool, tmp_path, plugin=True
     )
     for workspace, _materialization in placed:
         assert_materialized(workspace, published[PLUGIN_SKILL], "skills/agent-browser")
@@ -314,10 +312,10 @@ async def test_a_plugin_expands_on_cursor_local_through_production_composition(
 @pytest.mark.asyncio
 @pytest.mark.parametrize("lane", sorted(LANE_EXAMPLES))
 async def test_production_bindings_layer_over_a_repository_that_owns_its_cognition(
-    lane: str, catalog_db: CommonDatabase, runtime_pool: asyncpg.Pool, tmp_path: Path
+    lane: str, catalog_db: CommonDatabase, catalog_runtime_pool: asyncpg.Pool, tmp_path: Path
 ) -> None:
     published, placed = await materialized_through_production(
-        lane, catalog_db, runtime_pool, tmp_path, policy="repo_wins", repository=True
+        lane, catalog_db, catalog_runtime_pool, tmp_path, policy="repo_wins", repository=True
     )
     for workspace, materialization in placed:
         assert_materialized(workspace, published[SKILL], "skills/mission-control-observe")
@@ -336,9 +334,9 @@ async def test_production_bindings_layer_over_a_repository_that_owns_its_cogniti
 
 @pytest.mark.asyncio
 async def test_missing_custody_is_a_typed_launch_refusal(
-    catalog_db: CommonDatabase, runtime_pool: asyncpg.Pool
+    catalog_db: CommonDatabase, catalog_runtime_pool: asyncpg.Pool
 ) -> None:
-    published = await seeded_catalog(catalog_db, runtime_pool)
+    published = await seeded_catalog(catalog_db, catalog_runtime_pool)
     settings = custody_settings(None)
     assert compose_bundle_materializer(settings) is None
     definition, program = await compiled(
@@ -354,7 +352,7 @@ async def test_missing_custody_is_a_typed_launch_refusal(
     author = stub_author(
         definition,
         program,
-        projection_rows=compose_projection_rows(runtime_pool, settings=settings),
+        projection_rows=compose_projection_rows(catalog_runtime_pool, settings=settings),
         persisted=persisted,
     )
     with pytest.raises(ManifestBundleCustodyUnavailable) as refused:

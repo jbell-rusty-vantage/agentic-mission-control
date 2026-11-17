@@ -37,16 +37,14 @@ from mission_control.application.capabilities.external_capability_discovery impo
     ExternalDiscoverySource,
 )
 from mission_control.domain.authoring.contracts import DefinitionKind, ExactDefinitionRef
-from tests.integration.postgres.catalog_common import AI_ENGINEER_CATALOG, BIOTECH_CATALOG
-from tests.integration.postgres.catalog_common import catalog_db as catalog_db
-from tests.integration.postgres.catalog_common import runtime_pool as runtime_pool
+from tests.support.db_builders import AI_ENGINEER_CATALOG, BIOTECH_CATALOG
 
 pytestmark = pytest.mark.common_db
 
 
 @pytest_asyncio.fixture
-async def pool(runtime_pool: asyncpg.Pool) -> asyncpg.Pool:
-    return runtime_pool
+async def pool(catalog_runtime_pool: asyncpg.Pool) -> asyncpg.Pool:
+    return catalog_runtime_pool
 
 
 NOW = datetime(2026, 10, 3, tzinfo=UTC)

@@ -41,7 +41,6 @@ from mission_control.contracts.knowledge_protocol import Ref
 from mission_control.domain.policies.contracts import ActorContext
 from tests.fixtures.knowledge_binding import SteppingClock
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.runtime_common import common_db  # noqa: F401
 from tests.support.run_control import request, service
 from tests.unit.knowledge.test_gateway import origin
 from tests.unit.knowledge.test_trusted_judgment import PRODUCER, ScriptedRunner, evaluators, world
@@ -53,7 +52,7 @@ REVIEWER = ActorContext(actor_id="reviewer:sprint-oc", permissions=frozenset({RE
 
 
 @pytest_asyncio.fixture
-async def pool(common_db: CommonDatabase) -> AsyncIterator[asyncpg.Pool]:  # noqa: F811
+async def pool(common_db: CommonDatabase) -> AsyncIterator[asyncpg.Pool]:
     created = await common_db.pool()
     try:
         yield created
@@ -62,7 +61,7 @@ async def pool(common_db: CommonDatabase) -> AsyncIterator[asyncpg.Pool]:  # noq
 
 
 async def test_the_review_route_resolves_one_run_identifier_on_postgres(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     pool: asyncpg.Pool,
 ) -> None:
     scope = common_db.scope("tenant-1")

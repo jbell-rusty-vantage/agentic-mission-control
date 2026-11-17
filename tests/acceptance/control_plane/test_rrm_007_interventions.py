@@ -39,7 +39,6 @@ from temporalio.testing import WorkflowEnvironment
 from temporalio.worker import Worker
 from tests.fixtures.mission_control_common_db import CommonDatabase, canonical_scope
 from tests.fixtures.mission_control_production_stack import start_local
-from tests.integration.postgres.runtime_common import common_db as common_db
 from tests.integration.temporal import test_rrm_007_boundary_interventions as interventions
 from tests.integration.temporal.test_rrm_007_boundary_interventions import (
     GOAL_QUEUE,

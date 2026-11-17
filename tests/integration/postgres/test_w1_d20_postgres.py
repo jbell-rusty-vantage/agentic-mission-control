@@ -23,7 +23,6 @@ from mission_control.adapters.postgres.knowledge.output_inspection import (
 from mission_control.application.knowledge.gateway import TrustedAnswer
 from mission_control.application.knowledge.judgment import TrustedJudgmentRefused
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.runtime_common import common_db  # noqa: F401
 from tests.integration.postgres.test_trusted_judgment_postgres import access_for
 from tests.unit.knowledge.test_trusted_judgment import ScriptedRunner, evaluators, world
 from tests.unit.knowledge.test_w1_d19_d20 import census_refusal
@@ -32,7 +31,7 @@ pytestmark = [pytest.mark.asyncio, pytest.mark.common_db]
 
 
 @pytest_asyncio.fixture
-async def pool(common_db: CommonDatabase) -> AsyncIterator[asyncpg.Pool]:  # noqa: F811
+async def pool(common_db: CommonDatabase) -> AsyncIterator[asyncpg.Pool]:
     created = await common_db.pool()
     try:
         yield created
@@ -41,7 +40,7 @@ async def pool(common_db: CommonDatabase) -> AsyncIterator[asyncpg.Pool]:  # noq
 
 
 async def test_a_refused_census_shows_its_issues_in_inspection(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     pool: asyncpg.Pool,
 ) -> None:
     w, subject = await world(

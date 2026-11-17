@@ -25,7 +25,6 @@ from mission_control.contracts.contracts import MissionCommandRequest
 from mission_control.domain.policies.contracts import ActorContext, StartAction
 from mission_control.domain.policies.mailbox import MailboxState
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.runtime_common import common_db  # noqa: F401
 from tests.support.run_control import actor, command, request, service
 from tests.unit.run_control.test_boundary_commands import TARGET
 
@@ -56,7 +55,7 @@ def _request(
 
 
 async def test_mailbox_admission_delivery_consumption_and_supersession_on_postgres(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
 ) -> None:
     pool = await common_db.pool(max_size=4)
     try:

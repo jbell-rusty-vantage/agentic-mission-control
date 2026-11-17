@@ -31,7 +31,7 @@ from mission_control.domain.programs.human_gate import (
     outcome_for,
 )
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.runtime_common import common_db, owner_rows  # noqa: F401
+from tests.support.db_builders import owner_rows
 from tests.support.run_control import request, service
 from tests.unit.human_tasks.fixtures import activation, later, spec
 
@@ -73,7 +73,7 @@ async def _events(db: CommonDatabase, task_id: str) -> list[tuple[str, int, bool
 
 
 async def test_task_open_resolution_concurrency_and_idempotency(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
 ) -> None:
     pool = await common_db.pool(max_size=6)
     try:
@@ -151,7 +151,7 @@ async def test_task_open_resolution_concurrency_and_idempotency(
 
 
 async def test_stale_answers_changed_packets_and_rounds_cannot_reuse_an_approval(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
 ) -> None:
     pool = await common_db.pool()
     try:
@@ -217,7 +217,7 @@ async def test_stale_answers_changed_packets_and_rounds_cannot_reuse_an_approval
 
 
 async def test_timeout_policies_and_cancel_never_approve(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
 ) -> None:
     pool = await common_db.pool()
     try:

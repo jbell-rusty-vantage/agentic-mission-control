@@ -21,7 +21,6 @@ from mission_control.contracts.contracts import CancelPayload, CommandTarget, Mi
 from mission_control.domain.policies.contracts import RunPhase, StartAction
 from mission_control.domain.policies.stop_fence import STOP_FENCED, EffectAdmission, StopFence
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.runtime_common import common_db  # noqa: F401
 from tests.support.run_control import actor, command, request, service
 from tests.unit.run_control.test_boundary_commands import TARGET
 
@@ -63,7 +62,7 @@ def _admission(scope: str, run_id: str, effect_ref: str, generation: int = 1) ->
 
 
 async def test_fence_is_insert_only_first_wins_and_gates_admissions(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
 ) -> None:
     pool = await common_db.pool(max_size=4)
     try:
@@ -123,7 +122,7 @@ async def test_fence_is_insert_only_first_wins_and_gates_admissions(
 
 
 async def test_a_fence_write_and_an_effect_admission_never_both_win(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
 ) -> None:
     pool = await common_db.pool(max_size=8)
     try:
@@ -168,7 +167,7 @@ async def test_a_fence_write_and_an_effect_admission_never_both_win(
 
 
 async def test_immediate_cancel_through_the_postgres_composition_fences_first(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
 ) -> None:
     pool = await common_db.pool(max_size=4)
     try:

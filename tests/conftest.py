@@ -74,4 +74,4 @@ def test_application_postgres_dsn() -> str:
 
 
 # Block C live fixtures / helpers for persistent Agent Server qualification.
-pytest_plugins = ["tests.fixtures.agent_server_block_c"]
+pytest_plugins = ["tests.fixtures.agent_server_block_c", "tests.support.db_plugin"]

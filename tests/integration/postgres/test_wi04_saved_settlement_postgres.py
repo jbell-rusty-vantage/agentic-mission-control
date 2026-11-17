@@ -43,13 +43,12 @@ from mission_control.domain.policies.errors import IdempotencyConflict
 from tests.fixtures.checkpoint_recovery import recovery_harness, stage_recovery_unit
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.fixtures.saved_settlement import DurableEffectDouble
-from tests.integration.postgres.runtime_common import common_db  # noqa: F401
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.common_db]
 
 
 @pytest_asyncio.fixture
-async def pool(common_db: CommonDatabase) -> AsyncIterator[asyncpg.Pool]:  # noqa: F811
+async def pool(common_db: CommonDatabase) -> AsyncIterator[asyncpg.Pool]:
     await common_db.add_tenants(["tenant-1", "tenant-2"])
     created = await common_db.pool()
     try:
@@ -86,7 +85,7 @@ async def _sqlstate(pool: asyncpg.Pool, scope: str, statement: str, *args: objec
 
 
 async def test_saved_results_are_written_once_and_advance_by_cas(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     pool: asyncpg.Pool,
 ) -> None:
     scope = common_db.scope("tenant-1")
@@ -166,7 +165,7 @@ async def test_saved_results_are_written_once_and_advance_by_cas(
 
 
 async def test_a_fresh_worker_resumes_the_postgres_saved_result_without_cognition(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     pool: asyncpg.Pool,
 ) -> None:
     scope = common_db.scope("tenant-1")
@@ -211,7 +210,7 @@ async def test_a_fresh_worker_resumes_the_postgres_saved_result_without_cognitio
 
 
 async def test_the_live_fence_and_durable_events_hold_in_the_same_transaction(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     pool: asyncpg.Pool,
 ) -> None:
     """Review 5: the production store refuses a writer whose unit generation has no current
@@ -245,7 +244,7 @@ async def test_the_live_fence_and_durable_events_hold_in_the_same_transaction(
 
 
 async def test_native_receipt_reference_snapshot_survives_new_pool_and_store(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
 ) -> None:
     import json
 

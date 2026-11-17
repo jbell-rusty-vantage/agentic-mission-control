@@ -61,7 +61,7 @@ from tests.fixtures.mission_control_common_db import (
     drop_common_database,
     tenant_id,
 )
-from tests.integration.postgres.runtime_common import owner_rows
+from tests.support.db_builders import owner_rows
 from tests.support.run_control import request, service
 from tests.unit.approvals.fixtures import (
     POLICY,
@@ -552,7 +552,7 @@ async def test_production_context_probe_reads_generation_and_binding_from_harnes
     from mission_control.adapters.postgres.approvals.context import PostgresApprovalContextProbe
     from mission_control.application.execution.harness.lane_turns import execution_start
     from tests.fixtures.lane_turns import ScriptedSessionLane, scripted_frames
-    from tests.integration.postgres.mp06_common import pg_lane_unit
+    from tests.support.db_builders import pg_lane_unit
 
     pool = await mp11_db.pool(max_size=8)
     try:

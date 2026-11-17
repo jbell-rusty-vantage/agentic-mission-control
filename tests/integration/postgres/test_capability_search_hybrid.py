@@ -43,10 +43,7 @@ from tests.fixtures.capability_search_catalog import (
     evaluation_cases,
 )
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.catalog_common import BIOTECH_CATALOG
-from tests.integration.postgres.catalog_common import catalog_db as catalog_db
-from tests.integration.postgres.catalog_common import catalog_writer_pool as catalog_writer_pool
-from tests.integration.postgres.catalog_common import runtime_pool as runtime_pool
+from tests.support.db_builders import BIOTECH_CATALOG
 
 pytestmark = pytest.mark.common_db
 
@@ -101,10 +98,14 @@ async def _evaluate(service: CapabilitySearchService, scope: str) -> tuple[float
 
 @pytest.mark.asyncio
 async def test_lexical_projection_then_async_embedding_reaches_recall(
-    catalog_db: CommonDatabase, runtime_pool: asyncpg.Pool, catalog_writer_pool: asyncpg.Pool
+    catalog_db: CommonDatabase,
+    catalog_runtime_pool: asyncpg.Pool,
+    catalog_writer_pool: asyncpg.Pool,
 ) -> None:
     await _seed(catalog_db)
-    reader_definitions = PostgresDefinitionRepository(runtime_pool, catalog_scope=BIOTECH_CATALOG)
+    reader_definitions = PostgresDefinitionRepository(
+        catalog_runtime_pool, catalog_scope=BIOTECH_CATALOG
+    )
     refs = await reader_definitions.list_published_definition_refs()
     assert len(refs) > 50
     scope = "global"
@@ -138,7 +139,7 @@ async def test_lexical_projection_then_async_embedding_reaches_recall(
     activation = await generations.activate(spec, activated_at=NOW)
     assert activation.activated_count == len(refs)
 
-    async with runtime_pool.acquire() as connection, connection.transaction():
+    async with catalog_runtime_pool.acquire() as connection, connection.transaction():
         await apply_catalog_scope_string(connection, BIOTECH_CATALOG)
         nulls = await connection.fetchval(
             "SELECT count(*) FROM mission_control_search.search_document WHERE embedding IS NULL"
@@ -154,7 +155,7 @@ async def test_lexical_projection_then_async_embedding_reaches_recall(
     assert "pubmed_lookup_mesh" in pubmed["tool_names"]
     assert "pubmed_lookup_mesh" in pubmed["name_surface"]
 
-    reader = PostgresCatalogSearchRepository(runtime_pool, catalog_scope=BIOTECH_CATALOG)
+    reader = PostgresCatalogSearchRepository(catalog_runtime_pool, catalog_scope=BIOTECH_CATALOG)
     lexical = CapabilitySearchService(search=reader, definitions=reader_definitions)
     tenant = catalog_db.scope("tenant-1")
     response = await lexical.search(
@@ -253,13 +254,13 @@ async def test_migration_0026_constraints(catalog_db: CommonDatabase) -> None:
 
 @pytest.mark.asyncio
 async def test_pin_resolution_and_inspection_on_postgres(
-    catalog_db: CommonDatabase, runtime_pool: asyncpg.Pool
+    catalog_db: CommonDatabase, catalog_runtime_pool: asyncpg.Pool
 ) -> None:
     """FT-A8: pins resolve through PostgresDefinitionRepository.find_by_pin."""
     from mission_control.application.capabilities.catalog import inspect_pin
 
     await _seed(catalog_db)
-    definitions = PostgresDefinitionRepository(runtime_pool, catalog_scope=BIOTECH_CATALOG)
+    definitions = PostgresDefinitionRepository(catalog_runtime_pool, catalog_scope=BIOTECH_CATALOG)
     published = await definitions.find_by_pin("mcp.pubmed", "sha256:" + "0" * 64)
     assert published is None
     listed = {item.ref.logical_id: item for item in await definitions.list_published_definitions()}

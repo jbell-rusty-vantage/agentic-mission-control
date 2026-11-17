@@ -107,7 +107,6 @@ from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog
 from tests.fixtures.knowledge_binding import InMemoryStaging
 from tests.fixtures.mission_control_common_db import CommonDatabase, catalog_scope
 from tests.fixtures.run_forks import technical_snapshot
-from tests.integration.postgres.runtime_common import common_db  # noqa: F401
 from tests.integration.postgres.test_manifest_submit import (
     MINIMAL,
     OWNER,
@@ -126,7 +125,7 @@ NOTE_B = "source: hf-meta-llama-llama-3.1-model-card\nllama-3-1: 8B, 70B and 405
 
 
 @pytest_asyncio.fixture
-async def pool(common_db: CommonDatabase) -> AsyncIterator[asyncpg.Pool]:  # noqa: F811
+async def pool(common_db: CommonDatabase) -> AsyncIterator[asyncpg.Pool]:
     created = await common_db.pool("mission_control_runtime")
     try:
         yield created
@@ -183,7 +182,7 @@ async def produce(toolset: Any, submissions: Any, scope: str, run: str, stage: s
 
 
 async def test_reused_stage_output_reaches_the_derived_consumer(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     pool: asyncpg.Pool,
 ) -> None:
     scope = common_db.scope()
@@ -361,7 +360,7 @@ class SourceTemplates:
 
 
 async def test_fork_derived_manifest_run_starts_and_names_its_failure_causes(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     pool: asyncpg.Pool,
 ) -> None:
     scope = common_db.scope()

@@ -29,13 +29,11 @@ from tests.fixtures.mission_control_common_db import (
     catalog_scope,
     common_database,
 )
-from tests.integration.postgres.catalog_common import (
+from tests.support.db_builders import (
     AI_ENGINEER_CATALOG,
     BIOTECH_CATALOG,
     add_disabled_installation,
 )
-from tests.integration.postgres.catalog_common import catalog_db as catalog_db
-from tests.integration.postgres.catalog_common import runtime_pool as runtime_pool
 from tests.unit.coordinator.test_coordinator_facade import coordinator_skill, propose_prompt
 
 pytestmark = pytest.mark.common_db
@@ -56,9 +54,9 @@ def definition(description: str = "Catalog transaction test") -> CapabilityDefin
 
 
 @pytest.mark.asyncio
-async def test_publication_draft_alias_retirement_and_installation_isolation(runtime_pool):
-    repository = PostgresDefinitionRepository(runtime_pool, catalog_scope=BIOTECH_CATALOG)
-    other = PostgresDefinitionRepository(runtime_pool, catalog_scope=AI_ENGINEER_CATALOG)
+async def test_publication_draft_alias_retirement_and_installation_isolation(catalog_runtime_pool):
+    repository = PostgresDefinitionRepository(catalog_runtime_pool, catalog_scope=BIOTECH_CATALOG)
+    other = PostgresDefinitionRepository(catalog_runtime_pool, catalog_scope=AI_ENGINEER_CATALOG)
     value = definition()
     draft = await repository.save_draft(value, "author", NOW, 0)
     assert draft.draft_revision == 1
@@ -87,8 +85,8 @@ async def test_publication_draft_alias_retirement_and_installation_isolation(run
 
 
 @pytest.mark.asyncio
-async def test_erc_replay_compilation_conflict_rolls_back_new_digest(runtime_pool):
-    repository = PostgresDefinitionRepository(runtime_pool, catalog_scope=BIOTECH_CATALOG)
+async def test_erc_replay_compilation_conflict_rolls_back_new_digest(catalog_runtime_pool):
+    repository = PostgresDefinitionRepository(catalog_runtime_pool, catalog_scope=BIOTECH_CATALOG)
     record = {
         "digest": "sha256:" + "a" * 64,
         "compilation_id": "compilation-1",
@@ -108,14 +106,14 @@ async def test_erc_replay_compilation_conflict_rolls_back_new_digest(runtime_poo
 
 
 @pytest.mark.asyncio
-async def test_coordinator_bindings_use_scoped_postgres_publications(runtime_pool):
-    repository = PostgresDefinitionRepository(runtime_pool, catalog_scope=BIOTECH_CATALOG)
+async def test_coordinator_bindings_use_scoped_postgres_publications(catalog_runtime_pool):
+    repository = PostgresDefinitionRepository(catalog_runtime_pool, catalog_scope=BIOTECH_CATALOG)
     skill = await repository.publish(coordinator_skill(), "publisher", NOW, 0)
     prompt = await repository.publish(propose_prompt(), "publisher", NOW, 0)
     selector, prompts = await load_coordinator_catalog_bindings(repository=repository)
     assert selector.exact == skill.ref
     assert prompts == {"propose_workflow": prompt.ref}
-    other = PostgresDefinitionRepository(runtime_pool, catalog_scope=AI_ENGINEER_CATALOG)
+    other = PostgresDefinitionRepository(catalog_runtime_pool, catalog_scope=AI_ENGINEER_CATALOG)
     with pytest.raises(RuntimeError, match="unavailable"):
         await load_coordinator_catalog_bindings(repository=other)
     await repository.retire(skill.ref, "operator", NOW)
@@ -125,12 +123,12 @@ async def test_coordinator_bindings_use_scoped_postgres_publications(runtime_poo
 
 @pytest.mark.asyncio
 async def test_publication_is_canonical_asset_with_append_only_decisions(
-    catalog_db: CommonDatabase, runtime_pool
+    catalog_db: CommonDatabase, catalog_runtime_pool
 ):
-    repository = PostgresDefinitionRepository(runtime_pool, catalog_scope=BIOTECH_CATALOG)
+    repository = PostgresDefinitionRepository(catalog_runtime_pool, catalog_scope=BIOTECH_CATALOG)
     published = await repository.publish(definition(), "publisher", NOW, 0)
     await repository.retire(published.ref, "operator", NOW + timedelta(minutes=1))
-    async with runtime_pool.acquire() as connection, connection.transaction():
+    async with catalog_runtime_pool.acquire() as connection, connection.transaction():
         await apply_catalog_scope_string(connection, BIOTECH_CATALOG)
         asset = await connection.fetchrow(
             "SELECT asset_version_id, kind, contract, status, version_no, manifest_digest "
@@ -158,7 +156,7 @@ async def test_publication_is_canonical_asset_with_append_only_decisions(
         "UPDATE mission_control.asset_version SET status='admitted', version_no=version_no+1",
         "UPDATE mission_control.asset_version SET status='revoked', version_no=version_no+5",
     ):
-        async with runtime_pool.acquire() as connection, connection.transaction():
+        async with catalog_runtime_pool.acquire() as connection, connection.transaction():
             await apply_catalog_scope_string(connection, BIOTECH_CATALOG)
             with pytest.raises(asyncpg.RestrictViolationError):
                 await connection.execute(
@@ -170,19 +168,19 @@ async def test_publication_is_canonical_asset_with_append_only_decisions(
         "UPDATE mission_control.asset_decision SET disposition=$1",
         "DELETE FROM mission_control.asset_decision WHERE disposition<>$1",
     ):
-        async with runtime_pool.acquire() as connection, connection.transaction():
+        async with catalog_runtime_pool.acquire() as connection, connection.transaction():
             await apply_catalog_scope_string(connection, BIOTECH_CATALOG)
             with pytest.raises(asyncpg.InsufficientPrivilegeError):
                 await connection.execute(sql, "sha256:" + "f" * 64)
     # Revocation is a further forward transition and is also terminal.
-    async with runtime_pool.acquire() as connection, connection.transaction():
+    async with catalog_runtime_pool.acquire() as connection, connection.transaction():
         await apply_catalog_scope_string(connection, BIOTECH_CATALOG)
         await connection.execute(
             "UPDATE mission_control.asset_version SET status='revoked', version_no=version_no+1, "
             "updated_at=now() WHERE asset_version_id=$1",
             asset["asset_version_id"],
         )
-    async with runtime_pool.acquire() as connection, connection.transaction():
+    async with catalog_runtime_pool.acquire() as connection, connection.transaction():
         await apply_catalog_scope_string(connection, BIOTECH_CATALOG)
         with pytest.raises(asyncpg.RestrictViolationError):
             await connection.execute(
@@ -194,8 +192,8 @@ async def test_publication_is_canonical_asset_with_append_only_decisions(
 
 
 @pytest.mark.asyncio
-async def test_revision_pinning_and_alias_compare_and_swap(runtime_pool):
-    repository = PostgresDefinitionRepository(runtime_pool, catalog_scope=BIOTECH_CATALOG)
+async def test_revision_pinning_and_alias_compare_and_swap(catalog_runtime_pool):
+    repository = PostgresDefinitionRepository(catalog_runtime_pool, catalog_scope=BIOTECH_CATALOG)
     first = await repository.publish(definition("first"), "publisher", NOW, 0)
     second = await repository.publish(definition("second"), "publisher", NOW, 1)
     assert (first.ref.revision, second.ref.revision) == (1, 2)
@@ -229,9 +227,11 @@ async def test_revision_pinning_and_alias_compare_and_swap(runtime_pool):
 
 
 @pytest.mark.asyncio
-async def test_cross_application_catalog_denial(catalog_db: CommonDatabase, runtime_pool):
-    biotech = PostgresDefinitionRepository(runtime_pool, catalog_scope=BIOTECH_CATALOG)
-    ai_engineer = PostgresDefinitionRepository(runtime_pool, catalog_scope=AI_ENGINEER_CATALOG)
+async def test_cross_application_catalog_denial(catalog_db: CommonDatabase, catalog_runtime_pool):
+    biotech = PostgresDefinitionRepository(catalog_runtime_pool, catalog_scope=BIOTECH_CATALOG)
+    ai_engineer = PostgresDefinitionRepository(
+        catalog_runtime_pool, catalog_scope=AI_ENGINEER_CATALOG
+    )
     ours = await biotech.publish(definition("biotech"), "publisher", NOW, 0)
     theirs = await ai_engineer.publish(definition("ai-engineer"), "publisher", NOW, 0)
     # Same asset id and revision in both apps; each installation sees only its own bytes.
@@ -241,7 +241,7 @@ async def test_cross_application_catalog_denial(catalog_db: CommonDatabase, runt
         await biotech.get(theirs.ref)
     assert await biotech.list_published_definition_refs() == (ours.ref,)
     assert await ai_engineer.list_published_definition_refs() == (theirs.ref,)
-    async with runtime_pool.acquire() as connection, connection.transaction():
+    async with catalog_runtime_pool.acquire() as connection, connection.transaction():
         await apply_catalog_scope_string(connection, BIOTECH_CATALOG)
         count = await connection.fetchval("SELECT count(*) FROM mission_control.asset_version")
         assert count == 1
@@ -255,11 +255,13 @@ async def test_cross_application_catalog_denial(catalog_db: CommonDatabase, runt
                 AI_ENGINEER_INSTALLATION_ID,
                 "sha256:" + "0" * 64,
             )
-    async with runtime_pool.acquire() as connection, connection.transaction():
+    async with catalog_runtime_pool.acquire() as connection, connection.transaction():
         # Missing catalog context fails closed (no rows, no writes).
         assert await connection.fetchval("SELECT count(*) FROM mission_control.asset_version") == 0
     with pytest.raises(ValueError):
-        PostgresDefinitionRepository(runtime_pool, catalog_scope=catalog_db.scope("tenant-1"))
+        PostgresDefinitionRepository(
+            catalog_runtime_pool, catalog_scope=catalog_db.scope("tenant-1")
+        )
 
 
 @pytest.mark.asyncio

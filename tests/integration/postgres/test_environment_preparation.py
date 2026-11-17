@@ -61,11 +61,7 @@ from tests.fixtures.lane_turns import (
     scripted_frames,
 )
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.runtime_common import (  # noqa: F401
-    common_db,
-    owner_rows,
-    scoped_count,
-)
+from tests.support.db_builders import owner_rows, scoped_count
 
 pytestmark = pytest.mark.common_db
 
@@ -110,7 +106,7 @@ def _record(db: CommonDatabase, prepared: PreparedSession) -> EnvironmentPrepara
 
 
 @pytest_asyncio.fixture
-async def pool(common_db: CommonDatabase) -> AsyncIterator[asyncpg.Pool]:  # noqa: F811
+async def pool(common_db: CommonDatabase) -> AsyncIterator[asyncpg.Pool]:
     created = await common_db.pool("mission_control_runtime")
     try:
         yield created
@@ -119,7 +115,7 @@ async def pool(common_db: CommonDatabase) -> AsyncIterator[asyncpg.Pool]:  # noq
 
 
 @pytest_asyncio.fixture
-async def owner(common_db: CommonDatabase) -> AsyncIterator[asyncpg.Connection]:  # noqa: F811
+async def owner(common_db: CommonDatabase) -> AsyncIterator[asyncpg.Connection]:
     connection = await asyncpg.connect(common_db.owner_dsn)
     try:
         yield connection
@@ -155,7 +151,7 @@ async def _update_columns(db: CommonDatabase, role: str, table: str) -> set[str]
 
 
 async def test_the_readiness_ladder_is_seeded_immutable_reference_data(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     owner: asyncpg.Connection,
 ) -> None:
     rows = await owner.fetch(
@@ -182,7 +178,7 @@ async def test_the_readiness_ladder_is_seeded_immutable_reference_data(
 
 
 async def test_preparations_are_scoped_forced_rls_with_declared_grants(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
 ) -> None:
     (row,) = await owner_rows(
         common_db,
@@ -223,7 +219,7 @@ async def test_preparations_are_scoped_forced_rls_with_declared_grants(
 
 
 async def test_the_repository_inserts_merges_and_never_regresses(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     pool: asyncpg.Pool,
 ) -> None:
     repository = PostgresEnvironmentPreparationRepository(pool, clock=lambda: AT)
@@ -273,7 +269,7 @@ async def test_the_repository_inserts_merges_and_never_regresses(
 
 
 async def test_the_guard_refuses_what_the_merge_never_does(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     pool: asyncpg.Pool,
     owner: asyncpg.Connection,
 ) -> None:
@@ -329,7 +325,7 @@ async def _stored_readiness(db: CommonDatabase, harness_execution_id: UUID) -> l
 
 
 async def test_the_launch_policy_refuses_a_session_below_the_minimum(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     pool: asyncpg.Pool,
 ) -> None:
     lane = ScriptedSessionLane(frames=scripted_frames())
@@ -344,7 +340,7 @@ async def test_the_launch_policy_refuses_a_session_below_the_minimum(
 
 
 async def test_a_prepared_environment_starts_and_is_exercised(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     pool: asyncpg.Pool,
 ) -> None:
     frames = scripted_frames()
@@ -369,7 +365,7 @@ async def test_a_prepared_environment_starts_and_is_exercised(
 
 @pytest.mark.parametrize("lane", DISCOVERING_LANES)
 async def test_readiness_reaches_discovered_on_every_lane_with_a_mechanism(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     pool: asyncpg.Pool,
     tmp_path: Path,
     lane: str,

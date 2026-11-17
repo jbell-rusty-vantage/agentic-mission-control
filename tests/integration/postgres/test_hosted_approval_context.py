@@ -29,15 +29,14 @@ from mission_control.domain.policies.contracts import ActorContext
 from tests.fixtures.agents_lane import agents_stack
 from tests.fixtures.managed_lane import managed_stack
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.frames_common import admit_unit_attempt
-from tests.integration.postgres.runtime_common import common_db  # noqa: F401
+from tests.support.db_builders import admit_unit_attempt
 from tests.unit.approvals.fixtures import answer
 
 
 @pytest.mark.common_db
 @pytest.mark.parametrize("profile", ["claude_managed", "codex_agents"])
 async def test_hosted_review_revalidates_recorded_erc(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     tmp_path: Path,
     profile: str,
 ) -> None:

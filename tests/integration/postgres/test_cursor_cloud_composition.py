@@ -33,7 +33,6 @@ from tests.fixtures.cursor_cloud import (
 from tests.fixtures.isolated_settings import isolated_settings
 from tests.fixtures.lane_turns import ACTIVATION_UUID, RUN_UUID, RecordingSignals, lane_stack
 from tests.fixtures.mission_control_common_db import CommonDatabase, catalog_scope
-from tests.integration.postgres.runtime_common import common_db  # noqa: F401
 
 pytestmark = pytest.mark.common_db
 
@@ -41,7 +40,7 @@ SENTINEL = "mo06-sentinel-value"
 
 
 async def test_production_cursor_cloud_records_the_lease_and_resolves_env_vars(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

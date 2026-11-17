@@ -18,7 +18,6 @@ from mission_control.application.execution.harness.leases import (
 )
 from mission_control.application.workspaces.service import WorkspaceAllocator
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.runtime_common import common_db  # noqa: F401
 from tests.unit.workspaces.lease_scenarios import (
     NOW,
     claim,
@@ -33,7 +32,7 @@ pytestmark = pytest.mark.common_db
 
 
 async def test_concurrent_slot_acquisition_has_exactly_one_winner(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
 ) -> None:
     pool = await common_db.pool("mission_control_runtime", min_size=8, max_size=8)
     try:
@@ -45,7 +44,7 @@ async def test_concurrent_slot_acquisition_has_exactly_one_winner(
 
 
 async def test_stale_generation_writes_are_rejected(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
 ) -> None:
     pool = await common_db.pool("mission_control_runtime")
     try:
@@ -57,7 +56,7 @@ async def test_stale_generation_writes_are_rejected(
 
 
 async def test_a_stale_write_racing_a_takeover_never_both_apply(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
 ) -> None:
     pool = await common_db.pool("mission_control_runtime", min_size=4, max_size=4)
     try:
@@ -69,7 +68,7 @@ async def test_a_stale_write_racing_a_takeover_never_both_apply(
 
 
 async def test_v03_two_agents_race_for_one_writable_workspace(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     tmp_path: Path,
 ) -> None:
     """V03 end to end: real git worktrees, the Postgres ledger, two allocators (workers)."""
@@ -120,7 +119,7 @@ async def test_v03_two_agents_race_for_one_writable_workspace(
 
 
 async def test_slots_are_tenant_scoped_and_detail_round_trips(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
 ) -> None:
     pool = await common_db.pool("mission_control_runtime")
     try:
@@ -139,7 +138,7 @@ async def test_slots_are_tenant_scoped_and_detail_round_trips(
 
 
 async def test_expired_cursor_holder_requires_recovery_before_replacement(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
 ) -> None:
     pool = await common_db.pool("mission_control_runtime")
     try:

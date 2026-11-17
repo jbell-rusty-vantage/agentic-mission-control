@@ -51,12 +51,7 @@ from mission_control.domain.policies.forks import RunSnapshotManifest
 from mission_control.domain.policies.mailbox import MailboxState
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.fixtures.run_forks import stage_policy, technical_snapshot
-from tests.integration.postgres.runtime_common import (
-    common_db,  # noqa: F401
-    owner_rows,
-    scoped_command,
-    scoped_request,
-)
+from tests.support.db_builders import owner_rows, scoped_command, scoped_request
 from tests.support.run_control import WORKFLOW_DIGEST, actor
 from tests.support.run_control import service as run_control_service
 from tests.unit.context.test_fork_conversation_custody import custody
@@ -80,7 +75,7 @@ def caller() -> Any:
 
 @pytest.mark.parametrize("with_conversation", [False, True])
 async def test_fork_with_instruction_seeds_the_derived_run_and_records_lineage(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     with_conversation: bool,
 ) -> None:
     pool = await common_db.pool(max_size=6)

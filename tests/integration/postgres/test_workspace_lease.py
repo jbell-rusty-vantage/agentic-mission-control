@@ -31,8 +31,7 @@ from mission_control.domain.capabilities.hooks import HookDecision, HookEvent
 from mission_control.domain.frames.contracts import FrameKind, LaneProfile
 from mission_control.domain.policies.stop_fence import StopFence
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.frames_common import admit_unit_attempt
-from tests.integration.postgres.runtime_common import common_db  # noqa: F401
+from tests.support.db_builders import admit_unit_attempt
 
 pytestmark = pytest.mark.common_db
 NOW = datetime(2026, 10, 8, 12, tzinfo=UTC)
@@ -62,7 +61,7 @@ def _lease(scope: str, **changes: object) -> WorkspaceLease:
 
 
 async def test_workspace_leases_are_recorded_once_and_released_after_the_patch(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
 ) -> None:
     pool = await common_db.pool("mission_control_runtime")
     try:
@@ -88,7 +87,7 @@ async def test_workspace_leases_are_recorded_once_and_released_after_the_patch(
 
 
 async def test_released_lease_records_the_lane_snapshot_a_fork_restores(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
 ) -> None:
     """FT-G4: the newest released lease of a run names its frozen `cursor-snapshot:` ref."""
 
@@ -130,7 +129,7 @@ async def test_released_lease_records_the_lane_snapshot_a_fork_restores(
 
 
 async def test_tokens_store_only_digests_and_intents_are_insert_only(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
 ) -> None:
     pool = await common_db.pool("mission_control_runtime")
     owner = await asyncpg.connect(common_db.owner_dsn)
@@ -230,7 +229,7 @@ async def test_tokens_store_only_digests_and_intents_are_insert_only(
 
 
 async def test_the_readonly_role_reads_intents_but_never_tokens(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
 ) -> None:
     owner = await asyncpg.connect(common_db.owner_dsn)
     try:

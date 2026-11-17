@@ -15,15 +15,13 @@ from mission_control.domain.execution.contracts import CapturedWorkspaceCandidat
 from mission_control.domain.execution.errors import UndeclaredWorkspacePath, WorkspaceDigestMismatch
 from mission_control.domain.policies.errors import IdempotencyConflict
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.catalog_common import catalog_db as catalog_db
-from tests.integration.postgres.catalog_common import runtime_pool as runtime_pool
 
 pytestmark = pytest.mark.common_db
 
 
 @pytest_asyncio.fixture
-async def document_pool(runtime_pool: asyncpg.Pool) -> asyncpg.Pool:
-    return runtime_pool
+async def document_pool(catalog_runtime_pool: asyncpg.Pool) -> asyncpg.Pool:
+    return catalog_runtime_pool
 
 
 @pytest.mark.asyncio

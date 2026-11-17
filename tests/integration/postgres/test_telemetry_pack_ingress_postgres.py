@@ -28,7 +28,6 @@ from mission_control.interfaces.mcp.signal_tools import SIGNAL_EMIT_TOOL, mount_
 from tests.fixtures.cursor_cloud import cloud_rows, run_cursor_hooks
 from tests.fixtures.projections.rows import INSTRUCTION
 from tests.fixtures.scoped_api_stack import serve_loopback
-from tests.integration.postgres.runtime_common import common_db  # noqa: F401
 from tests.integration.postgres.test_signal_ingress_postgres import (  # noqa: F401
     Ingress,
     ingress,

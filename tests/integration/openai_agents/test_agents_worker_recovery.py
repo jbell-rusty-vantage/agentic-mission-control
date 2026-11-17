@@ -20,8 +20,7 @@ from tests.integration.anthropic_managed.test_managed_segment_loop_real_services
     _request,
     _workflow_worker,
 )
-from tests.integration.postgres.frames_common import admit_unit_attempt
-from tests.integration.postgres.runtime_common import common_db  # noqa: F401
+from tests.support.db_builders import admit_unit_attempt
 
 from mission_control.adapters.deep_agents.harness import DeepAgentsHarness
 from mission_control.adapters.operations.conformance import ConformanceRuntime
@@ -49,7 +48,7 @@ from mission_control.domain.frames.contracts import FrameKind
 
 @pytest.mark.common_db
 async def test_worker_loss_restores_items_and_root_turn_once(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     tmp_path: Path,
 ) -> None:
     client = await _client()

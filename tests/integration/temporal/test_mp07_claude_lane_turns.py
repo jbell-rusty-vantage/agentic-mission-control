@@ -60,8 +60,7 @@ from mission_control.domain.execution.lanes import CursorExecutionBinding
 from mission_control.domain.frames.contracts import FrameKind
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.fixtures.temporal_history import completed_activity_results, patch_ids
-from tests.integration.postgres.frames_common import admit_unit_attempt
-from tests.integration.postgres.runtime_common import common_db  # noqa: F401
+from tests.support.db_builders import admit_unit_attempt
 from tests.unit.claude.fixtures import (
     PROFILE,
     SESSION_ID,
@@ -210,7 +209,7 @@ def queues() -> tuple[str, str]:
 
 @pytest.mark.common_db
 async def test_a_claude_unit_runs_through_the_production_operation_workflow(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     tmp_path: Path,
 ) -> None:
     client = await temporal_client()
@@ -273,7 +272,7 @@ async def test_a_claude_unit_runs_through_the_production_operation_workflow(
 
 @pytest.mark.common_db
 async def test_a_provider_error_result_settles_failed_capacity_through_the_operation_workflow(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     tmp_path: Path,
 ) -> None:
     client = await temporal_client()

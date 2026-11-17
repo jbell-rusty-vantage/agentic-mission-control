@@ -33,8 +33,7 @@ from mission_control.domain.execution.contracts import (
 )
 from tests.acceptance.control_plane.test_wp_cp_045 import contract
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.runtime_common import common_db as common_db
-from tests.integration.postgres.runtime_common import scoped_request
+from tests.support.db_builders import scoped_request
 from tests.support.run_control import service
 
 pytestmark = pytest.mark.common_db

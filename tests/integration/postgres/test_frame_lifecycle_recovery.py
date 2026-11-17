@@ -9,8 +9,7 @@ from mission_control.domain.frames.contracts import FrameKind, LaneProfile
 from mission_control.domain.frames.facts import ExecutionOutcomeFact
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.fixtures.provider_frames import observation
-from tests.integration.postgres.frames_common import admit_unit_attempt
-from tests.integration.postgres.runtime_common import common_db as common_db
+from tests.support.db_builders import admit_unit_attempt
 
 pytestmark = pytest.mark.common_db
 

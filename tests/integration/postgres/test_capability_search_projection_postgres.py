@@ -39,10 +39,7 @@ from mission_control.domain.authoring.contracts import (
 )
 from mission_control.domain.coordinator.contracts import CapabilitySearchRequest, CatalogAssetStatus
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.catalog_common import AI_ENGINEER_CATALOG, BIOTECH_CATALOG
-from tests.integration.postgres.catalog_common import catalog_db as catalog_db
-from tests.integration.postgres.catalog_common import catalog_writer_pool as catalog_writer_pool
-from tests.integration.postgres.catalog_common import runtime_pool as runtime_pool
+from tests.support.db_builders import AI_ENGINEER_CATALOG, BIOTECH_CATALOG
 
 pytestmark = pytest.mark.common_db
 
@@ -114,9 +111,11 @@ def spec(
 
 @pytest.mark.asyncio
 async def test_projection_activation_search_admission_and_installation_scope(
-    catalog_db: CommonDatabase, runtime_pool: asyncpg.Pool, catalog_writer_pool: asyncpg.Pool
+    catalog_db: CommonDatabase,
+    catalog_runtime_pool: asyncpg.Pool,
+    catalog_writer_pool: asyncpg.Pool,
 ) -> None:
-    catalog = PostgresDefinitionRepository(runtime_pool, catalog_scope=BIOTECH_CATALOG)
+    catalog = PostgresDefinitionRepository(catalog_runtime_pool, catalog_scope=BIOTECH_CATALOG)
     crawl = await catalog.publish(tool("tool.web-crawl", "crawl public web pages"), "p", NOW, 0)
     search = await catalog.publish(tool("tool.web-search", "search public web pages"), "p", NOW, 0)
     scope = "global"
@@ -137,11 +136,11 @@ async def test_projection_activation_search_admission_and_installation_scope(
     assert activation.activated_count == 2
     assert activation.activated_source_set_digest == expected.expected_source_set_digest
     generations = PostgresProjectionGenerationRepository(
-        runtime_pool, catalog_scope=BIOTECH_CATALOG
+        catalog_runtime_pool, catalog_scope=BIOTECH_CATALOG
     )
     assert await generations.active_for_kind(scope, DefinitionKind.TOOL) == generation
 
-    reader = PostgresCatalogSearchRepository(runtime_pool, catalog_scope=BIOTECH_CATALOG)
+    reader = PostgresCatalogSearchRepository(catalog_runtime_pool, catalog_scope=BIOTECH_CATALOG)
     request = CapabilitySearchRequest(
         query="public web", kinds=frozenset({DefinitionKind.TOOL}), tenant_scope=scope
     )
@@ -168,11 +167,13 @@ async def test_projection_activation_search_admission_and_installation_scope(
     } == {"tool.web-crawl"}
 
     # Installation scoping: the other app's catalog sees no generations or documents.
-    foreign = PostgresCatalogSearchRepository(runtime_pool, catalog_scope=AI_ENGINEER_CATALOG)
+    foreign = PostgresCatalogSearchRepository(
+        catalog_runtime_pool, catalog_scope=AI_ENGINEER_CATALOG
+    )
     assert await foreign.lexical_search(every_status, limit=10) == ()
     assert (
         await PostgresProjectionGenerationRepository(
-            runtime_pool, catalog_scope=AI_ENGINEER_CATALOG
+            catalog_runtime_pool, catalog_scope=AI_ENGINEER_CATALOG
         ).get(scope, generation)
         is None
     )
@@ -183,7 +184,7 @@ async def test_projection_activation_search_admission_and_installation_scope(
         )
     # 'global' alone names no installation: fail closed instead of searching everything.
     with pytest.raises(ValueError, match="installation-bound"):
-        await PostgresCatalogSearchRepository(runtime_pool).lexical_search(request, limit=1)
+        await PostgresCatalogSearchRepository(catalog_runtime_pool).lexical_search(request, limit=1)
     # The tenant request scope of this installation resolves the installation itself.
     scoped = request.model_copy(
         update={
@@ -191,15 +192,19 @@ async def test_projection_activation_search_admission_and_installation_scope(
             "status_filter": every_status.status_filter,
         }
     )
-    hits = await PostgresCatalogSearchRepository(runtime_pool).lexical_search(scoped, limit=10)
+    hits = await PostgresCatalogSearchRepository(catalog_runtime_pool).lexical_search(
+        scoped, limit=10
+    )
     assert {item.document.logical_id for item in hits} == {"tool.web-crawl"}  # 'global' rows
 
 
 @pytest.mark.asyncio
 async def test_activation_verifies_count_digest_and_embedding_contract(
-    catalog_db: CommonDatabase, catalog_writer_pool: asyncpg.Pool, runtime_pool: asyncpg.Pool
+    catalog_db: CommonDatabase,
+    catalog_writer_pool: asyncpg.Pool,
+    catalog_runtime_pool: asyncpg.Pool,
 ) -> None:
-    catalog = PostgresDefinitionRepository(runtime_pool, catalog_scope=BIOTECH_CATALOG)
+    catalog = PostgresDefinitionRepository(catalog_runtime_pool, catalog_scope=BIOTECH_CATALOG)
     published = await catalog.publish(tool("tool.one", "one tool"), "p", NOW, 0)
     generations = PostgresProjectionGenerationRepository(
         catalog_writer_pool, catalog_scope=BIOTECH_CATALOG

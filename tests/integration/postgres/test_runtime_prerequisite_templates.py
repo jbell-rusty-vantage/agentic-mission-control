@@ -21,8 +21,7 @@ from mission_control.domain.execution.contracts import OperationAttemptIdentity
 from mission_control.domain.programs.contracts import StageGraphRunInput
 from tests.fixtures.managed_lane import managed_binding, managed_operation
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.frames_common import admit_unit_attempt
-from tests.integration.postgres.runtime_common import common_db  # noqa: F401
+from tests.support.db_builders import admit_unit_attempt
 from tests.unit.run_control.test_run_launch import _input
 
 pytestmark = pytest.mark.common_db
@@ -30,7 +29,7 @@ pytestmark = pytest.mark.common_db
 
 @pytest.mark.parametrize("contract", ["stagegraph.template/1", "goal.template/1"])
 async def test_placeholder_provider_template_never_evades_generic_guard(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     contract,
 ):
     pool = await common_db.pool("mission_control_runtime")

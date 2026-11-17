@@ -31,8 +31,7 @@ from mission_control.domain.frames.contracts import FrameKind, FrameObservation
 from tests.fixtures.lane_turns import RecordingSignals, ScriptedSessionLane, scripted_frames
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.fixtures.mp06_lanes import LossyReceiptLane, ReconcilingLossyLane
-from tests.integration.postgres.mp06_common import pg_lane_unit
-from tests.integration.postgres.runtime_common import common_db  # noqa: F401
+from tests.support.db_builders import pg_lane_unit
 from tests.unit.harness.test_mp06_dispatch_recovery import turn_request
 
 pytestmark = pytest.mark.common_db
@@ -53,7 +52,7 @@ async def _identity_json(db: CommonDatabase, heid: object) -> dict[str, object]:
 
 
 async def test_ownership_and_the_journal_are_fenced_and_survive_frame_appends(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
 ) -> None:
     pool = await common_db.pool("mission_control_runtime")
     try:
@@ -150,7 +149,7 @@ async def test_ownership_and_the_journal_are_fenced_and_survive_frame_appends(
 
 
 async def test_a_lost_receipt_is_reconciled_from_the_persisted_journal(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
 ) -> None:
     pool = await common_db.pool("mission_control_runtime")
     try:
@@ -180,7 +179,7 @@ async def test_a_lost_receipt_is_reconciled_from_the_persisted_journal(
 
 
 async def test_an_unreconcilable_dispatch_parks_in_doubt_with_one_send(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
 ) -> None:
     pool = await common_db.pool("mission_control_runtime")
     try:

@@ -40,8 +40,7 @@ from mission_control.domain.programs.family_failure import (
     FamilyFailureTerminalizationRequest,
 )
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.runtime_common import common_db as common_db
-from tests.integration.postgres.runtime_common import scoped_command, scoped_request
+from tests.support.db_builders import scoped_command, scoped_request
 from tests.support.run_control import service
 from tests.unit.run_control.test_boundary_commands import TARGET
 

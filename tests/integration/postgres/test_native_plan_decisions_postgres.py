@@ -25,8 +25,8 @@ from tests.fixtures.mission_control_common_db import (
     common_database,
     migration_paths_with,
 )
-from tests.integration.postgres.runtime_common import owner_rows
 from tests.integration.postgres.test_output_contracts_postgres import access_for
+from tests.support.db_builders import owner_rows
 from tests.unit.outputs.scenario import digest_of
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.common_db]

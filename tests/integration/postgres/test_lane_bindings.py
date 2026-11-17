@@ -20,7 +20,6 @@ from tests.fixtures.mission_control_common_db import (
     create_common_database,
     drop_common_database,
 )
-from tests.integration.postgres.runtime_common import common_db  # noqa: F401
 
 pytestmark = pytest.mark.common_db
 
@@ -68,7 +67,7 @@ async def test_lane_profiles_are_seeded_with_their_declared_describes(
 
 
 async def test_runtime_reads_but_never_writes_lane_profiles(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
 ) -> None:
     pool = await common_db.pool("mission_control_runtime")
     try:
@@ -123,7 +122,7 @@ async def _insert_binding(
 
 
 async def test_execution_bindings_default_to_deep_agents_and_cursor_requires_its_binding(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
 ) -> None:
     owner = await asyncpg.connect(common_db.owner_dsn)
     try:
@@ -203,7 +202,7 @@ async def test_execution_bindings_default_to_deep_agents_and_cursor_requires_its
 
 
 async def test_0036_admits_the_hosted_agent_api_profiles_on_every_lane_profile_check(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
 ) -> None:
     """HL-06: frames, native identity, continuation records, search documents and capability
     host support admit `claude_managed` and `codex_agents` (and still refuse an unknown one)."""

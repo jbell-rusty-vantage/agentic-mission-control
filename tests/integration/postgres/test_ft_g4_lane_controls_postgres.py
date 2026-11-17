@@ -38,14 +38,13 @@ from mission_control.application.execution.harness.state import (
 from mission_control.domain.capabilities.hooks import HookEvent
 from mission_control.domain.frames.contracts import LaneProfile
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.frames_common import admit_unit_attempt
-from tests.integration.postgres.runtime_common import common_db  # noqa: F401
+from tests.support.db_builders import admit_unit_attempt
 
 pytestmark = pytest.mark.common_db
 
 
 async def test_native_identity_moves_only_by_an_explicit_supersession(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
 ) -> None:
     pool = await common_db.pool("mission_control_runtime")
     try:
@@ -101,7 +100,7 @@ class _MissingSummary:
 
 
 async def test_the_missing_output_follow_up_is_given_once_per_generation(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
 ) -> None:
     pool = await common_db.pool("mission_control_runtime")
     try:

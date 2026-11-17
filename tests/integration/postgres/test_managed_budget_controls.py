@@ -14,15 +14,14 @@ from mission_control.application.execution.harness.state import LaneExecutionUpd
 from mission_control.domain.execution.budget_controls import BudgetControlRecord
 from mission_control.domain.frames.contracts import LaneProfile
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.frames_common import admit_unit_attempt
-from tests.integration.postgres.runtime_common import common_db  # noqa: F401
+from tests.support.db_builders import admit_unit_attempt
 
 pytestmark = pytest.mark.common_db
 DIGEST = "sha256:" + "a" * 64
 
 
 async def test_budget_intent_survives_new_store_and_is_owner_fenced_and_scoped(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
 ):
     pool = await common_db.pool("mission_control_runtime")
     try:

@@ -58,8 +58,7 @@ from mission_control.domain.execution.lanes import LaneSegmentBounds, ReattachRe
 from mission_control.domain.policies.contracts import ActorContext
 from tests.fixtures.lane_turns import RecordingSignals, lane_stack
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.frames_common import admit_unit_attempt
-from tests.integration.postgres.runtime_common import common_db, owner_rows  # noqa: F401
+from tests.support.db_builders import admit_unit_attempt, owner_rows
 from tests.unit.codex.drive import fields, started
 from tests.unit.codex.fixture_app_server import FixtureLauncher, load_script
 from tests.unit.codex.support import (
@@ -164,7 +163,7 @@ async def _open_task(composition: _Composition, scope: str, run_id: str) -> Appr
 
 
 async def test_a_codex_approval_is_a_durable_task_revalidated_by_the_production_probe(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     tmp_path: Path,
 ) -> None:
     await _released(common_db)
@@ -242,7 +241,7 @@ async def test_a_codex_approval_is_a_durable_task_revalidated_by_the_production_
 
 
 async def test_a_relaunch_marks_the_dead_connections_correlation_lost(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     tmp_path: Path,
 ) -> None:
     await _released(common_db)

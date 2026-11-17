@@ -39,7 +39,6 @@ from mission_control.domain.knowledge.effects import JournalState
 from tests.fixtures.checkpoint_recovery import recovery_harness, stage_recovery_unit
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.fixtures.saved_settlement import DurableEffectDouble
-from tests.integration.postgres.runtime_common import common_db  # noqa: F401
 from tests.integration.temporal.test_wi04_saved_settlement_restart import (
     _environment,
     _replays,
@@ -61,7 +60,7 @@ pytestmark = [pytest.mark.asyncio, pytest.mark.common_db]
 
 
 @pytest_asyncio.fixture
-async def pool(common_db: CommonDatabase) -> AsyncIterator[asyncpg.Pool]:  # noqa: F811
+async def pool(common_db: CommonDatabase) -> AsyncIterator[asyncpg.Pool]:
     await common_db.add_tenants(["tenant-1"])
     created = await common_db.pool()
     try:
@@ -129,7 +128,7 @@ class NativeSettler:
 
 
 async def test_a_plan_review_wait_survives_a_restart_and_applies_once(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     pool: asyncpg.Pool,
 ) -> None:
     stack_outputs = await accepted_report()
@@ -254,7 +253,7 @@ async def test_a_plan_review_wait_survives_a_restart_and_applies_once(
 
 
 async def test_explicit_native_selection_fulfills_after_review_successor_and_saved_restart(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     pool: asyncpg.Pool,
 ) -> None:
     """Real MC PG/Temporal boundary; KS transport is doubled with an immutable review successor."""

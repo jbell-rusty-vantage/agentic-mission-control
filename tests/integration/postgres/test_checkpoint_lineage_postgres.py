@@ -31,8 +31,7 @@ from tests.fixtures.checkpoint_lineage import (
     namespace_claim,
 )
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.runtime_common import common_db as common_db
-from tests.integration.postgres.runtime_common import owner_rows, scoped_request
+from tests.support.db_builders import owner_rows, scoped_request
 from tests.support.run_control import service as run_control_service
 
 pytestmark = pytest.mark.common_db

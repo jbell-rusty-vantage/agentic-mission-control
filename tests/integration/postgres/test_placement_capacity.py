@@ -13,14 +13,13 @@ from mission_control.adapters.postgres.run_control.canonical import begin
 from mission_control.domain.execution.placement import PlacementLimit
 from mission_control.domain.frames.contracts import LaneProfile
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.frames_common import admit_unit_attempt
-from tests.integration.postgres.runtime_common import common_db  # noqa: F401
+from tests.support.db_builders import admit_unit_attempt
 
 pytestmark = pytest.mark.common_db
 
 
 async def test_durable_capacity_restarts_and_cannot_enumerate_or_forge_other_tenants(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
 ) -> None:
     pool = await common_db.pool("mission_control_runtime")
     try:

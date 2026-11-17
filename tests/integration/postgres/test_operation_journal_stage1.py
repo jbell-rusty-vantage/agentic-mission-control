@@ -49,8 +49,7 @@ from mission_control.domain.policies.contracts import (
 )
 from mission_control.domain.policies.errors import IdempotencyConflict, RunVersionConflict
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.runtime_common import common_db as common_db
-from tests.integration.postgres.runtime_common import owner_rows
+from tests.support.db_builders import owner_rows
 from tests.support.run_control import actor, service
 from tests.support.run_control import command as unit_command
 from tests.support.run_control import request as unit_request

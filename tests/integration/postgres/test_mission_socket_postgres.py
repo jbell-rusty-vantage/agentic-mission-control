@@ -53,9 +53,7 @@ from mission_control.interfaces.socketio.app import MissionSocketConfig, mount_m
 from mission_control.interfaces.socketio.server import STREAM_SERVICES, MissionSocketLimits
 from tests.fixtures.mission_control_common_db import COMPONENT_VERSION, CommonDatabase
 from tests.fixtures.provider_frames import StepClock, turn_observations
-from tests.integration.postgres.frames_common import AdmittedUnit, admit_unit_attempt
-from tests.integration.postgres.runtime_common import common_db as common_db
-from tests.integration.postgres.runtime_common import owner_rows, scoped_command
+from tests.support.db_builders import AdmittedUnit, admit_unit_attempt, owner_rows, scoped_command
 from tests.support.run_control import ALL_PERMISSIONS
 from tests.unit.socketio.harness import MissionClient, serve
 

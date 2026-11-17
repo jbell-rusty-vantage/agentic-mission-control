@@ -22,7 +22,6 @@ from mission_control.domain.policies.stop_fence import StopFence
 from mission_control.interfaces.http.ingress import create_ingress_app
 from tests.fixtures.lane_turns import cursor_binding, cursor_operation
 from tests.fixtures.scoped_api_stack import serve_loopback
-from tests.integration.postgres.runtime_common import common_db  # noqa: F401
 from tests.integration.postgres.test_signal_ingress_postgres import (  # noqa: F401
     GATE_CONTEXT,
     Ingress,

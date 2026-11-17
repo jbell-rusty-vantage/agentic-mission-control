@@ -42,8 +42,7 @@ from mission_control.domain.policies.stop_fence import StopFence
 from mission_control.interfaces.http.hook_callback import create_hook_callback_app
 from tests.fixtures.lane_turns import lane_stack
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.frames_common import admit_unit_attempt
-from tests.integration.postgres.runtime_common import common_db, owner_rows  # noqa: F401
+from tests.support.db_builders import admit_unit_attempt, owner_rows
 from tests.unit.codex.drive import fields, started
 from tests.unit.codex.fixture_app_server import FixtureLauncher, load_script
 from tests.unit.codex.support import (
@@ -98,7 +97,7 @@ async def _codex_operation(pool: asyncpg.Pool, db: CommonDatabase) -> OperationE
 
 
 async def test_codex_kernel_hooks_persist_and_deny_a_fenced_tool_on_real_rows(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     tmp_path: Path,
 ) -> None:
     pool = await common_db.pool("mission_control_runtime", max_size=8)

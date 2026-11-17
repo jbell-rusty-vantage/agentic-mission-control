@@ -40,11 +40,7 @@ from mission_control.domain.prerequisites import (
 )
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.fixtures.owner_prerequisites import inputs
-from tests.integration.postgres.runtime_common import (  # noqa: F401
-    common_db,
-    owner_rows,
-    scoped_count,
-)
+from tests.support.db_builders import owner_rows, scoped_count
 
 pytestmark = pytest.mark.common_db
 
@@ -79,7 +75,7 @@ class Clock:
 
 
 @pytest_asyncio.fixture
-async def pool(common_db: CommonDatabase) -> AsyncIterator[asyncpg.Pool]:  # noqa: F811
+async def pool(common_db: CommonDatabase) -> AsyncIterator[asyncpg.Pool]:
     created = await common_db.pool("mission_control_runtime")
     try:
         yield created
@@ -88,7 +84,7 @@ async def pool(common_db: CommonDatabase) -> AsyncIterator[asyncpg.Pool]:  # noq
 
 
 @pytest_asyncio.fixture
-async def owner(common_db: CommonDatabase) -> AsyncIterator[asyncpg.Connection]:  # noqa: F811
+async def owner(common_db: CommonDatabase) -> AsyncIterator[asyncpg.Connection]:
     connection = await asyncpg.connect(common_db.owner_dsn)
     try:
         yield connection
@@ -133,7 +129,7 @@ async def _row(db: CommonDatabase, prerequisite_id: str) -> dict[str, object]:
 
 
 async def test_prerequisites_are_scoped_forced_rls_with_declared_grants(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
 ) -> None:
     (row,) = await owner_rows(
         common_db,
@@ -172,7 +168,7 @@ async def test_prerequisites_are_scoped_forced_rls_with_declared_grants(
 
 
 async def test_the_repository_registers_records_evidence_and_keeps_scopes_apart(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     pool: asyncpg.Pool,
 ) -> None:
     clock = Clock()
@@ -266,7 +262,7 @@ async def test_the_repository_registers_records_evidence_and_keeps_scopes_apart(
 
 
 async def test_the_table_refuses_what_the_record_never_does(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     pool: asyncpg.Pool,
     owner: asyncpg.Connection,
 ) -> None:
@@ -315,7 +311,7 @@ async def test_the_table_refuses_what_the_record_never_does(
 
 
 async def test_the_service_flags_an_expiring_login_before_launch_on_postgres(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     pool: asyncpg.Pool,
 ) -> None:
     clock = Clock()

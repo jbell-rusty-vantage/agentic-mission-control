@@ -16,9 +16,7 @@ from mission_control.domain.execution.contracts import (
 )
 from mission_control.domain.policies.errors import IdempotencyConflict, RunControlNotFound
 from tests.fixtures.mission_control_common_db import CommonDatabase, canonical_scope
-from tests.integration.postgres.catalog_common import catalog_db as catalog_db
-from tests.integration.postgres.catalog_common import insert_fixture_run
-from tests.integration.postgres.catalog_common import runtime_pool as runtime_pool
+from tests.support.db_builders import insert_fixture_run
 from tests.unit.workspaces.test_artifact_promotion import CONTENT_DIGEST, NOW, OWNER
 
 pytestmark = pytest.mark.common_db
@@ -69,7 +67,7 @@ async def _counts(pool: asyncpg.Pool, scope: str) -> tuple[int, int]:
 
 
 async def test_postgres_artifact_reference_and_event_commit_atomically(
-    catalog_db: CommonDatabase, runtime_pool: asyncpg.Pool
+    catalog_db: CommonDatabase, catalog_runtime_pool: asyncpg.Pool
 ) -> None:
     scope = catalog_db.scope("tenant-1")
     await insert_fixture_run(catalog_db, scope, RUN_KEY)
@@ -80,15 +78,15 @@ async def test_postgres_artifact_reference_and_event_commit_atomically(
             raise RuntimeError("injected artifact transaction failure")
 
     failing = PostgresArtifactDurableReferenceRepository(
-        runtime_pool, before_commit=fail_before_commit
+        catalog_runtime_pool, before_commit=fail_before_commit
     )
     with pytest.raises(RuntimeError, match="injected"):
         await failing.admit(request_scope=scope, run_id=RUN_KEY, artifact=artifact)
     assert await failing.get(scope, artifact.artifact_id) is None
     assert await failing.pending_events(scope) == ()
-    assert await _counts(runtime_pool, scope) == (0, 0)
+    assert await _counts(catalog_runtime_pool, scope) == (0, 0)
 
-    repository = PostgresArtifactDurableReferenceRepository(runtime_pool)
+    repository = PostgresArtifactDurableReferenceRepository(catalog_runtime_pool)
     first = await repository.admit(request_scope=scope, run_id=RUN_KEY, artifact=artifact)
     replayed = await repository.admit(request_scope=scope, run_id=RUN_KEY, artifact=artifact)
     events = await repository.pending_events(scope)
@@ -101,12 +99,12 @@ async def test_postgres_artifact_reference_and_event_commit_atomically(
 
 
 async def test_promotion_replay_is_idempotent_and_conflicts_fail_closed(
-    catalog_db: CommonDatabase, runtime_pool: asyncpg.Pool
+    catalog_db: CommonDatabase, catalog_runtime_pool: asyncpg.Pool
 ) -> None:
     scope = catalog_db.scope("tenant-1")
     await insert_fixture_run(catalog_db, scope, RUN_KEY)
     artifact = admitted_revision(RUN_KEY, scope)
-    repository = PostgresArtifactDurableReferenceRepository(runtime_pool)
+    repository = PostgresArtifactDurableReferenceRepository(catalog_runtime_pool)
     results = await asyncio.gather(
         *(
             repository.admit(request_scope=scope, run_id=RUN_KEY, artifact=artifact)
@@ -115,8 +113,8 @@ async def test_promotion_replay_is_idempotent_and_conflicts_fail_closed(
     )
     assert len(set(results)) == 1
     # Registered once: one canonical artifact row and one outbox row, no duplicates.
-    assert await _counts(runtime_pool, scope) == (1, 1)
-    async with runtime_pool.acquire() as connection, connection.transaction():
+    assert await _counts(catalog_runtime_pool, scope) == (1, 1)
+    async with catalog_runtime_pool.acquire() as connection, connection.transaction():
         await apply_scope(connection, scope)
         row = await connection.fetchrow(
             "SELECT a.custody_state, a.content_digest, a.byte_size, a.storage_kind, "
@@ -137,7 +135,7 @@ async def test_promotion_replay_is_idempotent_and_conflicts_fail_closed(
             run_id=RUN_KEY,
             artifact=artifact.model_copy(update={"content_digest": "sha256:" + "e" * 64}),
         )
-    assert await _counts(runtime_pool, scope) == (1, 1)
+    assert await _counts(catalog_runtime_pool, scope) == (1, 1)
     # Scoped read denial: another tenant and the other installation see nothing.
     other_tenant = catalog_db.scope("tenant-2")
     assert await repository.get(other_tenant, artifact.artifact_id) is None
@@ -151,7 +149,7 @@ async def test_promotion_replay_is_idempotent_and_conflicts_fail_closed(
     foreign = canonical_scope("tenant-1", "ai-engineer")
     assert await repository.get(foreign, artifact.artifact_id) is None
     # Artifact custody rows are not mutable/deletable by the runtime role.
-    async with runtime_pool.acquire() as connection, connection.transaction():
+    async with catalog_runtime_pool.acquire() as connection, connection.transaction():
         await apply_scope(connection, scope)
         with pytest.raises(asyncpg.InsufficientPrivilegeError):
             await connection.execute("DELETE FROM mission_control.artifact")

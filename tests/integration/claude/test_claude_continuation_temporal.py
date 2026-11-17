@@ -80,9 +80,8 @@ from tests.fixtures.continuation import FakeStaging, NoArtifacts, StepClock, tri
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.fixtures.mp12_lanes import Crashes
 from tests.fixtures.temporal_history import patch_ids
-from tests.integration.postgres.frames_common import admit_unit_attempt
-from tests.integration.postgres.runtime_common import common_db  # noqa: F401
 from tests.integration.postgres.test_continuation_postgres import continuation_actor
+from tests.support.db_builders import admit_unit_attempt
 from tests.unit.claude.fixtures import (
     SESSION_ID,
     FixtureScript,
@@ -130,7 +129,7 @@ def _scheduled(history: Any) -> list[str]:
     ids=["no-loss", "loss-after-snapshotted-hydrated-activated"],
 )
 async def test_a_claude_unit_continues_into_a_fresh_session_on_real_services(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     tmp_path: Path,
     crash_at: frozenset[ContinuationPhase],
 ) -> None:

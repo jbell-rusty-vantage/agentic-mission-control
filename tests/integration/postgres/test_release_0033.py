@@ -42,11 +42,7 @@ from tests.fixtures.mission_control_common_db import (
     install_component,
     migration_paths,
 )
-from tests.integration.postgres.runtime_common import (  # noqa: F401
-    common_db,
-    owner_rows,
-    scoped_count,
-)
+from tests.support.db_builders import owner_rows, scoped_count
 from tests.support.run_control import request, service
 
 pytestmark = pytest.mark.common_db
@@ -179,7 +175,7 @@ def _assert_lane_profiles_declared(state: dict[str, Any]) -> None:
 
 
 async def test_0033_tables_are_scoped_forced_rls_with_declared_grants(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
 ) -> None:
     rows = await owner_rows(
         common_db,
@@ -297,7 +293,7 @@ async def _admitted_run(db: CommonDatabase) -> tuple[str, UUID, UUID]:
 
 
 @pytest_asyncio.fixture
-async def owner(common_db: CommonDatabase) -> AsyncIterator[asyncpg.Connection]:  # noqa: F811
+async def owner(common_db: CommonDatabase) -> AsyncIterator[asyncpg.Connection]:
     connection = await asyncpg.connect(common_db.owner_dsn)
     try:
         yield connection
@@ -310,7 +306,7 @@ def _scope(db: CommonDatabase) -> tuple[UUID, str, UUID]:
 
 
 async def test_mp11_guards_refuse_moving_closed_or_settled_rows(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     owner: asyncpg.Connection,
 ) -> None:
     scope = _scope(common_db)
@@ -416,7 +412,7 @@ async def test_mp11_guards_refuse_moving_closed_or_settled_rows(
 
 
 async def test_mp15_guards_keep_causation_immutable_and_nothing_deleted(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     owner: asyncpg.Connection,
 ) -> None:
     scope = _scope(common_db)
@@ -504,7 +500,7 @@ async def test_mp15_guards_keep_causation_immutable_and_nothing_deleted(
 
 
 async def test_lane_profiles_equal_frozen_describes_with_trigger_and_rls_restored(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     owner: asyncpg.Connection,
 ) -> None:
     _assert_lane_profiles_declared(await _lane_state(owner))

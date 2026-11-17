@@ -29,7 +29,6 @@ from mission_control.application.knowledge.judgment import (
 )
 from mission_control.application.ports.outputs import AssessmentSupersessionConflict
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.runtime_common import common_db  # noqa: F401
 from tests.integration.postgres.test_trusted_judgment_postgres import access_for
 from tests.unit.knowledge.test_trusted_judgment import ScriptedRunner, world
 
@@ -37,7 +36,7 @@ pytestmark = [pytest.mark.asyncio, pytest.mark.common_db]
 
 
 @pytest_asyncio.fixture
-async def pool(common_db: CommonDatabase) -> AsyncIterator[asyncpg.Pool]:  # noqa: F811
+async def pool(common_db: CommonDatabase) -> AsyncIterator[asyncpg.Pool]:
     created = await common_db.pool(max_size=6)
     try:
         yield created
@@ -63,7 +62,7 @@ class BarrierStore(PostgresOutputContractStore):
 
 
 async def test_concurrent_billed_attempts_serialize_on_the_standing_wait(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     pool: asyncpg.Pool,
 ) -> None:
     w, subject = await world(

@@ -62,8 +62,7 @@ from mission_control.domain.policies.contracts import (
 from tests.acceptance.control_plane.test_wp_cp_040 import exact_fixture
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.fixtures.mission_control_local_agent_server import local_agent_server
-from tests.integration.postgres.runtime_common import common_db as common_db
-from tests.integration.postgres.runtime_common import scoped_command, scoped_request
+from tests.support.db_builders import scoped_command, scoped_request
 from tests.support.run_control import service as run_control_service
 from tests.unit.operations.test_async_child_check_time_admission import _sealed_contract
 from tests.unit.operations.test_async_child_parent_budget import spawn

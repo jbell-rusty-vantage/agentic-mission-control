@@ -46,7 +46,7 @@ from tests.fixtures.lane_turns import (
     scripted_frames,
 )
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.runtime_common import common_db, owner_rows  # noqa: F401
+from tests.support.db_builders import owner_rows
 
 pytestmark = pytest.mark.common_db
 
@@ -137,7 +137,7 @@ async def _readiness(db: CommonDatabase) -> list[asyncpg.Record]:
 
 @pytest.mark.asyncio
 async def test_the_operation_workflow_never_starts_an_unprepared_environment(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
 ) -> None:
     lane = ScriptedSessionLane(frames=scripted_frames())
     result, history = await _run(common_db, lane, "mo16-unprepared")
@@ -152,7 +152,7 @@ async def test_the_operation_workflow_never_starts_an_unprepared_environment(
 
 @pytest.mark.asyncio
 async def test_the_operation_workflow_runs_a_prepared_environment(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
 ) -> None:
     lane = PreparingLane(frames=scripted_frames())
     result, _history = await _run(common_db, lane, "mo16-prepared")

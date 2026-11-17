@@ -41,7 +41,6 @@ from mission_control.domain.knowledge.judgment import cited_decisions
 from tests.fixtures.checkpoint_recovery import recovery_harness, stage_recovery_unit
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.fixtures.saved_settlement import DurableEffectDouble
-from tests.integration.postgres.runtime_common import common_db  # noqa: F401
 from tests.integration.postgres.test_trusted_judgment_postgres import access_for
 from tests.integration.temporal.test_wi04_saved_settlement_restart import (
     _environment,
@@ -61,7 +60,7 @@ pytestmark = [pytest.mark.asyncio, pytest.mark.common_db]
 
 
 @pytest_asyncio.fixture
-async def pool(common_db: CommonDatabase) -> AsyncIterator[asyncpg.Pool]:  # noqa: F811
+async def pool(common_db: CommonDatabase) -> AsyncIterator[asyncpg.Pool]:
     await common_db.add_tenants(["tenant-1"])
     created = await common_db.pool()
     try:
@@ -109,7 +108,7 @@ class TrustedReviewSettler:
 
 
 async def test_trusted_review_wait_survives_a_worker_restart_and_resolves_the_exact_successor(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     pool: asyncpg.Pool,
 ) -> None:
     w, subject = await world(

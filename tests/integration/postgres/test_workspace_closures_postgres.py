@@ -23,9 +23,7 @@ from mission_control.adapters.postgres.workspace_closures import (
 from mission_control.domain.graph_runtime.identities import QualifiedCheckpointKey
 from mission_control.domain.resolution.profiles import WorkspaceClosureProfile
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.catalog_common import catalog_db as catalog_db
-from tests.integration.postgres.catalog_common import insert_fixture_run
-from tests.integration.postgres.catalog_common import runtime_pool as runtime_pool
+from tests.support.db_builders import insert_fixture_run
 from tests.unit.deep_agents.test_workspace_closure import _workspace
 
 pytestmark = pytest.mark.common_db
@@ -34,7 +32,7 @@ UNIT = "bl-unit-v1:" + "f" * 64
 
 @pytest.mark.asyncio
 async def test_closures_record_once_and_read_back_under_scope(
-    catalog_db: CommonDatabase, runtime_pool: asyncpg.Pool, tmp_path
+    catalog_db: CommonDatabase, catalog_runtime_pool: asyncpg.Pool, tmp_path
 ) -> None:
     scope = catalog_db.scope("tenant-a")
     run_key = "run-closure-postgres"
@@ -64,7 +62,7 @@ async def test_closures_record_once_and_read_back_under_scope(
     assert captured is not None
     closure = captured.closure
     payloads = FilesystemArtifactPayloadStore(tmp_path)
-    store = PostgresWorkspaceClosures(runtime_pool, payloads)
+    store = PostgresWorkspaceClosures(catalog_runtime_pool, payloads)
     await asyncio.gather(
         *(
             store.put(closure, captured.bodies, request_scope=scope, retain_until=None)

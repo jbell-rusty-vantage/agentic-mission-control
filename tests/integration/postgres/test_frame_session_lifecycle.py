@@ -12,9 +12,7 @@ from mission_control.application.frames.writer import FrameWriter
 from mission_control.domain.frames.contracts import FrameKind, LaneProfile
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.fixtures.provider_frames import FRAME_NOW, StepClock, observation
-from tests.integration.postgres.frames_common import admit_unit_attempt
-from tests.integration.postgres.runtime_common import common_db as common_db
-from tests.integration.postgres.runtime_common import owner_rows
+from tests.support.db_builders import admit_unit_attempt, owner_rows
 
 pytestmark = pytest.mark.common_db
 

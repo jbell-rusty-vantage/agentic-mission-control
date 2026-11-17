@@ -23,8 +23,6 @@ from mission_control.domain.execution.contracts import ArtifactPromotionState
 from mission_control.domain.execution.errors import WorkspaceSlotConflict
 from mission_control.domain.policies.errors import IdempotencyConflict
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.catalog_common import catalog_db as catalog_db
-from tests.integration.postgres.catalog_common import runtime_pool as runtime_pool
 from tests.integration.postgres.test_artifact_promotion_postgres_integration import (
     admitted_revision,
 )
@@ -35,8 +33,8 @@ pytestmark = pytest.mark.common_db
 
 
 @pytest_asyncio.fixture
-async def scoped_pool(runtime_pool: asyncpg.Pool) -> asyncpg.Pool:
-    return runtime_pool
+async def scoped_pool(catalog_runtime_pool: asyncpg.Pool) -> asyncpg.Pool:
+    return catalog_runtime_pool
 
 
 def materializer(

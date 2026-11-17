@@ -44,9 +44,6 @@ from mission_control.domain.policies.contracts import (
 from mission_control.domain.subscriptions.contracts import SubscriptionRequest, verify_signature
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.fixtures.provider_frames import StepClock
-from tests.integration.postgres.frames_common import AdmittedUnit, admit_unit_attempt
-from tests.integration.postgres.runtime_common import common_db as common_db
-from tests.integration.postgres.runtime_common import owner_rows, scoped_command
 from tests.integration.postgres.test_frame_facts_postgres import projector_actor
 from tests.integration.postgres.test_subscriptions import (
     READER,
@@ -55,6 +52,7 @@ from tests.integration.postgres.test_subscriptions import (
     Clock,
     Receiver,
 )
+from tests.support.db_builders import AdmittedUnit, admit_unit_attempt, owner_rows, scoped_command
 from tests.support.run_control import EMPTY_EVIDENCE_DIGEST, NOW, WORKFLOW_DIGEST
 from tests.unit.frames.test_provider_lanes import claude_observations, codex_app_observations
 

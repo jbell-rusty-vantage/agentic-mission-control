@@ -44,7 +44,6 @@ from tests.integration.cursor.test_mp09_cloud_segment_loop_real_services import 
     _run,
     pg_cloud_unit,
 )
-from tests.integration.postgres.runtime_common import common_db  # noqa: F401
 
 APPLICATION = "biotech"
 ENV_VARS_CLOUD = {"env_vars_ref": "environment:MC_LAUNCH", "client_agent_id": False}
@@ -117,7 +116,7 @@ class ThreadedIngress:
 
 @pytest.mark.common_db
 async def test_cursor_cloud_hook_pack_signals_arrive_ordered_without_gaps(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     tmp_path: Path,
 ) -> None:
     client = await _client()

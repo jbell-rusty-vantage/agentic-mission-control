@@ -61,7 +61,6 @@ from tests.fixtures.checkpoint_recovery import (
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.fixtures.saved_settlement import DurableEffectDouble
 from tests.fixtures.temporal_history import patch_ids
-from tests.integration.postgres.runtime_common import common_db  # noqa: F401
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.common_db]
 WORKFLOW_QUEUE = "wi04-operation-workflows"
@@ -70,7 +69,7 @@ TIMEOUT_SECONDS = 60
 
 
 @pytest_asyncio.fixture
-async def pool(common_db: CommonDatabase) -> AsyncIterator[asyncpg.Pool]:  # noqa: F811
+async def pool(common_db: CommonDatabase) -> AsyncIterator[asyncpg.Pool]:
     await common_db.add_tenants(["tenant-1"])
     created = await common_db.pool()
     try:
@@ -157,7 +156,7 @@ class _Stack:
 
 
 async def _stack(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     pool: asyncpg.Pool,
     environment: WorkflowEnvironment,
     double: DurableEffectDouble,
@@ -200,7 +199,7 @@ def _one_logical_result(stack: _Stack, double: DurableEffectDouble) -> None:
 
 
 async def test_worker_lost_in_the_settlement_pass_settles_on_a_fresh_worker(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     pool: asyncpg.Pool,
 ) -> None:
     double = DurableEffectDouble(acknowledge_on_write=True)
@@ -239,7 +238,7 @@ async def test_worker_lost_in_the_settlement_pass_settles_on_a_fresh_worker(
 
 
 async def test_review_wait_survives_a_worker_restart_and_settles_after_the_verdict(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     pool: asyncpg.Pool,
 ) -> None:
     double = DurableEffectDouble(review_required=True, acknowledge_on_write=True)
@@ -270,7 +269,7 @@ async def test_review_wait_survives_a_worker_restart_and_settles_after_the_verdi
 
 
 async def test_effect_wait_settles_once_when_the_receipt_arrives_late(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     pool: asyncpg.Pool,
 ) -> None:
     double = DurableEffectDouble()
@@ -299,7 +298,7 @@ async def test_effect_wait_settles_once_when_the_receipt_arrives_late(
 
 
 async def test_cancel_during_the_review_wait_settles_the_saved_result_cancelled(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     pool: asyncpg.Pool,
 ) -> None:
     double = DurableEffectDouble(review_required=True, acknowledge_on_write=True)
@@ -328,7 +327,7 @@ async def test_cancel_during_the_review_wait_settles_the_saved_result_cancelled(
 
 
 async def test_a_long_review_wait_continues_as_new_with_its_wait_and_bounded_history(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     pool: asyncpg.Pool,
 ) -> None:
     """Review 4: after `settlement_waits_per_run` waits the workflow continues as new carrying

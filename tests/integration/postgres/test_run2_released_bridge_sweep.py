@@ -11,14 +11,13 @@ from mission_control.adapters.cursor.bridge_recovery import (
 from mission_control.adapters.postgres.lanes.workspace_leases import PostgresWorkspaceLeaseStore
 from mission_control.application.workspaces.policy import slot_path
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.runtime_common import common_db  # noqa: F401
 from tests.unit.workspaces.lease_scenarios import NOW, claim
 
 pytestmark = pytest.mark.common_db
 
 
 async def test_released_sweep_is_scoped_and_acquisition_waits_for_endpoint_shutdown(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     tmp_path: Path,
 ):
     pool = await common_db.pool("mission_control_runtime", min_size=3, max_size=3)
@@ -114,7 +113,7 @@ async def test_released_sweep_is_scoped_and_acquisition_waits_for_endpoint_shutd
 
 
 async def test_confirmed_receipts_advance_limit_one_to_older_released_holders(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     tmp_path: Path,
 ):
     pool = await common_db.pool("mission_control_runtime")

@@ -55,12 +55,7 @@ from tests.fixtures.run_forks import (
     stage_policy,
     technical_snapshot,
 )
-from tests.integration.postgres.runtime_common import common_db as common_db
-from tests.integration.postgres.runtime_common import (
-    owner_rows,
-    scoped_command,
-    scoped_request,
-)
+from tests.support.db_builders import owner_rows, scoped_command, scoped_request
 from tests.support.run_control import NOW, WORKFLOW_DIGEST
 from tests.support.run_control import service as run_control_service
 

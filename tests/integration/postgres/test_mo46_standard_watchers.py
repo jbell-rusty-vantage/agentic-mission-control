@@ -15,10 +15,9 @@ from mission_control.domain.frames.contracts import FrameKind, FrameObservation
 from mission_control.domain.policies.contracts import CommandStatus, SetWaitAction
 from mission_control.domain.programs.watchers import compile_watcher, wait_condition_id
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.frames_common import admit_unit_attempt
-from tests.integration.postgres.runtime_common import common_db, scoped_command  # noqa: F401
 from tests.integration.postgres.test_mo44_watchers_postgres import FixedProgram
 from tests.integration.postgres.test_mp15_coordinator_inbox_postgres import mission_service
+from tests.support.db_builders import admit_unit_attempt, scoped_command
 from tests.unit.run_control.test_boundary_commands import declared_wait
 from tests.unit.watchers.test_standard_library import DATA, LIBRARY
 
@@ -27,7 +26,7 @@ pytestmark = pytest.mark.common_db
 
 @pytest.mark.parametrize("entry", LIBRARY.definitions(), ids=lambda entry: entry.logical_id)
 async def test_standard_template_records_real_admitted_actions_once(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     entry,
 ) -> None:
     pool = await common_db.pool()

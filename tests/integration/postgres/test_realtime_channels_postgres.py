@@ -34,8 +34,6 @@ from mission_control.domain.policies.contracts import CommandStatus, StartAction
 from mission_control.interfaces.socketio.server import MissionSocketLimits
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.fixtures.provider_frames import StepClock, turn_observations
-from tests.integration.postgres.runtime_common import common_db as common_db
-from tests.integration.postgres.runtime_common import owner_rows, scoped_command, scoped_request
 from tests.integration.postgres.test_mission_socket_postgres import auth, stack, subscribe
 from tests.integration.postgres.test_realtime_acceptance_postgres import (
     RealtimeClient,
@@ -44,6 +42,7 @@ from tests.integration.postgres.test_realtime_acceptance_postgres import (
     mission_of,
     release_link,
 )
+from tests.support.db_builders import owner_rows, scoped_command, scoped_request
 
 pytestmark = pytest.mark.common_db
 

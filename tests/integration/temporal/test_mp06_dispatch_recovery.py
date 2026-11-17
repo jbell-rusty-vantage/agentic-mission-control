@@ -70,8 +70,7 @@ from tests.fixtures.lane_turns import (
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.fixtures.mp06_lanes import CapacityLimitedLane, ReconcilingLossyLane
 from tests.fixtures.temporal_history import patch_ids
-from tests.integration.postgres.mp06_common import pg_lane_unit
-from tests.integration.postgres.runtime_common import common_db  # noqa: F401
+from tests.support.db_builders import pg_lane_unit
 
 ADDRESS = os.environ.get("MC_TEMPORAL_TEST_ADDRESS", "127.0.0.1:7233")
 NAMESPACE = os.environ.get("MC_TEMPORAL_TEST_NAMESPACE", "default")
@@ -166,7 +165,7 @@ def _attempts(history: Any) -> list[int]:
 
 @pytest.mark.common_db
 async def test_a_worker_lost_after_the_native_send_never_duplicates_the_turn(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
 ) -> None:
     client = await _client()
     lane_queue, workflow_queue = f"mp06-lane-{uuid4().hex[:8]}", f"mp06-wf-{uuid4().hex[:8]}"

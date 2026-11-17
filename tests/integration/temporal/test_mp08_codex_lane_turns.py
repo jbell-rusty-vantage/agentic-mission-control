@@ -69,8 +69,7 @@ from tests.fixtures.environment_kits import (
 from tests.fixtures.lane_turns import lane_stack
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.fixtures.temporal_history import completed_activity_results
-from tests.integration.postgres.frames_common import admit_unit_attempt
-from tests.integration.postgres.runtime_common import common_db  # noqa: F401
+from tests.support.db_builders import admit_unit_attempt
 from tests.unit.codex.fixture_app_server import FixtureLauncher, load_script
 from tests.unit.codex.support import (
     CodexStack,
@@ -250,7 +249,7 @@ def _service(
 
 @pytest.mark.common_db
 async def test_a_codex_turn_settles_through_lane_turn_segments_on_real_services(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     tmp_path: Path,
 ) -> None:
     client = await _client()
@@ -300,7 +299,7 @@ async def test_a_codex_turn_settles_through_lane_turn_segments_on_real_services(
 
 @pytest.mark.common_db
 async def test_an_app_server_that_dies_mid_turn_is_reattached_by_the_next_segment(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     tmp_path: Path,
 ) -> None:
     client = await _client()
@@ -358,7 +357,7 @@ async def test_an_app_server_that_dies_mid_turn_is_reattached_by_the_next_segmen
 
 @pytest.mark.common_db
 async def test_bounded_segments_cross_an_activity_boundary_and_complete(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     tmp_path: Path,
 ) -> None:
     client = await _client()
@@ -397,7 +396,7 @@ async def test_bounded_segments_cross_an_activity_boundary_and_complete(
 @pytest.mark.common_db
 @pytest.mark.skipif(BASH is None, reason="the mission layer runs under bash")
 async def test_a_pinned_environment_kit_is_prepared_before_the_codex_turn(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     tmp_path: Path,
 ) -> None:
     mission_layer = _RecordingMissionLayer(kit_document())
@@ -437,7 +436,7 @@ async def test_a_pinned_environment_kit_is_prepared_before_the_codex_turn(
 @pytest.mark.common_db
 @pytest.mark.skipif(BASH is None, reason="the mission layer runs under bash")
 async def test_a_kit_that_is_not_prepared_refuses_the_codex_turn(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     tmp_path: Path,
 ) -> None:
     mission_layer = _RecordingMissionLayer(

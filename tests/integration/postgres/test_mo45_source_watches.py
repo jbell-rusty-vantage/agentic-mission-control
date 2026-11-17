@@ -20,14 +20,13 @@ from mission_control.application.watchers.ports import WatcherCursor
 from mission_control.application.watchers.service import WatcherEvaluationService
 from mission_control.bootstrap.watch_sources import RegisteredWatchSources, SourceWatchRegistration
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.frames_common import admit_unit_attempt
-from tests.integration.postgres.runtime_common import common_db  # noqa: F401
 from tests.integration.postgres.test_mo44_watchers_postgres import (
     FixedProgram,
     eventually,
     local_temporal,
 )
 from tests.integration.postgres.test_mp15_coordinator_inbox_postgres import mission_service
+from tests.support.db_builders import admit_unit_attempt
 from tests.unit.watchers.fakes import T0
 from tests.unit.watchers.test_watcher_planner import plan, watcher
 
@@ -35,7 +34,7 @@ pytestmark = pytest.mark.common_db
 
 
 async def test_registered_worker_source_persists_deduplicates_and_drives_watcher(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     tmp_path: Path,
 ) -> None:
     pool = await common_db.pool()
@@ -85,7 +84,7 @@ async def test_registered_worker_source_persists_deduplicates_and_drives_watcher
 
 
 async def test_existing_temporal_evaluator_samples_registered_source_and_records_once(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     tmp_path: Path,
 ) -> None:
     pool = await common_db.pool()

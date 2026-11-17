@@ -114,11 +114,10 @@ from tests.fixtures.lane_turns import (
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.fixtures.mp12_lanes import SOURCE_SESSION, ContinuingLane, Crashes, FakeHydrator
 from tests.fixtures.temporal_history import patch_ids
-from tests.integration.postgres.frames_common import admit_unit_attempt
-from tests.integration.postgres.runtime_common import common_db  # noqa: F401
 from tests.integration.postgres.test_continuation_postgres import continuation_actor
 from tests.integration.temporal.test_wp_bp_020_temporal import FakeGoalDirectedActivities
 from tests.integration.temporal.test_wp_bp_020_temporal import _run_input as goal_input
+from tests.support.db_builders import admit_unit_attempt
 
 pytestmark = pytest.mark.common_db
 
@@ -325,7 +324,7 @@ DRILLS = (
 
 @pytest.mark.parametrize("crash_at", DRILLS, ids=("drill-a", "drill-b"))
 async def test_a_worker_lost_after_each_phase_activates_exactly_one_target(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     crash_at: frozenset[ContinuationPhase],
 ) -> None:
     client = await _client()
@@ -499,7 +498,7 @@ class ContinuedExecutorGoal(FakeGoalDirectedActivities):
 
 
 async def test_a_continued_executor_and_a_rollover_leave_the_goal_counters_intact(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
 ) -> None:
     from mission_control.application.execution.harness.state import InMemoryLaneExecutionStateStore
     from mission_control.application.frames.sink import InMemoryFrameStore

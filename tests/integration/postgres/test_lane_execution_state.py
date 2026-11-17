@@ -28,14 +28,13 @@ from mission_control.application.frames.kinds import classify, cursor_local_key
 from mission_control.application.frames.writer import FrameWriter
 from mission_control.domain.frames.contracts import FrameObservation, LaneProfile
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.frames_common import admit_unit_attempt
-from tests.integration.postgres.runtime_common import common_db  # noqa: F401
+from tests.support.db_builders import admit_unit_attempt
 
 pytestmark = pytest.mark.common_db
 
 
 async def test_owned_cursor_write_rechecks_owner_under_same_row_lock_after_takeover(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
 ) -> None:
     pool = await common_db.pool("mission_control_runtime")
     try:
@@ -74,7 +73,7 @@ async def test_owned_cursor_write_rechecks_owner_under_same_row_lock_after_takeo
 
 
 async def test_lane_state_is_written_once_and_advanced_per_segment(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
 ) -> None:
     pool = await common_db.pool("mission_control_runtime")
     try:
@@ -135,7 +134,7 @@ async def test_lane_state_is_written_once_and_advanced_per_segment(
 
 
 async def test_the_readonly_role_cannot_write_lane_state(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
 ) -> None:
     owner = await asyncpg.connect(common_db.owner_dsn)
     try:

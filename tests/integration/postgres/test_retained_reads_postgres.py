@@ -22,11 +22,7 @@ from mission_control.application.knowledge.access import InvocationAccess
 from mission_control.contracts.knowledge_protocol import canonical_json, digest_canonical
 from tests.fixtures.knowledge_binding import BINDING, read_intent_answer
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.runtime_common import (  # noqa: F401
-    common_db,
-    owner_rows,
-    runtime_pool,
-)
+from tests.support.db_builders import owner_rows
 from tests.unit.knowledge.test_gateway import harness, origin
 from tests.unit.knowledge.test_read_intent import GOVERNORS, request
 
@@ -34,7 +30,7 @@ pytestmark = [pytest.mark.asyncio, pytest.mark.common_db]
 
 
 @pytest_asyncio.fixture
-async def store(runtime_pool: asyncpg.Pool) -> AsyncIterator[PostgresRetainedReadStore]:  # noqa: F811
+async def store(runtime_pool: asyncpg.Pool) -> AsyncIterator[PostgresRetainedReadStore]:
     yield PostgresRetainedReadStore(runtime_pool)
 
 
@@ -52,7 +48,7 @@ def access_in(db: CommonDatabase, h: object, tenant: str = "tenant-1") -> Invoca
 
 
 async def test_a_read_intent_records_one_observation_per_operation(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     store: PostgresRetainedReadStore,
 ) -> None:
     h = harness()
@@ -117,8 +113,8 @@ async def test_a_read_intent_records_one_observation_per_operation(
 
 
 async def test_rows_are_immutable_and_readable_rows_need_their_digest(
-    common_db: CommonDatabase,  # noqa: F811
-    runtime_pool: asyncpg.Pool,  # noqa: F811
+    common_db: CommonDatabase,
+    runtime_pool: asyncpg.Pool,
     store: PostgresRetainedReadStore,
 ) -> None:
     h = harness()

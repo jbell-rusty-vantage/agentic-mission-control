@@ -70,8 +70,7 @@ from tests.fixtures.managed_lane import (
     managed_stack,
 )
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.frames_common import admit_unit_attempt
-from tests.integration.postgres.runtime_common import common_db  # noqa: F401
+from tests.support.db_builders import admit_unit_attempt
 
 ADDRESS = os.environ.get("MC_TEMPORAL_TEST_ADDRESS", "127.0.0.1:7233")
 NAMESPACE = os.environ.get("MC_TEMPORAL_TEST_NAMESPACE", "default")
@@ -214,7 +213,7 @@ async def _frames_stored_at_least(unit: PgManagedUnit, count: int) -> int:
 
 @pytest.mark.common_db
 async def test_a_worker_killed_mid_turn_is_reattached_by_another_without_duplicate_frames(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     tmp_path: Path,
 ) -> None:
     client = await _client()

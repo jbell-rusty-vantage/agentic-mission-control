@@ -25,10 +25,7 @@ from mission_control_db_contract.storage import storage_available, verify_capabi
 from tests.fixtures.capability_search_catalog import SEEDS
 from tests.fixtures.environment_kits import kit_document, kit_files
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.catalog_common import BIOTECH_CATALOG
-from tests.integration.postgres.catalog_common import catalog_db as catalog_db
-from tests.integration.postgres.catalog_common import catalog_writer_pool as catalog_writer_pool
-from tests.integration.postgres.catalog_common import runtime_pool as runtime_pool
+from tests.support.db_builders import BIOTECH_CATALOG
 
 pytestmark = pytest.mark.common_db
 
@@ -83,7 +80,7 @@ async def _apply_records(database: CommonDatabase, bundle: dict) -> dict[str, in
 
 @pytest.mark.asyncio
 async def test_bundle_registration_is_proposed_idempotent_and_admittable(
-    runtime_pool: asyncpg.Pool, catalog_writer_pool: asyncpg.Pool
+    catalog_runtime_pool: asyncpg.Pool, catalog_writer_pool: asyncpg.Pool
 ) -> None:
     manifest = build_bundle_manifest(
         FILES,
@@ -99,7 +96,7 @@ async def test_bundle_registration_is_proposed_idempotent_and_admittable(
     assert pin.startswith("skill.agent-browser@0.38.2#sha256:")
     assert await registry.find(manifest) == pin
     assert await registry.register_proposed(manifest, definition, "operator:ft-a2") == pin
-    reader = PostgresDefinitionRepository(runtime_pool, catalog_scope=BIOTECH_CATALOG)
+    reader = PostgresDefinitionRepository(catalog_runtime_pool, catalog_scope=BIOTECH_CATALOG)
     assert await reader.list_published_definitions() == ()  # proposed rows are invisible
     async with catalog_writer_pool.acquire() as connection, connection.transaction():
         await apply_catalog_scope_string(connection, BIOTECH_CATALOG)

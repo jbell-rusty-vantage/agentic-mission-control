@@ -14,14 +14,13 @@ from mission_control.bootstrap.settings import Settings
 from mission_control.domain.capabilities.host_support import LaneProfile
 from mission_control.domain.prerequisites import VerificationMethod
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.runtime_common import common_db  # noqa: F401
 from tests.unit.prerequisites.test_hosted_readonly import readonly_binding, readonly_template
 
 pytestmark = pytest.mark.common_db
 
 
 async def test_exact_readonly_source_proof_persists_and_config_change_refuses(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     tmp_path,
 ):
     pool = await common_db.pool("mission_control_runtime")

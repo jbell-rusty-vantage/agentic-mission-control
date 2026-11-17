@@ -12,7 +12,6 @@ from mission_control.adapters.postgres.run_control.run_control_repository import
 from mission_control.contracts.identities import uuid7
 from mission_control.domain.authoring.canonical import sha256_digest
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.runtime_common import common_db as common_db
 from tests.support.run_control import request, service
 from tests.unit.mission_control.test_completion_evidence import receipt_row
 

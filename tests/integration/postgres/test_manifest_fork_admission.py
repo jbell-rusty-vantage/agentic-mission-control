@@ -18,7 +18,6 @@ from mission_control.application.recovery.run_forks import ForkCommand, compile_
 from mission_control.domain.policies.contracts import DecisionStatus
 from mission_control.domain.policies.forks import RunSnapshotManifest, snapshot_id_for
 from tests.fixtures.run_forks import technical_snapshot
-from tests.integration.postgres.runtime_common import common_db as common_db
 from tests.integration.postgres.test_manifest_submit import (
     MINIMAL,
     OWNER,

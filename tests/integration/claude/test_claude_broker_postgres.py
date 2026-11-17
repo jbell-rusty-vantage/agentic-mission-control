@@ -39,7 +39,6 @@ from mission_control.application.human_tasks.service import HumanTaskService
 from mission_control.domain.execution.contracts import OperationWorkflowResult
 from mission_control.domain.policies.contracts import ActorContext
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.runtime_common import common_db  # noqa: F401
 from tests.integration.temporal.test_mp07_claude_lane_turns import (
     WORKER,
     claude_unit,
@@ -95,7 +94,7 @@ async def _open_task(
 
 
 async def test_a_permission_request_waits_on_a_postgres_approval_task_and_the_reviewer_allows(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     tmp_path: Path,
 ) -> None:
     await _released(common_db)
@@ -176,7 +175,7 @@ async def test_a_permission_request_waits_on_a_postgres_approval_task_and_the_re
 
 
 async def test_an_unanswered_request_expires_its_correlation_and_the_task_stays_pending(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     tmp_path: Path,
 ) -> None:
     await _released(common_db)

@@ -54,10 +54,7 @@ from mission_control.domain.policies.contracts import (
 from mission_control.interfaces.socketio.server import MissionSocketLimits
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.fixtures.provider_frames import StepClock
-from tests.integration.postgres.frames_common import admit_unit_attempt
 from tests.integration.postgres.realtime_process_app import SPEC_ENV, build
-from tests.integration.postgres.runtime_common import common_db as common_db
-from tests.integration.postgres.runtime_common import owner_rows, scoped_command, scoped_request
 from tests.integration.postgres.test_mission_socket_postgres import (
     DSN_ENV,
     FAST,
@@ -70,6 +67,7 @@ from tests.integration.postgres.test_mission_socket_postgres import (
     subscribe,
 )
 from tests.integration.postgres.test_provider_lineage_postgres import identity_rows, tokens
+from tests.support.db_builders import admit_unit_attempt, owner_rows, scoped_command, scoped_request
 from tests.unit.frames.test_provider_lanes import claude_observations, codex_app_observations
 from tests.unit.run_control.test_boundary_commands import TARGET, delivered
 from tests.unit.socketio.harness import MissionClient, serve

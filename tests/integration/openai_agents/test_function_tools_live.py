@@ -24,8 +24,7 @@ from tests.integration.anthropic_managed.test_managed_segment_loop_real_services
     _workflow_worker,
 )
 from tests.integration.anthropic_managed.test_session_lifecycle_live import _request
-from tests.integration.postgres.frames_common import admit_unit_attempt
-from tests.integration.postgres.runtime_common import common_db  # noqa: F401
+from tests.support.db_builders import admit_unit_attempt
 from tests.unit.approvals.fixtures import answer
 
 from mission_control.adapters.deep_agents.harness import DeepAgentsHarness
@@ -221,7 +220,7 @@ def drill_pack(tmp_path: Path, stamp: str):
 
 @pytest.mark.common_db
 async def test_live_function_review_survives_worker_restart(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     tmp_path: Path,
 ):
     allowance = Decimal(os.environ["MC_PAID_BUDGET_USD"])

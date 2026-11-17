@@ -9,14 +9,14 @@ from mission_control.adapters.postgres.prerequisites import PostgresOwnerPrerequ
 from mission_control.application.prerequisites.preflight import PrerequisitePreflight
 from mission_control.application.prerequisites.service import OwnerPrerequisiteService
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.test_owner_prerequisites import common_db, pool  # noqa: F401
+from tests.integration.postgres.test_owner_prerequisites import pool  # noqa: F401
 from tests.unit.prerequisites.test_preflight import definition
 
 pytestmark = pytest.mark.common_db
 
 
 async def test_preflight_persists_owner_steps_and_refuses_expired_evidence(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     pool: asyncpg.Pool,  # noqa: F811
 ) -> None:
     repository = PostgresOwnerPrerequisiteRepository(pool)

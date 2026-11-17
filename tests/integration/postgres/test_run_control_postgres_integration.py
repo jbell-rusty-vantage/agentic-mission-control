@@ -31,14 +31,13 @@ from tests.fixtures.mission_control_common_db import (
     drop_common_database,
     legacy_poison_intact,
 )
-from tests.integration.postgres.runtime_common import (
+from tests.support.db_builders import (
     assert_admission_lineage,
     owner_rows,
     scoped_command,
     scoped_count,
     scoped_request,
 )
-from tests.integration.postgres.runtime_common import common_db as common_db
 from tests.support.run_control import service
 
 pytestmark = pytest.mark.common_db

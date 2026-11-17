@@ -32,12 +32,7 @@ from mission_control.domain.coordinator.launch import (
 )
 from mission_control.domain.policies.contracts import CancelAction, RunOutcome, RunPhase
 from tests.fixtures.mission_control_common_db import CommonDatabase, catalog_scope
-from tests.integration.postgres.runtime_common import common_db as common_db
-from tests.integration.postgres.runtime_common import (
-    owner_rows,
-    scoped_command,
-    scoped_request,
-)
+from tests.support.db_builders import owner_rows, scoped_command, scoped_request
 from tests.support.run_control import service
 
 NOW = datetime(2026, 7, 26, 19, 0, tzinfo=UTC)

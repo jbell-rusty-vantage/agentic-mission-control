@@ -54,14 +54,7 @@ from mission_control_db_contract.seeds import load_bundles, order_bundles
 from tests.fixtures.capability_search_catalog import DIMENSIONS, MODEL_ID
 from tests.fixtures.environment_kits import BASH, setup_environ
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.catalog_common import (
-    BIOTECH_CATALOG,
-    SEEDS,
-    apply_seed_bundle,
-)
-from tests.integration.postgres.catalog_common import catalog_db as catalog_db
-from tests.integration.postgres.catalog_common import catalog_writer_pool as catalog_writer_pool
-from tests.integration.postgres.catalog_common import runtime_pool as runtime_pool
+from tests.support.db_builders import BIOTECH_CATALOG, SEEDS, apply_seed_bundle
 
 pytestmark = pytest.mark.common_db
 
@@ -117,19 +110,19 @@ async def _project(writer_pool: asyncpg.Pool, reader: PostgresDefinitionReposito
 @pytest.mark.asyncio
 async def test_seeded_kits_are_searchable_resolve_by_pin_and_prepare_a_worktree(
     catalog_db: CommonDatabase,
-    runtime_pool: asyncpg.Pool,
+    catalog_runtime_pool: asyncpg.Pool,
     catalog_writer_pool: asyncpg.Pool,
     tmp_path: Path,
 ) -> None:
     await _seed(catalog_db)
-    repository = PostgresDefinitionRepository(runtime_pool, catalog_scope=BIOTECH_CATALOG)
+    repository = PostgresDefinitionRepository(catalog_runtime_pool, catalog_scope=BIOTECH_CATALOG)
     kits = {
         item.ref.logical_id: item
         for item in await repository.list_published_definitions()
         if item.ref.kind == DefinitionKind.ENVIRONMENT_KIT
     }
     assert set(kits) == STARTER_KITS
-    async with runtime_pool.acquire() as connection, connection.transaction():
+    async with catalog_runtime_pool.acquire() as connection, connection.transaction():
         await apply_catalog_scope_string(connection, BIOTECH_CATALOG)
         categories = await connection.fetch(
             "SELECT DISTINCT kind FROM mission_control.asset_version "
@@ -139,7 +132,7 @@ async def test_seeded_kits_are_searchable_resolve_by_pin_and_prepare_a_worktree(
 
     # Searchable in the catalog, filtered by kind and by the lane profiles a kit supports.
     await _project(catalog_writer_pool, repository)
-    reader = PostgresCatalogSearchRepository(runtime_pool, catalog_scope=BIOTECH_CATALOG)
+    reader = PostgresCatalogSearchRepository(catalog_runtime_pool, catalog_scope=BIOTECH_CATALOG)
     search = CapabilitySearchService(search=reader, definitions=repository)
     tenant = catalog_db.scope("tenant-1")
     response = await search.search(

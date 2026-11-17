@@ -19,7 +19,6 @@ from mission_control.adapters.postgres.knowledge.output_fulfillment import (
 )
 from mission_control.domain.outputs.contracts import Enforcement, OutputForm
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.runtime_common import common_db  # noqa: F401
 from tests.integration.postgres.test_output_contracts_postgres import access_for
 from tests.unit.outputs.scenario import Stack, build_stack, codes, fulfillment, obligation, text
 from tests.unit.outputs.test_w1_d28_d29 import PIN, bridge_judges, report_candidate, report_promise
@@ -28,7 +27,7 @@ pytestmark = [pytest.mark.asyncio, pytest.mark.common_db]
 
 
 async def test_review_approved_report_is_fulfilled_then_revoked_on_postgres(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
 ) -> None:
     pool = await common_db.pool()
     try:

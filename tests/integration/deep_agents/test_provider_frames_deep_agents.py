@@ -32,8 +32,7 @@ from tests.fixtures.mission_control_common_db import (
     canonical_scope,
     provision_runtime,
 )
-from tests.integration.postgres.runtime_common import common_db as common_db
-from tests.integration.postgres.runtime_common import owner_rows
+from tests.support.db_builders import owner_rows
 from tests.support.run_control import ALL_PERMISSIONS, actor, command
 from tests.support.run_control import request as run_request
 from tests.support.run_control import service as run_control_service

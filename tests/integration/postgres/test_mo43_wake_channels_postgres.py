@@ -23,7 +23,6 @@ from mission_control.application.subscriptions.coordinator import NotificationKi
 from mission_control.application.subscriptions.coordinator_service import CoordinatorRejected
 from mission_control.application.subscriptions.launcher import subscribe_launcher
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.runtime_common import common_db  # noqa: F401
 from tests.integration.postgres.test_mp15_coordinator_inbox_postgres import (
     COORDINATOR,
     append_fixture_events,
@@ -35,7 +34,7 @@ pytestmark = pytest.mark.common_db
 
 
 async def test_launcher_inbox_wakes_a_waiting_coordinator_on_run_completed(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
 ) -> None:
     pool = await common_db.pool(max_size=6)
     try:

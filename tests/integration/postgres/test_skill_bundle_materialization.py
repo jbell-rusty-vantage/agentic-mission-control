@@ -40,21 +40,19 @@ from mission_control.domain.capabilities.bundles import CapabilityDrift
 from mission_control.domain.capabilities.catalog_entry import capability_pin
 from mission_control_db_contract.seeds import load_bundles, order_bundles
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.catalog_common import (
+from tests.support.db_builders import (
     BIOTECH_CATALOG,
     SEEDS,
     apply_seed_bundle,
     seeds_publish_module,
 )
-from tests.integration.postgres.catalog_common import catalog_db as catalog_db
-from tests.integration.postgres.catalog_common import runtime_pool as runtime_pool
 
 pytestmark = pytest.mark.common_db
 
 
 @pytest.mark.asyncio
 async def test_seeded_skill_mounts_read_only_and_tampering_is_refused(
-    catalog_db: CommonDatabase, runtime_pool: asyncpg.Pool, tmp_path: Path
+    catalog_db: CommonDatabase, catalog_runtime_pool: asyncpg.Pool, tmp_path: Path
 ) -> None:
     bundles = [
         bundle
@@ -67,7 +65,7 @@ async def test_seeded_skill_mounts_read_only_and_tampering_is_refused(
     replay = await apply_seed_bundle(catalog_db, skills)
     assert replay["created"] == 0 and replay["reused"] == len(skills["records"])
 
-    repository = PostgresDefinitionRepository(runtime_pool, catalog_scope=BIOTECH_CATALOG)
+    repository = PostgresDefinitionRepository(catalog_runtime_pool, catalog_scope=BIOTECH_CATALOG)
     published = {
         item.ref.logical_id: item for item in await repository.list_published_definitions()
     }
@@ -81,7 +79,7 @@ async def test_seeded_skill_mounts_read_only_and_tampering_is_refused(
     assert "skill.edgartools" not in published  # ai-engineer only
 
     # Plugin expansion rows pin each member's exact manifest digest.
-    async with runtime_pool.acquire() as connection, connection.transaction():
+    async with catalog_runtime_pool.acquire() as connection, connection.transaction():
         await apply_catalog_scope_string(connection, BIOTECH_CATALOG)
         members = await connection.fetch(
             "SELECT pm.position, pm.member_asset_id, pm.role, pm.optional, "

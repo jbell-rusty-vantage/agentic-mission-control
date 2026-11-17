@@ -23,10 +23,7 @@ from mission_control.domain.capabilities.host_support import (
     LaneProfile,
     all_profiles,
 )
-from tests.integration.postgres.catalog_common import BIOTECH_CATALOG
-from tests.integration.postgres.catalog_common import catalog_db as catalog_db
-from tests.integration.postgres.catalog_common import catalog_writer_pool as catalog_writer_pool
-from tests.integration.postgres.catalog_common import runtime_pool as runtime_pool
+from tests.support.db_builders import BIOTECH_CATALOG
 
 pytestmark = pytest.mark.common_db
 
@@ -260,8 +257,8 @@ async def test_host_support_columns_are_owner_immutable(catalog_db):
 
 
 @pytest.mark.asyncio
-async def test_published_hook_script_writes_kind_and_host_support(runtime_pool):
-    repository = PostgresDefinitionRepository(runtime_pool, catalog_scope=BIOTECH_CATALOG)
+async def test_published_hook_script_writes_kind_and_host_support(catalog_runtime_pool):
+    repository = PostgresDefinitionRepository(catalog_runtime_pool, catalog_scope=BIOTECH_CATALOG)
     hook = HookScriptDefinition.model_validate(
         {
             "logical_id": "hook.mc-policy-template",
@@ -283,7 +280,7 @@ async def test_published_hook_script_writes_kind_and_host_support(runtime_pool):
     summary = summarize(listed[0])
     assert summary.kind is DefinitionKind.HOOK_SCRIPT
     assert LaneProfile.CURSOR_CLOUD not in summary.supported_profiles
-    async with runtime_pool.acquire() as connection:
+    async with catalog_runtime_pool.acquire() as connection:
         async with connection.transaction():
             await apply_catalog_scope_string(connection, BIOTECH_CATALOG)
             row = await connection.fetchrow(

@@ -53,10 +53,8 @@ from tests.fixtures.cursor_environments import FakeEnvironmentsApi
 from tests.fixtures.isolated_settings import isolated_settings
 from tests.fixtures.lane_turns import ACTIVATION_UUID, RUN_UUID, RecordingSignals, lane_stack
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.catalog_common import BIOTECH_CATALOG, seeds_publish_module
-from tests.integration.postgres.catalog_common import catalog_db as catalog_db
-from tests.integration.postgres.catalog_common import runtime_pool as runtime_pool
 from tests.integration.postgres.test_environment_kits_postgres import _seed
+from tests.support.db_builders import BIOTECH_CATALOG, seeds_publish_module
 
 pytestmark = pytest.mark.common_db
 
@@ -65,7 +63,7 @@ SENTINEL = "mo13-sentinel-firecrawl-value"
 
 async def test_production_cursor_cloud_syncs_a_seeded_kit_once_and_reuses_it(
     catalog_db: CommonDatabase,
-    runtime_pool: asyncpg.Pool,
+    catalog_runtime_pool: asyncpg.Pool,
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -76,7 +74,7 @@ async def test_production_cursor_cloud_syncs_a_seeded_kit_once_and_reuses_it(
     kit = next(
         item
         for item in await PostgresDefinitionRepository(
-            runtime_pool, catalog_scope=BIOTECH_CATALOG
+            catalog_runtime_pool, catalog_scope=BIOTECH_CATALOG
         ).list_published_definitions()
         if item.ref.kind == DefinitionKind.ENVIRONMENT_KIT
         and item.ref.logical_id == "envkit.python-uv"
@@ -114,7 +112,7 @@ async def test_production_cursor_cloud_syncs_a_seeded_kit_once_and_reuses_it(
         secrets = await deployment_composition.compose_secret_broker(settings, resources)
         composed = deployment_composition.compose_cursor_cloud(
             settings,
-            runtime_pool,
+            catalog_runtime_pool,
             FilesystemArtifactPayloadStore(tmp_path / "payloads"),
             bundles=bundles,
             secrets=secrets,

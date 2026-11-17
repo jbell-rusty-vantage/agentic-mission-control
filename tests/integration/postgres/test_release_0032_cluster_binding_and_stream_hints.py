@@ -29,7 +29,6 @@ from mission_control.adapters.realtime.stream_hints_postgres import PostgresStre
 from mission_control.application.execution.run_launch import TemporalClusterIdentity
 from mission_control.application.streams.ports import StreamHint
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.runtime_common import common_db  # noqa: F401
 from tests.support.run_control import request, service
 
 pytestmark = pytest.mark.common_db
@@ -58,7 +57,7 @@ async def _admitted_run(pool: asyncpg.Pool, scope: str) -> tuple[Any, str]:
 
 
 async def test_run_cluster_binding_is_write_once_scoped_and_immutable(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
 ) -> None:
     pool = await common_db.pool(max_size=4)
     owner = await common_db.owner_pool(max_size=2)
@@ -94,7 +93,7 @@ async def test_run_cluster_binding_is_write_once_scoped_and_immutable(
 
 
 async def test_commits_notify_stream_hints_that_the_listener_delivers(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
 ) -> None:
     pool = await common_db.pool(max_size=4)
     delivered: list[StreamHint] = []

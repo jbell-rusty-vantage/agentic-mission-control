@@ -61,14 +61,14 @@ from tests.fixtures.knowledge_binding import (
     report_package,
 )
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.runtime_common import common_db, owner_rows  # noqa: F401
+from tests.support.db_builders import owner_rows
 from tests.unit.knowledge.test_gateway import AUDIENCE, BINDING, call, origin
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.common_db]
 
 
 @pytest_asyncio.fixture
-async def pool(common_db: CommonDatabase) -> AsyncIterator[asyncpg.Pool]:  # noqa: F811
+async def pool(common_db: CommonDatabase) -> AsyncIterator[asyncpg.Pool]:
     created = await common_db.pool()
     try:
         yield created
@@ -146,7 +146,7 @@ def report_item(tenant_id: str, report_id: str = "r-1"):
 
 
 async def test_concurrent_same_key_invocations_admit_one_row_and_one_effect(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     pool: asyncpg.Pool,
 ) -> None:
     _clock, _minter, client, journal, gateway = stack(pool)
@@ -194,7 +194,7 @@ async def test_concurrent_same_key_invocations_admit_one_row_and_one_effect(
 
 
 async def test_journal_and_submissions_are_tenant_isolated(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     pool: asyncpg.Pool,
 ) -> None:
     _clock, _minter, _client, journal, gateway = stack(pool)
@@ -218,7 +218,7 @@ async def test_journal_and_submissions_are_tenant_isolated(
 
 
 async def test_crash_after_dispatch_is_uncertain_until_recovery_settles_from_receipt(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     pool: asyncpg.Pool,
 ) -> None:
     clock, minter, client, _journal, gateway = stack(pool)
@@ -268,7 +268,7 @@ async def test_crash_after_dispatch_is_uncertain_until_recovery_settles_from_rec
 
 @pytest.mark.parametrize("code", ["INTERNAL", "UNRESOLVED_EFFECT"])
 async def test_a_refusal_after_the_native_commit_stays_uncertain_across_a_restart(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     pool: asyncpg.Pool,
     code: str,
 ) -> None:
@@ -300,7 +300,7 @@ async def test_a_refusal_after_the_native_commit_stays_uncertain_across_a_restar
 
 
 async def test_submission_key_is_idempotent_and_a_changed_selection_is_mce02(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     pool: asyncpg.Pool,
 ) -> None:
     service = SubmissionService(PostgresOutputSubmissionStore(pool))
@@ -348,7 +348,7 @@ async def test_submission_key_is_idempotent_and_a_changed_selection_is_mce02(
 
 
 async def test_stop_during_review_reaches_the_binding_after_a_restart(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     pool: asyncpg.Pool,
 ) -> None:
     _clock, _minter, client, _journal, gateway = stack(pool)
@@ -377,7 +377,7 @@ async def test_stop_during_review_reaches_the_binding_after_a_restart(
 
 
 async def test_final_submission_assessment_handoff_is_durable(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     pool: asyncpg.Pool,
 ) -> None:
     _clock, _minter, client, _journal, gateway = stack(pool)
@@ -415,7 +415,7 @@ async def test_final_submission_assessment_handoff_is_durable(
 
 
 async def test_one_sealed_plan_per_receiver_and_appended_attempt_receipts(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     pool: asyncpg.Pool,
 ) -> None:
     from tests.unit.context.test_transfer_materializer import (
@@ -525,7 +525,7 @@ async def test_one_sealed_plan_per_receiver_and_appended_attempt_receipts(
 
 
 async def test_content_lineage_persists_production_adoption_and_consumption(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     pool: asyncpg.Pool,
 ) -> None:
     from mission_control.adapters.postgres.knowledge.lineage import PostgresContentLineageStore
@@ -626,7 +626,7 @@ async def test_content_lineage_persists_production_adoption_and_consumption(
 
 
 async def test_a_host_grant_is_recorded_with_the_retry_dispatch_it_authorized(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     pool: asyncpg.Pool,
 ) -> None:
     """R2-MC D2 on the 1.6.0 journal: attempt 1 leaves the effect uncertain; the host's grant
@@ -674,7 +674,7 @@ async def test_a_host_grant_is_recorded_with_the_retry_dispatch_it_authorized(
 
 
 async def test_registration_reuse_is_atomic_under_concurrent_writers(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     pool: asyncpg.Pool,
 ) -> None:
     from mission_control.adapters.postgres.knowledge.lineage import PostgresContentLineageStore
@@ -729,7 +729,7 @@ async def test_registration_reuse_is_atomic_under_concurrent_writers(
 
 
 async def test_registration_subject_mismatch_rolls_back_without_weakening_strict_record(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     pool: asyncpg.Pool,
 ) -> None:
     from dataclasses import replace

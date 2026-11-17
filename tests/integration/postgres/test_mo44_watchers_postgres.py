@@ -68,11 +68,6 @@ from mission_control.domain.programs.watchers import (
 )
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.fixtures.provider_frames import observation
-from tests.integration.postgres.frames_common import admit_unit_attempt
-from tests.integration.postgres.runtime_common import (
-    common_db,  # noqa: F401
-    scoped_command,
-)
 from tests.integration.postgres.test_manifest_submit import (
     OWNER,
     Stack,
@@ -87,6 +82,7 @@ from tests.integration.postgres.test_mp15_coordinator_inbox_postgres import (
     owner_fetch,
     subscribe,
 )
+from tests.support.db_builders import admit_unit_attempt, scoped_command
 from tests.unit.run_control.test_boundary_commands import declared_wait, states
 from tests.unit.watchers.fakes import T0
 from tests.unit.watchers.test_watcher_manifest import definition, event_wait_document
@@ -148,7 +144,7 @@ class FixedProgram(PostgresWatcherStore):
 
 
 async def test_firings_are_admitted_commands_plus_one_journal_record_each_and_never_twice(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
 ) -> None:
     pool = await common_db.pool(max_size=6)
     try:
@@ -257,7 +253,7 @@ async def test_firings_are_admitted_commands_plus_one_journal_record_each_and_ne
 
 
 async def test_a_signal_uploaded_late_with_an_early_observation_time_is_still_read(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
 ) -> None:
     pool = await common_db.pool()
     try:
@@ -300,7 +296,7 @@ class DiesBeforeRecord(FixedProgram):
 
 
 async def test_a_pass_that_died_before_its_record_never_instructs_twice(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
 ) -> None:
     pool = await common_db.pool(max_size=6)
     try:
@@ -362,7 +358,7 @@ async def test_a_pass_that_died_before_its_record_never_instructs_twice(
 
 
 async def test_an_event_wait_is_released_and_a_pause_admitted_through_real_run_control(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
 ) -> None:
     pool = await common_db.pool(max_size=6)
     try:
@@ -451,7 +447,7 @@ async def test_an_event_wait_is_released_and_a_pause_admitted_through_real_run_c
 
 
 async def test_an_event_before_its_wait_is_declared_is_held_and_released_once_declared(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
 ) -> None:
     pool = await common_db.pool(max_size=6)
     try:
@@ -543,7 +539,7 @@ def watched_manifest(*watchers: dict[str, Any]) -> str:
 
 
 async def test_start_launches_the_evaluator_that_reads_the_committed_descriptors(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
 ) -> None:
     pool = await common_db.pool("mission_control_runtime")
     try:
@@ -589,7 +585,7 @@ class FlakyStarter(RecordingStarter):
 
 
 async def test_a_start_whose_evaluator_failed_launches_nothing_and_is_retried_in_full(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
 ) -> None:
     pool = await common_db.pool("mission_control_runtime")
     try:
@@ -633,7 +629,7 @@ async def local_temporal() -> Client:
 
 
 async def test_manifest_start_runs_the_composed_evaluator_on_the_local_temporal_server(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
 ) -> None:
     pool = await common_db.pool("mission_control_runtime")
     client = await local_temporal()

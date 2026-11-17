@@ -60,8 +60,7 @@ from tests.fixtures.lane_bindings import lane_fields
 from tests.fixtures.lane_turns import LaneStack, lane_stack
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.fixtures.temporal_history import patch_ids
-from tests.integration.postgres.frames_common import admit_unit_attempt
-from tests.integration.postgres.runtime_common import common_db  # noqa: F401
+from tests.support.db_builders import admit_unit_attempt
 
 ADDRESS = os.environ.get("MC_TEMPORAL_TEST_ADDRESS", "127.0.0.1:7233")
 NAMESPACE = os.environ.get("MC_TEMPORAL_TEST_NAMESPACE", "default")
@@ -227,7 +226,7 @@ async def _run(
 
 @pytest.mark.common_db
 async def test_the_cloud_segment_loop_resumes_after_a_dropped_stream_and_a_retention_expiry(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     tmp_path: Path,
 ) -> None:
     client = await _client()
@@ -285,7 +284,7 @@ async def test_the_cloud_segment_loop_resumes_after_a_dropped_stream_and_a_reten
 
 @pytest.mark.common_db
 async def test_a_429_on_create_waits_on_a_temporal_timer_and_then_creates_once(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     tmp_path: Path,
 ) -> None:
     client = await _client()

@@ -43,7 +43,7 @@ from mission_control.domain.outputs.successors import (
     RegisteredCandidate,
 )
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.runtime_common import common_db, owner_rows  # noqa: F401
+from tests.support.db_builders import owner_rows
 from tests.unit.knowledge.test_gateway import origin
 from tests.unit.outputs.scenario import (
     Stack,
@@ -63,7 +63,7 @@ AT = datetime(2026, 10, 27, 12, tzinfo=UTC)
 
 
 @pytest_asyncio.fixture
-async def pool(common_db: CommonDatabase) -> AsyncIterator[asyncpg.Pool]:  # noqa: F811
+async def pool(common_db: CommonDatabase) -> AsyncIterator[asyncpg.Pool]:
     created = await common_db.pool()
     try:
         yield created
@@ -132,7 +132,7 @@ DEFERRED = {
 }
 
 
-async def test_eight_forms_are_decided_through_the_ordinary_handlers(common_db, pool):  # noqa: F811
+async def test_eight_forms_are_decided_through_the_ordinary_handlers(common_db, pool):
     stack = await make_stack(common_db, pool, *eight_forms())
     omitted = await stack.evaluate()
     assert all(codes(omitted, item.key) == ["MISSING"] for item in eight_forms())
@@ -210,7 +210,7 @@ async def test_eight_forms_are_decided_through_the_ordinary_handlers(common_db, 
     assert stored[0]["n"] == 1
 
 
-async def test_keys_heads_and_concurrent_promotion(common_db, pool):  # noqa: F811
+async def test_keys_heads_and_concurrent_promotion(common_db, pool):
     stack = await make_stack(common_db, pool, obligation("draft.report", OutputForm.TEXT))
     first = await stack.submit("call-1", "draft.report", text("report", "v1"))
     replay = await stack.submit("call-1", "draft.report", text("report", "v1"))
@@ -252,7 +252,7 @@ async def test_keys_heads_and_concurrent_promotion(common_db, pool):  # noqa: F8
     assert retry.submission_id == third.submission_id  # replay before SubmissionClosed
 
 
-async def test_pending_successor_waits_for_its_boundary_and_pins_hold(common_db, pool):  # noqa: F811
+async def test_pending_successor_waits_for_its_boundary_and_pins_hold(common_db, pool):
     prior = obligation("draft.report", OutputForm.TEXT, cardinality=Cardinality(min=1, max=2))
     stack = await make_stack(common_db, pool, prior)
     in_flight = await stack.submit("call-1", "draft.report", text("report", "v1"))
@@ -320,7 +320,7 @@ async def test_pending_successor_waits_for_its_boundary_and_pins_hold(common_db,
     ]
 
 
-async def test_association_steps_are_taken_once_each(common_db, pool):  # noqa: F811
+async def test_association_steps_are_taken_once_each(common_db, pool):
     stack = await make_stack(common_db, pool, obligation("draft.report", OutputForm.TEXT))
     one = (RegisteredCandidate(candidate=text("report", "registered"), source="registered_output"),)
     actions = [
@@ -340,7 +340,7 @@ async def test_association_steps_are_taken_once_each(common_db, pool):  # noqa: 
     assert sorted(row["step"] for row in steps) == ["auto_associated", "reminder"]
 
 
-async def test_a_compiled_configuration_registers_through_the_real_service(common_db, pool):  # noqa: F811
+async def test_a_compiled_configuration_registers_through_the_real_service(common_db, pool):
     from tests.unit.authoring.test_output_promises_compile import compiled_configuration
 
     configuration = await compiled_configuration()
@@ -366,7 +366,7 @@ async def test_a_compiled_configuration_registers_through_the_real_service(commo
     assert result.completion == "waiting"
 
 
-async def test_sql_guards_and_tenant_isolation(common_db, pool):  # noqa: F811
+async def test_sql_guards_and_tenant_isolation(common_db, pool):
     await common_db.add_tenants(["tenant-2"])
     stack = await make_stack(common_db, pool, obligation("draft.report", OutputForm.TEXT))
     ack = await stack.submit("call-1", "draft.report", text("report", "v1"))
@@ -441,7 +441,7 @@ async def test_sql_guards_and_tenant_isolation(common_db, pool):  # noqa: F811
     assert await other.promise_set(elsewhere.scope, stack.run_id) is None
 
 
-async def test_submitted_outputs_are_finalized_unrejected_and_newest(common_db, pool):  # noqa: F811
+async def test_submitted_outputs_are_finalized_unrejected_and_newest(common_db, pool):
     """WI-02 B2: the submitted fallback reads only a finalized producer's newest revision per
     deliverable and never one an assessment rejected (fail) or held (review)."""
 
@@ -465,7 +465,7 @@ async def test_submitted_outputs_are_finalized_unrejected_and_newest(common_db, 
     assert await submitted("draft.patch") == ()
 
 
-async def test_submission_expected_head_is_atomic_and_replay_precedes_moved_head(common_db, pool):  # noqa: F811
+async def test_submission_expected_head_is_atomic_and_replay_precedes_moved_head(common_db, pool):
     """A promotion between service entry and store entry must invalidate a new submission."""
     entered = asyncio.Event()
     resume = asyncio.Event()

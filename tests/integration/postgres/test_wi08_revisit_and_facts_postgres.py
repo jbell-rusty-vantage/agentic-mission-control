@@ -17,7 +17,6 @@ from mission_control.domain.authoring.contracts import StageGraphBlueprint
 from mission_control.domain.programs.contracts import StageGraphCycleActivityRequest
 from mission_control.domain.programs.interpreter import StageGraphInterpreter
 from mission_control.domain.programs.routing import ROUTE_FACTS_KEY
-from tests.integration.postgres.runtime_common import common_db as common_db
 from tests.unit.orchestration.test_completion_validation_service import OUTPUT, prepared
 
 pytestmark = pytest.mark.common_db

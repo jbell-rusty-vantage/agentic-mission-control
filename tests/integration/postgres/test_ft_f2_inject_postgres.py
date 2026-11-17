@@ -27,7 +27,6 @@ from mission_control.application.missions.service import MissionControlService
 from mission_control.domain.policies.contracts import StartAction
 from mission_control.domain.policies.mailbox import MailboxState
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.runtime_common import common_db  # noqa: F401
 from tests.integration.postgres.test_command_mailbox_postgres import _request, operator
 from tests.support.run_control import command, request, service
 from tests.unit.run_control.test_boundary_commands import TARGET
@@ -38,7 +37,7 @@ INJECT = ("interrupt_and_inject",)
 
 
 async def test_interrupt_and_inject_park_replace_and_unsupported_on_postgres(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
 ) -> None:
     pool = await common_db.pool(max_size=4)
     try:

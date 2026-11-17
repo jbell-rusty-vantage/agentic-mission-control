@@ -24,7 +24,6 @@ from mission_control.application.ports.knowledge import RecordedUseDecision
 from mission_control.contracts.knowledge_protocol import Ref
 from tests.fixtures.knowledge_binding import BINDING, SteppingClock
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.runtime_common import common_db  # noqa: F401
 from tests.unit.knowledge.test_gateway import origin
 from tests.unit.knowledge.test_trusted_judgment import ScriptedRunner, evaluators, head_of, world
 
@@ -32,7 +31,7 @@ pytestmark = [pytest.mark.asyncio, pytest.mark.common_db]
 
 
 @pytest_asyncio.fixture
-async def pool(common_db: CommonDatabase) -> AsyncIterator[asyncpg.Pool]:  # noqa: F811
+async def pool(common_db: CommonDatabase) -> AsyncIterator[asyncpg.Pool]:
     created = await common_db.pool()
     try:
         yield created
@@ -53,7 +52,7 @@ def access_for(db: CommonDatabase) -> InvocationAccess:
 
 
 async def test_review_successor_after_restart_supersedes_and_promotes(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     pool: asyncpg.Pool,
 ) -> None:
     w, subject = await world(
@@ -95,7 +94,7 @@ async def test_review_successor_after_restart_supersedes_and_promotes(
 
 
 async def test_recorded_use_decisions_are_durable_and_immutable(
-    common_db: CommonDatabase,  # noqa: F811
+    common_db: CommonDatabase,
     pool: asyncpg.Pool,
 ) -> None:
     access = access_for(common_db)
