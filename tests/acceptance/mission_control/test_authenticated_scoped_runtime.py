@@ -32,7 +32,7 @@ from mission_control.adapters.temporal.workflows.operation import MissionOperati
 from mission_control.adapters.temporal.workflows.stagegraph import StageGraphWorkflow
 from mission_control.contracts.identities import mission_root_id
 
-pytestmark = pytest.mark.common_db
+pytestmark = [pytest.mark.psycopg_selector, pytest.mark.common_db]
 
 
 async def condition(stack: ScopedStack, run_id: str, field: str, expected: Any) -> bool:

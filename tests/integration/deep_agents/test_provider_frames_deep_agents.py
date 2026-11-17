@@ -99,7 +99,7 @@ from mission_control.domain.policies.contracts import (
     StartAction,
 )
 
-pytestmark = pytest.mark.common_db
+pytestmark = [pytest.mark.psycopg_selector, pytest.mark.common_db]
 
 SAVER_SCHEMA = "mission_control_runtime"
 SCOPE = canonical_scope("tenant-1")

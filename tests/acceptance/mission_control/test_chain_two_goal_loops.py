@@ -91,7 +91,7 @@ from mission_control.interfaces.cli import main as cli
 from mission_control.interfaces.http.chains import router as chains_router
 from mission_control.interfaces.http.mission_control import MissionPrincipal, get_mission_principal
 
-pytestmark = pytest.mark.common_db
+pytestmark = [pytest.mark.psycopg_selector, pytest.mark.common_db]
 
 ROOT = Path(__file__).resolve().parents[3]
 MISSION_2 = (

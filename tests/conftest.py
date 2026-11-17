@@ -41,59 +41,11 @@ if not (PROJECT_ROOT / ".env").exists():
         os.environ.setdefault(_name, _value)
 
 
-_PSYCOPG_SELECTOR_MODULES = {
-    ("experiments", "test_langgraph_temporal_stagegraph.py"),
-    ("deep_agents", "test_checkpoint_lineage_postgres_saver.py"),
-    ("deep_agents", "test_report_source_real_service.py"),
-    ("deep_agents", "test_provider_frames_deep_agents.py"),
-    ("deep_agents", "test_continuation_deep_agents.py"),
-    ("temporal", "test_rrm_004_worker_restart_recovery.py"),
-    ("agent_server", "test_rrm_013_async_subagent_live.py"),
-    ("control_plane", "test_rrm_005_inspection.py"),
-    ("control_plane", "test_rrm_006_semantic_forks.py"),
-    ("control_plane", "test_rrm_016_goal_directed_demo.py"),
-    ("control_plane", "test_rrm_009_production_composition.py"),
-    ("control_plane", "test_rrm_009_live_capabilities.py"),
-    ("control_plane", "test_rrm_009_production_cancellation.py"),
-    ("control_plane", "test_rrm_009_object_store.py"),
-    ("control_plane", "test_rrm_020_shared_goal_workspace.py"),
-    ("control_plane", "test_rrm_008_cancellation_demo.py"),
-    ("control_plane", "test_rrm_010_combined_smoke.py"),
-    ("mission_control", "test_postgres_runtime_parity.py"),
-    ("mission_control", "test_ft_g2_segment_loop.py"),
-    ("mission_control", "test_postgres_children_and_artifacts.py"),
-    ("mission_control", "test_manifest_async_child.py"),
-    ("mission_control", "test_manifest_async_child_live.py"),
-    ("mission_control", "test_manifest_sealed_async_child.py"),
-    ("mission_control", "test_authenticated_scoped_runtime.py"),
-    ("mission_control", "test_goal_schema_runtime.py"),
-    ("mission_control", "test_manifest_lifecycle.py"),
-    ("mission_control", "test_chain_two_goal_loops.py"),
-    ("mission_control", "test_wake_channels.py"),
-    ("mission_control", "test_cognition_points.py"),
-    ("mission_control", "test_observe_skill_recipes.py"),
-    ("mission_control", "test_tracing.py"),
-    ("mission_control", "test_tracing_forks.py"),
-    ("mission_control", "test_tracing_remote.py"),
-    ("mission_control", "test_goal_output_unparseable.py"),
-    ("mission_control", "test_tracing_live.py"),
-    ("mission_control", "test_tracing_stream.py"),
-    ("mission_control", "test_knowledge_gateway_runtime.py"),
-    ("mission_control", "test_overnight_stagegraph.py"),
-    ("mission_control", "test_overnight_goal_directed.py"),
-    ("mission_control", "test_overnight_linked.py"),
-    ("postgres", "test_mission_worker_startup.py"),
-}
-
-
 def pytest_asyncio_loop_factories(config, item):  # type: ignore[no-untyped-def]
     """Keep Psycopg's Windows selector requirement local to the modules that need it."""
 
     del config
-    if (
-        sys.platform == "win32"
-        and (item.path.parent.name, item.path.name) in _PSYCOPG_SELECTOR_MODULES
-    ):
+    if sys.platform == "win32" and item.get_closest_marker("psycopg_selector") is not None:
         return {"windows-selector": asyncio.SelectorEventLoop}
     return {"default": asyncio.new_event_loop}
 

@@ -63,6 +63,8 @@ from mission_control.bootstrap.application_profiles import load_application_prof
 from mission_control.domain.context import transfer_builders
 from mission_control.domain.outputs.contracts import OutputForm
 
+pytestmark = pytest.mark.psycopg_selector
+
 ROOT = Path(__file__).resolve().parents[3]
 KS = ROOT.parent / "knowledge-services"
 HOST = "src/knowledge-operation/tests/report-source-fixture-host.ts"

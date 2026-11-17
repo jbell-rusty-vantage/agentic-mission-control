@@ -26,7 +26,7 @@ from tests.fixtures.scoped_api_stack import inspect, prepare_run, scoped_stack, 
 
 from mission_control.interfaces.mcp.coordinator_http_client import CoordinatorStreamableHttpClient
 
-pytestmark = pytest.mark.common_db
+pytestmark = [pytest.mark.psycopg_selector, pytest.mark.common_db]
 
 WAKE_KINDS = "terminal_result,blocked,review_required"
 

@@ -42,7 +42,7 @@ from mission_control.domain.execution.contracts import (
     DeepAgentExecutionBinding,
 )
 
-pytestmark = pytest.mark.common_db
+pytestmark = [pytest.mark.psycopg_selector, pytest.mark.common_db]
 
 _ARTIFACTS_OF_RUN = """
     SELECT count(*) FROM mission_control.artifact a

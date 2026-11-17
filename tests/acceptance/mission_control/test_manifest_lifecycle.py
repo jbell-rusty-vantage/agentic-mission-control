@@ -32,7 +32,7 @@ from tests.fixtures.rrm009_production_stack import SCOPE
 from mission_control.application.authoring.manifest_submit import SubmitRequest
 from mission_control.domain.policies.contracts import CancelAction
 
-pytestmark = pytest.mark.common_db
+pytestmark = [pytest.mark.psycopg_selector, pytest.mark.common_db]
 
 ROOT = Path(__file__).resolve().parents[3]
 MISSION_1 = ROOT / "tests/fixtures/manifests/fast-track/01-research-ingestion-deep-agents.yml"

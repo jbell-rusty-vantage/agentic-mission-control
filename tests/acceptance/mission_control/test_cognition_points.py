@@ -25,7 +25,7 @@ from uuid import uuid4
 import pytest
 from tests.fixtures.scoped_api_stack import ScopedStack, inspect, prepare_run, scoped_stack, until
 
-pytestmark = pytest.mark.common_db
+pytestmark = [pytest.mark.psycopg_selector, pytest.mark.common_db]
 BASE = "/v1/applications/biotech/runs"
 
 

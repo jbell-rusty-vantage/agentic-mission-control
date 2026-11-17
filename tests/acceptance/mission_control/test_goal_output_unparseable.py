@@ -42,7 +42,7 @@ from tests.fixtures.stage2_outputs import write_outputs
 from mission_control.application.programs.goal_directed import OUTPUT_UNPARSEABLE
 from mission_control.contracts.identities import mission_root_id
 
-pytestmark = pytest.mark.common_db
+pytestmark = [pytest.mark.psycopg_selector, pytest.mark.common_db]
 
 
 async def reconcile_attempts(stack: ScopedStack, run_id: str) -> list[dict[str, Any]]:

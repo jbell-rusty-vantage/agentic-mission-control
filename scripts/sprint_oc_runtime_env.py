@@ -241,6 +241,7 @@ MC_UNMANAGED = {
     "MISSION_CONTROL_AUTH_PROFILES_PATH": f"credential-route lanes are off; {_PATH_UNSET}",
     "MISSION_CONTROL_LOCAL_RUN_PROFILE": f"W1 harness operator file; {_PATH_UNSET}",
     "MISSION_CONTROL_PREFLIGHT_WORKSPACE_ROOT": "unset = MISSION_CONTROL_WORKSPACE_ROOT",
+    "LANGGRAPH_CHECKPOINT_LOCATOR": "unset = the checkpoint DSN's own host and port",
     "CAPABILITY_BUNDLE_LOCAL_ROOT": f"unset = no directory bundle reader; {_PATH_UNSET}",
     "KNOWLEDGE_ISSUER_RETIRING_KEY_FILE": f"unset = no retiring key; {_PATH_UNSET}",
     "CURSOR_LEASE_ROOT": "the Cursor lanes are off",

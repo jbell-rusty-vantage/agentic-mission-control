@@ -41,7 +41,7 @@ from mission_control.application.programs.goal_directed import (
 from mission_control.contracts.identities import parse_request_scope
 from mission_control.domain.execution.contracts import CapturedWorkspaceCandidate, WorkspaceOwner
 
-pytestmark = pytest.mark.common_db
+pytestmark = [pytest.mark.psycopg_selector, pytest.mark.common_db]
 
 
 @pytest.mark.asyncio

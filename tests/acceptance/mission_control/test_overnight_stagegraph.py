@@ -24,6 +24,8 @@ from mission_control.application.authoring.manifest_submit import SubmitRequest
 from mission_control.contracts.identities import mission_root_id
 from mission_control.domain.authoring.manifest import canonical_manifest_bytes, load_manifest_yaml
 
+pytestmark = pytest.mark.psycopg_selector
+
 ROOT = Path(__file__).resolve().parents[3]
 TEMPLATE = ROOT / "tests/fixtures/manifests/sprint-oc-w2/ai-engineer.producer-consumer.mission.yml"
 

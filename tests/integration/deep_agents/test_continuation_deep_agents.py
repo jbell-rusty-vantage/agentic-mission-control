@@ -57,7 +57,7 @@ from mission_control.domain.context.checkpoint import CheckpointIdentities
 from mission_control.domain.context.packet import PacketScope
 from mission_control.domain.frames.contracts import FrameKind
 
-pytestmark = pytest.mark.common_db
+pytestmark = [pytest.mark.psycopg_selector, pytest.mark.common_db]
 
 SAVER_SCHEMA = "mission_control_runtime"
 MANIFEST = '{"records": 180, "source": "pubmed"}'

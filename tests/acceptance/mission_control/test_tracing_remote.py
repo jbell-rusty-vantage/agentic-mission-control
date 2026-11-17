@@ -54,7 +54,7 @@ from tests.fixtures.scoped_api_stack import (
 from tests.fixtures.stage2_outputs import write_outputs
 from tests.fixtures.tcp_proxy import SaverProxy
 
-pytestmark = pytest.mark.common_db
+pytestmark = [pytest.mark.psycopg_selector, pytest.mark.common_db]
 
 WALK_BUDGET_MS = "50"
 SAVER_DELAY_SECONDS = 0.15

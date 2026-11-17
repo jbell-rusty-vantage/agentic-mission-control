@@ -554,10 +554,11 @@ async def test_composition_resources_are_closed_when_build_or_worker_start_fails
             events.append("closed")
 
     monkeypatch.setattr(composition, "StandalonePersistenceLifespan", Lifespan)
-    settings = SimpleNamespace(
+    settings = isolated_settings(
         mission_control_worker_role="base",
         langgraph_checkpoint_dsn="postgresql://unused",
         langgraph_checkpoint_setup=False,
+        mc_local_db_runtime_dsn="postgresql://unused",
         capability_pins_path=tmp_path / "absent.json",
     )
     factory = composition.ProductionWorkerActivityCompositionFactory(cast(Any, object()))

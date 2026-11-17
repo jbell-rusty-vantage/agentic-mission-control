@@ -35,7 +35,7 @@ from tests.fixtures.scoped_api_stack import ScopedStack, scoped_stack, until
 from tests.fixtures.stage2_outputs import run_directory
 from tests.fixtures.stream_capture import StreamCapture, compare, mission_socket, problems
 
-pytestmark = pytest.mark.common_db
+pytestmark = [pytest.mark.psycopg_selector, pytest.mark.common_db]
 
 
 async def inject_into(stack: ScopedStack, run_id: str, node_key: str, text: str) -> dict[str, Any]:

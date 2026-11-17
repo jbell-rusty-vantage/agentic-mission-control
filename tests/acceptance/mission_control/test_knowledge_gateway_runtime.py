@@ -52,7 +52,7 @@ from mission_control.bootstrap.application_profiles import load_application_prof
 from mission_control.bootstrap.composition import compose_knowledge_lane
 from mission_control.domain.resolution.resolved import KnowledgePortBinding
 
-pytestmark = pytest.mark.common_db
+pytestmark = [pytest.mark.psycopg_selector, pytest.mark.common_db]
 EVIDENCE = Path(__file__).resolve().parents[3] / ".scratch" / "sprint-v" / "proofs" / "SV-16"
 DEPLOYMENTS = Path(__file__).resolve().parents[3] / "deployments"
 

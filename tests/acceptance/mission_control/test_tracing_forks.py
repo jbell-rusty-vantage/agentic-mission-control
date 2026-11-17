@@ -56,7 +56,7 @@ from mission_control.adapters.postgres.orchestration.goal_directed_repository im
 from mission_control.application.execution.run_launch import fork_semantic_input_binding_ref
 from mission_control.domain.programs.contracts import GoalDirectedStartPosition
 
-pytestmark = pytest.mark.common_db
+pytestmark = [pytest.mark.psycopg_selector, pytest.mark.common_db]
 
 EVIDENCE_ROOT = Path(".scratch/tracing-stage-1")
 # Under the 900 s pytest-timeout safety net; a run takes 60-200 s on the host.

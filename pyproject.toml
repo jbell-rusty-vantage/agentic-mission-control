@@ -117,6 +117,7 @@ markers = [
   "block_c_restart: Block C process-restart prepare/resume phases",
   "block_c_nn1: Block C N/N+1 compatibility drills",
   "block_c_nn1_deploy: two-endpoint N/N+1 deployment qualification drills",
+  "psycopg_selector: needs the Windows selector event loop (psycopg async); conftest selects it per item",
   "common_db: requires MISSION_CONTROL_TEST_ADMIN_DSN (disposable PostgreSQL 17 + pgvector); fails, never skips, when absent",
 ]
 

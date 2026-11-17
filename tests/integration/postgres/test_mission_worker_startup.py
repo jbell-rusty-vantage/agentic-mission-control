@@ -44,7 +44,7 @@ from tests.fixtures.mission_control_common_db import (
 )
 from tests.fixtures.mission_control_production_stack import start_local
 
-pytestmark = pytest.mark.common_db
+pytestmark = [pytest.mark.psycopg_selector, pytest.mark.common_db]
 
 
 @pytest.mark.asyncio

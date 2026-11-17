@@ -11,7 +11,7 @@ import pytest
 from tests.acceptance.mission_control.test_wake_channels import finished, missionctl
 from tests.fixtures.scoped_api_stack import prepare_run, scoped_stack, serve_loopback
 
-pytestmark = pytest.mark.common_db
+pytestmark = [pytest.mark.psycopg_selector, pytest.mark.common_db]
 EXAMPLES = tuple(
     sorted((Path(__file__).resolve().parents[2] / "fixtures/manifests/watchers").glob("*.yml"))
 )

@@ -11,6 +11,8 @@ from tests.acceptance.mission_control.test_overnight_stagegraph import stagegrap
 
 from mission_control.domain.authoring.manifest import canonical_manifest_bytes, load_manifest_yaml
 
+pytestmark = pytest.mark.psycopg_selector
+
 
 def linked_manifest(pack: dict[str, Any], *, scenario: str = "positive") -> str:
     source = load_manifest_yaml(goal_manifest(pack))["mission"]

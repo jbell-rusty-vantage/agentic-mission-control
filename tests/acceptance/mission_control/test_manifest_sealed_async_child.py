@@ -90,7 +90,7 @@ from mission_control.domain.execution.contracts import (
     DeepAgentExecutionBinding,
 )
 
-pytestmark = pytest.mark.common_db
+pytestmark = [pytest.mark.psycopg_selector, pytest.mark.common_db]
 POLICY = "policy:async-result:typed-manifest@1"
 MAX_CHECKS = 12
 

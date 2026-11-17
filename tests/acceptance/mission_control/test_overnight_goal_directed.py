@@ -32,6 +32,8 @@ from mission_control.domain.programs.goal_directed_runtime import (
     GoalVerifierObservation,
 )
 
+pytestmark = pytest.mark.psycopg_selector
+
 
 def goal_manifest(pack: dict[str, Any]) -> str:
     template = ROOT / "tests/fixtures/manifests/sprint-oc-w1/ai-engineer.report.mission.yml"

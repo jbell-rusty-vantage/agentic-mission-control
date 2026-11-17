@@ -343,7 +343,8 @@ async def test_postgres_context_database_failure_is_retryable_not_permanent_unat
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize(
-    ("native_run", "attributable"), [(str(uuid4()), True), ("client-label", False)]
+    ("native_run", "attributable"),
+    [("0b6c1f4e-8f0e-4c3a-9d2b-5a7e3c1d9f20", True), ("client-label", False)],
 )
 async def test_postgres_context_local_requires_native_billing_uuid(native_run, attributable):
     repository = postgres_cost_context([billing_frame(run=native_run)], lane="cursor_local")

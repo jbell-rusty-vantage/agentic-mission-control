@@ -327,7 +327,12 @@ SETTINGS_PROBE = textwrap.dedent(
         annotation = re.sub(r"<class '([^']+)'>", r"\\1", str(info.annotation))
         annotation = annotation.replace("pydantic.types.", "").replace("pathlib.", "")
         if kinds.fullmatch(annotation):
-            poisoned[name] = f"poison{len(poisoned)}"
+            # A constrained string (e.g. host:port) gets a poison value its pattern admits.
+            pattern = next((m.pattern for m in info.metadata if getattr(m, "pattern", None)), None)
+            n = len(poisoned)
+            candidates = [f"poison{n}", f"poison{n}:{n + 1}", f"{n}.{n}.{n}"]
+            poison = next(c for c in candidates if not pattern or re.search(pattern, c))
+            poisoned[name] = poison
 
     def value(instance, name):
         found = getattr(instance, name)

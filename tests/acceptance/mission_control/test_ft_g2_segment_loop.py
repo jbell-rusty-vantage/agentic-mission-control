@@ -26,7 +26,7 @@ from mission_control.adapters.temporal.workflows.operation import (
     OperationWorkflow,
 )
 
-pytestmark = pytest.mark.common_db
+pytestmark = [pytest.mark.psycopg_selector, pytest.mark.common_db]
 
 
 @pytest.fixture

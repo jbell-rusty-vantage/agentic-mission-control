@@ -113,7 +113,7 @@ from mission_control.domain.execution.contracts import (
     DeepAgentExecutionBinding,
 )
 
-pytestmark = pytest.mark.common_db
+pytestmark = [pytest.mark.psycopg_selector, pytest.mark.common_db]
 
 ASYNC_PROFILE_ID = "subagent.async-child"
 ASYNC_CHILD = "async-child"

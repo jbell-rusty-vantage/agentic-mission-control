@@ -89,7 +89,7 @@ from mission_control.domain.capabilities.hooks import KERNEL_HOOK_IDS
 from mission_control.domain.frames.contracts import DELTA_RETENTION_KINDS
 from mission_control.domain.policies.contracts import ActorContext
 
-pytestmark = pytest.mark.common_db
+pytestmark = [pytest.mark.psycopg_selector, pytest.mark.common_db]
 
 TRACING = technical.TRACING_FAMILY
 CYCLE_STAGE = technical.TRACING_CYCLE_STAGE
