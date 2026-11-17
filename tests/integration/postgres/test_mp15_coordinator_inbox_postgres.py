@@ -63,9 +63,9 @@ from mission_control.domain.policies.contracts import (
 from mission_control.domain.policies.mailbox import MailboxState
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.integration.postgres.runtime_common import common_db  # noqa: F401
+from tests.support.run_control import actor, command, request, service
 from tests.unit.human_tasks.fixtures import activation
 from tests.unit.run_control.test_boundary_commands import TARGET
-from tests.unit.run_control.test_run_control import actor, command, request, service
 
 pytestmark = pytest.mark.common_db
 

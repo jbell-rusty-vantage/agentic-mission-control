@@ -15,8 +15,8 @@ from mission_control.interfaces.http.control_plane import (
     get_control_plane_service,
 )
 from mission_control.interfaces.http.run_control import get_run_control_service
-from tests.unit.run_control.test_run_control import request as run_request
-from tests.unit.run_control.test_run_control import service as run_control_service
+from tests.support.run_control import request as run_request
+from tests.support.run_control import service as run_control_service
 
 
 @pytest.fixture(autouse=True)

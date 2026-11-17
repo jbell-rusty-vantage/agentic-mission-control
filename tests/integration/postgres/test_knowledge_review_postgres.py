@@ -42,9 +42,9 @@ from mission_control.domain.policies.contracts import ActorContext
 from tests.fixtures.knowledge_binding import SteppingClock
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.integration.postgres.runtime_common import common_db  # noqa: F401
+from tests.support.run_control import request, service
 from tests.unit.knowledge.test_gateway import origin
 from tests.unit.knowledge.test_trusted_judgment import PRODUCER, ScriptedRunner, evaluators, world
-from tests.unit.run_control.test_run_control import request, service
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.common_db]
 

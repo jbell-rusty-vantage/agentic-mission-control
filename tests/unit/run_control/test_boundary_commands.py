@@ -43,7 +43,7 @@ from mission_control.domain.policies.contracts import (
     WaitCondition,
 )
 from mission_control.domain.policies.errors import ReceiptTransitionRejected
-from tests.unit.run_control.test_run_control import (
+from tests.support.run_control import (
     ALL_PERMISSIONS,
     EMPTY_EVIDENCE_DIGEST,
     INITIAL_EVIDENCE_FRONTIER,

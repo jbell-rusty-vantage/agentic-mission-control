@@ -35,6 +35,7 @@ from tests.integration.postgres.runtime_common import (
     scoped_command,
     scoped_request,
 )
+from tests.support.run_control import service
 from tests.unit.run_control.test_boundary_commands import (
     TARGET,
     apply,
@@ -45,7 +46,6 @@ from tests.unit.run_control.test_boundary_commands import (
     resume,
     states,
 )
-from tests.unit.run_control.test_run_control import service
 
 pytestmark = pytest.mark.common_db
 

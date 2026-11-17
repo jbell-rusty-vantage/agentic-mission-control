@@ -92,7 +92,7 @@ from tests.fixtures.runtime_inspection import (
     sensitive_state,
     stamps_for,
 )
-from tests.unit.run_control.test_run_control import request, service
+from tests.support.run_control import request, service
 
 # --- Fixture world -----------------------------------------------------------------------
 

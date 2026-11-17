@@ -92,7 +92,7 @@ from tests.integration.temporal.test_wp_bp_020_temporal import (
     FakeGoalDirectedActivities,
 )
 from tests.integration.temporal.test_wp_bp_020_temporal import _run_input as fake_goal_input
-from tests.unit.run_control.test_run_control import command
+from tests.support.run_control import command
 
 QUEUE = "rrm016-goal-directed"
 # Captured from `test_journaled_goal_directed_run_settles_each_operation_once_through_a_pause`

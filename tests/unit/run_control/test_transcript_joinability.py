@@ -24,13 +24,7 @@ from mission_control.domain.policies.contracts import (
 )
 from mission_control.domain.policies.errors import RunControlNotFound
 from mission_control.domain.policies.reducer import ACTION_PERMISSIONS, required_action_permissions
-from tests.unit.run_control.test_run_control import (
-    ALL_PERMISSIONS,
-    actor,
-    command,
-    request,
-    service,
-)
+from tests.support.run_control import ALL_PERMISSIONS, actor, command, request, service
 
 UNIT_KEY = "bl-unit-v1:" + "0" * 64
 ACTIVATION = "7d4f0c1e-1111-4a2b-9c3d-000000000003"

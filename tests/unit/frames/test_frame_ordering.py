@@ -26,9 +26,9 @@ from tests.fixtures.provider_frames import (
     observation,
     provider_frame,
 )
+from tests.support.run_control import ALL_PERMISSIONS, actor, command, request
+from tests.support.run_control import service as run_control_service
 from tests.unit.frames.test_frame_facts import _RunControl
-from tests.unit.run_control.test_run_control import ALL_PERMISSIONS, actor, command, request
-from tests.unit.run_control.test_run_control import service as run_control_service
 
 
 def test_later_turn_failure_is_not_hidden_by_an_earlier_success() -> None:

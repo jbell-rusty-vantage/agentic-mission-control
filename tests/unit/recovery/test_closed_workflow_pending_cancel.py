@@ -4,8 +4,8 @@ from copy import deepcopy
 from uuid import uuid4
 
 import pytest
+from tests.support.run_control import NOW, actor
 from tests.unit.recovery.test_closed_workflow import setup_recovery
-from tests.unit.run_control.test_run_control import NOW, actor
 
 from mission_control.adapters.postgres.closed_workflow import (
     command_allows_cancelled_terminalization,

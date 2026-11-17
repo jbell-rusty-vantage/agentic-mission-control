@@ -64,11 +64,11 @@ from tests.fixtures.checkpoint_recovery import (
 from tests.fixtures.lane_bindings import lane_fields
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.integration.postgres.runtime_common import common_db as common_db
+from tests.support.run_control import actor, command, reconciler_command
+from tests.support.run_control import service as run_control_service
 from tests.unit.claude.fixtures import claude_operation
 from tests.unit.harness.test_lane_cleanup import CleaningLane
 from tests.unit.harness.test_lane_operator_abandonment import no_adapter_selection
-from tests.unit.run_control.test_run_control import actor, command, reconciler_command
-from tests.unit.run_control.test_run_control import service as run_control_service
 
 pytestmark = pytest.mark.common_db
 

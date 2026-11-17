@@ -52,8 +52,8 @@ from tests.integration.temporal.test_rrm_005_search_attributes import (
 )
 from tests.integration.temporal.test_wp_bp_010_temporal import QUEUE, _blueprint
 from tests.integration.temporal.test_wp_bp_010_temporal import _run_input as stage_run_input
-from tests.unit.run_control.test_run_control import request as run_request
-from tests.unit.run_control.test_run_control import service as run_control_service
+from tests.support.run_control import request as run_request
+from tests.support.run_control import service as run_control_service
 
 INSTALLATION = UUID("0192a4f0-0000-7000-8000-00000000c404")
 SCOPE = f"mc/{INSTALLATION}/biotech/1b0e1c4e-6d0f-5c6b-9a4e-0d6d6f1c2a01"

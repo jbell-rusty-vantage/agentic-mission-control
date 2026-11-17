@@ -64,7 +64,7 @@ from tests.fixtures.checkpoint_recovery import (
     run_control_authority,
     stage_recovery_unit,
 )
-from tests.unit.run_control.test_run_control import command, reconciler_command
+from tests.support.run_control import command, reconciler_command
 
 # --- helpers -------------------------------------------------------------------------
 

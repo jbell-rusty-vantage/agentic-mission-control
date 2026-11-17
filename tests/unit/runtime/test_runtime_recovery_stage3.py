@@ -38,7 +38,7 @@ from mission_control.domain.policies.forks import (
     admission_request_ref,
     lineage_for,
 )
-from tests.unit.run_control.test_run_control import request as run_request
+from tests.support.run_control import request as run_request
 
 DIGEST = "sha256:" + "a" * 64
 NOW = datetime(2026, 8, 6, 20, 0, tzinfo=UTC)

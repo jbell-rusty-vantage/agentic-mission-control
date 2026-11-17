@@ -38,7 +38,7 @@ from tests.integration.postgres.runtime_common import (
     scoped_command,
     scoped_request,
 )
-from tests.unit.run_control.test_run_control import service
+from tests.support.run_control import service
 
 NOW = datetime(2026, 7, 26, 19, 0, tzinfo=UTC)
 SENTINEL = "sk-proj-SENTINEL_OPENAI_KEY_1234567890"

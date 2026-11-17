@@ -50,7 +50,7 @@ from tests.fixtures.runtime_inspection import (
     seed_inspection_world,
 )
 from tests.integration.postgres.runtime_common import common_db as common_db
-from tests.unit.run_control.test_run_control import service as run_control_service
+from tests.support.run_control import service as run_control_service
 
 pytestmark = pytest.mark.common_db
 

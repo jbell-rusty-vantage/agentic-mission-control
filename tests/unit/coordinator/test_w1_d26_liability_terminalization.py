@@ -42,13 +42,13 @@ from mission_control.domain.programs.family_failure import (
     LIABILITY_TERMINALIZATION_ATTEMPT,
 )
 from tests.fixtures.goal_directed_journaled import SCOPE
+from tests.support.run_control import command
 from tests.unit.coordinator.test_w1_family_failure_terminalization import _request
 from tests.unit.orchestration.test_rrm_016_goal_directed_settlement import (
     _claim,
     _composition,
     _preparation,
 )
-from tests.unit.run_control.test_run_control import command
 from tests.unit.subscriptions.test_mp15_coordinator import classify_type
 
 

@@ -58,12 +58,12 @@ from tests.fixtures.goal_directed_journaled import (
     goal_run_control,
     goal_run_input,
 )
+from tests.support.run_control import actor as control_actor
 from tests.unit.operations.test_ft_b2_stage_handoff import (
     FakeArtifacts,
     FakeSelections,
     FakeStaging,
 )
-from tests.unit.run_control.test_run_control import actor as control_actor
 
 QUEUE = "ft-f1-command-mailbox"
 INSTRUCTION = "Also cite the 2024 meta-analysis in the record."

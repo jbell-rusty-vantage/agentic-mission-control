@@ -31,8 +31,8 @@ from mission_control.domain.execution.contracts import OperationExecutionBinding
 from mission_control.domain.policies.contracts import EffectDisposition
 from tests.acceptance.control_plane.test_wp_cp_045 import DeterministicProvider
 from tests.fixtures.lane_bindings import lane_fields
+from tests.support.run_control import actor
 from tests.unit.operations.test_async_child_parent_budget import admitted_parent, spawn
-from tests.unit.run_control.test_run_control import actor
 
 POLICY = "policy:async-result:v1"
 

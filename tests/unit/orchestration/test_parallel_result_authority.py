@@ -10,8 +10,8 @@ from mission_control.domain.policies.contracts import (
     CommandStatus,
     RecordOutputEvidenceAction,
 )
+from tests.support.run_control import DIGEST, command
 from tests.unit.orchestration.test_completion_validation_service import prepared
-from tests.unit.run_control.test_run_control import DIGEST, command
 
 
 @pytest.mark.asyncio

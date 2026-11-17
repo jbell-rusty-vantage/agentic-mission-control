@@ -22,8 +22,8 @@ from tests.fixtures.checkpoint_lineage import bind_unit, stage_unit
 from tests.fixtures.checkpoint_recovery import governed_workspace
 from tests.fixtures.lane_bindings import lane_fields
 from tests.fixtures.models import checked_in_catalog
-from tests.unit.run_control.test_run_control import actor, command
-from tests.unit.run_control.test_run_control import request as run_request
+from tests.support.run_control import actor, command
+from tests.support.run_control import request as run_request
 
 from mission_control.adapters.agent_server.async_subagents.bindings import (
     technical_child_definition,

@@ -26,11 +26,11 @@ from tests.fixtures.run_forks import (
     stage_policy,
     stagegraph_head,
 )
+from tests.support.run_control import WORKFLOW_DIGEST, actor
 from tests.unit.operations.test_checkpoint_recovery_classification import (
     _namespace,
     _write_foreign_root_checkpoint,
 )
-from tests.unit.run_control.test_run_control import WORKFLOW_DIGEST, actor
 
 
 @pytest.mark.asyncio

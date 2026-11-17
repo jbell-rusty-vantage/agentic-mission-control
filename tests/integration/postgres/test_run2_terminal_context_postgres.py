@@ -93,7 +93,7 @@ from tests.fixtures.lane_turns import ScriptedSessionLane, cursor_operation, scr
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.integration.postgres.runtime_common import common_db as common_db
 from tests.integration.postgres.runtime_common import owner_rows
-from tests.unit.run_control.test_run_control import actor, command, service
+from tests.support.run_control import actor, command, service
 
 pytestmark = pytest.mark.common_db
 

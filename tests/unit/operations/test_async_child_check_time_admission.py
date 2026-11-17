@@ -85,9 +85,9 @@ from tests.acceptance.control_plane.test_wp_cp_040 import (
 )
 from tests.acceptance.control_plane.test_wp_cp_045 import DeterministicProvider
 from tests.fixtures.fake_agent_protocol import FakeAgentProtocolClient, install
+from tests.support.run_control import actor
 from tests.unit.operations.test_async_child_parent_budget import admitted_parent, spawn
 from tests.unit.operations.test_async_child_parent_completion import Lineage
-from tests.unit.run_control.test_run_control import actor
 
 POLICY = "policy:async-result:v1"
 SECRETS = {"environment:BELLABS_ASYNC_SUBAGENT_SERVER_TOKEN": "offline-signing-secret"}

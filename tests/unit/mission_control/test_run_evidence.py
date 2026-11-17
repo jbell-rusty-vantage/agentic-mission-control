@@ -5,7 +5,7 @@ from uuid import uuid4
 import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
-from tests.unit.run_control.test_run_control import DIGEST, request, service
+from tests.support.run_control import DIGEST, request, service
 
 from mission_control.application.context.continuation import CheckpointReadService, CheckpointView
 from mission_control.application.coordinator.coordinator_results import (

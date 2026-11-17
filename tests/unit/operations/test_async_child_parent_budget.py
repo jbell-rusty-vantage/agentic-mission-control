@@ -30,9 +30,9 @@ from mission_control.domain.policies.contracts import (
     StartAction,
 )
 from tests.acceptance.control_plane.test_wp_cp_045 import NOW, DeterministicProvider, request
-from tests.unit.run_control.test_run_control import actor, command
-from tests.unit.run_control.test_run_control import request as run_request
-from tests.unit.run_control.test_run_control import service as run_control_service
+from tests.support.run_control import actor, command
+from tests.support.run_control import request as run_request
+from tests.support.run_control import service as run_control_service
 
 
 async def admitted_parent(*, bounded: dict[str, int] | None = None) -> tuple[object, str]:

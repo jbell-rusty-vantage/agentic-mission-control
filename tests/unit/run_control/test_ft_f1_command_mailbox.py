@@ -70,15 +70,15 @@ from mission_control.interfaces.mcp.coordinator_server import (
     create_coordinator_server,
 )
 from mission_control.interfaces.mcp.run_control_tools import COMMAND_SEND_TOOL, ScopedRunControl
-from tests.unit.coordinator.test_coordinator_mcp_read_surface import FakeFacade
-from tests.unit.run_control.test_run_control import (
+from tests.support.run_control import (
     EMPTY_EVIDENCE_DIGEST,
     INITIAL_EVIDENCE_FRONTIER,
     WORKFLOW_DIGEST,
     service,
 )
-from tests.unit.run_control.test_run_control import actor as control_actor
-from tests.unit.run_control.test_run_control import request as run_request
+from tests.support.run_control import actor as control_actor
+from tests.support.run_control import request as run_request
+from tests.unit.coordinator.test_coordinator_mcp_read_surface import FakeFacade
 
 INSTALLATION = "00000000-0000-7000-8000-0000000000aa"
 TENANT = "00000000-0000-7000-8000-0000000000bb"

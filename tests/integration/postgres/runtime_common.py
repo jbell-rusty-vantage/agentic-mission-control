@@ -18,8 +18,8 @@ from tests.fixtures.mission_control_common_db import (
     create_common_database,
     drop_common_database,
 )
-from tests.unit.run_control.test_run_control import command as unit_command
-from tests.unit.run_control.test_run_control import request as unit_request
+from tests.support.run_control import command as unit_command
+from tests.support.run_control import request as unit_request
 
 
 @pytest_asyncio.fixture

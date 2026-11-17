@@ -28,7 +28,7 @@ from tests.fixtures.qualia_knowledge import build_qualia_knowledge_tools
 from tests.fixtures.qualia_runtime import SpendLedger
 from tests.fixtures.qualia_stagegraph import RECORD_SCHEMA
 from tests.fixtures.qualia_web_tools import build_qualia_web_tools
-from tests.unit.run_control.test_run_control import request
+from tests.support.run_control import request
 
 AT = datetime(2026, 10, 31, tzinfo=UTC)
 SCOPE = canonical_scope("tenant-1", "biotech")

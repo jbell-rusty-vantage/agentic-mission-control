@@ -84,6 +84,7 @@ from tests.fixtures.goal_directed_journaled import (
     goal_templates,
     preparer,
 )
+from tests.support.run_control import actor, command
 from tests.unit.operations.test_checkpoint_recovery_classification import (
     AFTER_TOOL_CHECKPOINT,
     _chain,
@@ -94,7 +95,6 @@ from tests.unit.operations.test_checkpoint_recovery_classification import (
 )
 from tests.unit.operations.test_rrm_016_goal_directed_recovery import _Templates
 from tests.unit.orchestration.test_rrm_016_goal_directed_settlement import _preparation
-from tests.unit.run_control.test_run_control import actor, command
 
 CANCEL_REASON = "operation cancelled by the governed cancellation saga"
 

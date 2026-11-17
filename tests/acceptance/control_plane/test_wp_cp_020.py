@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
-from tests.unit.run_control.test_run_control import (
+from tests.support.run_control import (
     EMPTY_EVIDENCE_DIGEST,
     INITIAL_EVIDENCE_FRONTIER,
     WORKFLOW_DIGEST,

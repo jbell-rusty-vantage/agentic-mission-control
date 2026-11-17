@@ -30,7 +30,7 @@ from tests.fixtures.checkpoint_recovery import (
     recovery_harness,
     stage_recovery_unit,
 )
-from tests.unit.run_control.test_run_control import command
+from tests.support.run_control import command
 
 SLOT = {"concurrency.slots": 1}
 

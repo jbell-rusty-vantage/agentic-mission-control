@@ -26,7 +26,7 @@ from tests.fixtures.checkpoint_lineage import (
     transition,
     unit_result,
 )
-from tests.unit.run_control.test_run_control import (
+from tests.support.run_control import (
     EMPTY_EVIDENCE_DIGEST,
     INITIAL_EVIDENCE_FRONTIER,
     NOW,

@@ -18,8 +18,8 @@ from mission_control.application.missions.service import MissionControlService
 from mission_control.domain.policies.errors import RunControlNotFound
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.integration.postgres.runtime_common import common_db as common_db
+from tests.support.run_control import request, service
 from tests.unit.mission_control.test_run_evidence import ACTOR, binding
-from tests.unit.run_control.test_run_control import request, service
 
 pytestmark = pytest.mark.common_db
 

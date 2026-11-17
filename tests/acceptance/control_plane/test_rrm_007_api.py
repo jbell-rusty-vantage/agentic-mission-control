@@ -11,8 +11,7 @@ from typing import Any
 
 import httpx
 import pytest
-from tests.unit.run_control.test_boundary_commands import TARGET, pause
-from tests.unit.run_control.test_run_control import (
+from tests.support.run_control import (
     ALL_PERMISSIONS,
     actor,
     command,
@@ -21,9 +20,7 @@ from tests.unit.run_control.test_run_control import (
     request,
     service,
 )
-from tests.unit.run_control.test_run_control import (
-    SetWaitAction as _SetWaitAction,
-)
+from tests.unit.run_control.test_boundary_commands import TARGET, pause
 
 from mission_control.application.execution.boundary_interventions import (
     BoundaryCommandDeliveryService,
@@ -39,6 +36,7 @@ from mission_control.domain.policies.contracts import (
     RunPhase,
     StartAction,
 )
+from mission_control.domain.policies.contracts import SetWaitAction as _SetWaitAction
 from mission_control.interfaces.http.control_plane import (
     ControlPlanePrincipal,
     get_control_plane_principal,

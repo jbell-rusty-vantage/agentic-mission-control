@@ -9,7 +9,7 @@ from temporalio.api.history.v1 import HistoryEvent, WorkflowExecutionStartedEven
 from temporalio.converter import DataConverter
 from temporalio.exceptions import ApplicationError
 from tests.fixtures.rrm009_production_stack import goal_blueprint, goal_revision
-from tests.unit.run_control.test_run_control import actor, request, service
+from tests.support.run_control import actor, request, service
 
 from mission_control.adapters.temporal.linked_run_workflow import linked_root_input
 from mission_control.adapters.temporal.submission import TemporalWorkflowSubmitter

@@ -46,8 +46,8 @@ from tests.acceptance.control_plane.test_wp_cp_045 import (
 )
 from tests.fixtures.fake_agent_protocol import FakeAgentProtocolClient, install
 from tests.fixtures.rrm013_live_stack import reconciler
+from tests.support.run_control import actor
 from tests.unit.operations.test_async_child_parent_budget import admitted_parent, spawn
-from tests.unit.run_control.test_run_control import actor
 
 SECRETS = {"environment:AGENT_SERVER_TOKEN": "offline-token"}
 

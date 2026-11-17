@@ -292,9 +292,9 @@ async def test_nested_body_requires_stored_activation_receipt_and_parent_usage(c
     from mission_control.domain.authoring.contracts import StageGraphBlueprint
     from mission_control.domain.policies.contracts import RecordUsageAction, RunOutcome, RunPhase
     from mission_control.domain.programs.nested import NestedProjection
+    from tests.support.run_control import command
     from tests.unit.orchestration.test_completion_validation_service import prepared
     from tests.unit.orchestration.test_wi13_nested_runtime import body
-    from tests.unit.run_control.test_run_control import command
 
     fixture = await prepared(release_usage=False)
     candidate = fixture.result
@@ -420,13 +420,13 @@ async def test_never_activated_nested_body_persists_zero_usage_and_removes_empty
         NestedProgramService,
     )
     from mission_control.domain.programs.nested import NestedSettlementRequest
+    from tests.support.run_control import service
     from tests.unit.orchestration.test_wi13_nested_runtime import (
         NOW,
         SCOPE,
         body,
         parent_with_reservation,
     )
-    from tests.unit.run_control.test_run_control import service
 
     control, _ = service()
     parent = await parent_with_reservation(control, amount=amount)

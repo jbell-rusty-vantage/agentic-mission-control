@@ -43,7 +43,7 @@ from mission_control.domain.policies.contracts import (
 from mission_control.domain.policies.errors import IdempotencyConflict
 from tests.fixtures.checkpoint_recovery import FixtureControlPlane, governed_workspace
 from tests.fixtures.lane_turns import SCOPE, RecordingSignals, cursor_operation, lane_stack
-from tests.unit.run_control.test_run_control import actor, command, request, service
+from tests.support.run_control import actor, command, request, service
 
 
 class RejectionJournal:

@@ -24,10 +24,10 @@ from mission_control.application.programs.service import (
 from mission_control.domain.authoring.canonical import sha256_digest
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.integration.postgres.runtime_common import common_db as common_db
+from tests.support.run_control import ConfigurationVerifier
 from tests.unit.orchestration.test_artifact_schema_validation import Custody, captured
 from tests.unit.orchestration.test_completion_validation_service import OUTPUT, prepared
 from tests.unit.run_control.test_atomic_family_admission import admission_policies
-from tests.unit.run_control.test_run_control import ConfigurationVerifier
 
 pytestmark = pytest.mark.common_db
 

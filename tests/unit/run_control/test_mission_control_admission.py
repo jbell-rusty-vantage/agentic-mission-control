@@ -10,7 +10,7 @@ from mission_control.contracts.admission_contracts import (
     MissionLaunchRequest,
 )
 from mission_control.contracts.contracts import MissionControlRejected
-from tests.unit.run_control.test_run_control import actor, request, service
+from tests.support.run_control import actor, request, service
 from tests.unit.run_control.test_run_launch import RecordingSubmitter, _input
 
 

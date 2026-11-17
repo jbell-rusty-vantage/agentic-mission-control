@@ -6,7 +6,7 @@ import httpx
 import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
-from tests.unit.run_control.test_run_control import service as run_control_service
+from tests.support.run_control import service as run_control_service
 
 from mission_control.application.execution.boundary_interventions import BoundaryInterventionService
 from mission_control.application.installations.registry import (

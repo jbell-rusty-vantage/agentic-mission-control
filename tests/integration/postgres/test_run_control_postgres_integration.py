@@ -39,7 +39,7 @@ from tests.integration.postgres.runtime_common import (
     scoped_request,
 )
 from tests.integration.postgres.runtime_common import common_db as common_db
-from tests.unit.run_control.test_run_control import service
+from tests.support.run_control import service
 
 pytestmark = pytest.mark.common_db
 

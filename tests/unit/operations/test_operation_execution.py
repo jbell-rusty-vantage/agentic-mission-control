@@ -99,7 +99,7 @@ from mission_control.domain.policies.contracts import (
 )
 from mission_control.domain.policies.errors import IdempotencyConflict
 from tests.fixtures.lane_bindings import lane_fields
-from tests.unit.run_control.test_run_control import actor, command, request, service
+from tests.support.run_control import actor, command, request, service
 
 NOW = datetime(2026, 7, 19, 20, 0, tzinfo=UTC)
 DIGEST = "sha256:" + "a" * 64

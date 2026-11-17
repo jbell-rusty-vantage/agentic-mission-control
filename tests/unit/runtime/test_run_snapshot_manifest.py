@@ -69,9 +69,9 @@ from tests.fixtures.run_forks import (
     stage_policy,
     stagegraph_head,
 )
-from tests.unit.run_control.test_run_control import WORKFLOW_DIGEST, command
-from tests.unit.run_control.test_run_control import request as run_request
-from tests.unit.run_control.test_run_control import service as run_control_service
+from tests.support.run_control import WORKFLOW_DIGEST, command
+from tests.support.run_control import request as run_request
+from tests.support.run_control import service as run_control_service
 
 SCOPE = "tenant-1"
 
@@ -916,7 +916,7 @@ async def test_unauthorized_stale_unknown_and_rejected_forks_fail_safely() -> No
 
 
 def test_fork_request_binds_scope_snapshot_patch_and_admission() -> None:
-    from tests.unit.run_control.test_run_control import request as run_request
+    from tests.support.run_control import request as run_request
 
     target = run_request(request_id="fork-1")
     patch = RunForkPatch.create(

@@ -23,13 +23,7 @@ from mission_control.domain.coordinator.launch import BlueprintFamily, WorkflowS
 from mission_control.domain.policies.contracts import ActorContext
 from mission_control.domain.programs.contracts import StageGraphRunInput
 from tests.fixtures.rrm009_production_stack import stage_blueprint
-from tests.unit.run_control.test_run_control import (
-    DIGEST,
-    WORKFLOW_DIGEST,
-    actor,
-    request,
-    service,
-)
+from tests.support.run_control import DIGEST, WORKFLOW_DIGEST, actor, request, service
 
 SCOPE = "tenant-1"
 

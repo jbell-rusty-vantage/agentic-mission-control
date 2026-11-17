@@ -56,7 +56,7 @@ from tests.fixtures.provider_frames import StepClock, turn_observations
 from tests.integration.postgres.frames_common import AdmittedUnit, admit_unit_attempt
 from tests.integration.postgres.runtime_common import common_db as common_db
 from tests.integration.postgres.runtime_common import owner_rows, scoped_command
-from tests.unit.run_control.test_run_control import ALL_PERMISSIONS
+from tests.support.run_control import ALL_PERMISSIONS
 from tests.unit.socketio.harness import MissionClient, serve
 
 pytestmark = pytest.mark.common_db

@@ -78,7 +78,7 @@ from tests.fixtures.goal_directed_journaled import (
     goal_start_action,
 )
 from tests.fixtures.lane_bindings import lane_fields
-from tests.unit.run_control.test_run_control import actor, command
+from tests.support.run_control import actor, command
 
 NOW_ISSUER = "goal-directed-worker"
 
@@ -163,7 +163,7 @@ def _preparation(
 
 
 def _now() -> Any:
-    from tests.unit.run_control.test_run_control import NOW
+    from tests.support.run_control import NOW
 
     return NOW
 

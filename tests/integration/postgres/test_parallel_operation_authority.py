@@ -36,8 +36,8 @@ from mission_control.domain.policies.contracts import (
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.integration.postgres.runtime_common import common_db as common_db
 from tests.integration.postgres.runtime_common import scoped_command, scoped_request
+from tests.support.run_control import NOW, actor, service
 from tests.unit.operations.test_operation_execution import operation_request
-from tests.unit.run_control.test_run_control import NOW, actor, service
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.common_db]
 

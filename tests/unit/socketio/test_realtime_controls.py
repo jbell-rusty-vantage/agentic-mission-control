@@ -31,6 +31,7 @@ from mission_control.interfaces.socketio.commands import (
 )
 from mission_control.interfaces.socketio.server import MissionNamespace
 from tests.fixtures.provider_frames import FIXTURE_HARNESS
+from tests.support.run_control import command, service
 from tests.unit.frames.test_lineage_stream import claude_frames
 from tests.unit.run_control.test_boundary_commands import (
     TARGET,
@@ -38,7 +39,6 @@ from tests.unit.run_control.test_boundary_commands import (
     pause,
     started,
 )
-from tests.unit.run_control.test_run_control import command, service
 from tests.unit.socketio.harness import SERVER_EVENTS as HARNESS_EVENTS
 from tests.unit.socketio.harness import MissionClient, serve
 from tests.unit.socketio.test_mission_socket import (

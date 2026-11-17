@@ -20,8 +20,8 @@ from tests.fixtures.mission_control_production_stack import start_local
 from tests.fixtures.owned_process import OwnedProcess
 from tests.fixtures.validation_restart_worker import ValidationRestartWorkflow
 from tests.integration.postgres.runtime_common import common_db as common_db
+from tests.support.run_control import command
 from tests.unit.orchestration.test_completion_validation_service import prepared
-from tests.unit.run_control.test_run_control import command
 
 from mission_control.adapters.postgres.orchestration.completion_evidence import (
     PostgresCompletionEvidenceReader,

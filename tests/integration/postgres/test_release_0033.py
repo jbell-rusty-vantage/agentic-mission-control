@@ -47,7 +47,7 @@ from tests.integration.postgres.runtime_common import (  # noqa: F401
     owner_rows,
     scoped_count,
 )
-from tests.unit.run_control.test_run_control import request, service
+from tests.support.run_control import request, service
 
 pytestmark = pytest.mark.common_db
 

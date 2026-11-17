@@ -61,7 +61,7 @@ from tests.fixtures.checkpoint_recovery import (
     recovery_harness,
     stage_recovery_unit,
 )
-from tests.unit.run_control.test_run_control import actor, command
+from tests.support.run_control import actor, command
 
 FAST = InjectionSettings(poll_seconds=0.01, settle_grace_seconds=0.3, settle_poll_seconds=0.01)
 INJECTED = "Redirect: use release/2.3, not main."

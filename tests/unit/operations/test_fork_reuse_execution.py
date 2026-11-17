@@ -41,7 +41,7 @@ from tests.fixtures.run_forks import (
     stage_policy,
     stagegraph_head,
 )
-from tests.unit.run_control.test_run_control import WORKFLOW_DIGEST, command
+from tests.support.run_control import WORKFLOW_DIGEST, command
 
 SCOPE = "tenant-1"
 

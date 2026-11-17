@@ -58,8 +58,8 @@ from tests.integration.temporal.test_rrm_007_boundary_interventions import (
 from tests.integration.temporal.test_wp_bp_010_temporal import QUEUE, _blueprint
 from tests.integration.temporal.test_wp_bp_010_temporal import _run_input as stage_input
 from tests.integration.temporal.test_wp_bp_020_temporal import _run_input as goal_input
-from tests.unit.run_control.test_run_control import actor, command, request
-from tests.unit.run_control.test_run_control import service as run_control_service
+from tests.support.run_control import actor, command, request
+from tests.support.run_control import service as run_control_service
 
 from mission_control.adapters.postgres.run_control.run_control_repository import (
     PostgresRunControlRepository,

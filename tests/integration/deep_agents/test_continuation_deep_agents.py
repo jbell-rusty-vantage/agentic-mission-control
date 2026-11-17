@@ -24,7 +24,7 @@ from tests.fixtures.provider_frames import StepClock as FrameClock
 from tests.integration.postgres.frames_common import admit_unit_attempt
 from tests.integration.postgres.runtime_common import common_db as common_db
 from tests.integration.postgres.runtime_common import owner_rows
-from tests.unit.run_control.test_run_control import ALL_PERMISSIONS, actor
+from tests.support.run_control import ALL_PERMISSIONS, actor
 
 from mission_control.adapters.deep_agents.compaction import (
     DeepAgentsSessionHydrator,

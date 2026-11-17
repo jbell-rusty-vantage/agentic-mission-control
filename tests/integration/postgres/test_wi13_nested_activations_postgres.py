@@ -182,7 +182,7 @@ async def test_a_nested_child_is_admitted_once_into_the_parent_revision(
     )
     from mission_control.application.programs.nested_bodies import NestedLaunchRefused
     from mission_control.domain.programs.nested import NESTED_ISSUER
-    from tests.unit.run_control.test_run_control import request, service
+    from tests.support.run_control import request, service
 
     pool = await wi13_db.pool()
     try:

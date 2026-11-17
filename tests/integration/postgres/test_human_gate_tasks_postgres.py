@@ -32,8 +32,8 @@ from mission_control.domain.programs.human_gate import (
 )
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.integration.postgres.runtime_common import common_db, owner_rows  # noqa: F401
+from tests.support.run_control import request, service
 from tests.unit.human_tasks.fixtures import activation, later, spec
-from tests.unit.run_control.test_run_control import request, service
 
 pytestmark = pytest.mark.common_db
 

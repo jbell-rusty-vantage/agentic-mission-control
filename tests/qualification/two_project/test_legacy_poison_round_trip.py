@@ -126,7 +126,7 @@ async def test_admission_and_inspection_round_trip_never_reach_legacy(legacy_poi
     from mission_control.adapters.postgres.run_control.run_control_repository import (
         PostgresRunControlRepository,
     )
-    from tests.unit.run_control.test_run_control import request, service
+    from tests.support.run_control import request, service
 
     server = require_admin_dsn()
     database = await create_common_database(legacy_poison=legacy_poison, server_dsn=server)

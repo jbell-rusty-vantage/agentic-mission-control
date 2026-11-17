@@ -29,12 +29,7 @@ from mission_control.domain.policies.contracts import (
     TerminalizationProposal,
     TerminalizeAction,
 )
-from tests.unit.run_control.test_atomic_family_admission import (
-    TestFamilyMutation,
-    admission_policies,
-)
-from tests.unit.run_control.test_boundary_commands import TARGET, pause, states
-from tests.unit.run_control.test_run_control import (
+from tests.support.run_control import (
     EMPTY_EVIDENCE_DIGEST,
     INITIAL_EVIDENCE_FRONTIER,
     NOW,
@@ -43,6 +38,11 @@ from tests.unit.run_control.test_run_control import (
     command,
     request,
 )
+from tests.unit.run_control.test_atomic_family_admission import (
+    TestFamilyMutation,
+    admission_policies,
+)
+from tests.unit.run_control.test_boundary_commands import TARGET, pause, states
 
 
 def terminal_family_registry() -> FamilyAdmissionRegistry:

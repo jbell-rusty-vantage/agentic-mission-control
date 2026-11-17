@@ -4,8 +4,8 @@ from uuid import uuid4
 import httpx
 import pytest
 from fastapi import FastAPI
+from tests.support.run_control import actor
 from tests.unit.recovery.test_closed_workflow import setup_recovery
-from tests.unit.run_control.test_run_control import actor
 
 from mission_control.application.missions.runtime import MissionControlRuntimeService
 from mission_control.interfaces.http.mission_control import (

@@ -61,8 +61,8 @@ from tests.integration.postgres.runtime_common import (
     scoped_command,
     scoped_request,
 )
-from tests.unit.run_control.test_run_control import NOW, WORKFLOW_DIGEST
-from tests.unit.run_control.test_run_control import service as run_control_service
+from tests.support.run_control import NOW, WORKFLOW_DIGEST
+from tests.support.run_control import service as run_control_service
 
 pytestmark = pytest.mark.common_db
 

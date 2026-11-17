@@ -20,7 +20,7 @@ from mission_control.domain.authoring.manifest_lowering import (
 )
 from mission_control.domain.policies.contracts import RunRequest, VerifiedRunConfiguration
 from mission_control.domain.policies.errors import AdmissionRejected
-from tests.unit.run_control.test_run_control import ConfigurationVerifier, request
+from tests.support.run_control import ConfigurationVerifier, request
 
 
 class ManifestConfigurationVerifier(ConfigurationVerifier):

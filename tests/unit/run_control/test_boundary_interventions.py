@@ -37,6 +37,14 @@ from mission_control.domain.policies.contracts import (
     TerminalizeAction,
 )
 from mission_control.domain.programs.contracts import BoundaryCommandAck, WorkflowMessageReceipt
+from tests.support.run_control import (
+    EMPTY_EVIDENCE_DIGEST,
+    INITIAL_EVIDENCE_FRONTIER,
+    NOW,
+    WORKFLOW_DIGEST,
+    command,
+    service,
+)
 from tests.unit.run_control.test_boundary_commands import (
     BOUNDARY_PERMISSIONS,
     FAMILY_WORKFLOW_ID,
@@ -46,14 +54,6 @@ from tests.unit.run_control.test_boundary_commands import (
     pause,
     started,
     states,
-)
-from tests.unit.run_control.test_run_control import (
-    EMPTY_EVIDENCE_DIGEST,
-    INITIAL_EVIDENCE_FRONTIER,
-    NOW,
-    WORKFLOW_DIGEST,
-    command,
-    service,
 )
 
 

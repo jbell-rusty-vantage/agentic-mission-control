@@ -40,9 +40,9 @@ from mission_control.interfaces.http.mission_control import (
 )
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.integration.postgres.runtime_common import common_db as common_db
+from tests.support.run_control import actor, command, request, service
 from tests.unit.run_control.test_boundary_commands import TARGET, pause
 from tests.unit.run_control.test_mission_control_facade import pause_request
-from tests.unit.run_control.test_run_control import actor, command, request, service
 
 pytestmark = pytest.mark.common_db
 

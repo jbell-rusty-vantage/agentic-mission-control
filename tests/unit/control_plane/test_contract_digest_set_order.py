@@ -315,7 +315,7 @@ async def test_bootstrap_authority_projection_digests_are_independent_of_set_ite
     from mission_control.adapters.postgres.runtime.runtime_authority import (
         PostgresBootstrapAuthority,
     )
-    from tests.unit.run_control.test_run_control import request, service
+    from tests.support.run_control import request, service
 
     run_service, repository = service()
     admitted = await run_service.admit(request(request_id="bootstrap-digest"))
@@ -620,7 +620,8 @@ def test_stable_json_dump_normalizes_aware_datetimes_inside_sets() -> None:
 async def _run_control_replay_material():  # type: ignore[no-untyped-def]
     """A real accepted start transition, command result, outbox event and budget."""
 
-    from tests.unit.run_control.test_run_control import StartAction, command, request, service
+    from mission_control.domain.policies.contracts import StartAction
+    from tests.support.run_control import command, request, service
 
     run_service, repository = service()
     admitted = await run_service.admit(request(request_id="replay-sites"))

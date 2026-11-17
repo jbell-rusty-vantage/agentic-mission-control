@@ -64,9 +64,9 @@ from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.fixtures.mission_control_local_agent_server import local_agent_server
 from tests.integration.postgres.runtime_common import common_db as common_db
 from tests.integration.postgres.runtime_common import scoped_command, scoped_request
+from tests.support.run_control import service as run_control_service
 from tests.unit.operations.test_async_child_check_time_admission import _sealed_contract
 from tests.unit.operations.test_async_child_parent_budget import spawn
-from tests.unit.run_control.test_run_control import service as run_control_service
 
 pytestmark = pytest.mark.common_db
 TOKEN_ENV = "BELLABS_ASYNC_SUBAGENT_SERVER_TOKEN"

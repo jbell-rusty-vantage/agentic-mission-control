@@ -47,9 +47,9 @@ from mission_control.interfaces.mcp.transcript_tools import (
 )
 from tests.fixtures.provider_frames import INSTALLATION, SCOPE, TENANT
 from tests.fixtures.transcripts import RUN_KEY
+from tests.support.run_control import service as run_control_service
 from tests.unit.frames.test_transcript_interfaces import transcript_service
 from tests.unit.run_control.test_boundary_commands import TARGET, started
-from tests.unit.run_control.test_run_control import service as run_control_service
 
 READER = ActorContext(actor_id="reader", permissions=frozenset({"workflow_run.read"}))
 NOW = datetime(2026, 10, 8, 12, 0, tzinfo=UTC)

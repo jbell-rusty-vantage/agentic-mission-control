@@ -569,7 +569,7 @@ async def test_stagegraph_cancel_supersedes_a_delivered_release_and_a_held_wait(
 
 
 def authority_command(version: int, run_id: str, command_id: str, action: Any) -> Any:
-    from tests.unit.run_control.test_run_control import command
+    from tests.support.run_control import command
 
     return command(run_id, version, command_id, action)
 

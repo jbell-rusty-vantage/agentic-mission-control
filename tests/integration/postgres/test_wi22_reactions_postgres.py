@@ -85,6 +85,7 @@ from tests.fixtures.mission_control_common_db import (
     migration_paths_with,
 )
 from tests.integration.postgres.runtime_common import scoped_request
+from tests.support.run_control import service
 from tests.unit.context.test_transfer_plan import (
     OVERHEAD,
     _deliveries,
@@ -100,7 +101,6 @@ from tests.unit.outputs.scenario import (
     code_change,
     obligation,
 )
-from tests.unit.run_control.test_run_control import service
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.common_db]
 MIGRATION = (

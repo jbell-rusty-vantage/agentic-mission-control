@@ -207,7 +207,7 @@ def goal_snapshot(
     (`revisions[iteration]` overrides the revision an iteration ran under; the head runs
     under `revision`)."""
 
-    from tests.unit.run_control.test_run_control import request as run_request
+    from tests.support.run_control import request as run_request
 
     candidates = []
     agent_run = 1

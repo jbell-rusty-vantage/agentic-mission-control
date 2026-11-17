@@ -97,6 +97,9 @@ from tests.fixtures.run_forks import (
     stage_policy,
     stagegraph_head,
 )
+from tests.support.run_control import WORKFLOW_DIGEST, actor
+from tests.support.run_control import command as lifecycle
+from tests.support.run_control import request as run_request
 from tests.unit.coordinator.test_coordinator_mcp_read_surface import FakeFacade
 from tests.unit.operations.test_ft_b2_stage_handoff import (
     FakeArtifacts,
@@ -104,9 +107,6 @@ from tests.unit.operations.test_ft_b2_stage_handoff import (
     FakeStaging,
 )
 from tests.unit.orchestration.test_rrm_016_goal_directed_settlement import _run_iteration_one
-from tests.unit.run_control.test_run_control import WORKFLOW_DIGEST, actor
-from tests.unit.run_control.test_run_control import command as lifecycle
-from tests.unit.run_control.test_run_control import request as run_request
 
 SCOPE = "mc/00000000-0000-7000-8000-0000000000aa/biotech/00000000-0000-7000-8000-0000000000bb"
 GRANTS = {

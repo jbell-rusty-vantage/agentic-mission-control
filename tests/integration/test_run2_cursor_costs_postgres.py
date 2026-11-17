@@ -58,7 +58,7 @@ from tests.fixtures.mission_control_common_db import (
 )
 from tests.fixtures.provider_frames import harness_start
 from tests.integration.postgres.runtime_common import scoped_command, scoped_request
-from tests.unit.run_control.test_run_control import actor, service
+from tests.support.run_control import actor, service
 
 NOW = datetime(2026, 10, 14, tzinfo=UTC)
 COMPONENT = (

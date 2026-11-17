@@ -56,6 +56,7 @@ from tests.fixtures.goal_directed_journaled import (
     goal_run_control,
     goal_start_action,
 )
+from tests.support.run_control import command
 from tests.unit.operations.test_ft_b2_stage_handoff import (
     FakeArtifacts,
     FakeSelections,
@@ -66,7 +67,6 @@ from tests.unit.orchestration.test_rrm_016_goal_directed_settlement import (
     _preparation,
     _run_iteration_one,
 )
-from tests.unit.run_control.test_run_control import command
 
 DRAFT_SECRET = "PRIVATE-EXECUTOR-REASONING: try the hidden tactic first"
 

@@ -34,9 +34,9 @@ from mission_control.domain.policies.stop_fence import (
     fence_verdict,
     immediate_cancel_permissions,
 )
+from tests.support.run_control import service
 from tests.unit.run_control.test_boundary_commands import TARGET, started
 from tests.unit.run_control.test_mission_control_facade import actor
-from tests.unit.run_control.test_run_control import service
 
 NOW = datetime(2026, 10, 8, 9, 0, tzinfo=UTC)
 

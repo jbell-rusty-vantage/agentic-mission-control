@@ -10,7 +10,7 @@ import pytest
 
 from mission_control.application.subscriptions.coordinator import NotificationKind, extract_facts
 from mission_control.domain.policies.contracts import SetWaitAction, StartAction, WaitCondition
-from tests.unit.run_control.test_run_control import command, request, service
+from tests.support.run_control import command, request, service
 from tests.unit.subscriptions.test_mp15_coordinator import classify_type
 
 

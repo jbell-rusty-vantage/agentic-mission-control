@@ -11,7 +11,7 @@ from datetime import timedelta
 from typing import Any
 
 from tests.fixtures.checkpoint_recovery import MemoryOperationJournal
-from tests.unit.run_control.test_run_control import ALL_PERMISSIONS, NOW, WORKFLOW_DIGEST
+from tests.support.run_control import ALL_PERMISSIONS, NOW, WORKFLOW_DIGEST
 
 from mission_control.application.execution.inspection import InMemoryInspectionReadRepository
 from mission_control.application.execution.operations.checkpoint_lineage import (
@@ -401,7 +401,7 @@ def technical_snapshot(
 ) -> RunSnapshotManifest:
     """A minimal, valid StageGraph snapshot of `run_id` (storage and saga suites)."""
 
-    from tests.unit.run_control.test_run_control import request as run_request
+    from tests.support.run_control import request as run_request
 
     from mission_control.domain.policies.forks import (
         BudgetFrontier,

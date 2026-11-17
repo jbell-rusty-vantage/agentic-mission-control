@@ -58,8 +58,8 @@ from tests.fixtures.provider_frames import (
     provider_frame,
     turn_observations,
 )
-from tests.unit.run_control.test_run_control import ALL_PERMISSIONS, actor, command, request
-from tests.unit.run_control.test_run_control import service as run_control_service
+from tests.support.run_control import ALL_PERMISSIONS, actor, command, request
+from tests.support.run_control import service as run_control_service
 
 K = FrameKind
 DA = DeriveContext(lane=LaneProfile.DEEP_AGENTS, current_generation=1)

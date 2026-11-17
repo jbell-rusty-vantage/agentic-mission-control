@@ -42,7 +42,7 @@ from mission_control.domain.programs.nested import (
     stage_result,
     uncontained,
 )
-from tests.unit.run_control.test_run_control import command, request, service
+from tests.support.run_control import command, request, service
 
 NOW = datetime(2026, 10, 29, tzinfo=UTC)
 DIGEST = "sha256:" + "a" * 64

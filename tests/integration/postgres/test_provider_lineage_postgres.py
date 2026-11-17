@@ -55,12 +55,8 @@ from tests.integration.postgres.test_subscriptions import (
     Clock,
     Receiver,
 )
+from tests.support.run_control import EMPTY_EVIDENCE_DIGEST, NOW, WORKFLOW_DIGEST
 from tests.unit.frames.test_provider_lanes import claude_observations, codex_app_observations
-from tests.unit.run_control.test_run_control import (
-    EMPTY_EVIDENCE_DIGEST,
-    NOW,
-    WORKFLOW_DIGEST,
-)
 
 pytestmark = pytest.mark.common_db
 

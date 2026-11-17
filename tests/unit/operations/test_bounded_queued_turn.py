@@ -32,6 +32,7 @@ from tests.fixtures.checkpoint_recovery import (
     stage_recovery_unit,
 )
 from tests.fixtures.lane_bindings import lane_fields
+from tests.support.run_control import command
 from tests.unit.operations.test_ft_f2_interrupt_and_inject import (
     FAST,
     RecordingModel,
@@ -41,7 +42,6 @@ from tests.unit.operations.test_ft_f2_interrupt_and_inject import (
     states,
     status_of,
 )
-from tests.unit.run_control.test_run_control import command
 
 MARKER = "QUEUED-NATIVE-FOLLOWUP-EXACT-67142"
 

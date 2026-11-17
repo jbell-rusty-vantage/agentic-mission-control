@@ -62,6 +62,7 @@ from tests.fixtures.mission_control_common_db import (
     tenant_id,
 )
 from tests.integration.postgres.runtime_common import owner_rows
+from tests.support.run_control import request, service
 from tests.unit.approvals.fixtures import (
     POLICY,
     REVIEWER,
@@ -70,7 +71,6 @@ from tests.unit.approvals.fixtures import (
     elicitation_request,
     permission_request,
 )
-from tests.unit.run_control.test_run_control import request, service
 from tests.unit.socketio.harness import MissionClient, fixture_token, serve
 
 pytestmark = pytest.mark.common_db

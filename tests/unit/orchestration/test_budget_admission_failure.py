@@ -34,7 +34,7 @@ def graph():
 
 async def prepared(*, conclude=True, repository=None, run_request=None, make_command=None):
     from mission_control.domain.policies.contracts import BudgetApplicability
-    from tests.unit.run_control.test_run_control import request
+    from tests.support.run_control import request
 
     run_request = run_request or request()
     run_request = run_request.model_copy(
@@ -177,7 +177,7 @@ def test_absent_admission_rejection_keeps_legacy_projection_digest_and_payload()
 @pytest.mark.asyncio
 async def test_stale_admission_is_not_converted_to_candidate_failure():
     from mission_control.domain.policies.contracts import CancelAction
-    from tests.unit.run_control.test_run_control import command
+    from tests.support.run_control import command
 
     control, repository, candidate, _ = await prepared()
     advanced = await control.execute(command(candidate.run_id, 3, "advance", CancelAction()))
@@ -324,7 +324,7 @@ async def test_cancel_between_denial_and_rejection_commit_preserves_cancellation
         CancelAction,
         RecordAdmissionRejectionAction,
     )
-    from tests.unit.run_control.test_run_control import command
+    from tests.support.run_control import command
 
     control, repository, candidate, _ = await prepared()
     execute = control.execute_family_admission
@@ -493,8 +493,8 @@ async def test_other_producer_budget_liabilities_do_not_conclude_candidate(liabi
         ReserveBudgetAction,
         StartAction,
     )
+    from tests.support.run_control import ConfigurationVerifier, command, request
     from tests.unit.run_control.test_atomic_family_admission import admission_policies
-    from tests.unit.run_control.test_run_control import ConfigurationVerifier, command, request
 
     _, _, candidate, _ = await prepared()
     repository = InMemoryRunControlRepository()

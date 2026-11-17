@@ -63,7 +63,7 @@ from mission_control.interfaces.http.run_control import (
     compose_api_run_control_service,
     configure_family_admission_registry,
 )
-from tests.unit.run_control.test_run_control import ConfigurationVerifier, command, request
+from tests.support.run_control import ConfigurationVerifier, command, request
 
 
 class TestFamilyMutation(AtomicFamilyMutation):

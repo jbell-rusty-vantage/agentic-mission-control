@@ -105,7 +105,7 @@ from tests.integration.temporal.test_wp_bp_010_temporal import FakeStageGraphAct
 from tests.integration.temporal.test_wp_bp_010_temporal import _operation as stage_operation
 from tests.integration.temporal.test_wp_bp_020_temporal import FakeGoalDirectedActivities
 from tests.integration.temporal.test_wp_bp_020_temporal import _run_input as goal_input
-from tests.unit.run_control.test_run_control import request, service
+from tests.support.run_control import request, service
 
 pytestmark = pytest.mark.common_db
 

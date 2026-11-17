@@ -57,9 +57,9 @@ from tests.integration.postgres.runtime_common import (
     scoped_command,
     scoped_request,
 )
+from tests.support.run_control import WORKFLOW_DIGEST, actor
+from tests.support.run_control import service as run_control_service
 from tests.unit.context.test_fork_conversation_custody import custody
-from tests.unit.run_control.test_run_control import WORKFLOW_DIGEST, actor
-from tests.unit.run_control.test_run_control import service as run_control_service
 
 pytestmark = pytest.mark.common_db
 

@@ -15,7 +15,7 @@ from mission_control.domain.policies.contracts import (
     StartAction,
 )
 from mission_control.domain.policies.errors import CommandRejected
-from tests.unit.run_control.test_run_control import actor, command, request, service
+from tests.support.run_control import actor, command, request, service
 
 
 async def admitted():

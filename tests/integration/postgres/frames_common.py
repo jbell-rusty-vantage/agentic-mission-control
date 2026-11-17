@@ -26,7 +26,7 @@ from tests.fixtures.checkpoint_lineage import (
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.fixtures.provider_frames import BINDING_DIGEST
 from tests.integration.postgres.runtime_common import scoped_command, scoped_request
-from tests.unit.run_control.test_run_control import service as run_control_service
+from tests.support.run_control import service as run_control_service
 
 
 @dataclass(frozen=True)

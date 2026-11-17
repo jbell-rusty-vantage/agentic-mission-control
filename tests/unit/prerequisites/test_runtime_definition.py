@@ -14,7 +14,7 @@ from mission_control.application.prerequisites.preflight import (
 from mission_control.application.prerequisites.service import InMemoryOwnerPrerequisiteRepository
 from mission_control.domain.programs.contracts import StageGraphRunInput
 from tests.fixtures.managed_lane import managed_binding, managed_operation
-from tests.unit.run_control.test_run_control import request
+from tests.support.run_control import request
 from tests.unit.run_control.test_run_launch import _input
 
 

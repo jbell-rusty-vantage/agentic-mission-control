@@ -52,13 +52,13 @@ from mission_control.domain.programs.family_failure import (
     FamilyFailureTerminalizationResult,
 )
 from tests.fixtures.goal_directed_journaled import SCOPE, goal_start_action
+from tests.support.run_control import command
 from tests.unit.coordinator.test_root_result_materialization import root
 from tests.unit.orchestration.test_rrm_016_goal_directed_settlement import (
     _claim,
     _composition,
     _preparation,
 )
-from tests.unit.run_control.test_run_control import command
 
 NOW = datetime(2026, 10, 28, tzinfo=UTC)
 

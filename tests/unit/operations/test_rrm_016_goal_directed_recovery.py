@@ -36,12 +36,12 @@ from tests.fixtures.goal_directed_journaled import (
     governed_result_service,
     preparer,
 )
+from tests.support.run_control import command
 from tests.unit.orchestration.test_rrm_016_goal_directed_settlement import (
     _claim,
     _preparation,
     _reconciliation,
 )
-from tests.unit.run_control.test_run_control import command
 
 
 class _Templates:

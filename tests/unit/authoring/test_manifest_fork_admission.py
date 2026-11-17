@@ -12,7 +12,7 @@ from mission_control.application.authoring.manifest_submit import SUBMIT_ISSUER,
 from mission_control.domain.authoring.canonical import sha256_digest
 from mission_control.domain.authoring.manifest_lowering import MANIFEST_INPUT_CONTRACT
 from mission_control.domain.policies.forks import ForkRejected
-from tests.unit.run_control.test_run_control import request, service
+from tests.support.run_control import request, service
 
 
 async def fixture(corruption=None, *, contract=MANIFEST_INPUT_CONTRACT):

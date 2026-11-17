@@ -61,7 +61,7 @@ from tests.integration.temporal.test_chain_start_idempotent import (
     OneShotStore,
 )
 from tests.integration.temporal.test_chain_start_idempotent import SCOPE as CHAIN_SCOPE
-from tests.unit.run_control.test_run_control import request, service
+from tests.support.run_control import request, service
 from tests.unit.watchers.fakes import RUN_ID, FakeRunGateway, MemoryWatcherStore
 from tests.unit.watchers.test_watcher_manifest import definition, event_wait_document
 

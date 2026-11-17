@@ -43,9 +43,9 @@ from mission_control.domain.execution.heartbeats import (
 from mission_control.domain.policies.contracts import CancelAction, RunPhase
 from tests.fixtures.isolated_settings import isolated_settings
 from tests.fixtures.lane_bindings import lane_fields
+from tests.support.run_control import command, service
 from tests.unit.operations.test_operation_execution import operation_request
 from tests.unit.run_control.test_boundary_commands import FAMILY_WORKFLOW_ID, TARGET, started
-from tests.unit.run_control.test_run_control import command, service
 
 
 def _deep(*contracts: str) -> Any:

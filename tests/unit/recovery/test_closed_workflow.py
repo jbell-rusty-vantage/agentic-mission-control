@@ -8,7 +8,7 @@ from uuid import uuid4
 
 import pytest
 from pydantic import ValidationError
-from tests.unit.run_control.test_run_control import NOW, actor, command, request, service
+from tests.support.run_control import NOW, actor, command, request, service
 
 from mission_control.application.recovery.closed_workflow import (
     ClosedExecution,

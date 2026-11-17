@@ -51,9 +51,9 @@ from mission_control.domain.policies.errors import IdempotencyConflict, RunVersi
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.integration.postgres.runtime_common import common_db as common_db
 from tests.integration.postgres.runtime_common import owner_rows
-from tests.unit.run_control.test_run_control import actor, service
-from tests.unit.run_control.test_run_control import command as unit_command
-from tests.unit.run_control.test_run_control import request as unit_request
+from tests.support.run_control import actor, service
+from tests.support.run_control import command as unit_command
+from tests.support.run_control import request as unit_request
 
 NOW = datetime(2026, 8, 5, 20, 0, tzinfo=UTC)
 DIGEST = "sha256:" + "a" * 64

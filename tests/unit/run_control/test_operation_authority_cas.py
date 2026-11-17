@@ -13,7 +13,7 @@ from mission_control.domain.policies.contracts import (
     StartAction,
 )
 from mission_control.domain.policies.errors import CommandRejected, IdempotencyConflict
-from tests.unit.run_control.test_run_control import DIGEST, command, request, service
+from tests.support.run_control import DIGEST, command, request, service
 
 
 def claim(run_id: str, name: str):  # type: ignore[no-untyped-def]

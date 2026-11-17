@@ -70,8 +70,8 @@ from tests.integration.temporal.test_wp_bp_010_temporal import (
 from tests.integration.temporal.test_wp_bp_010_temporal import _run_input as stage_run_input
 from tests.integration.temporal.test_wp_bp_020_temporal import FakeGoalDirectedActivities
 from tests.integration.temporal.test_wp_bp_020_temporal import _run_input as goal_run_input
-from tests.unit.run_control.test_run_control import request as run_request
-from tests.unit.run_control.test_run_control import service as run_control_service
+from tests.support.run_control import request as run_request
+from tests.support.run_control import service as run_control_service
 
 GOAL_QUEUE = "wp-bp-020-temporal"
 NOW = datetime(2026, 10, 1, 12, 0, tzinfo=UTC)

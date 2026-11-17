@@ -36,8 +36,8 @@ from tests.integration.temporal.test_rrm_005_search_attributes import (
 )
 from tests.integration.temporal.test_wp_bp_010_temporal import QUEUE, _blueprint
 from tests.integration.temporal.test_wp_bp_010_temporal import _run_input as stage_run_input
-from tests.unit.run_control.test_run_control import request as run_request
-from tests.unit.run_control.test_run_control import service as run_control_service
+from tests.support.run_control import request as run_request
+from tests.support.run_control import service as run_control_service
 
 
 def _key(name: str) -> SearchAttributeKey[Any]:
