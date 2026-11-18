@@ -2,6 +2,7 @@
 
 import json
 from datetime import UTC, datetime, timedelta
+from typing import Any
 
 import pytest
 
@@ -107,5 +108,90 @@ async def test_fenced_terminal_snapshot_is_atomic_idempotent_and_rejects_stale_o
         assert usage["cost_micros"]["value"] is None
         sessions = await owner_rows(common_db, "SELECT state FROM mission_control.agent_session")
         assert [row["state"] for row in sessions] == ["closed"]
+    finally:
+        await pool.close()
+
+
+async def _opened(
+    common_db: CommonDatabase, pool: Any
+) -> tuple[PostgresFrameRepository, PostgresLaneExecutionStateStore, Any]:
+    admitted = await admit_unit_attempt(pool, common_db)
+    frames, states = PostgresFrameRepository(pool), PostgresLaneExecutionStateStore(pool)
+    handle = await frames.open_execution(
+        admitted.start(lane=LaneProfile.CURSOR_LOCAL, native_session_ref="agent-owned-fixture")
+    )
+    await FrameWriter(frames, handle).write(
+        [
+            observation("start", FrameKind.TURN_STARTED, {}, turn="native-owned-fixture"),
+            observation(
+                "partial-usage",
+                FrameKind.USAGE,
+                {"inputTokens": 10, "outputTokens": 2},
+                turn="native-owned-fixture",
+            ),
+        ]
+    )
+    return frames, states, handle
+
+
+@pytest.mark.parametrize("changed", ["generation", "expired"])
+async def test_an_owner_of_another_generation_or_an_expired_lease_never_inserts(
+    common_db: CommonDatabase, changed: str
+):
+    pool = await common_db.pool("mission_control_runtime", max_size=1)
+    try:
+        frames, states, handle = await _opened(common_db, pool)
+        scope = common_db.scope()
+        owner = await states.claim_owner(
+            scope,
+            handle.harness_execution_id,
+            owner_ref="recovery-fixture",
+            generation=1,
+            now=datetime.now(UTC),
+            lease=timedelta(minutes=2),
+        )
+        if changed == "generation":
+            owner = owner.model_copy(update={"generation": 2})
+        else:
+            owner = owner.model_copy(
+                update={"lease_expires_at": datetime.now(UTC) - timedelta(seconds=1)}
+            )
+        before = await frames.frames_for_execution(scope, handle.harness_execution_id, 1)
+        fresh = before[-1].model_copy(update={"provider_key": "fixture:fenced-new"})
+        with pytest.raises((StaleSessionOwner, ValueError)):
+            await frames.append_fenced([fresh], owner=owner)
+        after = await frames.frames_for_execution(scope, handle.harness_execution_id, 1)
+        assert len(after) == len(before), "a refused owner inserted nothing"
+    finally:
+        await pool.close()
+
+
+async def test_an_unfenced_capture_keeps_the_usage_deltas(common_db: CommonDatabase):
+    pool = await common_db.pool("mission_control_runtime", max_size=1)
+    try:
+        frames, _states, handle = await _opened(common_db, pool)
+        body = {
+            "status": "finished",
+            "recovered_observation": True,
+            "capture_manifest_digest": "sha256:" + "a" * 64,
+            "usage": {"inputTokens": 456013, "outputTokens": 14072, "totalTokens": 470085},
+        }
+        await FrameWriter(frames, handle).write(
+            [
+                observation(
+                    "captured-end",
+                    FrameKind.TURN_ENDED,
+                    body,
+                    turn="native-owned-fixture",
+                    raw_kind="mc.terminal-adoption.turn-ended",
+                )
+            ]
+        )
+        rows = await owner_rows(common_db, "SELECT usage FROM mission_control.session_turn")
+        usage = json.loads(rows[0]["usage"])["dimensions"]
+        # Only a fenced terminal capture replaces the incomplete per-frame deltas.
+        assert usage["input_tokens"]["value"] == 10 and usage["output_tokens"]["value"] == 2
+        assert usage["cost_micros"]["value"] is None
+        assert usage["cost_micros"]["disposition"] == "unknown"
     finally:
         await pool.close()
