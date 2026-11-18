@@ -31,16 +31,17 @@ from mission_control.domain.execution.contracts import OperationExecutionRequest
 from mission_control.domain.execution.lanes import SessionHandle
 from mission_control.interfaces.http.hook_callback import create_hook_callback_app
 from tests.fixtures.lane_turns import lane_stack
-from tests.unit.codex.drive import observed, sent
-from tests.unit.codex.fixture_app_server import FixtureLauncher, load_script
-from tests.unit.codex.support import (
+from tests.support.providers.codex import (
     CodexStack,
+    FixtureLauncher,
     StaticProjectionSource,
     build_harness,
     codex_binding,
     codex_operation,
     fixture_settings,
+    load_script,
 )
+from tests.unit.codex.drive import observed, sent
 
 
 def kernel_projection() -> HostProjection:

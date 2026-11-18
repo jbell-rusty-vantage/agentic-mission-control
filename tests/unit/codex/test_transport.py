@@ -25,7 +25,7 @@ from mission_control.adapters.codex.transport import (
     ResponseLost,
     TransportClosed,
 )
-from tests.unit.codex.fixture_app_server import MemoryChannel, channel_pair
+from tests.support.providers.codex import MemoryChannel, channel_pair
 
 
 async def _peer_echo(channel: MemoryChannel, *, reverse: bool = True) -> None:

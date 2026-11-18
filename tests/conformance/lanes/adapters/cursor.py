@@ -1,6 +1,6 @@
 """`cursor_local` (replaying bridge) and `cursor_cloud` (fake Cloud Agents API) for the suite.
 
-FIXTURES: `tests/fixtures/cursor_local.py` and `tests/fixtures/cursor_cloud.py` run the real
+FIXTURES: `tests/support/providers/cursor.py` and `tests/support/providers/cursor.py` run the real
 `CursorLocalHarness` / `CursorCloudHarness` over recorded-shape provider fakes inside a real
 Run (`tests/fixtures/cursor_controls.py`). No Cursor agent is created.
 """
@@ -30,7 +30,6 @@ from tests.conformance.lanes.contract import (
     LaneFake,
     Script,
 )
-from tests.fixtures.cursor_cloud import cloud_stack, load_sse
 from tests.fixtures.cursor_controls import (
     cloud_control_stack,
     control_stack,
@@ -39,7 +38,7 @@ from tests.fixtures.cursor_controls import (
     register_run,
     started_session,
 )
-from tests.fixtures.cursor_local import local_stack
+from tests.support.providers.cursor import cloud_stack, load_sse, local_stack
 
 # Bridge offsets / SSE event ids at which the fixture run holds with a tool call running.
 _LOCAL_TOOL_RUNNING = 6

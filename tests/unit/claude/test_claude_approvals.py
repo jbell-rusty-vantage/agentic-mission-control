@@ -59,8 +59,7 @@ from mission_control.domain.frames.contracts import FrameKind
 from mission_control.domain.policies.contracts import ActorContext
 from mission_control.domain.policies.stop_fence import StopFence
 from tests.fixtures.lane_turns import RecordingSignals
-from tests.unit.approvals.fixtures import answer
-from tests.unit.claude.fixtures import (
+from tests.support.providers.claude import (
     FIXTURE_ENVIRON,
     PROFILE,
     SESSION_ID,
@@ -71,6 +70,7 @@ from tests.unit.claude.fixtures import (
     fixture_admission,
     projection_rows,
 )
+from tests.unit.approvals.fixtures import answer
 
 REVIEWER = "owner"
 OWNER = ActorContext(actor_id=REVIEWER)

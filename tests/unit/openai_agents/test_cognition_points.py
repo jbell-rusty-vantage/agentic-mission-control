@@ -20,7 +20,7 @@ from mission_control.adapters.remote_session.cognition_points import generation_
 from mission_control.application.execution.harness.points import PointCollectingLane
 from mission_control.domain.execution.cognition_points import ThreadItemPoint
 from mission_control.domain.frames.contracts import FrameKind
-from tests.fixtures.agents_lane import agents_stack
+from tests.support.providers.openai_agents import agents_stack
 from tests.unit.remote_session.hosted_support import InMemoryFramesOf, settle_turn
 
 PROFILE = "codex_agents"

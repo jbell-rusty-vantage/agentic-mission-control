@@ -16,7 +16,7 @@ from mission_control.adapters.remote_session.errors import (
     CapacityLimited,
     SessionNotFound,
 )
-from tests.fixtures.managed_agents import API_KEY, FakeManagedAgentsApi
+from tests.support.providers.managed_agents import API_KEY, FakeManagedAgentsApi
 
 
 async def test_managed_agents_paths_carry_the_beta_and_skills_do_not() -> None:

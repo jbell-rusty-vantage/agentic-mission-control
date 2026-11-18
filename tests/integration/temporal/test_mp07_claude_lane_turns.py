@@ -6,7 +6,7 @@ loop, `SEGMENT_LOOP_PATCH`): `OperationWorkflowRequest.activity_task_queue` rout
 `lane.turn` segments to `provider_binding.task_queue`, where the production
 `OperationExecutionActivities` run `LaneTurnService` over `PostgresFrameRepository` and
 `PostgresLaneExecutionStateStore` (runtime role) with the FIXTURE SDK client
-(`tests/unit/claude/fixtures.py`: no Claude Code runs, nothing is paid for). Every history is
+(`tests/support/providers/claude.py`: no Claude Code runs, nothing is paid for). Every history is
 replayed with `Replayer` against `OperationWorkflow`.
 
 The MP-07 test-local segment loop (`mp07_segment_loop.py`) only stood in for this workflow
@@ -49,11 +49,7 @@ from tests.support.integration.temporal.mp07_claude_lane_turns import (
     temporal_client,
     workflow_request,
 )
-from tests.unit.claude.fixtures import (
-    PROFILE,
-    SESSION_ID,
-    claude_operation,
-)
+from tests.support.providers.claude import PROFILE, SESSION_ID, claude_operation
 
 
 def scheduled(history: Any) -> list[str]:

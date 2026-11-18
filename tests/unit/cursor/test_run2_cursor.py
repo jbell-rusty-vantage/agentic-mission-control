@@ -6,12 +6,10 @@ from pathlib import Path
 
 import pytest
 
-from mission_control.adapters.cursor.cloud_api import AgentNotFound
 from mission_control.application.execution.harness.protocol import NativeTurnLost
 from mission_control.domain.execution.lanes import CancelTurnRequest, TurnHandle
-from tests.fixtures.cursor_cloud import cloud_stack
 from tests.fixtures.cursor_controls import harness_fields, started_session
-from tests.fixtures.cursor_local import local_stack
+from tests.support.providers.cursor import cloud_stack, local_stack
 from tests.unit.cursor.support import send_request
 
 
@@ -63,17 +61,11 @@ async def test_cloud_continuation_preserves_admitted_body_and_archives_source(
     assert len([r for r in stack.api.requests if r.url.path.endswith("/archive")]) == 1
 
 
-async def test_cancel_ack_survives_run_disappearing_after_cancel(
-    tmp_path: Path, monkeypatch
-) -> None:
+async def test_cancel_ack_survives_run_disappearing_after_cancel(tmp_path: Path) -> None:
     stack = cloud_stack(tmp_path)
     heid, session = await started_session(stack)
     run = TurnHandle(session=session, turn_no=1, native_turn_ref=stack.api.run_id)
-
-    async def gone(*args):
-        raise AgentNotFound("gone")
-
-    monkeypatch.setattr(stack.client, "get_run", gone)
+    stack.api.forget_cancelled_runs = True
     receipt = await stack.harness.cancel_turn(
         CancelTurnRequest(
             **harness_fields(stack.operation, heid, "cursor_cloud"),

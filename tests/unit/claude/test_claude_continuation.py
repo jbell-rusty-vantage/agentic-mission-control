@@ -1,6 +1,6 @@
 """MP-07 x MP-12: context occupancy and the sealed-checkpoint continuation into a fresh session.
 
-FIXTURES: the scripted SDK client (`tests/unit/claude/fixtures.py`) and the MP-12 in-memory
+FIXTURES: the scripted SDK client (`tests/support/providers/claude.py`) and the MP-12 in-memory
 continuation service (`tests/fixtures/continuation.py`). The continuation is sealed from the
 live lease through `ClaudeWorkspaceSnapshots`, hydrated by `ClaudeSessionHydrator` into a
 **fresh** `ClaudeSDKClient` session (no `resume`, no `fork_session`) and the continuation
@@ -49,7 +49,7 @@ from tests.fixtures.continuation import (
     trigger,
 )
 from tests.fixtures.lane_turns import RecordingSignals
-from tests.unit.claude.fixtures import (
+from tests.support.providers.claude import (
     PROFILE,
     SESSION_ID,
     ClaudeStack,

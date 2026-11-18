@@ -49,8 +49,8 @@ from tests.support.integration.temporal.mp07_claude_lane_turns import (
     temporal_client,
     workflow_request,
 )
+from tests.support.providers.claude import PROFILE
 from tests.unit.approvals.fixtures import answer
-from tests.unit.claude.fixtures import PROFILE
 
 pytestmark = pytest.mark.common_db
 

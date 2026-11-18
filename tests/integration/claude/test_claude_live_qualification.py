@@ -101,11 +101,8 @@ from tests.integration.claude.live_drill import (
     write_recording,
 )
 from tests.support.integration.claude.claude_live_qualification import _operation, _rows
+from tests.support.providers.claude import PROFILE, FixtureWorkspace
 from tests.unit.approvals.fixtures import answer
-from tests.unit.claude.fixtures import (
-    PROFILE,
-    FixtureWorkspace,
-)
 
 DRILL_REVIEWER = "owner:drill"
 SEGMENT = LaneSegmentBounds(

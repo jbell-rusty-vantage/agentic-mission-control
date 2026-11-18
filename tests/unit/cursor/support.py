@@ -20,9 +20,9 @@ from mission_control.domain.execution.lanes import (
     SendTurnRequest,
     SessionHandle,
 )
-from tests.fixtures.cursor_cloud import CloudStack
 from tests.fixtures.cursor_controls import harness_fields
 from tests.fixtures.lane_turns import LaneStack, RecordingSignals, lane_stack
+from tests.support.providers.cursor import CloudStack
 
 
 def identity(stack: Any, profile: str) -> LaneExecutionIdentity:

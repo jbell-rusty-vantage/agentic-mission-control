@@ -9,8 +9,8 @@ from typing import Any
 
 from mission_control.application.execution.harness.lane_turns import LaneExecutionIdentity
 from mission_control.domain.execution.lane_turns import LaneTurnRequest
-from tests.fixtures.cursor_cloud import CloudStack
 from tests.fixtures.lane_turns import lane_stack
+from tests.support.providers.cursor import CloudStack
 
 
 def _turn(stack: CloudStack, **changes: Any) -> LaneTurnRequest:

@@ -4,7 +4,7 @@ from pathlib import Path
 
 from mission_control.application.secrets.delivery import DeliveredEnvironment
 from tests.fixtures.cursor_controls import started_session
-from tests.fixtures.cursor_local import local_stack
+from tests.support.providers.cursor import local_stack
 
 
 async def test_the_bridge_receives_per_attempt_signal_values(tmp_path: Path, monkeypatch) -> None:

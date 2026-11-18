@@ -1,6 +1,6 @@
 """`claude_agent_sdk` for the suite: the real harness over the scripted SDK client.
 
-FIXTURES: `tests/unit/claude/fixtures.py` replays wire-shaped records through the pinned SDK's
+FIXTURES: `tests/support/providers/claude.py` replays wire-shaped records through the pinned SDK's
 own parser; provider permissions bind through the production `BrokerPermissionBinding`. No
 Claude Code runs.
 """
@@ -32,7 +32,7 @@ from tests.conformance.lanes.contract import (
 from tests.conformance.lanes.drive import REVIEWER
 from tests.fixtures.continuation import FakeStaging
 from tests.fixtures.cursor_controls import FAST, admitted_unit, compose_control_stack
-from tests.unit.claude.fixtures import (
+from tests.support.providers.claude import (
     PROFILE,
     FixtureScript,
     ScriptRecord,

@@ -42,19 +42,19 @@ from mission_control.domain.capabilities.catalog_entry import capability_pin
 from mission_control.domain.execution.contracts import OperationExecutionRequest
 from mission_control.domain.execution.lane_turns import LaneTurnRequest
 from mission_control.domain.execution.lanes import CursorExecutionBinding
-from tests.fixtures.cursor_cloud import (
-    API_KEY,
-    FakeCloudApi,
-    cloud_operation,
-    load_cloud_fixture,
-    make_remote,
-)
-from tests.fixtures.cursor_environments import FakeEnvironmentsApi
 from tests.fixtures.isolated_settings import isolated_settings
 from tests.fixtures.lane_turns import ACTIVATION_UUID, RUN_UUID, RecordingSignals, lane_stack
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.support.db_builders import BIOTECH_CATALOG, seeds_publish_module
 from tests.support.integration.postgres.environment_kits_postgres import _seed
+from tests.support.providers.cursor import (
+    API_KEY,
+    FakeCloudApi,
+    FakeEnvironmentsApi,
+    cloud_operation,
+    load_cloud_fixture,
+    make_remote,
+)
 
 pytestmark = pytest.mark.common_db
 

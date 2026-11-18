@@ -3,7 +3,7 @@ real Signal Ingress (migration 0035; SPEC-04 section 4).
 
 The projected `cursor_cloud` hooks run as the Cursor VM runs them (`.cursor/hooks.json`
 commands as subprocesses in the workspace, the native payload on stdin; the fixture engine in
-`tests/fixtures/cursor_cloud.run_cursor_hooks`) with a run token minted for an admitted run,
+`tests/support/providers/cursor.run_cursor_hooks`) with a run token minted for an admitted run,
 against the ingress app served over real HTTP on 127.0.0.1 through the edge login. The inbox
 rows are what the IngressDrainer (MO-75) will turn into frames. `signal_emit` reaches the same
 store through the signals MCP server with the same credential.
@@ -25,13 +25,13 @@ from mission_control.domain.capabilities.host_support import LaneProfile
 from mission_control.interfaces.http.ingress import create_ingress_app
 from mission_control.interfaces.mcp.coordinator_http_client import CoordinatorStreamableHttpClient
 from mission_control.interfaces.mcp.signal_tools import SIGNAL_EMIT_TOOL, mount_signal_tools
-from tests.fixtures.cursor_cloud import cloud_rows, run_cursor_hooks
 from tests.fixtures.projections.rows import INSTRUCTION
 from tests.fixtures.scoped_api_stack import serve_loopback
 from tests.support.integration.postgres.signal_ingress_postgres import (
     Ingress,
     ingress,  # noqa: F401
 )
+from tests.support.providers.cursor import cloud_rows, run_cursor_hooks
 
 pytestmark = pytest.mark.common_db
 

@@ -13,13 +13,13 @@ What is FIXTURE (injected at the provider client/launcher seam only):
 
 * Deep Agents: the parent chat model (`ParityModel`, a `ChainModel` that also scripts Stage
   Graph stages); every tool, middleware and workspace path is the real Deep Agents runtime.
-* Claude Agent SDK: `ResponderClient` (a `tests/unit/claude/fixtures.FixtureClient` whose
+* Claude Agent SDK: `ResponderClient` (a `tests/support/providers/claude.FixtureClient` whose
   turns are computed from the leased workspace instead of a JSONL file).
-* Codex: `ResponderLauncher` (the `tests/unit/codex/fixture_app_server` app-server whose turns
+* Codex: `ResponderLauncher` (the `tests/support/providers/codex` app-server whose turns
   are computed the same way).
-* Cursor local: `ResponderBridgeLauncher` (the `tests/fixtures/cursor_local` replaying bridge
+* Cursor local: `ResponderBridgeLauncher` (the `tests/support/providers/cursor` replaying bridge
   whose runs are computed from the lease on each send). Cursor cloud: `ResponderCloudApi` (the
-  `tests/fixtures/cursor_cloud` Cloud Agents API v1 fake behind `httpx.MockTransport`, whose runs
+  `tests/support/providers/cursor` Cloud Agents API v1 fake behind `httpx.MockTransport`, whose runs
   are computed from the published run branch and whose artifacts are what the scripted agent
   wrote under `outputs/`). The real `CursorLocalHarness` / `CursorCloudHarness` run over them,
   with the production `RenderedProjectionSource(CatalogRows(...))` re-rendering and verifying
@@ -59,10 +59,6 @@ from pydantic import SecretStr
 from temporalio.worker import Worker
 from tests.fixtures import mission_control_production_stack as production_stack_module
 from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog, publish_output_schemas
-from tests.fixtures.cursor_cloud import API_KEY as CURSOR_API_KEY
-from tests.fixtures.cursor_cloud import PRESIGNED, FakeCloudApi, make_remote
-from tests.fixtures.cursor_local import MemoryArtifacts as CursorArtifacts
-from tests.fixtures.cursor_local import ReplayBridge, ReplayBridgeLauncher, make_repository
 from tests.fixtures.manifest_runtime import ChainModel, ChainScript, GoalScript, promise_submitter
 from tests.fixtures.mission_control_production_stack import open_postgres_production_stack
 from tests.fixtures.models import catalog_for, model_binding
@@ -73,14 +69,15 @@ from tests.fixtures.rrm009_production_stack import (
     TechnicalBinding,
     technical_binding,
 )
+from tests.support.artifacts import MemoryArtifacts
+from tests.support.artifacts import MemoryArtifacts as CursorArtifacts
 from tests.support.integration.temporal.manifest_v2_provider_launch import (
     AUTH_PROFILES,
     _PayloadInputs,
     provider_lane,
 )
 from tests.support.manifest_runtime import host_pins, missions_app
-from tests.unit.authoring.manifest_launch_fixture import fixture_bindings
-from tests.unit.claude.fixtures import (
+from tests.support.providers.claude import (
     FIXTURE_ENVIRON,
     FixtureClient,
     FixtureClientFactory,
@@ -89,14 +86,26 @@ from tests.unit.claude.fixtures import (
     ScriptRecord,
     fixture_admission,
 )
-from tests.unit.codex.fixture_app_server import (
+from tests.support.providers.codex import (
     FixtureAppServer,
     FixtureLaunch,
     FixtureLauncher,
+    StaticAuth,
+    TmpLeaser,
     channel_pair,
+    fixture_settings,
 )
-from tests.unit.codex.support import MemoryArtifacts, StaticAuth, TmpLeaser, fixture_settings
-from tests.unit.codex.support import admission as codex_admission
+from tests.support.providers.codex import admission as codex_admission
+from tests.support.providers.cursor import API_KEY as CURSOR_API_KEY
+from tests.support.providers.cursor import (
+    PRESIGNED,
+    FakeCloudApi,
+    ReplayBridge,
+    ReplayBridgeLauncher,
+    make_remote,
+    make_repository,
+)
+from tests.unit.authoring.manifest_launch_fixture import fixture_bindings
 
 from mission_control.adapters.claude.harness import (
     ClaudeAgentSdkHarness,

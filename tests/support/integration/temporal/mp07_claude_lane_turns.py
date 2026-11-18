@@ -36,7 +36,7 @@ from mission_control.domain.execution.contracts import (
 from mission_control.domain.execution.lane_turns import LaneSegmentBounds
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.support.db_builders import admit_unit_attempt
-from tests.unit.claude.fixtures import ClaudeStack, claude_operation, claude_stack
+from tests.support.providers.claude import ClaudeStack, claude_operation, claude_stack
 
 ADDRESS = os.environ.get("MC_TEMPORAL_TEST_ADDRESS", "127.0.0.1:7233")
 NAMESPACE = os.environ.get("MC_TEMPORAL_TEST_NAMESPACE", "default")

@@ -2,8 +2,9 @@
 
 Every phase is its own Python process (`resume_worker.py`) driving the lane's harness with the
 real pinned `ClaudeSDKClient`, `ExplicitEnvironmentCliTransport` and `StateRootSessionStore`
-against the FIXTURE stream-json CLI (`fake_cli.py`); no model is called. A resuming process
-knows the session only from what earlier processes persisted under the lease.
+against the FIXTURE stream-json CLI (`tests/support/providers/claude_cli.py`); no model is
+called. A resuming process knows the session only from what earlier processes persisted
+under the lease.
 """
 
 from __future__ import annotations
@@ -46,7 +47,7 @@ def _worker(workdir: Path, *args: str) -> dict[str, Any]:
 
 
 def _prompts(reply: str) -> list[str]:
-    """The user prompts the CLI answered from (`fake_cli.py` lists the whole session)."""
+    """The user prompts the CLI answered from (the fixture CLI lists the whole session)."""
 
     prompts: list[str] = json.loads(reply.split("prompts: ", 1)[1])
     return prompts

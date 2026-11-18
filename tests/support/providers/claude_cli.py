@@ -1,4 +1,4 @@
-"""FIXTURE stand-in for the Claude Code CLI in `--input-format stream-json` mode (MO-73).
+"""The one Claude Code CLI fake: the CLI in `--input-format stream-json` mode (MO-73).
 
 FIXTURE ONLY: no model is called and nothing here is a live recording. The process speaks the
 wire the pinned claude_agent_sdk==0.2.165 drives over the lane's transport: it answers the
@@ -20,10 +20,27 @@ import uuid
 from pathlib import Path
 from typing import Any
 
-from bootstrap_usage_fixture import zero_bootstrap_usage
 from claude_agent_sdk import project_key_for_directory
 
 MODEL = "claude-fixture"
+
+
+# Fixture copy of CLI 2.1.294 Bp defaults (bundle offset 210613402).
+def zero_bootstrap_usage() -> dict[str, Any]:
+    return {
+        "output_tokens_details": {"thinking_tokens": 0},
+        "input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "output_tokens": 0,
+        "server_tool_use": {"web_search_requests": 0, "web_fetch_requests": 0},
+        "service_tier": "standard",
+        "cache_creation": {"ephemeral_1h_input_tokens": 0, "ephemeral_5m_input_tokens": 0},
+        "inference_geo": "",
+        "iterations": [],
+        "speed": "standard",
+        "fallback_credit": None,
+    }
 
 
 def _emit(message: dict[str, Any]) -> None:

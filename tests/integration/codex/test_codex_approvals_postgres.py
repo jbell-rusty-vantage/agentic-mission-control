@@ -11,7 +11,7 @@ Mission Control side, all production code: `PostgresApprovalTaskRepository`,
 `PostgresApprovalContextProbe` (generation from the MP-06 session owner, policy digest from
 `harness_execution`), `ApprovalBroker`, `HumanTaskService`, `LaneTurnService` with
 `PostgresFrameRepository` / `PostgresLaneExecutionStateStore`. The app-server is the MP-08
-FIXTURE (`tests/unit/codex/fixture_app_server.py`): no Codex runs, nothing is paid.
+FIXTURE (`tests/support/providers/codex.py`): no Codex runs, nothing is paid.
 
 Proves on real rows: the codex request is persisted as an approval task and a live
 correlation (connection_ref = worker owner + app-server epoch) before any wait; the reviewer's
@@ -59,14 +59,15 @@ from mission_control.domain.policies.contracts import ActorContext
 from tests.fixtures.lane_turns import RecordingSignals, lane_stack
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.support.db_builders import admit_unit_attempt, owner_rows
-from tests.unit.codex.drive import fields, started
-from tests.unit.codex.fixture_app_server import FixtureLauncher, load_script
-from tests.unit.codex.support import (
+from tests.support.providers.codex import (
     REVIEWER,
     CodexStack,
+    FixtureLauncher,
     build_harness,
     codex_operation,
+    load_script,
 )
+from tests.unit.codex.drive import fields, started
 
 pytestmark = pytest.mark.common_db
 

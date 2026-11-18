@@ -13,7 +13,7 @@ from mission_control.application.prerequisites.preflight import (
 )
 from mission_control.application.prerequisites.service import InMemoryOwnerPrerequisiteRepository
 from mission_control.domain.programs.contracts import StageGraphRunInput
-from tests.fixtures.managed_lane import managed_binding, managed_operation
+from tests.support.providers.managed_agents import managed_binding, managed_operation
 from tests.support.run_control import request
 from tests.support.unit.run_control.run_launch import _input
 

@@ -39,8 +39,8 @@ from mission_control.application.secrets.redaction import SecretValueRegistry
 from mission_control.domain.execution.bindings import ProviderExecutionBinding
 from mission_control.domain.policies.contracts import ActorContext
 from mission_control.domain.policies.stop_fence import StopFence
-from tests.fixtures.agents_lane import agents_stack
 from tests.fixtures.lane_bindings import lane_fields
+from tests.support.providers.openai_agents import agents_stack
 from tests.support.unit.approvals.approval_broker import OWNER, _compose
 from tests.support.unit.effects.hosted_bundle_publication import NoCredential, repository
 from tests.unit.approvals.fixtures import answer

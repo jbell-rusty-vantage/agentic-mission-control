@@ -1,8 +1,9 @@
 """MO-03 (G11, Q-X2): the `codex` lane backs its Kernel Hooks and handles Codex hook trust.
 
 The harness runs over the FIXTURE app-server, whose FIXTURE hook engine
-(`fixture_hooks.py`) lists and runs the projected `.codex/hooks.json` the way Codex does:
-trusted only by the isolated home's `[hooks.state]`, a `PreToolUse` refusal blocking the tool.
+(`tests/support/providers/codex.py`) lists and runs the projected `.codex/hooks.json` the way
+Codex does: trusted only by the isolated home's `[hooks.state]`, a `PreToolUse` refusal
+blocking the tool.
 The hooks are the real `.mission/hooks/kernel.py` the lane wrote, run as subprocesses against
 a real uvicorn loopback listener serving the production callback app over the in-memory
 stores. No Codex runs and nothing is paid; the live CLI drill is the owner's (S0).
@@ -153,7 +154,7 @@ async def test_end_session_revokes_the_token_and_keeps_kernel_files_out_of_the_p
         EndSessionRequest(**fields(stack, "end"), session=session, reason="done")
     )
     assert receipt.patch_ref is not None
-    patch = stack.artifacts.stored[receipt.patch_ref].decode("utf-8").splitlines()
+    patch = stack.artifacts.staged[receipt.patch_ref].decode("utf-8").splitlines()
     assert not set(KERNEL_FILES) & set(patch)
     (stored,) = hook_rig.tokens._tokens.values()
     assert stored.revoked_at is not None

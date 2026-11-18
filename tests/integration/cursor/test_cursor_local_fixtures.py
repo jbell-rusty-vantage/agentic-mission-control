@@ -24,8 +24,8 @@ from mission_control.domain.frames.facts import (
     ToolEffectFact,
     TurnCompletedFact,
 )
-from tests.fixtures.cursor_local import local_stack
 from tests.fixtures.lane_turns import RecordingSignals, lane_stack
+from tests.support.providers.cursor import local_stack
 
 EXPECTED = {
     "full_run": ("completed", "finished", {ToolEffectFact, TurnCompletedFact}),

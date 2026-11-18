@@ -80,8 +80,13 @@ from tests.fixtures.mp12_lanes import Crashes
 from tests.fixtures.temporal_history import patch_ids
 from tests.support.db_builders import admit_unit_attempt
 from tests.support.integration.postgres.continuation_postgres import continuation_actor
-from tests.unit.codex.fixture_app_server import FixtureLauncher, load_script
-from tests.unit.codex.support import build_harness, codex_binding, codex_operation
+from tests.support.providers.codex import (
+    FixtureLauncher,
+    build_harness,
+    codex_binding,
+    codex_operation,
+    load_script,
+)
 
 pytestmark = pytest.mark.common_db
 

@@ -37,9 +37,9 @@ from mission_control.domain.execution.contracts import (
     AsyncSubagentLifecycle,
     AsyncSubagentUsage,
 )
-from tests.fixtures.fake_agent_protocol import FakeAgentProtocolClient, install
 from tests.fixtures.rrm013_live_stack import reconciler
 from tests.support.deep_agents import GRAPH_BINDING_DIGEST, NOW, SERVED, contract, request
+from tests.support.providers.agent_protocol import FakeAgentProtocolClient, install
 from tests.support.run_control import actor
 from tests.support.unit.operations.async_child_parent_budget import admitted_parent, spawn
 

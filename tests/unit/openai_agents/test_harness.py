@@ -18,7 +18,7 @@ from mission_control.domain.execution.lanes import (
     SendTurnRequest,
     StartRequest,
 )
-from tests.fixtures.agents_lane import AgentsStack, agents_stack
+from tests.support.providers.openai_agents import AgentsStack, agents_stack
 
 
 def fields(stack: AgentsStack, key: str) -> dict:

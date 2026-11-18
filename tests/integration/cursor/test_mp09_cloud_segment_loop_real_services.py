@@ -2,7 +2,7 @@
 disposable PostgreSQL 17 (127.0.0.1:55433, `MISSION_CONTROL_TEST_ADMIN_DSN`).
 
 The real `OperationWorkflow` segment loop drives the real `cursor_cloud` harness over the
-FIXTURE Cloud Agents API (`tests/fixtures/cursor_cloud.FakeCloudApi` behind
+FIXTURE Cloud Agents API (`tests/support/providers/cursor.FakeCloudApi` behind
 `httpx.MockTransport`, a bare git remote) with frames, lane state, the MP-06 dispatch journal
 and session ownership in PostgreSQL (runtime role, forced RLS); every history is replayed with
 `Replayer`. No Cursor API is called and nothing here proves live provider behaviour.

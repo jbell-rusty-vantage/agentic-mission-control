@@ -27,7 +27,7 @@ from mission_control.adapters.anthropic_managed.prepare import (
 from mission_control.adapters.secrets.sources import WorkerEnvironmentSource
 from mission_control.application.secrets.broker import SecretBroker
 from mission_control.application.secrets.delivery import DeliveryChannel, SecretUse
-from tests.fixtures.managed_agents import FakeManagedAgentsApi
+from tests.support.providers.managed_agents import FakeManagedAgentsApi
 from tests.support.unit.anthropic_managed.prepare import AI_ENGINEER_PACK, FIRECRAWL_VALUE, prepare
 
 

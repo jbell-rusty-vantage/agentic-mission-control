@@ -7,7 +7,7 @@ worker serves for `cursor_local` and `codex`, here with the `CodexHookMapper`),
 `KernelHookFenceGate`, `PostgresFrameRepository`, the loopback callback app on a real uvicorn
 listener, and the codex harness writing `kernel.py`, `context.json`, the token and the hook
 trust. The app-server and its hook engine are the MO-03 FIXTURE
-(`tests/unit/codex/fixture_hooks.py`): the projected kernel hooks run as subprocesses the
+(`tests/support/providers/codex.py`): the projected kernel hooks run as subprocesses the
 way Codex runs command hooks. No Codex runs, nothing is paid.
 
 Proves on real rows: the task token is stored as a digest bound to the codex execution; an
@@ -43,6 +43,14 @@ from mission_control.interfaces.http.hook_callback import create_hook_callback_a
 from tests.fixtures.lane_turns import lane_stack
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.support.db_builders import admit_unit_attempt, owner_rows
+from tests.support.providers.codex import (
+    CodexStack,
+    FixtureLauncher,
+    StaticProjectionSource,
+    build_harness,
+    fixture_settings,
+    load_script,
+)
 from tests.support.unit.codex.kernel_hooks import (
     command_statuses,
     kernel_operation,
@@ -50,13 +58,6 @@ from tests.support.unit.codex.kernel_hooks import (
     run_turn,
 )
 from tests.unit.codex.drive import fields, started
-from tests.unit.codex.fixture_app_server import FixtureLauncher, load_script
-from tests.unit.codex.support import (
-    CodexStack,
-    StaticProjectionSource,
-    build_harness,
-    fixture_settings,
-)
 
 pytestmark = pytest.mark.common_db
 

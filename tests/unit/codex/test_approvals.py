@@ -35,8 +35,8 @@ from mission_control.domain.execution.lanes import LaneSegmentBounds, ReattachRe
 from mission_control.domain.frames.contracts import FrameKind
 from mission_control.domain.policies.contracts import ActorContext
 from tests.fixtures.lane_turns import SCOPE, RecordingSignals
+from tests.support.providers.codex import REVIEWER, CodexStack, approval_rig, codex_stack
 from tests.unit.codex.drive import fields, sent, started
-from tests.unit.codex.support import REVIEWER, CodexStack, approval_rig, codex_stack
 
 BOUNDS = LaneSegmentBounds(max_duration_s=20, start_to_close_s=60, heartbeat_timeout_s=3)
 POLICY = "sha256:" + "a" * 64
@@ -206,7 +206,7 @@ async def test_the_event_pump_keeps_absorbing_while_an_approval_waits(tmp_path: 
 async def test_an_unanswered_approval_expires_its_correlation_not_the_task(
     tmp_path: Path,
 ) -> None:
-    from tests.unit.codex.support import fixture_settings
+    from tests.support.providers.codex import fixture_settings
 
     stack = codex_stack(
         tmp_path,

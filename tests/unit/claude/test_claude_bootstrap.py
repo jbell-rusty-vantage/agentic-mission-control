@@ -16,7 +16,7 @@ from claude_agent_sdk.types import (
 )
 
 from mission_control.adapters.claude.session import BOOTSTRAP_TEXT, LiveSession, SessionEnded
-from tests.unit.claude.bootstrap_usage_fixture import zero_bootstrap_usage
+from tests.support.providers.claude_cli import zero_bootstrap_usage
 
 
 def result(**changes: Any) -> ResultMessage:

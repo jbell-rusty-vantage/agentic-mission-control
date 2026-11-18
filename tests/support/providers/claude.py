@@ -1,4 +1,9 @@
-"""MP-07 FIXTURES: a scripted Claude Agent SDK client, a tmp-dir workspace port, a claude
+"""The one Claude Agent SDK fake: `FixtureClient` and the claude lane stack.
+
+The stream-json CLI stand-in that the resume proof spawns as a process is the script
+`claude_cli.py` beside this module.
+
+MP-07 FIXTURES: a scripted Claude Agent SDK client, a tmp-dir workspace port, a claude
 operation with a sealed `mc.execution_binding.v2`, and the lane stack around them.
 
 FIXTURES ONLY. `FixtureClient` stands in for `claude_agent_sdk.client.ClaudeSDKClient`: it
@@ -65,7 +70,7 @@ from mission_control.domain.execution.contracts import OperationExecutionRequest
 from mission_control.domain.execution.lane_turns import CleanupOutcome
 from tests.fixtures.lane_bindings import lane_fields
 from tests.fixtures.lane_turns import DIGEST, LANE_QUEUE, SCOPE, LaneStack, lane_stack
-from tests.unit.claude.bootstrap_usage_fixture import zero_bootstrap_usage
+from tests.support.providers.claude_cli import zero_bootstrap_usage
 
 FIXTURES = Path(__file__).resolve().parents[2] / "fixtures" / "provider_frames" / "claude"
 PROFILE = "claude_agent_sdk"

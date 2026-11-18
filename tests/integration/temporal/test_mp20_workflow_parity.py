@@ -49,7 +49,6 @@ from mission_control.domain.execution.lane_requirements import RequirementSet, a
 from mission_control.domain.policies.contracts import ActorContext, CancelAction
 from mission_control.domain.policies.mailbox import MailboxState
 from mission_control.domain.programs.human_gate import HumanResolutionRequest
-from tests.fixtures.cursor_cloud import make_remote
 from tests.fixtures.manifest_runtime import GoalScript
 from tests.fixtures.mp20_parity import (
     CURSOR_PROFILES,
@@ -81,6 +80,7 @@ from tests.support.manifest_runtime import (
     root_executions,
     submit,
 )
+from tests.support.providers.cursor import make_remote
 
 pytestmark = pytest.mark.common_db
 

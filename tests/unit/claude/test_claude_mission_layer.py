@@ -28,7 +28,7 @@ from tests.fixtures.environment_kits import (
     published_kit,
     setup_environ,
 )
-from tests.unit.claude.fixtures import (
+from tests.support.providers.claude import (
     PROFILE,
     ClaudeStack,
     base_operation,

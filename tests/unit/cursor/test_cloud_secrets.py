@@ -18,8 +18,8 @@ from mission_control.adapters.cursor.secrets import CursorSecretRefused
 from mission_control.adapters.cursor.workspace import git
 from mission_control.application.secrets.commit_scan import SecretInCommit
 from mission_control.domain.execution.lanes import ReattachRequest
-from tests.fixtures.cursor_cloud import cloud_stack
 from tests.fixtures.cursor_controls import harness_fields, started_session
+from tests.support.providers.cursor import cloud_stack
 
 PROFILE = "cursor_cloud"
 VALUE = "mo11-launch-value-5e2b"

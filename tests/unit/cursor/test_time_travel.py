@@ -32,8 +32,8 @@ from mission_control.domain.execution.cognition_points import (
 )
 from mission_control.domain.execution.lanes import LaneSeedHead, PrepareRequest, StartRequest
 from tests.fixtures.cursor_controls import harness_fields
-from tests.fixtures.cursor_local import local_stack
 from tests.fixtures.lane_turns import SCOPE, cursor_operation
+from tests.support.providers.cursor import local_stack
 from tests.support.unit.cursor.cognition_points import settled_points, unit_changes
 
 
@@ -138,7 +138,7 @@ async def test_seed_fork_stages_the_transcript_names_the_snapshot_and_is_idempot
     assert derived.snapshot_ref == source.channel_facts["turn_snapshot_ref"]
     assert receipt.native_artifacts[SEED_SNAPSHOT_REF] == derived.snapshot_ref
     assert receipt.native_artifacts["seed_head"] == "injected_message"
-    transcript = stack.artifacts.staged[receipt.native_artifacts[SEED_TRANSCRIPT_REF]][1].decode()
+    transcript = stack.artifacts.staged[receipt.native_artifacts[SEED_TRANSCRIPT_REF]].decode()
     assert transcript.startswith(HYDRATION_HEADER)
     assert "[assistant -> tool read (call-read-1)]" in transcript
     assert "[tool shell (call-shell-1)]" in transcript

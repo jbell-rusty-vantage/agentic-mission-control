@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import pytest
-from tests.fixtures.fake_agent_protocol import FakeAgentProtocolClient, install
 from tests.support.deep_agents import (
     GRAPH_BINDING_DIGEST,
     NOW,
@@ -11,6 +10,7 @@ from tests.support.deep_agents import (
     contract,
     request,
 )
+from tests.support.providers.agent_protocol import FakeAgentProtocolClient, install
 
 from mission_control.adapters.deep_agents.async_subagents import (
     DeepAgentsAsyncSubagentAdapter,

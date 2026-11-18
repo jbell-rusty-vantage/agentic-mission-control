@@ -69,9 +69,9 @@ from mission_control.domain.execution.lanes import (
     TurnHandle,
 )
 from tests.fixtures.lane_turns import SCOPE
+from tests.support.artifacts import MemoryArtifacts
+from tests.support.providers.claude import SESSION_ID, ClaudeStack, claude_operation, claude_stack
 from tests.support.unit.claude.claude_harness import _fields, _identity
-from tests.unit.claude.fixtures import SESSION_ID, ClaudeStack, claude_operation, claude_stack
-from tests.unit.codex.support import MemoryArtifacts
 
 UNIT_KEY = "bl-unit-v1:" + "a" * 64
 DERIVED_UNIT_KEY = "bl-unit-v1:" + "b" * 64
@@ -360,7 +360,7 @@ async def test_seed_fork_truncates_the_mirror_under_a_new_session_id_and_is_idem
     )
     assert receipt.derived.point.locator == f"{derived}#fork-seed:fork-req-1"
     assert receipt.copied_checkpoints == 4
-    lines = _store(stack).stored[artifacts[A_TRANSCRIPT_REF]].decode("utf-8").splitlines()
+    lines = _store(stack).staged[artifacts[A_TRANSCRIPT_REF]].decode("utf-8").splitlines()
     entries = [json.loads(line) for line in lines]
     assert [e["uuid"] for e in entries] == ["mirror-init", "a-0001", "u-0002", "a-0003"]
     assert all(e.get("sessionId") in {derived, None} for e in entries)
@@ -371,7 +371,7 @@ async def test_seed_fork_truncates_the_mirror_under_a_new_session_id_and_is_idem
     assert source is not None and len(source) == 6
     assert await lane.seed_fork(request) == receipt
     assert await lane.for_scope(SCOPE).seed_fork(request) == receipt
-    assert sum(1 for name in _store(stack).stored if derived in name) == 1
+    assert sum(1 for name in _store(stack).staged if derived in name) == 1
 
 
 async def test_without_a_mirror_the_transcript_is_rebuilt_from_frames(tmp_path: Path) -> None:
@@ -381,7 +381,7 @@ async def test_without_a_mirror_the_transcript_is_rebuilt_from_frames(tmp_path: 
     )
     assert receipt.restore_level == "R1" and receipt.history == "reconstructed"
     assert receipt.native_artifacts[A_SEED_KIND] == SEED_KIND_FRAMES
-    lines = _store(stack).stored[receipt.native_artifacts[A_TRANSCRIPT_REF]].decode().splitlines()
+    lines = _store(stack).staged[receipt.native_artifacts[A_TRANSCRIPT_REF]].decode().splitlines()
     entries = [json.loads(line) for line in lines]
     assert [e["uuid"] for e in entries] == ["a-0001", "u-0002", "a-0003"]
     assert all(e["reconstructed_from"] == "frames" for e in entries)

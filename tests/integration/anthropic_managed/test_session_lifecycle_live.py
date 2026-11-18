@@ -58,15 +58,20 @@ from mission_control.domain.execution.contracts import (
     OperationAttemptIdentity,
     OperationExecutionRequest,
 )
-from tests.fixtures.cursor_local import MemoryArtifacts
-from tests.fixtures.managed_lane import LANE_QUEUE, PROFILE, managed_binding, managed_operation
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.fixtures.session_retention import RecordingDeletionScheduler
+from tests.support.artifacts import MemoryArtifacts
 from tests.support.db_builders import admit_unit_attempt
 from tests.support.integration.anthropic_managed.session_lifecycle_live import (
     _frames,
     _lane_worker,
     _request,
+)
+from tests.support.providers.managed_agents import (
+    LANE_QUEUE,
+    PROFILE,
+    managed_binding,
+    managed_operation,
 )
 
 ADDRESS: Final = os.environ.get("MC_TEMPORAL_TEST_ADDRESS", "127.0.0.1:7233")

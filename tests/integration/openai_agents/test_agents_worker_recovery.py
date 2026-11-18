@@ -8,7 +8,6 @@ from pathlib import Path
 from uuid import uuid4
 
 import pytest
-from tests.fixtures.agents_lane import agents_harness, agents_stack
 from tests.fixtures.lane_bindings import lane_fields
 from tests.fixtures.lane_turns import lane_stack
 from tests.fixtures.mission_control_common_db import CommonDatabase
@@ -21,6 +20,7 @@ from tests.support.integration.anthropic_managed.managed_segment_loop_real_servi
     _request,
     _workflow_worker,
 )
+from tests.support.providers.openai_agents import agents_harness, agents_stack
 
 from mission_control.adapters.deep_agents.harness import DeepAgentsHarness
 from mission_control.adapters.operations.conformance import ConformanceRuntime

@@ -19,8 +19,8 @@ from typing import Any
 from uuid import UUID, uuid4
 
 from tests.fixtures.checkpoint_recovery import stage_recovery_unit
-from tests.fixtures.cursor_local import LocalStack, local_stack
 from tests.fixtures.lane_turns import SCOPE, LaneStack, lane_stack
+from tests.support.providers.cursor import LocalStack, local_stack
 from tests.support.run_control import actor as control_actor
 from tests.support.run_control import request as run_request
 from tests.support.run_control import service as run_control_service
@@ -298,7 +298,7 @@ async def cloud_control_stack(
 ) -> ControlStack:
     """The `cursor_cloud` lane (fake Cloud Agents API, bare remote) inside a real Run."""
 
-    from tests.fixtures.cursor_cloud import cloud_stack
+    from tests.support.providers.cursor import cloud_stack
 
     from mission_control.application.frames.sink import InMemoryFrameStore
 

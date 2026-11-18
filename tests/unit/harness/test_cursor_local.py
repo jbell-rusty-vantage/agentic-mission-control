@@ -51,8 +51,8 @@ from mission_control.domain.execution.lane_turns import (
 from mission_control.domain.execution.lanes import CursorExecutionBinding, PrepareRequest
 from mission_control.domain.frames.contracts import FrameKind, LaneProfile
 from mission_control.domain.frames.facts import CompactionObservedFact, ToolEffectFact
-from tests.fixtures.cursor_local import LocalStack, local_stack
 from tests.fixtures.lane_turns import RecordingSignals, SimulatedWorkerLoss
+from tests.support.providers.cursor import LocalStack, local_stack
 from tests.support.unit.harness.cursor_local import _identity, _service, _turn
 
 
@@ -203,11 +203,11 @@ async def test_a_full_turn_runs_through_lane_turn_with_kernel_hooks(tmp_path: Pa
     assert all("sk-fixture-secret" not in frame.body_excerpt for frame in frames)
     # The patch (agent changes only) was stored before the lease was released.
     assert facts.patch_ref is not None
-    name, diff, _media = stack.artifacts.staged[facts.patch_ref]
+    name, diff, _media = stack.artifacts.files()[facts.patch_ref]
     assert name.endswith("patch.diff") and b"src/feature.py" in diff
     assert b"AGENTS.md" not in diff and b".cursor/" not in diff and b".mission" not in diff
     assert any(
-        staged[0].endswith("outputs/report.md") for staged in stack.artifacts.staged.values()
+        staged[0].endswith("outputs/report.md") for staged in stack.artifacts.files().values()
     )
     (lease,) = stack.leases._leases.values()
     assert lease.released and lease.patch_artifact_ref == facts.patch_ref
@@ -474,9 +474,9 @@ def test_scrub_removes_secret_values_and_emails() -> None:
 
 
 def test_committed_fixtures_are_marked_synthetic_and_carry_no_email() -> None:
-    from tests.fixtures.cursor_local import FIXTURES
+    from tests.support.providers.cursor import LOCAL_FIXTURES
 
-    for path in FIXTURES.glob("*.jsonl"):
+    for path in LOCAL_FIXTURES.glob("*.jsonl"):
         text = path.read_text("utf-8")
         assert '"synthetic": true' in text.splitlines()[0], path.name
         assert "@" not in text.replace("@localhost", ""), path.name

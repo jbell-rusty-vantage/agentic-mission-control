@@ -31,15 +31,16 @@ from mission_control.application.environments.provider_environments import (
 )
 from mission_control.application.secrets.broker import SecretBroker
 from mission_control.domain.authoring.environment_kits import MISSION_SETUP_KIT, MISSION_SETUP_RUN
-from tests.fixtures.cursor_cloud import CloudStack, cloud_stack
 from tests.fixtures.cursor_controls import started_session
-from tests.fixtures.cursor_environments import (
+from tests.fixtures.environment_kits import StaticDefinitions, kit_document, kit_pin
+from tests.support.providers.cursor import (
+    CloudStack,
     FakeEnvironmentsApi,
+    cloud_stack,
     cursor_environments,
     kit_in_custody,
+    make_repository,
 )
-from tests.fixtures.cursor_local import make_repository
-from tests.fixtures.environment_kits import StaticDefinitions, kit_document, kit_pin
 
 TOKEN = "mo13-fixture-setup-token-7d1e"
 INSTALL = b"#!/usr/bin/env bash\nset -euo pipefail\necho base\n"

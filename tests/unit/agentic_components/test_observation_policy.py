@@ -18,7 +18,7 @@ from mission_control.domain.authoring.mission_definition import EnvironmentSelec
 from mission_control.domain.execution.bindings import ProviderExecutionBinding
 from mission_control.domain.execution.data_class import DEFAULT_DATA_CLASS_POLICY
 from tests.support.manifests.v2_launch import SCOPE, _compile, example, templates_of
-from tests.unit.codex.support import codex_binding, codex_operation
+from tests.support.providers.codex import codex_binding, codex_operation
 
 
 @pytest.mark.parametrize("enabled", [True, False])

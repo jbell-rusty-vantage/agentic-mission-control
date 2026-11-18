@@ -1,6 +1,6 @@
 """MP-08 x MP-12: the codex continuation (sealed checkpoint -> a fresh thread).
 
-FIXTURES: the FIXTURE app-server (`tests/unit/codex/fixture_app_server.py`) and the MP-12
+FIXTURES: the FIXTURE app-server (`tests/support/providers/codex.py`) and the MP-12
 in-memory continuation service (`tests/fixtures/continuation.py`). Proves:
 
 - the snapshot port freezes `inputs/`, `outputs/`, `.mission/` and takes custody of the lease's
@@ -60,8 +60,7 @@ from tests.fixtures.continuation import (
     trigger,
 )
 from tests.fixtures.lane_turns import SCOPE, RecordingSignals
-from tests.unit.codex.fixture_app_server import FixtureLauncher, load_script
-from tests.unit.codex.support import CodexStack, codex_stack
+from tests.support.providers.codex import CodexStack, FixtureLauncher, codex_stack, load_script
 
 SOURCE = "thr-0001"
 BOUNDS = LaneSegmentBounds(max_frames=200, max_duration_s=20, heartbeat_timeout_s=3)

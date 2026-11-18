@@ -36,7 +36,7 @@ from mission_control.domain.execution.contracts import (
 )
 from mission_control.domain.execution.lanes import LaneSegmentBounds
 from tests.fixtures.lane_turns import lane_stack
-from tests.fixtures.managed_lane import LANE_QUEUE, PROFILE
+from tests.support.providers.managed_agents import LANE_QUEUE, PROFILE
 
 BOUNDS: Final = LaneSegmentBounds(
     max_frames=2_000,

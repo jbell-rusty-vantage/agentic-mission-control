@@ -6,8 +6,8 @@ import pytest
 
 from mission_control.application.agentic_components.placement import LaneProjectionError
 from mission_control.domain.capabilities.gates import SignalGatePolicy
-from tests.fixtures.cursor_cloud import cloud_stack
 from tests.fixtures.cursor_controls import started_session
+from tests.support.providers.cursor import cloud_stack
 
 
 async def test_gated_launch_delivers_the_attempt_credential_once(tmp_path: Path) -> None:

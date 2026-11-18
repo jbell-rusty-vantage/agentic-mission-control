@@ -36,10 +36,10 @@ from mission_control.domain.execution.contracts import (
     OperationWorkflowRequest,
 )
 from mission_control.domain.execution.lanes import LaneSegmentBounds
-from tests.fixtures.cursor_local import LocalStack, local_stack
 from tests.fixtures.lane_turns import lane_stack
 from tests.fixtures.local_lane_workspaces import WITHIN_RUN, LaneDriver
 from tests.fixtures.temporal_history import completed_activity_results, patch_ids
+from tests.support.providers.cursor import LocalStack, local_stack
 
 ADDRESS = os.environ.get("MC_TEMPORAL_TEST_ADDRESS", "127.0.0.1:7233")
 NAMESPACE = os.environ.get("MC_TEMPORAL_TEST_NAMESPACE", "default")

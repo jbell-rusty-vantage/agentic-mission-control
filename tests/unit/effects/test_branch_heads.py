@@ -20,8 +20,8 @@ from mission_control.application.effects.mission_branches import (
     is_mission_branch,
     mission_branch,
 )
+from tests.support.artifacts import MemoryArtifacts
 from tests.unit.effects.support import API, REPOSITORY, FakeGitHub, StaticCredentials, make_remote
-from tests.unit.workspaces.workspace_fixtures import MemoryArtifacts
 
 SESSION = "https://claude.ai/code/session_01FixtureSession"
 IDENTITY = ("-c", "user.name=Claude", "-c", "user.email=claude@localhost")

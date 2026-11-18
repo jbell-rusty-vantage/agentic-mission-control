@@ -9,7 +9,7 @@ inline skills by name, the agent's `mcp` tools by `server_label` and the agent's
 metadata as the digest it carries.
 
 The read-back shapes follow the request bodies prepare sends (pinned `openai` 3.29.0 types;
-`tests/unit/openai_agents/support.py`); the live response shape is UNVERIFIED until the
+`tests/support/providers/openai_agents.py`); the live response shape is UNVERIFIED until the
 HL-11..HL-13 drills record it, so a field the API leaves out fails the proof instead of passing it.
 """
 

@@ -11,8 +11,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from tests.fixtures.cursor_local import local_stack
-from tests.unit.claude.fixtures import (
+from tests.support.artifacts import MemoryArtifacts
+from tests.support.providers.claude import (
     FIXTURE_ENVIRON,
     FixtureClientFactory,
     FixtureScript,
@@ -23,9 +23,8 @@ from tests.unit.claude.fixtures import (
     materialization_digest_for,
     projection_rows,
 )
-from tests.unit.codex.fixture_app_server import FixtureLauncher
-from tests.unit.codex.support import (
-    MemoryArtifacts,
+from tests.support.providers.codex import (
+    FixtureLauncher,
     StaticAuth,
     StaticProjectionSource,
     admission,
@@ -33,6 +32,7 @@ from tests.unit.codex.support import (
     codex_operation,
     fixture_settings,
 )
+from tests.support.providers.cursor import local_stack
 from tests.unit.workspaces.workspace_fixtures import commit, git, policy
 
 from mission_control.adapters.claude.harness import (

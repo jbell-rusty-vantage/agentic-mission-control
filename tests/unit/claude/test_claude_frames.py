@@ -29,7 +29,7 @@ from mission_control.adapters.claude.frames import (
 )
 from mission_control.application.frames.kinds import UnknownKindCounter
 from mission_control.domain.frames.contracts import FrameKind
-from tests.unit.claude.fixtures import FIXTURES, SESSION_ID, FixtureScript
+from tests.support.providers.claude import FIXTURES, SESSION_ID, FixtureScript
 
 
 def _messages(name: str) -> list[dict]:

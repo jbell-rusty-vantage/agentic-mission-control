@@ -30,8 +30,8 @@ from mission_control.application.secrets.redaction import install_log_redaction,
 from mission_control.application.secrets.references import SecretDeclaration
 from mission_control.domain.execution.bindings import EnvironmentBinding
 from mission_control.domain.frames.render import to_jsonl
-from tests.fixtures.cursor_cloud import cloud_stack
 from tests.fixtures.lane_turns import lane_stack
+from tests.support.providers.cursor import cloud_stack
 from tests.unit.cursor.support import frames_of, signals, turn
 
 SENTINEL = "mo11-sentinel-9d2f7a41c3"

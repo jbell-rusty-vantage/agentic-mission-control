@@ -1,6 +1,6 @@
 """MO-13: Cursor environments REST adapter, `sync`/`bind` and the committed-file check.
 
-Everything runs against the FIXTURE environments API (`tests/fixtures/cursor_environments.py`,
+Everything runs against the FIXTURE environments API (`tests/support/providers/cursor.py`,
 the shapes the MO-13 drill observed). SPEC-01 section 7 and section 10 (`cursor_cloud` with
 `sync`): an environment `mc-<kit>-<digest8>` is created once and a second mission with the same
 kit and repository reuses it without an update, while another repository gets its own; secrets
@@ -40,7 +40,7 @@ from mission_control.application.environments.provider_environments import (
 from mission_control.application.secrets.broker import SecretBroker
 from mission_control.application.secrets.delivery import DeliveryChannel
 from mission_control.domain.authoring.environment_kits import EnvironmentKitManifest
-from tests.fixtures.cursor_environments import API_KEY, FakeEnvironmentsApi, cursor_environments
+from tests.support.providers.cursor import API_KEY, FakeEnvironmentsApi, cursor_environments
 
 REPO = "https://github.com/acme/repo"
 OTHER_REPO = "https://github.com/acme/other"

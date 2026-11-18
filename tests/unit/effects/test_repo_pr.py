@@ -36,6 +36,7 @@ from mission_control.application.human_tasks.memory import InMemoryHumanTaskRepo
 from mission_control.application.human_tasks.service import HumanTaskService
 from mission_control.domain.policies.contracts import ActorContext
 from tests.fixtures.provider_frames import SCOPE
+from tests.support.artifacts import MemoryArtifacts
 from tests.unit.approvals.fixtures import POLICY, REVIEWER, RUN, answer
 from tests.unit.effects.support import (
     API,
@@ -45,7 +46,6 @@ from tests.unit.effects.support import (
     published_mission_branch,
     remote_head,
 )
-from tests.unit.workspaces.workspace_fixtures import MemoryArtifacts
 
 AGENT = ActorContext(actor_id="agent:lane", permissions=frozenset({GOVERNED_EFFECT_PERMISSION}))
 OWNER = ActorContext(actor_id=REVIEWER)

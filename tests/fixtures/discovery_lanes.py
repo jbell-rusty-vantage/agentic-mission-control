@@ -24,12 +24,12 @@ from typing import Final
 from uuid import UUID, uuid4
 
 from tests.fixtures.lane_turns import cursor_binding
-from tests.fixtures.managed_agents import FakeManagedAgentsApi
 from tests.fixtures.projections.discovery import claude_cli, codex_cli
+from tests.support.providers.claude import claude_binding
+from tests.support.providers.codex import codex_binding
+from tests.support.providers.managed_agents import FakeManagedAgentsApi
+from tests.support.providers.openai_agents import SHIPPED_PACK, FakeAgentsApi
 from tests.support.unit.harness.hosted_agent_api_profiles import AGENTS, MANAGED, _hosted_binding
-from tests.unit.claude.fixtures import claude_binding
-from tests.unit.codex.support import codex_binding
-from tests.unit.openai_agents.support import SHIPPED_PACK, FakeAgentsApi
 
 from mission_control.adapters.anthropic_managed import discovery as managed_discovery
 from mission_control.adapters.anthropic_managed.pack import load_pack as load_managed_pack

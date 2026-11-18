@@ -7,8 +7,8 @@ reattaches by session id and runs the next turn, then dies the same way. With
 `--without-cli-copy` it first deletes the CLI's own transcripts, as on a worker of another
 host that has only the leased state root. Every phase drives the real pinned
 `ClaudeSDKClient` over the lane's `ExplicitEnvironmentCliTransport` and
-`StateRootSessionStore`; the Claude Code process is the FIXTURE `fake_cli.py`. Nothing calls a
-model.
+`StateRootSessionStore`; the Claude Code process is the FIXTURE
+`tests/support/providers/claude_cli.py`. Nothing calls a model.
 
 Usage: `python -m tests.unit.claude.resume_worker {start|resume} DIR [--without-cli-copy]`;
 each phase records its outcome in `DIR/progress.json`.
@@ -56,7 +56,7 @@ from mission_control.domain.execution.lanes import (
     SessionHandle,
     StartRequest,
 )
-from tests.unit.claude.fixtures import (
+from tests.support.providers.claude import (
     PROFILE,
     FixtureWorkspace,
     claude_operation,
@@ -64,7 +64,7 @@ from tests.unit.claude.fixtures import (
     projection_rows,
 )
 
-FAKE_CLI = Path(__file__).with_name("fake_cli.py")
+FAKE_CLI = Path(__file__).resolve().parents[2] / "support" / "providers" / "claude_cli.py"
 PROMPTS = (
     "FIRST: remember the codeword ORCHID.",
     "SECOND: which codeword did the first turn give?",

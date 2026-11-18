@@ -27,9 +27,13 @@ from mission_control.application.execution.harness.sessions import WorkerSession
 from mission_control.domain.execution.lanes import LaneSegmentBounds
 from tests.fixtures.continuation import build_service
 from tests.fixtures.lane_turns import RecordingSignals
+from tests.support.providers.codex import (
+    FixtureLauncher,
+    build_harness,
+    codex_operation,
+    codex_stack,
+)
 from tests.unit.codex.drive import observed, sent, started
-from tests.unit.codex.fixture_app_server import FixtureLauncher
-from tests.unit.codex.support import build_harness, codex_operation, codex_stack
 
 BOUNDS = LaneSegmentBounds(max_frames=200, max_duration_s=20, heartbeat_timeout_s=3)
 

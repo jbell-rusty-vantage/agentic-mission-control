@@ -32,16 +32,16 @@ from mission_control.adapters.codex.launcher import (
 from mission_control.application.agentic_components.placement import LaneProjectionError
 from mission_control.application.execution.child_environment import provider_child_environment
 from mission_control.domain.execution.lanes import PrepareRequest
-from tests.unit.codex.drive import fields
-from tests.unit.codex.fixture_app_server import FixtureLauncher
-from tests.unit.codex.support import (
-    MemoryArtifacts,
+from tests.support.artifacts import MemoryArtifacts
+from tests.support.providers.codex import (
+    FixtureLauncher,
     StaticAuth,
     StaticProjectionSource,
     TmpLeaser,
     approval_rig,
     codex_stack,
 )
+from tests.unit.codex.drive import fields
 
 PACKAGE = Path(harness_module.__file__).resolve().parent
 

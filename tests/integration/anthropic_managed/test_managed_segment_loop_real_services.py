@@ -2,7 +2,7 @@
 disposable PostgreSQL 17 (127.0.0.1:55433, `MISSION_CONTROL_TEST_ADMIN_DSN`).
 
 The real `OperationWorkflow` segment loop drives the real `claude_managed` harness over the
-FIXTURE Managed Agents API (`tests/fixtures/managed_agents.FakeManagedAgentsApi` behind
+FIXTURE Managed Agents API (`tests/support/providers/managed_agents.FakeManagedAgentsApi` behind
 `httpx.MockTransport`), with frames, lane state, the MP-06 dispatch journal, session ownership
 and the MO-16 environment preparation record in PostgreSQL (runtime role, forced RLS); every
 history is replayed with `Replayer`. No Anthropic API is called and nothing here proves live
@@ -52,14 +52,6 @@ from mission_control.domain.execution.contracts import (
 from mission_control.domain.execution.environment_preparation import ReadinessLevel
 from mission_control.domain.frames.contracts import FrameKind
 from tests.fixtures.lane_turns import LaneStack, lane_stack
-from tests.fixtures.managed_lane import (
-    PROFILE,
-    ManagedStack,
-    managed_binding,
-    managed_harness,
-    managed_operation,
-    managed_stack,
-)
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.support.db_builders import admit_unit_attempt
 from tests.support.integration.anthropic_managed.managed_segment_loop_real_services import (
@@ -69,6 +61,14 @@ from tests.support.integration.anthropic_managed.managed_segment_loop_real_servi
     _replayed,
     _request,
     _workflow_worker,
+)
+from tests.support.providers.managed_agents import (
+    PROFILE,
+    ManagedStack,
+    managed_binding,
+    managed_harness,
+    managed_operation,
+    managed_stack,
 )
 
 

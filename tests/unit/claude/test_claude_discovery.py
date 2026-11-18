@@ -26,7 +26,7 @@ from mission_control.domain.execution.environment_preparation import (
 )
 from mission_control.domain.execution.lane_turns import LaneTurnRequest
 from tests.fixtures.lane_turns import RecordingSignals, lane_stack
-from tests.unit.claude.fixtures import PROFILE, ClaudeStack, claude_stack
+from tests.support.providers.claude import PROFILE, ClaudeStack, claude_stack
 
 SEGMENT = {"heartbeat_timeout_s": 60, "max_frames": 200}
 # What the stack's projection rows place (skill_row, tavily_row, verifier_row).

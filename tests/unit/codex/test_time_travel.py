@@ -52,8 +52,8 @@ from mission_control.domain.execution.cognition_points import (
 from mission_control.domain.execution.lane_turns import NativeRefs
 from mission_control.domain.execution.lanes import LaneSeedHead, PrepareRequest, StartRequest
 from tests.fixtures.lane_turns import SCOPE
+from tests.support.providers.codex import CodexStack, codex_operation, codex_stack
 from tests.unit.codex.drive import fields, observed, sent, started
-from tests.unit.codex.support import CodexStack, codex_operation, codex_stack
 
 UNIT_KEY = "bl-unit-v1:" + "a" * 64
 DERIVED_UNIT_KEY = "bl-unit-v1:" + "b" * 64
@@ -277,7 +277,7 @@ async def test_a_turn_boundary_point_forks_the_thread_natively_and_is_idempotent
     assert (
         artifacts[A_SEED_HEAD] == "injected_message" and artifacts[SEED_HEAD_MESSAGE_COUNT] == "1"
     )
-    preamble = stack.artifacts.stored[artifacts[A_HYDRATION_REF]].decode("utf-8")
+    preamble = stack.artifacts.staged[artifacts[A_HYDRATION_REF]].decode("utf-8")
     assert "# Injected message" in preamble and "Now add tests." in preamble
     assert "# Forked session history" in preamble and "$ ls" not in preamble, (
         "a native fork reconstructs no steps"
@@ -307,7 +307,7 @@ async def test_a_point_inside_the_first_turn_seeds_a_reconstructed_transcript(
     assert artifacts[A_SEED_KIND] == SEED_KIND_TRANSCRIPT and A_DERIVED_THREAD not in artifacts
     assert receipt.derived.point.locator == "seed:fork-req-1#fork-seed:fork-req-1"
     assert receipt.copied_checkpoints == 1 and artifacts[SEED_HEAD_MESSAGE_COUNT] == "1"
-    preamble = stack.artifacts.stored[artifacts[A_HYDRATION_REF]].decode("utf-8")
+    preamble = stack.artifacts.staged[artifacts[A_HYDRATION_REF]].decode("utf-8")
     assert "$ ls outputs" in preamble and "report.md" in preamble
     assert "Wrote outputs/report.md" not in preamble, "nothing after the point is seeded"
     assert stack.launcher.server.forks == [], "no previous turn to fork through"
@@ -344,7 +344,7 @@ async def test_a_point_inside_a_later_turn_forks_through_the_previous_turn(tmp_p
     assert fork["lastTurnId"] == first.native_turn_ref
     derived = receipt.native_artifacts[A_DERIVED_THREAD]
     assert [t["id"] for t in server.disk.threads[derived]["turns"]] == [first.native_turn_ref]
-    preamble = stack.artifacts.stored[receipt.native_artifacts[A_HYDRATION_REF]].decode("utf-8")
+    preamble = stack.artifacts.staged[receipt.native_artifacts[A_HYDRATION_REF]].decode("utf-8")
     assert "git status" in preamble and "Applied the steering instruction" not in preamble
 
 

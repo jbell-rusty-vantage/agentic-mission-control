@@ -43,6 +43,7 @@ from mission_control.application.execution.approvals_memory import StaticApprova
 from mission_control.application.human_tasks.service import HumanTaskService
 from mission_control.domain.policies.contracts import ActorContext
 from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.artifacts import MemoryArtifacts
 from tests.support.db_builders import owner_rows
 from tests.support.integration.postgres.mp11_approvals_postgres import (
     admitted_run,
@@ -57,7 +58,6 @@ from tests.unit.effects.support import (
     published_mission_branch,
     remote_head,
 )
-from tests.unit.workspaces.workspace_fixtures import MemoryArtifacts
 
 pytestmark = pytest.mark.common_db
 

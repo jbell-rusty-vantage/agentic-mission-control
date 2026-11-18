@@ -65,11 +65,10 @@ from mission_control.domain.execution.lanes import (
     SessionHandle,
     StartRequest,
 )
-from tests.fixtures.cursor_local import LocalStack, local_stack
 from tests.fixtures.lane_turns import lane_stack
 from tests.fixtures.layering_repo import REPO_FILES, repository_bytes, write_repository_files
 from tests.fixtures.projections.rows import hook_row, skill_row, tavily_row, verifier_row
-from tests.unit.claude.fixtures import (
+from tests.support.providers.claude import (
     ClaudeStack,
     base_operation,
     claude_binding,
@@ -77,14 +76,16 @@ from tests.unit.claude.fixtures import (
     claude_stack,
     materialization_digest_for,
 )
-from tests.unit.codex.fixture_app_server import FixtureLauncher, load_script
-from tests.unit.codex.support import (
+from tests.support.providers.codex import (
     CodexStack,
+    FixtureLauncher,
     StaticProjectionSource,
     build_harness,
     codex_binding,
     codex_operation,
+    load_script,
 )
+from tests.support.providers.cursor import LocalStack, local_stack
 
 MISSION_WINS = MaterializationPolicy(conflicts=ConflictPolicy.MISSION_WINS)
 REFUSE = MaterializationPolicy(conflicts=ConflictPolicy.REFUSE)

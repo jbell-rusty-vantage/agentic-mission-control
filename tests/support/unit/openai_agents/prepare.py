@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from mission_control.adapters.openai_agents.prepare import CodexAgentsPreparer
 from mission_control.adapters.secrets.sources import WorkerEnvironmentSource
-from tests.unit.openai_agents.support import FakeAgentsApi
+from tests.support.providers.openai_agents import FakeAgentsApi
 
 TOKEN = "github-readonly-test-value-7f3a"
 WORKER = {"MC_GITHUB_READONLY_TOKEN": TOKEN}

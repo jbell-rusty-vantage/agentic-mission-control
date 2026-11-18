@@ -37,7 +37,7 @@ from mission_control.adapters.claude.transport import (
 )
 from mission_control.adapters.claude.workspace import StateRootSessionStore
 from mission_control.application.execution.child_environment import provider_child_environment
-from tests.unit.claude.fixtures import FIXTURE_ENVIRON, fixture_admission
+from tests.support.providers.claude import FIXTURE_ENVIRON, fixture_admission
 
 SESSION: Final = "7c1f0a52-9d3e-4b6a-8f21-5e0c9a7b3d14"
 MAIN: Final = (

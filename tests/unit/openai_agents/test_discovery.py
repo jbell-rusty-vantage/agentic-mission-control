@@ -18,7 +18,7 @@ from mission_control.adapters.openai_agents.pack import load_pack
 from mission_control.adapters.openai_agents.prepare import PACK_KEY, CodexAgentsPreparer
 from mission_control.adapters.secrets.sources import WorkerEnvironmentSource
 from mission_control.domain.execution.discovery import DiscoveryItem, discovery_gaps
-from tests.unit.openai_agents.support import SHIPPED_PACK, FakeAgentsApi
+from tests.support.providers.openai_agents import SHIPPED_PACK, FakeAgentsApi
 
 WORKER = {"MC_GITHUB_READONLY_TOKEN": "github-readonly-test-value-7f3a"}
 

@@ -15,9 +15,9 @@ from typing import Any
 from mission_control.application.agentic_components.placement import operating_contract
 from mission_control.bootstrap.host_projection import HOST_PROJECTORS
 from mission_control.domain.agentic_components.projection import ResolvedCapability
-from tests.fixtures.cursor_cloud import CloudStack, cloud_rows, cloud_stack
 from tests.fixtures.cursor_controls import started_session
 from tests.fixtures.projections.rows import verifier_row
+from tests.support.providers.cursor import CloudStack, cloud_rows, cloud_stack
 from tests.unit.cursor.support import heid_of, lanes_for, send_request, signals, turn
 
 PROFILE = "cursor_cloud"

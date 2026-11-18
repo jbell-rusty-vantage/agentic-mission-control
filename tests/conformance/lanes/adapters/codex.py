@@ -1,6 +1,6 @@
 """`codex` for the suite: the real harness over the FIXTURE app-server.
 
-FIXTURES: `tests/unit/codex/fixture_app_server.py` speaks the pinned app-server v2 protocol
+FIXTURES: `tests/support/providers/codex.py` speaks the pinned app-server v2 protocol
 from scripted turns (each `turn/start` plays the next script; a later launch, a continuation
 target, plays its own). No Codex runs.
 """
@@ -31,8 +31,14 @@ from tests.conformance.lanes.contract import (
 )
 from tests.fixtures.continuation import FakeStaging
 from tests.fixtures.cursor_controls import FAST, admitted_unit, compose_control_stack
-from tests.unit.codex.fixture_app_server import FixtureLauncher, load_script
-from tests.unit.codex.support import PROFILE, TmpLeaser, build_harness, codex_operation
+from tests.support.providers.codex import (
+    PROFILE,
+    FixtureLauncher,
+    TmpLeaser,
+    build_harness,
+    codex_operation,
+    load_script,
+)
 
 # The scripted turns of the first app-server, in `turn/start` order.
 _TURNS: Mapping[Script, tuple[str, ...]] = {

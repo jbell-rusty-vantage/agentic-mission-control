@@ -29,8 +29,8 @@ from tests.fixtures.checkpoint_recovery import (
 )
 from tests.fixtures.lane_bindings import lane_fields
 from tests.fixtures.lane_turns import ScriptedSessionLane
+from tests.support.providers.claude import claude_operation
 from tests.support.run_control import command, reconciler_command
-from tests.unit.claude.fixtures import claude_operation
 
 
 @dataclass

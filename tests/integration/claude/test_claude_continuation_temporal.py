@@ -6,7 +6,7 @@ PostgreSQL 17: a `claude_agent_sdk` unit continued into a fresh session by the r
 The real `lane.*` and `continuation.*` activities run over `LaneTurnService` and the
 continuation service; the continuation ledger (transfer rows, sealed checkpoint, the
 continuation packet), the lane state and the frames live in PostgreSQL under the runtime role.
-The lane is the Claude harness over the FIXTURE SDK client (`tests/unit/claude/fixtures.py`: no
+The lane is the Claude harness over the FIXTURE SDK client (`tests/support/providers/claude.py`: no
 Claude Code process, no login, no model turn), continued through
 `claude_continuation_registration`: the snapshot port freezes the lease, the hydrator opens a
 fresh SDK session (no `resume`, no conversation fork). The worker is lost (an activity raises)
@@ -82,12 +82,7 @@ from tests.fixtures.mp12_lanes import Crashes
 from tests.fixtures.temporal_history import patch_ids
 from tests.support.db_builders import admit_unit_attempt
 from tests.support.integration.postgres.continuation_postgres import continuation_actor
-from tests.unit.claude.fixtures import (
-    SESSION_ID,
-    FixtureScript,
-    claude_operation,
-    claude_stack,
-)
+from tests.support.providers.claude import SESSION_ID, FixtureScript, claude_operation, claude_stack
 
 pytestmark = pytest.mark.common_db
 

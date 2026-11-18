@@ -22,8 +22,8 @@ from mission_control.adapters.openai_agents.prepare import (
 from mission_control.adapters.remote_session.errors import AccessDenied, CapacityLimited
 from mission_control.adapters.secrets.sources import WorkerEnvironmentSource
 from mission_control.application.secrets.broker import SecretUnavailable
+from tests.support.providers.openai_agents import API_KEY, SHIPPED_PACK, FakeAgentsApi, copy_pack
 from tests.support.unit.openai_agents.prepare import LABELS, TOKEN, WORKER, _preparer
-from tests.unit.openai_agents.support import API_KEY, SHIPPED_PACK, FakeAgentsApi, copy_pack
 
 
 async def test_the_first_sync_creates_every_resource_with_the_pack_bodies() -> None:

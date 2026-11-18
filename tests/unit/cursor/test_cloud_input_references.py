@@ -18,9 +18,9 @@ from mission_control.application.workspaces.cloud_branches import (
 )
 from mission_control.domain.context.render import bytes_digest
 from mission_control.domain.execution.contracts import WorkspaceOwner, WorkspaceSlotBinding
-from tests.fixtures.cursor_cloud import cloud_stack
 from tests.fixtures.cursor_controls import StaticInputs, started_session
 from tests.fixtures.lane_turns import cursor_operation
+from tests.support.providers.cursor import cloud_stack
 
 
 class SignedInputs(StaticInputs):

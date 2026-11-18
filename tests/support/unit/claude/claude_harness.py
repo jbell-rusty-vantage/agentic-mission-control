@@ -13,7 +13,7 @@ from mission_control.application.execution.harness.lane_turns import (
 )
 from mission_control.domain.execution.bindings import ProviderExecutionBinding
 from mission_control.domain.execution.lane_turns import LaneSegmentBounds, LaneTurnRequest
-from tests.unit.claude.fixtures import PROFILE, ClaudeStack
+from tests.support.providers.claude import PROFILE, ClaudeStack
 
 SMALL = LaneSegmentBounds(
     max_frames=50,

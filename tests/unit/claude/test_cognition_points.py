@@ -22,8 +22,8 @@ from mission_control.domain.execution.cognition_points import SessionCursorPoint
 from mission_control.domain.execution.lane_turns import NativeRefs
 from mission_control.domain.frames.contracts import ProviderFrame
 from tests.fixtures.lane_turns import RecordingSignals
+from tests.support.providers.claude import SESSION_ID, ClaudeStack, claude_stack
 from tests.support.unit.claude.claude_harness import _frames, _identity, _turn
-from tests.unit.claude.fixtures import SESSION_ID, ClaudeStack, claude_stack
 
 
 async def _settled_turn(tmp_path: Path, script: str = "full_run") -> tuple[ClaudeStack, str]:

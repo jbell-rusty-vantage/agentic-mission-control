@@ -40,10 +40,9 @@ from mission_control.domain.frames.facts import (
     ToolEffectFact,
     TurnCompletedFact,
 )
-from tests.fixtures.cursor_cloud import cloud_stack
 from tests.fixtures.cursor_controls import harness_fields
-from tests.fixtures.cursor_local import local_stack
 from tests.fixtures.lane_turns import RecordingSignals, lane_stack
+from tests.support.providers.cursor import cloud_stack, local_stack
 
 FIXTURES = Path(__file__).resolve().parents[2] / "integration" / "cursor" / "fixtures"
 SECRET = "sk-fixture-secret"

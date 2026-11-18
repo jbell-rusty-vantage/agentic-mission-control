@@ -34,8 +34,8 @@ from mission_control.domain.execution.lane_turns import (
 )
 from mission_control.domain.execution.lanes import CursorCloudOptions, CursorExecutionBinding
 from mission_control.domain.frames.contracts import FrameKind
-from tests.fixtures.cursor_cloud import CloudStack, cloud_stack
 from tests.fixtures.lane_turns import RecordingSignals
+from tests.support.providers.cursor import CloudStack, cloud_stack
 from tests.support.unit.harness.cursor_cloud import _identity, _lanes, _turn
 
 
@@ -98,12 +98,12 @@ async def test_a_cloud_turn_runs_on_the_pre_created_branch_and_settles(tmp_path:
     assert any('"retention_seconds":3600' in frame.body_excerpt for frame in frames)
     # The SCM diff is the patch; artifacts registered with digests before the agent was archived.
     assert facts.patch_ref is not None
-    name, diff, _media = stack.artifacts.staged[facts.patch_ref]
+    name, diff, _media = stack.artifacts.files()[facts.patch_ref]
     assert name.endswith("patch.diff") and b"src/feature.py" in diff
     assert b".cursor/" not in diff and b".mission/" not in diff
     manifest = next(
         json.loads(content)
-        for staged_name, content, _m in stack.artifacts.staged.values()
+        for staged_name, content, _m in stack.artifacts.files().values()
         if staged_name.endswith("session-manifest.json")
     )
     assert {item["path"] for item in manifest["artifacts"]} == {
@@ -160,7 +160,7 @@ async def test_metadata_unavailable_is_recorded_not_fatal(tmp_path: Path) -> Non
     assert "metadata" in stack.api.creates[0] and "metadata" not in stack.api.creates[1]
     manifest = next(
         json.loads(content)
-        for name, content, _m in stack.artifacts.staged.values()
+        for name, content, _m in stack.artifacts.files().values()
         if name.endswith("session-manifest.json")
     )
     assert manifest["metadata"] == "feature_unavailable"
@@ -356,7 +356,7 @@ def test_sse_parsing_keeps_ids_and_leading_status_without_one() -> None:
 
 
 async def test_publishing_is_idempotent_per_branch(tmp_path: Path) -> None:
-    from tests.fixtures.cursor_cloud import make_remote
+    from tests.support.providers.cursor import make_remote
 
     remote = make_remote(tmp_path)
     publisher = GitBranchPublisher(tmp_path / "mirrors")

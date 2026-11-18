@@ -17,8 +17,8 @@ from mission_control.adapters.cursor.bridge import ProviderTransient
 from mission_control.adapters.cursor.cloud import client_agent_id, parse_dispatch_key
 from mission_control.application.execution.harness.dispatch import DispatchReconcilingLane
 from mission_control.domain.execution.lanes import ObserveRequest, ReattachRequest, TurnHandle
-from tests.fixtures.cursor_cloud import cloud_stack
 from tests.fixtures.cursor_controls import harness_fields, started_session
+from tests.support.providers.cursor import cloud_stack
 from tests.unit.cursor.support import (
     dispatch_record,
     fresh_cloud_harness,

@@ -30,9 +30,9 @@ from tests.fixtures.environment_kits import (
     published_kit,
     setup_environ,
 )
-from tests.unit.codex.fixture_app_server import FixtureLauncher
-from tests.unit.codex.support import (
+from tests.support.providers.codex import (
     PROFILE,
+    FixtureLauncher,
     build_harness,
     codex_binding,
     codex_operation,

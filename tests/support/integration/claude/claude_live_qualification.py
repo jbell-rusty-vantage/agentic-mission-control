@@ -13,7 +13,7 @@ from mission_control.application.agentic_components.placement import operating_c
 from mission_control.application.execution.auth_admission import AuthAdmission
 from mission_control.bootstrap.host_projection import HOST_PROJECTORS
 from mission_control.domain.execution.contracts import OperationExecutionRequest
-from tests.unit.claude.fixtures import PROFILE, base_operation, claude_binding, claude_operation
+from tests.support.providers.claude import PROFILE, base_operation, claude_binding, claude_operation
 
 
 def _rows() -> tuple[Any, ...]:

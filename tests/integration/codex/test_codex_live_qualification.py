@@ -95,8 +95,8 @@ from tests.integration.codex.live_drill import (
     write_record,
     write_recording,
 )
-from tests.unit.codex.support import (
-    MemoryArtifacts,
+from tests.support.artifacts import MemoryArtifacts
+from tests.support.providers.codex import (
     StaticProjectionSource,
     approval_rig,
     codex_binding,

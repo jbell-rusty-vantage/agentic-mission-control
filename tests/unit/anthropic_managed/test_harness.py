@@ -50,10 +50,11 @@ from mission_control.domain.execution.lanes import (
 )
 from mission_control.domain.frames.contracts import FrameKind
 from tests.fixtures.lane_turns import LaneStack, RecordingSignals, SimulatedWorkerLoss, lane_stack
-from tests.fixtures.managed_agents import MODEL_USAGE, TURN_LIST_COST
-from tests.fixtures.managed_lane import (
+from tests.support.providers.managed_agents import (
     MAX_LIST_COST,
+    MODEL_USAGE,
     PROFILE,
+    TURN_LIST_COST,
     ManagedStack,
     managed_harness,
     managed_stack,
@@ -251,7 +252,7 @@ async def test_a_turn_runs_settles_from_its_closing_idle_and_ends_after_custody(
     (order,) = stack.deletions.orders.values()
     assert order.session_ref == session_id and order.lane_profile == PROFILE
     (manifest,) = stack.artifacts.staged.values()
-    captured = json.loads(manifest[1])
+    captured = json.loads(manifest)
     assert captured["provenance"]["provider_session_ref"] == session_id
     assert set(captured["turns"].values().__iter__().__next__()) >= {"status", "usage"}
 

@@ -51,7 +51,7 @@ async def test_published_schema_uses_existing_publication_boundary():
 def test_existing_provider_binding_canonical_digest_and_seal_roundtrip_unchanged():
     from mission_control.domain.authoring.canonical import sha256_digest
     from mission_control.domain.execution.bindings import ProviderExecutionBinding
-    from tests.unit.codex.support import codex_binding
+    from tests.support.providers.codex import codex_binding
 
     binding = codex_binding()
     encoded = stable_json_dump(binding)

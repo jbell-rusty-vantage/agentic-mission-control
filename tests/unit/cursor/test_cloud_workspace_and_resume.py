@@ -9,7 +9,6 @@ from __future__ import annotations
 import json
 from datetime import timedelta
 from pathlib import Path
-from unittest.mock import AsyncMock
 
 import pytest
 
@@ -26,8 +25,8 @@ from mission_control.domain.execution.lanes import (
     ReattachRequest,
     SnapshotRequest,
 )
-from tests.fixtures.cursor_cloud import cloud_stack
 from tests.fixtures.cursor_controls import harness_fields, started_session
+from tests.support.providers.cursor import cloud_stack
 from tests.unit.cursor.support import (
     dispatch_record,
     frames_of,
@@ -80,7 +79,7 @@ async def test_prepare_records_the_provider_workspace_and_end_session_releases_a
     assert "provider:uncommitted-state-not-captured" in lease.workspace_snapshot.exclusions
     manifest = next(
         json.loads(content)
-        for name, content, _m in stack.artifacts.staged.values()
+        for name, content, _m in stack.artifacts.files().values()
         if name.endswith("session-manifest.json")
     )
     assert manifest["workspace_snapshot_ref"] == lease.snapshot_ref
@@ -90,28 +89,18 @@ async def test_prepare_records_the_provider_workspace_and_end_session_releases_a
 
 @pytest.mark.parametrize("moving", ["branch", "native", "missing"])
 async def test_conversation_capture_checks_second_head_and_native_anchor(
-    tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
-    moving: str,
+    tmp_path: Path, moving: str
 ) -> None:
     stack = cloud_stack(tmp_path)
     heid, handle = await started_session(stack)
     assert handle.native_session_ref is not None
     branch = stack.harness.session_branch(heid)[1]
     initial_head = _branch_head(stack, branch)
-    if moving == "branch":
-        monkeypatch.setattr(
-            stack.harness._publisher, "head", AsyncMock(side_effect=[initial_head, "f" * 40])
-        )
-    elif moving == "native":
-        initial = dict(stack.api.agents[handle.native_session_ref])
-        monkeypatch.setattr(
-            stack.client,
-            "get_agent",
-            AsyncMock(side_effect=[initial, {**initial, "latestRunId": "foreign-run"}]),
-        )
+    # The fake moves the origin while the conversation is exported, or has no export.
+    if moving == "missing":
+        stack.api.conversation_missing = True
     else:
-        monkeypatch.setattr(stack.client, "conversation", AsyncMock(return_value=None))
+        stack.api.conversation_moves = moving
     request = SnapshotRequest(
         **harness_fields(stack.operation, heid, PROFILE), session=handle, reason="custody"
     )
@@ -127,7 +116,8 @@ async def test_conversation_capture_checks_second_head_and_native_anchor(
         assert stored is not None and stored.conversation is not None
         assert stored.conversation.disposition == "missing"
         assert stored.conversation.content_bytes < 2048
-    assert _branch_head(stack, branch) == initial_head, (
+    expected = stack.api.foreign_head if moving == "branch" else initial_head
+    assert expected is not None and _branch_head(stack, branch) == expected, (
         "capture never publishes or edits the source branch"
     )
 
@@ -236,7 +226,7 @@ async def test_reattach_rehydrates_branch_projection_and_lease_without_republish
     assert stack.leases is not None and len(stack.leases._leases) == 1
 
 
-async def test_cloud_history_requires_authoritative_terminal_record(tmp_path, monkeypatch):
+async def test_cloud_history_requires_authoritative_terminal_record(tmp_path: Path) -> None:
     from mission_control.domain.execution.history_reconciliation import (
         HistoryReplayComplete,
         HistoryReplayIncomplete,
@@ -249,10 +239,11 @@ async def test_cloud_history_requires_authoritative_terminal_record(tmp_path, mo
         **harness_fields(stack.operation, heid, PROFILE),
         turn=TurnHandle(session=session, turn_no=1, native_turn_ref=stack.api.run_id),
     )
-    monkeypatch.setattr(stack.harness, "_read_turn", AsyncMock(return_value={"status": "running"}))
+    # The provider's run record is still running, then finished.
+    stack.api.runs[stack.api.run_id]["status"] = "RUNNING"
     with pytest.raises(HistoryReplayIncomplete):
         _ = [frame async for frame in stack.harness.reconcile_history(request)]
-    monkeypatch.setattr(stack.harness, "_read_turn", AsyncMock(return_value={"status": "finished"}))
+    stack.api.runs[stack.api.run_id]["status"] = "FINISHED"
     replay = [frame async for frame in stack.harness.reconcile_history(request)]
     assert replay[0].terminal and isinstance(replay[-1], HistoryReplayComplete)
 

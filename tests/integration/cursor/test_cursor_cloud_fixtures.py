@@ -30,8 +30,8 @@ from mission_control.domain.execution.lane_turns import LaneTurnRequest
 from mission_control.domain.execution.lanes import LaneSegmentBounds
 from mission_control.domain.frames.contracts import LaneProfile
 from mission_control.domain.frames.facts import ToolEffectFact, TurnCompletedFact
-from tests.fixtures.cursor_cloud import cloud_stack
 from tests.fixtures.lane_turns import LANE_QUEUE, RecordingSignals, lane_stack
+from tests.support.providers.cursor import cloud_stack
 
 WORKFLOW_QUEUE = "ft-g5-operation-workflows"
 

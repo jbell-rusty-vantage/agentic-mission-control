@@ -8,8 +8,8 @@ from mission_control.application.execution.approvals_broker import ApprovalBroke
 from mission_control.application.execution.harness.protocol import AgentHarness
 from mission_control.application.frames.sink import InMemoryFrameStore
 from tests.conformance.lanes.contract import LaneAdapter, LaneFake, Script
-from tests.fixtures.agents_lane import AgentsStack, agents_stack
 from tests.fixtures.cursor_controls import FAST, admitted_unit, compose_control_stack
+from tests.support.providers.openai_agents import AgentsStack, agents_stack
 
 _SCRIPTS = {
     Script.FULL_TURN: ("full",),

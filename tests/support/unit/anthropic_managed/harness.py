@@ -20,7 +20,7 @@ from mission_control.domain.execution.lanes import (
     StartRequest,
     TurnHandle,
 )
-from tests.fixtures.managed_lane import PROFILE, ManagedStack
+from tests.support.providers.managed_agents import PROFILE, ManagedStack
 
 
 def _identity(operation: OperationExecutionRequest) -> LaneExecutionIdentity:

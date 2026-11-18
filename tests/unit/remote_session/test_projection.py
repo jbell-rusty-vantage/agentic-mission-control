@@ -7,10 +7,10 @@ from mission_control.adapters.openai_agents.pack import CodexAgentsPack
 from mission_control.adapters.openai_agents.pack import load_pack as load_agents
 from mission_control.adapters.openai_agents.prepare import CodexAgentsPreparer
 from mission_control.adapters.remote_session.projection import configuration, project
-from tests.fixtures.managed_agents import FakeManagedAgentsApi
+from tests.support.providers.managed_agents import FakeManagedAgentsApi
+from tests.support.providers.openai_agents import SHIPPED_PACK, FakeAgentsApi
 from tests.support.unit.anthropic_managed.prepare import AI_ENGINEER_PACK, prepare
 from tests.support.unit.openai_agents.prepare import _preparer
-from tests.unit.openai_agents.support import SHIPPED_PACK, FakeAgentsApi
 
 
 async def test_managed_inline_projection_reuses_all_resources(tmp_path: Path):

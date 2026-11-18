@@ -14,7 +14,7 @@ from pathlib import Path
 import pytest
 
 from mission_control.application.execution.harness.dispatch import ProviderCapacityLimited
-from tests.fixtures.cursor_cloud import cloud_stack
+from tests.support.providers.cursor import cloud_stack
 from tests.unit.cursor.support import (
     heid_of,
     identity,

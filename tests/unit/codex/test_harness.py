@@ -51,11 +51,10 @@ from mission_control.domain.execution.lanes import (
 from mission_control.domain.frames.body import frame_body_object
 from mission_control.domain.frames.contracts import FrameKind
 from tests.fixtures.lane_turns import RecordingSignals
-from tests.support.unit.codex.harness import BOUNDS
-from tests.unit.codex.fixture_app_server import FixtureLauncher, load_script
-from tests.unit.codex.support import (
+from tests.support.providers.codex import (
     FAKE_WORKER_ENV,
     FIXTURE_INSTRUCTIONS,
+    FixtureLauncher,
     StaticAuth,
     admission,
     build_harness,
@@ -63,7 +62,9 @@ from tests.unit.codex.support import (
     codex_operation,
     codex_stack,
     fixture_settings,
+    load_script,
 )
+from tests.support.unit.codex.harness import BOUNDS
 
 
 @pytest.mark.asyncio
@@ -240,9 +241,9 @@ async def test_a_full_turn_persists_every_event_as_frames_and_settles(tmp_path: 
     lease = next(iter(stack.leaser.leases.values()))
     assert (Path(lease.path) / ".codex" / "config.toml").is_file()
     assert not (Path(lease.path) / "AGENTS.md").exists()
-    assert lease.released and lease.patch_artifact_ref in stack.artifacts.stored
+    assert lease.released and lease.patch_artifact_ref in stack.artifacts.staged
     assert facts.patch_ref == lease.patch_artifact_ref
-    assert any(name.endswith("workspace-snapshot.json") for name in stack.artifacts.stored)
+    assert any(name.endswith("workspace-snapshot.json") for name in stack.artifacts.staged)
     assert stack.auth.calls == 1
 
 
@@ -679,7 +680,7 @@ def test_a_windows_selector_loop_cannot_run_the_lane(monkeypatch: pytest.MonkeyP
 
 
 def test_fixture_scripts_are_labelled_and_never_claimed_recorded() -> None:
-    from tests.unit.codex.fixture_app_server import SCRIPTS
+    from tests.support.providers.codex import SCRIPTS
 
     names = sorted(path.stem for path in SCRIPTS.glob("*.jsonl"))
     assert names == [

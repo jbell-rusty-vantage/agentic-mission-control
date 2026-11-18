@@ -54,20 +54,17 @@ from mission_control.domain.execution.bindings import ProviderExecutionBinding
 from mission_control.domain.execution.contracts import OperationExecutionRequest
 from mission_control.domain.execution.lanes import PrepareRequest, StartRequest
 from tests.fixtures.cursor_controls import started_session
-from tests.fixtures.cursor_local import local_stack
 from tests.fixtures.lane_turns import lane_stack
 from tests.fixtures.projections.rows import firecrawl_row, tavily_row
-from tests.support.unit.codex.kernel_hooks import memory_hooks
-from tests.unit.claude.fixtures import (
+from tests.support.providers.claude import (
     claude_binding,
     claude_operation,
     claude_stack,
     fixture_admission,
 )
-from tests.unit.codex.drive import started
-from tests.unit.codex.fixture_app_server import FixtureLauncher, load_script
-from tests.unit.codex.support import (
+from tests.support.providers.codex import (
     CodexStack,
+    FixtureLauncher,
     StaticAuth,
     StaticProjectionSource,
     admission,
@@ -75,7 +72,11 @@ from tests.unit.codex.support import (
     codex_binding,
     codex_operation,
     fixture_settings,
+    load_script,
 )
+from tests.support.providers.cursor import local_stack
+from tests.support.unit.codex.kernel_hooks import memory_hooks
+from tests.unit.codex.drive import started
 
 SENTINEL = "mo04-sentinel-value"
 WORKER: dict[str, str] = {

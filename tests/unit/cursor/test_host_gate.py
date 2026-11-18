@@ -24,7 +24,7 @@ from mission_control.application.agentic_components.placement import LaneProject
 from mission_control.application.execution.harness.lane_turns import LaneExecutionIdentity
 from mission_control.domain.execution.lanes import PrepareRequest, StartRequest
 from tests.fixtures.cursor_controls import harness_fields
-from tests.fixtures.cursor_local import local_stack
+from tests.support.providers.cursor import local_stack
 
 
 def test_windows_is_refused_whatever_the_loop_and_posix_hosts_pass() -> None:

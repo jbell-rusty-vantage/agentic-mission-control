@@ -12,7 +12,7 @@ from typing import Final
 from mission_control.adapters.anthropic_managed.prepare import ClaudeManagedPrepare
 from mission_control.adapters.secrets.sources import WorkerEnvironmentSource
 from mission_control.application.secrets.broker import SecretBroker
-from tests.fixtures.managed_agents import FakeManagedAgentsApi
+from tests.support.providers.managed_agents import FakeManagedAgentsApi
 
 REPO_ROOT: Final = Path(__file__).resolve().parents[4]
 AI_ENGINEER_PACK: Final = REPO_ROOT / "deployments/hosted-packs/ai-engineer/claude_managed"

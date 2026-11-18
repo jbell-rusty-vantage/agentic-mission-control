@@ -28,7 +28,6 @@ from mission_control.domain.execution.contracts import OperationExecutionResult
 from mission_control.domain.execution.lane_turns import LaneTurnRequest
 from mission_control.domain.execution.lanes import SessionHandle, SnapshotRequest
 from tests.conformance.lanes.records import live_drills
-from tests.fixtures.cursor_cloud import cloud_stack
 from tests.fixtures.cursor_controls import (
     ControlStack,
     cloud_control_stack,
@@ -38,8 +37,8 @@ from tests.fixtures.cursor_controls import (
     source_agent,
     started_session,
 )
-from tests.fixtures.cursor_local import local_stack
 from tests.fixtures.lane_turns import RecordingSignals, lane_stack
+from tests.support.providers.cursor import cloud_stack, local_stack
 
 PROFILES = ("cursor_local", "cursor_cloud")
 # Bridge offsets / SSE event ids at which the fixture run holds after its turn ended.

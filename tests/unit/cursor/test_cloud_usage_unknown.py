@@ -11,8 +11,8 @@ from pathlib import Path
 import pytest
 
 from mission_control.domain.execution.lanes import SessionHandle, TurnHandle, UsageRequest
-from tests.fixtures.cursor_cloud import cloud_stack
 from tests.fixtures.cursor_controls import harness_fields
+from tests.support.providers.cursor import cloud_stack
 from tests.unit.cursor.support import heid_of, lanes_for, signals, turn
 
 PROFILE = "cursor_cloud"

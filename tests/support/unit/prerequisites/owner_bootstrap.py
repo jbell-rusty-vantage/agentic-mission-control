@@ -6,7 +6,7 @@ Moved from tests/unit/prerequisites/test_owner_bootstrap.py.
 from mission_control.application.prerequisites.bootstrap_probe import BootstrapProbePlan
 from mission_control.domain.authoring.canonical import sha256_digest
 from mission_control.domain.execution.bindings import ProviderExecutionBinding
-from tests.fixtures.managed_lane import managed_binding, managed_operation
+from tests.support.providers.managed_agents import managed_binding, managed_operation
 
 
 def probe_template():

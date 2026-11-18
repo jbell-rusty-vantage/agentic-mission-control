@@ -126,9 +126,9 @@ async def test_cloud_capture_flows_through_lease_snapshot_fork_seed_and_mandator
     from mission_control.application.context.fork_context import ForkContextReader
     from mission_control.domain.context.packet import ContextPacket, pack
     from mission_control.domain.context.snapshot_evidence import CONVERSATION_MEDIA_TYPE
-    from tests.fixtures.cursor_cloud import cloud_stack
     from tests.fixtures.lane_turns import SCOPE as LANE_SCOPE
     from tests.fixtures.lane_turns import cursor_operation
+    from tests.support.providers.cursor import cloud_stack
     from tests.unit.context.packets import target, worked_example_request
     from tests.unit.cursor.support import lanes_for, signals, turn
 

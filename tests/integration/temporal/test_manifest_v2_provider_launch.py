@@ -11,8 +11,8 @@ submit services, the production launch author (``compose_manifest_launch_inputs`
 StageGraph family, ``OperationWorkflow``, the production operation boundary and
 ``LaneTurnService`` over PostgreSQL frames and lane state.
 
-FIXTURE: the Claude Agent SDK client (``tests/unit/claude/fixtures.py``) and the Codex
-app-server (``tests/unit/codex/fixture_app_server.py``): no Claude Code or Codex process is
+FIXTURE: the Claude Agent SDK client (``tests/support/providers/claude.py``) and the Codex
+app-server (``tests/support/providers/codex.py``): no Claude Code or Codex process is
 launched and nothing is paid for; their tmp-dir workspace ports and static auth admissions; the
 deployment bindings (Deep Agents scaffold of the test stack, the lane bound to a test queue);
 the ``application: biotech`` transform of the checked examples.
@@ -118,6 +118,7 @@ from tests.fixtures.rrm009_production_stack import (
     SCOPE,
     technical_binding,
 )
+from tests.support.artifacts import MemoryArtifacts
 from tests.support.integration.temporal.manifest_v2_provider_launch import (
     AUTH_PROFILES,
     ROOT,
@@ -125,22 +126,22 @@ from tests.support.integration.temporal.manifest_v2_provider_launch import (
     provider_lane,
 )
 from tests.support.manifest_runtime import host_pins, missions_app, post, submit
-from tests.unit.authoring.manifest_launch_fixture import fixture_bindings
-from tests.unit.claude.fixtures import (
+from tests.support.providers.claude import (
     FIXTURE_ENVIRON,
     FixtureClientFactory,
     FixtureScript,
     FixtureWorkspace,
     fixture_admission,
 )
-from tests.unit.codex.fixture_app_server import FixtureLauncher, load_script
-from tests.unit.codex.support import (
-    MemoryArtifacts,
+from tests.support.providers.codex import (
+    FixtureLauncher,
     StaticAuth,
     TmpLeaser,
     fixture_settings,
+    load_script,
 )
-from tests.unit.codex.support import admission as codex_admission
+from tests.support.providers.codex import admission as codex_admission
+from tests.unit.authoring.manifest_launch_fixture import fixture_bindings
 
 pytestmark = pytest.mark.common_db
 

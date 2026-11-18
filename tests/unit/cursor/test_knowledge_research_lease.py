@@ -4,7 +4,7 @@ from pathlib import Path
 
 from mission_control.adapters.cursor.workspace import GitWorktreeLeaser, git
 from tests.fixtures.cursor_controls import started_session
-from tests.fixtures.cursor_local import local_stack
+from tests.support.providers.cursor import local_stack
 
 
 async def test_repo_free_local_session_prepares_an_initialized_research_workspace(

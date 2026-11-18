@@ -3,7 +3,7 @@
 The real `OperationWorkflow` schedules the real `lane.turn` / `lane.status` / `lane.cancel`
 activities over `LaneTurnService`, whose frames and lane state live in a disposable
 PostgreSQL 17 database (runtime role, forced RLS) and whose lane is the `codex` harness over
-the FIXTURE app-server (`tests/unit/codex/fixture_app_server.py`: in-process, no CLI, no
+the FIXTURE app-server (`tests/support/providers/codex.py`: in-process, no CLI, no
 login, no model turn). Every history is replayed with `Replayer`. Nothing here proves live
 Codex behaviour; it proves the lane drives the shared lifecycle on real services.
 
@@ -70,13 +70,14 @@ from tests.fixtures.lane_turns import lane_stack
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.fixtures.temporal_history import completed_activity_results
 from tests.support.db_builders import admit_unit_attempt
-from tests.unit.codex.fixture_app_server import FixtureLauncher, load_script
-from tests.unit.codex.support import (
+from tests.support.providers.codex import (
     CodexStack,
+    FixtureLauncher,
     build_harness,
     codex_binding,
     codex_operation,
     fixture_settings,
+    load_script,
 )
 
 ADDRESS = os.environ.get("MC_TEMPORAL_TEST_ADDRESS", "127.0.0.1:7233")

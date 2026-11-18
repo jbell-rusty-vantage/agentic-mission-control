@@ -35,9 +35,9 @@ from mission_control.domain.execution.placement import PlacementLimit
 from mission_control.domain.policies.contracts import RunPhase
 from tests.fixtures.lane_bindings import lane_fields
 from tests.fixtures.lane_turns import lane_stack
-from tests.fixtures.managed_lane import managed_stack
 from tests.support.db_builders import admit_unit_attempt, owner_rows
 from tests.support.integration.anthropic_managed import session_lifecycle_live as lifecycle
+from tests.support.providers.managed_agents import managed_stack
 from tests.support.unit.prerequisites.owner_bootstrap import probe_template
 
 

@@ -1,7 +1,7 @@
 """`claude_managed` for the suite: the real harness over the fake Managed Agents API.
 
-FIXTURES: `tests/fixtures/managed_lane.py` syncs the checked-in AI Engineer pack through the
-real `ClaudeManagedPrepare` into `tests/fixtures/managed_agents.FakeManagedAgentsApi`
+FIXTURES: `tests/support/providers/managed_agents.py` syncs the checked-in AI Engineer pack
+through the real `ClaudeManagedPrepare` into its `FakeManagedAgentsApi`
 (`httpx.MockTransport`) and runs `ClaudeManagedHarness` over it inside a real Run. No
 Anthropic API is called.
 """
@@ -21,8 +21,13 @@ from mission_control.application.execution.stop_fence import InMemoryStopFenceRe
 from mission_control.application.frames.sink import InMemoryFrameStore
 from tests.conformance.lanes.contract import LaneAdapter, LaneFake, Script
 from tests.fixtures.cursor_controls import FAST, admitted_unit, compose_control_stack
-from tests.fixtures.managed_agents import FakeManagedAgentsApi
-from tests.fixtures.managed_lane import PROFILE, ManagedStack, managed_harness, managed_stack
+from tests.support.providers.managed_agents import (
+    PROFILE,
+    FakeManagedAgentsApi,
+    ManagedStack,
+    managed_harness,
+    managed_stack,
+)
 
 # The fake's turn scripts for each claimed scenario's first turn (and the replacement turn).
 _SCRIPTS: Final[Mapping[Script, tuple[str, ...]]] = {

@@ -14,6 +14,7 @@ from mission_control.adapters.workspaces.git_workspaces import GitWorkspaceBacke
 from mission_control.application.execution.harness.leases import InMemoryWorkspaceLeaseStore
 from mission_control.application.workspaces.service import AllocationRequest, WorkspaceAllocator
 from mission_control.domain.execution.bindings import WorkspacePolicyPin
+from tests.support.artifacts import MemoryArtifacts
 
 SCOPE = "scope/00000000-0000-0000-0000-000000000001/app/00000000-0000-0000-0000-000000000002"
 IDENTITY = ("-c", "user.name=Fixture", "-c", "user.email=fixture@localhost")
@@ -52,22 +53,6 @@ def make_primary(root: Path) -> Path:
     git("add", "--all", cwd=root)
     commit(root, "base")
     return root
-
-
-class MemoryArtifacts:
-    def __init__(self) -> None:
-        self.staged: dict[str, bytes] = {}
-
-    async def stage(self, *, request_scope: str, name: str, content: bytes, media_type: str) -> str:
-        ref = f"payload://{len(self.staged)}/{name}"
-        self.staged[ref] = content
-        return ref
-
-    async def retrieve(self, durable_ref: str) -> bytes:
-        try:
-            return self.staged[durable_ref]
-        except KeyError as error:
-            raise LookupError(durable_ref) from error
 
 
 class Clock:
@@ -177,7 +162,6 @@ __all__ = [
     "IDENTITY",
     "SCOPE",
     "Clock",
-    "MemoryArtifacts",
     "Stack",
     "commit",
     "git",

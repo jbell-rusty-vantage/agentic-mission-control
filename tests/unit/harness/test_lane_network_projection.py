@@ -45,20 +45,24 @@ from mission_control.domain.execution.lanes import (
     StartRequest,
 )
 from mission_control.domain.execution.network_policy import ResolvedNetworkPolicy
-from tests.fixtures.cursor_cloud import cloud_stack
 from tests.fixtures.cursor_controls import started_session
-from tests.fixtures.cursor_local import local_stack
 from tests.fixtures.lane_bindings import lane_fields
-from tests.unit.claude.fixtures import (
+from tests.support.providers.claude import (
     base_operation,
     claude_binding,
     claude_operation,
     claude_stack,
     materialization_digest_for,
 )
+from tests.support.providers.codex import (
+    FixtureLauncher,
+    codex_binding,
+    codex_operation,
+    codex_stack,
+    load_script,
+)
+from tests.support.providers.cursor import cloud_stack, local_stack
 from tests.unit.codex.drive import started
-from tests.unit.codex.fixture_app_server import FixtureLauncher, load_script
-from tests.unit.codex.support import codex_binding, codex_operation, codex_stack
 
 INGRESS = "mc-ingress.vercel.app"
 POLICY = ResolvedNetworkPolicy(

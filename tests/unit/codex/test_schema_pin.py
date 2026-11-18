@@ -22,8 +22,7 @@ from mission_control.adapters.codex.approvals import native_response
 from mission_control.application.execution.approvals import NativeReply
 from mission_control.domain.execution.lanes import LaneSegmentBounds
 from tests.fixtures.lane_turns import RecordingSignals
-from tests.unit.codex.fixture_app_server import SCRIPTS
-from tests.unit.codex.support import codex_stack
+from tests.support.providers.codex import SCRIPTS, codex_stack
 
 SCHEMA_DIR = Path(protocol.SCHEMA_FIXTURE_DIR)
 PIN = json.loads((SCHEMA_DIR / "PIN.json").read_text(encoding="utf-8"))

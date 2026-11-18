@@ -13,7 +13,7 @@ from typing import Any
 
 from temporalio.testing import ActivityEnvironment
 from tests.fixtures.lane_turns import DIGEST, ScriptedSessionLane, lane_stack
-from tests.fixtures.managed_lane import managed_binding, managed_operation
+from tests.support.providers.managed_agents import managed_binding, managed_operation
 from tests.support.unit.harness.managed_budget_controls import NOW, Approvals, Authority, Provider
 
 from mission_control.adapters.anthropic_managed.describe import CLAUDE_MANAGED_DESCRIBE

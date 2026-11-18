@@ -23,8 +23,8 @@ from mission_control.domain.execution.usage_admission import (
     plan_limit_response,
 )
 from tests.support.operations import operation_request
-from tests.unit.claude.fixtures import claude_operation
-from tests.unit.codex.support import codex_operation
+from tests.support.providers.claude import claude_operation
+from tests.support.providers.codex import codex_operation
 
 QUEUE = "mc-claude-lane-test"
 

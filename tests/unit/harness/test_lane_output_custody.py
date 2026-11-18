@@ -15,8 +15,8 @@ import pytest
 
 from mission_control.adapters.claude.harness import _output_files
 from mission_control.domain.execution.contracts import OperationExecutionRequest
-from tests.fixtures.cursor_local import local_stack
 from tests.fixtures.lane_turns import RecordingSignals
+from tests.support.providers.cursor import local_stack
 from tests.support.unit.harness.cursor_local import _identity, _service, _turn
 
 
@@ -58,7 +58,7 @@ async def test_cursor_local_registers_declared_outputs_through_the_custody_port(
     # snapshot still freezes `outputs/` with the rest of the lease, as before).
     heid = _identity(stack).harness_execution_id
     assert f"cursor-local/{heid}/outputs/report.md" not in {
-        staged[0] for staged in stack.artifacts.staged.values()
+        staged[0] for staged in stack.artifacts.files().values()
     }
 
 

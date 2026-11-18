@@ -28,7 +28,7 @@ from tests.integration.claude.live_drill import (
     missing_preconditions,
     write_record,
 )
-from tests.unit.claude.fixtures import PROFILE, fixture_admission
+from tests.support.providers.claude import PROFILE, fixture_admission
 
 COMPLETE = {
     "MC_LIVE_CLAUDE_QUALIFICATION": "1",

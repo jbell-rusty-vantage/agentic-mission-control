@@ -28,7 +28,7 @@ from mission_control.adapters.anthropic_managed.prepare import (
 from mission_control.adapters.secrets.sources import WorkerEnvironmentSource
 from mission_control.application.secrets.broker import SecretBroker
 from mission_control.domain.execution.discovery import DiscoveryItem, discovery_gaps
-from tests.fixtures.managed_agents import FakeManagedAgentsApi
+from tests.support.providers.managed_agents import FakeManagedAgentsApi
 
 PACK: Final = Path(__file__).resolve().parents[3] / "deployments/hosted-packs/ai-engineer"
 

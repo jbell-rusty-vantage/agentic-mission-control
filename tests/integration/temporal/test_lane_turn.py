@@ -598,7 +598,7 @@ async def test_fork_runs_its_first_segment_in_a_fresh_lease_restored_from_the_sn
         register_run,
         started_session,
     )
-    from tests.fixtures.cursor_local import local_stack
+    from tests.support.providers.cursor import local_stack
 
     source = local_stack(tmp_path / "source")
     register_run(source)
@@ -629,7 +629,7 @@ async def test_fork_runs_its_first_segment_in_a_fresh_lease_restored_from_the_sn
     assert fork.launcher.created and fork.launcher.agents[0] != source_agent
     patch = next(
         content
-        for ref, (name, content, _media) in fork.artifacts.staged.items()
+        for ref, (name, content, _media) in fork.artifacts.files().items()
         if ref in settled.output_refs and name.endswith("patch.diff")
     )
     assert restored_name.encode("utf-8") in patch, "the derived run's patch carries the fork"

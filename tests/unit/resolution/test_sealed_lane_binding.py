@@ -27,7 +27,7 @@ from mission_control.domain.policies.contracts import Contract
 from mission_control.domain.resolution.sealed import MAX_SEALED_PAYLOAD_BYTES, SealedLaneBinding
 from tests.fixtures.lane_turns import cursor_binding, cursor_operation
 from tests.support.operations import operation_request
-from tests.unit.claude.fixtures import claude_operation
+from tests.support.providers.claude import claude_operation
 
 
 def _payload(**changes: Any) -> dict[str, Any]:

@@ -21,7 +21,6 @@ from mission_control.domain.authoring.environment_kits import (
 )
 from mission_control.domain.execution.lanes import PreparedSession, PrepareRequest
 from tests.fixtures.cursor_controls import harness_fields, started_session
-from tests.fixtures.cursor_local import LocalStack, local_stack
 from tests.fixtures.environment_kits import (
     BASH,
     kit_document,
@@ -30,6 +29,7 @@ from tests.fixtures.environment_kits import (
     published_kit,
     setup_environ,
 )
+from tests.support.providers.cursor import LocalStack, local_stack
 
 pytestmark = pytest.mark.skipif(BASH is None, reason="the mission layer runs under bash")
 

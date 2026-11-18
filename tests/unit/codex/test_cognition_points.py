@@ -21,8 +21,8 @@ from mission_control.domain.execution.cognition_points import ThreadItemPoint
 from mission_control.domain.execution.lane_turns import NativeRefs
 from mission_control.domain.frames.contracts import FrameKind, ProviderFrame
 from tests.fixtures.lane_turns import RecordingSignals
+from tests.support.providers.codex import CodexStack, codex_stack
 from tests.support.unit.codex.harness import BOUNDS
-from tests.unit.codex.support import CodexStack, codex_stack
 
 
 async def _settled_turn(tmp_path: Path, *scripts: str) -> tuple[CodexStack, str, str]:
@@ -184,8 +184,7 @@ def test_usage_skips_the_attributed_companion_frame(tmp_path: Path) -> None:
 
 
 def test_the_harness_is_a_point_collecting_lane(tmp_path: Path) -> None:
-    from tests.unit.codex.fixture_app_server import FixtureLauncher
-    from tests.unit.codex.support import build_harness
+    from tests.support.providers.codex import FixtureLauncher, build_harness
 
     harness, *_rest = build_harness(tmp_path, FixtureLauncher())
     assert isinstance(harness, CodexLocalHarness) and isinstance(harness, PointCollectingLane)

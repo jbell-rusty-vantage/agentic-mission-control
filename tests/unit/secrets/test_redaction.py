@@ -24,7 +24,7 @@ from mission_control.application.secrets.redaction import (
     redact_receipt,
 )
 from mission_control.domain.frames.body import REDACTED, frame_body
-from tests.fixtures.cursor_cloud import make_remote
+from tests.support.providers.cursor import make_remote
 
 SECRET = "mo11-redaction-sentinel-4c1e"
 LONGER = SECRET + "-and-more"

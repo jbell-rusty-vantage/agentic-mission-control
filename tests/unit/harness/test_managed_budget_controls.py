@@ -377,7 +377,7 @@ async def test_native_cancel_after_process_restart_never_lifts_budget(tmp_path):
         ReattachRequest,
         TurnHandle,
     )
-    from tests.fixtures.managed_lane import managed_harness, managed_stack
+    from tests.support.providers.managed_agents import managed_harness, managed_stack
     from tests.support.unit.anthropic_managed.harness import _fields, _sent, _started
 
     fixture = managed_stack(tmp_path)

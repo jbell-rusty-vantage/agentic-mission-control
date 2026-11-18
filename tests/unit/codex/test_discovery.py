@@ -40,7 +40,7 @@ from mission_control.domain.execution.lanes import PrepareRequest, StartRequest
 from mission_control.domain.frames.contracts import FrameKind
 from tests.fixtures.lane_turns import RecordingSignals, lane_stack
 from tests.fixtures.projections.discovery import codex_cli
-from tests.unit.codex.support import codex_operation, codex_stack
+from tests.support.providers.codex import codex_operation, codex_stack
 
 RECORDING = json.loads(codex_cli.RECORDING.read_text(encoding="utf-8"))
 BOUNDS = {"heartbeat_timeout_s": 60, "max_frames": 100}

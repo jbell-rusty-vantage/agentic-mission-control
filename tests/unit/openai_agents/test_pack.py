@@ -17,7 +17,7 @@ from mission_control.adapters.openai_agents.pack import (
     load_pack,
     pack_directory,
 )
-from tests.unit.openai_agents.support import SHIPPED_PACK, copy_pack
+from tests.support.providers.openai_agents import SHIPPED_PACK, copy_pack
 
 
 def _edit(pack: Path, change: dict[str, Any]) -> None:

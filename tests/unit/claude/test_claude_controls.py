@@ -48,7 +48,7 @@ from mission_control.domain.execution.lanes import (
 from mission_control.domain.frames.contracts import FrameKind
 from mission_control.domain.policies.stop_fence import StopFence
 from tests.fixtures.lane_turns import RecordingSignals
-from tests.unit.claude.fixtures import (
+from tests.support.providers.claude import (
     PROFILE,
     SESSION_ID,
     ClaudeStack,

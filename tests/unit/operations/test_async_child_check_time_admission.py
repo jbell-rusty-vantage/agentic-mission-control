@@ -72,12 +72,12 @@ from mission_control.domain.execution.contracts import (
 )
 from mission_control.domain.outputs.contracts import OutputForm, SubmissionAck
 from mission_control.domain.outputs.rules import text_digest
-from tests.fixtures.fake_agent_protocol import FakeAgentProtocolClient, install
 from tests.support.deep_agents import (
     exact_fixture,
     planned_invocation,
     unit_bound,
 )
+from tests.support.providers.agent_protocol import FakeAgentProtocolClient, install
 from tests.support.run_control import actor
 from tests.support.unit.operations.async_child_check_time_admission import (
     TEXT,

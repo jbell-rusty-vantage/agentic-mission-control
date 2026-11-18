@@ -20,8 +20,12 @@ from mission_control.adapters.remote_session.cognition_points import generation_
 from mission_control.application.execution.harness.points import PointCollectingLane
 from mission_control.domain.execution.cognition_points import SessionCursorPoint
 from mission_control.domain.frames.contracts import FrameKind
-from tests.fixtures.managed_agents import MODEL_USAGE, TURN_LIST_COST
-from tests.fixtures.managed_lane import PROFILE, managed_stack
+from tests.support.providers.managed_agents import (
+    MODEL_USAGE,
+    PROFILE,
+    TURN_LIST_COST,
+    managed_stack,
+)
 from tests.unit.remote_session.hosted_support import InMemoryFramesOf, settle_turn
 
 

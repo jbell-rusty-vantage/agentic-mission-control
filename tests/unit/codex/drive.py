@@ -18,7 +18,7 @@ from mission_control.domain.execution.lanes import (
     TurnHandle,
 )
 from tests.fixtures.lane_turns import RecordingSignals
-from tests.unit.codex.support import CodexStack
+from tests.support.providers.codex import CodexStack
 
 
 def fields(stack: CodexStack, key: str = "test") -> dict[str, Any]:

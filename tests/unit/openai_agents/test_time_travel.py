@@ -34,7 +34,7 @@ from mission_control.domain.execution.lanes import (
     SendTurnRequest,
     StartRequest,
 )
-from tests.fixtures.agents_lane import agents_stack
+from tests.support.providers.openai_agents import agents_stack
 from tests.unit.remote_session.hosted_support import (
     InMemoryFramesOf,
     harness_fields,

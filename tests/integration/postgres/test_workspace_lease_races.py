@@ -18,6 +18,7 @@ from mission_control.application.execution.harness.leases import (
 )
 from mission_control.application.workspaces.service import WorkspaceAllocator
 from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.artifacts import MemoryArtifacts
 from tests.unit.workspaces.lease_scenarios import (
     NOW,
     claim,
@@ -26,7 +27,7 @@ from tests.unit.workspaces.lease_scenarios import (
     stale_generation_writes_are_rejected,
     stale_write_racing_a_takeover_never_both_apply,
 )
-from tests.unit.workspaces.workspace_fixtures import MemoryArtifacts, make_primary, present, request
+from tests.unit.workspaces.workspace_fixtures import make_primary, present, request
 
 pytestmark = pytest.mark.common_db
 

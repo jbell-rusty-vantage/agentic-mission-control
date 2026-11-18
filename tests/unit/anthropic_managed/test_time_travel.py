@@ -34,8 +34,12 @@ from mission_control.domain.execution.lanes import (
     SendTurnRequest,
     StartRequest,
 )
-from tests.fixtures.managed_agents import MODEL_USAGE, TURN_LIST_COST
-from tests.fixtures.managed_lane import PROFILE, managed_stack
+from tests.support.providers.managed_agents import (
+    MODEL_USAGE,
+    PROFILE,
+    TURN_LIST_COST,
+    managed_stack,
+)
 from tests.unit.remote_session.hosted_support import (
     InMemoryFramesOf,
     harness_fields,

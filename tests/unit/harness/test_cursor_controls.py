@@ -74,8 +74,9 @@ from tests.fixtures.cursor_controls import (
     started_session,
     states,
 )
-from tests.fixtures.cursor_local import MemoryArtifacts, local_stack
 from tests.fixtures.lane_turns import SCOPE, RecordingSignals
+from tests.support.artifacts import MemoryArtifacts
+from tests.support.providers.cursor import local_stack
 
 INJECTED = "Redirect: build on release/2.3, not main."
 
@@ -352,7 +353,7 @@ async def test_snapshot_manifest_lists_patch_untracked_mission_digests_and_nativ
     assert f"native:agent_id={launcher.meta['agent_id']}" in refs
     assert f"native:run_id={launcher.first_run}" in refs
     frozen = await snapshots.load(refs[0], stack.local.artifacts)
-    diff = stack.local.artifacts.staged[frozen.patch.ref][1]
+    diff = stack.local.artifacts.staged[frozen.patch.ref]
     assert b"Edited by the agent" in diff and b"new_module.py" in diff
     assert b".mission" not in diff and b"AGENTS.md" not in diff
 

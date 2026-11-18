@@ -3,7 +3,7 @@ Ingress ordered and without gaps, driven by the real local Temporal server (127.
 and a disposable PostgreSQL 17 (`MISSION_CONTROL_TEST_ADMIN_DSN`).
 
 The real `OperationWorkflow` drives the real `cursor_cloud` harness over the fixture Cloud
-Agents API (`tests/fixtures/cursor_cloud.FakeCloudApi`): `prepare` pushes the run branch with
+Agents API (`tests/support/providers/cursor.FakeCloudApi`): `prepare` pushes the run branch with
 the Host Projection (`.cursor/hooks.json`, `.mission/hooks/signal`, the policy and the
 `mc-signals` skill); `start` creates the agent with the run's launch `envVars`
 (`MC_SIGNAL_TOKEN`, a `signal_token` minted for the admitted run, and `MC_SIGNAL_URL`). The
