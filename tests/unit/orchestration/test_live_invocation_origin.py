@@ -41,12 +41,7 @@ from mission_control.domain.programs.goal_directed_runtime import GoalOperationP
 from tests.fixtures.lane_bindings import LANE_REBINDERS, lane_fields
 from tests.integration.temporal.test_wp_bp_010_temporal import RecordingOperationBindings
 from tests.integration.temporal.test_wp_bp_020_temporal import _run_input
-from tests.unit.authoring.manifest_launch_fixture import (
-    deep_agents_chain,
-    fixture_bindings,
-    pubmed_bound,
-)
-from tests.unit.authoring.test_manifest_launch_inputs import (
+from tests.support.manifests.launch_inputs import (
     MINIMAL,
     MISSION_2,
     admitted,
@@ -55,6 +50,11 @@ from tests.unit.authoring.test_manifest_launch_inputs import (
     pubmed_resolver,
     resolver,
     served_with_mcp,
+)
+from tests.unit.authoring.manifest_launch_fixture import (
+    deep_agents_chain,
+    fixture_bindings,
+    pubmed_bound,
 )
 from tests.unit.operations.test_ft_b2_stage_handoff import _downstream_request
 

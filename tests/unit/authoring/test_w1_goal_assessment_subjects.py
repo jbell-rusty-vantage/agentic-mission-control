@@ -17,8 +17,8 @@ from mission_control.application.programs.goal_directed import _iteration_transf
 from mission_control.domain.authoring.manifest import parse_manifest_yaml
 from mission_control.domain.authoring.mission_definition import manifest_to_definitions
 from tests.fixtures.mission_control_common_db import canonical_scope
+from tests.support.manifests.launch_inputs import admitted, compile_programs, resolver
 from tests.unit.authoring.manifest_launch_fixture import fixture_bindings, fixture_served
-from tests.unit.authoring.test_manifest_launch_inputs import admitted, compile_programs, resolver
 
 ROOT = Path(__file__).resolve().parents[3]
 

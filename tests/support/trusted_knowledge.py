@@ -1,4 +1,7 @@
-"""Builders, constants and fakes shared from tests/unit/knowledge/test_trusted_judgment.py."""
+"""Builders, constants and fakes that other test files import.
+
+Moved from tests/unit/knowledge/test_trusted_judgment.py.
+"""
 
 from __future__ import annotations
 

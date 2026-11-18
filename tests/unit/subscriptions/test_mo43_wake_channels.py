@@ -67,7 +67,7 @@ from mission_control.interfaces.mcp.subscriptions import (
     McpSessionHub,
     McpSubscriptionBridge,
 )
-from tests.unit.authoring.test_manifest_interfaces import FakeLifecycle
+from tests.support.manifests.interfaces import FakeLifecycle
 from tests.unit.coordinator.test_coordinator_mcp_read_surface import FakeFacade
 from tests.unit.subscriptions.coordinator_fakes import (
     MISSION,

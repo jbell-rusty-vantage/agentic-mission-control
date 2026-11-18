@@ -168,7 +168,7 @@ def _compiled_configuration() -> Any:
 
     from pathlib import Path
 
-    from tests.unit.authoring.test_manifest_v2_launch import compiled_ok
+    from tests.support.manifests.v2_launch import compiled_ok
 
     fixture = (
         Path(__file__).resolve().parents[2]

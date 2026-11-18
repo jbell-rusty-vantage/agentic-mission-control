@@ -26,7 +26,7 @@ from mission_control.domain.authoring.manifest import (
 from mission_control.domain.authoring.manifest_v2 import MissionManifestV2
 from mission_control.domain.execution.lanes import DEFAULT_LANE_PROFILE, LANE_PROFILES
 from mission_control.domain.outputs.contracts import Enforcement, OutputForm
-from tests.unit.authoring.test_manifest_compile import scope, service
+from tests.support.manifests.compile import scope, service
 from tests.unit.guide.support import SANDBOXES, full_guide, stub_guide
 
 # The owner's budget for the short page, in tokens (characters divided by four).

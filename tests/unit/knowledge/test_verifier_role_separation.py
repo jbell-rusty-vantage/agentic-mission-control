@@ -36,9 +36,9 @@ from tests.fixtures.knowledge_binding import BINDING
 from tests.fixtures.lane_bindings import lane_fields
 from tests.fixtures.output_contracts import InMemoryOutputContractStore
 from tests.support.knowledge import RUN, lane
-from tests.unit.authoring.test_manifest_launch_inputs import (  # noqa: F401 (fixture)
+from tests.support.manifests.launch_inputs import (
     admitted,
-    chain,
+    chain,  # noqa: F401
     pubmed_resolver,
 )
 from tests.unit.outputs.scenario import host_access, obligation, promises
@@ -280,12 +280,8 @@ def test_a_real_goal_directed_verifier_template_lacks_the_producer_tools() -> No
     from mission_control.application.knowledge.toolset import TOOL_NAMES
     from mission_control.domain.execution.contracts import DeepAgentExecutionBinding
     from tests.fixtures.mission_control_common_db import canonical_scope
-    from tests.unit.authoring.manifest_launch_fixture import fixture_bindings
-    from tests.unit.authoring.test_manifest_launch_inputs import (
-        compile_programs,
-        fixture_served,
-        resolver,
-    )
+    from tests.support.manifests.launch_inputs import compile_programs, resolver
+    from tests.unit.authoring.manifest_launch_fixture import fixture_bindings, fixture_served
 
     scope = canonical_scope("tenant-1", "ai-engineer")
     manifest = (

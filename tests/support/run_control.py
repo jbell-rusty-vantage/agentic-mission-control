@@ -1,4 +1,7 @@
-"""Builders, constants and fakes shared from tests/unit/run_control/test_run_control.py."""
+"""Builders, constants and fakes that other test files import.
+
+Moved from tests/unit/run_control/test_run_control.py.
+"""
 
 from __future__ import annotations
 

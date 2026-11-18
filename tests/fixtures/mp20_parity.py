@@ -73,12 +73,12 @@ from tests.fixtures.rrm009_production_stack import (
     TechnicalBinding,
     technical_binding,
 )
-from tests.integration.temporal.test_manifest_launch_production import host_pins, missions_app
 from tests.integration.temporal.test_manifest_v2_provider_launch import (
     AUTH_PROFILES,
     _PayloadInputs,
     provider_lane,
 )
+from tests.support.manifest_runtime import host_pins, missions_app
 from tests.unit.authoring.manifest_launch_fixture import fixture_bindings
 from tests.unit.claude.fixtures import (
     FIXTURE_ENVIRON,

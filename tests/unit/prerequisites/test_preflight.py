@@ -38,8 +38,8 @@ from mission_control.domain.policies.contracts import ActorContext
 from mission_control.domain.prerequisites import PrerequisiteStanding
 from mission_control.interfaces.mcp.mission_tools import ScopedManifests
 from tests.fixtures.provider_frames import SCOPE
-from tests.unit.authoring.test_manifest_compile import MINIMAL, http_app
-from tests.unit.authoring.test_manifest_interfaces import FakeLifecycle, manifests, principal
+from tests.support.manifests.compile import MINIMAL, http_app
+from tests.support.manifests.interfaces import FakeLifecycle, manifests, principal
 
 
 def definition(lane="claude_managed"):
@@ -84,13 +84,7 @@ async def test_actual_manifest_preflight_and_require_match_sealed_codex_identity
     from mission_control.application.prerequisites.preflight import BoundCodexPrerequisiteIdentity
     from mission_control.bootstrap import prerequisites as composition
     from mission_control.domain.execution.data_class import DEFAULT_DATA_CLASS_POLICY
-    from tests.unit.authoring.test_manifest_v2_launch import (
-        SCOPE,
-        _compile,
-        bindings,
-        example,
-        templates_of,
-    )
+    from tests.support.manifests.v2_launch import SCOPE, _compile, bindings, example, templates_of
 
     bound = bindings()
     yaml = example("codex", "stage-graph").read_text()
@@ -169,7 +163,7 @@ async def test_actual_manifest_preflight_and_require_match_sealed_codex_identity
 @pytest.mark.parametrize("missing", ["model", "auth", "host"])
 def test_bound_codex_identity_never_falls_back_to_another_profile(missing):
     from mission_control.application.prerequisites.preflight import BoundCodexPrerequisiteIdentity
-    from tests.unit.authoring.test_manifest_v2_launch import bindings, example
+    from tests.support.manifests.v2_launch import bindings, example
 
     document = load_manifest_yaml(example("codex", "goal-loop").read_text())
     node = manifest_to_definitions(parse_manifest_any(document), document)[0].program
@@ -200,7 +194,7 @@ def test_bound_codex_identity_never_falls_back_to_another_profile(missing):
 
 def test_bound_codex_identity_uses_goal_loop_verifier_selection():
     from mission_control.application.prerequisites.preflight import BoundCodexPrerequisiteIdentity
-    from tests.unit.authoring.test_manifest_v2_launch import bindings, example
+    from tests.support.manifests.v2_launch import bindings, example
 
     document = load_manifest_yaml(example("codex", "goal-loop").read_text())
     node = manifest_to_definitions(parse_manifest_any(document), document)[0].program
@@ -406,13 +400,7 @@ async def test_actual_manifest_preflight_and_require_match_sealed_claude_agent_s
     from mission_control.application.prerequisites.preflight import BoundClaudePrerequisiteIdentity
     from mission_control.bootstrap import prerequisites as composition
     from mission_control.domain.execution.data_class import DEFAULT_DATA_CLASS_POLICY
-    from tests.unit.authoring.test_manifest_v2_launch import (
-        SCOPE,
-        _compile,
-        bindings,
-        example,
-        templates_of,
-    )
+    from tests.support.manifests.v2_launch import SCOPE, _compile, bindings, example, templates_of
 
     bound = bindings()
     lane = bound.providers.claude_agent_sdk
@@ -508,7 +496,7 @@ async def test_actual_manifest_preflight_and_require_match_sealed_claude_agent_s
 async def test_claude_host_proof_refuses_subscription_before_observer():
     from mission_control.application.prerequisites.preflight import BoundClaudePrerequisiteIdentity
     from mission_control.domain.execution.data_class import DEFAULT_DATA_CLASS_POLICY
-    from tests.unit.authoring.test_manifest_v2_launch import SCOPE, _compile, bindings, example
+    from tests.support.manifests.v2_launch import SCOPE, _compile, bindings, example
 
     bound = bindings()
     compilation = await _compile(

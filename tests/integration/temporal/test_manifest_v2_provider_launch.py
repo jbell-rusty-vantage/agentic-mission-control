@@ -119,12 +119,7 @@ from tests.fixtures.rrm009_production_stack import (
     SCOPE,
     technical_binding,
 )
-from tests.integration.temporal.test_manifest_launch_production import (
-    host_pins,
-    missions_app,
-    post,
-    submit,
-)
+from tests.support.manifest_runtime import host_pins, missions_app, post, submit
 from tests.unit.authoring.manifest_launch_fixture import fixture_bindings
 from tests.unit.claude.fixtures import (
     FIXTURE_ENVIRON,

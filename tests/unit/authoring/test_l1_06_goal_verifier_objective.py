@@ -30,9 +30,9 @@ from mission_control.domain.execution.contracts import (
     is_purpose_card,
 )
 from tests.fixtures.mission_control_common_db import canonical_scope
+from tests.support.manifests.experiment_loop import rendered
+from tests.support.manifests.launch_inputs import admitted, compile_programs, resolver
 from tests.unit.authoring.manifest_launch_fixture import fixture_bindings, fixture_served
-from tests.unit.authoring.test_experiment_loop_fixtures import rendered
-from tests.unit.authoring.test_manifest_launch_inputs import admitted, compile_programs, resolver
 
 E1 = "e1-goal-loop-report.mission.yml"
 E4 = "e4-linked-chain.mission.yml"

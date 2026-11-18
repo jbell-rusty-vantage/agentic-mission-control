@@ -9,8 +9,8 @@ from mission_control.application.authoring.manifest_launch_inputs import Manifes
 from mission_control.domain.authoring.manifest_v2 import WorkspaceOutputs, WorkspaceSelectionV2
 from mission_control.domain.authoring.mission_definition import MissionDefinition
 from mission_control.domain.execution.lanes import CursorExecutionBinding
-from tests.unit.authoring.test_manifest_cursor_launch import CLOUD, LOCAL
-from tests.unit.authoring.test_manifest_v2_launch import bindings, compiled_ok, edited, templates_of
+from tests.support.manifests.cursor_launch import CLOUD, LOCAL
+from tests.support.manifests.v2_launch import bindings, compiled_ok, edited, templates_of
 
 
 def knowledge(text_path: Path, *, named: bool = False) -> str:

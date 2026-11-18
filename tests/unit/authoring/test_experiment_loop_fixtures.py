@@ -11,58 +11,34 @@ Stage Graph root export E4's chain reads (the root-promise gap fixed in iteratio
 from __future__ import annotations
 
 import json
-from pathlib import Path
 
 import pytest
 
 from mission_control.application.authoring.completion_support import completion_support_issues
 from mission_control.application.authoring.manifest_service import (
-    ManifestCompilation,
     catalog_output_schemas,
 )
 from mission_control.domain.authoring.contracts import GoalDirectedBlueprint, StageGraphBlueprint
 from mission_control.domain.authoring.manifest import load_manifest_yaml
 from mission_control.domain.authoring.manifest_lowering import lower_mission, output_promises
 from mission_control.domain.authoring.nested_lowering import nested_definition
-from tests.unit.authoring.test_manifest_compile import scope, service
+from tests.support.manifests.compile import service
+from tests.support.manifests.experiment_loop import FIXTURES, LOOP, ROOT, compiled, rendered
 
-ROOT = Path(__file__).resolve().parents[3]
-LOOP = ROOT / "tests/fixtures/manifests/experiment-loop"
 SEEDS = ROOT / "packages/mission-control-db-contract/seeds"
 SEED = SEEDS / "common/mc.catalog.knowledge-tools-1.2.0.json"
-FIXTURES = (
-    "e1-goal-loop-report.mission.yml",
-    "e2-stagegraph-fanout-join.mission.yml",
-    "e3-stagegraph-route-revisit.mission.yml",
-    "e4-linked-chain.mission.yml",
-    "e5-nested-goal-in-graph.mission.yml",
-)
 # The hosted-lane Stage Graph fixtures share the directory; `test_hosted_stagegraph_fixtures.py`
 # compiles and seals them (F2: claude_managed, F3: codex_agents).
 HOSTED_FIXTURES = (
     "f2-managed-stagegraph.mission.yml",
     "f3-agents-stagegraph.mission.yml",
 )
-# What the driver substitutes; the pack shape matters only to the model, never to compile.
-PLACEHOLDERS = {"__PACK__": '{"reportId":"fixture","task":{},"fragments":[]}'}
 PRODUCERS = {"producer.default", "producer.fallback"}  # the rows sprint_oc_w1_bindings binds
-
-
-def rendered(name: str, producer: str = "producer.fallback") -> str:
-    text = (LOOP / name).read_text(encoding="utf-8")
-    for key, value in PLACEHOLDERS.items():
-        text = text.replace(key, value)
-    return text.replace("__PRODUCER__", producer)
 
 
 def missions(name: str) -> list[dict]:
     document = load_manifest_yaml(rendered(name))
     return document.get("missions") or [document["mission"]]
-
-
-async def compiled(name: str, producer: str = "producer.fallback") -> ManifestCompilation:
-    compile_service, _, _ = await service()
-    return await compile_service.compile(rendered(name, producer), scope("ai-engineer"))
 
 
 def test_the_fixture_set_is_exactly_e1_to_e5() -> None:

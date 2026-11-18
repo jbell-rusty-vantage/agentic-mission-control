@@ -28,7 +28,7 @@ from mission_control.domain.programs.contracts import (
 )
 from tests.fixtures import rrm009_production_stack as technical
 from tests.fixtures.scoped_api_stack import admit_and_launch, inspect, scoped_stack, until
-from tests.integration.temporal.test_manifest_launch_production import host_pins
+from tests.support.manifest_runtime import host_pins
 
 pytestmark = pytest.mark.common_db
 

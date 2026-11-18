@@ -52,15 +52,8 @@ from mission_control.domain.authoring.extensions import ExtensionRegistry
 from mission_control.domain.authoring.mission_environment import is_secret_like_config_key
 from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog
 from tests.fixtures.environment_kits import StaticDefinitions
-from tests.unit.authoring.test_manifest_v2_environment import (
-    AT,
-    ENV,
-    NODE,
-    SCOPE,
-    _set,
-    blockers,
-    manifest,
-)
+from tests.support.manifests.v2_environment import AT, ENV, NODE, _set, blockers, manifest
+from tests.support.manifests.v2_launch import SCOPE
 
 ROOT = Path(__file__).resolve().parents[3]
 EXAMPLE = ROOT / "deployments/examples/installation-config.example.json"

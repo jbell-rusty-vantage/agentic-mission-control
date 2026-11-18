@@ -42,7 +42,7 @@ def test_identity_summary_does_not_change_binding_or_claim_discovery():
 
 
 def test_provider_summary_keeps_requested_and_observed_identity_separate():
-    from tests.unit.authoring.test_manifest_v2_launch import bindings
+    from tests.support.manifests.v2_launch import bindings
 
     source = bindings()
     before = source.model_dump_json()

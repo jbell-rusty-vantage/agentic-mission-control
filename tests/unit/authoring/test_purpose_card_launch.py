@@ -42,14 +42,9 @@ from mission_control.domain.execution.contracts import (
     purpose_card_segment,
 )
 from mission_control.domain.policies.forks import stage_objective_path
+from tests.support.manifests.compile import scope, service
+from tests.support.manifests.v2_launch import compiled_ok, edited, example, templates_of
 from tests.support.operations import DIGEST, operation_request
-from tests.unit.authoring.test_manifest_compile import scope, service
-from tests.unit.authoring.test_manifest_v2_launch import (
-    compiled_ok,
-    edited,
-    example,
-    templates_of,
-)
 from tests.unit.authoring.test_mission_brief import BRIEF
 from tests.unit.guide.support import SANDBOXES
 from tests.unit.orchestration.test_fork_templates import MemoryTemplates, _patch

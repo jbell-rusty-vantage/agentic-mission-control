@@ -22,7 +22,7 @@ from mission_control.domain.authoring.manifest import (
 from mission_control.domain.authoring.manifest_lowering import output_promises
 from mission_control.domain.authoring.mission_definition import manifest_to_definitions
 from mission_control.domain.composition.chain import compile_chain
-from tests.unit.authoring.test_experiment_loop_fixtures import FIXTURES, rendered
+from tests.support.manifests.experiment_loop import FIXTURES, rendered
 
 PROGRAM = "/missions/0/program"
 

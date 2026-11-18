@@ -27,7 +27,7 @@ from mission_control.domain.authoring.manifest import (
 )
 from mission_control.domain.authoring.manifest_lowering import lower_mission
 from mission_control.domain.authoring.mission_definition import manifest_to_definitions
-from tests.unit.authoring.test_manifest_compile import scope, service
+from tests.support.manifests.compile import scope, service
 
 ROOT = Path(__file__).resolve().parents[3]
 FIXTURES = ROOT / "tests/fixtures/manifests"

@@ -15,8 +15,8 @@ from mission_control.application.programs.human_gates import (
 )
 from mission_control.domain.authoring.contracts import StageGraphBlueprint
 from mission_control.domain.programs.contracts import StageGraphRunInput
+from tests.support.manifests.launch_inputs import MISSION_2, compile_programs
 from tests.unit.authoring.manifest_launch_fixture import deep_agents_chain
-from tests.unit.authoring.test_manifest_launch_inputs import MISSION_2, compile_programs
 
 ROOT = Path(__file__).resolve().parents[3]
 MISSION_1 = ROOT / "tests/fixtures/manifests/fast-track/01-research-ingestion-deep-agents.yml"

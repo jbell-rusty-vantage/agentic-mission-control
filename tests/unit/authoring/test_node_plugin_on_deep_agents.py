@@ -57,8 +57,8 @@ from mission_control.domain.execution.contracts import (
 )
 from tests.fixtures.catalog.fast_track_catalog import NOW, fast_track_catalog
 from tests.fixtures.mission_control_common_db import canonical_scope
+from tests.support.manifests.launch_inputs import resolver
 from tests.unit.authoring.manifest_launch_fixture import fixture_bindings, fixture_served
-from tests.unit.authoring.test_manifest_launch_inputs import resolver
 
 ROOT = Path(__file__).resolve().parents[3]
 MINIMAL = ROOT / "tests/fixtures/manifests/minimal-stage-graph.yml"

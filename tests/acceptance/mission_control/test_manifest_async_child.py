@@ -56,10 +56,9 @@ from tests.fixtures.rrm009_production_stack import (
     call_usage,
     technical_binding,
 )
-from tests.integration.temporal.test_manifest_launch_production import (
+from tests.support.manifest_runtime import (
     MISSION_2,
     OUTPUT_SCHEMAS,
-    deep_agents_chain,
     evaluable,
     host_pins,
     missions_app,
@@ -67,7 +66,11 @@ from tests.integration.temporal.test_manifest_launch_production import (
     pubmed_digest,
     submit,
 )
-from tests.unit.authoring.manifest_launch_fixture import fixture_bindings, pubmed_bound
+from tests.unit.authoring.manifest_launch_fixture import (
+    deep_agents_chain,
+    fixture_bindings,
+    pubmed_bound,
+)
 
 from mission_control.adapters.postgres.async_subagents.async_subagent_detail_repository import (
     PostgresAsyncSubagentDetailRepository,

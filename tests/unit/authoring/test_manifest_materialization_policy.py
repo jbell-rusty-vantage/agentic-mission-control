@@ -20,7 +20,7 @@ from mission_control.domain.agentic_components.layering import (
 from mission_control.domain.authoring.manifest_v2 import manifest_v2_json_schema
 from mission_control.domain.execution.bindings import ProviderExecutionBinding
 from mission_control.domain.execution.lanes import CursorExecutionBinding
-from tests.unit.authoring.test_manifest_v2_launch import (
+from tests.support.manifests.v2_launch import (
     EXAMPLES,
     blockers,
     compile_yaml,

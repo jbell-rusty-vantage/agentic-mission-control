@@ -39,13 +39,7 @@ from tests.fixtures.mission_control_production_stack import open_postgres_produc
 from tests.fixtures.models import catalog_for
 from tests.fixtures.rrm009_production_harness import _diagnose
 from tests.fixtures.rrm009_production_stack import SCOPE, call_usage, technical_binding
-from tests.integration.temporal.test_manifest_launch_production import (
-    OUTPUT_SCHEMAS,
-    host_pins,
-    missions_app,
-    post,
-    submit,
-)
+from tests.support.manifest_runtime import OUTPUT_SCHEMAS, host_pins, missions_app, post, submit
 
 from mission_control.adapters.agent_server.async_subagents.sealed import (
     sealed_child_served_identity,

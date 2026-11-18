@@ -59,7 +59,7 @@ from tests.fixtures.mission_control_common_db import catalog_scope, ingress_logi
 from tests.fixtures.mission_control_production_stack import open_postgres_production_stack
 from tests.fixtures.rrm009_production_stack import SCOPE, technical_binding
 from tests.integration.postgres.test_signal_ingress_postgres import FakeOidc, FakeUploads
-from tests.integration.temporal.test_manifest_launch_production import (
+from tests.support.manifest_runtime import (
     MISSION_2,
     OUTPUT_SCHEMAS,
     evaluable,

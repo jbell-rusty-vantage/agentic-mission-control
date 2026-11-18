@@ -24,7 +24,7 @@ from mission_control.application.capabilities.definition_scan import (
 from mission_control.domain.authoring.contracts import DefinitionKind
 from mission_control.domain.coordinator.contracts import CapabilitySearchRequest
 from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog
-from tests.unit.authoring.test_manifest_compile import minimal, reasons, scope, service, text
+from tests.support.manifests.compile import minimal, reasons, scope, service, text
 
 
 class UnbuiltProjection:

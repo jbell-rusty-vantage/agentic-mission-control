@@ -25,7 +25,7 @@ from mission_control.domain.authoring.extensions import ExtensionRegistry
 from mission_control.domain.authoring.manifest import load_manifest_yaml
 from mission_control.domain.capabilities.catalog_entry import capability_pin
 from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog
-from tests.unit.authoring.test_manifest_compile import minimal, scope, text
+from tests.support.manifests.compile import minimal, scope, text
 
 ROOT = Path(__file__).resolve().parents[3]
 KNOWLEDGE = ROOT / "tests/fixtures/manifests/knowledge-tools-stage-graph.yml"

@@ -46,7 +46,7 @@ from mission_control.domain.authoring.mission_definition import (
     manifest_to_definitions,
 )
 from tests.architecture.test_package_boundaries import APPLICATION_NEEDLES
-from tests.unit.authoring.test_manifest_compile import MINIMAL, scope, service
+from tests.support.manifests.compile import MINIMAL, scope, service
 from tests.unit.guide.support import SANDBOXES
 
 ROOT = Path(__file__).resolve().parents[3]

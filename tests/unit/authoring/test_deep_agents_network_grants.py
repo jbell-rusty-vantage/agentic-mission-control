@@ -11,7 +11,7 @@ import yaml
 from mission_control.adapters.deep_agents.binding import execution_binding
 from mission_control.application.authoring.manifest_launch_inputs import ManifestLaunchBindingError
 from mission_control.domain.authoring.manifest import canonical_manifest_bytes
-from tests.unit.authoring.test_manifest_launch_inputs import (
+from tests.support.manifests.launch_inputs import (
     MINIMAL,
     admitted,
     compile_programs,

@@ -19,12 +19,7 @@ from mission_control.domain.authoring.canonical import sha256_digest
 from mission_control.domain.execution.bindings import ProviderExecutionBinding
 from mission_control.domain.execution.contracts import PromptTrustClass, is_purpose_card
 from mission_control.domain.execution.lanes import CursorExecutionBinding
-from tests.unit.authoring.test_manifest_v2_launch import (
-    compiled_ok,
-    edited,
-    example,
-    templates_of,
-)
+from tests.support.manifests.v2_launch import compiled_ok, edited, example, templates_of
 
 DIAGNOSTIC = (
     "This is a bounded synthetic control diagnostic. Make exactly one shell tool call "
@@ -167,7 +162,7 @@ def test_a_session_lane_output_contract_names_its_outputs_file_not_a_custody_too
     from mission_control.application.authoring.manifest_launch_inputs import AdmittedLaunch
     from mission_control.domain.execution.contracts import SESSION_LANE_RUNTIMES
     from mission_control.domain.programs.completion import OutputSchemaBinding
-    from tests.unit.authoring.test_manifest_v2_launch import SCOPE, resolver
+    from tests.support.manifests.v2_launch import SCOPE, resolver
 
     schema: dict[str, object] = {"type": "object"}
     binding = OutputSchemaBinding(

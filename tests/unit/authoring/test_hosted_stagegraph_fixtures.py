@@ -52,7 +52,7 @@ from mission_control.domain.authoring.manifest import load_manifest_yaml
 from mission_control.domain.execution.bindings import ProviderExecutionBinding
 from tests.fixtures.applications import installed_applications
 from tests.fixtures.models import bindings_catalog
-from tests.unit.authoring.test_manifest_v2_launch import SCOPE, compile_yaml, edited, served
+from tests.support.manifests.v2_launch import SCOPE, compile_yaml, edited, served
 
 ROOT = Path(__file__).resolve().parents[3]
 FIXTURES = ROOT / "tests/fixtures/manifests/experiment-loop"

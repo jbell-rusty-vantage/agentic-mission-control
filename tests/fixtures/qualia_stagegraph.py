@@ -365,7 +365,7 @@ async def run_pilot(
     from tests.acceptance.mission_control.test_overnight_stagegraph import run_stagegraph_fixture
     from tests.fixtures.mission_control_production_stack import open_postgres_production_stack
     from tests.fixtures.overnight_stagegraph_evidence import export_stagegraph
-    from tests.integration.temporal.test_manifest_launch_production import host_pins
+    from tests.support.manifest_runtime import host_pins
 
     from mission_control.adapters.postgres.knowledge.output_contracts import (
         PostgresOutputContractStore,

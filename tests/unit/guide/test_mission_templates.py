@@ -33,7 +33,7 @@ from mission_control.domain.authoring.manifest import load_manifest_yaml
 from mission_control.domain.authoring.manifest_v2 import BRIEF_MISSING, MANIFEST_V2_LITERAL
 from tests.architecture.test_package_boundaries import APPLICATION_NEEDLES
 from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog
-from tests.unit.authoring.test_manifest_compile import scope, service
+from tests.support.manifests.compile import scope, service
 from tests.unit.guide.support import SANDBOXES, full_guide
 
 # The application the fixture catalog compiles for; a template names none.

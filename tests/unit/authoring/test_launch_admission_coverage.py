@@ -21,13 +21,7 @@ from mission_control.application.execution.harness.describe import DECLARED_LANE
 from mission_control.application.resolution.resolver import RuntimeResolver
 from mission_control.domain.authoring.mission_definition import DefinitionNode
 from mission_control.domain.resolution.resolved import ResolutionRefused
-from tests.unit.authoring.test_manifest_v2_launch import (
-    EXAMPLES,
-    compiled_ok,
-    example,
-    resolver,
-    templates_of,
-)
+from tests.support.manifests.v2_launch import EXAMPLES, compiled_ok, example, resolver, templates_of
 
 # Profile -> the checked example whose launch reaches it.
 LAUNCHED: dict[str, Path] = {

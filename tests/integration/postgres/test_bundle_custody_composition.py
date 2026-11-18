@@ -95,8 +95,8 @@ from tests.support.db_builders import (
     apply_seed_bundle,
     seeds_publish_module,
 )
-from tests.unit.authoring.test_manifest_cursor_launch import LOCAL
-from tests.unit.authoring.test_manifest_v2_launch import (
+from tests.support.manifests.cursor_launch import LOCAL
+from tests.support.manifests.v2_launch import (
     AT,
     SCOPE,
     bundle_selection,

@@ -73,7 +73,8 @@ from tests.fixtures.rrm009_production_stack import (
     TechnicalBinding,
     technical_binding,
 )
-from tests.integration.temporal.test_manifest_launch_production import (
+from tests.support.deep_agents import exact_fixture
+from tests.support.manifest_runtime import (
     MISSION_2,
     OUTPUT_SCHEMAS,
     SCOPED,
@@ -91,7 +92,6 @@ from tests.integration.temporal.test_manifest_launch_production import (
     root_executions,
     submit,
 )
-from tests.support.deep_agents import exact_fixture
 from tests.unit.authoring.manifest_launch_fixture import deep_agents_chain, fixture_bindings
 
 pytestmark = pytest.mark.common_db

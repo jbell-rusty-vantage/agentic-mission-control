@@ -10,30 +10,22 @@ from __future__ import annotations
 
 import asyncio
 from dataclasses import replace
-from datetime import UTC, datetime
-from pathlib import Path
+from datetime import datetime
 from types import SimpleNamespace
 from typing import Any
 from uuid import uuid4
 
 import pytest
 
-from mission_control.adapters.storage.control_plane_payloads import InMemoryPayloadStore
 from mission_control.application.authoring.manifest_launch_inputs import (
-    AdmittedLaunch,
     ManifestChainLaunchInputs,
     ManifestLaunchBindingError,
     ManifestLaunchBindings,
     ManifestLaunchInputAuthor,
-    ManifestLaunchResolver,
-    ServedComponents,
     binding_ref,
 )
 from mission_control.application.authoring.manifest_service import (
     CompiledMission,
-    ManifestCompileService,
-    ManifestProgramCompiler,
-    ManifestScope,
 )
 from mission_control.application.chains.relay import (
     ChainIntent,
@@ -41,7 +33,6 @@ from mission_control.application.chains.relay import (
     ChainRelayReport,
 )
 from mission_control.bootstrap.resolution import compose_manifest_launch_resolver
-from mission_control.domain.authoring.extensions import ExtensionRegistry
 from mission_control.domain.authoring.manifest import canonical_manifest_bytes, load_manifest_yaml
 from mission_control.domain.authoring.mission_definition import MissionDefinition
 from mission_control.domain.execution.contracts import (
@@ -49,10 +40,23 @@ from mission_control.domain.execution.contracts import (
     DeepAgentModelComponent,
 )
 from tests.fixtures.applications import installed_applications
-from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog
 from tests.fixtures.mission_control_common_db import canonical_scope
 from tests.fixtures.models import bindings_catalog
 from tests.support.deep_agents import exact_fixture
+from tests.support.manifests.launch_inputs import (
+    MINIMAL,
+    MISSION_2,
+    ROOT,
+    SCOPE,
+    SECRETS,
+    admitted,
+    chain,  # noqa: F401
+    compile_programs,
+    pubmed_digest,
+    pubmed_resolver,
+    resolver,
+    served_with_mcp,
+)
 from tests.unit.authoring.manifest_launch_fixture import (
     deep_agents_chain,
     fixture_bindings,
@@ -61,94 +65,13 @@ from tests.unit.authoring.manifest_launch_fixture import (
     unserved_model_ref,
 )
 
-ROOT = Path(__file__).resolve().parents[3]
-MINIMAL = ROOT / "tests/fixtures/manifests/minimal-stage-graph.yml"
-MISSION_2 = (
-    ROOT / "tests/fixtures/manifests/fast-track/02-research-ingestion-cursor-cloud-chain.yml"
-)
 MISSION_3 = ROOT / "tests/fixtures/manifests/fast-track/03-codebase-feature-cursor-local.yml"
-SCOPE = canonical_scope("tenant-1")
-SECRETS = {"openai": "OPENAI_API_KEY"}
-
-
-async def compile_programs(
-    manifest_yaml: str, scope: str = SCOPE
-) -> tuple[list[MissionDefinition], list[Any]]:
-    definitions, search = await fast_track_catalog()
-    service = ManifestCompileService(
-        definitions=definitions,
-        search=search,
-        programs=ManifestProgramCompiler(definitions, ExtensionRegistry(), InMemoryPayloadStore()),
-    )
-    compilation = await service.compile(
-        manifest_yaml,
-        ManifestScope(request_scope=scope, actor_id="owner", at=datetime(2026, 10, 8, tzinfo=UTC)),
-    )
-    assert compilation.ok, [item.message for item in compilation.report.blockers]
-    return list(compilation.definitions), list(compilation.programs)
-
-
-def admitted(
-    program: CompiledMission, run_id: str = "run-mp02", scope: str = SCOPE
-) -> AdmittedLaunch:
-    return AdmittedLaunch.from_configuration(scope, run_id, program.configuration)
-
-
-def resolver(
-    bindings: ManifestLaunchBindings | None = None,
-    *,
-    served: ServedComponents | None = None,
-    secrets: dict[str, str] | None = None,
-) -> ManifestLaunchResolver:
-    bindings = bindings or fixture_bindings()
-    return compose_manifest_launch_resolver(
-        bindings,
-        served or fixture_served(bindings),
-        applications=installed_applications(),
-        models=bindings_catalog(bindings),
-        provider_secret_env=SECRETS if secrets is None else secrets,
-    )
-
-
-def served_with_mcp(bindings: ManifestLaunchBindings) -> ServedComponents:
-    """FIXTURE served set: the fixture components plus the bound MCP servers."""
-
-    servers = {
-        item.mcp_server.ref.digest
-        for item in bindings.capabilities.values()
-        if item.mcp_server is not None
-    }
-    return replace(fixture_served(bindings), mcp_servers=frozenset(servers))
-
-
-def pubmed_resolver(
-    definition: MissionDefinition,
-    bindings: ManifestLaunchBindings | None = None,
-    *,
-    served: ServedComponents | None = None,
-    secrets: dict[str, str] | None = None,
-) -> ManifestLaunchResolver:
-    bound = pubmed_bound(bindings or fixture_bindings(), pubmed_digest(definition))
-    if served is not None:
-        served = replace(served, mcp_servers=served_with_mcp(bound).mcp_servers)
-    return resolver(bound, served=served or served_with_mcp(bound), secrets=secrets)
 
 
 @pytest.fixture(scope="module")
 def minimal() -> tuple[MissionDefinition, CompiledMission]:
     definitions, programs = asyncio.run(compile_programs(MINIMAL.read_text(encoding="utf-8")))
     return definitions[0], programs[0]
-
-
-@pytest.fixture(scope="module")
-def chain() -> tuple[list[MissionDefinition], list[CompiledMission]]:
-    return asyncio.run(compile_programs(deep_agents_chain(MISSION_2.read_text(encoding="utf-8"))))
-
-
-def pubmed_digest(definition: MissionDefinition) -> str:
-    (capability,) = [item for item in definition.capabilities if item.alias == "pubmed"]
-    assert capability.resolved is not None and capability.resolved.digest is not None
-    return capability.resolved.digest
 
 
 # --- Stage Graph ------------------------------------------------------------------------------
@@ -259,7 +182,7 @@ def test_a_node_model_profile_without_binding_names_the_overlay(
 
 
 def test_goal_templates_bind_executor_and_verifier(
-    chain: tuple[list[MissionDefinition], list[CompiledMission]],
+    chain: tuple[list[MissionDefinition], list[CompiledMission]],  # noqa: F811
 ) -> None:
     definitions, programs = chain
     research = next(item for item in definitions if item.mission_key == "research")
@@ -277,7 +200,7 @@ def test_goal_templates_bind_executor_and_verifier(
 
 
 def test_missing_model_binding_fails_at_the_mission_model(
-    chain: tuple[list[MissionDefinition], list[CompiledMission]],
+    chain: tuple[list[MissionDefinition], list[CompiledMission]],  # noqa: F811
 ) -> None:
     definitions, programs = chain
     bindings = fixture_bindings(model_profiles=())
@@ -288,7 +211,7 @@ def test_missing_model_binding_fails_at_the_mission_model(
     assert raised.value.pointer == "/missions/1/environment/model/profile"
 
 
-def test_named_goal_templates_require_explicit_served_schema_binding(chain):
+def test_named_goal_templates_require_explicit_served_schema_binding(chain):  # noqa: F811
     from mission_control.domain.authoring.canonical import sha256_digest
     from mission_control.domain.execution.contracts import StructuredOutputBinding
     from mission_control.domain.programs.goal_directed_runtime import GoalNamedExecutorObservation
@@ -325,7 +248,7 @@ def test_named_goal_templates_require_explicit_served_schema_binding(chain):
 
 
 def test_a_goal_schema_needs_the_model_rows_structured_output_strategy(
-    chain: tuple[list[MissionDefinition], list[CompiledMission]],
+    chain: tuple[list[MissionDefinition], list[CompiledMission]],  # noqa: F811
 ) -> None:
     """W1 D16: a GoalDirected role that binds a structured-output schema is refused at launch
     when its model row declares no structured_output strategy (never framework auto-detection,
@@ -356,7 +279,7 @@ def test_a_goal_schema_needs_the_model_rows_structured_output_strategy(
 
 
 def test_unserved_model_fails_without_fabricating_one(
-    chain: tuple[list[MissionDefinition], list[CompiledMission]],
+    chain: tuple[list[MissionDefinition], list[CompiledMission]],  # noqa: F811
 ) -> None:
     definitions, programs = chain
     base = fixture_bindings()
@@ -372,7 +295,7 @@ def test_unserved_model_fails_without_fabricating_one(
 
 
 def test_missing_auth_reference_fails_at_the_model_pointer(
-    chain: tuple[list[MissionDefinition], list[CompiledMission]],
+    chain: tuple[list[MissionDefinition], list[CompiledMission]],  # noqa: F811
 ) -> None:
     definitions, programs = chain
     with pytest.raises(ManifestLaunchBindingError) as raised:
@@ -384,7 +307,7 @@ def test_missing_auth_reference_fails_at_the_model_pointer(
 
 
 def test_missing_sandbox_binding_fails_at_the_sandbox_pointer(
-    chain: tuple[list[MissionDefinition], list[CompiledMission]],
+    chain: tuple[list[MissionDefinition], list[CompiledMission]],  # noqa: F811
 ) -> None:
     definitions, programs = chain
     bindings = fixture_bindings(sandbox_profiles=("research.standard",))

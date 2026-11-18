@@ -16,8 +16,8 @@ from mission_control.domain.authoring.contracts import StageGraphBlueprint
 from mission_control.domain.outputs.contracts import Enforcement, OutputForm, Requirement, SchemaPin
 from mission_control.domain.programs.contracts import StageAuthoredInput
 from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog, publish_output_schemas
-from tests.unit.authoring import test_manifest_launch_inputs as fixtures
-from tests.unit.authoring.test_manifest_launch_inputs import MINIMAL, compile_programs
+from tests.support.manifests import launch_inputs as fixtures
+from tests.support.manifests.launch_inputs import MINIMAL, compile_programs
 
 
 @pytest.mark.asyncio

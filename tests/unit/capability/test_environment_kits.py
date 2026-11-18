@@ -295,7 +295,7 @@ def test_mission_control_dev_adopts_the_owned_cursor_environment_byte_for_byte()
 
 @pytest.mark.parametrize("profile", ["claude_agent_sdk", "codex", "cursor_cloud"])
 def test_a_manifest_pinning_a_published_kit_compiles_through_the_catalog(profile: str) -> None:
-    from tests.unit.authoring.test_manifest_v2_environment import (
+    from tests.support.manifests.v2_environment import (
         CONFIG,
         _set,
         blockers,

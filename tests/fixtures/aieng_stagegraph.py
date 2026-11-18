@@ -241,7 +241,7 @@ async def run_aieng(
     from tests.fixtures.qualia_scenarios import controller, fork_from_completed_stage
     from tests.fixtures.qualia_stagegraph import build_bindings, lifecycle_for
     from tests.fixtures.rrm009_production_stack import technical_binding
-    from tests.integration.temporal.test_manifest_launch_production import host_pins
+    from tests.support.manifest_runtime import host_pins
 
     from mission_control.adapters.postgres.knowledge.output_contracts import (
         PostgresOutputContractStore,

@@ -26,13 +26,8 @@ from mission_control.application.knowledge.toolset import TOOL_NAMES
 from mission_control.domain.authoring.contracts import DefinitionKind
 from mission_control.domain.execution.contracts import DeepAgentExecutionBinding
 from tests.fixtures.mission_control_common_db import canonical_scope
-from tests.unit.authoring.manifest_launch_fixture import fixture_bindings
-from tests.unit.authoring.test_manifest_launch_inputs import (
-    admitted,
-    compile_programs,
-    fixture_served,
-    resolver,
-)
+from tests.support.manifests.launch_inputs import admitted, compile_programs, resolver
+from tests.unit.authoring.manifest_launch_fixture import fixture_bindings, fixture_served
 
 ROOT = Path(__file__).resolve().parents[3]
 MANIFEST = ROOT / "tests/fixtures/manifests/knowledge-tools-stage-graph.yml"

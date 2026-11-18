@@ -12,7 +12,7 @@ from mission_control.application.authoring.control_plane_repository import (
 )
 from mission_control.domain.authoring.contracts import WatcherDefinition
 from mission_control.domain.capabilities.catalog_entry import capability_pin
-from tests.unit.authoring.test_manifest_compile import AT, minimal, scope, service, text
+from tests.support.manifests.compile import AT, minimal, scope, service, text
 
 STALL_DETECTOR = WatcherDefinition.model_validate(
     {

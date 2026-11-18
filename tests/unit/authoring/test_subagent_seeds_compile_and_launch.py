@@ -47,12 +47,12 @@ from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog
 from tests.fixtures.mission_control_common_db import canonical_scope
 from tests.fixtures.models import bindings_catalog
 from tests.support.deep_agents import exact_fixture
+from tests.support.manifests.launch_inputs import MINIMAL, admitted
 from tests.unit.authoring.manifest_launch_fixture import (
     fixture_bindings,
     fixture_served,
     pubmed_bound,
 )
-from tests.unit.authoring.test_manifest_launch_inputs import MINIMAL, admitted
 
 SCOPE = canonical_scope("tenant-1")
 SECRETS = {"openai": "OPENAI_API_KEY"}

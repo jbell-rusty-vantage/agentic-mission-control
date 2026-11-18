@@ -481,7 +481,7 @@ async def _run_goal_case(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, scenar
     from tests.fixtures.overnight_trusted import install_scripted_trusted
     from tests.fixtures.rrm009_production_stack import technical_binding
     from tests.integration.deep_agents.test_report_source_real_service import response
-    from tests.integration.temporal.test_manifest_launch_production import host_pins
+    from tests.support.manifest_runtime import host_pins
 
     from mission_control.adapters.postgres.human_tasks.repository import PostgresHumanTaskRepository
     from mission_control.adapters.temporal.human_gate_wake import TemporalHumanGateWake

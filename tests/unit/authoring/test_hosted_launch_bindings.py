@@ -8,7 +8,7 @@ from mission_control.application.authoring.provider_launch import ProviderLanes,
 from mission_control.bootstrap.resolution import compose_manifest_launch_resolver
 from tests.fixtures.applications import installed_applications
 from tests.fixtures.models import bindings_catalog
-from tests.unit.authoring.test_manifest_v2_launch import bindings
+from tests.support.manifests.v2_launch import bindings
 
 
 @pytest.mark.parametrize(
@@ -49,7 +49,7 @@ def test_hosted_provider_resolution_requires_a_reviewed_base_commit(monkeypatch)
     from mission_control.application.authoring.provider_launch import required_pins
     from mission_control.application.resolution.resolver import RuntimeResolver
     from mission_control.domain.authoring.mission_definition import DefinitionNode
-    from tests.unit.authoring.test_manifest_v2_launch import compiled_ok, example, served
+    from tests.support.manifests.v2_launch import compiled_ok, example, served
 
     # OC-R3: the hosted node is admitted through the resolution seam.
     admitted: list[str] = []

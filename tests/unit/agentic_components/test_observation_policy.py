@@ -16,13 +16,8 @@ from mission_control.domain.authoring.manifest import canonical_manifest_bytes, 
 from mission_control.domain.authoring.manifest_v2 import EnvironmentV2
 from mission_control.domain.authoring.mission_definition import EnvironmentSelections
 from mission_control.domain.execution.bindings import ProviderExecutionBinding
-from tests.unit.authoring.test_manifest_v2_launch import (
-    DEFAULT_DATA_CLASS_POLICY,
-    SCOPE,
-    _compile,
-    example,
-    templates_of,
-)
+from mission_control.domain.execution.data_class import DEFAULT_DATA_CLASS_POLICY
+from tests.support.manifests.v2_launch import SCOPE, _compile, example, templates_of
 from tests.unit.codex.support import codex_binding, codex_operation
 
 

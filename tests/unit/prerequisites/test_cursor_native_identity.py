@@ -16,13 +16,7 @@ async def test_actual_manifest_preflight_and_require_match_sealed_cursor_local_i
     from mission_control.application.prerequisites.preflight import BoundCursorPrerequisiteIdentity
     from mission_control.bootstrap import prerequisites as composition
     from mission_control.domain.execution.data_class import DEFAULT_DATA_CLASS_POLICY
-    from tests.unit.authoring.test_manifest_v2_launch import (
-        SCOPE,
-        _compile,
-        bindings,
-        example,
-        templates_of,
-    )
+    from tests.support.manifests.v2_launch import SCOPE, _compile, bindings, example, templates_of
 
     bound = bindings()
     lane = bound.providers.cursor_local
@@ -136,7 +130,7 @@ async def test_actual_manifest_preflight_and_require_match_sealed_cursor_local_i
 async def test_selected_subscription_refused_before_any_host_observation():
     from mission_control.application.prerequisites.preflight import BoundCursorPrerequisiteIdentity
     from mission_control.domain.execution.data_class import DEFAULT_DATA_CLASS_POLICY
-    from tests.unit.authoring.test_manifest_v2_launch import SCOPE, _compile, bindings, example
+    from tests.support.manifests.v2_launch import SCOPE, _compile, bindings, example
 
     bound = bindings()
     lane = bound.providers.cursor_local

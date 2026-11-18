@@ -23,7 +23,6 @@ from __future__ import annotations
 
 import asyncio
 import copy
-import importlib.util
 import json
 from pathlib import Path
 from typing import Any
@@ -91,9 +90,9 @@ from tests.fixtures.projections.rows import (
     tavily_row,
     verifier_row,
 )
-from tests.unit.authoring.test_manifest_v2_launch import (
+from tests.support.manifests.cursor_launch import CLOUD, LOCAL, ROOT, seeds_publish_module
+from tests.support.manifests.v2_launch import (
     BINDINGS,
-    EXAMPLES,
     SCOPE,
     V1_BINDINGS,
     bindings,
@@ -104,23 +103,8 @@ from tests.unit.authoring.test_manifest_v2_launch import (
     templates_of,
 )
 
-ROOT = Path(__file__).resolve().parents[3]
 MISSIONS = ROOT / "tests/fixtures/manifests/fast-track"
-LOCAL = EXAMPLES / "cursor-local.stage-graph.mission.yml"
-CLOUD = EXAMPLES / "cursor-cloud.goal-loop.mission.yml"
 PROFILE_OF = {LOCAL: "cursor_local", CLOUD: "cursor_cloud"}
-
-
-def seeds_publish_module() -> Any:
-    """``scripts/seeds_publish_bundles.py`` (FT-A7 custody upload of the agent-skill seeds)."""
-
-    spec = importlib.util.spec_from_file_location(
-        "mo31_publish", ROOT / "scripts" / "seeds_publish_bundles.py"
-    )
-    assert spec is not None and spec.loader is not None
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
 
 
 def cursor_templates(path: Path, bound: ManifestLaunchBindings | None = None) -> dict[str, Any]:

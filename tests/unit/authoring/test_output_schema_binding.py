@@ -11,8 +11,8 @@ from mission_control.domain.authoring.mission_definition import (
     AcceptanceExpression,
     manifest_to_definitions,
 )
-from tests.unit.authoring.test_manifest_compile import AT, minimal, scope, service, text
-from tests.unit.authoring.test_manifest_launch_inputs import admitted, pubmed_resolver
+from tests.support.manifests.compile import AT, minimal, scope, service, text
+from tests.support.manifests.launch_inputs import admitted, pubmed_resolver
 
 SCHEMA = {"type": "object", "required": ["count"], "properties": {"count": {"type": "integer"}}}
 

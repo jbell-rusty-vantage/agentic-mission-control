@@ -46,13 +46,8 @@ from mission_control.bootstrap.composition import (
 from mission_control.domain.execution.contracts import DeepAgentExecutionBinding
 from tests.fixtures.isolated_settings import isolated_settings
 from tests.fixtures.knowledge_binding import FakeKnowledgeBinding, SteppingClock
-from tests.unit.authoring.manifest_launch_fixture import fixture_bindings
-from tests.unit.authoring.test_manifest_launch_inputs import (
-    admitted,
-    compile_programs,
-    fixture_served,
-    resolver,
-)
+from tests.support.manifests.launch_inputs import admitted, compile_programs, resolver
+from tests.unit.authoring.manifest_launch_fixture import fixture_bindings, fixture_served
 from tests.unit.knowledge.test_knowledge_manifest import MANIFEST, SCOPE
 
 APP = "ai-engineer"
