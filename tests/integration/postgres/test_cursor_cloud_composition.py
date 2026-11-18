@@ -13,7 +13,6 @@ import pytest
 from pydantic import SecretStr
 
 from mission_control.adapters.cursor.cloud import run_branch
-from mission_control.adapters.cursor.cloud_api import CloudAgentsClient
 from mission_control.adapters.cursor.workspace import git
 from mission_control.adapters.operations.runtime_ports import FilesystemArtifactPayloadStore
 from mission_control.adapters.postgres.lanes.workspace_leases import PostgresWorkspaceLeaseStore
@@ -49,11 +48,6 @@ async def test_production_cursor_cloud_records_the_lease_and_resolves_env_vars(
     remote = make_remote(tmp_path)
     events, record = load_cloud_fixture()
     api = FakeCloudApi(events, record, remote)
-    monkeypatch.setattr(
-        deployment_composition,
-        "CloudAgentsClient",
-        lambda key: CloudAgentsClient(key, transport=api.transport()),
-    )
     scope = common_db.scope("tenant-1")
     operation = cloud_operation(
         remote, (), env_vars_ref="environment:MC_MO06_MODE", client_agent_id=False
@@ -73,6 +67,7 @@ async def test_production_cursor_cloud_records_the_lease_and_resolves_env_vars(
             FilesystemArtifactPayloadStore(tmp_path / "payloads"),
             bundles=None,
             secrets=secrets,
+            agents_transport=api.transport(),
         )
         assert composed is not None
         harness, client, environments = composed

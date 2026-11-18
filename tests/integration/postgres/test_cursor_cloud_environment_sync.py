@@ -25,9 +25,6 @@ from mission_control.adapters.capabilities.local_bundle_store import (
     FilesystemBundleObjectStore,
 )
 from mission_control.adapters.cursor.cloud import run_branch
-from mission_control.adapters.cursor.cloud_api import CloudAgentsClient
-from mission_control.adapters.cursor.environments import CursorEnvironmentsClient
-from mission_control.adapters.cursor.secrets import CursorSecretsClient
 from mission_control.adapters.cursor.workspace import git
 from mission_control.adapters.operations.runtime_ports import FilesystemArtifactPayloadStore
 from mission_control.adapters.postgres.control_plane.definition_repository import (
@@ -86,21 +83,6 @@ async def test_production_cursor_cloud_syncs_a_seeded_kit_once_and_reuses_it(
     events, record = load_cloud_fixture()
     agents = FakeCloudApi(events, record, remote)
     environments = FakeEnvironmentsApi()
-    monkeypatch.setattr(
-        deployment_composition,
-        "CloudAgentsClient",
-        lambda key: CloudAgentsClient(key, transport=agents.transport()),
-    )
-    monkeypatch.setattr(
-        deployment_composition,
-        "CursorEnvironmentsClient",
-        lambda key: CursorEnvironmentsClient(key, transport=environments.transport()),
-    )
-    monkeypatch.setattr(
-        deployment_composition,
-        "CursorSecretsClient",
-        lambda key: CursorSecretsClient(key, transport=environments.transport()),
-    )
     scope = catalog_db.scope("tenant-1")
     resources = AsyncExitStack()
     try:
@@ -116,6 +98,8 @@ async def test_production_cursor_cloud_syncs_a_seeded_kit_once_and_reuses_it(
             FilesystemArtifactPayloadStore(tmp_path / "payloads"),
             bundles=bundles,
             secrets=secrets,
+            agents_transport=agents.transport(),
+            environments_transport=environments.transport(),
         )
         assert composed is not None
         harness, client, api = composed

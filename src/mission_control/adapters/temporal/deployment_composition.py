@@ -1015,6 +1015,8 @@ def compose_cursor_cloud(
     bundles: BundleMaterializer | None,
     secrets: SecretBroker,
     outputs: LaneOutputCustody | None = None,
+    agents_transport: httpx.AsyncBaseTransport | None = None,
+    environments_transport: httpx.AsyncBaseTransport | None = None,
 ) -> tuple[CursorCloudHarness, CloudAgentsClient, CursorEnvironments] | None:
     """The `cursor_cloud` lane (FT-G5) over the Cloud Agents API v1 when a Cursor credential
     is bound. Branches are published through the worker's git configuration; the cloud
@@ -1026,7 +1028,9 @@ def compose_cursor_cloud(
     commit to the run branch is scanned for the values that broker resolved for the run.
     MO-13: a binding's provider environment is applied through the environments API (the
     kit read from the catalog and its base layer from bundle custody, secrets through the
-    same broker). The caller closes both returned API clients."""
+    same broker). The caller closes both returned API clients. `agents_transport` (the Cloud
+    Agents API) and `environments_transport` (the environments and secrets endpoints)
+    replace the default HTTP transport; tests pass the Cursor API fakes."""
 
     if settings.cursor_api_key is None:
         return None
@@ -1035,10 +1039,10 @@ def compose_cursor_cloud(
         (settings.deep_agent_sandbox_workspace_root or DEFAULT_WORKSPACE_ROOT) / "cursor-leases"
     )
     workspaces_root = root / "cloud-workspaces"
-    client = CloudAgentsClient(settings.cursor_api_key)
+    client = CloudAgentsClient(settings.cursor_api_key, transport=agents_transport)
     environments = CursorEnvironments(
-        CursorEnvironmentsClient(settings.cursor_api_key),
-        CursorSecretsClient(settings.cursor_api_key),
+        CursorEnvironmentsClient(settings.cursor_api_key, transport=environments_transport),
+        CursorSecretsClient(settings.cursor_api_key, transport=environments_transport),
     )
     kits = EnvironmentKitCatalog(
         PostgresDefinitionRepository(
