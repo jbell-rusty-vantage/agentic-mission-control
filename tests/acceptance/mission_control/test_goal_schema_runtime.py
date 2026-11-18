@@ -96,6 +96,7 @@ async def test_signed_goal_named_outputs_delayed_publication_and_cancellation(
             await release_cancel.wait()
             return await original_delivery(transport, status)
 
+        # TODO(OVE-238): scoped_stack builds the transport; no delivery-gate seam yet.
         monkeypatch.setattr(TemporalBoundaryCommandTransport, "_deliver_cancel", delay_cancel)
         original_prepare = GoalDirectedOperationPreparationService.prepare
 
@@ -106,6 +107,7 @@ async def test_signed_goal_named_outputs_delayed_publication_and_cancellation(
                 await release_preparation.wait()
             return dispatch
 
+        # TODO(OVE-238): scoped_stack builds the preparer; no preparation-gate seam yet.
         monkeypatch.setattr(GoalDirectedOperationPreparationService, "prepare", admitted_verifier)
     calls = []
     original_capture = PostgresArtifactBytes.capture
@@ -144,6 +146,7 @@ async def test_signed_goal_named_outputs_delayed_publication_and_cancellation(
                     await release_preparation.wait()
             return content
 
+        # TODO(OVE-238): scoped_stack builds the byte reader; no capture-gate seam yet.
         monkeypatch.setattr(PostgresArtifactBytes, "capture", capture)
         run_id, root_id = await admit_and_launch(stack, "GoalDirected")
 
