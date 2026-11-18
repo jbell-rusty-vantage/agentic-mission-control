@@ -223,6 +223,10 @@ def materialize_projection(
     missing = [item.command for item in checks if not item.available]
     if missing and require_executables:
         raise MaterializationRejected(f"launch executable(s) not found: {', '.join(missing)}")
+    # Every projected path is checked before layering reads the repository: layering resolves
+    # paths under the root, so an absolute path would otherwise be read from outside it.
+    for item in projection.files:
+        _target(root, item.path)
     layered = layer_projection(projection, DirectoryView(root), policy)
     plan: list[tuple[Path, bytes, int]] = []
     unchanged: list[str] = []

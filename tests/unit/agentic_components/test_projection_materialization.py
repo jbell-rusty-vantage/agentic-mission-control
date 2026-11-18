@@ -339,6 +339,25 @@ def test_materialize_rejects_traversal(tmp_path: Path, path: str) -> None:
         _materialize(projection, tmp_path)
 
 
+def test_materialize_rejects_an_absolute_path_to_an_existing_file_before_reading_it(
+    tmp_path: Path,
+) -> None:
+    # Layering reads the repository's bytes at each projected path; an absolute path to a file
+    # that exists outside the workspace must be refused before layering can read or skip it.
+    outside = tmp_path / "outside.md"
+    outside.write_bytes(b"outside bytes")
+    workspace = tmp_path / "workspace"
+    workspace.mkdir()
+    projection = HostProjection(
+        profile=LaneProfile.CODEX,
+        files=(ProjectedFile(path=outside.as_posix(), content=b"x"),),
+        report=ProjectionReport(),
+    )
+    with pytest.raises(MaterializationRejected, match="escapes the workspace"):
+        _materialize(projection, workspace)
+    assert outside.read_bytes() == b"outside bytes"
+
+
 def test_materialize_rejects_symlinked_components(tmp_path: Path) -> None:
     outside = tmp_path / "outside"
     outside.mkdir()

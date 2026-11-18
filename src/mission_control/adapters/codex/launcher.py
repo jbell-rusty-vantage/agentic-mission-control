@@ -86,7 +86,8 @@ def subprocess_supported(loop: asyncio.AbstractEventLoop | None = None) -> tuple
         current = loop or asyncio.get_running_loop()
     except RuntimeError:
         return False, "no running event loop"
-    if isinstance(current, asyncio.ProactorEventLoop):
+    proactor = getattr(asyncio, "ProactorEventLoop", None)  # defined on Windows builds only
+    if proactor is not None and isinstance(current, proactor):
         return True, "windows proactor loop"
     return (
         False,

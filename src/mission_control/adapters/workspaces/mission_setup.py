@@ -13,7 +13,7 @@ import asyncio
 import os
 import shutil
 from collections.abc import Callable, Mapping
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 
 from mission_control.application.environments.mission_layer import EnvironmentNotPrepared
 from mission_control.domain.authoring.environment_kits import MISSION_SETUP_RUN, SetupPhase
@@ -30,7 +30,12 @@ def resolve_bash(
     """The ``bash`` on PATH; on Windows, Git for Windows' bash instead of the WSL launcher."""
 
     found = which("bash")
-    if found is None or not windows or Path(found).parent.name.lower() not in _WSL_LAUNCHER_DIRS:
+    # Parse as a Windows path when resolving for Windows, so the check holds on any host.
+    if (
+        found is None
+        or not windows
+        or PureWindowsPath(found).parent.name.lower() not in _WSL_LAUNCHER_DIRS
+    ):
         return found
     git = which("git")
     if git is None:
