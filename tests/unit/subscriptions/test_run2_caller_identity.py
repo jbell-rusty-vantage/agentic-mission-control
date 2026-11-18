@@ -1,27 +1,22 @@
-"""Public run UUID -> scoped production resolver -> launcher's durable inbox contract.
+"""Public run UUID -> alias resolver -> launcher's durable inbox contract.
 
-The PostgreSQL method and coordinator services execute unchanged. A scoped fake
-connection supplies the alias row; SQL execution/RLS and native caller resumption
-are outside this fixture proof.
+The coordinator services execute unchanged over the in-memory stores. The production alias
+resolution, its scope and row-level security run on the disposable database in
+tests/integration/postgres/test_subscription_caller_identity_postgres.py.
 """
 
 from __future__ import annotations
 
-from collections.abc import AsyncIterator
-from contextlib import asynccontextmanager
-from typing import Any
 from uuid import UUID
 
 import pytest
 
-from mission_control.adapters.postgres.subscriptions.store import PostgresSubscriptionStore
 from mission_control.application.subscriptions.coordinator import NotificationKind
 from mission_control.application.subscriptions.coordinator_service import (
     CoordinatorInboxService,
     CoordinatorRejected,
 )
 from mission_control.application.subscriptions.launcher import subscribe_launcher
-from mission_control.application.subscriptions.ports import SubscriptionNotFound
 from mission_control.domain.policies.contracts import ActorContext
 from mission_control.domain.subscriptions.contracts import SubscriptionTarget
 from tests.unit.subscriptions.coordinator_fakes import InMemoryInboxStore, journal_event
@@ -38,79 +33,30 @@ CALLER = ActorContext(actor_id="full3-caller", permissions=frozenset({"workflow_
 OTHER = ActorContext(actor_id="other-caller", permissions=CALLER.permissions)
 
 
-class ScopedConnection:
-    """DB boundary fixture checks scope/alias binds, not PostgreSQL query execution."""
+class AliasSubscriptions(InMemoryStore):
+    """Resolves the public run key to the internal run, as `PostgresSubscriptionStore` does on
+    the database (tests/integration/postgres/test_subscription_caller_identity_postgres.py)."""
 
     def __init__(self) -> None:
-        self.in_transaction = False
-        self.scope: tuple[str, ...] | None = None
+        super().__init__()
         self.lookups: list[UUID] = []
 
-    @asynccontextmanager
-    async def transaction(self) -> AsyncIterator[None]:
-        self.in_transaction = True
-        try:
-            yield
-        finally:
-            self.in_transaction = False
-            self.scope = None
-
-    def is_in_transaction(self) -> bool:
-        return self.in_transaction
-
-    async def execute(self, query: str, *args: str) -> str:
-        assert self.in_transaction
-        assert "set_config('mc.installation_id'" in query
-        assert "set_config('mc.application_id'" in query
-        assert "set_config('mc.tenant_id'" in query
-        self.scope = args
-        return "SELECT 1"
-
-    async def fetchrow(self, query: str, *args: Any) -> dict[str, UUID] | None:
-        assert self.in_transaction and self.scope is not None
-        assert tuple(str(value) for value in args[:3]) == self.scope
-        assert "installation_id = $1 AND application_id = $2 AND tenant_id = $3" in query
-        assert "(run_id = $4 OR run_key = $5)" in query
-        assert "ORDER BY run_id = $4 DESC LIMIT 1" in query
-        target, alias = args[3:]
-        assert isinstance(target, UUID) and alias == str(target)
-        self.lookups.append(target)
-        if args[:3] == DATA_SCOPE and target in {PUBLIC_RUN, INTERNAL_RUN}:
-            return {"run_id": INTERNAL_RUN, "mission_id": MISSION}
-        return None
-
-
-class ScopedPool:
-    def __init__(self) -> None:
-        self.connection = ScopedConnection()
-
-    @asynccontextmanager
-    async def acquire(self) -> AsyncIterator[ScopedConnection]:
-        yield self.connection
-
-
-class AliasSubscriptions(InMemoryStore):
-    """Only the DB boundary is fake; alias normalization uses the production method."""
-
-    def __init__(self, resolver: PostgresSubscriptionStore) -> None:
-        super().__init__()
-        self.resolver = resolver
-
     async def resolve_target(self, kind: str, target_id: UUID) -> SubscriptionTarget:
-        return await self.resolver.resolve_target(kind, target_id)
+        self.lookups.append(target_id)
+        if kind == "run" and target_id in {PUBLIC_RUN, INTERNAL_RUN}:
+            return SubscriptionTarget(kind="run", mission_id=MISSION, run_id=INTERNAL_RUN)
+        return await super().resolve_target(kind, target_id)
 
 
-def compose() -> tuple[CoordinatorInboxService, InMemoryInboxStore, ScopedPool]:
-    pool = ScopedPool()
-    resolver = PostgresSubscriptionStore(pool, SCOPE)
-    subscriptions = AliasSubscriptions(resolver)
+def compose() -> tuple[CoordinatorInboxService, InMemoryInboxStore, AliasSubscriptions]:
+    subscriptions = AliasSubscriptions()
     inbox = InMemoryInboxStore(subscriptions)
-    return CoordinatorInboxService(subscriptions, inbox), inbox, pool
+    return CoordinatorInboxService(subscriptions, inbox), inbox, subscriptions
 
 
 async def test_public_run_launcher_joins_internal_journal_and_owned_inbox() -> None:
     assert PUBLIC_RUN != INTERNAL_RUN
-    service, inbox, pool = compose()
+    service, inbox, subscriptions = compose()
     inbox.add(journal_event(1, "human_task.created"), human_task_id="before-launch")
     launched = await subscribe_launcher(service, str(PUBLIC_RUN), CALLER)
     assert launched.status == "subscribed" and launched.subscription_id is not None
@@ -162,15 +108,4 @@ async def test_public_run_launcher_joins_internal_journal_and_owned_inbox() -> N
     assert not (await service.poll(sid, CALLER)).notifications
     again = await service.ack(sid, CALLER, through_inbox_seq=2)
     assert again.acked_inbox_seq == 2 and not again.acknowledged
-    assert set(pool.connection.lookups) == {PUBLIC_RUN, INTERNAL_RUN}
-    assert pool.connection.scope is None and not pool.connection.in_transaction
-
-
-async def test_production_alias_resolver_keeps_request_scope_on_lookup() -> None:
-    pool = ScopedPool()
-    other_scope = SCOPE.replace("0000000000bb", "0000000000cc")
-    resolver = PostgresSubscriptionStore(pool, other_scope)
-    with pytest.raises(SubscriptionNotFound):
-        await resolver.resolve_target("run", PUBLIC_RUN)
-    assert pool.connection.lookups == [PUBLIC_RUN]
-    assert pool.connection.scope is None and not pool.connection.in_transaction
+    assert set(subscriptions.lookups) == {PUBLIC_RUN, INTERNAL_RUN}
