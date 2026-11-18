@@ -4,7 +4,9 @@ import pytest
 from tests.support.unit.mission_control.completion_evidence import receipt_row
 from tests.support.unit.mission_control.run_evidence import ACTOR, setup
 
-from mission_control.adapters.postgres.orchestration.completion_evidence import _decision
+from mission_control.adapters.postgres.orchestration.completion_evidence import (
+    decode_completion_receipt,
+)
 from mission_control.application.missions.completion_evidence import CompletionEvidenceCorrupt
 from mission_control.application.missions.retrieval import (
     RunEvidenceInconsistent,
@@ -18,11 +20,11 @@ from mission_control.domain.programs.completion import CompletionValidation
 
 
 def test_journal_receipt_preserves_pending_and_legacy_validation():
-    record = _decision(receipt_row(), "tenant-1", "run-1")
+    record = decode_completion_receipt(receipt_row(), "tenant-1", "run-1")
     assert isinstance(record.validation, CompletionValidation)
     assert record.validation.status == "pending"
     assert record.validation.reason_codes == ("artifact_not_published",)
-    legacy = _decision(receipt_row(legacy=True), "tenant-1", "run-1")
+    legacy = decode_completion_receipt(receipt_row(legacy=True), "tenant-1", "run-1")
     assert legacy.validation["artifact_schema_validation"] == "not_evaluated"
 
 
@@ -38,27 +40,27 @@ def test_journal_integrity_mismatch_is_not_returned(field, value):
     row = receipt_row()
     row[field] = value
     with pytest.raises(CompletionEvidenceCorrupt):
-        _decision(row, "tenant-1", "run-1")
+        decode_completion_receipt(row, "tenant-1", "run-1")
 
 
 def test_cross_run_or_scope_and_invalid_v2_fail_closed():
     for scope, run_id in (("other", "run-1"), ("tenant-1", "another")):
         with pytest.raises(CompletionEvidenceCorrupt):
-            _decision(receipt_row(), scope, run_id)
+            decode_completion_receipt(receipt_row(), scope, run_id)
     row = receipt_row()
     row["mutation"]["decision_payload"]["completion_validation"]["status"] = "guessed"
     row["mutation_fingerprint"] = sha256_digest(
         {key: value for key, value in row["mutation"].items() if key != "decided_at"}
     )
     with pytest.raises(CompletionEvidenceCorrupt):
-        _decision(row, "tenant-1", "run-1")
+        decode_completion_receipt(row, "tenant-1", "run-1")
 
 
 @pytest.mark.asyncio
 async def test_scoped_completion_page_is_authorized_and_included_in_evidence():
     _, lifecycle, _, _, run_id = await setup()
     reader = AsyncMock()
-    record = _decision(receipt_row(run_id=run_id), "tenant-1", run_id)
+    record = decode_completion_receipt(receipt_row(run_id=run_id), "tenant-1", run_id)
     reader.list.return_value = CompletionEvidencePage(
         run_id=run_id,
         status="recorded",
@@ -87,8 +89,8 @@ async def test_scoped_completion_page_is_authorized_and_included_in_evidence():
 @pytest.mark.parametrize("case", ["duplicate", "reversed", "wrong_scope", "stale_cursor"])
 async def test_completion_page_rejects_bad_identity_or_order(case):
     _, lifecycle, _, _, run_id = await setup()
-    one = _decision(receipt_row(run_id=run_id), "tenant-1", run_id)
-    two = _decision(receipt_row(run_id=run_id, version=2), "tenant-1", run_id)
+    one = decode_completion_receipt(receipt_row(run_id=run_id), "tenant-1", run_id)
+    two = decode_completion_receipt(receipt_row(run_id=run_id, version=2), "tenant-1", run_id)
     records = {
         "duplicate": (one, one),
         "reversed": (two, one),

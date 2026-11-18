@@ -47,7 +47,9 @@ class PostgresCompletionEvidenceReader:
                 after_family_version,
                 limit + 1,
             )
-        decisions = tuple(_decision(row, request_scope, run_id) for row in rows[:limit])
+        decisions = tuple(
+            decode_completion_receipt(row, request_scope, run_id) for row in rows[:limit]
+        )
         return CompletionEvidencePage(
             run_id=run_id,
             status="recorded" if decisions else "not_recorded",
@@ -56,7 +58,11 @@ class PostgresCompletionEvidenceReader:
         )
 
 
-def _decision(row: asyncpg.Record, request_scope: str, run_id: str) -> CompletionDecisionEvidence:
+def decode_completion_receipt(
+    row: asyncpg.Record, request_scope: str, run_id: str
+) -> CompletionDecisionEvidence:
+    """One journal row as completion evidence, or `CompletionEvidenceCorrupt` when its scope,
+    run, version, key, fingerprint or decision time differs from the recorded mutation."""
     try:
         raw = row["mutation"]
         mutation = StageGraphDecisionMutation.model_validate(
