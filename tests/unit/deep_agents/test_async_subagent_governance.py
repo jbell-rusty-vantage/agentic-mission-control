@@ -1,16 +1,6 @@
 from __future__ import annotations
 
 import pytest
-from tests.support.deep_agents import (
-    GRAPH_BINDING_DIGEST,
-    NOW,
-    SERVED,
-    DeterministicProvider,
-    checkpoint,
-    contract,
-    request,
-)
-from tests.support.providers.agent_protocol import FakeAgentProtocolClient, install
 
 from mission_control.adapters.deep_agents.async_subagents import (
     DeepAgentsAsyncSubagentAdapter,
@@ -32,6 +22,16 @@ from mission_control.domain.execution.delegation import (
     AsyncDelegationBoundary,
     classify_async_delegation,
 )
+from tests.support.deep_agents import (
+    GRAPH_BINDING_DIGEST,
+    NOW,
+    SERVED,
+    DeterministicProvider,
+    checkpoint,
+    contract,
+    request,
+)
+from tests.support.providers.agent_protocol import FakeAgentProtocolClient, install
 
 
 class OrderedDetails(InMemoryAsyncSubagentDetailRepository):

@@ -5,17 +5,6 @@ from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
-from tests.support.unit.control_plane.agentic_asset_definitions import (
-    server_definition,
-    skill_definition,
-    tool_definition,
-)
-from tests.support.unit.control_plane.control_plane import (
-    authority,
-    configured_service,
-    invocation,
-    publish,
-)
 
 from mission_control.domain.authoring.canonical import canonical_json, sha256_digest
 from mission_control.domain.authoring.contracts import (
@@ -34,6 +23,17 @@ from mission_control.domain.authoring.contracts import (
     PromptDefinition,
 )
 from mission_control.domain.authoring.errors import CompilationRejected
+from tests.support.unit.control_plane.agentic_asset_definitions import (
+    server_definition,
+    skill_definition,
+    tool_definition,
+)
+from tests.support.unit.control_plane.control_plane import (
+    authority,
+    configured_service,
+    invocation,
+    publish,
+)
 
 
 async def _publish_capability(
@@ -484,19 +484,12 @@ def test_canonical_bytes_preserve_unicode_order_and_reject_nonfinite_numbers() -
         canonical_json({"bad": float("nan")})
 
 
-def test_compiler_has_database_network_clock_and_environment_drift_guards() -> None:
+def test_compiler_reads_no_socket_clock_or_environment() -> None:
+    # Database and HTTP SDK imports are refused for the whole domain by
+    # tests/architecture/test_package_boundaries.py; this guards the compiler's own drift inputs.
     source = Path("src/mission_control/domain/authoring/compiler.py").read_text(encoding="utf-8")
     tree = ast.parse(source)
-    forbidden_imports = {
-        "beanie",
-        "pymongo",
-        "requests",
-        "httpx",
-        "socket",
-        "os",
-        "time",
-        "datetime",
-    }
+    forbidden_imports = {"socket", "os", "time", "datetime"}
     imported = {
         alias.name.split(".")[0]
         for node in ast.walk(tree)

@@ -95,21 +95,14 @@ def test_operation_identity_and_single_registries_are_versioned_and_complete() -
     assert len(set(queues.__dict__.values())) == 5
 
 
-def test_workflow_owners_have_no_forbidden_nondeterministic_io_imports() -> None:
+def test_workflow_owners_use_no_socket_or_wall_clock() -> None:
+    # Provider and database SDK imports in workflow modules are refused by
+    # tests/architecture/test_package_boundaries.py; this guards the in-source calls.
     sources = "\n".join(
         (
             inspect.getsource(BellLabsRunWorkflow),
             inspect.getsource(OperationWorkflow),
         )
     )
-    for forbidden in (
-        "asyncpg",
-        "pymongo",
-        "requests.",
-        "httpx.",
-        "boto3",
-        "openai.",
-        "socket.",
-        "datetime.now",
-    ):
+    for forbidden in ("socket.", "datetime.now"):
         assert forbidden not in sources

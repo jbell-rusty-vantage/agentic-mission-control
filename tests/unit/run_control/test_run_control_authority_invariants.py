@@ -5,14 +5,6 @@ from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
-from tests.support.run_control import (
-    EMPTY_EVIDENCE_DIGEST,
-    INITIAL_EVIDENCE_FRONTIER,
-    WORKFLOW_DIGEST,
-    command,
-    request,
-    service,
-)
 
 from mission_control.application.execution.run_control_repository import (
     InMemoryRunControlRepository,
@@ -37,6 +29,14 @@ from mission_control.domain.policies.contracts import (
     StartAction,
     TerminalizationProposal,
     TerminalizeAction,
+)
+from tests.support.run_control import (
+    EMPTY_EVIDENCE_DIGEST,
+    INITIAL_EVIDENCE_FRONTIER,
+    WORKFLOW_DIGEST,
+    command,
+    request,
+    service,
 )
 
 NOW = datetime(2026, 8, 10, 12, 0, tzinfo=UTC)
@@ -289,13 +289,9 @@ async def test_outbox_publish_ack_ambiguity_redelivers_stable_event_identity() -
     assert await run_service.pending_outbox("tenant-1") == ()
 
 
-def test_domain_owner_has_no_runtime_or_persistence_authority_imports() -> None:
+def test_journaled_operation_settles_through_effect_commands_not_the_lifecycle_reducer() -> None:
+    # The domain's SDK imports are refused by tests/architecture/test_package_boundaries.py.
     root = Path(__file__).resolve().parents[3]
-    files = sorted((root / "src" / "mission_control" / "domain" / "policies").glob("*.py"))
-    assert files, "Domain SDK import guard found no policy source files"
-    domain_source = "\n".join(path.read_text(encoding="utf-8") for path in files)
-    forbidden = ("temporalio", "asyncpg", "beanie", "langgraph", "deepagents")
-    assert not any(name in domain_source for name in forbidden)
     journaled_operation = (
         root
         / "src"
