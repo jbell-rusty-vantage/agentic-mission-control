@@ -1,6 +1,6 @@
 """Builders, constants and fakes that other test files import.
 
-Moved from tests/unit/schema/test_graph_query_intents.py.
+Moved from integrations/biotech/tests/schema/test_graph_query_intents.py.
 """
 
 from __future__ import annotations

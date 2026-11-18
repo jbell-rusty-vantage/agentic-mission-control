@@ -3,6 +3,12 @@ from __future__ import annotations
 from datetime import UTC, datetime
 
 import pytest
+from tests.support.unit.web_research.web_research_semantic_handlers import (
+    BROWSER_RUNTIME,
+    FIRECRAWL_RUNTIME,
+    TAVILY_RUNTIME,
+    binding_authority,
+)
 
 from biotech_mission_adapters.application.capabilities.reviewed_capability_promotion import (
     build_scenario_d_execution_correction,
@@ -30,12 +36,6 @@ from mission_control.domain.authoring.contracts import (
     WorkflowTypeDefinition,
 )
 from mission_control.domain.authoring.extensions import ExtensionRegistry
-from tests.support.unit.web_research.web_research_semantic_handlers import (
-    BROWSER_RUNTIME,
-    FIRECRAWL_RUNTIME,
-    TAVILY_RUNTIME,
-    binding_authority,
-)
 
 NOW = datetime(2026, 7, 26, 15, 0, tzinfo=UTC)
 

@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 import pytest
+from tests.support.unit.schema.graph_query_intents import _intent
 
 from biotech_mission_adapters.application.schema.graph_query import (
     compile_query_intent,
     validate_query_intent,
 )
 from biotech_mission_adapters.domain.schema_context.errors import QueryIntentRejected
-from tests.support.unit.schema.graph_query_intents import _intent
 
 
 def test_exact_and_neighborhood_queries_compile_deterministically() -> None:

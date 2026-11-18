@@ -6,6 +6,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
+from tests.fixtures.sibling_checkouts import authoritative_schema_path
 
 from biotech_mission_adapters.bootstrap.schema_source import (
     SCHEMA_SOURCE_ENV,
@@ -16,7 +17,6 @@ from biotech_mission_adapters.bootstrap.schema_source import (
     published_source_reference,
     read_authoritative_schema,
 )
-from tests.fixtures.sibling_checkouts import authoritative_schema_path
 
 
 def test_default_follows_the_belllabs_layout(tmp_path: Path) -> None:

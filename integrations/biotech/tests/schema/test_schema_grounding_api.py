@@ -4,6 +4,7 @@ from datetime import UTC, datetime
 
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
+from tests.schema_context_helpers import accepted, catalog
 
 from biotech_mission_adapters.application.schema.schema_grounding_repository import (
     InMemorySchemaGroundingRecordRepository,
@@ -17,7 +18,6 @@ from mission_control.interfaces.http.control_plane import (
     ControlPlanePrincipal,
     get_control_plane_principal,
 )
-from tests.schema_context_helpers import accepted, catalog
 
 NOW = datetime(2026, 7, 24, 16, 0, tzinfo=UTC)
 

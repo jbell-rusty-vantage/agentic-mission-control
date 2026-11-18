@@ -55,7 +55,7 @@ from mission_control.domain.graph_runtime.kernel import (
 )
 
 NOW = datetime(2026, 1, 15, 12, 0, tzinfo=UTC)
-FIXTURES = Path(__file__).parents[2] / "fixtures" / "reference_blueprints"
+FIXTURES = Path(__file__).resolve().parents[1] / "fixtures" / "reference_blueprints"
 
 
 def fixture(name: str) -> QualiaFixtureInput | DaveFixtureInput:

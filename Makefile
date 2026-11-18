@@ -74,7 +74,7 @@ WORKER    ?= auto
 	deps-check audit links precommit arch skills-references skills-manifest skills-check \
 	manifest-schemas \
 	manifest-schemas-check seeds-validate check ci \
-	test test-unit test-unit-fast test-arch test-conformance test-integration test-acceptance \
+	test test-unit test-unit-fast test-biotech test-arch test-conformance test-integration test-acceptance \
 	test-qualification test-db-contract test-failed coverage lane-qualify \
 	clean up dev down stop status
 
@@ -358,9 +358,9 @@ lane-qualify: ## Lane qualification: offline fixture, lane conformance and repla
 seeds-validate: ## Fail if a seed Capability Pin does not parse or a tools/list digest drifted
 	$(RUN) python scripts/seeds_validate.py
 
-check: lint fmt-check typecheck-fast deps-check test-arch test-unit test-conformance skills-check ## Fast local gate (minutes)
+check: lint fmt-check typecheck-fast deps-check test-arch test-unit test-biotech test-conformance skills-check ## Fast local gate (minutes)
 
-ci: lock-check lint fmt-check typecheck deps-check test-arch test-unit test-conformance links ## Full gate: everything that needs no live infrastructure
+ci: lock-check lint fmt-check typecheck deps-check test-arch test-unit test-biotech test-conformance links ## Full gate: everything that needs no live infrastructure
 
 # ========================================================================================
 ##@ Tests (PYTEST_ARGS="..." passes through)
@@ -373,6 +373,9 @@ test-unit: ## Unit tests
 
 test-unit-fast: ## Unit tests in parallel (pytest-xdist)
 	$(PYTEST) tests/unit -n auto
+
+test-biotech: ## Biotech-domain tests (integrations/biotech/tests; the biotech group)
+	$(UV) run --no-sync --group biotech pytest integrations/biotech/tests $(PYTEST_ARGS)
 
 test-arch: ## Package-boundary and ownership rules
 	$(PYTEST) tests/architecture

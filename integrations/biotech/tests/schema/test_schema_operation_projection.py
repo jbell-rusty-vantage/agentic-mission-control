@@ -1,6 +1,7 @@
+from tests.schema_context_helpers import accepted, catalog
+
 from biotech_mission_adapters.domain.schema_context.expansion import expand_selection
 from biotech_mission_adapters.domain.schema_context.projection import build_operation_projection
-from tests.schema_context_helpers import accepted, catalog
 
 
 def test_projection_uses_sdl_plus_live_online_indexes_and_does_not_invent_vectors() -> None:

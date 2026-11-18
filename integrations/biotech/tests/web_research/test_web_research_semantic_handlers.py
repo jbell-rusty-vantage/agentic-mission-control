@@ -7,6 +7,24 @@ from typing import Any, cast
 
 import pytest
 from pydantic import ValidationError
+from tests.fixtures.lane_bindings import LANE_REBINDERS
+from tests.support.unit.web_research.web_research_semantic_handlers import (
+    BLUEPRINT_DIGEST,
+    BROWSER_RUNTIME,
+    CONFIGURATION_DIGEST,
+    FIRECRAWL_RUNTIME,
+    OPENAI_SENTINEL,
+    RUN_ID,
+    SCOPE,
+    TAVILY_RUNTIME,
+    FakeBrowser,
+    FakeSearch,
+    binding,
+    binding_authority,
+    exact_ref,
+    request,
+    runtime,
+)
 
 from biotech_mission_adapters.application.web_research.web_research_repository import (
     InMemoryWebResearchRecordRepository,
@@ -44,24 +62,6 @@ from mission_control.domain.policies.contracts import ActorContext
 from mission_control.domain.programs.bindings import StageHandlerBinding
 from mission_control.domain.programs.contracts import (
     WorkflowEvaluationRequest,
-)
-from tests.fixtures.lane_bindings import LANE_REBINDERS
-from tests.support.unit.web_research.web_research_semantic_handlers import (
-    BLUEPRINT_DIGEST,
-    BROWSER_RUNTIME,
-    CONFIGURATION_DIGEST,
-    FIRECRAWL_RUNTIME,
-    OPENAI_SENTINEL,
-    RUN_ID,
-    SCOPE,
-    TAVILY_RUNTIME,
-    FakeBrowser,
-    FakeSearch,
-    binding,
-    binding_authority,
-    exact_ref,
-    request,
-    runtime,
 )
 
 

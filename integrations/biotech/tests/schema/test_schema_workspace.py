@@ -4,6 +4,8 @@ import json
 from pathlib import Path
 
 import pytest
+from tests.fixtures.sibling_checkouts import authoritative_schema_path
+from tests.schema_context_helpers import SDL
 
 from biotech_mission_adapters.application.schema.schema_catalog import parse_schema_catalog
 from biotech_mission_adapters.application.schema.schema_workspace import (
@@ -14,8 +16,6 @@ from biotech_mission_adapters.application.schema.schema_workspace import (
     workspace_profile_paths,
 )
 from biotech_mission_adapters.bootstrap.schema_source import read_authoritative_schema
-from tests.fixtures.sibling_checkouts import authoritative_schema_path
-from tests.schema_context_helpers import SDL
 
 
 def test_profiles_mount_one_representation_per_candidate(tmp_path: Path) -> None:
@@ -42,8 +42,8 @@ def test_authoritative_schema_tier0_is_bounded_and_workload_candidates_are_prese
     schema_path = authoritative_schema_path()
     # Tracked copy of the live-windows-bind-9 input report; see tests/fixtures/schema_context/.
     report_path = (
-        Path(__file__).resolve().parents[2]
-        / "fixtures/schema_context/trudiagnostic_report_2026-03-30.md"
+        Path(__file__).resolve().parents[4]
+        / "tests/fixtures/schema_context/trudiagnostic_report_2026-03-30.md"
     )
     source = read_authoritative_schema(schema_path)
     catalog = parse_schema_catalog(source, str(schema_path))

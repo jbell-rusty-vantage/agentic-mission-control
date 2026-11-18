@@ -91,7 +91,8 @@ do not import this domain package.
 
 ## Evidence
 
-`tests/unit/schema`, `tests/unit/web_research`, and the Neo4j adapter tests preserve the
+`integrations/biotech/tests` (schema, web research, reference research and the Neo4j adapter
+tests; `make test-biotech`) preserve the
 existing semantic, authority and bounded operation assertions after relocation.
 `tests/integration/postgres/test_biotech_adapter_records.py` verifies the optional migration,
 restricted role isolation, replay/concurrency, immutable conflicts and malformed payload

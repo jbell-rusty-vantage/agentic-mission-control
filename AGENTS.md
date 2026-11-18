@@ -32,7 +32,7 @@ The runtime DSN must be the restricted `mission_control_runtime` login from the 
 - Use `GLOSSARY.md` terms and honour its Avoid lists.
 - Commit when an issue's work is complete and verified; push at gate release and session end (owner rule 2026-10-27).
 
-<!-- BEGIN:sdlc v=0.2.0 src=8902a53261da -->
+<!-- BEGIN:sdlc v=0.2.0 src=46ab0fa818a0 -->
 ## Repository guide
 General Mission Control runtime and the common database component. Provider consolidation, one provider at a time; Deep Agents is the primary lane and the reference adapter shape (ADR-0005). Not here: application knowledge (`integrations/biotech`, never imported by the kernel), AI Engineer or Biotech schema authority, Knowledge Services internals.
 

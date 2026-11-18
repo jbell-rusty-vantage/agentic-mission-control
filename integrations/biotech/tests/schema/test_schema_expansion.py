@@ -1,8 +1,8 @@
 from graphql import parse
+from tests.schema_context_helpers import accepted, catalog
 
 from biotech_mission_adapters.application.schema.schema_catalog import parse_schema_catalog
 from biotech_mission_adapters.domain.schema_context.expansion import expand_selection
-from tests.schema_context_helpers import accepted, catalog
 
 
 def test_expansion_is_complete_parseable_and_deterministic() -> None:

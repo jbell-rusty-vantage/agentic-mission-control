@@ -5,6 +5,7 @@ from typing import Self, cast
 
 import pytest
 from neo4j import READ_ACCESS, WRITE_ACCESS
+from tests.fixtures.sibling_checkouts import authoritative_schema_path
 
 from biotech_mission_adapters.adapters.infrastructure.neo4j_schema_deployment import (
     Neo4jLiveSchemaDeploymentReader,
@@ -42,7 +43,6 @@ from biotech_mission_adapters.domain.schema_grounding.errors import (
     SchemaDeploymentMismatch,
 )
 from mission_control.domain.authoring.canonical import sha256_digest
-from tests.fixtures.sibling_checkouts import authoritative_schema_path
 
 NOW = datetime(2026, 7, 26, 18, 0, tzinfo=UTC)
 SCHEMA_DIGEST = "sha256:" + "1" * 64

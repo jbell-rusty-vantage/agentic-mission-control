@@ -541,12 +541,11 @@
       "path": "integrations/biotech",
       "purpose": "Optional Biotech adapters; the kernel never imports them. Application-specific schema grounding, research and Neo4j adapters (namespace biotech_mission_adapters); deployment composition supplies their policies explicitly.",
       "tests": [
-        "tests/integration/biotech",
-        "tests/unit/reference_research",
-        "tests/unit/web_research"
+        "integrations/biotech/tests",
+        "tests/integration/biotech"
       ],
       "verify": [
-        "uv run --group biotech pytest tests/unit/reference_research tests/unit/web_research"
+        "uv run --group biotech pytest integrations/biotech/tests (make test-biotech)"
       ],
       "invariants": [
         "The kernel never imports this package.",

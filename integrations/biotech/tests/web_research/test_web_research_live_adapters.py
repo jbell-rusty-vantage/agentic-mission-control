@@ -8,6 +8,15 @@ from types import SimpleNamespace
 
 import pytest
 from mcp.types import TextContent
+from tests.support.unit.web_research.web_research_live_adapters import (
+    BROWSER_REF,
+    BROWSER_RUNTIME,
+    FIRECRAWL_RUNTIME,
+    TAVILY_RUNTIME,
+    FakeBrowserRunner,
+    FakeScreenshots,
+    exact_ref,
+)
 
 from biotech_mission_adapters.adapters.infrastructure import web_research_runtime
 from biotech_mission_adapters.adapters.infrastructure.web_research_runtime import (
@@ -24,15 +33,6 @@ from biotech_mission_adapters.domain.coordinator.web_research_runtime import (
 )
 from mission_control.adapters.capabilities import browser_subprocess
 from mission_control.domain.authoring.contracts import DefinitionKind
-from tests.support.unit.web_research.web_research_live_adapters import (
-    BROWSER_REF,
-    BROWSER_RUNTIME,
-    FIRECRAWL_RUNTIME,
-    TAVILY_RUNTIME,
-    FakeBrowserRunner,
-    FakeScreenshots,
-    exact_ref,
-)
 
 FIRECRAWL_REF = exact_ref(
     DefinitionKind.MCP_TOOL,

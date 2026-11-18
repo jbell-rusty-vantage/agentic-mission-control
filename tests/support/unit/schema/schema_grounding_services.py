@@ -1,6 +1,6 @@
 """Builders, constants and fakes that other test files import.
 
-Moved from tests/unit/schema/test_schema_grounding_services.py.
+Moved from integrations/biotech/tests/schema/test_schema_grounding_services.py.
 """
 
 from __future__ import annotations

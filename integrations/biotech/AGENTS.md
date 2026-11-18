@@ -43,12 +43,13 @@ docs/organization/biotech-module-map.json for source lineage.
 Optional Biotech adapters; the kernel never imports them. Application-specific schema grounding, research and Neo4j adapters (namespace biotech_mission_adapters); deployment composition supplies their policies explicitly.
 Entrypoints:
 - src/
+- tests/
 - pyproject.toml
-Tests: tests/integration/biotech, tests/unit/reference_research, tests/unit/web_research
+Tests: integrations/biotech/tests, tests/integration/biotech
 Invariants:
 - The kernel never imports this package.
 - No entity writer here; Biotech domain writes arrive through the Knowledge Services intent and receipt contract.
 Explained by (docs/knowledge): knowledge-services
 Decided by (docs/adr): ADR-0007, ADR-0059, ADR-0060, ADR-0061
-Verify: uv run --group biotech pytest tests/unit/reference_research tests/unit/web_research
+Verify: uv run --group biotech pytest integrations/biotech/tests (make test-biotech)
 <!-- END:sdlc-module -->

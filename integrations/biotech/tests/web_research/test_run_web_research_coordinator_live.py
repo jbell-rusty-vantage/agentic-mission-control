@@ -10,6 +10,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
+from tests.fixtures.isolated_settings import isolated_settings
 
 from biotech_mission_adapters.application.web_research.web_research_semantic_binding import (
     REQUIRED_SELECTED_IDENTITIES,
@@ -42,9 +43,8 @@ from mission_control.domain.authoring.contracts import (
 )
 from mission_control.domain.coordinator.contracts import AuthorizationState
 from mission_control.domain.policies.contracts import ActorContext
-from tests.fixtures.isolated_settings import isolated_settings
 
-ROOT = Path(__file__).resolve().parents[3]
+ROOT = Path(__file__).resolve().parents[4]
 SCRIPT = ROOT / "scripts" / "run_web_research_coordinator_live.py"
 
 

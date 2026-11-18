@@ -5,6 +5,7 @@ from hashlib import sha256
 from typing import Any
 
 import pytest
+from tests.fixtures.sibling_checkouts import authoritative_schema_path
 
 from biotech_mission_adapters.application.schema.schema_catalog import (
     DEFAULT_SEMANTIC_OVERLAY,
@@ -20,7 +21,6 @@ from biotech_mission_adapters.domain.schema_catalog import (
     require_valid_catalog_overlay,
     semantic_overlay_json_schema,
 )
-from tests.fixtures.sibling_checkouts import authoritative_schema_path
 
 SDL = b"""
 directive @node on OBJECT

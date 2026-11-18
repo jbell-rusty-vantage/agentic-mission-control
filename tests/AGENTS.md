@@ -11,6 +11,10 @@ and exact selections. Disable external tracing in deterministic tests and never
 spend provider budget without authorization. Never point destructive fixture setup
 at live or unknown databases; generate isolated local database names.
 
+Biotech-domain tests (biotech_mission_adapters) live in integrations/biotech/tests and run
+with `uv run --group biotech pytest integrations/biotech/tests` (`make test-biotech`, part of
+`make check`); the seven that read BIOTECH_SCHEMA_SDL_PATH stay opt-in and skip without it.
+
 A source reorganization requires import, packaging and renewed runtime checks.
 Do not sum overlapping suite counts or claim deployment from local execution.
 

@@ -1,6 +1,6 @@
 """Builders, constants and fakes that other test files import.
 
-Moved from tests/unit/web_research/test_web_research_semantic_handlers.py.
+Moved from integrations/biotech/tests/web_research/test_web_research_semantic_handlers.py.
 """
 
 from __future__ import annotations
