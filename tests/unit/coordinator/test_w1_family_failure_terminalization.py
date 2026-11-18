@@ -5,15 +5,14 @@ decode-looping ones `cancelling` forever). The Mission Control root now schedule
 `coordinator.terminalize_failed_family` on its family queue before failing, and run control
 (the real in-memory reducer here) ends the run `failed` with the typed cause, or `cancelled`
 when a cancel was accepted, after releasing the unused baseline. A unit still settling keeps
-the run open (retryable); history recorded before the patch fails at once, as it did.
+the run open (retryable); history recorded before the patch fails at once, as it did. The
+root's own scheduling runs on Temporal in
+tests/integration/temporal/test_root_family_failure_terminalization.py.
 """
 
 from __future__ import annotations
 
-from dataclasses import replace
-from types import SimpleNamespace
 from typing import Any
-from unittest.mock import AsyncMock
 
 import pytest
 from temporalio import activity
@@ -33,7 +32,6 @@ from mission_control.adapters.temporal.family_failure_activity import FAMILY_FAI
 from mission_control.adapters.temporal.orchestration_activities import StageGraphActivities
 from mission_control.adapters.temporal.registration.activities import coordinator_activities
 from mission_control.adapters.temporal.workflows import mission_run
-from mission_control.adapters.temporal.workflows.belllabs_run import BellLabsRunWorkflow
 from mission_control.application.execution.family_failure import (
     FamilyFailureLiabilityPending,
     FamilyFailureTerminalization,
@@ -51,8 +49,7 @@ from mission_control.domain.programs.family_failure import (
 )
 from tests.fixtures.goal_directed_journaled import SCOPE, goal_start_action
 from tests.support.run_control import command
-from tests.support.unit.coordinator.root_result_materialization import root
-from tests.support.unit.coordinator.w1_family_failure_terminalization import NOW, _request
+from tests.support.unit.coordinator.w1_family_failure_terminalization import _request
 from tests.support.unit.orchestration.rrm_016_goal_directed_settlement import (
     _claim,
     _composition,
@@ -244,82 +241,6 @@ def test_w1_d39_a_failed_operation_child_is_named_by_its_innermost_typed_cause()
     named, message = mission_run.family_failure_cause(family)
     assert named == "activity_error:operation_execution_in_progress"
     assert message == "held"
-
-
-def _patch_root(monkeypatch: pytest.MonkeyPatch, admitted: Any, *, patched: bool) -> None:
-    monkeypatch.setattr(
-        mission_run.workflow, "info", lambda: SimpleNamespace(workflow_id=admitted.workflow_id)
-    )
-    monkeypatch.setattr(mission_run.workflow, "patched", lambda _: patched)
-    monkeypatch.setattr(mission_run.workflow, "now", lambda: NOW)
-    monkeypatch.setattr(mission_run.workflow, "logger", SimpleNamespace(warning=lambda *a: None))
-
-
-@pytest.mark.parametrize("family", ["StageGraph", "GoalDirected"])
-@pytest.mark.asyncio
-async def test_the_root_terminalizes_the_run_then_fails_with_the_family_error(
-    monkeypatch: pytest.MonkeyPatch, family: str
-) -> None:
-    admitted = root(family)
-    failure = _child_error(ApplicationError("boom", type="goal_operation_unreported"))
-    calls: list[tuple[str, Any, dict[str, Any]]] = []
-
-    async def run_activity(name: str, request: Any, **options: Any) -> Any:
-        calls.append((name, request, options))
-        return FamilyFailureTerminalizationResult(accepted=True, resulting_run_version=9)
-
-    monkeypatch.setattr(BellLabsRunWorkflow, "run", AsyncMock(side_effect=failure))
-    _patch_root(monkeypatch, admitted, patched=True)
-    monkeypatch.setattr(mission_run.workflow, "start_activity", run_activity)
-    with pytest.raises(ChildWorkflowError) as raised:
-        await mission_run.MissionRunWorkflow().run(admitted)
-    assert raised.value is failure
-    ((name, request, options),) = calls
-    assert name == FAMILY_FAILURE_ACTIVITY
-    assert options["task_queue"] == admitted.family_task_queue
-    assert "NotFoundError" in options["retry_policy"].non_retryable_error_types
-    assert request == replace(
-        request,
-        request_scope=admitted.request_scope,
-        run_id=admitted.run_id,
-        execution_epoch=1,
-        family=family,
-        family_workflow_id=admitted.family_workflow_id,
-        cause="application_error:goal_operation_unreported",
-        occurred_at=NOW,
-    )
-    assert "boom" not in repr(request)  # the message is digested, never carried
-
-
-@pytest.mark.asyncio
-async def test_an_exhausted_terminalization_never_masks_the_family_failure(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    admitted = root("GoalDirected")
-    failure = _child_error(TerminatedError("operator"))
-    exhausted = _activity_error(RuntimeError("budget_not_settled"))
-    monkeypatch.setattr(BellLabsRunWorkflow, "run", AsyncMock(side_effect=failure))
-    _patch_root(monkeypatch, admitted, patched=True)
-    exhausted_activity = AsyncMock(side_effect=exhausted)
-    monkeypatch.setattr(mission_run.workflow, "start_activity", exhausted_activity)
-    with pytest.raises(ChildWorkflowError) as raised:
-        await mission_run.MissionRunWorkflow().run(admitted)
-    assert raised.value is failure
-
-
-@pytest.mark.asyncio
-async def test_pre_patch_root_history_fails_without_the_new_activity(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    admitted = root("GoalDirected")
-    failure = _child_error(ApplicationError("boom"))
-    start_activity = AsyncMock()
-    monkeypatch.setattr(BellLabsRunWorkflow, "run", AsyncMock(side_effect=failure))
-    _patch_root(monkeypatch, admitted, patched=False)
-    monkeypatch.setattr(mission_run.workflow, "start_activity", start_activity)
-    with pytest.raises(ChildWorkflowError):
-        await mission_run.MissionRunWorkflow().run(admitted)
-    start_activity.assert_not_called()
 
 
 @pytest.mark.parametrize(
