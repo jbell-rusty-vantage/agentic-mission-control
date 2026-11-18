@@ -16,6 +16,7 @@ import tomllib
 from pathlib import Path
 
 import pytest
+from tests.support.architecture.package_boundaries import APPLICATION_NEEDLES
 
 ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = ROOT / "src" / "mission_control"
@@ -445,13 +446,6 @@ def test_runtime_resource_scans_have_real_inputs():
         assert json.loads(document.read_text(encoding="utf-8"))
 
 
-# OC-R4 (design §1 application row; §4: nothing outside deployments/<app>/ and the KS binding
-# package names an application): the kernel names no application, K01 binding or apply contract
-# as a value. Docstrings and comments may cite them; the one place they are named as data is
-# deployments/<app>/application.toml.
-# Matched case-insensitively as substrings of every non-docstring string constant, f-string
-# parts included (`ast.walk` visits a JoinedStr's Constant parts).
-APPLICATION_NEEDLES = ("biotech", "ai-engineer", "ai_engineer", "aiengineer", "ingestion-intent")
 # (path, exact value) -> why the kernel may hold it.
 APPLICATION_NAME_ALLOWED = {
     (

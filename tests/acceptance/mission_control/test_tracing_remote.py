@@ -29,21 +29,6 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-from tests.acceptance.mission_control.test_cognition_points import (
-    BASE,
-    all_points,
-    at_wait,
-    completed,
-    is_root,
-    launch,
-    satisfy_wait,
-)
-from tests.acceptance.mission_control.test_tracing import (
-    _write_evidence,
-    cli,
-    find_keys,
-    parse_cli_json,
-)
 from tests.fixtures.scoped_api_stack import (
     ScopedStack,
     inspect,
@@ -53,6 +38,21 @@ from tests.fixtures.scoped_api_stack import (
 )
 from tests.fixtures.stage2_outputs import write_outputs
 from tests.fixtures.tcp_proxy import SaverProxy
+from tests.support.acceptance.mission_control.cognition_points import (
+    BASE,
+    all_points,
+    at_wait,
+    completed,
+    is_root,
+    launch,
+    satisfy_wait,
+)
+from tests.support.acceptance.mission_control.tracing import (
+    _write_evidence,
+    cli,
+    find_keys,
+    parse_cli_json,
+)
 
 pytestmark = [pytest.mark.psycopg_selector, pytest.mark.common_db]
 

@@ -39,7 +39,9 @@ from typing import Any
 from uuid import uuid4
 
 import pytest
-from tests.acceptance.mission_control.test_cognition_points import (
+from tests.fixtures import rrm009_production_stack as technical
+from tests.fixtures.scoped_api_stack import ScopedStack, scoped_stack, until
+from tests.support.acceptance.mission_control.cognition_points import (
     BASE,
     all_points,
     completed,
@@ -47,8 +49,6 @@ from tests.acceptance.mission_control.test_cognition_points import (
     launch,
     snapshot,
 )
-from tests.fixtures import rrm009_production_stack as technical
-from tests.fixtures.scoped_api_stack import ScopedStack, scoped_stack, until
 
 from mission_control.adapters.postgres.orchestration.goal_directed_repository import (
     PostgresGoalDirectedDocumentRepository,

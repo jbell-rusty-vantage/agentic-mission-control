@@ -38,9 +38,9 @@ from mission_control.domain.authoring.brief import (
     MissionPurpose,
 )
 from mission_control.domain.execution.lanes import DELIVERY_COMMANDS, LANE_PROFILES
-from tests.architecture.test_package_boundaries import APPLICATION_NEEDLES
 from tests.conformance.lanes.compile.stub import NARROW_DECLARATION, STUB_DECLARATION
 from tests.conformance.resolution.fixtures import MODELS
+from tests.support.architecture.package_boundaries import APPLICATION_NEEDLES
 from tests.support.unit.selection.selection_workspace import (
     OPEN_WORKFLOW,
     RESEARCH,

@@ -19,7 +19,7 @@ class LinkedRepairProbe:
     async def verify(
         self, stack: Any, scope: str, runs: dict[str, str], script: Any, lane: Any
     ) -> None:
-        from tests.acceptance.mission_control.test_overnight_goal_directed import goal_records
+        from tests.support.acceptance.mission_control.overnight_goal_directed import goal_records
 
         store = PostgresOutputContractStore(stack.worker_pool)
         held_receipt = script.source.registered[1]

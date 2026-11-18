@@ -23,12 +23,6 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-from tests.acceptance.mission_control.test_cognition_points import BASE
-from tests.acceptance.mission_control.test_tracing import (
-    db_rows,
-    temporal_diagnostics,
-    terminal,
-)
 from tests.fixtures.scoped_api_stack import (
     ScopedStack,
     inspect,
@@ -38,6 +32,8 @@ from tests.fixtures.scoped_api_stack import (
     until,
 )
 from tests.fixtures.stage2_outputs import write_outputs
+from tests.support.acceptance.mission_control.cognition_points import BASE
+from tests.support.acceptance.mission_control.tracing import db_rows, temporal_diagnostics, terminal
 
 from mission_control.application.programs.goal_directed import OUTPUT_UNPARSEABLE
 from mission_control.contracts.identities import mission_root_id

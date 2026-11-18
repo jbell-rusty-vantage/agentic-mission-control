@@ -11,17 +11,14 @@ from hashlib import sha256
 import pytest
 from temporalio import activity
 from temporalio.worker import Replayer
-from tests.acceptance.mission_control.test_authenticated_scoped_runtime import (
-    admit_and_launch,
+from tests.fixtures import rrm009_production_stack as technical
+from tests.fixtures.rrm009_production_harness import canonical_evidence
+from tests.fixtures.scoped_api_stack import admit_and_launch, inspect, scoped_stack, until
+from tests.support.acceptance.mission_control.authenticated_scoped_runtime import (
     assert_persisted_run_evidence,
     command,
     condition,
-    inspect,
-    scoped_stack,
-    until,
 )
-from tests.fixtures import rrm009_production_stack as technical
-from tests.fixtures.rrm009_production_harness import canonical_evidence
 from tests.support.unit.orchestration.goal_schema_completion import (
     OUTPUT,
     SUMMARY,

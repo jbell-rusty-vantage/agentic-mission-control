@@ -222,7 +222,6 @@ async def run_aieng(
 ) -> dict[str, Any]:
     """Full source graph with live controls, then the recorded-point Tavily fork of literature."""
     import pytest
-    from tests.acceptance.mission_control.test_overnight_stagegraph import run_stagegraph_fixture
     from tests.fixtures.aieng_full_manifest import (
         INTERRUPTED,
         QUEUED,
@@ -241,6 +240,7 @@ async def run_aieng(
     from tests.fixtures.qualia_scenarios import controller, fork_from_completed_stage
     from tests.fixtures.qualia_stagegraph import build_bindings, lifecycle_for
     from tests.fixtures.rrm009_production_stack import technical_binding
+    from tests.support.acceptance.mission_control.overnight_stagegraph import run_stagegraph_fixture
     from tests.support.manifest_runtime import host_pins
 
     from mission_control.adapters.postgres.knowledge.output_contracts import (

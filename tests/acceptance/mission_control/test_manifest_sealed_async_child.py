@@ -26,19 +26,14 @@ from typing import Any, cast
 import pytest
 from langchain_core.messages import AIMessage, BaseMessage, ToolMessage
 from langchain_core.outputs import ChatGeneration, ChatResult
-from tests.acceptance.mission_control import test_manifest_async_child as base
-from tests.acceptance.mission_control.test_postgres_children_and_artifacts import (
-    _run,
-    _terminal,
-    _wait_for,
-)
 from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog, publish_output_schemas
 from tests.fixtures.manifest_runtime import ChainScript, GoalScript, promise_submitter
 from tests.fixtures.mission_control_local_agent_server import local_agent_server
 from tests.fixtures.mission_control_production_stack import open_postgres_production_stack
 from tests.fixtures.models import catalog_for
-from tests.fixtures.rrm009_production_harness import _diagnose
+from tests.fixtures.rrm009_production_harness import _diagnose, _run, _terminal, _wait_for
 from tests.fixtures.rrm009_production_stack import SCOPE, call_usage, technical_binding
+from tests.support.acceptance.mission_control import manifest_async_child as base
 from tests.support.manifest_runtime import OUTPUT_SCHEMAS, host_pins, missions_app, post, submit
 
 from mission_control.adapters.agent_server.async_subagents.sealed import (

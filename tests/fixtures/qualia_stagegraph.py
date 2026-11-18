@@ -362,9 +362,9 @@ async def run_pilot(
     resume_source: str | None = None,
     resume_run_id: str | None = None,
 ) -> dict[str, Any]:
-    from tests.acceptance.mission_control.test_overnight_stagegraph import run_stagegraph_fixture
     from tests.fixtures.mission_control_production_stack import open_postgres_production_stack
     from tests.fixtures.overnight_stagegraph_evidence import export_stagegraph
+    from tests.support.acceptance.mission_control.overnight_stagegraph import run_stagegraph_fixture
     from tests.support.manifest_runtime import host_pins
 
     from mission_control.adapters.postgres.knowledge.output_contracts import (

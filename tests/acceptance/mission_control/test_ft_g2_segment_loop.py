@@ -13,12 +13,12 @@ from pathlib import Path
 
 import pytest
 from temporalio.worker import Replayer
-from tests.acceptance.mission_control.test_postgres_runtime_parity import (
-    goal_directed_two_iterations_scenario as goal_scenario,
-)
 from tests.fixtures.mission_control_production_stack import open_postgres_production_stack
 from tests.fixtures.rrm009_production_harness import ProductionStack
 from tests.fixtures.temporal_history import patch_ids
+from tests.support.acceptance.mission_control.postgres_runtime_parity import (
+    goal_directed_two_iterations_scenario as goal_scenario,
+)
 
 from mission_control.adapters.temporal.workflow_sandbox import coordinator_workflow_runner
 from mission_control.adapters.temporal.workflows.operation import (

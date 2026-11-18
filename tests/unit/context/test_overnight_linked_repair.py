@@ -7,7 +7,7 @@ from mission_control.domain.authoring.manifest import (
     resolve_environments,
 )
 from mission_control.domain.authoring.mission_definition import manifest_to_definitions
-from tests.acceptance.mission_control.test_overnight_linked import linked_manifest
+from tests.support.acceptance.mission_control.overnight_linked import linked_manifest
 
 
 def test_held_repair_is_explicit_subject_with_independent_required_receiver_outputs() -> None:

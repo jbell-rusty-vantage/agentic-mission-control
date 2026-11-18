@@ -23,17 +23,17 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-from tests.acceptance.mission_control.test_cognition_points import (
+from tests.fixtures.live_models import write_json
+from tests.fixtures.scoped_api_stack import ScopedStack, scoped_stack, until
+from tests.fixtures.stage2_outputs import run_directory
+from tests.fixtures.stream_capture import StreamCapture, compare, mission_socket, problems
+from tests.support.acceptance.mission_control.cognition_points import (
     BASE,
     all_points,
     completed,
     launch,
 )
-from tests.acceptance.mission_control.test_tracing import TRACING, transcript_entries
-from tests.fixtures.live_models import write_json
-from tests.fixtures.scoped_api_stack import ScopedStack, scoped_stack, until
-from tests.fixtures.stage2_outputs import run_directory
-from tests.fixtures.stream_capture import StreamCapture, compare, mission_socket, problems
+from tests.support.acceptance.mission_control.tracing import TRACING, transcript_entries
 
 pytestmark = [pytest.mark.psycopg_selector, pytest.mark.common_db]
 
@@ -190,7 +190,7 @@ async def test_fx_tr_cancel_t0(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) 
     inside S1's running turn; no model call starts after the cancel is accepted and the unit
     settles `cancelled`, not `completed`."""
 
-    from tests.acceptance.mission_control.test_tracing import (
+    from tests.support.acceptance.mission_control.tracing import (
         cancel_immediately,
         settlements_for_run,
         terminal,
@@ -226,7 +226,7 @@ async def test_fx_tr_disconnect_t0(tmp_path: Path, monkeypatch: pytest.MonkeyPat
     retry), the run terminates, the settlement records the usage of the calls that completed
     before the failure, and the partial turn has points that hold its frames."""
 
-    from tests.acceptance.mission_control.test_tracing import (
+    from tests.support.acceptance.mission_control.tracing import (
         frames_for_run,
         settlements_for_run,
         terminal,
@@ -261,8 +261,8 @@ async def test_failed_producer_behind_a_declared_wait_terminalizes(
     FX-TR-DISCONNECT attempt 1 parked here at the wait). The family skips a wait whose stages
     can never be released and settles the run `failed`, `review` skipped, the wait never set."""
 
-    from tests.acceptance.mission_control.test_tracing import settlements_for_run, terminal
     from tests.fixtures.scoped_api_stack import inspect
+    from tests.support.acceptance.mission_control.tracing import settlements_for_run, terminal
 
     monkeypatch.setenv("MISSION_CONTROL_TECHNICAL_FAIL_AT_TOOLS", "1")
     async with scoped_stack(tmp_path, monkeypatch) as stack:

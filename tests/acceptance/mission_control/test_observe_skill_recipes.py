@@ -8,8 +8,8 @@ import json
 from pathlib import Path
 
 import pytest
-from tests.acceptance.mission_control.test_wake_channels import finished, missionctl
 from tests.fixtures.scoped_api_stack import prepare_run, scoped_stack, serve_loopback
+from tests.support.acceptance.mission_control.wake_channels import finished, missionctl
 
 pytestmark = [pytest.mark.psycopg_selector, pytest.mark.common_db]
 EXAMPLES = tuple(

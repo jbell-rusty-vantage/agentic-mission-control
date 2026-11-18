@@ -6,95 +6,11 @@ import json
 from typing import Any
 
 import pytest
-from tests.acceptance.mission_control.test_overnight_goal_directed import goal_manifest
-from tests.acceptance.mission_control.test_overnight_stagegraph import stagegraph_manifest
+from tests.support.acceptance.mission_control.overnight_linked import linked_manifest
 
-from mission_control.domain.authoring.manifest import canonical_manifest_bytes, load_manifest_yaml
+from mission_control.domain.authoring.manifest import load_manifest_yaml
 
 pytestmark = pytest.mark.psycopg_selector
-
-
-def linked_manifest(pack: dict[str, Any], *, scenario: str = "positive") -> str:
-    source = load_manifest_yaml(goal_manifest(pack))["mission"]
-    source["key"] = "source"
-    source["title"] = "Grounded report accepted by independent verifier and review"
-    source["environment"]["governors"].update(iterations=1, patience=1)
-    source["environment"]["budget"]["usd"] = 3
-    source["environment"]["budget"]["tool_calls"] = 12
-    consumer = load_manifest_yaml(stagegraph_manifest(pack))["mission"]
-    consumer["key"] = "consumer"
-    consumer["title"] = "Independent mission summarizes one accepted linked report"
-    consumer["goals"] = [consumer["goals"][1]]
-    consumer["program"]["objectives"] = [consumer["goals"][0]["key"]]
-    consumer["environment"]["budget"]["usd"] = 2
-    consumer["environment"]["budget"]["tool_calls"] = 12
-    consume, review = consumer["program"]["nodes"][2:]
-    consume["depends_on"] = []
-    consume["inputs"] = [{"name": "report", "from": "source.report", "expand": "reference"}]
-    consume["instruction"] = (
-        "Read /.mission/transfer.json and use knowledge_read on its exact report access_ref. "
-        "Submit consume.comparison as a short attributed summary of the actual source bytes."
-    )
-    review["task"]["packet"] = ["consume.comparison"]
-    consumer["program"]["nodes"] = [consume, review]
-    if scenario == "held-repair":
-        from copy import deepcopy
-
-        source["title"] = "Bounded unsupported source retained for explicit repair"
-        consumer["title"] = "Repair exact held report using full source findings"
-        consume["outputs"].extend(
-            deepcopy(item)
-            for item in source["program"]["outputs"]
-            if item["name"] in {"report", "progress_note"}
-        )
-        consume["instruction"] = (
-            "Read the exact held report and full findings from /.mission/transfer.json. "
-            "These are repair subjects, not accepted evidence. Propose a grounded successor "
-            "with supersedes bound to the actual source receipt; submit consume.report, "
-            "consume.progress_note and consume.comparison for normal checks and review."
-        )
-        review["task"]["packet"].extend(["consume.report", "consume.progress_note"])
-    if scenario == "adoption":
-        from copy import deepcopy
-
-        promised = deepcopy(
-            next(item for item in source["program"]["outputs"] if item["name"] == "report")
-        )
-        promised["name"] = "adopted_report"
-        consume["outputs"].append(promised)
-        review["task"]["packet"].append("consume.adopted_report")
-    return canonical_manifest_bytes(
-        {
-            "manifest": "mission/v1",
-            "missions": [source, consumer],
-            "links": [
-                {
-                    "from": "source",
-                    "to": "consumer",
-                    "kind": "supplies",
-                    "outputs": ["report"],
-                    "on": (
-                        {"goal_accepted": {"goal_key": source["goals"][0]["key"]}}
-                        if scenario.startswith("cancel-")
-                        else "execution_complete"
-                        if scenario == "held-repair"
-                        else "mission_accepted"
-                    ),
-                    "on_upstream_cancel": (
-                        "cancel_downstream" if scenario == "cancel-propagate" else "continue"
-                    ),
-                    "receiving_purpose": "repair"
-                    if scenario == "held-repair"
-                    else "dependent_input",
-                    "selector": "finalized_snapshot"
-                    if scenario == "held-repair"
-                    else "accepted_snapshot",
-                    "placement": "handle",
-                    "alternatives": ["file"],
-                }
-            ],
-        }
-    ).decode()
 
 
 def test_linked_manifest_keeps_acceptance_gate_and_independent_consumer() -> None:
@@ -198,7 +114,7 @@ async def verify_linked(
                     scope, runs[name], obligation.key, obligation.revision
                 )
                 assert decision is not None and decision[1].disposition == "fulfilled"
-    from tests.acceptance.mission_control.test_overnight_goal_directed import goal_records
+    from tests.support.acceptance.mission_control.overnight_goal_directed import goal_records
 
     source_result = await goal_records(stack, scope, runs["source"])
     assert source_result["result"] is not None
@@ -216,7 +132,7 @@ async def review_linked(
     actor: Any,
     records: list[dict[str, Any]],
 ) -> None:
-    from tests.acceptance.mission_control.test_overnight_goal_directed import goal_records
+    from tests.support.acceptance.mission_control.overnight_goal_directed import goal_records
 
     from mission_control.adapters.postgres.knowledge.output_contracts import (
         PostgresOutputContractStore,
@@ -281,11 +197,6 @@ async def _run_linked_case(tmp_path: Any, monkeypatch: Any, scenario: str) -> No
     from pathlib import Path
     from uuid import uuid4
 
-    from tests.acceptance.mission_control.test_overnight_goal_directed import goal_launch_bindings
-    from tests.acceptance.mission_control.test_overnight_stagegraph import (
-        ROOT,
-        production_lifecycle,
-    )
     from tests.fixtures.knowledge_binding import model_content
     from tests.fixtures.manifest_runtime import AUTHOR
     from tests.fixtures.mission_control_common_db import canonical_scope
@@ -295,6 +206,13 @@ async def _run_linked_case(tmp_path: Any, monkeypatch: Any, scenario: str) -> No
     from tests.fixtures.overnight_linked_probes import LinkedProbe
     from tests.fixtures.overnight_trusted import install_scripted_trusted
     from tests.fixtures.rrm009_production_stack import technical_binding
+    from tests.support.acceptance.mission_control.overnight_goal_directed import (
+        goal_launch_bindings,
+    )
+    from tests.support.acceptance.mission_control.overnight_stagegraph import (
+        ROOT,
+        production_lifecycle,
+    )
     from tests.support.integration.deep_agents.report_source_real_service import command, response
     from tests.support.manifest_runtime import host_pins
 

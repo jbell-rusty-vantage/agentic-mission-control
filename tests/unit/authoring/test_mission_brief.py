@@ -43,7 +43,7 @@ from mission_control.domain.authoring.mission_definition import (
     MissionDefinition,
     manifest_to_definitions,
 )
-from tests.architecture.test_package_boundaries import APPLICATION_NEEDLES
+from tests.support.architecture.package_boundaries import APPLICATION_NEEDLES
 from tests.support.manifests.compile import MINIMAL, scope, service
 from tests.support.unit.authoring.mission_brief import APPLICATION, BRIEF, document
 
