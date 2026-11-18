@@ -9,12 +9,26 @@ from mission_control.domain.execution.lanes import CursorExecutionBinding
 from tests.fixtures.lane_bindings import lane_fields
 
 
-async def test_actual_manifest_preflight_and_require_match_sealed_cursor_local_identity(
-    monkeypatch,
-):
+async def _no_installation_blockers() -> tuple[str, ...]:
+    return ()
+
+
+def _composed_preflight(repository, bound, scope):
+    """The production composition over in-memory owner evidence and reviewed bindings."""
+    from mission_control.bootstrap.prerequisites import compose_prerequisite_preflight
+
+    return compose_prerequisite_preflight(
+        None,
+        binding=None,
+        owner_evidence=repository,
+        launch_bindings=bound,
+        catalog_scope=scope.rsplit("/", 1)[0] + "/catalog",
+        installation_check=_no_installation_blockers,
+    )
+
+
+async def test_actual_manifest_preflight_and_require_match_sealed_cursor_local_identity():
     from mission_control.application.authoring.manifest_service import MissionManifestService
-    from mission_control.application.prerequisites.preflight import BoundCursorPrerequisiteIdentity
-    from mission_control.bootstrap import prerequisites as composition
     from mission_control.domain.execution.data_class import DEFAULT_DATA_CLASS_POLICY
     from tests.support.manifests.v2_launch import SCOPE, _compile, bindings, example, templates_of
 
@@ -41,19 +55,7 @@ async def test_actual_manifest_preflight_and_require_match_sealed_cursor_local_i
     compilation = await _compile(yaml, SCOPE, DEFAULT_DATA_CLASS_POLICY)
     assert compilation.ok, [(i.pointer, i.message) for i in compilation.report.blockers]
     repository = InMemoryOwnerPrerequisiteRepository()
-    monkeypatch.setattr(composition, "PostgresOwnerPrerequisiteRepository", lambda pool: repository)
-    monkeypatch.setattr(composition.ManifestLaunchBindings, "load", lambda path: bound)
-    monkeypatch.setattr(composition, "configured_network_hosts", lambda settings: None)
-    monkeypatch.setattr(composition, "compose_bundle_materializer", lambda settings: None)
-    preflight = composition.compose_prerequisite_preflight(
-        None,
-        binding=None,
-        settings=SimpleNamespace(
-            manifest_launch_bindings_path="reviewed.json",
-            mission_control_catalog_scope=SCOPE.rsplit("/", 1)[0] + "/catalog",
-        ),
-    )
-    preflight._installation_check = None
+    preflight = _composed_preflight(repository, bound, SCOPE)
     compiler = SimpleNamespace(compile=AsyncMock(return_value=compilation))
     service = MissionManifestService(
         compiler=compiler, request_scope=SCOPE, prerequisites=preflight
@@ -117,7 +119,10 @@ async def test_actual_manifest_preflight_and_require_match_sealed_cursor_local_i
             )
         }
     )
-    preflight._native_identity = BoundCursorPrerequisiteIdentity(changed)
+    preflight = _composed_preflight(repository, changed, SCOPE)
+    service = MissionManifestService(
+        compiler=compiler, request_scope=SCOPE, prerequisites=preflight
+    )
     fresh = await service.preflight(
         yaml, actor_id="owner", permissions=frozenset({"mission.read", "catalog.read"})
     )

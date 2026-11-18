@@ -1,6 +1,6 @@
 """Compose trusted owner verification using installation configuration and restricted pools."""
 
-from collections.abc import Callable
+from collections.abc import Awaitable, Callable
 from contextlib import AsyncExitStack
 
 import asyncpg
@@ -25,6 +25,7 @@ from mission_control.application.prerequisites.probes import (
     ConfiguredOwnerProbes,
     OwnerProbeConfiguration,
 )
+from mission_control.application.prerequisites.service import OwnerPrerequisiteRepository
 from mission_control.application.prerequisites.setup import ProbeResult, ProbeUnavailable
 from mission_control.bootstrap.bundle_custody import compose_bundle_materializer
 from mission_control.bootstrap.common_installation import inspect_common_installation
@@ -81,10 +82,19 @@ def compose_prerequisite_preflight(
     *,
     binding: ApplicationBinding | None,
     settings: Settings | None = None,
+    owner_evidence: OwnerPrerequisiteRepository | None = None,
+    launch_bindings: ManifestLaunchBindings | None = None,
+    catalog_scope: str | None = None,
+    installation_check: Callable[[], Awaitable[tuple[str, ...]]] | None = None,
 ) -> PrerequisitePreflight:
-    """One complete guard for API, worker chain relays and trusted direct launchers."""
+    """One complete guard for API, worker chain relays and trusted direct launchers.
+
+    The keyword seams default to the installation's own sources: owner evidence in
+    PostgreSQL, the reviewed launch bindings file named by ``settings``, the catalog scope
+    from ``settings`` or ``binding``, and the fresh-installation check over ``pool``.
+    """
     bundles = compose_bundle_materializer(settings) if settings else None
-    bindings = (
+    bindings = launch_bindings or (
         ManifestLaunchBindings.load(settings.manifest_launch_bindings_path)
         if settings and settings.manifest_launch_bindings_path
         else None
@@ -93,6 +103,8 @@ def compose_prerequisite_preflight(
     scope = f"mc/{binding.installation_id}/{binding.application_id}/catalog" if binding else ""
     if settings and settings.mission_control_catalog_scope:
         scope = settings.mission_control_catalog_scope
+    if catalog_scope is not None:
+        scope = catalog_scope
     seed_urls: frozenset[str] = frozenset()
     managed = (
         getattr(bindings.providers, "claude_managed", None)
@@ -105,13 +117,13 @@ def compose_prerequisite_preflight(
             item["url"] for item in projection.get("agent", {}).get("mcp_servers", [])
         )
     return PrerequisitePreflight(
-        PostgresOwnerPrerequisiteRepository(pool),
+        owner_evidence if owner_evidence is not None else PostgresOwnerPrerequisiteRepository(pool),
         kits=EnvironmentKitCatalog(
             PostgresDefinitionRepository(pool, catalog_scope=scope), bundles=bundles
         ),
         bundles=bundles,
         network_hosts=configured_network_hosts(settings),
-        installation_check=FreshInstallationCheck(pool, binding),
+        installation_check=installation_check or FreshInstallationCheck(pool, binding),
         knowledge_repository=repository.model_dump(mode="json") if repository else None,
         oauth_requirements=CatalogOAuthRequirements(
             PostgresDefinitionRepository(pool, catalog_scope=scope), seed_urls=seed_urls

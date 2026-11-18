@@ -42,6 +42,24 @@ from tests.support.manifests.interfaces import FakeLifecycle, manifests, princip
 from tests.support.unit.prerequisites.preflight import definition
 
 
+async def _no_installation_blockers() -> tuple[str, ...]:
+    return ()
+
+
+def _composed_preflight(repository, bound, scope):
+    """The production composition over in-memory owner evidence and reviewed bindings."""
+    from mission_control.bootstrap.prerequisites import compose_prerequisite_preflight
+
+    return compose_prerequisite_preflight(
+        None,
+        binding=None,
+        owner_evidence=repository,
+        launch_bindings=bound,
+        catalog_scope=scope.rsplit("/", 1)[0] + "/catalog",
+        installation_check=_no_installation_blockers,
+    )
+
+
 async def test_fresh_managed_installation_lists_full_owner_steps_and_readiness():
     repository = InMemoryOwnerPrerequisiteRepository()
     preflight = PrerequisitePreflight(repository)
@@ -62,10 +80,8 @@ async def test_fresh_managed_installation_lists_full_owner_steps_and_readiness()
     assert not (await repository.list("another-scope"))
 
 
-async def test_actual_manifest_preflight_and_require_match_sealed_codex_identity(monkeypatch):
+async def test_actual_manifest_preflight_and_require_match_sealed_codex_identity():
     from mission_control.application.authoring.manifest_service import MissionManifestService
-    from mission_control.application.prerequisites.preflight import BoundCodexPrerequisiteIdentity
-    from mission_control.bootstrap import prerequisites as composition
     from mission_control.domain.execution.data_class import DEFAULT_DATA_CLASS_POLICY
     from tests.support.manifests.v2_launch import SCOPE, _compile, bindings, example, templates_of
 
@@ -74,19 +90,7 @@ async def test_actual_manifest_preflight_and_require_match_sealed_codex_identity
     compilation = await _compile(yaml, SCOPE, DEFAULT_DATA_CLASS_POLICY)
     assert compilation.ok, [(i.pointer, i.message) for i in compilation.report.blockers]
     repository = InMemoryOwnerPrerequisiteRepository()
-    monkeypatch.setattr(composition, "PostgresOwnerPrerequisiteRepository", lambda pool: repository)
-    monkeypatch.setattr(composition.ManifestLaunchBindings, "load", lambda path: bound)
-    monkeypatch.setattr(composition, "configured_network_hosts", lambda settings: None)
-    monkeypatch.setattr(composition, "compose_bundle_materializer", lambda settings: None)
-    preflight = composition.compose_prerequisite_preflight(
-        None,
-        binding=None,
-        settings=SimpleNamespace(
-            manifest_launch_bindings_path="reviewed.json",
-            mission_control_catalog_scope=SCOPE.rsplit("/", 1)[0] + "/catalog",
-        ),
-    )
-    preflight._installation_check = None
+    preflight = _composed_preflight(repository, bound, SCOPE)
     compiler = SimpleNamespace(compile=AsyncMock(return_value=compilation))
     service = MissionManifestService(
         compiler=compiler, request_scope=SCOPE, prerequisites=preflight
@@ -133,7 +137,10 @@ async def test_actual_manifest_preflight_and_require_match_sealed_codex_identity
             )
         }
     )
-    preflight._native_identity = BoundCodexPrerequisiteIdentity(changed)
+    preflight = _composed_preflight(repository, changed, SCOPE)
+    service = MissionManifestService(
+        compiler=compiler, request_scope=SCOPE, prerequisites=preflight
+    )
     fresh = await service.preflight(
         yaml, actor_id="owner", permissions=frozenset({"mission.read", "catalog.read"})
     )
@@ -376,12 +383,8 @@ def test_cli_preflight_returns_nonzero_and_preserves_owner_steps(monkeypatch, ca
     assert requests[0].url.path.endswith("/missions:preflight")
 
 
-async def test_actual_manifest_preflight_and_require_match_sealed_claude_agent_sdk_identity(
-    monkeypatch,
-):
+async def test_actual_manifest_preflight_and_require_match_sealed_claude_agent_sdk_identity():
     from mission_control.application.authoring.manifest_service import MissionManifestService
-    from mission_control.application.prerequisites.preflight import BoundClaudePrerequisiteIdentity
-    from mission_control.bootstrap import prerequisites as composition
     from mission_control.domain.execution.data_class import DEFAULT_DATA_CLASS_POLICY
     from tests.support.manifests.v2_launch import SCOPE, _compile, bindings, example, templates_of
 
@@ -407,19 +410,7 @@ async def test_actual_manifest_preflight_and_require_match_sealed_claude_agent_s
     compilation = await _compile(yaml, SCOPE, DEFAULT_DATA_CLASS_POLICY)
     assert compilation.ok, [(i.pointer, i.message) for i in compilation.report.blockers]
     repository = InMemoryOwnerPrerequisiteRepository()
-    monkeypatch.setattr(composition, "PostgresOwnerPrerequisiteRepository", lambda pool: repository)
-    monkeypatch.setattr(composition.ManifestLaunchBindings, "load", lambda path: bound)
-    monkeypatch.setattr(composition, "configured_network_hosts", lambda settings: None)
-    monkeypatch.setattr(composition, "compose_bundle_materializer", lambda settings: None)
-    preflight = composition.compose_prerequisite_preflight(
-        None,
-        binding=None,
-        settings=SimpleNamespace(
-            manifest_launch_bindings_path="reviewed.json",
-            mission_control_catalog_scope=SCOPE.rsplit("/", 1)[0] + "/catalog",
-        ),
-    )
-    preflight._installation_check = None
+    preflight = _composed_preflight(repository, bound, SCOPE)
     compiler = SimpleNamespace(compile=AsyncMock(return_value=compilation))
     service = MissionManifestService(
         compiler=compiler, request_scope=SCOPE, prerequisites=preflight
@@ -466,7 +457,10 @@ async def test_actual_manifest_preflight_and_require_match_sealed_claude_agent_s
             )
         }
     )
-    preflight._native_identity = BoundClaudePrerequisiteIdentity(changed)
+    preflight = _composed_preflight(repository, changed, SCOPE)
+    service = MissionManifestService(
+        compiler=compiler, request_scope=SCOPE, prerequisites=preflight
+    )
     fresh = await service.preflight(
         yaml, actor_id="owner", permissions=frozenset({"mission.read", "catalog.read"})
     )
