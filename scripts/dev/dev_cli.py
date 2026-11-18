@@ -12,8 +12,11 @@ only when a feature needs them (handoff 2026-11-17 §3.1; SPEC-02). Standard lib
   ./dev check [--full]                 make check (fast gate) or make ci + the provenance check
   ./dev test LAYER [-k EXPR] [PATH..]  unit, arch, conformance, integration, acceptance, db-contract
   ./dev trace show|build|check|linear  the provenance chain (docs/tools/trace.py)
+  ./dev planes list|show P|check       the data-plane registry config/planes.toml (no network)
+  ./dev db status|schema|query --plane P   read-only database sessions (scripts/dev/planes.py)
 
-Exit codes: 0 ok, 1 a check or test failed, 2 usage error, 3 the environment is not ready.
+Exit codes: 0 ok, 1 a check or test failed, 2 usage error, 3 the environment is not ready,
+4 refused by policy (`./dev db`).
 """
 
 from __future__ import annotations
@@ -28,6 +31,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 TRACE = ROOT / "docs" / "tools" / "trace.py"
+PLANES = ROOT / "scripts" / "dev" / "planes.py"
 ENTRYPOINTS = [
     "AGENTS.md",
     "docs/specs/provider-consolidation-2026-10/sprint-oc/NEXT-SESSION.md",
@@ -185,7 +189,8 @@ def doctor() -> int:
 def check(full: bool) -> int:
     if not shutil.which("make"):
         return fail("make is not on PATH", "install GNU make, or run `./dev doctor`", 3)
-    code = run(["make", "ci" if full else "check"])
+    planes_code = run([sys.executable, "-X", "utf8", str(PLANES), "planes", "check"])
+    code = run(["make", "ci" if full else "check"]) or planes_code
     if full:
         upstream = git("rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{u}")
         revision_range = f"{upstream}..HEAD" if upstream else "HEAD~1..HEAD"
@@ -215,6 +220,22 @@ def trace(args: list[str]) -> int:
     if not args:
         args = ["--help"]
     return run([sys.executable, "-X", "utf8", str(TRACE), *args], env=dict(os.environ))
+
+
+def planes(group: str, args: list[str]) -> int:
+    """`planes` runs here (standard library); `db` needs psycopg, so it runs through `uv run`
+    unless this interpreter already has it. Credentials resolve inside planes.py, never here."""
+    command = [sys.executable, "-X", "utf8", str(PLANES), group, *args]
+    if group == "db":
+        try:
+            import psycopg  # noqa: F401
+        except ImportError:
+            if not shutil.which("uv"):
+                return fail(
+                    "`./dev db` needs psycopg from the repository environment", "make install", 3
+                )
+            command = ["uv", "run", "--no-sync", "python", "-X", "utf8", str(PLANES), group, *args]
+    return subprocess.run(command, cwd=ROOT, check=False).returncode
 
 
 # --------------------------------------------------------------------------------------- main
@@ -251,9 +272,23 @@ def main() -> int:
         description="Examples: ./dev trace show OVE-225   ./dev trace check   ./dev trace build",
         add_help=False,
     )
+    sub.add_parser(
+        "planes",
+        help="the data-plane registry: list | show PLANE | check (no network)",
+        description="Examples: ./dev planes list   ./dev planes show aieng-db   ./dev planes check",
+        add_help=False,
+    )
+    sub.add_parser(
+        "db",
+        help="read-only database sessions: status | schema | query --plane P",
+        description="Example: ./dev db status --plane lab-aieng-build04",
+        add_help=False,
+    )
     argv = sys.argv[1:]
     if argv and argv[0] == "trace":
         return trace(argv[1:])
+    if argv and argv[0] in {"planes", "db"}:
+        return planes(argv[0], argv[1:] or ["--help"])
     args = parser.parse_args(argv)
     if args.command is None:
         parser.print_help()
