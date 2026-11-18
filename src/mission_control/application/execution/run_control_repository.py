@@ -523,7 +523,11 @@ class InMemoryRunControlRepository:
         idempotency_issuer: str,
         command_id: str,
     ) -> CommandResult | None:
-        self._require_scope(request_scope, run_id)
+        # A scoped receipt lookup, as PostgreSQL: a run of another scope (or none) finds no
+        # result rather than raising (OVE-238 G3).
+        projection = self._runs.get(run_id)
+        if projection is None or projection.request_scope != request_scope:
+            return None
         if (request_scope, run_id, idempotency_issuer, command_id) in self._family_results:
             raise IdempotencyConflict(
                 "combined family command identity cannot be replayed as a plain command"
@@ -541,17 +545,20 @@ class InMemoryRunControlRepository:
         async with self._lock:
             self._require_scope(request_scope, run_id)
             key = (request_scope, run_id)
-            prior = self._temporal_ids.get(key)
-            if prior is not None and prior[1] is not None:
+            recorded = self._temporal_ids.get(key, (None, None))
+            if recorded == (workflow_id, temporal_run_id):
+                return
+            if temporal_run_id is None and recorded[0] == workflow_id:
                 # Tracing Stage 3 (R1-F14), as the Postgres repository: an idempotent
                 # re-launch that offers no run id for the same workflow is a no-op.
-                if temporal_run_id is None and prior[0] == workflow_id:
-                    return
-                if prior != (workflow_id, temporal_run_id):
-                    raise TemporalIdentityConflict(
-                        run_id, recorded=prior[1], offered=temporal_run_id
-                    )
                 return
+            if recorded[1] is not None:
+                raise TemporalIdentityConflict(
+                    run_id, recorded=recorded[1], offered=temporal_run_id
+                )
+            if recorded[0] is not None and recorded[0] != workflow_id:
+                # A recorded workflow id binds the run even before its run id is known.
+                raise TemporalIdentityConflict(run_id, recorded=recorded[0], offered=workflow_id)
             self._temporal_ids[key] = (workflow_id, temporal_run_id)
 
     def temporal_ids(self, request_scope: str, run_id: str) -> tuple[str, str | None] | None:
