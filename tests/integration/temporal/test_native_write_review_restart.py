@@ -40,11 +40,11 @@ from tests.fixtures.checkpoint_recovery import recovery_harness, stage_recovery_
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.fixtures.saved_settlement import DurableEffectDouble
 from tests.support.integration.temporal.wi04_saved_settlement_restart import (
-    _environment,
     _replays,
     _scheduled,
     _Stack,
 )
+from tests.support.temporal import start_workflow_env
 from tests.support.unit.knowledge.native_write import (
     DIGEST,
     PLAN,
@@ -148,7 +148,7 @@ async def test_a_plan_review_wait_survives_a_restart_and_applies_once(
     harness = await recovery_harness(request_scope=scope, saved_results=store, settlers=(settler,))
     effects.attach(harness.model, answer_turns=(2, 4, 6))
     request = await harness.request(stage_recovery_unit(harness.run_id, request_scope=scope))
-    environment = await _environment()
+    environment = await start_workflow_env()
     async with environment:
         stack = _Stack(harness, environment, store)
         with environment.auto_time_skipping_disabled():
@@ -327,7 +327,7 @@ async def test_explicit_native_selection_fulfills_after_review_successor_and_sav
     request = await harness.request(
         stage_recovery_unit(harness.run_id, request_scope=common_db.scope("tenant-1"))
     )
-    environment = await _environment()
+    environment = await start_workflow_env()
     async with environment:
         stack = _Stack(harness, environment, store)
         with environment.auto_time_skipping_disabled():

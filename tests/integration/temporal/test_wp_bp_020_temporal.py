@@ -5,7 +5,6 @@ from datetime import datetime
 from types import SimpleNamespace
 
 import pytest
-from temporalio.testing import WorkflowEnvironment
 from temporalio.worker import Replayer, Worker
 
 from mission_control.adapters.temporal.workflow_sandbox import coordinator_workflow_runner
@@ -45,6 +44,7 @@ from tests.support.integration.temporal.wp_bp_020_temporal import (
     _operation,
     _run_input,
 )
+from tests.support.temporal import start_workflow_env
 
 
 class RecordingGoalDocuments:
@@ -300,10 +300,7 @@ async def test_real_reconciler_binds_verifier_authority_and_recomputes_digest() 
 @pytest.mark.asyncio
 async def test_goal_workflow_runs_separate_operation_children_and_replays() -> None:
     activities = FakeGoalDirectedActivities()
-    try:
-        environment = await WorkflowEnvironment.start_time_skipping()
-    except RuntimeError as error:
-        pytest.skip(f"Temporal test server is unavailable: {error}")
+    environment = await start_workflow_env()
 
     async with environment:
         async with Worker(
@@ -348,10 +345,7 @@ async def test_goal_workflow_continue_as_new_preserves_semantic_iteration() -> N
         }
     )
     activities = FakeGoalDirectedActivities(complete_at_iteration=25)
-    try:
-        environment = await WorkflowEnvironment.start_time_skipping()
-    except RuntimeError as error:
-        pytest.skip(f"Temporal test server is unavailable: {error}")
+    environment = await start_workflow_env()
 
     async with environment:
         async with Worker(
@@ -398,10 +392,7 @@ async def test_goal_workflow_returns_governed_scope_expansion_proposal() -> None
             "max_iterations": 2,
         }
     )
-    try:
-        environment = await WorkflowEnvironment.start_time_skipping()
-    except RuntimeError as error:
-        pytest.skip(f"Temporal test server is unavailable: {error}")
+    environment = await start_workflow_env()
 
     async with environment:
         async with Worker(
@@ -430,10 +421,7 @@ async def test_goal_workflow_returns_governed_scope_expansion_proposal() -> None
 @pytest.mark.asyncio
 async def test_goal_workflow_cancels_active_operation_and_replays_reconciliation() -> None:
     activities = FakeGoalDirectedActivities(slow_operation=True)
-    try:
-        environment = await WorkflowEnvironment.start_time_skipping()
-    except RuntimeError as error:
-        pytest.skip(f"Temporal test server is unavailable: {error}")
+    environment = await start_workflow_env()
 
     async with environment:
         async with Worker(

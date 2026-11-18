@@ -16,7 +16,6 @@ from datetime import UTC, datetime, timedelta
 
 import pytest
 from temporalio.client import Client, WorkflowExecutionStatus
-from temporalio.testing import WorkflowEnvironment
 from temporalio.worker import Worker
 
 from mission_control.adapters.temporal.activities.session_retention import (
@@ -39,6 +38,7 @@ from mission_control.domain.execution.session_retention import (
     SessionRetentionPolicy,
 )
 from tests.fixtures.session_retention import FakeSessionDeleter
+from tests.support.temporal import workflow_environment
 
 ADDRESS = os.environ.get("MC_TEMPORAL_TEST_ADDRESS", "127.0.0.1:7233")
 NAMESPACE = os.environ.get("MC_TEMPORAL_TEST_NAMESPACE", "default")
@@ -71,7 +71,7 @@ def _service(
 async def test_a_hosted_session_is_deleted_only_after_custody_plus_retention(
     profile: LaneProfileName,
 ) -> None:
-    async with await WorkflowEnvironment.start_time_skipping() as env:
+    async with workflow_environment() as env:
         queue = f"session-retention-{uuid.uuid4()}"
         session_ref = f"session-{uuid.uuid4().hex[:8]}"
         deleter = FakeSessionDeleter({session_ref})
@@ -110,7 +110,7 @@ async def test_a_hosted_session_is_deleted_only_after_custody_plus_retention(
 
 
 async def test_ordering_a_session_twice_while_its_timer_runs_is_one_deletion() -> None:
-    async with await WorkflowEnvironment.start_time_skipping() as env:
+    async with workflow_environment() as env:
         queue = f"session-retention-{uuid.uuid4()}"
         deleter = FakeSessionDeleter({"sesn_1"})
         service = _service(env.client, queue, timedelta(hours=1), await env.get_current_time())
@@ -134,7 +134,7 @@ async def test_ordering_a_session_twice_while_its_timer_runs_is_one_deletion() -
 
 
 async def test_a_provider_outage_delays_the_deletion_and_never_drops_it() -> None:
-    async with await WorkflowEnvironment.start_time_skipping() as env:
+    async with workflow_environment() as env:
         queue = f"session-retention-{uuid.uuid4()}"
         deleter = FakeSessionDeleter({"sess_1"}, failures=2)
         service = _service(env.client, queue, timedelta(minutes=5), await env.get_current_time())
@@ -152,7 +152,7 @@ async def test_a_provider_outage_delays_the_deletion_and_never_drops_it() -> Non
 
 
 async def test_a_session_the_provider_no_longer_has_counts_as_deleted() -> None:
-    async with await WorkflowEnvironment.start_time_skipping() as env:
+    async with workflow_environment() as env:
         queue = f"session-retention-{uuid.uuid4()}"
         deleter = FakeSessionDeleter()
         service = _service(env.client, queue, timedelta(0), await env.get_current_time())

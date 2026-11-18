@@ -99,118 +99,115 @@ def operator() -> ActorContext:
 
 
 @pytest.mark.asyncio
-async def test_interrupt_and_inject_replaces_the_running_executor_turn_on_temporal() -> None:
-    try:
-        environment = await WorkflowEnvironment.start_time_skipping()
-    except RuntimeError as error:
-        pytest.skip(f"Temporal test server is unavailable: {error}")
-    async with environment:
-        repository = InMemoryRunControlRepository()
-        run_control = goal_run_control(repository)
-        selections, staging = FakeSelections(), InMemoryStaging()
-        packs = ContextPackService(
-            artifacts=FakeArtifacts({}, scope=None), selections=selections, staging=staging
-        )
-        mailbox = MailboxDeliveryService(repository.mailbox, run_control)
-        model = SteerableModel()
-        composition = await compose_goal_directed(
-            run_control=run_control,
-            journal=MemoryOperationJournal(),
-            lineage=CheckpointLineageService(InMemoryCheckpointLineageRepository()),
-            results=InMemoryArtifactPayloadStore(),
-            bindings=InMemoryOperationBindingRepository(),
-            saver=InMemorySaver(),
-            model=model,
-            blueprint=goal_blueprint(),
-            context_packs=packs,
-            context_inputs=staging,
-            mailbox=mailbox,
-            injections=InterruptAndInjectService(
-                mailbox,
-                packs=packs,
-                settings=InjectionSettings(poll_seconds=0.05, settle_grace_seconds=1.0),
+async def test_interrupt_and_inject_replaces_the_running_executor_turn_on_temporal(
+    workflow_env: WorkflowEnvironment,
+) -> None:
+    repository = InMemoryRunControlRepository()
+    run_control = goal_run_control(repository)
+    selections, staging = FakeSelections(), InMemoryStaging()
+    packs = ContextPackService(
+        artifacts=FakeArtifacts({}, scope=None), selections=selections, staging=staging
+    )
+    mailbox = MailboxDeliveryService(repository.mailbox, run_control)
+    model = SteerableModel()
+    composition = await compose_goal_directed(
+        run_control=run_control,
+        journal=MemoryOperationJournal(),
+        lineage=CheckpointLineageService(InMemoryCheckpointLineageRepository()),
+        results=InMemoryArtifactPayloadStore(),
+        bindings=InMemoryOperationBindingRepository(),
+        saver=InMemorySaver(),
+        model=model,
+        blueprint=goal_blueprint(),
+        context_packs=packs,
+        context_inputs=staging,
+        mailbox=mailbox,
+        injections=InterruptAndInjectService(
+            mailbox,
+            packs=packs,
+            settings=InjectionSettings(poll_seconds=0.05, settle_grace_seconds=1.0),
+        ),
+    )
+    run_id = await admit_goal_run(run_control, "ft-f2-inject")
+    facade = MissionControlService(
+        run_control,
+        BoundaryInterventionService(run_control),
+        request_scope=SCOPE,
+        mailbox=mailbox,
+    )
+    entered, gate = model.gate_on(1)  # the first executor call never returns by itself
+    async with (
+        Worker(
+            workflow_env.client,
+            task_queue=QUEUE,
+            workflows=[GoalDirectedWorkflow, OperationWorkflow],
+            workflow_runner=coordinator_workflow_runner(),
+            activities=coordinator_activities("GoalDirected", composition.family),
+        ),
+        Worker(
+            workflow_env.client,
+            task_queue=composition.binding.task_queue,
+            activities=agent_cognitive_activities(
+                OperationExecutionActivities(composition.service, worker_identity="ft-f2")
             ),
+        ),
+    ):
+        handle = await workflow_env.client.start_workflow(
+            GoalDirectedWorkflow.run,
+            goal_run_input(run_id, goal_blueprint(), baseline={"tokens.total": 20}),
+            id=f"family/{run_id}/1",
+            task_queue=QUEUE,
         )
-        run_id = await admit_goal_run(run_control, "ft-f2-inject")
-        facade = MissionControlService(
-            run_control,
-            BoundaryInterventionService(run_control),
-            request_scope=SCOPE,
-            mailbox=mailbox,
+        await asyncio.wait_for(entered.wait(), timeout=60)
+        projection = await run_control.get_run(SCOPE, run_id)
+        request = MissionCommandRequest.model_validate(
+            {
+                "request_id": str(uuid4()),
+                "expected_version": projection.version,
+                "expected_generation": 1,
+                "target": {"kind": "run", "id": run_id},
+                "kind": "interrupt_and_inject",
+                "payload": {"content": {"text": INJECTED}},
+                "reason": "redirect the executor",
+            }
         )
-        entered, gate = model.gate_on(1)  # the first executor call never returns by itself
-        async with (
-            Worker(
-                environment.client,
-                task_queue=QUEUE,
-                workflows=[GoalDirectedWorkflow, OperationWorkflow],
-                workflow_runner=coordinator_workflow_runner(),
-                activities=coordinator_activities("GoalDirected", composition.family),
-            ),
-            Worker(
-                environment.client,
-                task_queue=composition.binding.task_queue,
-                activities=agent_cognitive_activities(
-                    OperationExecutionActivities(composition.service, worker_identity="ft-f2")
-                ),
-            ),
-        ):
-            handle = await environment.client.start_workflow(
-                GoalDirectedWorkflow.run,
-                goal_run_input(run_id, goal_blueprint(), baseline={"tokens.total": 20}),
-                id=f"family/{run_id}/1",
-                task_queue=QUEUE,
-            )
-            await asyncio.wait_for(entered.wait(), timeout=60)
-            projection = await run_control.get_run(SCOPE, run_id)
-            request = MissionCommandRequest.model_validate(
-                {
-                    "request_id": str(uuid4()),
-                    "expected_version": projection.version,
-                    "expected_generation": 1,
-                    "target": {"kind": "run", "id": run_id},
-                    "kind": "interrupt_and_inject",
-                    "payload": {"content": {"text": INJECTED}},
-                    "reason": "redirect the executor",
-                }
-            )
-            first = await facade.command(run_id, request, operator())
-            duplicate = await facade.command(run_id, request, operator())
-            assert duplicate.replay and duplicate.delivery == first.delivery
-            result = await handle.result()
-            gate.set()
+        first = await facade.command(run_id, request, operator())
+        duplicate = await facade.command(run_id, request, operator())
+        assert duplicate.replay and duplicate.delivery == first.delivery
+        result = await handle.result()
+        gate.set()
 
-        assert result.goal_iterations == 2
-        assert (await run_control.get_run(SCOPE, run_id)).terminal_outcome == RunOutcome.COMPLETED
-        (entry,) = await repository.mailbox.list_entries(SCOPE, run_id)
-        assert entry.state == MailboxState.CONSUMED
-        status = await run_control.get_boundary_command(
-            SCOPE, run_id, entry.command_issuer, entry.command_id
-        )
-        assert status is not None
-        assert [item.state.value for item in status.receipts] == [
-            "accepted",
-            "queued",
-            "delivered",
-            "observed",
-            "applied",
-        ]
-        observed = status.receipts[3].delivery_report
-        assert observed.delivered_semantics == "cancel_and_replace"
-        assert observed.native_refs.cancelled_turn_ref == "turn:1"
-        assert observed.native_refs.replacement_turn_ref == "turn:2"
-        # The replacement turn carried the follow_up_turn packet with the injected item.
-        follow_ups = [
-            packet
-            for packet, _selection in selections.rows.values()
-            if packet.target.purpose == ContextPurpose.FOLLOW_UP_TURN
-        ]
-        (packet,) = follow_ups
-        (item,) = [i for i in packet.items if i.source_kind == ContextSourceKind.QUEUED_INSTRUCTION]
-        assert item.inline is not None and item.inline.text == INJECTED
-        seen: list[Any] = model.__dict__["injected"]
-        assert any(any(INJECTED in text for text in call) for call in seen)
-        # Exactly one interrupt for the duplicated request.
-        events = [record.envelope.event_type for record in repository._outbox.values()]
-        assert events.count("command.delivered") == 1
-        assert events.count("command.completed") == 1
+    assert result.goal_iterations == 2
+    assert (await run_control.get_run(SCOPE, run_id)).terminal_outcome == RunOutcome.COMPLETED
+    (entry,) = await repository.mailbox.list_entries(SCOPE, run_id)
+    assert entry.state == MailboxState.CONSUMED
+    status = await run_control.get_boundary_command(
+        SCOPE, run_id, entry.command_issuer, entry.command_id
+    )
+    assert status is not None
+    assert [item.state.value for item in status.receipts] == [
+        "accepted",
+        "queued",
+        "delivered",
+        "observed",
+        "applied",
+    ]
+    observed = status.receipts[3].delivery_report
+    assert observed.delivered_semantics == "cancel_and_replace"
+    assert observed.native_refs.cancelled_turn_ref == "turn:1"
+    assert observed.native_refs.replacement_turn_ref == "turn:2"
+    # The replacement turn carried the follow_up_turn packet with the injected item.
+    follow_ups = [
+        packet
+        for packet, _selection in selections.rows.values()
+        if packet.target.purpose == ContextPurpose.FOLLOW_UP_TURN
+    ]
+    (packet,) = follow_ups
+    (item,) = [i for i in packet.items if i.source_kind == ContextSourceKind.QUEUED_INSTRUCTION]
+    assert item.inline is not None and item.inline.text == INJECTED
+    seen: list[Any] = model.__dict__["injected"]
+    assert any(any(INJECTED in text for text in call) for call in seen)
+    # Exactly one interrupt for the duplicated request.
+    events = [record.envelope.event_type for record in repository._outbox.values()]
+    assert events.count("command.delivered") == 1
+    assert events.count("command.completed") == 1

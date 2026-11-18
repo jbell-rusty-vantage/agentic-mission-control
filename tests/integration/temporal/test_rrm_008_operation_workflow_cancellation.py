@@ -43,7 +43,6 @@ from tests.fixtures.checkpoint_recovery import (
     recovery_harness,
     stage_recovery_unit,
 )
-from tests.fixtures.temporal_history import patch_ids
 from tests.support.integration.temporal.rrm_008_operation_workflow_cancellation import (
     WORKFLOW_QUEUE,
     _replays,
@@ -51,6 +50,7 @@ from tests.support.integration.temporal.rrm_008_operation_workflow_cancellation 
     _scheduled,
     _Stack,
 )
+from tests.support.temporal import patch_ids
 from tests.support.unit.operations.checkpoint_recovery_classification import (
     _namespace,
     _write_foreign_root_checkpoint,
@@ -67,158 +67,149 @@ async def _until(predicate: Any, *, seconds: float = 60) -> None:
 
 
 @pytest.mark.asyncio
-async def test_temporal_cancel_reaches_running_cognition_and_the_unit_settles_cancelled() -> None:
+async def test_temporal_cancel_reaches_running_cognition_and_the_unit_settles_cancelled(
+    workflow_env: WorkflowEnvironment,
+) -> None:
     """REQ-CP-EXEC-008 step 3: the cancel is delivered to the Activity through its heartbeat;
     the in-flight model call is interrupted; the unit settles `cancelled` with its latest
     durable checkpoint; the workflow completes `cancelled` and replays."""
 
-    try:
-        environment = await WorkflowEnvironment.start_time_skipping()
-    except RuntimeError as error:
-        pytest.skip(f"Temporal test server is unavailable: {error}")
-    async with environment:
-        harness = await recovery_harness()
-        stack = _Stack(harness, environment)
-        unit = stage_recovery_unit(harness.run_id)
-        request = await harness.request(unit)
-        entered, _gate = harness.model.gate_on(1)
-        workflow_worker, activity_worker = stack.workers()
-        # The lineage fixture clock is fixed at its initial UTC value. Do not advance
-        # virtual heartbeat/lease deadlines while awaiting real cancellation delivery.
-        with environment.auto_time_skipping_disabled():
-            async with workflow_worker, activity_worker:
-                handle = await stack.start(request, "rrm008-cancel-during-model")
-                await asyncio.wait_for(entered.wait(), timeout=60)
-                await handle.cancel()
-                result = await asyncio.wait_for(handle.result(), timeout=120)
-                history = await _replays(handle)
-        assert result.disposition == "cancelled"
-        settled = parse_operation_result(result.result)
-        assert settled.status == "cancelled" and settled.failure_code == "cancelled"
-        assert settled.result_checkpoint is not None
-        transition = await harness.lineage.get_transition("tenant-1", unit.unit_key, 1)
-        assert transition is not None
-        assert transition.classification == CheckpointClassification.INTERRUPTED
-        assert settled.result_checkpoint == transition.result_key
-        assert len(harness.model.calls) == 1, "the interrupted call never resumed"
-        [settlement] = harness.journal.settlements.values()
-        assert settlement.status == "cancelled"
-        namespace = _namespace(request)
-        assert await harness.lineage.get_namespace_in_flight("tenant-1", namespace) is None
-        scheduled = _scheduled(history)
-        assert scheduled[0] == "operation.execute"
-        assert "operation.cancel" in scheduled, "the saga reconciled through operation.cancel"
-        assert CANCELLATION_SAGA_PATCH in patch_ids(history)
-        attempts = await harness.lineage.list_attempts("tenant-1", unit.unit_key)
-        assert all(item.unit_key == unit.unit_key for item in attempts)
-        print(
-            "RRM-008 EVIDENCE operation workflow cancel during model work:",
-            {
-                "model_calls": harness.model.calls,
-                "scheduled_activities": scheduled,
-                "attempts": [(item.attempt.attempt, item.claim_fence) for item in attempts],
-                "settlements": len(harness.journal.settlements),
-                "classification": transition.classification.value,
-            },
-        )
+    harness = await recovery_harness()
+    stack = _Stack(harness, workflow_env)
+    unit = stage_recovery_unit(harness.run_id)
+    request = await harness.request(unit)
+    entered, _gate = harness.model.gate_on(1)
+    workflow_worker, activity_worker = stack.workers()
+    # The lineage fixture clock is fixed at its initial UTC value. Do not advance
+    # virtual heartbeat/lease deadlines while awaiting real cancellation delivery.
+    with workflow_env.auto_time_skipping_disabled():
+        async with workflow_worker, activity_worker:
+            handle = await stack.start(request, "rrm008-cancel-during-model")
+            await asyncio.wait_for(entered.wait(), timeout=60)
+            await handle.cancel()
+            result = await asyncio.wait_for(handle.result(), timeout=120)
+            history = await _replays(handle)
+    assert result.disposition == "cancelled"
+    settled = parse_operation_result(result.result)
+    assert settled.status == "cancelled" and settled.failure_code == "cancelled"
+    assert settled.result_checkpoint is not None
+    transition = await harness.lineage.get_transition("tenant-1", unit.unit_key, 1)
+    assert transition is not None
+    assert transition.classification == CheckpointClassification.INTERRUPTED
+    assert settled.result_checkpoint == transition.result_key
+    assert len(harness.model.calls) == 1, "the interrupted call never resumed"
+    [settlement] = harness.journal.settlements.values()
+    assert settlement.status == "cancelled"
+    namespace = _namespace(request)
+    assert await harness.lineage.get_namespace_in_flight("tenant-1", namespace) is None
+    scheduled = _scheduled(history)
+    assert scheduled[0] == "operation.execute"
+    assert "operation.cancel" in scheduled, "the saga reconciled through operation.cancel"
+    assert CANCELLATION_SAGA_PATCH in patch_ids(history)
+    attempts = await harness.lineage.list_attempts("tenant-1", unit.unit_key)
+    assert all(item.unit_key == unit.unit_key for item in attempts)
+    print(
+        "RRM-008 EVIDENCE operation workflow cancel during model work:",
+        {
+            "model_calls": harness.model.calls,
+            "scheduled_activities": scheduled,
+            "attempts": [(item.attempt.attempt, item.claim_fence) for item in attempts],
+            "settlements": len(harness.journal.settlements),
+            "classification": transition.classification.value,
+        },
+    )
 
 
 @pytest.mark.asyncio
-async def test_cancel_before_dispatch_settles_without_cognition_and_replays() -> None:
+async def test_cancel_before_dispatch_settles_without_cognition_and_replays(
+    workflow_env: WorkflowEnvironment,
+) -> None:
     """Window: before dispatch (the `request_cancel` signal arrives before the Activity is
     scheduled). Zero invocations; exactly one `operation.cancel`; one settlement."""
 
-    try:
-        environment = await WorkflowEnvironment.start_time_skipping()
-    except RuntimeError as error:
-        pytest.skip(f"Temporal test server is unavailable: {error}")
-    async with environment:
-        harness = await recovery_harness()
-        stack = _Stack(harness, environment)
-        unit = stage_recovery_unit(harness.run_id)
-        request = await harness.request(unit)
-        workflow_worker, activity_worker = stack.workers()
-        handle = await environment.client.start_workflow(
-            OperationWorkflow.run,
-            _request(request),
-            id="rrm008-cancel-before-dispatch",
-            task_queue=WORKFLOW_QUEUE,
-            start_signal="request_cancel",
-        )
-        async with workflow_worker, activity_worker:
-            result = await asyncio.wait_for(handle.result(), timeout=120)
-            history = await _replays(handle)
-        assert result.disposition == "cancelled"
-        settled = parse_operation_result(result.result)
-        assert settled.status == "cancelled" and settled.result_checkpoint is None
-        assert harness.model.calls == [] and harness.runtime.invocations == 0
-        assert _scheduled(history) == ["operation.cancel"]
-        [settlement] = harness.journal.settlements.values()
-        assert settlement.status == "cancelled"
-        budget = await harness.run_control.get_budget("tenant-1", harness.run_id)
-        assert request.budget_reservation_id not in budget.reservations
+    harness = await recovery_harness()
+    stack = _Stack(harness, workflow_env)
+    unit = stage_recovery_unit(harness.run_id)
+    request = await harness.request(unit)
+    workflow_worker, activity_worker = stack.workers()
+    handle = await workflow_env.client.start_workflow(
+        OperationWorkflow.run,
+        _request(request),
+        id="rrm008-cancel-before-dispatch",
+        task_queue=WORKFLOW_QUEUE,
+        start_signal="request_cancel",
+    )
+    async with workflow_worker, activity_worker:
+        result = await asyncio.wait_for(handle.result(), timeout=120)
+        history = await _replays(handle)
+    assert result.disposition == "cancelled"
+    settled = parse_operation_result(result.result)
+    assert settled.status == "cancelled" and settled.result_checkpoint is None
+    assert harness.model.calls == [] and harness.runtime.invocations == 0
+    assert _scheduled(history) == ["operation.cancel"]
+    [settlement] = harness.journal.settlements.values()
+    assert settlement.status == "cancelled"
+    budget = await harness.run_control.get_budget("tenant-1", harness.run_id)
+    assert request.budget_reservation_id not in budget.reservations
 
 
 @pytest.mark.asyncio
-async def test_parked_in_doubt_unit_is_reached_by_the_cancel_and_settled_by_the_operator() -> None:
+async def test_parked_in_doubt_unit_is_reached_by_the_cancel_and_settled_by_the_operator(
+    workflow_env: WorkflowEnvironment,
+) -> None:
     """RRM-004 note: the parked `OperationWorkflow` no longer ignores the cancel. It keeps
     the incident (nothing is re-executed), and the operator's `abandon_unit` settles the unit
     `cancelled`; the workflow then completes and replays."""
 
-    try:
-        environment = await WorkflowEnvironment.start_time_skipping()
-    except RuntimeError as error:
-        pytest.skip(f"Temporal test server is unavailable: {error}")
-    async with environment:
-        harness = await recovery_harness()
-        stack = _Stack(harness, environment)
-        unit = stage_recovery_unit(harness.run_id)
-        request = await harness.request(unit)
-        await _write_foreign_root_checkpoint(harness, _namespace(request))
-        workflow_worker, activity_worker = stack.workers()
-        async with workflow_worker, activity_worker:
-            handle = await stack.start(request, "rrm008-cancel-parked")
+    harness = await recovery_harness()
+    stack = _Stack(harness, workflow_env)
+    unit = stage_recovery_unit(harness.run_id)
+    request = await harness.request(unit)
+    await _write_foreign_root_checkpoint(harness, _namespace(request))
+    workflow_worker, activity_worker = stack.workers()
+    async with workflow_worker, activity_worker:
+        handle = await stack.start(request, "rrm008-cancel-parked")
 
-            async def parked() -> bool:
-                incident = await harness.lineage.get_incident("tenant-1", unit.unit_key, 1)
-                return incident is not None
-
-            await _until(parked)
-            await handle.cancel()
-            await _until(lambda: handle.query(OperationWorkflow.cancellation_requested))
-            # The cancel re-ran the settlement once: still in doubt, no model call.
-            await _until(lambda: _attempt_count(harness, unit.unit_key, 2))
-            description = await handle.describe()
-            assert description.status is not None and description.status.name == "RUNNING"
-            assert harness.model.calls == []
-            assert harness.journal.settlements == {}
+        async def parked() -> bool:
             incident = await harness.lineage.get_incident("tenant-1", unit.unit_key, 1)
-            assert incident is not None and incident.status == "operator_required"
+            return incident is not None
 
-            decided = await harness.reconcile(
-                request,
-                "reconcile-abandon-under-cancel",
-                ReconcileUnitAction(
-                    unit_key=unit.unit_key,
-                    execution_generation=1,
-                    incident_id=incident.incident_id,
-                    decision="abandon_unit",
-                ),
-            )
-            assert decided.status == CommandStatus.ACCEPTED
-            await handle.signal(OperationWorkflow.unit_reconciliation_recorded, "hint")
-            result = await asyncio.wait_for(handle.result(), timeout=120)
-            history = await _replays(handle)
-
-        assert result.disposition == "cancelled"
-        settled = parse_operation_result(result.result)
-        assert (settled.status, settled.failure_code) == ("cancelled", "in_doubt_abandoned")
+        await _until(parked)
+        await handle.cancel()
+        await _until(lambda: handle.query(OperationWorkflow.cancellation_requested))
+        # The cancel re-ran the settlement once: still in doubt, no model call.
+        await _until(lambda: _attempt_count(harness, unit.unit_key, 2))
+        description = await handle.describe()
+        assert description.status is not None and description.status.name == "RUNNING"
         assert harness.model.calls == []
-        claim_id = _effect_claim_id(bind_operation_execution_request(request))
-        assert harness.journal.settlements[claim_id].status == "cancelled"
-        scheduled = _scheduled(history)
-        assert scheduled[0] == "operation.execute"
-        assert scheduled.count("operation.cancel") == 2, "cancel pass, then the decision"
+        assert harness.journal.settlements == {}
+        incident = await harness.lineage.get_incident("tenant-1", unit.unit_key, 1)
+        assert incident is not None and incident.status == "operator_required"
+
+        decided = await harness.reconcile(
+            request,
+            "reconcile-abandon-under-cancel",
+            ReconcileUnitAction(
+                unit_key=unit.unit_key,
+                execution_generation=1,
+                incident_id=incident.incident_id,
+                decision="abandon_unit",
+            ),
+        )
+        assert decided.status == CommandStatus.ACCEPTED
+        await handle.signal(OperationWorkflow.unit_reconciliation_recorded, "hint")
+        result = await asyncio.wait_for(handle.result(), timeout=120)
+        history = await _replays(handle)
+
+    assert result.disposition == "cancelled"
+    settled = parse_operation_result(result.result)
+    assert (settled.status, settled.failure_code) == ("cancelled", "in_doubt_abandoned")
+    assert harness.model.calls == []
+    claim_id = _effect_claim_id(bind_operation_execution_request(request))
+    assert harness.journal.settlements[claim_id].status == "cancelled"
+    scheduled = _scheduled(history)
+    assert scheduled[0] == "operation.execute"
+    assert scheduled.count("operation.cancel") == 2, "cancel pass, then the decision"
 
 
 async def _attempt_count(harness: RecoveryHarness, unit_key: str, expected: int) -> bool:
@@ -226,62 +217,59 @@ async def _attempt_count(harness: RecoveryHarness, unit_key: str, expected: int)
 
 
 @pytest.mark.asyncio
-async def test_worker_shutdown_mid_model_call_is_not_a_cancel_and_the_retry_recovers() -> None:
+async def test_worker_shutdown_mid_model_call_is_not_a_cancel_and_the_retry_recovers(
+    workflow_env: WorkflowEnvironment,
+) -> None:
     """Review F1 (REQ-CP-EXEC-011): the Activity worker shuts down while the model call is
     in flight. Temporal cancels the attempt's task with `worker_shutdown`, which is not a
     requested cancel: the holder re-raises (no `cancelled` settlement), the scheduler
     retries the Activity on the next worker, which classifies the interrupted lineage and
     completes the unit without re-appending the prompt. `operation.cancel` never runs."""
 
-    try:
-        environment = await WorkflowEnvironment.start_time_skipping()
-    except RuntimeError as error:
-        pytest.skip(f"Temporal test server is unavailable: {error}")
-    async with environment:
-        harness = await recovery_harness()
-        stack = _Stack(harness, environment)
-        unit = stage_recovery_unit(harness.run_id)
-        request = await harness.request(unit)
-        entered, _gate = harness.model.gate_on(1)
-        workflow_worker, first_activity_worker = stack.workers()
-        async with workflow_worker:
-            async with first_activity_worker:
-                handle = await stack.start(request, "rrm008-worker-shutdown")
-                await asyncio.wait_for(entered.wait(), timeout=60)
-            # The first worker is gone: nothing was settled, the unit is not cancelled.
-            assert harness.journal.settlements == {}
-            assert not await handle.query(OperationWorkflow.cancellation_requested)
-            second_activity_worker = Worker(
-                environment.client,
-                task_queue=harness.binding.task_queue,
-                activities=[stack.activities.execute, stack.activities.cancel],
-            )
-            async with second_activity_worker:
-                result = await asyncio.wait_for(handle.result(), timeout=120)
-                history = await _replays(handle)
-
-        assert result.disposition == "completed"
-        settled = parse_operation_result(result.result)
-        assert settled.status == "completed"
-        [settlement] = harness.journal.settlements.values()
-        assert settlement.status == "completed"
-        assert all(human == 1 for human, _tools in harness.model.calls), "no re-appended prompt"
-        attempts = await harness.lineage.list_attempts("tenant-1", unit.unit_key)
-        assert [(item.attempt.attempt, item.claim_fence) for item in attempts] == [
-            (1, 1),
-            (2, 2),
-        ]
-        scheduled = _scheduled(history)
-        assert scheduled == ["operation.execute"], "one Activity, retried by the scheduler"
-        print(
-            "RRM-008 EVIDENCE worker shutdown mid model call:",
-            {
-                "model_calls": harness.model.calls,
-                "attempts": [(item.attempt.attempt, item.claim_fence) for item in attempts],
-                "settlement": settlement.status,
-                "scheduled_activities": scheduled,
-            },
+    harness = await recovery_harness()
+    stack = _Stack(harness, workflow_env)
+    unit = stage_recovery_unit(harness.run_id)
+    request = await harness.request(unit)
+    entered, _gate = harness.model.gate_on(1)
+    workflow_worker, first_activity_worker = stack.workers()
+    async with workflow_worker:
+        async with first_activity_worker:
+            handle = await stack.start(request, "rrm008-worker-shutdown")
+            await asyncio.wait_for(entered.wait(), timeout=60)
+        # The first worker is gone: nothing was settled, the unit is not cancelled.
+        assert harness.journal.settlements == {}
+        assert not await handle.query(OperationWorkflow.cancellation_requested)
+        second_activity_worker = Worker(
+            workflow_env.client,
+            task_queue=harness.binding.task_queue,
+            activities=[stack.activities.execute, stack.activities.cancel],
         )
+        async with second_activity_worker:
+            result = await asyncio.wait_for(handle.result(), timeout=120)
+            history = await _replays(handle)
+
+    assert result.disposition == "completed"
+    settled = parse_operation_result(result.result)
+    assert settled.status == "completed"
+    [settlement] = harness.journal.settlements.values()
+    assert settlement.status == "completed"
+    assert all(human == 1 for human, _tools in harness.model.calls), "no re-appended prompt"
+    attempts = await harness.lineage.list_attempts("tenant-1", unit.unit_key)
+    assert [(item.attempt.attempt, item.claim_fence) for item in attempts] == [
+        (1, 1),
+        (2, 2),
+    ]
+    scheduled = _scheduled(history)
+    assert scheduled == ["operation.execute"], "one Activity, retried by the scheduler"
+    print(
+        "RRM-008 EVIDENCE worker shutdown mid model call:",
+        {
+            "model_calls": harness.model.calls,
+            "attempts": [(item.attempt.attempt, item.claim_fence) for item in attempts],
+            "settlement": settlement.status,
+            "scheduled_activities": scheduled,
+        },
+    )
 
 
 class _GatedActivities(OperationExecutionActivities):
@@ -300,57 +288,54 @@ class _GatedActivities(OperationExecutionActivities):
 
 
 @pytest.mark.asyncio
-async def test_reconciliation_hint_during_the_activity_is_not_lost() -> None:
+async def test_reconciliation_hint_during_the_activity_is_not_lost(
+    workflow_env: WorkflowEnvironment,
+) -> None:
     """Review F2: the hint counter is snapshotted before each Activity. A `reconcile_unit`
     hint that lands while the attempt runs wakes the parked unit at once (a second
     `operation.execute` without a second hint) instead of being swallowed."""
 
-    try:
-        environment = await WorkflowEnvironment.start_time_skipping()
-    except RuntimeError as error:
-        pytest.skip(f"Temporal test server is unavailable: {error}")
-    async with environment:
-        harness = await recovery_harness()
-        unit = stage_recovery_unit(harness.run_id)
-        request = await harness.request(unit)
-        await _write_foreign_root_checkpoint(harness, _namespace(request))
-        activities = _GatedActivities(harness.service)
-        workflow_worker = Worker(
-            environment.client,
+    harness = await recovery_harness()
+    unit = stage_recovery_unit(harness.run_id)
+    request = await harness.request(unit)
+    await _write_foreign_root_checkpoint(harness, _namespace(request))
+    activities = _GatedActivities(harness.service)
+    workflow_worker = Worker(
+        workflow_env.client,
+        task_queue=WORKFLOW_QUEUE,
+        workflows=[OperationWorkflow],
+        workflow_runner=coordinator_workflow_runner(),
+    )
+    activity_worker = Worker(
+        workflow_env.client,
+        task_queue=harness.binding.task_queue,
+        activities=[activities.execute, activities.cancel],
+    )
+    async with workflow_worker, activity_worker:
+        handle = await workflow_env.client.start_workflow(
+            OperationWorkflow.run,
+            _request(request),
+            id="rrm008-hint-during-activity",
             task_queue=WORKFLOW_QUEUE,
-            workflows=[OperationWorkflow],
-            workflow_runner=coordinator_workflow_runner(),
         )
-        activity_worker = Worker(
-            environment.client,
-            task_queue=harness.binding.task_queue,
-            activities=[activities.execute, activities.cancel],
-        )
-        async with workflow_worker, activity_worker:
-            handle = await environment.client.start_workflow(
-                OperationWorkflow.run,
-                _request(request),
-                id="rrm008-hint-during-activity",
-                task_queue=WORKFLOW_QUEUE,
-            )
-            await asyncio.wait_for(activities.started.wait(), timeout=60)
-            await handle.signal(OperationWorkflow.unit_reconciliation_recorded, "early")
-            activities.gate.set()
-            # The unit parks `in_doubt`; the early hint re-runs the classification once.
-            await _until(lambda: _attempt_count(harness, unit.unit_key, 2))
-            history = await handle.fetch_history()
-            description = await handle.describe()
-            assert description.status is not None and description.status.name == "RUNNING"
-            await handle.terminate("review F2 proof complete")
+        await asyncio.wait_for(activities.started.wait(), timeout=60)
+        await handle.signal(OperationWorkflow.unit_reconciliation_recorded, "early")
+        activities.gate.set()
+        # The unit parks `in_doubt`; the early hint re-runs the classification once.
+        await _until(lambda: _attempt_count(harness, unit.unit_key, 2))
+        history = await handle.fetch_history()
+        description = await handle.describe()
+        assert description.status is not None and description.status.name == "RUNNING"
+        await handle.terminate("review F2 proof complete")
 
-        scheduled = _scheduled(history)
-        assert scheduled.count("operation.execute") == 2
-        assert "operation.cancel" not in scheduled
-        signals = sum(
-            1
-            for event in history.events
-            if event.HasField("workflow_execution_signaled_event_attributes")
-        )
-        assert signals == 1, "one hint, delivered during the first Activity"
-        assert NUDGE_SNAPSHOT_PATCH in patch_ids(history)
-        assert harness.model.calls == [] and harness.journal.settlements == {}
+    scheduled = _scheduled(history)
+    assert scheduled.count("operation.execute") == 2
+    assert "operation.cancel" not in scheduled
+    signals = sum(
+        1
+        for event in history.events
+        if event.HasField("workflow_execution_signaled_event_attributes")
+    )
+    assert signals == 1, "one hint, delivered during the first Activity"
+    assert NUDGE_SNAPSHOT_PATCH in patch_ids(history)
+    assert harness.model.calls == [] and harness.journal.settlements == {}

@@ -26,7 +26,7 @@ from mission_control.adapters.temporal.workflows.operation import (
     SEGMENT_LOOP_PATCH,
     OperationWorkflow,
 )
-from tests.fixtures.temporal_history import patch_ids
+from tests.support.temporal import patch_ids
 
 HISTORIES = Path(__file__).resolve().parent / "histories" / "ft_lanes"
 EXPECTED = {

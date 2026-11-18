@@ -16,7 +16,6 @@ cognition, its history replaying.
 from __future__ import annotations
 
 import asyncio
-import os
 from collections.abc import AsyncIterator
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
@@ -25,7 +24,6 @@ from typing import Any
 import asyncpg
 import pytest
 import pytest_asyncio
-from temporalio.testing import WorkflowEnvironment
 from temporalio.worker import Replayer, Worker
 
 from mission_control.adapters.postgres.reactions import (
@@ -67,6 +65,7 @@ from tests.fixtures.mission_control_common_db import (
     common_database,
     migration_paths_with,
 )
+from tests.support.temporal import start_workflow_env
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.common_db]
 MIGRATION = (
@@ -90,14 +89,6 @@ async def pool(db: CommonDatabase) -> AsyncIterator[asyncpg.Pool]:
         yield created
     finally:
         await created.close()
-
-
-async def _environment() -> WorkflowEnvironment:
-    existing = os.environ.get("MISSION_CONTROL_TEST_TEMPORAL_SERVER") or None
-    try:
-        return await WorkflowEnvironment.start_time_skipping(test_server_existing_path=existing)
-    except RuntimeError as error:
-        pytest.skip(f"Temporal test server is unavailable: {error}")
 
 
 class Crash(BaseException):
@@ -139,7 +130,7 @@ async def test_a_reaction_runs_once_as_an_ordinary_operation_across_a_relay_cras
     db: CommonDatabase, pool: asyncpg.Pool
 ) -> None:
     scope = db.scope()
-    environment = await _environment()
+    environment = await start_workflow_env()
     async with environment:
         harness = await recovery_harness(request_scope=scope)
         template = await harness.request(

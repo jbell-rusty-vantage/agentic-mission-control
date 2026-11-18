@@ -12,8 +12,6 @@ from __future__ import annotations
 import asyncio
 from pathlib import Path
 
-import pytest
-from temporalio.testing import WorkflowEnvironment
 from temporalio.worker import Replayer, Worker
 
 from mission_control.adapters.temporal.operation_activities import (
@@ -32,6 +30,7 @@ from mission_control.domain.frames.contracts import LaneProfile
 from mission_control.domain.frames.facts import ToolEffectFact, TurnCompletedFact
 from tests.fixtures.lane_turns import LANE_QUEUE, RecordingSignals, lane_stack
 from tests.support.providers.cursor import cloud_stack
+from tests.support.temporal import start_workflow_env
 
 WORKFLOW_QUEUE = "ft-g5-operation-workflows"
 
@@ -57,10 +56,7 @@ async def test_the_cloud_fixture_replays_through_the_adapter_and_reducer(tmp_pat
 async def test_the_cloud_lane_runs_through_the_operation_workflow_segment_loop(
     tmp_path: Path,
 ) -> None:
-    try:
-        env = await WorkflowEnvironment.start_time_skipping()
-    except RuntimeError as error:
-        pytest.skip(f"Temporal test server is unavailable: {error}")
+    env = await start_workflow_env()
     async with env:
         stack = cloud_stack(tmp_path, api_changes={"cut_after": "4"})
         lanes = lane_stack(stack.harness, operation=stack.operation)

@@ -23,7 +23,7 @@ from mission_control.adapters.temporal.workflows.stagegraph import (
     SETTLE_BASELINE_PATCH,
     StageGraphWorkflow,
 )
-from tests.fixtures.temporal_history import patch_ids, scheduled_activity_inputs
+from tests.support.temporal import patch_ids, scheduled_activity_inputs
 
 HISTORIES = Path(__file__).resolve().parents[2] / "fixtures" / "histories" / "rrm021_pre_change"
 CASES = (

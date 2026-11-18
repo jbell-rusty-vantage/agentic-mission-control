@@ -51,13 +51,12 @@ from mission_control.domain.execution.invocation_settlement import (
 from tests.fixtures.checkpoint_recovery import recovery_harness, stage_recovery_unit
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.fixtures.saved_settlement import DurableEffectDouble
-from tests.fixtures.temporal_history import patch_ids
 from tests.support.integration.temporal.wi04_saved_settlement_restart import (
-    _environment,
     _replays,
     _scheduled,
     _Stack,
 )
+from tests.support.temporal import patch_ids, start_workflow_env
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.common_db]
 
@@ -104,7 +103,7 @@ async def test_worker_lost_in_the_settlement_pass_settles_on_a_fresh_worker(
     pool: asyncpg.Pool,
 ) -> None:
     double = DurableEffectDouble(acknowledge_on_write=True)
-    environment = await _environment()
+    environment = await start_workflow_env()
     async with environment:
         stack, request = await _stack(common_db, pool, environment, double)
         entered, _release = double.gate_on_pass(1)
@@ -143,7 +142,7 @@ async def test_review_wait_survives_a_worker_restart_and_settles_after_the_verdi
     pool: asyncpg.Pool,
 ) -> None:
     double = DurableEffectDouble(review_required=True, acknowledge_on_write=True)
-    environment = await _environment()
+    environment = await start_workflow_env()
     async with environment:
         stack, request = await _stack(common_db, pool, environment, double)
         with environment.auto_time_skipping_disabled():
@@ -174,7 +173,7 @@ async def test_effect_wait_settles_once_when_the_receipt_arrives_late(
     pool: asyncpg.Pool,
 ) -> None:
     double = DurableEffectDouble()
-    environment = await _environment()
+    environment = await start_workflow_env()
     async with environment:
         stack, request = await _stack(common_db, pool, environment, double)
         with environment.auto_time_skipping_disabled():
@@ -203,7 +202,7 @@ async def test_cancel_during_the_review_wait_settles_the_saved_result_cancelled(
     pool: asyncpg.Pool,
 ) -> None:
     double = DurableEffectDouble(review_required=True, acknowledge_on_write=True)
-    environment = await _environment()
+    environment = await start_workflow_env()
     async with environment:
         stack, request = await _stack(common_db, pool, environment, double)
         with environment.auto_time_skipping_disabled():
@@ -236,7 +235,7 @@ async def test_a_long_review_wait_continues_as_new_with_its_wait_and_bounded_his
     without bound; the result still settles once and every run replays."""
 
     double = DurableEffectDouble(review_required=True, acknowledge_on_write=True)
-    environment = await _environment()
+    environment = await start_workflow_env()
     async with environment:
         stack, request = await _stack(common_db, pool, environment, double)
         with environment.auto_time_skipping_disabled():

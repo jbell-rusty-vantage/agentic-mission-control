@@ -94,8 +94,6 @@ from tests.fixtures.goal_directed_journaled import (
     goal_run_control,
     goal_run_input,
 )
-from tests.fixtures.operation_activities import wait_heartbeating
-from tests.fixtures.temporal_history import patch_ids, scheduled_activity_inputs
 from tests.support.integration.temporal.rrm_007_boundary_interventions import (
     GOAL_QUEUE,
     ROOT_WORKFLOWS,
@@ -122,15 +120,14 @@ from tests.support.integration.temporal.wp_bp_010_temporal import _run_input as 
 from tests.support.integration.temporal.wp_bp_020_temporal import _run_input as goal_input
 from tests.support.integration.temporal.wp_bp_020_temporal import fake_settlement
 from tests.support.journal import MemoryOperationJournal
+from tests.support.temporal import (
+    patch_ids,
+    scheduled_activity_inputs,
+    wait_heartbeating,
+    workflow_environment,
+)
 
 GOAL_COMPOSITION_QUEUE = "rrm008-goal-directed"
-
-
-def _environment() -> Any:
-    try:
-        return WorkflowEnvironment.start_time_skipping()
-    except RuntimeError as error:  # pragma: no cover - environment-dependent
-        pytest.skip(f"Temporal test server is unavailable: {error}")
 
 
 # --- fixture operation boundaries that honour the saga -----------------------------------------
@@ -237,7 +234,7 @@ async def test_stagegraph_cancel_reaches_the_running_sibling_and_terminalizes_ca
     through `operation.cancel`, cancels the never-admitted `downstream` dependency, and the
     reducer records `cancelled` (`applied`). The root returns the cancelled family result."""
 
-    async with await _environment() as environment:
+    async with workflow_environment() as environment:
         authority = Authority(environment.client)
         activities = CancellableStageGraphActivities(authority)
         run_id = await authority.admit("rrm-008-stagegraph-cancel")
@@ -309,7 +306,7 @@ async def test_stagegraph_saga_settles_a_generation_superseded_before_the_cancel
     settles `cancelled`, so its liability is reconciled and the run terminalizes `cancelled`.
     Both histories replay."""
 
-    async with await _environment() as environment:
+    async with workflow_environment() as environment:
         authority = Authority(environment.client)
         activities = CancellableStageGraphActivities(authority)
         activities.superseded_reports = {"slow": 1}
@@ -355,7 +352,7 @@ async def test_stagegraph_cancel_supersedes_a_delivered_release_and_a_held_wait(
     outcome (never satisfied), a release delivered afterwards is rejected `superseded`, and
     the run terminalizes `cancelled` with nothing admitted."""
 
-    async with await _environment() as environment:
+    async with workflow_environment() as environment:
         authority = Authority(environment.client)
         activities = CancellableStageGraphActivities(authority)
         run_id = await authority.admit("rrm-008-stagegraph-cancel-wait")
@@ -412,7 +409,7 @@ async def test_cancel_accepted_before_the_family_starts_terminalizes_through_the
     the boundary (`accepted`, `delivered`); the family's `start` binds the target under
     `cancelling`, nothing is admitted, and the saga terminalizes `cancelled` (`applied`)."""
 
-    async with await _environment() as environment:
+    async with workflow_environment() as environment:
         authority = Authority(environment.client)
         activities = CancellableStageGraphActivities(authority)
         run_id = await authority.admit("rrm-008-cancel-before-start")
@@ -492,7 +489,7 @@ async def test_goal_directed_cancel_during_executor_cognition_finishes_the_saga(
     through the terminal path, releases the baseline and proposes terminal `cancelled`,
     which the reducer records. No liability remains."""
 
-    async with await _environment() as environment:
+    async with workflow_environment() as environment:
         run_control = goal_run_control()
         authority = Authority(environment.client, run_control)
         model = GoalScriptedModel()
@@ -570,7 +567,7 @@ async def test_goal_directed_saga_finishes_when_the_cancelled_unit_is_in_doubt()
     `cancelling` until the operator settles it (the reducer rejects `start_new_generation`
     while cancelling)."""
 
-    async with await _environment() as environment:
+    async with workflow_environment() as environment:
         authority = Authority(environment.client)
         blueprint = _goal_blueprint(max_iterations=3)
         activities = CancellableGoalActivities(authority, blueprint, complete_at_iteration=3)
@@ -631,7 +628,7 @@ async def test_goal_directed_saga_settles_a_generation_superseded_before_the_can
     `cancelled`, the family consumes that settlement and the run terminalizes `cancelled`.
     The history replays."""
 
-    async with await _environment() as environment:
+    async with workflow_environment() as environment:
         authority = Authority(environment.client)
         blueprint = _goal_blueprint(max_iterations=3)
         activities = CancellableGoalActivities(authority, blueprint, complete_at_iteration=3)
@@ -687,7 +684,7 @@ async def test_goal_directed_cancel_while_paused_and_across_continue_as_new() ->
     rejects the pending commands `superseded`, releases the baseline and terminalizes
     `cancelled` (with the pause still active, which the reducer allows under cancellation)."""
 
-    async with await _environment() as environment:
+    async with workflow_environment() as environment:
         authority = Authority(environment.client)
         blueprint = _goal_blueprint(max_iterations=3)
         activities = CancellableGoalActivities(authority, blueprint, complete_at_iteration=3)

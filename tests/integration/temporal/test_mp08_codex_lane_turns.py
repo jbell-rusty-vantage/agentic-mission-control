@@ -68,7 +68,6 @@ from tests.fixtures.environment_kits import (
 )
 from tests.fixtures.lane_turns import lane_stack
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.fixtures.temporal_history import completed_activity_results
 from tests.support.db_builders import admit_unit_attempt
 from tests.support.providers.codex import (
     CodexStack,
@@ -79,6 +78,7 @@ from tests.support.providers.codex import (
     fixture_settings,
     load_script,
 )
+from tests.support.temporal import completed_activity_results
 
 ADDRESS = os.environ.get("MC_TEMPORAL_TEST_ADDRESS", "127.0.0.1:7233")
 NAMESPACE = os.environ.get("MC_TEMPORAL_TEST_NAMESPACE", "default")

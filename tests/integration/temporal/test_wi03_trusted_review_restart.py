@@ -43,11 +43,11 @@ from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.fixtures.saved_settlement import DurableEffectDouble
 from tests.support.integration.postgres.trusted_judgment_postgres import access_for
 from tests.support.integration.temporal.wi04_saved_settlement_restart import (
-    _environment,
     _replays,
     _scheduled,
     _Stack,
 )
+from tests.support.temporal import start_workflow_env
 from tests.support.trusted_knowledge import ScriptedRunner, World, evaluators, head_of, world
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.common_db]
@@ -118,7 +118,7 @@ async def test_trusted_review_wait_survives_a_worker_restart_and_resolves_the_ex
     harness = await recovery_harness(request_scope=scope, saved_results=store, settlers=(settler,))
     effects.attach(harness.model, answer_turns=(2, 4, 6))
     request = await harness.request(stage_recovery_unit(harness.run_id, request_scope=scope))
-    environment = await _environment()
+    environment = await start_workflow_env()
     async with environment:
         stack = _Stack(harness, environment, store)
         with environment.auto_time_skipping_disabled():

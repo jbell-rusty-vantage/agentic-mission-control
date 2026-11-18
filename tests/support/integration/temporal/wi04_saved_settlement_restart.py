@@ -6,10 +6,8 @@ Moved from tests/integration/temporal/test_wi04_saved_settlement_restart.py.
 from __future__ import annotations
 
 import asyncio
-import os
 from typing import Any
 
-import pytest
 from temporalio.client import WorkflowHandle
 from temporalio.testing import WorkflowEnvironment
 from temporalio.worker import Replayer, Worker
@@ -33,14 +31,6 @@ from tests.fixtures.checkpoint_recovery import RecoveryHarness
 WORKFLOW_QUEUE = "wi04-operation-workflows"
 HEARTBEAT_SECONDS = 2
 TIMEOUT_SECONDS = 60
-
-
-async def _environment() -> WorkflowEnvironment:
-    existing = os.environ.get("MISSION_CONTROL_TEST_TEMPORAL_SERVER") or None
-    try:
-        return await WorkflowEnvironment.start_time_skipping(test_server_existing_path=existing)
-    except RuntimeError as error:
-        pytest.skip(f"Temporal test server is unavailable: {error}")
 
 
 class _Stack:

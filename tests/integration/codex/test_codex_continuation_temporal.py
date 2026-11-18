@@ -77,7 +77,6 @@ from tests.fixtures.continuation import NOW, NoArtifacts, trigger
 from tests.fixtures.lane_turns import lane_stack
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.fixtures.mp12_lanes import Crashes
-from tests.fixtures.temporal_history import patch_ids
 from tests.support.clock import SECOND, Clock
 from tests.support.db_builders import admit_unit_attempt
 from tests.support.integration.postgres.continuation_postgres import continuation_actor
@@ -89,6 +88,7 @@ from tests.support.providers.codex import (
     codex_operation,
     load_script,
 )
+from tests.support.temporal import patch_ids
 
 pytestmark = pytest.mark.common_db
 

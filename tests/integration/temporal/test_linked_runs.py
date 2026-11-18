@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import pytest
-from temporalio.testing import WorkflowEnvironment
 from temporalio.worker import Worker
 
 from mission_control.adapters.temporal.linked_run_activities import (
@@ -34,12 +33,12 @@ from tests.support.integration.temporal.linked_runs import (
     DIGEST,
     NOW,
     PARENT_ACCOUNT,
-    FixtureChildWorkflow,
     actor,
     authority,
     linked_request,
     service_fixture,
 )
+from tests.support.temporal import FixtureChildWorkflow, start_workflow_env
 
 
 class FixtureResultAssessor:
@@ -332,10 +331,7 @@ async def test_temporal_mapping_executes_admitted_child_as_distinct_workflow(
             "stages": [{"stage_id": "child"}],
         },
     )
-    try:
-        environment = await WorkflowEnvironment.start_time_skipping()
-    except RuntimeError as error:
-        pytest.skip(f"Temporal test server is unavailable: {error}")
+    environment = await start_workflow_env()
 
     async with environment:
         assessor = FixtureResultAssessor()
@@ -428,10 +424,7 @@ async def test_degradable_child_failure_requires_governed_resolution() -> None:
         authority_ref=DECISION_AUTHORITY,
     )
     activities = LinkedRunActivities(decisions)
-    try:
-        environment = await WorkflowEnvironment.start_time_skipping()
-    except RuntimeError as error:
-        pytest.skip(f"Temporal test server is unavailable: {error}")
+    environment = await start_workflow_env()
 
     async with environment:
         async with Worker(

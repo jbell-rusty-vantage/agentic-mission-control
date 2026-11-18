@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import asyncio
 
-from temporalio.testing import WorkflowEnvironment
 from temporalio.worker import Replayer, Worker
 
 from mission_control.adapters.temporal.operation_activities import OperationExecutionActivities
@@ -12,6 +11,7 @@ from mission_control.adapters.temporal.registration.activities import agent_cogn
 from mission_control.adapters.temporal.workflow_sandbox import coordinator_workflow_runner
 from mission_control.adapters.temporal.workflows.operation import OperationWorkflow
 from mission_control.domain.execution.contracts import OperationWorkflowRequest
+from tests.support.temporal import workflow_environment
 from tests.support.unit.harness.lane_operator_abandonment import lane_recovery, no_adapter_selection
 
 
@@ -27,7 +27,7 @@ async def test_real_lane_cancel_parks_then_normal_abandon_hint_settles_and_repla
         operation=recovery.request,
     )
     # Failure to start the disposable server is a failure, never an availability skip.
-    async with await WorkflowEnvironment.start_time_skipping() as env:
+    async with workflow_environment() as env:
         workflow_worker = Worker(
             env.client,
             task_queue="operator-reconciliation-workflows",

@@ -9,7 +9,6 @@ from typing import Any
 
 import pytest
 from temporalio.client import ScheduleActionStartWorkflow, ScheduleAlreadyRunningError
-from temporalio.testing import WorkflowEnvironment
 from temporalio.worker import Worker
 
 from mission_control.adapters.temporal.activities.frames_expire import (
@@ -20,6 +19,7 @@ from mission_control.adapters.temporal.activities.frames_expire import (
 )
 from mission_control.adapters.temporal.workflow_sandbox import coordinator_workflow_runner
 from mission_control.adapters.temporal.workflows.frames_expire import FramesExpireWorkflow
+from tests.support.temporal import workflow_environment
 
 
 @dataclass(frozen=True)
@@ -50,7 +50,7 @@ class _Retention:
 async def test_frames_expire_workflow_applies_retention_to_every_scope() -> None:
     retention = _Retention()
     scopes = ["mc/a/biotech/t1", "mc/a/biotech/t2"]
-    async with await WorkflowEnvironment.start_time_skipping() as env:
+    async with workflow_environment() as env:
         queue = f"frames-expire-{uuid.uuid4()}"
         async with Worker(
             env.client,

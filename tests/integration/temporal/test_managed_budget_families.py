@@ -15,7 +15,6 @@ from uuid import NAMESPACE_URL, uuid5
 
 import pytest
 from temporalio import activity, workflow
-from temporalio.testing import WorkflowEnvironment
 from temporalio.worker import Replayer, Worker
 
 from mission_control.adapters.temporal.workflow_sandbox import coordinator_workflow_runner
@@ -54,6 +53,7 @@ from tests.support.integration.temporal.rrm_007_boundary_interventions import (
 )
 from tests.support.integration.temporal.wp_bp_010_temporal import _blueprint, _run_input
 from tests.support.providers.managed_agents import managed_binding, managed_operation
+from tests.support.temporal import start_workflow_env
 
 DIGEST = "sha256:" + "a" * 64
 QUEUE = "run2-budget-family-isolated"
@@ -173,9 +173,7 @@ class ManagedGoalActivities(BudgetReceipts, GovernedGoalActivities):
 
 @pytest.mark.parametrize("family", ["StageGraph", "GoalDirected"])
 async def test_accepted_budget_hold_and_resume_reach_active_family_children_and_replay(family):
-    environment = await WorkflowEnvironment.start_time_skipping(
-        test_server_existing_path=existing_test_server()
-    )
+    environment = await start_workflow_env(test_server_existing_path=existing_test_server())
     async with environment:
         authority = Authority(environment.client)
         if family == "StageGraph":
@@ -247,9 +245,7 @@ async def test_accepted_budget_hold_and_resume_reach_active_family_children_and_
 
 @pytest.mark.parametrize("rejected_kind", ["pause", "resume"])
 async def test_stagegraph_rejected_authority_keeps_previous_held_child_projection(rejected_kind):
-    environment = await WorkflowEnvironment.start_time_skipping(
-        test_server_existing_path=existing_test_server()
-    )
+    environment = await start_workflow_env(test_server_existing_path=existing_test_server())
     async with environment:
         authority = Authority(environment.client)
         activities = ManagedStageActivities(authority)

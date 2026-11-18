@@ -49,7 +49,7 @@ from tests.fixtures.lane_turns import (
     lane_stack,
     scripted_frames,
 )
-from tests.fixtures.temporal_history import patch_ids
+from tests.support.temporal import patch_ids, start_workflow_env
 
 WORKFLOW_QUEUE = "ft-g2-operation-workflows"
 SMALL = LaneSegmentBounds(
@@ -107,13 +107,6 @@ async def _replays(handle: WorkflowHandle[Any, Any]) -> Any:
     return history
 
 
-async def _time_skipping() -> WorkflowEnvironment:
-    try:
-        return await WorkflowEnvironment.start_time_skipping()
-    except RuntimeError as error:
-        pytest.skip(f"Temporal test server is unavailable: {error}")
-
-
 def _workers(env: WorkflowEnvironment, stack: LaneStack) -> tuple[Worker, Worker]:
     activities = OperationExecutionActivities(
         stack.boundary, worker_identity="ft-g2-worker", lane_turns=stack.service
@@ -141,7 +134,7 @@ async def _start(
 
 @pytest.mark.asyncio
 async def test_a_cursor_unit_runs_as_segments_and_settles_from_closing_facts() -> None:
-    env = await _time_skipping()
+    env = await start_workflow_env()
     async with env:
         stack = lane_stack()
         workflow_worker, activity_worker = _workers(env, stack)
@@ -162,7 +155,7 @@ async def test_a_cursor_unit_runs_as_segments_and_settles_from_closing_facts() -
 
 @pytest.mark.asyncio
 async def test_a_failed_segment_resumes_from_persisted_frames_without_a_second_send() -> None:
-    env = await _time_skipping()
+    env = await start_workflow_env()
     async with env:
         lane = ScriptedSessionLane(frames=scripted_frames(), fail_at=4)
         stack = lane_stack(lane)
@@ -188,7 +181,7 @@ async def test_a_failed_segment_resumes_from_persisted_frames_without_a_second_s
 async def test_cancel_update_cancels_the_turn_then_lane_cancel_settles_and_rejects_repeats() -> (
     None
 ):
-    env = await _time_skipping()
+    env = await start_workflow_env()
     async with env:
         lane = ScriptedSessionLane(frames=scripted_frames(), hold_after=1, cancel_delay_s=0.5)
         stack = lane_stack(lane)
@@ -216,7 +209,7 @@ async def test_cancel_update_cancels_the_turn_then_lane_cancel_settles_and_rejec
 
 @pytest.mark.asyncio
 async def test_commands_carried_from_an_earlier_run_are_rejected() -> None:
-    env = await _time_skipping()
+    env = await start_workflow_env()
     async with env:
         lane = ScriptedSessionLane(frames=scripted_frames(), hold_after=1)
         stack = lane_stack(lane)
@@ -238,7 +231,7 @@ async def test_commands_carried_from_an_earlier_run_are_rejected() -> None:
 
 @pytest.mark.asyncio
 async def test_a_status_poll_that_never_turns_terminal_parks_the_unit_in_doubt() -> None:
-    env = await _time_skipping()
+    env = await start_workflow_env()
     async with env:
         lane = ScriptedSessionLane(frames=scripted_frames(), hold_after=1, never_terminal=True)
         stack = lane_stack(lane)
@@ -273,7 +266,7 @@ async def test_a_status_poll_that_never_turns_terminal_parks_the_unit_in_doubt()
 
 @pytest.mark.asyncio
 async def test_busy_waits_for_idle_then_sends_once() -> None:
-    env = await _time_skipping()
+    env = await start_workflow_env()
     async with env:
         lane = ScriptedSessionLane(frames=scripted_frames(), busy_sends=1)
         lane.cancelled = True  # the fake reports idle once its prior run is terminal
@@ -301,7 +294,7 @@ def _deep_agents_lane_turns(harness: Any) -> LaneTurnService:
 
 @pytest.mark.asyncio
 async def test_a_deep_agents_unit_runs_its_governed_body_through_lane_turn() -> None:
-    env = await _time_skipping()
+    env = await start_workflow_env()
     async with env:
         harness = await recovery_harness()
         unit = stage_recovery_unit(harness.run_id)
@@ -342,7 +335,7 @@ async def test_a_deep_agents_unit_runs_its_governed_body_through_lane_turn() -> 
 
 @pytest.mark.asyncio
 async def test_a_deep_agents_cancel_reaches_cognition_and_lane_cancel_settles() -> None:
-    env = await _time_skipping()
+    env = await start_workflow_env()
     async with env:
         harness = await recovery_harness()
         unit = stage_recovery_unit(harness.run_id)
@@ -485,7 +478,7 @@ class _GatedStatusLane(ScriptedSessionLane):
 
 @pytest.mark.asyncio
 async def test_pause_mid_run_is_a_typed_rejection_on_a_cursor_unit() -> None:
-    env = await _time_skipping()
+    env = await start_workflow_env()
     async with env:
         lane = ScriptedSessionLane(frames=scripted_frames(), hold_after=1)
         stack = lane_stack(lane)
@@ -510,7 +503,7 @@ async def test_pause_mid_run_is_a_typed_rejection_on_a_cursor_unit() -> None:
 
 @pytest.mark.asyncio
 async def test_pause_at_the_run_boundary_holds_the_next_segment_until_resume() -> None:
-    env = await _time_skipping()
+    env = await start_workflow_env()
     async with env:
         lane = _GatedStatusLane()
         stack = lane_stack(lane)
@@ -561,7 +554,7 @@ async def test_inject_on_cursor_local_cancels_and_replaces_inside_the_segment_lo
 ) -> None:
     from tests.fixtures.cursor_controls import control_stack, states
 
-    env = await _time_skipping()
+    env = await start_workflow_env()
     async with env:
         stack = await control_stack(
             tmp_path, "inject_run", launcher_changes={"hold_at": 6}, declared_outputs=("report.md",)
@@ -611,7 +604,7 @@ async def test_fork_runs_its_first_segment_in_a_fresh_lease_restored_from_the_sn
         SnapshotRequest(**harness_fields(source.operation, heid), session=session, reason="fork")
     )
     source_agent = session.native_session_ref
-    env = await _time_skipping()
+    env = await start_workflow_env()
     async with env:
         fork, _inputs = fork_stack_from(
             tmp_path / "fork", source, manifest.refs[0], agent_base="agent-forked-0002"
@@ -646,7 +639,7 @@ async def test_request_continuation_hands_the_next_turn_to_a_hydrated_agent(
 ) -> None:
     from tests.fixtures.cursor_controls import control_stack, seal_and_transfer
 
-    env = await _time_skipping()
+    env = await start_workflow_env()
     async with env:
         stack = await control_stack(tmp_path, "inject_run", launcher_changes={"hold_at": 6})
         launcher = stack.local.launcher
@@ -698,7 +691,7 @@ async def test_a_session_lane_settlement_writes_its_cognition_points_through_the
         clock=lambda: datetime(2026, 11, 5, 12, 0, tzinfo=UTC),
     )
     lane = PointLane(frames=scripted_frames(tool_calls=2))
-    env = await _time_skipping()
+    env = await start_workflow_env()
     async with env:
         stack = lane_stack(lane, operation=operation, lineage=lineage, points=points)
         stack.frames.register_run(

@@ -20,7 +20,6 @@ from typing import Any
 
 import pytest
 from temporalio import activity, workflow
-from temporalio.testing import WorkflowEnvironment
 from temporalio.worker import Replayer, Worker
 
 from mission_control.adapters.temporal.workflow_sandbox import coordinator_workflow_runner
@@ -75,13 +74,13 @@ from mission_control.domain.programs.nested import (
     project_exports,
     stage_result,
 )
-from tests.fixtures.temporal_history import patch_ids
 from tests.support.integration.temporal.wp_bp_010_temporal import (
     DIGEST,
     QUEUE,
     FakeStageGraphActivities,
     _operation,
 )
+from tests.support.temporal import patch_ids, start_workflow_env
 
 INSTALLATION = "5e8f2a52-7c0e-4f55-9a4e-2f2a3b1c0d11"
 SCOPE = f"mc/{INSTALLATION}/ai-engineer/7a7d7b1e-1c2d-4e3f-8a9b-0c1d2e3f4a5b"
@@ -262,17 +261,10 @@ class NestedActivities(FakeStageGraphActivities):
         ]
 
 
-async def _environment() -> WorkflowEnvironment:
-    try:
-        return await WorkflowEnvironment.start_time_skipping()
-    except RuntimeError as error:
-        pytest.skip(f"Temporal test server is unavailable: {error}")
-
-
 @pytest.mark.asyncio
 async def test_a_nested_stage_graph_body_runs_as_a_child_run_and_exports_exactly() -> None:
     activities = NestedActivities()
-    environment = await _environment()
+    environment = await start_workflow_env()
     workflows = [
         StageGraphWorkflow,
         OperationWorkflow,
@@ -328,7 +320,7 @@ async def test_a_nested_stage_graph_body_runs_as_a_child_run_and_exports_exactly
 @pytest.mark.asyncio
 async def test_a_refused_activation_starts_nothing_and_fails_the_host_stage() -> None:
     activities = NestedActivities(refuse="nested_execution_unavailable")
-    environment = await _environment()
+    environment = await start_workflow_env()
     workflows = [
         StageGraphWorkflow,
         OperationWorkflow,
@@ -459,7 +451,7 @@ def _probe_operation() -> dict[str, Any]:
 async def test_a_parent_cancel_is_governed_first_and_settles_the_hosted_body_cancelled() -> None:
     activities = NestedActivities(hold_inner=True)
     activities.operation_heartbeat_timeout_seconds = 5
-    environment = await _environment()
+    environment = await start_workflow_env()
     workflows = [
         NestedProbeWorkflow,
         StageGraphWorkflow,
@@ -590,7 +582,7 @@ async def test_a_goal_loop_executor_body_runs_as_a_child_graph_each_iteration() 
 
     nested = NestedActivities()
     activities = goal_activities(nested)
-    environment = await _environment()
+    environment = await start_workflow_env()
     workflows = [
         GoalDirectedWorkflow,
         StageGraphWorkflow,
@@ -668,7 +660,7 @@ class SlowActivation(NestedActivities):
 @pytest.mark.asyncio
 async def test_a_cancel_during_activation_never_starts_the_child_and_closes_it() -> None:
     activities = SlowActivation()
-    environment = await _environment()
+    environment = await start_workflow_env()
     workflows = [
         NestedProbeWorkflow,
         StageGraphWorkflow,
@@ -725,7 +717,7 @@ async def test_a_pause_during_activation_is_delivered_once_the_child_started() -
     delivered to the child run on attach (never dropped); the body then completes."""
 
     activities = PauseDuringActivation()
-    environment = await _environment()
+    environment = await start_workflow_env()
     workflows = [
         NestedProbeWorkflow,
         StageGraphWorkflow,

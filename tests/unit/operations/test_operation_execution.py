@@ -7,7 +7,6 @@ from typing import Any, cast
 
 import pytest
 from temporalio.client import Client
-from temporalio.testing import WorkflowEnvironment
 from temporalio.worker import Replayer, Worker
 
 from mission_control.adapters.deep_agents.harness import DeepAgentsHarness
@@ -100,6 +99,7 @@ from tests.support.operations import (
     service_fixture,
 )
 from tests.support.run_control import actor, command, request, service
+from tests.support.temporal import workflow_environment
 
 
 def test_operation_workflow_v2_binds_one_exact_execution_request() -> None:
@@ -1103,7 +1103,7 @@ async def test_journaled_operation_settles_usage_effect_and_terminalizes(
 async def test_operation_workflow_routes_bound_execution_to_exact_cross_queue_activity() -> None:
     service, _bindings, runtime, events, budget = service_fixture()
     activities = OperationExecutionActivities(service)
-    async with await WorkflowEnvironment.start_time_skipping() as environment:
+    async with workflow_environment() as environment:
         async with (
             Worker(
                 environment.client,
@@ -1215,7 +1215,7 @@ async def _run_operation_workflow(
     service: OperationExecutionService, request: OperationExecutionRequest, workflow_id: str
 ):  # type: ignore[no-untyped-def]
     activities = OperationExecutionActivities(service, worker_identity="worker:exec-014")
-    async with await WorkflowEnvironment.start_time_skipping() as environment:
+    async with workflow_environment() as environment:
         async with (
             Worker(
                 environment.client,
@@ -1304,7 +1304,7 @@ async def test_lost_native_holder_is_taken_over_by_fence_and_parked_in_doubt() -
     request = unit_operation_request()
     unit_key = native_unit().unit_key
     activities = OperationExecutionActivities(service, worker_identity="worker:exec-014")
-    async with await WorkflowEnvironment.start_time_skipping() as environment:
+    async with workflow_environment() as environment:
         async with (
             Worker(
                 environment.client,

@@ -27,12 +27,12 @@ from mission_control.domain.programs.contracts import (
     StageGraphCompletionActivityResult,
 )
 from tests.fixtures.goal_directed_journaled import SCOPE
-from tests.fixtures.operation_activities import cancelled_operation_result, wait_heartbeating
 from tests.support.integration.temporal.rrm_007_boundary_interventions import (
     Authority,
     GovernedStageGraphActivities,
     until,
 )
+from tests.support.temporal import cancelled_operation_result, wait_heartbeating
 
 BASELINE = {"tokens.total": 20}
 # The fixture families' operation heartbeat timeout: a cancel reaches the running fake

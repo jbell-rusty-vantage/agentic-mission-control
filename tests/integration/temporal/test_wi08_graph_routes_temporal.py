@@ -12,7 +12,6 @@ from typing import Any
 
 import pytest
 from temporalio import activity
-from temporalio.testing import WorkflowEnvironment
 from temporalio.worker import Replayer, Worker
 
 from mission_control.adapters.temporal.workflow_sandbox import coordinator_workflow_runner
@@ -45,13 +44,13 @@ from mission_control.domain.programs.contracts import (
 )
 from mission_control.domain.programs.interpreter import StageGraphInterpreter
 from mission_control.domain.programs.routing import ROUTE_FACTS_KEY
-from tests.fixtures.operation_activities import wait_heartbeating
 from tests.support.integration.temporal.wp_bp_010_temporal import (
     QUEUE,
     FakeStageGraphActivities,
     _operation,
     _run_input,
 )
+from tests.support.temporal import start_workflow_env, wait_heartbeating
 
 
 def routed_graph() -> StageGraphBlueprint:
@@ -295,10 +294,7 @@ class RoutedActivities(FakeStageGraphActivities):
 @pytest.mark.asyncio
 async def test_routes_and_groups_execute_on_temporal_and_replay() -> None:
     activities = RoutedActivities()
-    try:
-        environment = await WorkflowEnvironment.start_time_skipping()
-    except RuntimeError as error:
-        pytest.skip(f"Temporal test server is unavailable: {error}")
+    environment = await start_workflow_env()
 
     graph = routed_graph()
     async with environment:
@@ -402,17 +398,10 @@ def _approved_on_second_visit(stage: str, cycle: int) -> Any:
     return {"approved": {"status": "known", "value": cycle >= 1, "evidence_ref": f"ev:c{cycle}"}}
 
 
-async def _environment() -> WorkflowEnvironment:
-    try:
-        return await WorkflowEnvironment.start_time_skipping()
-    except RuntimeError as error:
-        pytest.skip(f"Temporal test server is unavailable: {error}")
-
-
 @pytest.mark.asyncio
 async def test_a_revisit_region_reruns_governed_by_the_host_and_replays() -> None:
     activities = RoutedActivities(facts=_approved_on_second_visit)
-    environment = await _environment()
+    environment = await start_workflow_env()
     async with environment:
         async with Worker(
             environment.client,
@@ -458,7 +447,7 @@ def _unknown_severity(stage: str, cycle: int) -> Any:
 @pytest.mark.asyncio
 async def test_an_exhausted_route_is_held_durably_until_an_operator_command() -> None:
     activities = RoutedActivities(facts=_unknown_severity)
-    environment = await _environment()
+    environment = await start_workflow_env()
     async with environment:
         async with Worker(
             environment.client,
@@ -507,7 +496,7 @@ async def test_a_capped_region_concludes_failed_with_the_typed_unmet_reason() ->
     `failed` with a typed reason citing the cap (a failure ref, so the reducer records FAILED)."""
 
     activities = RoutedActivities(facts=_never_approved)
-    environment = await _environment()
+    environment = await start_workflow_env()
     async with environment:
         async with Worker(
             environment.client,

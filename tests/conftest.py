@@ -73,5 +73,10 @@ def test_application_postgres_dsn() -> str:
     return _required_external_test_service("TEST_APPLICATION_POSTGRES_DSN")
 
 
-# Block C live fixtures / helpers for persistent Agent Server qualification.
-pytest_plugins = ["tests.fixtures.agent_server_block_c", "tests.support.db_plugin"]
+# Shared fixtures registered as plugins: Block C live fixtures for persistent Agent Server
+# qualification, the disposable common databases, and the Temporal test server (`workflow_env`).
+pytest_plugins = [
+    "tests.fixtures.agent_server_block_c",
+    "tests.support.db_plugin",
+    "tests.support.temporal",
+]

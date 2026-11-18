@@ -4,7 +4,6 @@ import asyncio
 from dataclasses import replace
 
 import pytest
-from temporalio.testing import WorkflowEnvironment
 from temporalio.worker import Replayer, Worker
 
 from mission_control.adapters.temporal.workflow_sandbox import coordinator_workflow_runner
@@ -34,6 +33,7 @@ from tests.support.integration.temporal.wp_bp_010_temporal import (
     _operation,
     _run_input,
 )
+from tests.support.temporal import start_workflow_env
 
 # A cancelled sibling's heartbeat timeout: the cancel is delivered on the next heartbeat.
 SIBLING_CANCEL_HEARTBEAT_SECONDS = 5
@@ -159,10 +159,7 @@ async def test_real_materializer_freezes_the_stage_unit_cognitive_namespace() ->
 @pytest.mark.asyncio
 async def test_incremental_any_join_runs_downstream_before_slow_sibling_and_replays() -> None:
     activities = FakeStageGraphActivities()
-    try:
-        environment = await WorkflowEnvironment.start_time_skipping()
-    except RuntimeError as error:
-        pytest.skip(f"Temporal test server is unavailable: {error}")
+    environment = await start_workflow_env()
 
     workflow_id = "family/run-wp-bp-010-temporal/1"
     async with environment:
@@ -199,10 +196,7 @@ async def test_incremental_any_join_runs_downstream_before_slow_sibling_and_repl
 async def test_slow_sibling_cancellation_is_reconciled_before_completion() -> None:
     activities = FakeStageGraphActivities()
     activities.operation_heartbeat_timeout_seconds = SIBLING_CANCEL_HEARTBEAT_SECONDS
-    try:
-        environment = await WorkflowEnvironment.start_time_skipping()
-    except RuntimeError as error:
-        pytest.skip(f"Temporal test server is unavailable: {error}")
+    environment = await start_workflow_env()
 
     async with environment:
         async with Worker(
@@ -233,10 +227,7 @@ async def test_slow_sibling_cancellation_is_reconciled_before_completion() -> No
 @pytest.mark.asyncio
 async def test_continue_as_new_preserves_accepted_projection_and_semantic_identity() -> None:
     activities = FakeStageGraphActivities()
-    try:
-        environment = await WorkflowEnvironment.start_time_skipping()
-    except RuntimeError as error:
-        pytest.skip(f"Temporal test server is unavailable: {error}")
+    environment = await start_workflow_env()
 
     run_input = _run_input(_blueprint())
     run_input = run_input.__class__(**{**run_input.__dict__, "force_continue_as_new": True})
@@ -268,10 +259,7 @@ async def test_continue_as_new_preserves_accepted_projection_and_semantic_identi
 @pytest.mark.asyncio
 async def test_bounded_workflow_cycle_reuses_producers_and_advances_cycle_identity() -> None:
     activities = FakeStageGraphActivities(cycle_once=True)
-    try:
-        environment = await WorkflowEnvironment.start_time_skipping()
-    except RuntimeError as error:
-        pytest.skip(f"Temporal test server is unavailable: {error}")
+    environment = await start_workflow_env()
 
     async with environment:
         async with Worker(
@@ -306,10 +294,7 @@ async def test_bounded_workflow_cycle_reuses_producers_and_advances_cycle_identi
 @pytest.mark.asyncio
 async def test_bounded_stage_cycle_has_distinct_identity_and_preserves_workflow_ordinal() -> None:
     activities = FakeStageGraphActivities(cycle_once=True, cycle_scope="stage")
-    try:
-        environment = await WorkflowEnvironment.start_time_skipping()
-    except RuntimeError as error:
-        pytest.skip(f"Temporal test server is unavailable: {error}")
+    environment = await start_workflow_env()
     async with environment:
         async with Worker(
             environment.client,

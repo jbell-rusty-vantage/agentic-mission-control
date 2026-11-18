@@ -17,7 +17,6 @@ from typing import Any
 import pytest
 from temporalio import activity
 from temporalio.client import WorkflowFailureError
-from temporalio.testing import WorkflowEnvironment
 from temporalio.worker import Replayer, Worker
 
 from mission_control.adapters.temporal.family_failure_activity import terminalize_failed_family
@@ -33,6 +32,7 @@ from mission_control.domain.programs.family_failure import (
 )
 from tests.fixtures.goal_directed_journaled import SCOPE
 from tests.support.integration.temporal.w1_family_failure_root import QUEUE, FailingFamily, _root
+from tests.support.temporal import start_workflow_env
 from tests.support.unit.coordinator.w1_d26_liability_terminalization import _stuck_unit
 
 
@@ -53,10 +53,7 @@ async def test_bounded_retries_close_a_run_whose_unit_never_settles() -> None:
         # The in-memory run control is admitted under the fixture tenant scope.
         return await terminalize_failed_family(service, replace(request, request_scope=SCOPE))
 
-    try:
-        env = await WorkflowEnvironment.start_time_skipping()
-    except RuntimeError as error:
-        pytest.skip(f"Temporal test server is unavailable: {error}")
+    env = await start_workflow_env()
     admitted = _root(run_id)
     async with env:
         async with Worker(

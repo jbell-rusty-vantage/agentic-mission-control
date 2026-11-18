@@ -65,6 +65,9 @@ from tests.fixtures.checkpoint_recovery import (
     stage_recovery_unit,
 )
 from tests.support.run_control import command, reconciler_command
+
+# --- helpers -------------------------------------------------------------------------
+from tests.support.temporal import workflow_environment
 from tests.support.unit.operations.checkpoint_recovery_classification import (
     AFTER_TOOL_CHECKPOINT,
     _chain,
@@ -74,8 +77,6 @@ from tests.support.unit.operations.checkpoint_recovery_classification import (
     _root_checkpoints,
     _write_foreign_root_checkpoint,
 )
-
-# --- helpers -------------------------------------------------------------------------
 
 
 async def _baseline_digest() -> str:
@@ -1031,7 +1032,6 @@ async def test_lost_wake_up_hint_is_recovered_by_resending_the_same_decision() -
     re-sends the hint; the workflow wakes and the unit converges. A different decision for
     the resolved revision is still rejected."""
 
-    from temporalio.testing import WorkflowEnvironment
     from temporalio.worker import Worker
 
     from mission_control.adapters.temporal.operation_activities import (
@@ -1064,7 +1064,7 @@ async def test_lost_wake_up_hint_is_recovered_by_resending_the_same_decision() -
     )
     activities = OperationExecutionActivities(harness.service, worker_identity="worker:resend")
 
-    async with await WorkflowEnvironment.start_time_skipping() as environment:
+    async with workflow_environment() as environment:
 
         class FlakyNudge:
             def __init__(self) -> None:

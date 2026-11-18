@@ -12,7 +12,6 @@ from __future__ import annotations
 from uuid import UUID, uuid4
 
 import pytest
-from temporalio.testing import WorkflowEnvironment
 
 from mission_control.adapters.temporal.submission import TemporalWorkflowSubmitter
 from mission_control.application.chains.relay import (
@@ -30,6 +29,7 @@ from tests.support.integration.temporal.chain_start_idempotent import (
     OneShotStore,
 )
 from tests.support.run_control import request, service
+from tests.support.temporal import workflow_environment
 
 
 @pytest.mark.asyncio
@@ -50,7 +50,7 @@ async def test_delivering_the_same_start_intent_twice_yields_one_workflow() -> N
         initial_goal="Ingest the supplied evidence map",
         actor_ref="chain:test",
     )
-    async with await WorkflowEnvironment.start_time_skipping() as env:
+    async with workflow_environment() as env:
         submitter = TemporalWorkflowSubmitter(
             env.client,
             stagegraph_task_queue="chain-test-stagegraph",

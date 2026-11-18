@@ -77,7 +77,6 @@ from tests.fixtures.goal_directed_journaled import (
     goal_run_input,
     turns_by_operation,
 )
-from tests.fixtures.temporal_history import patch_ids, scheduled_activity_inputs
 from tests.support.integration.temporal.rrm_007_boundary_interventions import (
     Authority,
     _phase_is,
@@ -91,6 +90,7 @@ from tests.support.integration.temporal.wp_bp_020_temporal import FakeGoalDirect
 from tests.support.integration.temporal.wp_bp_020_temporal import _run_input as fake_goal_input
 from tests.support.journal import MemoryOperationJournal
 from tests.support.run_control import command
+from tests.support.temporal import patch_ids, scheduled_activity_inputs, start_workflow_env
 
 QUEUE = "rrm016-goal-directed"
 # Captured from `test_journaled_goal_directed_run_settles_each_operation_once_through_a_pause`
@@ -164,123 +164,118 @@ def _workers(environment: WorkflowEnvironment, composition: GoalComposition) -> 
 
 
 @pytest.mark.asyncio
-async def test_journaled_goal_directed_run_settles_each_operation_once_through_a_pause() -> None:
-    try:
-        environment = await WorkflowEnvironment.start_time_skipping()
-    except RuntimeError as error:
-        pytest.skip(f"Temporal test server is unavailable: {error}")
-    async with environment:
-        run_control = goal_run_control()
-        authority = Authority(environment.client, run_control)
-        composition = await _composition(run_control)
-        run_id = await admit_goal_run(run_control, "rrm-016-temporal")
-        workflow_id = f"family/{run_id}/1"
-        entered, gate = composition.model.gate_on(1)
-        family_worker, cognitive_worker = _workers(environment, composition)
-        async with family_worker, cognitive_worker:
-            handle = await environment.client.start_workflow(
-                GoalDirectedWorkflow.run,
-                goal_run_input(run_id, goal_blueprint(), baseline=BASELINE),
-                id=workflow_id,
-                task_queue=QUEUE,
-            )
-            # REQ-BP-GD-011: a pause requested while the first executor runs is delivered at
-            # once and applied only at the iteration boundary.
-            await asyncio.wait_for(entered.wait(), timeout=60)
-            await authority.intervene(run_id, "pause", pause("hold-run"))
-            await until(lambda: _state_is(authority, run_id, "pause", "delivered"), seconds=60)
-            assert (await authority.run(run_id)).phase == RunPhase.ACTIVE
-            gate.set()
-            await until(lambda: _state_is(authority, run_id, "pause", "applied"), seconds=60)
-            assert await _phase_is(authority, run_id, RunPhase.PAUSED)
-            paused = (await handle.query(GoalDirectedWorkflow.boundary_state))["paused"]
-            assert paused["next_goal_iteration"] == 2
-            # The iteration-1 operations settled before the boundary: nothing is reserved
-            # for them while the run is paused.
-            budget = await run_control.get_budget(SCOPE, run_id)
-            assert set(budget.reservations) == {"baseline"}
-            assert len(budget.usage_records) == 2
-            await authority.intervene(run_id, "resume", resume("hold-run", "release-run"))
-            result = await handle.result()
-            history = await handle.fetch_history()
-
-        assert result.convergence_proposal is not None
-        assert result.convergence_proposal.action == "complete"
-        assert result.goal_iterations == 2
-        assert await authority.states(run_id, "pause") == ["accepted", "delivered", "applied"]
-        assert await authority.states(run_id, "resume") == ["accepted", "delivered", "applied"]
-
-        # Every executor and verifier operation: one claim, one settlement, one usage record.
-        bindings = [item.operation_binding_ref for item in composition.documents.iterations] + [
-            item.verifier_binding_ref for item in composition.documents.verifications
-        ]
-        assert len(set(bindings)) == 4
-        budget = await run_control.get_budget(SCOPE, run_id)
-        effects = await run_control.get_effects(SCOPE, run_id)
-        run = await run_control.get_run(SCOPE, run_id)
-        settlements = {operation_settlement_id(binding): binding for binding in bindings}
-        assert set(budget.usage_records) == {*settlements, "goal-usage:baseline"}
-        for settlement_id, binding in settlements.items():
-            usage = budget.usage_records[settlement_id]
-            assert usage.authority_ref == binding
-            assert usage.actual_amounts == {"tokens.total": TOKENS_PER_OPERATION}
-        assert budget.consumed.get("tokens.total") == 4 * TOKENS_PER_OPERATION
-        assert not any(budget.reserved.values()) and not any(budget.pending_settlement.values())
-        assert budget.reservations == {}
-        assert sorted(item.operation_ref for item in effects.claims.values()) == sorted(bindings)
-        assert {item.disposition for item in effects.claims.values()} == {
-            EffectDisposition.SUCCEEDED
-        }
-        assert {
-            (item.settlement_id, item.accepted_by_authority_ref)
-            for item in run.accepted_operation_settlement_evidence
-        } == set(settlements.items())
-        assert run.terminal_outcome == RunOutcome.COMPLETED
-
-        # REQ-BP-GD-012 / isolation: the executor session is reused in iteration order (one
-        # new input per iteration), the verifier never shares it, and the goal context never
-        # reached the system prompt.
-        assert turns_by_operation(composition.model) == [
-            ("executor", 1, 1),
-            ("executor", 1, 1),
-            ("verifier", 1, 1),
-            ("verifier", 1, 1),
-            ("executor", 2, 2),
-            ("executor", 2, 2),
-            ("verifier", 2, 2),
-            ("verifier", 2, 2),
-        ]
-        [first, second] = composition.documents.iterations
-        assert first.session_id == second.session_id
-        assert {item.verifier_session_id for item in composition.documents.verifications} != {
-            first.session_id
-        }
-        assert not any(item["system_has_goal_context"] for item in composition.model.turns)
-
-        # The family recorded no operation usage: only the run-level baseline release.
-        assert [
-            item for item in lifecycle_command_ids(history) if item.startswith("goal:usage:")
-        ] == ["goal:usage:baseline"]
-        assert JOURNALED_SETTLEMENT_PATCH in patch_ids(history)
-        assert await replay(handle, [GoalDirectedWorkflow, OperationWorkflow]) == 1
-        capture = os.getenv("RRM016_CAPTURE_HISTORY_DIR")
-        if capture:  # re-capture the committed post-change fixture (see POST_CHANGE)
-            _write_history(Path(capture) / POST_CHANGE_HISTORY, history.to_json())
-        print(
-            "RRM-016 EVIDENCE temporal "
-            + json.dumps(
-                {
-                    "run_id": run_id,
-                    "usage_records": sorted(budget.usage_records),
-                    "consumed": budget.consumed,
-                    "settled_effects": len(effects.claims),
-                    "accepted_settlements": len(run.accepted_operation_settlement_evidence),
-                    "pause": await authority.states(run_id, "pause"),
-                    "patches": sorted(patch_ids(history)),
-                },
-                sort_keys=True,
-            )
+async def test_journaled_goal_directed_run_settles_each_operation_once_through_a_pause(
+    workflow_env: WorkflowEnvironment,
+) -> None:
+    run_control = goal_run_control()
+    authority = Authority(workflow_env.client, run_control)
+    composition = await _composition(run_control)
+    run_id = await admit_goal_run(run_control, "rrm-016-temporal")
+    workflow_id = f"family/{run_id}/1"
+    entered, gate = composition.model.gate_on(1)
+    family_worker, cognitive_worker = _workers(workflow_env, composition)
+    async with family_worker, cognitive_worker:
+        handle = await workflow_env.client.start_workflow(
+            GoalDirectedWorkflow.run,
+            goal_run_input(run_id, goal_blueprint(), baseline=BASELINE),
+            id=workflow_id,
+            task_queue=QUEUE,
         )
+        # REQ-BP-GD-011: a pause requested while the first executor runs is delivered at
+        # once and applied only at the iteration boundary.
+        await asyncio.wait_for(entered.wait(), timeout=60)
+        await authority.intervene(run_id, "pause", pause("hold-run"))
+        await until(lambda: _state_is(authority, run_id, "pause", "delivered"), seconds=60)
+        assert (await authority.run(run_id)).phase == RunPhase.ACTIVE
+        gate.set()
+        await until(lambda: _state_is(authority, run_id, "pause", "applied"), seconds=60)
+        assert await _phase_is(authority, run_id, RunPhase.PAUSED)
+        paused = (await handle.query(GoalDirectedWorkflow.boundary_state))["paused"]
+        assert paused["next_goal_iteration"] == 2
+        # The iteration-1 operations settled before the boundary: nothing is reserved
+        # for them while the run is paused.
+        budget = await run_control.get_budget(SCOPE, run_id)
+        assert set(budget.reservations) == {"baseline"}
+        assert len(budget.usage_records) == 2
+        await authority.intervene(run_id, "resume", resume("hold-run", "release-run"))
+        result = await handle.result()
+        history = await handle.fetch_history()
+
+    assert result.convergence_proposal is not None
+    assert result.convergence_proposal.action == "complete"
+    assert result.goal_iterations == 2
+    assert await authority.states(run_id, "pause") == ["accepted", "delivered", "applied"]
+    assert await authority.states(run_id, "resume") == ["accepted", "delivered", "applied"]
+
+    # Every executor and verifier operation: one claim, one settlement, one usage record.
+    bindings = [item.operation_binding_ref for item in composition.documents.iterations] + [
+        item.verifier_binding_ref for item in composition.documents.verifications
+    ]
+    assert len(set(bindings)) == 4
+    budget = await run_control.get_budget(SCOPE, run_id)
+    effects = await run_control.get_effects(SCOPE, run_id)
+    run = await run_control.get_run(SCOPE, run_id)
+    settlements = {operation_settlement_id(binding): binding for binding in bindings}
+    assert set(budget.usage_records) == {*settlements, "goal-usage:baseline"}
+    for settlement_id, binding in settlements.items():
+        usage = budget.usage_records[settlement_id]
+        assert usage.authority_ref == binding
+        assert usage.actual_amounts == {"tokens.total": TOKENS_PER_OPERATION}
+    assert budget.consumed.get("tokens.total") == 4 * TOKENS_PER_OPERATION
+    assert not any(budget.reserved.values()) and not any(budget.pending_settlement.values())
+    assert budget.reservations == {}
+    assert sorted(item.operation_ref for item in effects.claims.values()) == sorted(bindings)
+    assert {item.disposition for item in effects.claims.values()} == {EffectDisposition.SUCCEEDED}
+    assert {
+        (item.settlement_id, item.accepted_by_authority_ref)
+        for item in run.accepted_operation_settlement_evidence
+    } == set(settlements.items())
+    assert run.terminal_outcome == RunOutcome.COMPLETED
+
+    # REQ-BP-GD-012 / isolation: the executor session is reused in iteration order (one
+    # new input per iteration), the verifier never shares it, and the goal context never
+    # reached the system prompt.
+    assert turns_by_operation(composition.model) == [
+        ("executor", 1, 1),
+        ("executor", 1, 1),
+        ("verifier", 1, 1),
+        ("verifier", 1, 1),
+        ("executor", 2, 2),
+        ("executor", 2, 2),
+        ("verifier", 2, 2),
+        ("verifier", 2, 2),
+    ]
+    [first, second] = composition.documents.iterations
+    assert first.session_id == second.session_id
+    assert {item.verifier_session_id for item in composition.documents.verifications} != {
+        first.session_id
+    }
+    assert not any(item["system_has_goal_context"] for item in composition.model.turns)
+
+    # The family recorded no operation usage: only the run-level baseline release.
+    assert [item for item in lifecycle_command_ids(history) if item.startswith("goal:usage:")] == [
+        "goal:usage:baseline"
+    ]
+    assert JOURNALED_SETTLEMENT_PATCH in patch_ids(history)
+    assert await replay(handle, [GoalDirectedWorkflow, OperationWorkflow]) == 1
+    capture = os.getenv("RRM016_CAPTURE_HISTORY_DIR")
+    if capture:  # re-capture the committed post-change fixture (see POST_CHANGE)
+        _write_history(Path(capture) / POST_CHANGE_HISTORY, history.to_json())
+    print(
+        "RRM-016 EVIDENCE temporal "
+        + json.dumps(
+            {
+                "run_id": run_id,
+                "usage_records": sorted(budget.usage_records),
+                "consumed": budget.consumed,
+                "settled_effects": len(effects.claims),
+                "accepted_settlements": len(run.accepted_operation_settlement_evidence),
+                "pause": await authority.states(run_id, "pause"),
+                "patches": sorted(patch_ids(history)),
+            },
+            sort_keys=True,
+        )
+    )
 
 
 class _UngovernedGoalActivities(FakeGoalDirectedActivities):
@@ -297,10 +292,7 @@ class _UngovernedGoalActivities(FakeGoalDirectedActivities):
 @pytest.mark.asyncio
 async def test_family_fails_closed_without_a_run_control_settlement() -> None:
     activities = _UngovernedGoalActivities()
-    try:
-        environment = await WorkflowEnvironment.start_time_skipping()
-    except RuntimeError as error:
-        pytest.skip(f"Temporal test server is unavailable: {error}")
+    environment = await start_workflow_env()
     async with environment:
         async with Worker(
             environment.client,
@@ -371,54 +363,51 @@ async def test_post_change_goal_directed_history_replays_on_the_journaled_path()
 
 
 @pytest.mark.asyncio
-async def test_iterations_with_distinct_output_refs_terminalize() -> None:
+async def test_iterations_with_distinct_output_refs_terminalize(
+    workflow_env: WorkflowEnvironment,
+) -> None:
     """RRM-019: iterations produce different output refs. The run completes and promotes
     exactly the outputs its terminalization proposal names: the final executor's outputs that
     the accepting verifier admitted, not iteration 1's (rejected) output."""
 
-    try:
-        environment = await WorkflowEnvironment.start_time_skipping()
-    except RuntimeError as error:
-        pytest.skip(f"Temporal test server is unavailable: {error}")
-    async with environment:
-        run_control = goal_run_control()
-        composition = await _composition(run_control)
-        composition.model.stable_output_ref = False
-        run_id = await admit_goal_run(run_control, "rrm-019-distinct-output-refs")
-        family_worker, cognitive_worker = _workers(environment, composition)
-        async with family_worker, cognitive_worker:
-            handle = await environment.client.start_workflow(
-                GoalDirectedWorkflow.run,
-                goal_run_input(run_id, goal_blueprint(), baseline=BASELINE),
-                id=f"family/{run_id}/1",
-                task_queue=QUEUE,
-            )
-            result = await handle.result()
-            history = await handle.fetch_history()
-        assert result.goal_iterations == 2
-        # Every iteration's immutable outputs remain in the family result (lineage) ...
-        assert result.output_refs == ("artifact:rrm016:1", "artifact:rrm016:2")
-        [first_verification, final_verification] = result.verification_results
-        assert first_verification.decision != "accepted"
-        assert final_verification.decision == "accepted"
-        assert final_verification.admitted_executor_output_refs == ("artifact:rrm016:2",)
-        # ... but the proposal and the promoted evidence name the verified final outputs only.
-        assert result.terminalization_proposal is not None
-        assert result.terminalization_proposal.output_refs == ("artifact:rrm016:2",)
-        run = await run_control.get_run(SCOPE, run_id)
-        assert run.terminal_outcome == RunOutcome.COMPLETED
-        assert [item.output_ref for item in run.accepted_output_evidence] == ["artifact:rrm016:2"]
-        assert [item for item in lifecycle_command_ids(history) if item.startswith("goal:output:")]
-        assert all(
-            item.startswith("goal:output:artifact:rrm016:2:")
-            for item in lifecycle_command_ids(history)
-            if item.startswith("goal:output:")
+    run_control = goal_run_control()
+    composition = await _composition(run_control)
+    composition.model.stable_output_ref = False
+    run_id = await admit_goal_run(run_control, "rrm-019-distinct-output-refs")
+    family_worker, cognitive_worker = _workers(workflow_env, composition)
+    async with family_worker, cognitive_worker:
+        handle = await workflow_env.client.start_workflow(
+            GoalDirectedWorkflow.run,
+            goal_run_input(run_id, goal_blueprint(), baseline=BASELINE),
+            id=f"family/{run_id}/1",
+            task_queue=QUEUE,
         )
-        assert VERIFIED_TERMINAL_OUTPUTS_PATCH in patch_ids(history)
-        assert await replay(handle, [GoalDirectedWorkflow, OperationWorkflow]) == 1
-        capture = os.getenv("RRM019_CAPTURE_HISTORY_DIR")
-        if capture:  # re-capture the committed post-change fixture (see RRM019_POST_CHANGE)
-            _write_history(Path(capture) / RRM019_HISTORY, history.to_json())
+        result = await handle.result()
+        history = await handle.fetch_history()
+    assert result.goal_iterations == 2
+    # Every iteration's immutable outputs remain in the family result (lineage) ...
+    assert result.output_refs == ("artifact:rrm016:1", "artifact:rrm016:2")
+    [first_verification, final_verification] = result.verification_results
+    assert first_verification.decision != "accepted"
+    assert final_verification.decision == "accepted"
+    assert final_verification.admitted_executor_output_refs == ("artifact:rrm016:2",)
+    # ... but the proposal and the promoted evidence name the verified final outputs only.
+    assert result.terminalization_proposal is not None
+    assert result.terminalization_proposal.output_refs == ("artifact:rrm016:2",)
+    run = await run_control.get_run(SCOPE, run_id)
+    assert run.terminal_outcome == RunOutcome.COMPLETED
+    assert [item.output_ref for item in run.accepted_output_evidence] == ["artifact:rrm016:2"]
+    assert [item for item in lifecycle_command_ids(history) if item.startswith("goal:output:")]
+    assert all(
+        item.startswith("goal:output:artifact:rrm016:2:")
+        for item in lifecycle_command_ids(history)
+        if item.startswith("goal:output:")
+    )
+    assert VERIFIED_TERMINAL_OUTPUTS_PATCH in patch_ids(history)
+    assert await replay(handle, [GoalDirectedWorkflow, OperationWorkflow]) == 1
+    capture = os.getenv("RRM019_CAPTURE_HISTORY_DIR")
+    if capture:  # re-capture the committed post-change fixture (see RRM019_POST_CHANGE)
+        _write_history(Path(capture) / RRM019_HISTORY, history.to_json())
 
 
 @pytest.mark.asyncio
@@ -510,7 +499,7 @@ async def _run_with_outside_commands(
     act: Callable[[Any, str, GoalOperationReconciliationRequest], Awaitable[None]],
     request_id: str,
 ) -> tuple[Any, Any, str, WorkflowHistory, BaseException | None]:
-    environment = await WorkflowEnvironment.start_time_skipping()
+    environment = await start_workflow_env()
     async with environment:
         run_control = goal_run_control()
         composition = await _composition(run_control)

@@ -32,8 +32,7 @@ from mission_control.adapters.temporal.workflows.belllabs_run import BellLabsRun
 from mission_control.adapters.temporal.workflows.goal_directed import GoalDirectedWorkflow
 from mission_control.adapters.temporal.workflows.operation import OperationWorkflow
 from mission_control.adapters.temporal.workflows.stagegraph import StageGraphWorkflow
-from tests.fixtures.temporal_history import patch_ids
-from tests.support.integration.temporal.linked_runs import FixtureChildWorkflow
+from tests.support.temporal import FixtureChildWorkflow, patch_ids
 
 UPGRADE = Path(__file__).resolve().parent / "histories" / "temporalio_1_30"
 FIXTURES = Path(__file__).resolve().parents[2] / "fixtures" / "histories"

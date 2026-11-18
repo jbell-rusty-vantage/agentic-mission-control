@@ -38,7 +38,6 @@ from mission_control.domain.execution.contracts import (
 from mission_control.domain.execution.lanes import CursorExecutionBinding
 from mission_control.domain.frames.contracts import FrameKind
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.fixtures.temporal_history import completed_activity_results, patch_ids
 from tests.support.integration.temporal.mp07_claude_lane_turns import (
     WORKER,
     claude_unit,
@@ -50,6 +49,7 @@ from tests.support.integration.temporal.mp07_claude_lane_turns import (
     workflow_request,
 )
 from tests.support.providers.claude import PROFILE, SESSION_ID, claude_operation
+from tests.support.temporal import completed_activity_results, patch_ids
 
 
 def scheduled(history: Any) -> list[str]:

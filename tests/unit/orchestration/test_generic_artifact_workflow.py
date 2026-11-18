@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import pytest
 from temporalio import activity
 from temporalio.testing import WorkflowEnvironment
 from temporalio.worker import Worker
@@ -38,31 +37,26 @@ async def promote_artifact(payload: dict) -> dict:
     }
 
 
-async def test_generic_temporal_workflow_promotes_only_after_operation() -> None:
-    try:
-        environment = await WorkflowEnvironment.start_time_skipping()
-    except RuntimeError as error:
-        pytest.skip(f"Temporal test server is unavailable: {error}")
-    try:
-        async with Worker(
-            environment.client,
+async def test_generic_temporal_workflow_promotes_only_after_operation(
+    workflow_env: WorkflowEnvironment,
+) -> None:
+    async with Worker(
+        workflow_env.client,
+        task_queue="generic-artifact-test",
+        workflows=[GenericArtifactWorkflow],
+        workflow_runner=coordinator_workflow_runner(),
+        activities=[complete_operation, promote_artifact],
+    ):
+        result = await workflow_env.client.execute_workflow(
+            GenericArtifactWorkflow.run,
+            {
+                "request_scope": "tenant",
+                "operation": {"ignored": "by fake"},
+                "promotion": {"logical_path": "/workspace/output/report.md"},
+            },
+            id="generic-artifact-test",
             task_queue="generic-artifact-test",
-            workflows=[GenericArtifactWorkflow],
-            workflow_runner=coordinator_workflow_runner(),
-            activities=[complete_operation, promote_artifact],
-        ):
-            result = await environment.client.execute_workflow(
-                GenericArtifactWorkflow.run,
-                {
-                    "request_scope": "tenant",
-                    "operation": {"ignored": "by fake"},
-                    "promotion": {"logical_path": "/workspace/output/report.md"},
-                },
-                id="generic-artifact-test",
-                task_queue="generic-artifact-test",
-            )
-    finally:
-        await environment.shutdown()
+        )
 
     assert result["operation"]["status"] == "completed"
     assert result["artifact"]["status"] == "admitted"

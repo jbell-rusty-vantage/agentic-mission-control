@@ -60,7 +60,6 @@ from tests.fixtures.lane_turns import (
 )
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.fixtures.mp06_lanes import CapacityLimitedLane, ReconcilingLossyLane
-from tests.fixtures.temporal_history import patch_ids
 from tests.support.db_builders import pg_lane_unit
 from tests.support.integration.temporal.mp06_dispatch_recovery import (
     _activity_worker,
@@ -71,6 +70,7 @@ from tests.support.integration.temporal.mp06_dispatch_recovery import (
     _start,
     _workflow_worker,
 )
+from tests.support.temporal import patch_ids
 
 
 def _attempts(history: Any) -> list[int]:

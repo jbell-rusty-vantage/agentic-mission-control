@@ -58,11 +58,11 @@ from mission_control.domain.programs.goal_directed_runtime import (
     GoalOperationReconciliationRequest,
     GoalOperationReconciliationResult,
 )
-from tests.fixtures.operation_activities import wait_heartbeating
 from tests.support.integration.temporal.wp_bp_010_temporal import QUEUE, FakeStageGraphActivities
 from tests.support.integration.temporal.wp_bp_020_temporal import FakeGoalDirectedActivities
 from tests.support.integration.temporal.wp_bp_020_temporal import _run_input as goal_input
 from tests.support.run_control import command, request, service
+from tests.support.temporal import wait_heartbeating
 
 GOAL_QUEUE = "wp-bp-020-temporal"
 SCOPE = "tenant-1"

@@ -7,7 +7,6 @@ from datetime import timedelta
 
 import pytest
 from temporalio.client import Client
-from temporalio.testing import WorkflowEnvironment
 from temporalio.worker import Worker
 
 from mission_control.adapters.temporal.workflow_sandbox import coordinator_workflow_runner
@@ -25,6 +24,7 @@ from tests.support.integration.temporal.rrm_007_boundary_interventions import (
     until,
 )
 from tests.support.integration.temporal.wp_bp_010_temporal import QUEUE, _blueprint, _run_input
+from tests.support.temporal import start_workflow_env
 
 
 @pytest.mark.asyncio
@@ -33,10 +33,7 @@ async def test_declared_wait_survives_worker_loss_and_resumes_from_signal() -> N
     """The declared wait survives the loss of its worker and is released only through the
     governed facade (RRM-007, REQ-CP-EXEC-007): a raw signal releases nothing."""
 
-    try:
-        environment = await WorkflowEnvironment.start_time_skipping()
-    except RuntimeError as error:
-        pytest.skip(f"Temporal test server is unavailable: {error}")
+    environment = await start_workflow_env()
 
     authority = Authority(environment.client)
     activities = GovernedStageGraphActivities(authority)

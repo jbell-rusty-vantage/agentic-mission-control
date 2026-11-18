@@ -16,7 +16,6 @@ from langchain_core.tools import BaseTool
 from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.store.memory import InMemoryStore
 from temporalio import activity
-from temporalio.testing import WorkflowEnvironment
 from temporalio.worker import Worker
 from tests.fixtures.checkpoint_lineage import (
     execute_with_checkpoint_lineage,
@@ -27,9 +26,9 @@ from tests.fixtures.goal_directed_journaled import (
     goal_template_workspace,
 )
 from tests.fixtures.lane_bindings import LANE_REBINDERS, lane_fields
-from tests.fixtures.operation_activities import cancelled_operation_result
 from tests.support.deep_agents import exact_fixture
 from tests.support.operations import operation_request
+from tests.support.temporal import cancelled_operation_result, start_workflow_env
 
 from mission_control.adapters.deep_agents import (
     DeepAgentRuntimeAdapter,
@@ -530,10 +529,7 @@ async def test_temporal_goal_rollover_uses_fresh_deep_agent_typed_handoff_and_sa
         family_input=asdict(run_input),
         family_task_queue=QUEUE,
     )
-    try:
-        environment = await WorkflowEnvironment.start_time_skipping()
-    except RuntimeError as error:
-        pytest.skip(f"Temporal test server is unavailable: {error}")
+    environment = await start_workflow_env()
 
     async with environment:
         async with (

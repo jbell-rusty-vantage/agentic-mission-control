@@ -8,9 +8,6 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from types import SimpleNamespace
 
-from temporalio import workflow
-from temporalio.exceptions import ApplicationError
-
 from mission_control.application.programs.linked_runs import (
     InMemoryLinkedRunRepository,
     LinkedRunService,
@@ -39,12 +36,6 @@ from mission_control.domain.policies.contracts import (
     RunPhase,
     RunRequest,
 )
-from mission_control.domain.programs.contracts import (
-    BellLabsRunInput,
-    StageGraphCompletionProposal,
-    StageGraphRunInput,
-    StageGraphRunResult,
-)
 
 NOW = datetime(2026, 7, 19, 21, 0, tzinfo=UTC)
 DIGEST = "sha256:" + "a" * 64
@@ -52,32 +43,6 @@ CHILD_DIGEST = "sha256:" + "b" * 64
 PARENT_ACCOUNT = "budget-account:parent"
 PARENT_AUTHORITY = "workflow_run.parent:parent-run:sponsor"
 DECISION_AUTHORITY = "authority:composition"
-
-
-@workflow.defn(name="belllabs.run.v1", sandboxed=False)
-class FixtureChildWorkflow:
-    @workflow.run
-    async def run(self, root_input: BellLabsRunInput) -> StageGraphRunResult:
-        run_input = StageGraphRunInput(**root_input.family_input)
-        if run_input.blueprint.get("logical_id") == "child.fail":
-            raise ApplicationError("fixture child failed", non_retryable=True)
-        if run_input.blueprint.get("logical_id") == "child.cancel":
-            await workflow.wait_condition(lambda: False)
-        return StageGraphRunResult(
-            run_id=run_input.run_id,
-            workflow_cycles=0,
-            execution_epoch=run_input.execution_epoch,
-            family_version=1,
-            output_refs={"child": ("artifact:child:exact-v1",)},
-            reused_output_refs={},
-            schedule_trace=("child",),
-            completion_proposal=StageGraphCompletionProposal(
-                required_obligations_accepted=True,
-                pending_dependency_ids=(),
-                open_producer_liability_ids=(),
-                valid_output_refs=("artifact:child:exact-v1",),
-            ),
-        )
 
 
 def ref(kind: DefinitionKind, name: str, digest: str = DIGEST) -> ExactDefinitionRef:

@@ -47,7 +47,7 @@ from mission_control.domain.programs.goal_directed_runtime import (
     GoalOperationReconciliationResult,
     GoalOperationSettlement,
 )
-from tests.fixtures.operation_activities import sleep_heartbeating
+from tests.support.temporal import sleep_heartbeating
 
 DIGEST = "sha256:" + "a" * 64
 NOW = datetime(2026, 8, 10, 20, 0, tzinfo=UTC)

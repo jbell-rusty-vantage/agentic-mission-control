@@ -62,6 +62,7 @@ from tests.support.integration.temporal.chain_start_idempotent import (
 )
 from tests.support.integration.temporal.chain_start_idempotent import SCOPE as CHAIN_SCOPE
 from tests.support.run_control import request, service
+from tests.support.temporal import workflow_environment
 from tests.support.unit.watchers.watcher_manifest import definition, event_wait_document
 from tests.unit.watchers.fakes import RUN_ID, FakeRunGateway, MemoryWatcherStore
 
@@ -234,7 +235,7 @@ def fired_at(store: MemoryWatcherStore, watcher_id: str, base: datetime) -> list
 
 
 async def test_sample_watchers_fire_deterministically_within_their_limits_and_never_twice() -> None:
-    async with await WorkflowEnvironment.start_time_skipping() as env:
+    async with workflow_environment() as env:
         base = await env.get_current_time()
         store, runs = MemoryWatcherStore(SAMPLES), FakeRunGateway()
         store.fail_records = 1  # the first firing's record fails once: the activity retries
@@ -305,7 +306,7 @@ async def test_one_evaluator_per_run_including_chain_released_consumers() -> Non
         initial_goal="Ingest the supplied evidence map",
         actor_ref="chain:test",
     )
-    async with await WorkflowEnvironment.start_time_skipping() as env:
+    async with workflow_environment() as env:
         watchers = TemporalWatcherStarter(env.client, task_queue="chain-test-watchers")
         relay = ChainIntentRelay(
             store=OneShotStore(intent),  # the first acknowledgement is lost: delivered twice
@@ -360,7 +361,7 @@ async def test_held_clocks_recursion_and_an_early_event_wait_on_the_workflow() -
         {"on": {"event": "watcher.fired"}, "then": [{"notify": {"kind": "progress"}}]},
     )
     timeline = (Step(5, merged), Step(50, declare), Step(150, finish))
-    async with await WorkflowEnvironment.start_time_skipping() as env:
+    async with workflow_environment() as env:
         base = await env.get_current_time()
         store, runs = MemoryWatcherStore((stall, relay, await_merge)), FakeRunGateway()
         service = TimelineService(base, store, runs, timeline)

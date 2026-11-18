@@ -14,7 +14,6 @@ from typing import Any
 
 import asyncpg
 import pytest
-from temporalio.testing import WorkflowEnvironment
 from temporalio.worker import Replayer, Worker
 
 from mission_control.adapters.postgres.environments import (
@@ -47,6 +46,7 @@ from tests.fixtures.lane_turns import (
 )
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.support.db_builders import owner_rows
+from tests.support.temporal import start_workflow_env
 
 pytestmark = pytest.mark.common_db
 
@@ -62,13 +62,6 @@ def _identity(scope: str) -> LaneExecutionIdentity:
     return LaneExecutionIdentity.of(_operation(scope), "cursor_local", 1)
 
 
-async def _time_skipping() -> WorkflowEnvironment:
-    try:
-        return await WorkflowEnvironment.start_time_skipping()
-    except RuntimeError as error:
-        pytest.skip(f"Temporal test server is unavailable: {error}")
-
-
 def _scheduled(history: Any) -> list[str]:
     return [
         event.activity_task_scheduled_event_attributes.activity_type.name
@@ -79,7 +72,7 @@ def _scheduled(history: Any) -> list[str]:
 
 async def _run(db: CommonDatabase, lane: Any, workflow_id: str) -> tuple[Any, Any]:
     pool = await db.pool("mission_control_runtime")
-    env = await _time_skipping()
+    env = await start_workflow_env()
     try:
         operation = _operation(db.scope())
         preparations = EnvironmentPreparationService(PostgresEnvironmentPreparationRepository(pool))

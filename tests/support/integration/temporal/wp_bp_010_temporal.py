@@ -57,7 +57,7 @@ from mission_control.domain.programs.contracts import (
     StageGraphRunInput,
 )
 from mission_control.domain.programs.interpreter import StageGraphInterpreter
-from tests.fixtures.operation_activities import cancelled_operation_result, wait_heartbeating
+from tests.support.temporal import cancelled_operation_result, wait_heartbeating
 
 DIGEST = "sha256:" + "a" * 64
 NOW = datetime(2026, 8, 11, 12, 0, tzinfo=UTC)

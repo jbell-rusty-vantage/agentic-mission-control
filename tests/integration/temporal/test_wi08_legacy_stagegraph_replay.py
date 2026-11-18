@@ -23,7 +23,7 @@ from mission_control.adapters.temporal.workflows.stagegraph import (
     REVISIT_REGION_PATCH,
     StageGraphWorkflow,
 )
-from tests.fixtures.temporal_history import patch_ids, scheduled_activity_inputs
+from tests.support.temporal import patch_ids, scheduled_activity_inputs
 
 HISTORIES = Path(__file__).resolve().parents[2] / "fixtures" / "histories"
 CASES = sorted(HISTORIES.glob("*/stagegraph_*.json"))

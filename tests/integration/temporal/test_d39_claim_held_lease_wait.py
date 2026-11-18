@@ -15,7 +15,6 @@ from typing import Any
 
 import pytest
 from temporalio import activity
-from temporalio.testing import WorkflowEnvironment
 from temporalio.worker import Replayer, Worker
 
 from mission_control.adapters.temporal.operation_activities import claim_held_failure
@@ -27,8 +26,8 @@ from mission_control.adapters.temporal.workflows.operation import (
 from mission_control.application.execution.operations.operation_execution import (
     OperationClaimHeld,
 )
-from tests.fixtures.temporal_history import patch_ids
 from tests.support.operations import _workflow_request
+from tests.support.temporal import patch_ids, start_workflow_env
 
 WORKFLOW_QUEUE = "d39-operation-workflows"
 HOLDER_LEASE = timedelta(seconds=240)
@@ -36,10 +35,7 @@ HOLDER_LEASE = timedelta(seconds=240)
 
 @pytest.mark.asyncio
 async def test_a_refused_round_waits_for_the_holder_lease_then_continues_the_unit() -> None:
-    try:
-        environment = await WorkflowEnvironment.start_time_skipping()
-    except RuntimeError as error:
-        pytest.skip(f"Temporal test server is unavailable: {error}")
+    environment = await start_workflow_env()
     calls: list[tuple[int, datetime]] = []
     deadline: list[datetime] = []
 

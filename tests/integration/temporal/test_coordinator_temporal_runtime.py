@@ -6,7 +6,6 @@ from typing import Any, cast
 
 import pytest
 from temporalio.client import Client
-from temporalio.testing import WorkflowEnvironment
 
 from mission_control.adapters.temporal import worker as production_worker
 from mission_control.adapters.temporal.activities.goal_directed import GoalDirectedActivities
@@ -36,6 +35,7 @@ from mission_control.domain.programs.contracts import (
     WorkflowEvaluationResult,
 )
 from tests.fixtures.lane_bindings import LANE_REBINDERS
+from tests.support.temporal import start_workflow_env
 
 DIGEST = "sha256:" + "a" * 64
 
@@ -132,10 +132,7 @@ async def test_fastmcp_first_all_application_worker_factories_validate() -> None
         create_agent_cognitive_worker,
     )
 
-    try:
-        environment = await WorkflowEnvironment.start_time_skipping()
-    except RuntimeError as error:
-        pytest.skip(f"Temporal test server is unavailable: {error}")
+    environment = await start_workflow_env()
 
     operations = OperationExecutionActivities(cast(Any, object()))
     artifacts = ArtifactPromotionActivities(

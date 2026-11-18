@@ -20,7 +20,6 @@ import pytest
 from temporalio import activity
 from temporalio.client import WorkflowFailureError
 from temporalio.exceptions import ApplicationError
-from temporalio.testing import WorkflowEnvironment
 from temporalio.worker import Worker
 
 from mission_control.adapters.temporal.workflow_sandbox import coordinator_workflow_runner
@@ -42,7 +41,6 @@ from mission_control.domain.programs.contracts import (
     StageGraphResultActivityRequest,
     StageGraphResultActivityResult,
 )
-from tests.fixtures.temporal_history import patch_ids
 from tests.support.integration.temporal.rrm_007_boundary_interventions import (
     ROOT_WORKFLOWS,
     SCOPE,
@@ -60,13 +58,7 @@ from tests.support.integration.temporal.rrm_008_family_cancellation import (
 )
 from tests.support.integration.temporal.wp_bp_010_temporal import QUEUE, _blueprint
 from tests.support.integration.temporal.wp_bp_010_temporal import _run_input as stage_input
-
-
-def _environment() -> Any:
-    try:
-        return WorkflowEnvironment.start_time_skipping()
-    except RuntimeError as error:  # pragma: no cover - environment-dependent
-        pytest.skip(f"Temporal test server is unavailable: {error}")
+from tests.support.temporal import patch_ids, workflow_environment
 
 
 class BaselineSettlingActivities(CancellableStageGraphActivities):
@@ -138,7 +130,7 @@ def _stage_input(run_id: str, **overrides: Any) -> Any:
 
 @pytest.mark.asyncio
 async def test_stagegraph_with_a_baseline_completes_with_the_budget_settled() -> None:
-    async with await _environment() as environment:
+    async with workflow_environment() as environment:
         authority = Authority(environment.client)
         activities = BaselineSettlingActivities(authority)
         run_id = await _admitted_with_baseline(authority, "rrm-021-stagegraph-complete")
@@ -195,7 +187,7 @@ async def test_stagegraph_with_a_baseline_completes_with_the_budget_settled() ->
 async def test_cancelled_stagegraph_with_a_baseline_releases_it_and_terminalizes_cancelled() -> (
     None
 ):
-    async with await _environment() as environment:
+    async with workflow_environment() as environment:
         authority = Authority(environment.client)
         activities = BaselineSettlingActivities(authority)
         run_id = await _admitted_with_baseline(authority, "rrm-021-stagegraph-cancel")
@@ -238,7 +230,7 @@ async def _terminal(authority: Authority, run_id: str) -> bool:
 
 @pytest.mark.asyncio
 async def test_a_baseline_that_differs_from_the_admitted_reservation_is_refused() -> None:
-    async with await _environment() as environment:
+    async with workflow_environment() as environment:
         authority = Authority(environment.client)
         run_id = await _admitted_with_baseline(authority, "rrm-021-stagegraph-mismatch")
         decisions = StageGraphDecisionService(authority.run_control, authority.repository)
@@ -262,7 +254,7 @@ async def test_a_blocked_stagegraph_releases_its_baseline_before_it_fails() -> N
     """The family fails `stagegraph_blocked` (a required dependency never resolves) without
     proposing terminalization: the baseline is released first, so nothing stays reserved."""
 
-    async with await _environment() as environment:
+    async with workflow_environment() as environment:
         authority = Authority(environment.client)
         activities = BaselineSettlingActivities(authority)
         activities.block_after_downstream = True

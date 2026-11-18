@@ -87,126 +87,121 @@ def operator() -> ActorContext:
 
 
 @pytest.mark.asyncio
-async def test_queued_instruction_is_consumed_once_across_a_worker_restart() -> None:
-    try:
-        environment = await WorkflowEnvironment.start_time_skipping()
-    except RuntimeError as error:
-        pytest.skip(f"Temporal test server is unavailable: {error}")
-    async with environment:
-        repository = InMemoryRunControlRepository()
-        run_control = goal_run_control(repository)
-        selections, staging = FakeSelections(), InMemoryStaging()
-        packs = ContextPackService(
-            artifacts=FakeArtifacts({}, scope=None), selections=selections, staging=staging
-        )
-        mailbox = MailboxDeliveryService(repository.mailbox, run_control)
-        composition = await compose_goal_directed(
-            run_control=run_control,
-            journal=MemoryOperationJournal(),
-            lineage=CheckpointLineageService(InMemoryCheckpointLineageRepository()),
-            results=InMemoryArtifactPayloadStore(),
-            bindings=InMemoryOperationBindingRepository(),
-            saver=InMemorySaver(),
-            model=GoalScriptedModel(),
-            blueprint=goal_blueprint(),
-            context_packs=packs,
-            context_inputs=staging,
-            mailbox=mailbox,
-        )
-        run_id = await admit_goal_run(run_control, "ft-f1-mailbox")
-        facade = MissionControlService(
-            run_control,
-            BoundaryInterventionService(run_control),
-            request_scope=SCOPE,
-            mailbox=mailbox,
-        )
-        projection = await run_control.get_run(SCOPE, run_id)
-        receipt = await facade.command(
-            run_id,
-            MissionCommandRequest.model_validate(
-                {
-                    "request_id": str(uuid4()),
-                    "expected_version": projection.version,
-                    "expected_generation": 1,
-                    "target": {"kind": "run", "id": run_id},
-                    "kind": "queue_instruction",
-                    "payload": {"boundary": "next_iteration", "content": {"text": INSTRUCTION}},
-                    "reason": "operator steering",
-                }
+async def test_queued_instruction_is_consumed_once_across_a_worker_restart(
+    workflow_env: WorkflowEnvironment,
+) -> None:
+    repository = InMemoryRunControlRepository()
+    run_control = goal_run_control(repository)
+    selections, staging = FakeSelections(), InMemoryStaging()
+    packs = ContextPackService(
+        artifacts=FakeArtifacts({}, scope=None), selections=selections, staging=staging
+    )
+    mailbox = MailboxDeliveryService(repository.mailbox, run_control)
+    composition = await compose_goal_directed(
+        run_control=run_control,
+        journal=MemoryOperationJournal(),
+        lineage=CheckpointLineageService(InMemoryCheckpointLineageRepository()),
+        results=InMemoryArtifactPayloadStore(),
+        bindings=InMemoryOperationBindingRepository(),
+        saver=InMemorySaver(),
+        model=GoalScriptedModel(),
+        blueprint=goal_blueprint(),
+        context_packs=packs,
+        context_inputs=staging,
+        mailbox=mailbox,
+    )
+    run_id = await admit_goal_run(run_control, "ft-f1-mailbox")
+    facade = MissionControlService(
+        run_control,
+        BoundaryInterventionService(run_control),
+        request_scope=SCOPE,
+        mailbox=mailbox,
+    )
+    projection = await run_control.get_run(SCOPE, run_id)
+    receipt = await facade.command(
+        run_id,
+        MissionCommandRequest.model_validate(
+            {
+                "request_id": str(uuid4()),
+                "expected_version": projection.version,
+                "expected_generation": 1,
+                "target": {"kind": "run", "id": run_id},
+                "kind": "queue_instruction",
+                "payload": {"boundary": "next_iteration", "content": {"text": INSTRUCTION}},
+                "reason": "operator steering",
+            }
+        ),
+        operator(),
+    )
+    assert receipt.delivery is not None
+    assert [item.state.value for item in receipt.delivery.receipts] == ["accepted", "queued"]
+    LostOnce.lost = 0
+    async with (
+        Worker(
+            workflow_env.client,
+            task_queue=QUEUE,
+            workflows=[GoalDirectedWorkflow, OperationWorkflow],
+            workflow_runner=coordinator_workflow_runner(),
+            activities=coordinator_activities("GoalDirected", composition.family),
+        ),
+        Worker(
+            workflow_env.client,
+            task_queue=composition.binding.task_queue,
+            activities=agent_cognitive_activities(
+                LostOnce(composition.service, worker_identity="ft-f1")
             ),
-            operator(),
+        ),
+    ):
+        result = await workflow_env.client.execute_workflow(
+            GoalDirectedWorkflow.run,
+            goal_run_input(run_id, goal_blueprint(), baseline={"tokens.total": 20}),
+            id=f"family/{run_id}/1",
+            task_queue=QUEUE,
         )
-        assert receipt.delivery is not None
-        assert [item.state.value for item in receipt.delivery.receipts] == ["accepted", "queued"]
-        LostOnce.lost = 0
-        async with (
-            Worker(
-                environment.client,
-                task_queue=QUEUE,
-                workflows=[GoalDirectedWorkflow, OperationWorkflow],
-                workflow_runner=coordinator_workflow_runner(),
-                activities=coordinator_activities("GoalDirected", composition.family),
-            ),
-            Worker(
-                environment.client,
-                task_queue=composition.binding.task_queue,
-                activities=agent_cognitive_activities(
-                    LostOnce(composition.service, worker_identity="ft-f1")
-                ),
-            ),
-        ):
-            result = await environment.client.execute_workflow(
-                GoalDirectedWorkflow.run,
-                goal_run_input(run_id, goal_blueprint(), baseline={"tokens.total": 20}),
-                id=f"family/{run_id}/1",
-                task_queue=QUEUE,
-            )
 
-        assert LostOnce.lost == 1
-        assert result.goal_iterations == 2
-        assert (await run_control.get_run(SCOPE, run_id)).terminal_outcome == RunOutcome.COMPLETED
-        (entry,) = await repository.mailbox.list_entries(SCOPE, run_id)
-        assert entry.state == MailboxState.CONSUMED
-        assert entry.delivery_key is not None and "goal-iteration/1/executor" in entry.delivery_key
-        status = await run_control.get_boundary_command(
-            SCOPE, run_id, entry.command_issuer, entry.command_id
-        )
-        assert status is not None
-        assert [item.state.value for item in status.receipts] == [
-            "accepted",
-            "queued",
-            "delivered",
-            "observed",
-            "applied",
-        ]
-        assert {
-            item.delivery_report.delivered_semantics
-            for item in status.receipts
-            if item.delivery_report is not None
-        } == {"turn_boundary_guaranteed"}
+    assert LostOnce.lost == 1
+    assert result.goal_iterations == 2
+    assert (await run_control.get_run(SCOPE, run_id)).terminal_outcome == RunOutcome.COMPLETED
+    (entry,) = await repository.mailbox.list_entries(SCOPE, run_id)
+    assert entry.state == MailboxState.CONSUMED
+    assert entry.delivery_key is not None and "goal-iteration/1/executor" in entry.delivery_key
+    status = await run_control.get_boundary_command(
+        SCOPE, run_id, entry.command_issuer, entry.command_id
+    )
+    assert status is not None
+    assert [item.state.value for item in status.receipts] == [
+        "accepted",
+        "queued",
+        "delivered",
+        "observed",
+        "applied",
+    ]
+    assert {
+        item.delivery_report.delivered_semantics
+        for item in status.receipts
+        if item.delivery_report is not None
+    } == {"turn_boundary_guaranteed"}
 
-        # Exactly one packet carries the instruction: the first executor's, first in line
-        # after the operating contract and goals.
-        carrying = [
-            packet
-            for packet, _selection in selections.rows.values()
-            if any(
-                item.source_kind == ContextSourceKind.QUEUED_INSTRUCTION for item in packet.items
-            )
-        ]
-        assert [packet.target.activation_id for packet in carrying] == ["goal-iteration/1/executor"]
-        (item,) = [
-            item
-            for item in carrying[0].items
-            if item.source_kind == ContextSourceKind.QUEUED_INSTRUCTION
-        ]
-        assert item.inline is not None and item.inline.text == INSTRUCTION
-        assert item.mandatory and item.trust.value == "admitted_input"
-        kinds = [item.source_kind for item in carrying[0].items]
-        assert kinds.index(ContextSourceKind.QUEUED_INSTRUCTION) < kinds.index(
-            ContextSourceKind.WORKSPACE_MAP
-        )
-        events = [record.envelope.event_type for record in repository._outbox.values()]
-        assert events.count("command.queued") == 1
-        assert events.count("command.delivered") == 1
-        assert events.count("command.completed") == 1
+    # Exactly one packet carries the instruction: the first executor's, first in line
+    # after the operating contract and goals.
+    carrying = [
+        packet
+        for packet, _selection in selections.rows.values()
+        if any(item.source_kind == ContextSourceKind.QUEUED_INSTRUCTION for item in packet.items)
+    ]
+    assert [packet.target.activation_id for packet in carrying] == ["goal-iteration/1/executor"]
+    (item,) = [
+        item
+        for item in carrying[0].items
+        if item.source_kind == ContextSourceKind.QUEUED_INSTRUCTION
+    ]
+    assert item.inline is not None and item.inline.text == INSTRUCTION
+    assert item.mandatory and item.trust.value == "admitted_input"
+    kinds = [item.source_kind for item in carrying[0].items]
+    assert kinds.index(ContextSourceKind.QUEUED_INSTRUCTION) < kinds.index(
+        ContextSourceKind.WORKSPACE_MAP
+    )
+    events = [record.envelope.event_type for record in repository._outbox.values()]
+    assert events.count("command.queued") == 1
+    assert events.count("command.delivered") == 1
+    assert events.count("command.completed") == 1

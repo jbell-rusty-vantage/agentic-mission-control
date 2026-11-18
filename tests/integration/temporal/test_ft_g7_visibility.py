@@ -29,7 +29,6 @@ from mission_control.adapters.temporal.workflows.belllabs_run import BellLabsRun
 from mission_control.adapters.temporal.workflows.operation import OperationWorkflow
 from mission_control.adapters.temporal.workflows.stagegraph import StageGraphWorkflow
 from mission_control.domain.coordinator.launch import BlueprintFamily
-from tests.fixtures.temporal_history import patch_ids
 from tests.support.integration.temporal.ft_g7_visibility import _mc_upserts
 from tests.support.integration.temporal.rrm_005_search_attributes import (
     UnitBoundStageGraphActivities,
@@ -39,6 +38,7 @@ from tests.support.integration.temporal.wp_bp_010_temporal import QUEUE, _bluepr
 from tests.support.integration.temporal.wp_bp_010_temporal import _run_input as stage_run_input
 from tests.support.run_control import request as run_request
 from tests.support.run_control import service as run_control_service
+from tests.support.temporal import patch_ids
 
 
 def _key(name: str) -> SearchAttributeKey[Any]:

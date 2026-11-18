@@ -32,12 +32,12 @@ from mission_control.adapters.temporal.workflows.operation import (
 )
 from mission_control.domain.frames.contracts import FrameKind
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.fixtures.temporal_history import patch_ids
 from tests.support.integration.cursor.mp09_cloud_segment_loop_real_services import (
     _client,
     _run,
     pg_cloud_unit,
 )
+from tests.support.temporal import patch_ids
 
 
 def _scheduled(history: Any) -> list[str]:

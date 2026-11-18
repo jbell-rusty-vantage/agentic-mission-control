@@ -8,14 +8,12 @@ history without a wait carries no marker. Time-skipping test server; no provider
 
 from __future__ import annotations
 
-import os
 from collections import deque
 from typing import Any
 from uuid import uuid4
 
 import pytest
 from temporalio import activity
-from temporalio.testing import WorkflowEnvironment
 from temporalio.worker import Replayer, Worker
 
 from mission_control.adapters.temporal.artifact_workflow import (
@@ -23,7 +21,7 @@ from mission_control.adapters.temporal.artifact_workflow import (
     GenericArtifactWorkflow,
 )
 from mission_control.adapters.temporal.workflow_sandbox import coordinator_workflow_runner
-from tests.fixtures.temporal_history import patch_ids
+from tests.support.temporal import patch_ids, start_workflow_env
 
 pytestmark = pytest.mark.asyncio
 QUEUE = "wi04-generic-artifact"
@@ -47,13 +45,7 @@ async def _run(statuses: list[str]) -> tuple[dict[str, Any], Any, list[str]]:
     async def promote(payload: dict[str, Any]) -> dict[str, Any]:
         return {"artifact_id": "artifact-1", "binding_id": payload["binding_id"]}
 
-    existing = os.environ.get("MISSION_CONTROL_TEST_TEMPORAL_SERVER") or None
-    try:
-        environment = await WorkflowEnvironment.start_time_skipping(
-            test_server_existing_path=existing
-        )
-    except RuntimeError as error:
-        pytest.skip(f"Temporal test server is unavailable: {error}")
+    environment = await start_workflow_env()
     async with environment:
         async with Worker(
             environment.client,

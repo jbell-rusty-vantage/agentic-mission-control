@@ -23,7 +23,7 @@ from mission_control.adapters.temporal.workflow_sandbox import coordinator_workf
 from mission_control.adapters.temporal.workflows.goal_directed import GoalDirectedWorkflow
 from mission_control.adapters.temporal.workflows.operation import OperationWorkflow
 from mission_control.adapters.temporal.workflows.stagegraph import StageGraphWorkflow
-from tests.fixtures.temporal_history import patch_ids
+from tests.support.temporal import patch_ids
 
 HISTORIES = Path(__file__).resolve().parents[2] / "fixtures" / "histories" / "rrm007_pre_change"
 CASES = (
