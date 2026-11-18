@@ -4,10 +4,7 @@ import json
 
 import pytest
 
-from tests.support.unit.report_source_context import SPEC, context
-
-assert SPEC and SPEC.loader
-SPEC.loader.exec_module(context)
+from tests.support.unit.report_source_context import context
 
 
 def bundle(tmp_path, monkeypatch, *, budget=10000):

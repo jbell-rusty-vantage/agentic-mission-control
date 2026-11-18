@@ -6,11 +6,66 @@ process restart or durable object custody: result payloads and staged inputs sta
 
 from dataclasses import replace
 
+from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 from tests.fixtures.checkpoint_lineage import bind_unit
 from tests.fixtures.lane_bindings import lane_fields
-from tests.integration.deep_agents import test_checkpoint_lineage_postgres_saver as cp
-from tests.integration.deep_agents.test_report_source_context import FullContextReader
-from tests.integration.deep_agents.test_wi02_transfer_plan_lane import registry
+from tests.fixtures.mission_control_common_db import provision_runtime
+from tests.support.deep_agents import registry
+from tests.support.integration.deep_agents.checkpoint_lineage_postgres_saver import (
+    SAVER_SCHEMA,
+    AcceptingAuthority,
+    delivery,
+    root_lineage,
+)
+from tests.support.integration.deep_agents.report_source_context import FullContextReader
+from tests.support.operations import MCP_DIGEST, SKILL_DIGEST, operation_request
+from tests.support.run_control import actor, command
+from tests.support.run_control import request as run_request
+from tests.support.run_control import service as run_control_service
+
+from mission_control.adapters.deep_agents import DeepAgentRuntimeAdapter, ExactDeepAgentMaterializer
+from mission_control.adapters.deep_agents.harness import DeepAgentsHarness
+from mission_control.adapters.deep_agents.persistence import runtime_checkpoint_conninfo
+from mission_control.adapters.operations.conformance import (
+    ConformanceAssetVerifier,
+    ConformanceBudgetAuthority,
+    ConformanceEventSink,
+    ConformanceSandbox,
+    ConformanceSecretResolver,
+)
+from mission_control.adapters.postgres.operations.checkpoint_lineage import (
+    PostgresCheckpointLineageRepository,
+)
+from mission_control.adapters.postgres.operations.operation_journal import (
+    PostgresAtomicOperationJournalRepository,
+)
+from mission_control.adapters.postgres.run_control.run_control_repository import (
+    PostgresRunControlRepository,
+)
+from mission_control.adapters.storage.artifact_payloads import InMemoryArtifactPayloadStore
+from mission_control.application.execution.operations.checkpoint_lineage import (
+    CheckpointLineageService,
+)
+from mission_control.application.execution.operations.journaled_operation_execution import (
+    JournaledOperationExecutionCoordinator,
+)
+from mission_control.application.execution.operations.operation_execution import (
+    InMemoryOperationBindingRepository,
+    OperationExecutionService,
+)
+from mission_control.application.execution.operations.operation_journal import (
+    OperationJournalService,
+)
+from mission_control.application.resolution.registries import LaneRegistry
+from mission_control.domain.execution.contracts import (
+    OperationAttemptIdentity,
+    OperationExecutionRequest,
+)
+from mission_control.domain.policies.contracts import (
+    CommandStatus,
+    ReserveBudgetAction,
+    StartAction,
+)
 
 
 class CountingReader(FullContextReader):
@@ -22,14 +77,14 @@ class CountingReader(FullContextReader):
 
 
 async def admit(pool, scope):
-    control, _ = cp.run_control_service(cp.PostgresRunControlRepository(pool))
-    admitted = await control.admit(cp.run_request(request_scope=scope, request_id="joined-reader"))
+    control, _ = run_control_service(PostgresRunControlRepository(pool))
+    admitted = await control.admit(run_request(request_scope=scope, request_id="joined-reader"))
     started = await control.execute(
-        cp.command(admitted.run_id, 1, "joined-start", cp.StartAction()).model_copy(
+        command(admitted.run_id, 1, "joined-start", StartAction()).model_copy(
             update={"request_scope": scope}
         )
     )
-    assert started.status == cp.CommandStatus.ACCEPTED
+    assert started.status == CommandStatus.ACCEPTED
     return control, admitted.run_id
 
 
@@ -40,25 +95,25 @@ async def consume_and_replay(
     run = await control.get_run(scope, binding.run_id)
     reservation = "joined-reader-reservation"
     reserved = await control.execute(
-        cp.command(
+        command(
             binding.run_id,
             run.version,
             "joined-reserve",
-            cp.ReserveBudgetAction(reservation_id=reservation, amounts={"tokens.total": 10}),
+            ReserveBudgetAction(reservation_id=reservation, amounts={"tokens.total": 10}),
         ).model_copy(update={"request_scope": scope})
     )
-    assert reserved.status == cp.CommandStatus.ACCEPTED
+    assert reserved.status == CommandStatus.ACCEPTED
     binding = bind_unit(
         binding,
         binding.runtime_unit,
         control_revision=reserved.resulting_run_version,
         reservation_id=reservation,
     )
-    request = cp.OperationExecutionRequest.model_validate(
+    request = OperationExecutionRequest.model_validate(
         {
-            **cp.operation_request().model_dump(mode="python"),
+            **operation_request().model_dump(mode="python"),
             "request_scope": scope,
-            "identity": cp.OperationAttemptIdentity(
+            "identity": OperationAttemptIdentity(
                 run_id=binding.run_id,
                 operation_id=binding.operation_id,
                 operation_attempt=1,
@@ -74,61 +129,59 @@ async def consume_and_replay(
             "transfer": selection,
         }
     )
-    dsn = cp.runtime_checkpoint_conninfo(await cp.provision_runtime(database), cp.SAVER_SCHEMA)
-    payloads = cp.InMemoryArtifactPayloadStore()
+    dsn = runtime_checkpoint_conninfo(await provision_runtime(database), SAVER_SCHEMA)
+    payloads = InMemoryArtifactPayloadStore()
     model = CountingReader()
 
     def service(saver):
         components = replace(
             registry(binding, bundle, model), checkpointers={binding.checkpointer_ref.digest: saver}
         )
-        adapter = cp.DeepAgentRuntimeAdapter(
-            cp.ExactDeepAgentMaterializer(components),
+        adapter = DeepAgentRuntimeAdapter(
+            ExactDeepAgentMaterializer(components),
             transfer=transfer_factory(),
             knowledge=knowledge,
         )
-        assets = cp.ConformanceAssetVerifier(
-            mcp_schema_digests={"fixture-mcp": cp.MCP_DIGEST},
-            asset_manifest_digests={"skill:fixture.skill:1": cp.SKILL_DIGEST},
+        assets = ConformanceAssetVerifier(
+            mcp_schema_digests={"fixture-mcp": MCP_DIGEST},
+            asset_manifest_digests={"skill:fixture.skill:1": SKILL_DIGEST},
         )
-        return cp.OperationExecutionService(
-            authority=cp.AcceptingAuthority(),
-            bindings=cp.InMemoryOperationBindingRepository(),
-            lanes=cp.LaneRegistry([cp.DeepAgentsHarness(adapter)]),
-            sandbox=cp.ConformanceSandbox(),
+        return OperationExecutionService(
+            authority=AcceptingAuthority(),
+            bindings=InMemoryOperationBindingRepository(),
+            lanes=LaneRegistry([DeepAgentsHarness(adapter)]),
+            sandbox=ConformanceSandbox(),
             assets=assets,
             mcp=assets,
-            secrets=cp.ConformanceSecretResolver({"environment:OPENAI_API_KEY": "unused"}),
-            events=cp.ConformanceEventSink(),
-            budget=cp.ConformanceBudgetAuthority(),
-            journal=cp.JournaledOperationExecutionCoordinator(
-                journal=cp.OperationJournalService(
-                    cp.PostgresAtomicOperationJournalRepository(pool)
-                ),
+            secrets=ConformanceSecretResolver({"environment:OPENAI_API_KEY": "unused"}),
+            events=ConformanceEventSink(),
+            budget=ConformanceBudgetAuthority(),
+            journal=JournaledOperationExecutionCoordinator(
+                journal=OperationJournalService(PostgresAtomicOperationJournalRepository(pool)),
                 run_control=control,
                 results=payloads,
-                actor=cp.actor(),
+                actor=actor(),
             ),
             journal_claimed_by="worker:joined",
-            lineage=cp.CheckpointLineageService(cp.PostgresCheckpointLineageRepository(pool)),
+            lineage=CheckpointLineageService(PostgresCheckpointLineageRepository(pool)),
         )
 
     namespace = binding.cognitive_session_namespace
-    async with cp.AsyncPostgresSaver.from_conn_string(dsn) as saver:
-        result = await service(saver).execute(request, cp.delivery(1, binding.runtime_unit))
+    async with AsyncPostgresSaver.from_conn_string(dsn) as saver:
+        result = await service(saver).execute(request, delivery(1, binding.runtime_unit))
         assert result.status == "completed", result
-        chain = await cp.root_lineage(saver, namespace)
+        chain = await root_lineage(saver, namespace)
         assert chain and model.calls > 0
     calls = model.calls
-    lineage = cp.PostgresCheckpointLineageRepository(pool)
+    lineage = PostgresCheckpointLineageRepository(pool)
     transitions = await lineage.list_transitions(scope, namespace)
     assert len(transitions) == 1
     # New saver connection, registry, adapter, transfer store and execution service.
     # The same settled unit returns its journaled payload before provider dispatch.
-    async with cp.AsyncPostgresSaver.from_conn_string(dsn) as saver:
-        duplicate = await service(saver).execute(request, cp.delivery(2, binding.runtime_unit))
+    async with AsyncPostgresSaver.from_conn_string(dsn) as saver:
+        duplicate = await service(saver).execute(request, delivery(2, binding.runtime_unit))
         assert duplicate == result
         assert model.calls == calls
-        assert len(await cp.root_lineage(saver, namespace)) == len(chain)
+        assert len(await root_lineage(saver, namespace)) == len(chain)
     assert await lineage.list_transitions(scope, namespace) == transitions
     return result

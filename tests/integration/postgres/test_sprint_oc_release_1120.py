@@ -15,14 +15,14 @@ from uuid import UUID, uuid4
 import pytest
 
 from mission_control_db_contract.deployment import plan_release, verify_release
-from tests.integration.postgres.test_run2_release_141 import (
+from tests.support.integration.postgres.run2_release_141 import (
     PACKAGE,
     VERSIONS,
     disposable,
     install,
     release_at,
 )
-from tests.integration.postgres.test_sprint_v_release_150 import (
+from tests.support.integration.postgres.sprint_v_release_150 import (
     as_role,
     create_tenant,
     raises_sqlstate,

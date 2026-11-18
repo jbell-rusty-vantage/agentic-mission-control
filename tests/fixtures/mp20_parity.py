@@ -73,7 +73,7 @@ from tests.fixtures.rrm009_production_stack import (
     TechnicalBinding,
     technical_binding,
 )
-from tests.integration.temporal.test_manifest_v2_provider_launch import (
+from tests.support.integration.temporal.manifest_v2_provider_launch import (
     AUTH_PROFILES,
     _PayloadInputs,
     provider_lane,
@@ -1269,7 +1269,7 @@ def cursor_lanes(
     the fixture model, auth/host/environment names `lane_environment` selects, and the
     manifest repository mapped to the tmp repository (local) and tmp bare remote (cloud)."""
 
-    from tests.integration.temporal.test_manifest_v2_provider_launch import BINDINGS_EXAMPLE
+    from tests.support.integration.temporal.manifest_v2_provider_launch import BINDINGS_EXAMPLE
 
     document = json.loads(BINDINGS_EXAMPLE.read_text(encoding="utf-8"))
     scaffold = bindings.deep_agents

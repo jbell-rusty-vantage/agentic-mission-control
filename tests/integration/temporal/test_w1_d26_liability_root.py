@@ -32,7 +32,7 @@ from mission_control.domain.programs.family_failure import (
     FamilyFailureTerminalizationResult,
 )
 from tests.fixtures.goal_directed_journaled import SCOPE
-from tests.integration.temporal.test_w1_family_failure_root import QUEUE, FailingFamily, _root
+from tests.support.integration.temporal.w1_family_failure_root import QUEUE, FailingFamily, _root
 from tests.support.unit.coordinator.w1_d26_liability_terminalization import _stuck_unit
 
 

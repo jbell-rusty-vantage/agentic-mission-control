@@ -13,7 +13,6 @@ from __future__ import annotations
 
 import asyncio
 from collections.abc import AsyncIterator
-from datetime import UTC, datetime
 from pathlib import Path
 
 import asyncpg
@@ -40,7 +39,7 @@ from tests.fixtures.mission_control_common_db import (
     migration_paths_with,
 )
 from tests.support.db_builders import owner_rows
-from tests.support.knowledge import origin
+from tests.support.integration.postgres.wi07_collections_postgres import AT, access_for
 from tests.support.unit.knowledge.wi07_report_collections import (
     PIN,
     CurrentUse,
@@ -60,7 +59,6 @@ from tests.unit.outputs.scenario import (
 )
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.common_db]
-AT = datetime(2026, 10, 28, 12, tzinfo=UTC)
 MIGRATION = (
     Path(__file__).resolve().parents[3]
     / "scripts/release_190/0066_collection_member_assessments.sql"
@@ -86,22 +84,6 @@ async def released_180_db() -> AsyncIterator[CommonDatabase]:
     paths = sorted(RELEASE_180.glob("[0-9][0-9][0-9][0-9]_*.sql"))
     async with common_database(paths=paths) as database:
         yield database
-
-
-def access_for(db: CommonDatabase, operation: str = "op-research-1") -> InvocationAccess:
-    _mc, installation, application, tenant_id = db.scope("tenant-1").split("/")
-    return InvocationAccess(
-        origin=origin(
-            1,
-            installation_id=installation,
-            application_id=application,
-            tenant_id=tenant_id,
-            operation_id=operation,
-        ),
-        subject="mission-control-runtime",
-        invocation_id="inv-" + operation.replace("/", "-"),
-        authenticated_at=AT,
-    )
 
 
 async def make_stack(db: CommonDatabase, pool: asyncpg.Pool, *items) -> Stack:  # type: ignore[no-untyped-def]

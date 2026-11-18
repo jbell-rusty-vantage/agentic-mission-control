@@ -114,10 +114,10 @@ from tests.fixtures.lane_turns import (
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.fixtures.mp12_lanes import SOURCE_SESSION, ContinuingLane, Crashes, FakeHydrator
 from tests.fixtures.temporal_history import patch_ids
-from tests.integration.postgres.test_continuation_postgres import continuation_actor
-from tests.integration.temporal.test_wp_bp_020_temporal import FakeGoalDirectedActivities
-from tests.integration.temporal.test_wp_bp_020_temporal import _run_input as goal_input
 from tests.support.db_builders import admit_unit_attempt
+from tests.support.integration.postgres.continuation_postgres import continuation_actor
+from tests.support.integration.temporal.wp_bp_020_temporal import FakeGoalDirectedActivities
+from tests.support.integration.temporal.wp_bp_020_temporal import _run_input as goal_input
 
 pytestmark = pytest.mark.common_db
 

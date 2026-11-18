@@ -13,7 +13,7 @@ import pytest
 
 from mission_control.application.execution.harness.describe import DECLARED_LANE_MATRICES
 from mission_control_db_contract.deployment import plan_release, verify_release
-from tests.integration.postgres.test_run2_release_141 import (
+from tests.support.integration.postgres.run2_release_141 import (
     PACKAGE,
     VERSIONS,
     disposable,

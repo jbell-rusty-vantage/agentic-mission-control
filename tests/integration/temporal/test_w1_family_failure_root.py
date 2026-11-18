@@ -14,7 +14,6 @@ its patch and the payload decode are real. Both new histories replay.
 from __future__ import annotations
 
 import asyncio
-from dataclasses import asdict, replace
 from datetime import timedelta
 from typing import Any
 
@@ -23,7 +22,7 @@ from pydantic import ValidationError
 from temporalio import activity, workflow
 from temporalio.client import WorkflowFailureError
 from temporalio.common import RetryPolicy
-from temporalio.exceptions import ApplicationError, CancelledError, ChildWorkflowError
+from temporalio.exceptions import CancelledError, ChildWorkflowError
 from temporalio.worker import Replayer, Worker
 
 from mission_control.adapters.temporal.workflow_sandbox import coordinator_workflow_runner
@@ -32,19 +31,16 @@ from mission_control.adapters.temporal.workflows.mission_run import (
     MissionRunWorkflow,
 )
 from mission_control.adapters.temporal.workflows.payload_contracts import decode_contract
-from mission_control.domain.programs.contracts import BellLabsRunInput, StageGraphRunInput
+from mission_control.domain.programs.contracts import StageGraphRunInput
 from mission_control.domain.programs.family_failure import (
     FamilyFailureTerminalizationRequest,
     FamilyFailureTerminalizationResult,
 )
 from mission_control.domain.programs.goal_directed_runtime import GoalOperationDispatch
 from tests.fixtures.temporal_history import patch_ids
-from tests.integration.temporal.test_rrm_005_search_attributes import _start_local
-from tests.integration.temporal.test_wp_bp_010_temporal import _blueprint
-from tests.integration.temporal.test_wp_bp_010_temporal import _run_input as stage_run_input
+from tests.support.integration.temporal.rrm_005_search_attributes import _start_local
+from tests.support.integration.temporal.w1_family_failure_root import QUEUE, FailingFamily, _root
 from tests.support.unit.coordinator.root_result_materialization import SCOPE
-
-QUEUE = "w1-family-failure-root"
 
 
 @workflow.defn(name="belllabs.stagegraph", sandboxed=False)
@@ -70,15 +66,6 @@ class UndecodableResultFamily:
             retry_policy=RetryPolicy(maximum_attempts=1),
         )
         decode_contract(GoalOperationDispatch, raw, site="w1.undecodable_dispatch")
-
-
-@workflow.defn(name="belllabs.stagegraph", sandboxed=False)
-class FailingFamily:
-    """Fails at once with a typed application error."""
-
-    @workflow.run
-    async def run(self, run_input: StageGraphRunInput) -> None:
-        raise ApplicationError("unit failed", type="goal_operation_unreported", non_retryable=True)
 
 
 class Recorder:
@@ -109,22 +96,6 @@ class Recorder:
             "schema_version": "belllabs.goal-operation-dispatch.v1",
             "operation_binding_ref": "b" * 8_193,
         }
-
-
-def _root(run_id: str) -> BellLabsRunInput:
-    family_input = asdict(
-        replace(stage_run_input(_blueprint()), run_id=run_id, request_scope=SCOPE)
-    )
-    return BellLabsRunInput(
-        schema_version="mc.mission_run.v1",
-        run_id=run_id,
-        request_scope=SCOPE,
-        effective_configuration_digest=family_input["effective_configuration_digest"],
-        workflow_type_digest=family_input["workflow_type_digest"],
-        family="StageGraph",
-        family_task_queue=QUEUE,
-        family_input=family_input,
-    )
 
 
 async def _run(

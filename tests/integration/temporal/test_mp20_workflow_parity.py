@@ -68,7 +68,7 @@ from tests.fixtures.mp20_parity import (
 from tests.fixtures.rrm009_production_harness import _command, _diagnose, _run, _send, _until
 from tests.fixtures.rrm009_production_stack import SCOPE
 from tests.fixtures.temporal_history import patch_ids
-from tests.integration.temporal.test_rrm_007_boundary_interventions import replay
+from tests.support.integration.temporal.rrm_007_boundary_interventions import replay
 from tests.support.manifest_runtime import (
     OWNER_KEY,
     SCOPED,

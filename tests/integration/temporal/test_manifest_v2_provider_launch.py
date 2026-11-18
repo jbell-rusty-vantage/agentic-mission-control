@@ -83,7 +83,6 @@ from mission_control.application.authoring.manifest_submit import (
 )
 from mission_control.application.authoring.provider_launch import (
     LAUNCH_BINDINGS_SCHEMA_V2,
-    ProviderLaneBinding,
     ProviderLanes,
 )
 from mission_control.application.execution.child_environment import provider_child_environment
@@ -119,6 +118,12 @@ from tests.fixtures.rrm009_production_stack import (
     SCOPE,
     technical_binding,
 )
+from tests.support.integration.temporal.manifest_v2_provider_launch import (
+    AUTH_PROFILES,
+    ROOT,
+    _PayloadInputs,
+    provider_lane,
+)
 from tests.support.manifest_runtime import host_pins, missions_app, post, submit
 from tests.unit.authoring.manifest_launch_fixture import fixture_bindings
 from tests.unit.claude.fixtures import (
@@ -139,15 +144,7 @@ from tests.unit.codex.support import admission as codex_admission
 
 pytestmark = pytest.mark.common_db
 
-ROOT = Path(__file__).resolve().parents[3]
 EXAMPLES = ROOT / "tests/fixtures/manifests/multi-provider"
-BINDINGS_EXAMPLE = (
-    ROOT / "deployments/examples/manifest-launch-bindings.multi-provider.codex-0.162.1.example.json"
-)
-AUTH_PROFILES = {
-    "claude_agent_sdk": "claude-sdk-owner-subscription",
-    "codex": "codex-owner-chatgpt",
-}
 RUNTIMES = {"claude_agent_sdk": "claude", "codex": "codex"}
 OPERATION_WORKFLOW = "belllabs.operation.v2"
 # FIXTURE catalog schema for the example's `patch_report@1` output and acceptance: what the
@@ -172,25 +169,6 @@ def stage_manifest(profile: str) -> str:
     patch.pop("inputs")
     mission["program"]["nodes"] = [patch]
     return canonical_manifest_bytes(document).decode("utf-8")
-
-
-def provider_lane(
-    bindings: ManifestLaunchBindings, profile: str, task_queue: str
-) -> ProviderLaneBinding:
-    """The example's provider lane, on the test queue and the stack's own scaffold refs."""
-
-    document = json.loads(BINDINGS_EXAMPLE.read_text(encoding="utf-8"))
-    lane = document["providers"][profile]
-    scaffold = bindings.deep_agents
-    lane.update(
-        task_queue=task_queue,
-        agent_profile_ref=scaffold.agent_profile_ref.model_dump(mode="json"),
-        tracing_policy_ref=scaffold.tracing_policy_ref,
-        sensitive_data_policy_ref=scaffold.sensitive_data_policy_ref,
-        snapshot_policy_ref=scaffold.snapshot_policy_ref,
-        workspace=scaffold.workspace.model_dump(mode="json"),
-    )
-    return ProviderLaneBinding.model_validate(lane)
 
 
 @dataclass
@@ -384,26 +362,6 @@ async def provider_launch(
                 )
         finally:
             unregister()
-
-
-class _PayloadInputs:
-    """Governed read-only workspace inputs from the content-addressed payload store (the
-    production worker's reader, `deployment_composition._DurableInputsFromPayloads`)."""
-
-    def __init__(self, payloads: Any) -> None:
-        self._payloads = payloads
-
-    async def retrieve(self, durable_ref: str) -> bytes:
-        from mission_control.application.artifacts.artifact_promotion import ArtifactPayloadAddress
-
-        object_ref, _, rest = durable_ref.partition("#")
-        digest, _, size = rest.rpartition(":")
-        data: bytes = await self._payloads.retrieve(
-            ArtifactPayloadAddress(
-                object_ref=object_ref, content_digest=digest, size_bytes=int(size)
-            )
-        )
-        return data
 
 
 async def _activity_failures(stack: ProductionStack, run_id: str) -> list[str]:

@@ -593,7 +593,7 @@ def _preparation(role: str):
     from mission_control.domain.programs.goal_directed_runtime import (
         GoalOperationPreparationRequest,
     )
-    from tests.integration.temporal.test_wp_bp_020_temporal import _run_input
+    from tests.support.integration.temporal.wp_bp_020_temporal import _run_input
 
     run = _run_input()
     kernel = GoalDirectedInterpreter(GENERIC_GOAL_DIRECTED)

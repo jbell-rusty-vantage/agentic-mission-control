@@ -5,23 +5,25 @@ Prior releases and their proof remain immutable."""
 from __future__ import annotations
 
 import json
-from contextlib import asynccontextmanager
 from uuid import uuid4
 
-import asyncpg
 import pytest
 
 from mission_control_db_contract.deployment import verify_release
-from tests.integration.postgres.test_run2_release_141 import (
+from tests.support.integration.postgres.run2_release_141 import (
     PACKAGE,
     VERSIONS,
     assert_runtime_security,
-    context,
     disposable,
     install,
     release_at,
 )
-from tests.integration.postgres.test_run2_release_142 import preserve_document
+from tests.support.integration.postgres.run2_release_142 import preserve_document
+from tests.support.integration.postgres.sprint_v_release_150 import (
+    as_role,
+    create_tenant,
+    raises_sqlstate,
+)
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.common_db]
 SUCCESSOR = PACKAGE / "releases/1.5.0/component"
@@ -49,29 +51,6 @@ DIGEST_A = "sha256:" + "a" * 64
 DIGEST_B = "sha256:" + "b" * 64
 RUN_ID = uuid4()
 MISSION_ID = uuid4()
-
-
-async def create_tenant(connection, target):
-    tenant = uuid4()
-    await connection.execute(
-        "INSERT INTO mission_control.tenant "
-        "(installation_id,application_id,tenant_id,external_tenant_ref,state,"
-        "qualification_fixture,created_at,created_by_actor_ref) "
-        "VALUES ($1::uuid,$2,$3,$4,'active',true,now(),'fixture:sprint-v')",
-        target["installation_id"],
-        target["application_id"],
-        tenant,
-        f"sprint-v-{tenant}",
-    )
-    return tenant
-
-
-@asynccontextmanager
-async def as_role(connection, target, tenant, role="mission_control_runtime"):
-    async with connection.transaction():
-        await connection.execute(f"SET LOCAL ROLE {role}")
-        await context(connection, target, tenant)
-        yield
 
 
 def origin(attempt=1):
@@ -118,14 +97,6 @@ async def admit(connection, target, tenant, effect_key, digest=DIGEST_A, **updat
         "SELECT * FROM mission_control.admit_knowledge_operation($1::jsonb)",
         candidate(target, tenant, effect_key, digest, **updates),
     )
-
-
-async def raises_sqlstate(connection, sqlstate, query, *args):
-    with pytest.raises(asyncpg.PostgresError) as caught:
-        async with connection.transaction():
-            await connection.execute(query, *args)
-    assert caught.value.sqlstate == sqlstate, caught.value
-    return caught.value
 
 
 @pytest.mark.parametrize("upgrade", [None, "1.4.4"], ids=["fresh", "upgrade-from-144"])

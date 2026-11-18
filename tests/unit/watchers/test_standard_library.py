@@ -6,13 +6,10 @@ import pytest
 
 from mission_control.domain.authoring.manifest import load_manifest_yaml
 from mission_control.domain.programs.watchers import compile_watcher, wait_condition_id
-from tests.support.unit.watchers.standard_library import DATA, LIBRARY, ROOT, SPEC
+from tests.support.unit.watchers.standard_library import DATA, LIBRARY, ROOT
 from tests.support.unit.watchers.watcher_manifest import definition
 from tests.support.unit.watchers.watcher_planner import plan, signal
 from tests.unit.watchers.fakes import T0, at
-
-assert SPEC is not None and SPEC.loader is not None
-SPEC.loader.exec_module(LIBRARY)
 
 
 @pytest.mark.parametrize("entry", LIBRARY.definitions(), ids=lambda entry: entry.logical_id)

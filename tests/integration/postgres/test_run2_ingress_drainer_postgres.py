@@ -8,7 +8,8 @@ from mission_control.adapters.postgres.ingress_drainer import PostgresIngressDra
 from mission_control.application.frames.writer import FrameWriter
 from mission_control.application.secrets.minting import CredentialBinding
 from mission_control.application.signals.drainer import IngressDrainer, write_signal
-from tests.integration.postgres.test_signal_ingress_postgres import (
+from tests.support.db_builders import admit_unit_attempt
+from tests.support.integration.postgres.signal_ingress_postgres import (
     GATE_CONTEXT,
     Ingress,
     batch,
@@ -17,7 +18,6 @@ from tests.integration.postgres.test_signal_ingress_postgres import (
     ingress,  # noqa: F401
     signal,
 )
-from tests.support.db_builders import admit_unit_attempt
 
 pytestmark = pytest.mark.common_db
 

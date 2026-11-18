@@ -35,8 +35,8 @@ from mission_control.application.outputs.submission_service import SubmissionSer
 from mission_control.domain.knowledge.origin import MissionIdentityUnavailable
 from tests.fixtures.knowledge_binding import model_report
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.test_knowledge_gateway_postgres import stack
 from tests.support.db_builders import admit_unit_attempt, owner_rows
+from tests.support.integration.postgres.knowledge_gateway_postgres import stack
 from tests.support.knowledge import _runtime_invocation
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.common_db]

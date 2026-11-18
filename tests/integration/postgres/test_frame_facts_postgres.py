@@ -19,11 +19,10 @@ from mission_control.application.frames.reducer import (
 )
 from mission_control.application.frames.writer import FrameWriter
 from mission_control.domain.frames.contracts import frame_id_from_native_event_ref
-from mission_control.domain.policies.contracts import ActorContext
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.fixtures.provider_frames import StepClock, turn_observations
 from tests.support.db_builders import admit_unit_attempt, owner_rows
-from tests.support.run_control import ALL_PERMISSIONS, actor
+from tests.support.integration.postgres.frame_facts_postgres import projector_actor
 
 pytestmark = pytest.mark.common_db
 
@@ -35,12 +34,6 @@ FRAME_EVENTS = (
     "attempt.completed",
     "session.ended",
 )
-
-
-def projector_actor() -> ActorContext:
-    return actor().model_copy(
-        update={"permissions": ALL_PERMISSIONS | {"workflow_run.apply_frame_facts"}}
-    )
 
 
 @pytest.mark.asyncio

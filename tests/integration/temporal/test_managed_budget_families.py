@@ -43,7 +43,7 @@ from mission_control.domain.programs.contracts import (
     StageGraphAdmissionActivityResult,
 )
 from tests.fixtures.managed_lane import managed_binding, managed_operation
-from tests.integration.temporal.test_rrm_007_boundary_interventions import (
+from tests.support.integration.temporal.rrm_007_boundary_interventions import (
     SCOPE,
     Authority,
     GovernedGoalActivities,
@@ -53,7 +53,7 @@ from tests.integration.temporal.test_rrm_007_boundary_interventions import (
     _state_is,
     until,
 )
-from tests.integration.temporal.test_wp_bp_010_temporal import _blueprint, _run_input
+from tests.support.integration.temporal.wp_bp_010_temporal import _blueprint, _run_input
 
 DIGEST = "sha256:" + "a" * 64
 QUEUE = "run2-budget-family-isolated"

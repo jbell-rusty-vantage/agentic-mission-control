@@ -39,7 +39,7 @@ from mission_control.application.signals.service import IngressKeys, SignalIngre
 from mission_control.interfaces.http.ingress import create_ingress_app
 from tests.fixtures.mission_control_common_db import CommonDatabase, ingress_login
 from tests.fixtures.scoped_api_stack import until
-from tests.integration.cursor.test_mp09_cloud_segment_loop_real_services import (
+from tests.support.integration.cursor.mp09_cloud_segment_loop_real_services import (
     _client,
     _run,
     pg_cloud_unit,

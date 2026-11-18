@@ -45,13 +45,13 @@ from mission_control.domain.coordinator.launch import (
 )
 from mission_control.domain.policies.contracts import ActorContext, RunOutcome, RunPhase
 from tests.fixtures.temporal_history import patch_ids
-from tests.integration.temporal.test_ft_g7_visibility import _mc_upserts
-from tests.integration.temporal.test_rrm_005_search_attributes import (
+from tests.support.integration.temporal.ft_g7_visibility import _mc_upserts
+from tests.support.integration.temporal.rrm_005_search_attributes import (
     UnitBoundStageGraphActivities,
     _start_local,
 )
-from tests.integration.temporal.test_wp_bp_010_temporal import QUEUE, _blueprint
-from tests.integration.temporal.test_wp_bp_010_temporal import _run_input as stage_run_input
+from tests.support.integration.temporal.wp_bp_010_temporal import QUEUE, _blueprint
+from tests.support.integration.temporal.wp_bp_010_temporal import _run_input as stage_run_input
 from tests.support.run_control import request as run_request
 from tests.support.run_control import service as run_control_service
 

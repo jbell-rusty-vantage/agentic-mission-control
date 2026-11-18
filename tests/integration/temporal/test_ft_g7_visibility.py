@@ -15,7 +15,7 @@ from dataclasses import replace
 from typing import Any
 
 import pytest
-from temporalio.client import Client, WorkflowHistory
+from temporalio.client import Client
 from temporalio.common import SearchAttributeKey
 from temporalio.worker import Replayer, Worker
 
@@ -30,36 +30,19 @@ from mission_control.adapters.temporal.workflows.operation import OperationWorkf
 from mission_control.adapters.temporal.workflows.stagegraph import StageGraphWorkflow
 from mission_control.domain.coordinator.launch import BlueprintFamily
 from tests.fixtures.temporal_history import patch_ids
-from tests.integration.temporal.test_rrm_005_search_attributes import (
+from tests.support.integration.temporal.ft_g7_visibility import _mc_upserts
+from tests.support.integration.temporal.rrm_005_search_attributes import (
     UnitBoundStageGraphActivities,
     _start_local,
 )
-from tests.integration.temporal.test_wp_bp_010_temporal import QUEUE, _blueprint
-from tests.integration.temporal.test_wp_bp_010_temporal import _run_input as stage_run_input
+from tests.support.integration.temporal.wp_bp_010_temporal import QUEUE, _blueprint
+from tests.support.integration.temporal.wp_bp_010_temporal import _run_input as stage_run_input
 from tests.support.run_control import request as run_request
 from tests.support.run_control import service as run_control_service
 
 
 def _key(name: str) -> SearchAttributeKey[Any]:
     return next(key for key in BELLLABS_SEARCH_ATTRIBUTE_KEYS if key.name == name)
-
-
-def _mc_upserts(history: WorkflowHistory) -> list[dict[str, str]]:
-    """The fast-track upserts of a history, decoded as `{name: raw json}`."""
-
-    upserts: list[dict[str, str]] = []
-    for event in history.events:
-        if not event.HasField("upsert_workflow_search_attributes_event_attributes"):
-            continue
-        fields = event.upsert_workflow_search_attributes_event_attributes.search_attributes
-        mc = {
-            name: payload.data.decode("utf-8")
-            for name, payload in fields.indexed_fields.items()
-            if name.startswith("mc_")
-        }
-        if mc:
-            upserts.append(mc)
-    return upserts
 
 
 async def _count(client: Client, query: str, expected: int) -> int:

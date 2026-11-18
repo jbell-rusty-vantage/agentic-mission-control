@@ -52,11 +52,11 @@ from mission_control.interfaces.mcp.governed_gateway import (
     register_governed_tools,
 )
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.test_mp11_approvals_postgres import (  # noqa: F401
-    admitted_run,
-    mp11_db,
-)
 from tests.support.db_builders import owner_rows
+from tests.support.integration.postgres.mp11_approvals_postgres import (
+    admitted_run,
+    mp11_db,  # noqa: F401
+)
 from tests.unit.approvals.fixtures import POLICY, REVIEWER, Clock, RecordingExecutor, answer
 
 pytestmark = pytest.mark.common_db

@@ -10,7 +10,7 @@ from uuid import uuid4
 import pytest
 
 from mission_control_db_contract.deployment import verify_release
-from tests.integration.postgres.test_run2_release_141 import (
+from tests.support.integration.postgres.run2_release_141 import (
     PACKAGE,
     VERSIONS,
     assert_runtime_security,
@@ -18,10 +18,16 @@ from tests.integration.postgres.test_run2_release_141 import (
     install,
     release_at,
 )
-from tests.integration.postgres.test_sprint_v_release_150 import (
+from tests.support.integration.postgres.sprint_v_release_150 import (
     as_role,
     create_tenant,
     raises_sqlstate,
+)
+from tests.support.integration.postgres.sprint_v_release_160 import (
+    HANDLE_INSERT,
+    MISSION_ID,
+    RUN_ID,
+    wire_handle,
 )
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.common_db]
@@ -30,18 +36,6 @@ PREVIOUS = PACKAGE / "releases/1.5.0/component"
 MIGRATION = "0055_knowledge_handles_assessment_delivery_attempts"
 DIGEST_A = "sha256:" + "a" * 64
 DIGEST_B = "sha256:" + "b" * 64
-RUN_ID = uuid4()
-MISSION_ID = uuid4()
-HANDLE_INSERT = (
-    "INSERT INTO mission_control.knowledge_operation_handle (installation_id,application_id,"
-    "tenant_id,handle_id,binding_id,operation,request_id,remote_operation_id,protocol_version,"
-    "handle,effect_key,mission_id,run_id,operation_ref,operation_attempt,execution_generation,"
-    "invocation_ref,caller_origin,state,remote_revision,version,recorded_at,updated_at,"
-    "created_at,created_by_actor_ref) VALUES ($1::uuid,$2,$3,$4,'aiengineer-postgres',$5,$6,$7,"
-    "'ks.knowledge_operation.v2',$8::jsonb,$9,$10,$11,'stage:draft',1,1,'invocation:1',"
-    "'{\"kind\":\"mission_invocation\"}'::jsonb,$12,$13,1,now(),now(),now(),'fixture:sprint-v') "
-    "RETURNING handle_id"
-)
 HANDLE_UPDATE = (
     "UPDATE mission_control.knowledge_operation_handle SET state=$2, remote_revision=$3, "
     "pending_review_ref=$4, cancel_request_id=COALESCE(cancel_request_id, $5), error_code=$6, "
@@ -75,18 +69,6 @@ RECEIPT = (
     "'invocation:2',$5,'kh:aiengineer-postgres/report/r1@1','/inputs/r1/body.md',$6,$7,$8,$9,"
     "true,$10,now(),now(),'fixture:sprint-v') RETURNING attempt, outcome_code"
 )
-
-
-def wire_handle(operation_id: str) -> str:
-    return json.dumps(
-        {
-            "protocolVersion": "ks.knowledge_operation.v2",
-            "tenant": "t",
-            "application": "biotech",
-            "binding": "aiengineer-postgres",
-            "operationId": operation_id,
-        }
-    )
 
 
 @pytest.mark.parametrize("upgrade", [None, "1.5.0"], ids=["fresh", "upgrade-from-150"])

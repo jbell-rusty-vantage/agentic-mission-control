@@ -21,37 +21,14 @@ from mission_control.adapters.postgres.run_control.run_control_repository import
 from mission_control.application.execution.boundary_interventions import BoundaryInterventionService
 from mission_control.application.execution.mailbox import MailboxDeliveryService
 from mission_control.application.missions.service import MissionControlService
-from mission_control.contracts.contracts import MissionCommandRequest
-from mission_control.domain.policies.contracts import ActorContext, StartAction
+from mission_control.domain.policies.contracts import StartAction
 from mission_control.domain.policies.mailbox import MailboxState
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.support.boundary_commands import TARGET
-from tests.support.run_control import actor, command, request, service
+from tests.support.integration.postgres.command_mailbox_postgres import _request, operator
+from tests.support.run_control import command, request, service
 
 pytestmark = pytest.mark.common_db
-
-
-def operator() -> ActorContext:
-    source = actor()
-    return source.model_copy(
-        update={"permissions": source.permissions | {"workflow_run.read", "workflow_run.control"}}
-    )
-
-
-def _request(
-    run_id: str, version: int, kind: str, payload: dict[str, object]
-) -> MissionCommandRequest:
-    return MissionCommandRequest.model_validate(
-        {
-            "request_id": str(uuid4()),
-            "expected_version": version,
-            "expected_generation": 1,
-            "target": {"kind": "run", "id": run_id},
-            "kind": kind,
-            "payload": payload,
-            "reason": "operator steering",
-        }
-    )
 
 
 async def test_mailbox_admission_delivery_consumption_and_supersession_on_postgres(

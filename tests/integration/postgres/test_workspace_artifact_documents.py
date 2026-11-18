@@ -23,7 +23,7 @@ from mission_control.domain.execution.contracts import ArtifactPromotionState
 from mission_control.domain.execution.errors import WorkspaceSlotConflict
 from mission_control.domain.policies.errors import IdempotencyConflict
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.test_artifact_promotion_postgres_integration import (
+from tests.support.integration.postgres.artifact_promotion_postgres_integration import (
     admitted_revision,
 )
 from tests.support.unit.workspaces.goal_role_slot_ownership import _goal_request, _rebound

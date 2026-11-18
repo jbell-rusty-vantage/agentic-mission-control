@@ -31,7 +31,12 @@ from mission_control.domain.programs.contracts import (
     StageResultObservation,
 )
 from mission_control.domain.programs.interpreter import StageGraphInterpreter
-from tests.integration.temporal.test_wp_bp_010_temporal import DIGEST, NOW, _blueprint, _operation
+from tests.support.integration.temporal.wp_bp_010_temporal import (
+    DIGEST,
+    NOW,
+    _blueprint,
+    _operation,
+)
 
 RUN_ID = "run-ft-b2"
 SCOPE = "mc/0192a4f0-0000-7000-8000-00000000b10e/biotech/6f1e2d3c-0000-5000-8000-000000000001"

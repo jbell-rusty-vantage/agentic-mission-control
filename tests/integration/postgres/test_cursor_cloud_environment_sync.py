@@ -53,8 +53,8 @@ from tests.fixtures.cursor_environments import FakeEnvironmentsApi
 from tests.fixtures.isolated_settings import isolated_settings
 from tests.fixtures.lane_turns import ACTIVATION_UUID, RUN_UUID, RecordingSignals, lane_stack
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.test_environment_kits_postgres import _seed
 from tests.support.db_builders import BIOTECH_CATALOG, seeds_publish_module
+from tests.support.integration.postgres.environment_kits_postgres import _seed
 
 pytestmark = pytest.mark.common_db
 

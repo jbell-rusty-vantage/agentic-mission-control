@@ -43,7 +43,7 @@ from mission_control.domain.programs.contracts import (
     StageGraphResultActivityResult,
 )
 from tests.fixtures.temporal_history import patch_ids
-from tests.integration.temporal.test_rrm_007_boundary_interventions import (
+from tests.support.integration.temporal.rrm_007_boundary_interventions import (
     ROOT_WORKFLOWS,
     SCOPE,
     Authority,
@@ -51,15 +51,15 @@ from tests.integration.temporal.test_rrm_007_boundary_interventions import (
     replay,
     until,
 )
-from tests.integration.temporal.test_rrm_008_family_cancellation import (
+from tests.support.integration.temporal.rrm_008_family_cancellation import (
     BASELINE,
     CancellableStageGraphActivities,
     _await_completion,
     _cancel,
     terminalize_through_run_control,
 )
-from tests.integration.temporal.test_wp_bp_010_temporal import QUEUE, _blueprint
-from tests.integration.temporal.test_wp_bp_010_temporal import _run_input as stage_input
+from tests.support.integration.temporal.wp_bp_010_temporal import QUEUE, _blueprint
+from tests.support.integration.temporal.wp_bp_010_temporal import _run_input as stage_input
 
 
 def _environment() -> Any:

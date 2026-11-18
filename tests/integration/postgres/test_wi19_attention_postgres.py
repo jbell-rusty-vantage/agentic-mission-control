@@ -57,7 +57,7 @@ from tests.fixtures.mission_control_common_db import (
     common_database,
     migration_paths_with,
 )
-from tests.integration.postgres.test_mp15_coordinator_inbox_postgres import (
+from tests.support.integration.postgres.mp15_coordinator_inbox_postgres import (
     owner_fetch,
     started_run,
 )

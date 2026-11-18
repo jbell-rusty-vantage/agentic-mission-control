@@ -20,13 +20,13 @@ from mission_control.application.watchers.ports import WatcherCursor
 from mission_control.application.watchers.service import WatcherEvaluationService
 from mission_control.bootstrap.watch_sources import RegisteredWatchSources, SourceWatchRegistration
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.test_mo44_watchers_postgres import (
+from tests.support.db_builders import admit_unit_attempt
+from tests.support.integration.postgres.mo44_watchers_postgres import (
     FixedProgram,
     eventually,
     local_temporal,
 )
-from tests.integration.postgres.test_mp15_coordinator_inbox_postgres import mission_service
-from tests.support.db_builders import admit_unit_attempt
+from tests.support.integration.postgres.mp15_coordinator_inbox_postgres import mission_service
 from tests.support.unit.watchers.watcher_planner import plan, watcher
 from tests.unit.watchers.fakes import T0
 

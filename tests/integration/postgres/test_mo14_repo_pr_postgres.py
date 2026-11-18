@@ -43,11 +43,11 @@ from mission_control.application.execution.approvals_memory import StaticApprova
 from mission_control.application.human_tasks.service import HumanTaskService
 from mission_control.domain.policies.contracts import ActorContext
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.test_mp11_approvals_postgres import (  # noqa: F401
-    admitted_run,
-    mp11_db,
-)
 from tests.support.db_builders import owner_rows
+from tests.support.integration.postgres.mp11_approvals_postgres import (
+    admitted_run,
+    mp11_db,  # noqa: F401
+)
 from tests.unit.approvals.fixtures import POLICY, REVIEWER, answer
 from tests.unit.effects.support import (
     API,

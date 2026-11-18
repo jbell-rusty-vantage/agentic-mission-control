@@ -33,7 +33,7 @@ from mission_control.adapters.temporal.workflows.goal_directed import GoalDirect
 from mission_control.adapters.temporal.workflows.operation import OperationWorkflow
 from mission_control.adapters.temporal.workflows.stagegraph import StageGraphWorkflow
 from tests.fixtures.temporal_history import patch_ids
-from tests.integration.temporal.test_linked_runs import FixtureChildWorkflow
+from tests.support.integration.temporal.linked_runs import FixtureChildWorkflow
 
 UPGRADE = Path(__file__).resolve().parent / "histories" / "temporalio_1_30"
 FIXTURES = Path(__file__).resolve().parents[2] / "fixtures" / "histories"

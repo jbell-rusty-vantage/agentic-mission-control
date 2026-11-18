@@ -41,8 +41,8 @@ from mission_control.domain.knowledge.judgment import cited_decisions
 from tests.fixtures.checkpoint_recovery import recovery_harness, stage_recovery_unit
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.fixtures.saved_settlement import DurableEffectDouble
-from tests.integration.postgres.test_trusted_judgment_postgres import access_for
-from tests.integration.temporal.test_wi04_saved_settlement_restart import (
+from tests.support.integration.postgres.trusted_judgment_postgres import access_for
+from tests.support.integration.temporal.wi04_saved_settlement_restart import (
     _environment,
     _replays,
     _scheduled,

@@ -16,7 +16,10 @@ from mission_control.bootstrap.signals import compose_signal_ingress, verify_sig
 from mission_control.bootstrap.worker import start_hook_callback_listener
 from mission_control.domain.execution.bindings import EnvironmentBinding
 from mission_control.interfaces.mcp.coordinator_http_client import CoordinatorStreamableHttpClient
-from tests.integration.postgres.test_signal_ingress_postgres import Ingress, ingress  # noqa: F401
+from tests.support.integration.postgres.signal_ingress_postgres import (
+    Ingress,
+    ingress,  # noqa: F401
+)
 
 pytestmark = pytest.mark.common_db
 

@@ -39,8 +39,7 @@ from temporalio.testing import WorkflowEnvironment
 from temporalio.worker import Worker
 from tests.fixtures.mission_control_common_db import CommonDatabase, canonical_scope
 from tests.fixtures.mission_control_production_stack import start_local
-from tests.integration.temporal import test_rrm_007_boundary_interventions as interventions
-from tests.integration.temporal.test_rrm_007_boundary_interventions import (
+from tests.support.integration.temporal.rrm_007_boundary_interventions import (
     GOAL_QUEUE,
     Authority,
     GovernedGoalActivities,
@@ -54,9 +53,9 @@ from tests.integration.temporal.test_rrm_007_boundary_interventions import (
     resume,
     until,
 )
-from tests.integration.temporal.test_wp_bp_010_temporal import QUEUE, _blueprint
-from tests.integration.temporal.test_wp_bp_010_temporal import _run_input as stage_input
-from tests.integration.temporal.test_wp_bp_020_temporal import _run_input as goal_input
+from tests.support.integration.temporal.wp_bp_010_temporal import QUEUE, _blueprint
+from tests.support.integration.temporal.wp_bp_010_temporal import _run_input as stage_input
+from tests.support.integration.temporal.wp_bp_020_temporal import _run_input as goal_input
 from tests.support.run_control import actor, command, request
 from tests.support.run_control import service as run_control_service
 
@@ -188,26 +187,26 @@ def _submitter(client: Client) -> TemporalWorkflowSubmitter:
 @pytest.mark.asyncio
 async def test_interventions_on_real_temporal_with_postgres_authority(
     common_db: CommonDatabase,
-    monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
     assert common_db.scope("tenant-1") == SCOPE
-    # The shared RRM-007 authority helpers read their module scope and request builders at
-    # call time: point them at the canonical scope of this disposable database.
-    monkeypatch.setattr(interventions, "SCOPE", SCOPE)
-    monkeypatch.setattr(interventions, "request", partial(request, request_scope=SCOPE))
-    monkeypatch.setattr(
-        interventions,
-        "command",
-        lambda *args: command(*args).model_copy(update={"request_scope": SCOPE}),
-    )
     pool = await common_db.pool(max_size=8)
     owner = await common_db.owner_pool()
     evidence: dict[str, Any] = {}
     try:
         run_control, _ = run_control_service(PostgresRunControlRepository(pool))  # type: ignore[arg-type]
         async with await start_local(tmp_path / "temporal.sqlite", port=TEMPORAL_PORT) as env:
-            authority = Authority(env.client, run_control)
+            # The shared RRM-007 authority runs at the canonical scope of this disposable
+            # database, with request and command builders scoped to it.
+            authority = Authority(
+                env.client,
+                run_control,
+                scope=SCOPE,
+                run_request=partial(request, request_scope=SCOPE),
+                lifecycle_command=lambda *args: command(*args).model_copy(
+                    update={"request_scope": SCOPE}
+                ),
+            )
             authority.facade = BoundaryInterventionService(
                 run_control,
                 BoundaryCommandDeliveryService(

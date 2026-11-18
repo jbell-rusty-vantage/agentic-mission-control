@@ -14,7 +14,7 @@ from __future__ import annotations
 import json
 from datetime import timedelta
 from typing import Any
-from uuid import UUID, uuid4
+from uuid import uuid4
 
 import pytest
 
@@ -44,15 +44,16 @@ from mission_control.domain.policies.contracts import (
 from mission_control.domain.subscriptions.contracts import SubscriptionRequest, verify_signature
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.fixtures.provider_frames import StepClock
-from tests.integration.postgres.test_frame_facts_postgres import projector_actor
-from tests.integration.postgres.test_subscriptions import (
+from tests.support.db_builders import AdmittedUnit, admit_unit_attempt, owner_rows, scoped_command
+from tests.support.integration.postgres.frame_facts_postgres import projector_actor
+from tests.support.integration.postgres.provider_lineage_postgres import identity_rows, tokens
+from tests.support.integration.postgres.subscriptions import (
     READER,
     SECRET_ENV,
     SECRET_VALUE,
     Clock,
     Receiver,
 )
-from tests.support.db_builders import AdmittedUnit, admit_unit_attempt, owner_rows, scoped_command
 from tests.support.run_control import EMPTY_EVIDENCE_DIGEST, NOW, WORKFLOW_DIGEST
 from tests.support.unit.frames.provider_lanes import claude_observations, codex_app_observations
 
@@ -61,38 +62,6 @@ pytestmark = pytest.mark.common_db
 COVERED = CompletionEvidence(
     declared_outputs=frozenset({"report"}), registered_outputs=frozenset({"report"})
 )
-
-
-async def identity_rows(db: CommonDatabase, harness_execution_id: UUID) -> dict[str, Any]:
-    execution = await owner_rows(
-        db,
-        "SELECT lifecycle FROM mission_control.harness_execution WHERE harness_execution_id = $1",
-        harness_execution_id,
-    )
-    sessions = await owner_rows(
-        db,
-        "SELECT session_id, state FROM mission_control.agent_session "
-        "WHERE harness_execution_id = $1",
-        harness_execution_id,
-    )
-    turns = await owner_rows(
-        db,
-        "SELECT t.turn_no, t.native_turn_ref, t.usage::text AS usage "
-        "FROM mission_control.session_turn t JOIN mission_control.agent_session s "
-        "ON s.session_id = t.session_id WHERE s.harness_execution_id = $1 ORDER BY t.turn_no",
-        harness_execution_id,
-    )
-    return {
-        "lifecycle": execution[0]["lifecycle"],
-        "sessions": [row["state"] for row in sessions],
-        "turns": [
-            (row["turn_no"], row["native_turn_ref"], json.loads(row["usage"])) for row in turns
-        ],
-    }
-
-
-def tokens(usage: dict[str, Any], dimension: str) -> Any:
-    return usage["dimensions"][dimension]["value"]
 
 
 async def run_events(db: CommonDatabase, run_key: str) -> list[Any]:

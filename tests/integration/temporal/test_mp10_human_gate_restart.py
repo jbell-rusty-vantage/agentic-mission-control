@@ -100,11 +100,11 @@ from mission_control.domain.programs.human_gate import (
     packet_item,
 )
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.temporal.test_wp_bp_010_temporal import FakeStageGraphActivities
-from tests.integration.temporal.test_wp_bp_010_temporal import _operation as stage_operation
-from tests.integration.temporal.test_wp_bp_020_temporal import FakeGoalDirectedActivities
-from tests.integration.temporal.test_wp_bp_020_temporal import _run_input as goal_input
 from tests.support.db_builders import owner_rows
+from tests.support.integration.temporal.wp_bp_010_temporal import FakeStageGraphActivities
+from tests.support.integration.temporal.wp_bp_010_temporal import _operation as stage_operation
+from tests.support.integration.temporal.wp_bp_020_temporal import FakeGoalDirectedActivities
+from tests.support.integration.temporal.wp_bp_020_temporal import _run_input as goal_input
 from tests.support.run_control import request, service
 
 pytestmark = pytest.mark.common_db

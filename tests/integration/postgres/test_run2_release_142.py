@@ -8,16 +8,16 @@ import pytest
 
 from mission_control_db_contract.deployment import apply_release, plan_release, verify_release
 from mission_control_db_contract.errors import ContractError
-from tests.integration.postgres.test_run2_release_141 import (
+from tests.support.integration.postgres.run2_release_141 import (
     PACKAGE,
     VERSIONS,
     assert_runtime_security,
     disposable,
-    insert_document,
     install,
     release_at,
     retained_release_130,
 )
+from tests.support.integration.postgres.run2_release_142 import preserve_document
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.common_db]
 SUCCESSOR = PACKAGE / "releases/1.4.2/component"
@@ -30,25 +30,6 @@ async def function_metadata(connection):
         "SELECT oid,proowner,proacl,prosecdef,proconfig FROM pg_proc WHERE oid=$1::regprocedure",
         SIGNATURE,
     )
-
-
-async def preserve_document(connection, target):
-    tenant = uuid4()
-    await connection.execute(
-        "INSERT INTO mission_control.tenant "
-        "(installation_id,application_id,tenant_id,external_tenant_ref,state,"
-        "qualification_fixture,created_at,created_by_actor_ref) "
-        "VALUES ($1::uuid,$2,$3,'release-142-preserved','active',true,now(),'fixture:successor')",
-        target["installation_id"],
-        target["application_id"],
-        tenant,
-    )
-    await insert_document(connection, target, tenant, "operation.binding/1", "before-upgrade")
-    row = await connection.fetchrow(
-        "SELECT * FROM mission_control.runtime_document WHERE tenant_id=$1", tenant
-    )
-    assert row is not None
-    return tenant, row
 
 
 async def preserve_inbox_receipt(connection, target, tenant):

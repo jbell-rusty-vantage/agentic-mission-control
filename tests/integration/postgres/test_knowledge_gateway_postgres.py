@@ -15,16 +15,12 @@ from __future__ import annotations
 import asyncio
 import json
 from collections import deque
-from collections.abc import AsyncIterator
 from datetime import timedelta
 
 import asyncpg
 import pytest
-import pytest_asyncio
 
 from mission_control.adapters.postgres.context.transfer_plans import PostgresTransferPlanStore
-from mission_control.adapters.postgres.knowledge.handles import PostgresKnowledgeHandleStore
-from mission_control.adapters.postgres.knowledge.operations import PostgresKnowledgeJournal
 from mission_control.adapters.postgres.knowledge.submissions import PostgresOutputSubmissionStore
 from mission_control.application.context.materialization import (
     ContextDeliveryBlocked,
@@ -36,7 +32,6 @@ from mission_control.application.context.materialization import (
 )
 from mission_control.application.context.resolution import ContentResolutionService
 from mission_control.application.knowledge.access import InvocationAccess, RecoveryAccess
-from mission_control.application.knowledge.gateway import KnowledgeGateway
 from mission_control.application.knowledge.operations import KnowledgeRefused
 from mission_control.application.outputs.submission_service import (
     OutputSelection,
@@ -51,31 +46,21 @@ from mission_control.domain.context.transfer import ReceiverAttempt, ReceiverRef
 from mission_control.domain.knowledge.effects import EffectConflict, JournalState
 from mission_control.domain.outputs.contracts import ExactOutput, OutputForm
 from tests.fixtures.knowledge_binding import (
-    AUDIENCE,
     BINDING,
-    FakeKnowledgeBinding,
     InMemoryStaging,
-    Issuer,
-    RecordingMinter,
     SteppingClock,
-    knowledge_port,
     model_report,
     report_package,
 )
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.support.db_builders import owner_rows
+from tests.support.integration.postgres.knowledge_gateway_postgres import (
+    pool,  # noqa: F401
+    stack,
+)
 from tests.support.knowledge import call, origin
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.common_db]
-
-
-@pytest_asyncio.fixture
-async def pool(common_db: CommonDatabase) -> AsyncIterator[asyncpg.Pool]:
-    created = await common_db.pool()
-    try:
-        yield created
-    finally:
-        await created.close()
 
 
 def access_for(db: CommonDatabase, tenant: str = "tenant-1", **updates: object) -> InvocationAccess:
@@ -109,34 +94,6 @@ def recovery_for(access: InvocationAccess) -> RecoveryAccess:
     )
 
 
-def stack(pool: asyncpg.Pool, clock: SteppingClock | None = None):
-    clock = clock or SteppingClock()
-    issuer = Issuer(clock=clock)
-    minter = RecordingMinter(issuer.minter())
-    client = FakeKnowledgeBinding(verifier=issuer.verifier(), clock=clock)
-    journal = PostgresKnowledgeJournal(pool)
-    handles = PostgresKnowledgeHandleStore(pool)
-
-    async def sleep(_seconds: float) -> None:
-        return None
-
-    def gateway(max_polls: int = 10) -> KnowledgeGateway:
-        return KnowledgeGateway(
-            client=client,
-            journal=journal,
-            handles=handles,
-            minter=minter,
-            content=client,
-            knowledge=knowledge_port(BINDING),
-            audience=AUDIENCE,
-            max_polls=max_polls,
-            clock=clock,
-            sleep=sleep,
-        )
-
-    return clock, minter, client, journal, gateway
-
-
 def report_item(tenant_id: str, report_id: str = "r-1"):
     package = report_package(report_id, "1", tenant=tenant_id)
     report = package.report
@@ -149,7 +106,7 @@ def report_item(tenant_id: str, report_id: str = "r-1"):
 
 async def test_concurrent_same_key_invocations_admit_one_row_and_one_effect(
     common_db: CommonDatabase,
-    pool: asyncpg.Pool,
+    pool: asyncpg.Pool,  # noqa: F811
 ) -> None:
     _clock, _minter, client, journal, gateway = stack(pool)
     access = access_for(common_db)
@@ -197,7 +154,7 @@ async def test_concurrent_same_key_invocations_admit_one_row_and_one_effect(
 
 async def test_journal_and_submissions_are_tenant_isolated(
     common_db: CommonDatabase,
-    pool: asyncpg.Pool,
+    pool: asyncpg.Pool,  # noqa: F811
 ) -> None:
     _clock, _minter, _client, journal, gateway = stack(pool)
     mine = access_for(common_db, "tenant-1")
@@ -221,7 +178,7 @@ async def test_journal_and_submissions_are_tenant_isolated(
 
 async def test_crash_after_dispatch_is_uncertain_until_recovery_settles_from_receipt(
     common_db: CommonDatabase,
-    pool: asyncpg.Pool,
+    pool: asyncpg.Pool,  # noqa: F811
 ) -> None:
     clock, minter, client, _journal, gateway = stack(pool)
     access = access_for(common_db)
@@ -271,7 +228,7 @@ async def test_crash_after_dispatch_is_uncertain_until_recovery_settles_from_rec
 @pytest.mark.parametrize("code", ["INTERNAL", "UNRESOLVED_EFFECT"])
 async def test_a_refusal_after_the_native_commit_stays_uncertain_across_a_restart(
     common_db: CommonDatabase,
-    pool: asyncpg.Pool,
+    pool: asyncpg.Pool,  # noqa: F811
     code: str,
 ) -> None:
     """WI-05: the binding committed natively, lost its protocol receipt and refused. The durable
@@ -303,7 +260,7 @@ async def test_a_refusal_after_the_native_commit_stays_uncertain_across_a_restar
 
 async def test_submission_key_is_idempotent_and_a_changed_selection_is_mce02(
     common_db: CommonDatabase,
-    pool: asyncpg.Pool,
+    pool: asyncpg.Pool,  # noqa: F811
 ) -> None:
     service = SubmissionService(PostgresOutputSubmissionStore(pool))
     access = access_for(common_db)
@@ -351,7 +308,7 @@ async def test_submission_key_is_idempotent_and_a_changed_selection_is_mce02(
 
 async def test_stop_during_review_reaches_the_binding_after_a_restart(
     common_db: CommonDatabase,
-    pool: asyncpg.Pool,
+    pool: asyncpg.Pool,  # noqa: F811
 ) -> None:
     _clock, _minter, client, _journal, gateway = stack(pool)
     client.operation_statuses["report.assess"] = deque(["running", "waiting_review"])
@@ -380,7 +337,7 @@ async def test_stop_during_review_reaches_the_binding_after_a_restart(
 
 async def test_final_submission_assessment_handoff_is_durable(
     common_db: CommonDatabase,
-    pool: asyncpg.Pool,
+    pool: asyncpg.Pool,  # noqa: F811
 ) -> None:
     _clock, _minter, client, _journal, gateway = stack(pool)
     client.operation_statuses["report.assess"] = deque(["running", "running", "succeeded"])
@@ -418,7 +375,7 @@ async def test_final_submission_assessment_handoff_is_durable(
 
 async def test_one_sealed_plan_per_receiver_and_appended_attempt_receipts(
     common_db: CommonDatabase,
-    pool: asyncpg.Pool,
+    pool: asyncpg.Pool,  # noqa: F811
 ) -> None:
     from tests.support.unit.context.transfer_materializer import (
         OVERHEAD,
@@ -528,7 +485,7 @@ async def test_one_sealed_plan_per_receiver_and_appended_attempt_receipts(
 
 async def test_content_lineage_persists_production_adoption_and_consumption(
     common_db: CommonDatabase,
-    pool: asyncpg.Pool,
+    pool: asyncpg.Pool,  # noqa: F811
 ) -> None:
     from mission_control.adapters.postgres.knowledge.lineage import PostgresContentLineageStore
     from mission_control.application.knowledge.toolset import KnowledgeToolset, LiveInvocation
@@ -629,7 +586,7 @@ async def test_content_lineage_persists_production_adoption_and_consumption(
 
 async def test_a_host_grant_is_recorded_with_the_retry_dispatch_it_authorized(
     common_db: CommonDatabase,
-    pool: asyncpg.Pool,
+    pool: asyncpg.Pool,  # noqa: F811
 ) -> None:
     """R2-MC D2 on the 1.6.0 journal: attempt 1 leaves the effect uncertain; the host's grant
     for attempt 2 is found through `open_for_operation` and recorded on the dispatch row and
@@ -677,7 +634,7 @@ async def test_a_host_grant_is_recorded_with_the_retry_dispatch_it_authorized(
 
 async def test_registration_reuse_is_atomic_under_concurrent_writers(
     common_db: CommonDatabase,
-    pool: asyncpg.Pool,
+    pool: asyncpg.Pool,  # noqa: F811
 ) -> None:
     from mission_control.adapters.postgres.knowledge.lineage import PostgresContentLineageStore
     from mission_control.domain.knowledge.lineage import ProvenanceRole
@@ -732,7 +689,7 @@ async def test_registration_reuse_is_atomic_under_concurrent_writers(
 
 async def test_registration_subject_mismatch_rolls_back_without_weakening_strict_record(
     common_db: CommonDatabase,
-    pool: asyncpg.Pool,
+    pool: asyncpg.Pool,  # noqa: F811
 ) -> None:
     from dataclasses import replace
 

@@ -44,10 +44,8 @@ from mission_control.adapters.claude.harness import (
     turn_reference,
 )
 from mission_control.adapters.claude.transport import SdkClientFactory
-from mission_control.application.agentic_components.materialization import projection_digest
 from mission_control.application.agentic_components.placement import (
     RenderedProjectionSource,
-    operating_contract,
     static_rows,
 )
 from mission_control.application.execution.approvals_broker import ApprovalBroker
@@ -102,13 +100,11 @@ from tests.integration.claude.live_drill import (
     write_record,
     write_recording,
 )
+from tests.support.integration.claude.claude_live_qualification import _operation, _rows
 from tests.unit.approvals.fixtures import answer
 from tests.unit.claude.fixtures import (
     PROFILE,
     FixtureWorkspace,
-    base_operation,
-    claude_binding,
-    claude_operation,
 )
 
 DRILL_REVIEWER = "owner:drill"
@@ -130,41 +126,6 @@ TURN_ONE = (
 LONG_TURN = "Write the numbers from 1 to 600, one per line, and nothing else. Do not use tools."
 REPLACEMENT = "Ignore the previous request. Reply with the single line REPLACED-OK."
 RESUMED = "Reply with the single line RESUMED-OK."
-
-
-def _rows() -> tuple[Any, ...]:
-    from tests.fixtures.projections.rows import skill_row
-
-    # One skill only: no hook script, no MCP server and no executable is projected.
-    return (skill_row(),)
-
-
-def _operation(admission: AuthAdmission, *, key: str) -> OperationExecutionRequest:
-    base = base_operation()
-    digest = projection_digest(
-        HOST_PROJECTORS.render(_rows(), PROFILE, operating_contract(base), None)
-    )
-    binding = claude_binding(
-        materialization_digest=digest,
-        model={
-            "profile": "frontier.default",
-            "model_id": os.environ.get("MC_CLAUDE_DRILL_MODEL", "claude-sonnet-4-5"),
-        },
-        auth={"profile": admission.profile_id, "billing_mode": admission.billing_mode},
-        provider_options={
-            "provider": PROFILE,
-            "permission_mode": "default",
-            # Bash is not pre-allowed: its call must reach `can_use_tool`.
-            "allowed_tools": ["Read", "Task"],
-            "max_turns": 8,
-        },
-    )
-    operation = claude_operation(binding=binding)
-    payload = operation.model_dump(mode="python")
-    identity = payload["identity"]
-    payload["identity"] = {**dict(identity), "operation_id": f"claude-drill-{key}"}
-    payload["idempotency_key"] = f"claude-drill:{key}"
-    return OperationExecutionRequest.model_validate(payload)
 
 
 def _fields(operation: OperationExecutionRequest, key: str) -> dict[str, Any]:

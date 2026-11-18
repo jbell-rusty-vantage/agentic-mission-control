@@ -295,7 +295,7 @@ async def _run_linked_case(tmp_path: Any, monkeypatch: Any, scenario: str) -> No
     from tests.fixtures.overnight_linked_probes import LinkedProbe
     from tests.fixtures.overnight_trusted import install_scripted_trusted
     from tests.fixtures.rrm009_production_stack import technical_binding
-    from tests.integration.deep_agents.test_report_source_real_service import command, response
+    from tests.support.integration.deep_agents.report_source_real_service import command, response
     from tests.support.manifest_runtime import host_pins
 
     from mission_control.adapters.postgres.chains.exports import PostgresChainStartGate

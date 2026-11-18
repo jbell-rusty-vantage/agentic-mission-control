@@ -50,11 +50,11 @@ from mission_control.domain.authoring.environment_kits import (
 from mission_control.domain.capabilities.catalog_entry import capability_pin
 from mission_control.domain.capabilities.host_support import HostSupportStatus
 from mission_control.domain.coordinator.contracts import CapabilitySearchRequest
-from mission_control_db_contract.seeds import load_bundles, order_bundles
 from tests.fixtures.capability_search_catalog import DIMENSIONS, MODEL_ID
 from tests.fixtures.environment_kits import BASH, setup_environ
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.support.db_builders import BIOTECH_CATALOG, SEEDS, apply_seed_bundle
+from tests.support.db_builders import BIOTECH_CATALOG
+from tests.support.integration.postgres.environment_kits_postgres import _seed
 
 pytestmark = pytest.mark.common_db
 
@@ -67,16 +67,6 @@ STARTER_KITS = {
     "envkit.knowledge-research",
     "envkit.biotech-backend",
 }
-
-
-async def _seed(database: CommonDatabase) -> None:
-    bundles = [
-        bundle
-        for bundle in order_bundles(load_bundles([SEEDS / "common", SEEDS / "biotech"]), set())
-        if not any(record["kind"].startswith("storage_") for record in bundle["records"])
-    ]
-    for bundle in bundles:
-        await apply_seed_bundle(database, bundle)
 
 
 async def _project(writer_pool: asyncpg.Pool, reader: PostgresDefinitionRepository) -> None:

@@ -33,13 +33,13 @@ from tests.fixtures.mission_control_common_db import (
     catalog_scope,
     common_database,
 )
-from tests.integration.postgres.test_capability_search_projection_postgres import (
+from tests.support.integration.postgres.capability_search_projection_postgres import (
     NOW,
     document,
     spec,
     tool,
 )
-from tests.integration.postgres.test_run2_release_141 import (
+from tests.support.integration.postgres.run2_release_141 import (
     PACKAGE,
     VERSIONS,
     disposable,

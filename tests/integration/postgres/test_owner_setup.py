@@ -14,7 +14,7 @@ from mission_control.application.prerequisites.setup import (
 )
 from mission_control.domain.prerequisites import VerificationMethod
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.test_owner_prerequisites import pool  # noqa: F401
+from tests.support.integration.postgres.owner_prerequisites import pool  # noqa: F401
 
 pytestmark = pytest.mark.common_db
 

@@ -15,18 +15,12 @@ from mission_control.adapters.postgres.orchestration.completion_evidence import 
 from mission_control.adapters.postgres.run_control.run_control_repository import (
     PostgresRunControlRepository,
 )
-from mission_control.application.execution.service import FamilyAdmissionRegistry, RunControlService
 from mission_control.application.programs.completion_validation import ArtifactPublicationPending
-from mission_control.application.programs.service import (
-    StageGraphDecisionService,
-    register_stagegraph_family_mutations,
-)
 from mission_control.domain.authoring.canonical import sha256_digest
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.support.run_control import ConfigurationVerifier
+from tests.support.integration.postgres.completion_validation_postgres import recompose
 from tests.support.unit.orchestration.artifact_schema_validation import Custody, captured
 from tests.support.unit.orchestration.completion_validation_service import OUTPUT, prepared
-from tests.support.unit.run_control.atomic_family_admission import admission_policies
 
 pytestmark = pytest.mark.common_db
 
@@ -63,16 +57,6 @@ async def test_unbound_artifact_never_becomes_accepted_even_after_replay(common_
     finally:
         await pool.close()
         await writer.close()
-
-
-def recompose(pool, writer, custody):
-    repository = PostgresRunControlRepository(pool, family_writer_pool=writer)
-    registry = FamilyAdmissionRegistry()
-    register_stagegraph_family_mutations(registry)
-    control = RunControlService(
-        repository, ConfigurationVerifier(frozenset({"goal"})), admission_policies(), registry
-    )
-    return control, StageGraphDecisionService(control, repository, artifacts=custody)
 
 
 @pytest.mark.asyncio

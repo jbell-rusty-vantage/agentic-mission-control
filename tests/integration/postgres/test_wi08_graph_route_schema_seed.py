@@ -10,7 +10,7 @@ import pytest
 
 from mission_control_db_contract.errors import ContractError
 from mission_control_db_contract.seeds import load_bundles, validate_bundle
-from tests.integration.postgres.test_ai_engineer_report_schema_seed import (
+from tests.support.integration.postgres.ai_engineer_report_schema_seed import (
     RELEASE_142,
     SEEDS,
     apply,
@@ -21,8 +21,8 @@ from tests.integration.postgres.test_ai_engineer_report_schema_seed import (
     receipts,
     s0_row,
 )
-from tests.integration.postgres.test_capability_bundles_publish import SYNTHETIC_STORAGE
-from tests.integration.postgres.test_run2_release_141 import disposable, install, release_at
+from tests.support.integration.postgres.capability_bundles_publish import SYNTHETIC_STORAGE
+from tests.support.integration.postgres.run2_release_141 import disposable, install, release_at
 
 NEW_KEY = ("mc.catalog.artifact-schemas", "1.0.1")
 pytestmark = pytest.mark.common_db

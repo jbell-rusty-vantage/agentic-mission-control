@@ -16,7 +16,6 @@ from __future__ import annotations
 
 import asyncio
 from collections.abc import AsyncIterator
-from datetime import UTC, datetime
 
 import asyncpg
 import pytest
@@ -26,7 +25,6 @@ from mission_control.adapters.postgres.knowledge.output_contracts import (
     PostgresOutputContractStore,
 )
 from mission_control.adapters.postgres.scope import apply_scope
-from mission_control.application.knowledge.access import InvocationAccess
 from mission_control.application.outputs.fulfillment import (
     AuthorAccess,
     OutputSetRef,
@@ -44,7 +42,7 @@ from mission_control.domain.outputs.successors import (
 )
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.support.db_builders import owner_rows
-from tests.support.knowledge import origin
+from tests.support.integration.postgres.output_contracts_postgres import access_for
 from tests.unit.outputs.scenario import (
     Stack,
     build_stack,
@@ -59,7 +57,6 @@ from tests.unit.outputs.scenario import (
 )
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.common_db]
-AT = datetime(2026, 10, 27, 12, tzinfo=UTC)
 
 
 @pytest_asyncio.fixture
@@ -69,21 +66,6 @@ async def pool(common_db: CommonDatabase) -> AsyncIterator[asyncpg.Pool]:
         yield created
     finally:
         await created.close()
-
-
-def access_for(db: CommonDatabase, tenant: str = "tenant-1", attempt: int = 1) -> InvocationAccess:
-    _mc, installation, application, tenant_id = db.scope(tenant).split("/")
-    return InvocationAccess(
-        origin=origin(
-            attempt,
-            installation_id=installation,
-            application_id=application,
-            tenant_id=tenant_id,
-        ),
-        subject="mission-control-runtime",
-        invocation_id=f"inv-{attempt:04d}",
-        authenticated_at=AT,
-    )
 
 
 async def make_stack(db, pool, *items, completion=None):  # type: ignore[no-untyped-def]

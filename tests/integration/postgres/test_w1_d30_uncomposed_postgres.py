@@ -21,7 +21,7 @@ from mission_control.application.knowledge.trusted_settlement import (
 from mission_control.domain.execution.invocation_settlement import SettlementOutcome
 from mission_control.domain.outputs.contracts import OutputForm, Requirement
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.test_wi07_collections_postgres import access_for
+from tests.support.integration.postgres.wi07_collections_postgres import access_for
 from tests.support.unit.knowledge.wi07_report_collections import PIN, handle
 from tests.unit.outputs.scenario import build_stack, obligation
 

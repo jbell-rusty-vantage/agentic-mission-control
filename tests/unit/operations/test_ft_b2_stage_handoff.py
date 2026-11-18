@@ -42,7 +42,7 @@ from mission_control.domain.programs.contracts import (
 )
 from mission_control.domain.programs.interpreter import StageGraphInterpreter
 from tests.fixtures.lane_bindings import LANE_REBINDERS
-from tests.integration.temporal.test_wp_bp_010_temporal import (
+from tests.support.integration.temporal.wp_bp_010_temporal import (
     DIGEST,
     RecordingOperationBindings,
     _blueprint,

@@ -20,7 +20,7 @@ class LinkedSourceRevocation:
     proof: dict[str, Any] = field(default_factory=dict)
 
     def install(self, monkeypatch: Any, process: Any, pool: Any) -> None:
-        from tests.integration.deep_agents.test_report_source_real_service import command
+        from tests.support.integration.deep_agents.report_source_real_service import command
 
         from mission_control.adapters.postgres.knowledge.output_contracts import (
             PostgresOutputContractStore,

@@ -200,7 +200,7 @@ def test_the_record_is_what_the_qualification_gate_reads(tmp_path: Path) -> None
 
 
 def test_the_drill_operations_are_distinct_claude_units_with_bash_not_preallowed() -> None:
-    from tests.integration.claude.test_claude_live_qualification import _operation
+    from tests.support.integration.claude.claude_live_qualification import _operation
 
     admission = fixture_admission(route="api_key")
     turn = _operation(admission, key="turn")

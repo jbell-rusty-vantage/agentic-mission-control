@@ -19,7 +19,7 @@ from mission_control.adapters.postgres.knowledge.output_fulfillment import (
 )
 from mission_control.domain.outputs.contracts import Enforcement, OutputForm
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.test_output_contracts_postgres import access_for
+from tests.support.integration.postgres.output_contracts_postgres import access_for
 from tests.support.unit.outputs.w1_d28_d29 import (
     PIN,
     bridge_judges,

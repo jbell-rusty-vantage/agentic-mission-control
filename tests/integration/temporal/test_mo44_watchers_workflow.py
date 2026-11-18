@@ -55,12 +55,12 @@ from mission_control.contracts.identities import (
     parse_request_scope,
 )
 from mission_control.domain.programs.watchers import WatcherDescriptor, WatcherSpec, compile_watcher
-from tests.integration.temporal.test_chain_start_idempotent import (
+from tests.support.integration.temporal.chain_start_idempotent import (
     NOW,
     AdmittedRunInputs,
     OneShotStore,
 )
-from tests.integration.temporal.test_chain_start_idempotent import SCOPE as CHAIN_SCOPE
+from tests.support.integration.temporal.chain_start_idempotent import SCOPE as CHAIN_SCOPE
 from tests.support.run_control import request, service
 from tests.support.unit.watchers.watcher_manifest import definition, event_wait_document
 from tests.unit.watchers.fakes import RUN_ID, FakeRunGateway, MemoryWatcherStore

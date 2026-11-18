@@ -41,7 +41,6 @@ from mission_control.application.context.pack_service import ContextPackService
 from mission_control.application.frames.writer import FrameWriter
 from mission_control.domain.context.checkpoint import CheckpointIdentities
 from mission_control.domain.context.packet import PacketScope
-from mission_control.domain.policies.contracts import ActorContext
 from mission_control.domain.policies.errors import IdempotencyConflict
 from tests.fixtures.continuation import (
     FakeStaging,
@@ -56,22 +55,9 @@ from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.fixtures.provider_frames import StepClock as FrameClock
 from tests.fixtures.provider_frames import turn_observations
 from tests.support.db_builders import admit_unit_attempt, owner_rows
-from tests.support.run_control import ALL_PERMISSIONS, actor
+from tests.support.integration.postgres.continuation_postgres import continuation_actor
 
 pytestmark = pytest.mark.common_db
-
-
-def continuation_actor() -> ActorContext:
-    return actor().model_copy(
-        update={
-            "permissions": ALL_PERMISSIONS
-            | {
-                "workflow_run.record_continuation",
-                "workflow_run.request_continuation",
-                "workflow_run.read",
-            }
-        }
-    )
 
 
 class Hydrator:

@@ -53,7 +53,7 @@ def realtime_settings(redis_url: str, origin: str) -> Settings:
 
 
 def build(spec: dict[str, Any]) -> Any:
-    from tests.integration.postgres.test_mission_socket_postgres import deployment
+    from tests.support.integration.postgres.mission_socket_postgres import deployment
 
     composed: MissionDeployment = deployment(spec_database(spec), Path(spec["jwks"]))
     app = create_application(composed)

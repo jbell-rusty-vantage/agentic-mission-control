@@ -149,7 +149,7 @@ async def knowledge_host(root: Path) -> Any:
 
     Yields ``(process, ready, key_path)``: ``key_path`` is Mission Control's own private JWK
     (the host never sees it); ``ready["jwks"]`` names MC's kid and the host evaluator kid."""
-    from tests.integration.deep_agents.test_report_source_real_service import response
+    from tests.support.integration.deep_agents.report_source_real_service import response
 
     key_path, jwks_path, kid = write_issuer_key(root)
     config = root / "knowledge-host.json"

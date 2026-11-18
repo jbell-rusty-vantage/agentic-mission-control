@@ -20,15 +20,12 @@ fixture request objects a lane adapter would build. No provider is called.
 from __future__ import annotations
 
 import asyncio
-from collections.abc import AsyncIterator
 from datetime import UTC, datetime
 from typing import Any
-from uuid import uuid4
 
 import asyncpg
 import httpx
 import pytest
-import pytest_asyncio
 from fastapi import FastAPI
 
 from mission_control.adapters.postgres.approvals.correlations import (
@@ -36,9 +33,6 @@ from mission_control.adapters.postgres.approvals.correlations import (
 )
 from mission_control.adapters.postgres.approvals.tasks import PostgresApprovalTaskRepository
 from mission_control.adapters.postgres.human_tasks.repository import PostgresHumanTaskRepository
-from mission_control.adapters.postgres.run_control.run_control_repository import (
-    PostgresRunControlRepository,
-)
 from mission_control.adapters.postgres.run_control.stop_fence import PostgresStopFenceRepository
 from mission_control.application.execution.approvals_broker import ApprovalBroker
 from mission_control.application.execution.approvals_memory import StaticApprovalContext
@@ -57,12 +51,13 @@ from mission_control.interfaces.socketio.app import MissionSocketConfig, mount_m
 from mission_control.interfaces.socketio.auth import SocketAuthRejected, token_expiry
 from tests.fixtures.mission_control_common_db import (
     CommonDatabase,
-    create_common_database,
-    drop_common_database,
     tenant_id,
 )
 from tests.support.db_builders import owner_rows
-from tests.support.run_control import request, service
+from tests.support.integration.postgres.mp11_approvals_postgres import (
+    admitted_run,
+    mp11_db,  # noqa: F401
+)
 from tests.unit.approvals.fixtures import (
     POLICY,
     REVIEWER,
@@ -76,24 +71,6 @@ from tests.unit.socketio.harness import MissionClient, fixture_token, serve
 pytestmark = pytest.mark.common_db
 
 OWNER = ActorContext(actor_id=REVIEWER)
-
-
-@pytest_asyncio.fixture
-async def mp11_db() -> AsyncIterator[CommonDatabase]:
-    """Scratch database with the released chain 0001..0033 (MP-11 tables from 0033)."""
-
-    database = await create_common_database()
-    try:
-        yield database
-    finally:
-        await drop_common_database(database)
-
-
-async def admitted_run(pool: asyncpg.Pool, scope: str) -> str:
-    authority, _ = service(PostgresRunControlRepository(pool))  # type: ignore[arg-type]
-    admission = await authority.admit(request(request_scope=scope, request_id=str(uuid4())))
-    assert admission.run_id is not None
-    return admission.run_id
 
 
 class Stack:
@@ -154,7 +131,7 @@ async def _correlation_states(db: CommonDatabase, task_id: str) -> list[str]:
 
 
 async def test_two_concurrent_reviewers_one_resolution_with_events(
-    mp11_db: CommonDatabase,
+    mp11_db: CommonDatabase,  # noqa: F811
 ) -> None:
     pool = await mp11_db.pool(max_size=8)
     try:
@@ -221,7 +198,7 @@ async def test_two_concurrent_reviewers_one_resolution_with_events(
 
 
 async def test_restart_and_timeout_never_replay_into_another_request_or_arguments(
-    mp11_db: CommonDatabase,
+    mp11_db: CommonDatabase,  # noqa: F811
 ) -> None:
     pool = await mp11_db.pool(max_size=8)
     try:
@@ -314,7 +291,7 @@ async def test_restart_and_timeout_never_replay_into_another_request_or_argument
 
 
 async def test_stale_approval_after_compaction_cancel_and_stop_fence(
-    mp11_db: CommonDatabase,
+    mp11_db: CommonDatabase,  # noqa: F811
 ) -> None:
     pool = await mp11_db.pool(max_size=8)
     try:
@@ -372,7 +349,7 @@ async def test_stale_approval_after_compaction_cancel_and_stop_fence(
 
 
 async def test_deny_and_cancel_are_distinct_and_cross_tenant_reads_see_nothing(
-    mp11_db: CommonDatabase,
+    mp11_db: CommonDatabase,  # noqa: F811
 ) -> None:
     pool = await mp11_db.pool(max_size=8)
     try:
@@ -436,7 +413,7 @@ class _Resolver:
 
 
 async def test_http_and_socket_retry_of_the_same_resolution_is_idempotent(
-    mp11_db: CommonDatabase,
+    mp11_db: CommonDatabase,  # noqa: F811
 ) -> None:
     pool = await mp11_db.pool(max_size=8)
     try:
@@ -543,7 +520,7 @@ async def test_http_and_socket_retry_of_the_same_resolution_is_idempotent(
 
 
 async def test_production_context_probe_reads_generation_and_binding_from_harness_execution(
-    mp11_db: CommonDatabase,
+    mp11_db: CommonDatabase,  # noqa: F811
 ) -> None:
     """The real `PostgresApprovalContextProbe` on an MP-06 harness execution (fixture lane)."""
 

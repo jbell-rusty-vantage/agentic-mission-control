@@ -11,7 +11,6 @@ from __future__ import annotations
 import copy
 import json
 import secrets
-from pathlib import Path
 from urllib.parse import quote, urlsplit, urlunsplit
 
 import asyncpg
@@ -24,27 +23,35 @@ from mission_control.adapters.postgres.control_plane.definition_repository impor
 from mission_control.adapters.postgres.scope import apply_catalog_scope_string
 from mission_control.domain.authoring.contracts import ArtifactSchemaDefinition, PublishedDefinition
 from mission_control_db_contract.errors import ContractError
-from mission_control_db_contract.seeds import load_bundles, seed_apply, seed_plan, validate_bundle
+from mission_control_db_contract.seeds import load_bundles, seed_plan, validate_bundle
 from tests.fixtures.mission_control_common_db import admin_dsn
+from tests.qualification.two_project.release_install import write_target
+from tests.support.integration.postgres.ai_engineer_report_schema_seed import (
+    RELEASE_142,
+    ROOT,
+    S0_ID,
+    SEEDS,
+    apply,
+    catalog_counts,
+    ident,
+    plan,
+    published,
+    receipts,
+    s0_row,
+)
 
 # The established synthetic Supabase-shaped Storage stand-in (FT-A2); it is not Supabase.
-from tests.integration.postgres.test_capability_bundles_publish import SYNTHETIC_STORAGE
-from tests.integration.postgres.test_run2_release_141 import (
+from tests.support.integration.postgres.capability_bundles_publish import SYNTHETIC_STORAGE
+from tests.support.integration.postgres.run2_release_141 import (
     VERSIONS,
     disposable,
     install,
     release_at,
     retained_release_130,
 )
-from tests.qualification.two_project.release_install import write_target
 
-ROOT = Path(__file__).resolve().parents[3]
-PACKAGE = ROOT / "packages/mission-control-db-contract"
-SEEDS = PACKAGE / "seeds"
-RELEASE_142 = PACKAGE / "releases/1.4.2/component"
 NEW_KEY = ("mc.app.ai-engineer.artifact-schemas", "1.0.0")
 NEW_PATH = SEEDS / "ai-engineer/mc.app.ai-engineer.artifact-schemas-1.0.0.json"
-S0_ID = "schema.s0-probe-report"
 SDLC_IDS = (
     "schema.sdlc-diagnosis-report",
     "schema.sdlc-patch-report",
@@ -56,61 +63,10 @@ LIVE_130_RECEIPTS = (
 pytestmark = pytest.mark.common_db
 
 
-def ident(bundle: dict) -> tuple[str, str]:
-    return bundle["seed_key"], bundle["seed_version"]
-
-
 def seed_sets() -> tuple[list[dict], dict]:
     everything = load_bundles([SEEDS / "common", SEEDS / "ai-engineer"])
     (new,) = [bundle for bundle in everything if ident(bundle) == NEW_KEY]
     return [bundle for bundle in everything if ident(bundle) != NEW_KEY], new
-
-
-def published(bundle: dict) -> dict[str, PublishedDefinition]:
-    result = {}
-    for record in bundle["records"]:
-        if record["kind"] == "asset_version":
-            definition = PublishedDefinition.model_validate(record["fields"]["manifest"])
-            result[definition.ref.logical_id] = definition
-    return result
-
-
-def confirm(target: dict) -> str:
-    return f"{target['project_ref']}:{target['installation_id']}"
-
-
-async def apply(target, release, bundles) -> dict[tuple[str, str], str]:
-    result = await seed_apply(target, release, bundles, confirmation=confirm(target), **VERSIONS)
-    return {(b["seed_key"], b["seed_version"]): b["outcome"] for b in result["bundles"]}
-
-
-async def plan(target, release, bundles) -> dict[tuple[str, str], str]:
-    result = await seed_plan(target, release, bundles, **VERSIONS)
-    return {(b["seed_key"], b["seed_version"]): b["status"] for b in result["bundles"]}
-
-
-async def receipts(connection) -> dict[tuple[str, str], tuple]:
-    rows = await connection.fetch(
-        "SELECT seed_key,seed_version,seed_digest,component_version,record_counts::text AS counts,"
-        "applied_at,applied_by FROM mission_control.installation_seed_receipt"
-    )
-    return {(row["seed_key"], row["seed_version"]): tuple(row.values())[2:] for row in rows}
-
-
-async def catalog_counts(connection) -> dict[str, int]:
-    tables = ("asset_version", "asset_decision", "seed_identity", "installation_seed_receipt")
-    return {
-        table: await connection.fetchval(f"SELECT count(*) FROM mission_control.{table}")
-        for table in tables
-    }
-
-
-async def s0_row(connection) -> asyncpg.Record:
-    return await connection.fetchrow(
-        "SELECT asset_version_id,manifest_digest,manifest::text AS manifest,status,version_no,"
-        "updated_at FROM mission_control.asset_version WHERE asset_id=$1",
-        f"definition:artifact_schema:{S0_ID}",
-    )
 
 
 async def runtime_login(connection, target) -> tuple[str, str]:

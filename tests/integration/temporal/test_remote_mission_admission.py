@@ -58,7 +58,7 @@ from tests.fixtures.manifest_runtime import AUTHOR, ChainScript, chain_component
 from tests.fixtures.mission_control_common_db import catalog_scope, ingress_login
 from tests.fixtures.mission_control_production_stack import open_postgres_production_stack
 from tests.fixtures.rrm009_production_stack import SCOPE, technical_binding
-from tests.integration.postgres.test_signal_ingress_postgres import FakeOidc, FakeUploads
+from tests.support.integration.postgres.signal_ingress_postgres import FakeOidc, FakeUploads
 from tests.support.manifest_runtime import (
     MISSION_2,
     OUTPUT_SCHEMAS,

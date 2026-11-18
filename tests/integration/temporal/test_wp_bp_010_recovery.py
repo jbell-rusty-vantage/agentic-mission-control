@@ -17,18 +17,14 @@ from mission_control.adapters.temporal.workflows.stagegraph import (
     wait_condition_id,
 )
 from mission_control.domain.policies.contracts import SatisfyWaitAction
-from tests.integration.temporal.test_rrm_007_boundary_interventions import (
+from tests.support.integration.temporal.rrm_007_boundary_interventions import (
     Authority,
     GovernedStageGraphActivities,
     _has_wait,
     _state_is,
     until,
 )
-from tests.integration.temporal.test_wp_bp_010_temporal import (
-    QUEUE,
-    _blueprint,
-    _run_input,
-)
+from tests.support.integration.temporal.wp_bp_010_temporal import QUEUE, _blueprint, _run_input
 
 
 @pytest.mark.asyncio

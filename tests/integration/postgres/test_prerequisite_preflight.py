@@ -9,7 +9,7 @@ from mission_control.adapters.postgres.prerequisites import PostgresOwnerPrerequ
 from mission_control.application.prerequisites.preflight import PrerequisitePreflight
 from mission_control.application.prerequisites.service import OwnerPrerequisiteService
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.test_owner_prerequisites import pool  # noqa: F401
+from tests.support.integration.postgres.owner_prerequisites import pool  # noqa: F401
 from tests.support.unit.prerequisites.preflight import definition
 
 pytestmark = pytest.mark.common_db

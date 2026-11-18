@@ -30,12 +30,12 @@ from tests.fixtures.knowledge_binding import (
     knowledge_port,
     report_package,
 )
-from tests.integration.deep_agents.test_wi02_transfer_plan_lane import (
+from tests.support.deep_agents import registry
+from tests.support.integration.deep_agents.wi02_transfer_plan_lane import (
     PlanReadingModel,
     _invocation,
     _selection,
 )
-from tests.support.deep_agents import registry
 from tests.support.knowledge import TENANT, origin
 from tests.support.unit.context.transfer_materializer import FakeOutputs
 

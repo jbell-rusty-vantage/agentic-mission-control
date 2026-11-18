@@ -18,26 +18,19 @@ every history is replayed with `Replayer`. Providers are labelled fixtures
 from __future__ import annotations
 
 import asyncio
-import os
 from contextlib import suppress
 from dataclasses import dataclass, field
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime
 from typing import Any
 from uuid import uuid4
 
 import pytest
-from temporalio.client import Client, WorkflowHandle
-from temporalio.worker import Replayer, Worker
 
 from mission_control.adapters.temporal.operation_activities import (
-    OperationExecutionActivities,
     parse_operation_result,
 )
-from mission_control.adapters.temporal.registration.activities import agent_cognitive_activities
-from mission_control.adapters.temporal.workflow_sandbox import coordinator_workflow_runner
 from mission_control.adapters.temporal.workflows.operation import (
     CAPACITY_WAIT_PATCH,
-    OperationWorkflow,
 )
 from mission_control.application.execution.harness.dispatch import StaleSessionOwner
 from mission_control.application.execution.harness.lane_turns import (
@@ -52,12 +45,10 @@ from mission_control.application.execution.stop_fence import (
 from mission_control.application.frames.sink import InMemoryFrameStore
 from mission_control.domain.execution.contracts import (
     OperationExecutionRequest,
-    OperationWorkflowRequest,
 )
 from mission_control.domain.execution.lanes import (
     CancelReceipt,
     CancelTurnRequest,
-    LaneSegmentBounds,
 )
 from mission_control.domain.policies.stop_fence import EffectAdmission, StopFence
 from tests.fixtures.lane_turns import (
@@ -71,85 +62,15 @@ from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.fixtures.mp06_lanes import CapacityLimitedLane, ReconcilingLossyLane
 from tests.fixtures.temporal_history import patch_ids
 from tests.support.db_builders import pg_lane_unit
-
-ADDRESS = os.environ.get("MC_TEMPORAL_TEST_ADDRESS", "127.0.0.1:7233")
-NAMESPACE = os.environ.get("MC_TEMPORAL_TEST_NAMESPACE", "default")
-BOUNDS = LaneSegmentBounds(
-    max_frames=50,
-    max_duration_s=30,
-    start_to_close_s=60,
-    heartbeat_timeout_s=3,
-    status_poll_limit=3,
-    status_poll_interval_s=1,
-    busy_wait_s=30,
+from tests.support.integration.temporal.mp06_dispatch_recovery import (
+    _activity_worker,
+    _client,
+    _replayed,
+    _request,
+    _scheduled,
+    _start,
+    _workflow_worker,
 )
-
-
-async def _client() -> Client:
-    try:
-        return await Client.connect(ADDRESS, namespace=NAMESPACE)
-    except RuntimeError as error:
-        pytest.fail(f"the real local Temporal server at {ADDRESS} is required: {error}")
-
-
-def _request(operation: OperationExecutionRequest) -> OperationWorkflowRequest:
-    return OperationWorkflowRequest.model_validate(
-        {
-            "semantic_attempt_id": operation.identity.semantic_key,
-            "operation_kind": "bound_operation",
-            "operation": operation,
-            "segments": BOUNDS,
-        }
-    )
-
-
-def _workflow_worker(client: Client, queue: str) -> Worker:
-    return Worker(
-        client,
-        task_queue=queue,
-        workflows=[OperationWorkflow],
-        workflow_runner=coordinator_workflow_runner(),
-    )
-
-
-def _activity_worker(client: Client, queue: str, boundary: Any, service: LaneTurnService) -> Worker:
-    activities = OperationExecutionActivities(
-        boundary, worker_identity=service.sessions.owner_ref, lane_turns=service
-    )
-    return Worker(
-        client,
-        task_queue=queue,
-        activities=agent_cognitive_activities(activities),
-        graceful_shutdown_timeout=timedelta(0),
-    )
-
-
-async def _start(
-    client: Client, request: OperationWorkflowRequest, queue: str, name: str
-) -> WorkflowHandle[Any, Any]:
-    return await client.start_workflow(
-        OperationWorkflow.run,
-        request,
-        id=f"{name}-{uuid4().hex[:10]}",
-        task_queue=queue,
-        execution_timeout=timedelta(minutes=5),
-    )
-
-
-async def _replayed(handle: WorkflowHandle[Any, Any]) -> Any:
-    history = await handle.fetch_history()
-    await Replayer(
-        workflows=[OperationWorkflow], workflow_runner=coordinator_workflow_runner()
-    ).replay_workflow(history)
-    return history
-
-
-def _scheduled(history: Any) -> list[str]:
-    return [
-        event.activity_task_scheduled_event_attributes.activity_type.name
-        for event in history.events
-        if event.HasField("activity_task_scheduled_event_attributes")
-    ]
 
 
 def _attempts(history: Any) -> list[int]:

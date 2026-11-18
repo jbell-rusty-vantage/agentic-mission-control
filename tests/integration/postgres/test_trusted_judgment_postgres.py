@@ -19,12 +19,11 @@ from mission_control.adapters.postgres.knowledge.output_contracts import (
     PostgresOutputContractStore,
 )
 from mission_control.adapters.postgres.knowledge.use_decisions import PostgresUseDecisionStore
-from mission_control.application.knowledge.access import InvocationAccess
 from mission_control.application.ports.knowledge import RecordedUseDecision
 from mission_control.contracts.knowledge_protocol import Ref
 from tests.fixtures.knowledge_binding import BINDING, SteppingClock
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.support.knowledge import origin
+from tests.support.integration.postgres.trusted_judgment_postgres import access_for
 from tests.support.trusted_knowledge import ScriptedRunner, evaluators, head_of, world
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.common_db]
@@ -37,18 +36,6 @@ async def pool(common_db: CommonDatabase) -> AsyncIterator[asyncpg.Pool]:
         yield created
     finally:
         await created.close()
-
-
-def access_for(db: CommonDatabase) -> InvocationAccess:
-    """The database's own application (``MISSION_CONTROL_APPLICATION``: run once per app)."""
-
-    _mc, installation, app, tenant_id = db.scope("tenant-1").split("/")
-    return InvocationAccess(
-        origin=origin(installation_id=installation, application_id=app, tenant_id=tenant_id),
-        subject="mission-control-runtime",
-        invocation_id="inv-producer",
-        authenticated_at=SteppingClock().now,
-    )
 
 
 async def test_review_successor_after_restart_supersedes_and_promotes(

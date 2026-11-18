@@ -13,6 +13,8 @@ SPEC = importlib.util.spec_from_file_location(
 
 
 LIBRARY = importlib.util.module_from_spec(SPEC)
+assert SPEC is not None and SPEC.loader is not None
+SPEC.loader.exec_module(LIBRARY)
 
 
 DATA = {

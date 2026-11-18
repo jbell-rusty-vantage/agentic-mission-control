@@ -23,7 +23,7 @@ from mission_control.adapters.postgres.knowledge.output_inspection import (
 from mission_control.application.knowledge.gateway import TrustedAnswer
 from mission_control.application.knowledge.judgment import TrustedJudgmentRefused
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.test_trusted_judgment_postgres import access_for
+from tests.support.integration.postgres.trusted_judgment_postgres import access_for
 from tests.support.trusted_knowledge import ScriptedRunner, evaluators, world
 from tests.support.unit.knowledge.w1_d19_d20 import census_refusal
 

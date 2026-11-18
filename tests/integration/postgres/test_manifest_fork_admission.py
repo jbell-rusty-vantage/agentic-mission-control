@@ -18,17 +18,9 @@ from mission_control.application.recovery.run_forks import ForkCommand, compile_
 from mission_control.domain.policies.contracts import DecisionStatus
 from mission_control.domain.policies.forks import RunSnapshotManifest, snapshot_id_for
 from tests.fixtures.run_forks import technical_snapshot
-from tests.integration.postgres.test_manifest_submit import (
-    MINIMAL,
-    OWNER,
-    Stack,
-)
-from tests.integration.postgres.test_manifest_submit import (
-    request as submit_request,
-)
-from tests.integration.postgres.test_manifest_submit import (
-    stack as stack,
-)
+from tests.support.integration.postgres.manifest_submit import MINIMAL, OWNER, Stack
+from tests.support.integration.postgres.manifest_submit import request as submit_request
+from tests.support.integration.postgres.manifest_submit import stack as stack
 
 pytestmark = pytest.mark.common_db
 

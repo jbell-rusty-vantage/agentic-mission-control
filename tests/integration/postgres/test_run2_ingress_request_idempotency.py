@@ -24,7 +24,7 @@ from mission_control.adapters.postgres.ingress import (
 from mission_control.application.secrets.minting import CredentialMinter, LaunchBinding
 from mission_control.application.signals.contracts import IngressRejected
 from tests.fixtures.mission_control_common_db import create_common_database, drop_common_database
-from tests.integration.postgres.test_signal_ingress_postgres import (
+from tests.support.integration.postgres.signal_ingress_postgres import (
     Ingress,
     bearer,
     ingress,  # noqa: F401

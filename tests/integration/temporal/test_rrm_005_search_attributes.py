@@ -17,12 +17,10 @@ from typing import Any
 
 import pytest
 from google.protobuf.duration_pb2 import Duration
-from temporalio import activity
 from temporalio.api.enums.v1 import IndexedValueType
 from temporalio.api.operatorservice.v1 import AddSearchAttributesRequest
 from temporalio.api.workflowservice.v1 import RegisterNamespaceRequest
 from temporalio.client import Client, WorkflowHistory
-from temporalio.testing import WorkflowEnvironment
 from temporalio.worker import Replayer, Worker
 
 from mission_control.adapters.temporal.search_attributes import (
@@ -50,78 +48,28 @@ from mission_control.domain.authoring.fixtures import GENERIC_GOAL_DIRECTED
 from mission_control.domain.coordinator.launch import BlueprintFamily
 from mission_control.domain.execution.checkpoint_lineage import OperationActivityAttempt
 from mission_control.domain.execution.contracts import OperationWorkflowRequest
-from mission_control.domain.graph_runtime.identities import RuntimeUnitIdentity
-from mission_control.domain.programs.contracts import (
-    StageGraphAdmissionActivityRequest,
-    StageGraphAdmissionActivityResult,
-)
-from mission_control.domain.programs.runtime_units import stage_runtime_unit
 from mission_control.domain.programs.search_attributes import (
     BELLLABS_SEARCH_ATTRIBUTES,
     search_attribute_scope_hash,
     visibility_run_query,
 )
 from tests.fixtures.checkpoint_lineage import BINDING
-from tests.integration.temporal.test_wp_bp_010_temporal import (
+from tests.support.integration.temporal.rrm_005_search_attributes import (
+    UnitBoundStageGraphActivities,
+    _start_local,
+)
+from tests.support.integration.temporal.wp_bp_010_temporal import (
     QUEUE,
-    FakeStageGraphActivities,
     _blueprint,
 )
-from tests.integration.temporal.test_wp_bp_010_temporal import _run_input as stage_run_input
-from tests.integration.temporal.test_wp_bp_020_temporal import FakeGoalDirectedActivities
-from tests.integration.temporal.test_wp_bp_020_temporal import _run_input as goal_run_input
+from tests.support.integration.temporal.wp_bp_010_temporal import _run_input as stage_run_input
+from tests.support.integration.temporal.wp_bp_020_temporal import FakeGoalDirectedActivities
+from tests.support.integration.temporal.wp_bp_020_temporal import _run_input as goal_run_input
 from tests.support.run_control import request as run_request
 from tests.support.run_control import service as run_control_service
 
 GOAL_QUEUE = "wp-bp-020-temporal"
 NOW = datetime(2026, 10, 1, 12, 0, tzinfo=UTC)
-
-
-async def _start_local() -> WorkflowEnvironment:
-    try:
-        return await WorkflowEnvironment.start_local(
-            search_attributes=BELLLABS_SEARCH_ATTRIBUTE_KEYS, dev_server_log_level="error"
-        )
-    except RuntimeError as error:
-        pytest.skip(f"Temporal dev server is unavailable: {error}")
-
-
-class UnitBoundStageGraphActivities(FakeStageGraphActivities):
-    """The BP-010 fixture with each operation bound to its `CON-CP-RUNTIME-UNIT-V1`."""
-
-    def __init__(self) -> None:
-        super().__init__()
-        self.operations: list[tuple[RuntimeUnitIdentity, OperationWorkflowRequest]] = []
-
-    @activity.defn(name="stagegraph.admit_operation")
-    async def admit(
-        self, request: StageGraphAdmissionActivityRequest
-    ) -> StageGraphAdmissionActivityResult:
-        admitted = await FakeStageGraphActivities.admit(self, request)
-        assert admitted.operation is not None
-        unit = stage_runtime_unit(request.request_scope, request.proposal.identity)
-        bound = OperationWorkflowRequest.model_validate(
-            {
-                **admitted.operation.model_dump(mode="python"),
-                "operation": {
-                    **admitted.operation.operation.model_dump(mode="python"),
-                    "runtime_unit": unit,
-                },
-            }
-        )
-        self.operations.append((unit, bound))
-        return replace(admitted, operation=bound)
-
-    @property
-    def functions(self) -> list[object]:
-        return [
-            self.initialize,
-            self.admit,
-            self.decide,
-            self.apply_cycle,
-            self.complete,
-            self.execute_operation,
-        ]
 
 
 async def _eventually(predicate: Any) -> Any:

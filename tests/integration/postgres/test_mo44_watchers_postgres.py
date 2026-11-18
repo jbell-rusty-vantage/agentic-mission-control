@@ -20,18 +20,14 @@ once and never records it again.
 
 from __future__ import annotations
 
-import asyncio
 import copy
 import json
-import os
-from collections.abc import Awaitable, Callable
 from datetime import timedelta
 from typing import Any
 from uuid import uuid4
 
 import asyncpg
 import pytest
-from temporalio.client import Client
 from temporalio.worker import Worker
 
 from mission_control.adapters.postgres.frames.repository import PostgresFrameRepository
@@ -68,13 +64,20 @@ from mission_control.domain.programs.watchers import (
 )
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.fixtures.provider_frames import observation
-from tests.integration.postgres.test_manifest_submit import (
+from tests.support.boundary_commands import declared_wait, states
+from tests.support.db_builders import admit_unit_attempt, scoped_command
+from tests.support.integration.postgres.manifest_submit import (
     OWNER,
     Stack,
     goal_loop_manifest,
     request,
 )
-from tests.integration.postgres.test_mp15_coordinator_inbox_postgres import (
+from tests.support.integration.postgres.mo44_watchers_postgres import (
+    FixedProgram,
+    eventually,
+    local_temporal,
+)
+from tests.support.integration.postgres.mp15_coordinator_inbox_postgres import (
     COORDINATOR,
     append_fixture_events,
     inbox_service,
@@ -82,15 +85,10 @@ from tests.integration.postgres.test_mp15_coordinator_inbox_postgres import (
     owner_fetch,
     subscribe,
 )
-from tests.support.boundary_commands import declared_wait, states
-from tests.support.db_builders import admit_unit_attempt, scoped_command
 from tests.support.unit.watchers.watcher_manifest import definition, event_wait_document
 from tests.unit.watchers.fakes import T0
 
 pytestmark = pytest.mark.common_db
-
-TEMPORAL_ADDRESS = os.environ.get("MC_TEMPORAL_TEST_ADDRESS", "127.0.0.1:7233")
-TEMPORAL_NAMESPACE = os.environ.get("MC_TEMPORAL_TEST_NAMESPACE", "default")
 
 
 def watcher(watcher_id: str, body: dict[str, Any]) -> WatcherDescriptor:
@@ -127,20 +125,6 @@ def command_issuer(kind: str) -> str:
     """The idempotency issuer `MissionControlService` binds an evaluator command to."""
 
     return json.dumps(["mc.command.v1", WATCHER_ACTOR_ID, kind], separators=(",", ":"))
-
-
-class FixedProgram(PostgresWatcherStore):
-    """The PostgreSQL store with the descriptors given here instead of a definition snapshot."""
-
-    def __init__(
-        self, pool: asyncpg.Pool, scope: str, descriptors: tuple[WatcherDescriptor, ...]
-    ) -> None:
-        super().__init__(pool, scope)
-        self.fixed = descriptors
-
-    async def descriptors(self, run_id: str) -> tuple[WatcherDescriptor, ...]:
-        del run_id
-        return self.fixed
 
 
 async def test_firings_are_admitted_commands_plus_one_journal_record_each_and_never_twice(
@@ -606,26 +590,6 @@ async def test_a_start_whose_evaluator_failed_launches_nothing_and_is_retried_in
         assert len(stack.submitter.calls) == 1
     finally:
         await pool.close()
-
-
-async def eventually[T](
-    probe: Callable[[], Awaitable[T]], done: Callable[[T], bool], *, seconds: float = 60
-) -> T:
-    """The probe's first value that is done, read every half second for at most ``seconds``."""
-
-    for _ in range(int(seconds * 2)):
-        value = await probe()
-        if done(value):
-            return value
-        await asyncio.sleep(0.5)
-    pytest.fail(f"not done within {seconds} s")
-
-
-async def local_temporal() -> Client:
-    try:
-        return await Client.connect(TEMPORAL_ADDRESS, namespace=TEMPORAL_NAMESPACE)
-    except RuntimeError as error:
-        pytest.fail(f"the real local Temporal server at {TEMPORAL_ADDRESS} is required: {error}")
 
 
 async def test_manifest_start_runs_the_composed_evaluator_on_the_local_temporal_server(

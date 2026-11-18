@@ -67,13 +67,13 @@ from tests.fixtures.mission_control_common_db import (
     common_database,
     migration_paths_with,
 )
-from tests.integration.postgres.test_mp15_coordinator_inbox_postgres import (
+from tests.support.integration.postgres.mp15_coordinator_inbox_postgres import (
     COORDINATOR,
     append_fixture_events,
     owner_fetch,
     started_run,
 )
-from tests.integration.postgres.test_subscriptions import Receiver
+from tests.support.integration.postgres.subscriptions import Receiver
 from tests.unit.human_tasks.fixtures import activation
 
 pytestmark = pytest.mark.common_db

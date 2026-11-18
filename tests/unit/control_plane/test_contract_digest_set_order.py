@@ -287,7 +287,7 @@ def test_structural_compiler_requirement_digest_is_independent_of_set_iteration_
 async def test_linked_run_request_fingerprint_is_independent_of_set_iteration_order() -> None:
     """`LinkedRunService.request_child` replays an exact request across processes."""
 
-    from tests.integration.temporal.test_linked_runs import linked_request, service_fixture
+    from tests.support.integration.temporal.linked_runs import linked_request, service_fixture
 
     service, _control, run_control, _repository = service_fixture()
     first, second = with_different_set_orders(linked_request())

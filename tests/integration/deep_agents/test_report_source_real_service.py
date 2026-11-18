@@ -25,11 +25,9 @@ from tests.fixtures.knowledge_binding import (
 from tests.fixtures.lane_bindings import lane_fields
 from tests.fixtures.mission_control_common_db import create_common_database, drop_common_database
 from tests.integration.deep_agents.report_source_replay import admit, consume_and_replay
-from tests.integration.deep_agents.test_report_source_context import FullContextReader
-from tests.integration.deep_agents.test_wi02_transfer_plan_lane import (
-    _invocation,
-    _selection,
-)
+from tests.support.integration.deep_agents.report_source_context import FullContextReader
+from tests.support.integration.deep_agents.report_source_real_service import command, response
+from tests.support.integration.deep_agents.wi02_transfer_plan_lane import _invocation, _selection
 from tests.unit.outputs.scenario import build_stack, obligation
 
 from mission_control.adapters.deep_agents.knowledge_tools import CURRENT_INVOCATION, knowledge_tools
@@ -68,19 +66,6 @@ pytestmark = pytest.mark.psycopg_selector
 ROOT = Path(__file__).resolve().parents[3]
 KS = ROOT.parent / "knowledge-services"
 HOST = "src/knowledge-operation/tests/report-source-fixture-host.ts"
-
-
-async def response(process):
-    line = await asyncio.wait_for(asyncio.to_thread(process.stdout.readline), 90)
-    if not line:
-        raise AssertionError(f"fixture host exited: {process.returncode}")
-    return json.loads(line)
-
-
-async def command(process, payload):
-    process.stdin.write((json.dumps(payload) + "\n").encode())
-    process.stdin.flush()
-    return await response(process)
 
 
 @pytest.mark.asyncio

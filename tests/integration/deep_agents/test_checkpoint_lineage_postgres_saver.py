@@ -30,6 +30,13 @@ from tests.fixtures.mission_control_common_db import (
     provision_runtime,
 )
 from tests.support.deep_agents import SessionProbeModel, exact_fixture
+from tests.support.integration.deep_agents.checkpoint_lineage_postgres_saver import (
+    SAVER_SCHEMA,
+    AcceptingAuthority,
+    delivery,
+    root,
+    root_lineage,
+)
 from tests.support.operations import MCP_DIGEST, SKILL_DIGEST, operation_request
 from tests.support.run_control import actor, command
 from tests.support.run_control import request as run_request
@@ -81,7 +88,6 @@ from mission_control.domain.execution.checkpoint_lineage import (
     STAMP_INVOCATION_ID,
     STAMP_STATE_SCHEMA_DIGEST,
     STAMP_UNIT_KEY,
-    OperationActivityAttempt,
 )
 from mission_control.domain.execution.contracts import (
     DeepAgentExecutionBinding,
@@ -97,24 +103,12 @@ from mission_control.domain.policies.contracts import (
 
 pytestmark = [pytest.mark.psycopg_selector, pytest.mark.common_db]
 
-SAVER_SCHEMA = "mission_control_runtime"
 PROMPT = "Return BINDING-OK"
 SCOPE = canonical_scope("tenant-1")
 
 
 def scoped_command(run_id: str, version: int, command_id: str, action: Any) -> Any:
     return command(run_id, version, command_id, action).model_copy(update={"request_scope": SCOPE})
-
-
-class AcceptingAuthority:
-    async def verify(self, request: OperationExecutionRequest) -> None:
-        del request
-
-    async def verify_continuation(self, request: OperationExecutionRequest, binding: Any) -> None:
-        del request, binding
-
-    async def verify_cancellation(self, request: OperationExecutionRequest, binding: Any) -> None:
-        del request, binding
 
 
 @dataclass
@@ -258,39 +252,6 @@ async def bound_request(
             "idempotency_key": f"rrm-003:{unit.unit_key}",
         }
     )
-
-
-def delivery(attempt: int, unit: RuntimeUnitIdentity) -> OperationActivityAttempt:
-    return OperationActivityAttempt(
-        workflow_id=f"operation/{unit.semantic_operation_id}",
-        workflow_run_id="temporal-run-1",
-        activity_id="1",
-        attempt=attempt,
-        worker_identity="worker:rrm-003",
-    )
-
-
-def root(namespace: str, checkpoint_id: str | None = None) -> RunnableConfig:
-    configurable: dict[str, Any] = {"thread_id": namespace, "checkpoint_ns": ""}
-    if checkpoint_id is not None:
-        configurable["checkpoint_id"] = checkpoint_id
-    return {"configurable": configurable}
-
-
-async def root_lineage(saver: AsyncPostgresSaver, namespace: str) -> list[Any]:
-    """Root checkpoints from the latest back to the first, following parent links."""
-
-    chain = []
-    cursor = await saver.aget_tuple(root(namespace))
-    while cursor is not None:
-        chain.append(cursor)
-        parent = cursor.parent_config
-        cursor = (
-            await saver.aget_tuple(root(namespace, parent["configurable"]["checkpoint_id"]))
-            if parent is not None
-            else None
-        )
-    return chain
 
 
 @pytest.mark.asyncio

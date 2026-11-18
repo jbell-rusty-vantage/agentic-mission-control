@@ -43,8 +43,8 @@ from mission_control.domain.composition.chain import (
 from mission_control.domain.policies.contracts import StartAction
 from mission_control.domain.subscriptions.contracts import SubscriptionRequest
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.postgres.test_mission_chain_tables import insert_chain, insert_mission
 from tests.support.boundary_commands import TARGET
+from tests.support.integration.postgres.mission_chain_tables import insert_chain, insert_mission
 from tests.support.run_control import actor, command, request, service
 
 pytestmark = pytest.mark.common_db

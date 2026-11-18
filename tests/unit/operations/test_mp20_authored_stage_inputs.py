@@ -21,7 +21,7 @@ from mission_control.domain.authoring.manifest import ExpansionTier as AuthoredT
 from mission_control.domain.context.packet import ExpansionTier
 from mission_control.domain.programs.contracts import StageAuthoredInput
 from tests.fixtures.lane_bindings import LANE_REBINDERS
-from tests.integration.temporal.test_wp_bp_010_temporal import (
+from tests.support.integration.temporal.wp_bp_010_temporal import (
     RecordingOperationBindings,
     _blueprint,
 )

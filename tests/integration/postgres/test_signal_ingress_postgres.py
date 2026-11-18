@@ -13,8 +13,6 @@ import hashlib
 import hmac
 import json
 import time
-from collections.abc import AsyncIterator
-from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from typing import Any
 from uuid import uuid4
@@ -22,16 +20,13 @@ from uuid import uuid4
 import asyncpg
 import httpx
 import pytest
-import pytest_asyncio
 
 from mission_control.adapters.postgres.ingress import (
     PostgresIngressStore,
     PostgresMintedCredentialStore,
-    PostgresSessionBindings,
 )
 from mission_control.adapters.postgres.run_control.stop_fence import PostgresStopFenceRepository
 from mission_control.adapters.postgres.scope import apply_scope
-from mission_control.application.capabilities.bundle_custody import SignedUpload
 from mission_control.application.secrets.minting import (
     MINT_PURPOSES,
     CredentialBinding,
@@ -43,7 +38,6 @@ from mission_control.application.secrets.minting import (
 from mission_control.application.signals.contracts import IngressRejected, TrustTier
 from mission_control.application.signals.ports import (
     InboxItem,
-    OidcIdentity,
     Principal,
     SessionBinding,
 )
@@ -58,7 +52,6 @@ from mission_control.application.signals.verification import (
 )
 from mission_control.domain.policies.stop_fence import StopFence
 from mission_control.interfaces.http.ingress import create_ingress_app
-from tests.fixtures.mission_control_common_db import CommonDatabase, ingress_login
 from tests.fixtures.provider_webhooks import (
     ANTHROPIC_SESSION_IDLED,
     ANTHROPIC_TEST_SECRET,
@@ -69,134 +62,21 @@ from tests.fixtures.provider_webhooks import (
     standard_headers,
 )
 from tests.fixtures.scoped_api_stack import serve_loopback
-from tests.support.db_builders import admit_unit_attempt
+from tests.support.integration.postgres.signal_ingress_postgres import (
+    CURSOR_MASTER,
+    ENV_MASTER,
+    GATE_CONTEXT,
+    GITHUB_SECRET,
+    HARNESS_EXECUTION,
+    Ingress,
+    batch,
+    bearer,
+    gate_body,
+    ingress,  # noqa: F401
+    signal,
+)
 
 pytestmark = pytest.mark.common_db
-
-ENV_MASTER = b"environment-key-master-for-disposable-tests"
-CURSOR_MASTER = b"cursor-webhook-master-for-disposable-tests"
-GITHUB_SECRET = "github-webhook-secret"
-HARNESS_EXECUTION = "0192a4f0-0000-7000-8000-0000000000e1"
-GATE_CONTEXT = {
-    "harness_execution_id": HARNESS_EXECUTION,
-    "lane_profile": "cursor_cloud",
-    "disallowed_tools": ["WebFetch"],
-}
-
-
-class FakeOidc:
-    """Stands in for `CursorOidcVerifier` (proved on its own against signed JWTs)."""
-
-    async def verify(self, token: str) -> OidcIdentity:
-        if not token.startswith("oidc:"):
-            raise IngressRejected(401, "invalid_token")
-        return OidcIdentity(provider="cursor", session_id=token.removeprefix("oidc:"))
-
-
-class FakeUploads:
-    async def signed_upload(self, storage_key: str) -> SignedUpload:
-        return SignedUpload(path=storage_key, url=f"https://storage.test/{storage_key}", token="t")
-
-
-@dataclass
-class Ingress:
-    db: CommonDatabase
-    runtime: asyncpg.Pool
-    edge: asyncpg.Pool
-    scope: str
-    run_key: str
-    unit_key: str
-    minter: CredentialMinter
-    sessions: PostgresSessionBindings
-    store: PostgresIngressStore
-    service: SignalIngressService
-
-    @property
-    def binding(self) -> CredentialBinding:
-        return CredentialBinding(self.scope, self.run_key, self.unit_key, 1)
-
-    async def owner(self, query: str, *args: Any) -> list[asyncpg.Record]:
-        connection = await asyncpg.connect(self.db.owner_dsn)
-        try:
-            return list(await connection.fetch(query, *args))
-        finally:
-            await connection.close()
-
-    async def inbox(self, kind: str | None = None) -> list[asyncpg.Record]:
-        return await self.owner(
-            "SELECT * FROM mission_control.ingress_inbox "
-            "WHERE $1::text IS NULL OR kind = $1 ORDER BY received_at, ingress_id",
-            kind,
-        )
-
-
-@pytest_asyncio.fixture
-async def ingress(common_db: CommonDatabase) -> AsyncIterator[Ingress]:
-    runtime = await common_db.pool("mission_control_runtime")
-    edge = await asyncpg.create_pool(
-        await ingress_login(common_db), min_size=1, max_size=4, statement_cache_size=0
-    )
-    try:
-        admitted = await admit_unit_attempt(runtime, common_db)
-        scope = common_db.scope()
-        store = PostgresIngressStore(
-            edge, installation_id=common_db.installation_id, application_id="biotech"
-        )
-        service = SignalIngressService(
-            store,
-            keys=IngressKeys(
-                environment_key_master=ENV_MASTER,
-                cursor_webhook_master=CURSOR_MASTER,
-                webhook_secrets={
-                    "anthropic": ANTHROPIC_TEST_SECRET,
-                    "openai": OPENAI_TEST_SECRET,
-                    "github": GITHUB_SECRET,
-                },
-            ),
-            oidc=FakeOidc(),
-            uploads=FakeUploads(),
-        )
-        yield Ingress(
-            db=common_db,
-            runtime=runtime,
-            edge=edge,
-            scope=scope,
-            run_key=admitted.run_key,
-            unit_key=admitted.unit.unit_key,
-            minter=CredentialMinter(PostgresMintedCredentialStore(runtime, scope)),
-            sessions=PostgresSessionBindings(runtime),
-            store=store,
-            service=service,
-        )
-    finally:
-        await edge.close()
-        await runtime.close()
-
-
-def bearer(token: str) -> dict[str, str]:
-    return {"authorization": f"Bearer {token}"}
-
-
-def signal(signal_id: str, kind: str = "milestone", **data: Any) -> dict[str, Any]:
-    return {"signal_id": signal_id, "type": kind, "seq": 1, "data": data}
-
-
-def batch(*signals: dict[str, Any]) -> bytes:
-    return json.dumps({"signals": list(signals)}).encode()
-
-
-def gate_body(signal_id: str, effect_ref: str, tool: str = "Shell", **extra: Any) -> bytes:
-    return json.dumps(
-        {
-            "signal_id": signal_id,
-            "hook_event": "before_shell",
-            "effect_ref": effect_ref,
-            "effect_kind": "shell",
-            "tool": tool,
-            "tool_input": {"command": "pytest -q"},
-            **extra,
-        }
-    ).encode()
 
 
 async def rejected(call: Any) -> str:
@@ -205,7 +85,7 @@ async def rejected(call: Any) -> str:
     return refusal.value.code
 
 
-async def test_run_token_signals_are_accepted_once_redacted_and_notified(ingress: Ingress) -> None:
+async def test_run_token_signals_are_accepted_once_redacted_and_notified(ingress: Ingress) -> None:  # noqa: F811
     token = await ingress.minter.mint("signal_token", ingress.binding, context=GATE_CONTEXT)
     listener = await asyncpg.connect(ingress.db.owner_dsn)
     notified: asyncio.Queue[str] = asyncio.Queue()
@@ -253,7 +133,7 @@ async def test_run_token_signals_are_accepted_once_redacted_and_notified(ingress
     assert await rejected(other_app.signals(body, bearer(token.value))) == "unknown"
 
 
-async def test_payload_batch_and_rate_limits_are_enforced(ingress: Ingress) -> None:
+async def test_payload_batch_and_rate_limits_are_enforced(ingress: Ingress) -> None:  # noqa: F811
     limited = MintPurpose(
         "signal_token", ("signal:write",), timedelta(hours=1), rate_limit_per_minute=3
     )
@@ -304,7 +184,7 @@ async def test_payload_batch_and_rate_limits_are_enforced(ingress: Ingress) -> N
 
 
 async def test_the_gate_writes_the_intent_before_allow_and_answers_replays_alike(
-    ingress: Ingress,
+    ingress: Ingress,  # noqa: F811
 ) -> None:
     token = await ingress.minter.mint("signal_token", ingress.binding, context=GATE_CONTEXT)
     headers = bearer(token.value)
@@ -338,7 +218,7 @@ async def test_the_gate_writes_the_intent_before_allow_and_answers_replays_alike
     assert (blind.decision, blind.reason) == ("deny", "gate_context_missing")
 
 
-async def test_the_gate_answers_stop_under_a_fence_and_after_revocation(ingress: Ingress) -> None:
+async def test_the_gate_answers_stop_under_a_fence_and_after_revocation(ingress: Ingress) -> None:  # noqa: F811
     token = await ingress.minter.mint("signal_token", ingress.binding, context=GATE_CONTEXT)
     headers = bearer(token.value)
     assert (await ingress.service.gate(gate_body("f-0", "before"), headers)).decision == "allow"
@@ -377,7 +257,7 @@ async def test_the_gate_answers_stop_under_a_fence_and_after_revocation(ingress:
 
 
 async def test_a_reused_gate_id_never_carries_its_decision_to_another_effect(
-    ingress: Ingress,
+    ingress: Ingress,  # noqa: F811
 ) -> None:
     token = await ingress.minter.mint("signal_token", ingress.binding, context=GATE_CONTEXT)
     headers = bearer(token.value)
@@ -416,7 +296,7 @@ async def test_a_reused_gate_id_never_carries_its_decision_to_another_effect(
     assert len(await ingress.inbox("gate.decision")) == 1
 
 
-async def test_each_kind_dedupes_in_its_own_space(ingress: Ingress) -> None:
+async def test_each_kind_dedupes_in_its_own_space(ingress: Ingress) -> None:  # noqa: F811
     token = await ingress.minter.mint("signal_token", ingress.binding, context=GATE_CONTEXT)
     headers = bearer(token.value)
     # A hook records an event and gates it under one id, in either order.
@@ -454,7 +334,7 @@ async def test_each_kind_dedupes_in_its_own_space(ingress: Ingress) -> None:
     assert (await ingress.inbox("artifact.committed"))[0]["ingress_id"] == committed
 
 
-async def test_an_unregistered_lane_profile_is_a_typed_deny(ingress: Ingress) -> None:
+async def test_an_unregistered_lane_profile_is_a_typed_deny(ingress: Ingress) -> None:  # noqa: F811
     context = {**GATE_CONTEXT, "lane_profile": "no_such_profile"}
     token = await ingress.minter.mint("signal_token", ingress.binding, context=context)
     answer = await ingress.service.gate(gate_body("lp-1", "call-lp"), bearer(token.value))
@@ -463,7 +343,7 @@ async def test_an_unregistered_lane_profile_is_a_typed_deny(ingress: Ingress) ->
 
 
 async def test_a_revoked_token_answers_stop_but_writes_only_within_its_rate_window(
-    ingress: Ingress,
+    ingress: Ingress,  # noqa: F811
 ) -> None:
     limited = MintPurpose(
         "signal_token", ("signal:write",), timedelta(hours=1), rate_limit_per_minute=3
@@ -501,7 +381,7 @@ async def test_a_revoked_token_answers_stop_but_writes_only_within_its_rate_wind
     ] * 3
 
 
-async def _until_waiting(ingress: Ingress, waiters: int) -> None:
+async def _until_waiting(ingress: Ingress, waiters: int) -> None:  # noqa: F811
     """Wait until `waiters` edge transactions are blocked on a lock."""
 
     for _ in range(200):
@@ -515,7 +395,7 @@ async def _until_waiting(ingress: Ingress, waiters: int) -> None:
     raise AssertionError(f"{waiters} edge calls never blocked")
 
 
-async def _racing(ingress: Ingress, lock: str, *args: Any, calls: list[Any]) -> list[Any]:
+async def _racing(ingress: Ingress, lock: str, *args: Any, calls: list[Any]) -> list[Any]:  # noqa: F811
     """Run `calls` concurrently while the owner holds `lock`, so each one passes its
     duplicate check before any of them records; then release it."""
 
@@ -533,7 +413,7 @@ async def _racing(ingress: Ingress, lock: str, *args: Any, calls: list[Any]) -> 
 
 
 async def test_concurrent_repeats_answer_the_first_record_never_an_error(
-    ingress: Ingress,
+    ingress: Ingress,  # noqa: F811
 ) -> None:
     token = await ingress.minter.mint("signal_token", ingress.binding, context=GATE_CONTEXT)
     headers = bearer(token.value)
@@ -579,7 +459,7 @@ async def test_concurrent_repeats_answer_the_first_record_never_an_error(
     assert len(await ingress.inbox("mission_request")) == 1
 
 
-async def test_a_new_generation_revokes_the_old_token_at_the_edge(ingress: Ingress) -> None:
+async def test_a_new_generation_revokes_the_old_token_at_the_edge(ingress: Ingress) -> None:  # noqa: F811
     first = await ingress.minter.mint("signal_token", ingress.binding)
     assert (await ingress.service.signals(batch(signal("n-1")), bearer(first.value))).accepted
     second = CredentialBinding(ingress.scope, ingress.run_key, ingress.unit_key, 2)
@@ -609,7 +489,7 @@ def _signed(
     }
 
 
-async def test_an_environment_key_session_binds_once_on_the_run_nonce(ingress: Ingress) -> None:
+async def test_an_environment_key_session_binds_once_on_the_run_nonce(ingress: Ingress) -> None:  # noqa: F811
     expires = datetime.now(UTC) + timedelta(hours=1)
     await ingress.sessions.register(
         SessionBinding(
@@ -676,7 +556,7 @@ async def test_an_environment_key_session_binds_once_on_the_run_nonce(ingress: I
     )
 
 
-async def test_a_provider_oidc_session_must_be_bound_by_the_worker(ingress: Ingress) -> None:
+async def test_a_provider_oidc_session_must_be_bound_by_the_worker(ingress: Ingress) -> None:  # noqa: F811
     assert (
         await rejected(ingress.service.signals(batch(signal("o-0")), bearer("oidc:bc-agent-1")))
         == "unbound_session"
@@ -714,7 +594,7 @@ def _hex(secret: bytes, body: bytes) -> str:
 
 
 async def test_provider_webhooks_are_tenantless_wakeups_deduped_on_delivery(
-    ingress: Ingress,
+    ingress: Ingress,  # noqa: F811
 ) -> None:
     body = delivery_body(ANTHROPIC_SESSION_IDLED)
     await ingress.service.webhook("anthropic", body, _standard(body, "msg_1"))
@@ -780,7 +660,7 @@ async def test_provider_webhooks_are_tenantless_wakeups_deduped_on_delivery(
 
 
 async def test_signed_provider_fixtures_wake_once_and_forged_or_replayed_ones_record_nothing(
-    ingress: Ingress,
+    ingress: Ingress,  # noqa: F811
 ) -> None:
     """HL-17: signed fixture deliveries become `mc.provider_wake.v1` rows (the event type and
     resource id only, never the payload's state); forged and replayed deliveries add no row
@@ -874,7 +754,7 @@ async def test_signed_provider_fixtures_wake_once_and_forged_or_replayed_ones_re
 
 
 async def test_artifact_uploads_are_prepared_once_and_committed_into_the_inbox(
-    ingress: Ingress,
+    ingress: Ingress,  # noqa: F811
 ) -> None:
     token = await ingress.minter.mint("signal_token", ingress.binding)
     headers = bearer(token.value)
@@ -933,7 +813,7 @@ async def test_artifact_uploads_are_prepared_once_and_committed_into_the_inbox(
 
 
 async def test_mission_requests_need_a_launch_credential_and_dedupe_on_idempotency(
-    ingress: Ingress,
+    ingress: Ingress,  # noqa: F811
 ) -> None:
     launch = await ingress.minter.mint(
         "mission_request",
@@ -1002,7 +882,7 @@ async def test_mission_requests_need_a_launch_credential_and_dedupe_on_idempoten
     assert (refused.state, refused.reason) == ("refused", "spawn_grant_missing")
 
 
-async def test_least_privilege_and_the_drainer_row_contract(ingress: Ingress) -> None:
+async def test_least_privilege_and_the_drainer_row_contract(ingress: Ingress) -> None:  # noqa: F811
     token = await ingress.minter.mint("signal_token", ingress.binding)
     await ingress.service.signals(batch(*(signal(f"d-{i}") for i in range(4))), bearer(token.value))
 
@@ -1092,7 +972,7 @@ async def test_least_privilege_and_the_drainer_row_contract(ingress: Ingress) ->
         await ingress.owner("UPDATE mission_control.ingress_credential SET generation = 2")
 
 
-async def test_the_minted_credential_store_round_trips_digests_only(ingress: Ingress) -> None:
+async def test_the_minted_credential_store_round_trips_digests_only(ingress: Ingress) -> None:  # noqa: F811
     token = await ingress.minter.mint("signal_token", ingress.binding, context=GATE_CONTEXT)
     store = PostgresMintedCredentialStore(ingress.runtime, ingress.scope)
     record = await store.by_digest(token.record.digest)
@@ -1112,7 +992,7 @@ async def test_the_minted_credential_store_round_trips_digests_only(ingress: Ing
         await other.insert(token.record)
 
 
-async def test_the_local_http_edge_round_trips_through_postgres(ingress: Ingress) -> None:
+async def test_the_local_http_edge_round_trips_through_postgres(ingress: Ingress) -> None:  # noqa: F811
     token = await ingress.minter.mint("signal_token", ingress.binding, context=GATE_CONTEXT)
     launch = await ingress.minter.mint("mission_request", LaunchBinding(ingress.scope))
     app = create_ingress_app([ingress.service])

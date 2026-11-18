@@ -58,7 +58,7 @@ from mission_control.domain.frames.transcript import TranscriptEntry
 from mission_control.domain.policies.contracts import ActorContext
 from tests.fixtures.provider_frames import SCOPE
 from tests.fixtures.transcripts import RUN_KEY
-from tests.integration.postgres.test_operation_journal_stage1 import (
+from tests.support.integration.postgres.operation_journal_stage1 import (
     _SCOPE,
     attempt,
     authority_command,

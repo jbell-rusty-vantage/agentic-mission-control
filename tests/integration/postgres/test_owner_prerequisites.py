@@ -41,6 +41,7 @@ from mission_control.domain.prerequisites import (
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.fixtures.owner_prerequisites import inputs
 from tests.support.db_builders import owner_rows, scoped_count
+from tests.support.integration.postgres.owner_prerequisites import pool  # noqa: F401
 
 pytestmark = pytest.mark.common_db
 
@@ -72,15 +73,6 @@ class Clock:
 
     def __call__(self) -> datetime:
         return self.now
-
-
-@pytest_asyncio.fixture
-async def pool(common_db: CommonDatabase) -> AsyncIterator[asyncpg.Pool]:
-    created = await common_db.pool("mission_control_runtime")
-    try:
-        yield created
-    finally:
-        await created.close()
 
 
 @pytest_asyncio.fixture
@@ -169,7 +161,7 @@ async def test_prerequisites_are_scoped_forced_rls_with_declared_grants(
 
 async def test_the_repository_registers_records_evidence_and_keeps_scopes_apart(
     common_db: CommonDatabase,
-    pool: asyncpg.Pool,
+    pool: asyncpg.Pool,  # noqa: F811
 ) -> None:
     clock = Clock()
     repository = PostgresOwnerPrerequisiteRepository(pool, clock=clock)
@@ -263,7 +255,7 @@ async def test_the_repository_registers_records_evidence_and_keeps_scopes_apart(
 
 async def test_the_table_refuses_what_the_record_never_does(
     common_db: CommonDatabase,
-    pool: asyncpg.Pool,
+    pool: asyncpg.Pool,  # noqa: F811
     owner: asyncpg.Connection,
 ) -> None:
     repository = PostgresOwnerPrerequisiteRepository(pool, clock=lambda: AT)
@@ -312,7 +304,7 @@ async def test_the_table_refuses_what_the_record_never_does(
 
 async def test_the_service_flags_an_expiring_login_before_launch_on_postgres(
     common_db: CommonDatabase,
-    pool: asyncpg.Pool,
+    pool: asyncpg.Pool,  # noqa: F811
 ) -> None:
     clock = Clock()
     service = OwnerPrerequisiteService(

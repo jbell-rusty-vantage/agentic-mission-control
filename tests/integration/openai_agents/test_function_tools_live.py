@@ -17,14 +17,14 @@ from tests.fixtures.agents_lane import agents_stack
 from tests.fixtures.lane_bindings import lane_fields
 from tests.fixtures.lane_turns import lane_stack
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.integration.anthropic_managed.test_managed_segment_loop_real_services import (
+from tests.support.db_builders import admit_unit_attempt
+from tests.support.integration.anthropic_managed.managed_segment_loop_real_services import (
     _activity_worker,
     _client,
     _replayed,
     _workflow_worker,
 )
-from tests.integration.anthropic_managed.test_session_lifecycle_live import _request
-from tests.support.db_builders import admit_unit_attempt
+from tests.support.integration.anthropic_managed.session_lifecycle_live import _request
 from tests.unit.approvals.fixtures import answer
 
 from mission_control.adapters.deep_agents.harness import DeepAgentsHarness

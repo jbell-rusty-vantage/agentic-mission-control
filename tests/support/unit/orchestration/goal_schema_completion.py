@@ -22,7 +22,7 @@ from mission_control.domain.programs.goal_directed_runtime import (
     GoalOperationPreparationRequest,
     GoalOperationReconciliationRequest,
 )
-from tests.integration.temporal.test_wp_bp_020_temporal import _operation, _run_input
+from tests.support.integration.temporal.wp_bp_020_temporal import _operation, _run_input
 from tests.support.unit.orchestration.artifact_schema_validation import SCHEMA, captured
 
 OUTPUT = "workspace-candidate://goal-output"

@@ -79,7 +79,7 @@ from tests.fixtures.goal_directed_journaled import (
     turns_by_operation,
 )
 from tests.fixtures.temporal_history import patch_ids, scheduled_activity_inputs
-from tests.integration.temporal.test_rrm_007_boundary_interventions import (
+from tests.support.integration.temporal.rrm_007_boundary_interventions import (
     Authority,
     _phase_is,
     _state_is,
@@ -88,10 +88,8 @@ from tests.integration.temporal.test_rrm_007_boundary_interventions import (
     resume,
     until,
 )
-from tests.integration.temporal.test_wp_bp_020_temporal import (
-    FakeGoalDirectedActivities,
-)
-from tests.integration.temporal.test_wp_bp_020_temporal import _run_input as fake_goal_input
+from tests.support.integration.temporal.wp_bp_020_temporal import FakeGoalDirectedActivities
+from tests.support.integration.temporal.wp_bp_020_temporal import _run_input as fake_goal_input
 from tests.support.run_control import command
 
 QUEUE = "rrm016-goal-directed"

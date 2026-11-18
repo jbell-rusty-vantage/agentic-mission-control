@@ -18,7 +18,7 @@ import pytest
 from mission_control.application.knowledge.operations import RECORDED_HANDLE_OPERATIONS
 from mission_control.contracts.knowledge_protocol import EFFECTFUL_OPERATIONS
 from mission_control_db_contract.deployment import verify_release
-from tests.integration.postgres.test_run2_release_141 import (
+from tests.support.integration.postgres.run2_release_141 import (
     PACKAGE,
     VERSIONS,
     assert_runtime_security,
@@ -26,12 +26,12 @@ from tests.integration.postgres.test_run2_release_141 import (
     install,
     release_at,
 )
-from tests.integration.postgres.test_sprint_v_release_150 import (
+from tests.support.integration.postgres.sprint_v_release_150 import (
     as_role,
     create_tenant,
     raises_sqlstate,
 )
-from tests.integration.postgres.test_sprint_v_release_160 import (
+from tests.support.integration.postgres.sprint_v_release_160 import (
     HANDLE_INSERT,
     MISSION_ID,
     RUN_ID,

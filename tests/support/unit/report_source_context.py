@@ -13,3 +13,5 @@ SPEC = importlib.util.spec_from_file_location(
 
 
 context = importlib.util.module_from_spec(SPEC)
+assert SPEC and SPEC.loader
+SPEC.loader.exec_module(context)
