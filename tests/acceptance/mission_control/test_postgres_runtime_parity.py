@@ -17,13 +17,18 @@ from typing import cast
 import asyncpg
 import pytest
 from tests.fixtures.mission_control_common_db import legacy_poison_intact
-from tests.fixtures.mission_control_production_stack import (
-    open_postgres_production_stack,
+from tests.fixtures.rrm009_production_stack import (
+    AGENT_COGNITIVE_QUEUE,
+    publish_technical_catalog,
+    stage_input,
+    stage_templates,
 )
-from tests.fixtures.mission_control_production_stack import (
-    start_local as _start_local,
+from tests.fixtures.run_authority_digest import run_authority_digest
+from tests.support.acceptance.mission_control.postgres_runtime_parity import (
+    goal_directed_two_iterations_scenario,
 )
-from tests.fixtures.rrm009_production_harness import (
+from tests.support.ids import SCOPE
+from tests.support.stack import (
     STAGE_OBJECTIVE,
     ProductionStack,
     _admit,
@@ -45,19 +50,12 @@ from tests.fixtures.rrm009_production_harness import (
     _visible,
     _wait_for,
     canonical_evidence,
+    open_stack,
     record_parity_trace,
 )
-from tests.fixtures.rrm009_production_stack import (
-    AGENT_COGNITIVE_QUEUE,
-    publish_technical_catalog,
-    stage_input,
-    stage_templates,
+from tests.support.stack import (
+    start_local as _start_local,
 )
-from tests.fixtures.run_authority_digest import run_authority_digest
-from tests.support.acceptance.mission_control.postgres_runtime_parity import (
-    goal_directed_two_iterations_scenario,
-)
-from tests.support.ids import SCOPE
 
 from mission_control.adapters.postgres.orchestration.stagegraph_repository import (
     PostgresStageGraphOperationTemplateRepository,
@@ -84,7 +82,7 @@ pytestmark = [pytest.mark.psycopg_selector, pytest.mark.common_db]
 
 @pytest.fixture
 async def stack(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> AsyncIterator[ProductionStack]:
-    async with open_postgres_production_stack(root=tmp_path, monkeypatch=monkeypatch) as production:
+    async with open_stack(root=tmp_path, monkeypatch=monkeypatch) as production:
         yield production
 
 
@@ -505,9 +503,7 @@ async def test_stagegraph_cancel_at_declared_wait_closes_real_runtime(
 ) -> None:
     # The legacy-poison parity run: legacy namespaces exist with sentinel rows that no
     # restricted role may touch; the whole production stack must never fall back to them.
-    async with open_postgres_production_stack(
-        root=tmp_path, monkeypatch=monkeypatch, legacy_poison=True
-    ) as stack:
+    async with open_stack(root=tmp_path, monkeypatch=monkeypatch, legacy_poison=True) as stack:
         await _cancel_at_declared_wait(stack)
         assert stack.database is not None
         assert await legacy_poison_intact(stack.database.owner_dsn)

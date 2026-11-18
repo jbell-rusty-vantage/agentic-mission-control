@@ -1,7 +1,7 @@
 """FX-TR (TRACING-PROPOSAL §P9, Stage 1 WP-TR-1): the tracing fixture on the production
 offline stack, the FX-TR-RECONCILE proof and the lifecycle/"who" half of FX-TR-STEP.
 
-The signed scoped stack (`tests/fixtures/scoped_api_stack.py`): a fresh common database on
+The signed scoped stack (`tests/support/stack.py`): a fresh common database on
 the disposable cluster (the newest built release, 1.4.4), a local Temporal dev server, the
 production workers with deterministic Deep Agents cognition (no provider call) and the
 configured API over ASGI. `prepare_run(stack, "StageGraphTracing")` publishes the four-stage
@@ -26,10 +26,10 @@ WP-TR-2 (FX-TR-STEP, FX-TR-SUB, FX-TR-HOOK) fixture pieces: the exact MCP server
 fixture-owned `tests/fixtures/rrm009_mcp_server.py` (a >12 KiB `lookup_binding_marker`
 result), the tracing family's stage operations carry the catalog hook `rrm009.annotate`
 once `DeploymentCapabilityComponents` can register its bundle, and
-`scoped_api_stack.close_saver` closes the API's pinned saver for the "saver closed" reads.
+`tests.support.stack.close_saver` closes the API's pinned saver for the "saver closed" reads.
 
 WP-TR-3 (FX-TR-RETAIN, FX-TR-REPLAY, FX-TR-STEP on the projection) fixture pieces: the
-scoped stack now serves the maintenance queue (`scoped_api_stack.maintenance_worker`:
+scoped stack now serves the maintenance queue (`tests.support.stack.maintenance_worker`:
 `mc.frames_expire.v1` over the runtime pool, unless the production worker set already serves
 it) and exposes it as `stack.maintenance_queue`; `run_frames_expiry(stack, now=)` drives the
 retention workflow the way the FT-C1 integration proof does; `projection_state`,
@@ -53,14 +53,6 @@ from uuid import uuid4
 
 import pytest
 from tests.fixtures import rrm009_production_stack as technical
-from tests.fixtures.scoped_api_stack import (
-    ScopedStack,
-    close_saver,
-    inspect,
-    scoped_stack,
-    serve_loopback,
-    until,
-)
 from tests.support.acceptance.mission_control.cognition_points import (
     BASE,
     all_points,
@@ -87,6 +79,14 @@ from tests.support.acceptance.mission_control.tracing import (
     temporal_diagnostics,
     terminal,
     transcript_entries,
+)
+from tests.support.stack import (
+    ScopedStack,
+    close_saver,
+    inspect,
+    open_stack,
+    serve_loopback,
+    until,
 )
 
 from mission_control.adapters.postgres.frames.retention import (
@@ -456,7 +456,7 @@ async def test_tracing_blueprint_cycles_s2_twice_and_completes(
     Writes `.scratch/tracing-stage-1/fx-tr-smoke.json` with the event types, the journal
     mutation kinds and the unit map for the WP-TR proofs."""
 
-    async with scoped_stack(tmp_path, monkeypatch) as stack:
+    async with open_stack(tmp_path, monkeypatch, signed=True) as stack:
         run_id = await run_tracing_to_completion(stack)
         state = await inspect(stack, run_id)
         assert state["lifecycle"] == "completed", state
@@ -538,7 +538,7 @@ async def test_fx_tr_reconcile(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) 
 
     monkeypatch.setenv("MISSION_CONTROL_TEST_POINTS_FAULT", "skip")
     assert os.environ["MISSION_CONTROL_TEST_POINTS_FAULT"] == "skip"
-    async with scoped_stack(tmp_path, monkeypatch) as stack:
+    async with open_stack(tmp_path, monkeypatch, signed=True) as stack:
         run_id = await run_tracing_to_completion(stack)
         generations = await settled_generations(stack, run_id)
         assert generations, "no settled unit generation (checkpoint_transition) for the run"
@@ -594,7 +594,7 @@ async def test_fx_tr_reconcile_cli(tmp_path: Path, monkeypatch: pytest.MonkeyPat
 
     monkeypatch.setenv("MISSION_CONTROL_TEST_POINTS_FAULT", "skip")
     async with (
-        scoped_stack(tmp_path, monkeypatch) as stack,
+        open_stack(tmp_path, monkeypatch, signed=True) as stack,
         serve_loopback(stack.application) as url,
     ):
         run_id = await run_tracing_to_completion(stack)
@@ -637,7 +637,7 @@ async def test_fx_tr_step_lifecycle_half(tmp_path: Path, monkeypatch: pytest.Mon
 
     Passes only once the WP-TR-1 writers land (source streams)."""
 
-    async with scoped_stack(tmp_path, monkeypatch) as stack:
+    async with open_stack(tmp_path, monkeypatch, signed=True) as stack:
         run_id = await run_tracing_to_completion(stack)
         points = await all_points(stack, run_id)
         units = units_by_location(points)
@@ -857,7 +857,7 @@ async def test_fx_tr_step(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> No
 
     Passes only once the WP-TR-2 source streams land (observer, promoter, environment frame)."""
 
-    async with scoped_stack(tmp_path, monkeypatch) as stack:
+    async with open_stack(tmp_path, monkeypatch, signed=True) as stack:
         run_id = await run_tracing_to_completion(stack)
         points = await all_points(stack, run_id)
         units = units_by_location(points)
@@ -1180,7 +1180,7 @@ async def test_fx_tr_sub(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Non
 
     Passes only once the WP-TR-2 subagent frames and nested points land (source streams)."""
 
-    async with scoped_stack(tmp_path, monkeypatch) as stack:
+    async with open_stack(tmp_path, monkeypatch, signed=True) as stack:
         run_id = await run_tracing_to_completion(stack)
         points = await all_points(stack, run_id)
         units = units_by_location(points)
@@ -1350,7 +1350,7 @@ async def test_fx_tr_hook(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> No
     Passes only once the WP-TR-2 hook ports, the frame sink and the component registration
     (`DeploymentCapabilityComponents.hook_scripts`) land (source streams)."""
 
-    async with scoped_stack(tmp_path, monkeypatch) as stack:
+    async with open_stack(tmp_path, monkeypatch, signed=True) as stack:
         run_id = await run_tracing_to_completion(stack)
         points = await all_points(stack, run_id)
         units = units_by_location(points)
@@ -1842,7 +1842,7 @@ async def test_fx_tr_retain(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> 
     Passes only once the WP-TR-3 retention classes (0047 generated column, the narrowed
     `expire_provider_frames`) and the v2 `body.state` land (source streams)."""
 
-    async with scoped_stack(tmp_path, monkeypatch) as stack:
+    async with open_stack(tmp_path, monkeypatch, signed=True) as stack:
         run_id = await run_tracing_to_completion(stack)
         frames = await frames_for_run(stack, run_id)
         assert frames, "no provider frames for the run"
@@ -1986,7 +1986,7 @@ async def test_fx_tr_replay(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> 
     `model_request` frames and promoted objects are WP-TR-2's."""
 
     async with (
-        scoped_stack(tmp_path, monkeypatch) as stack,
+        open_stack(tmp_path, monkeypatch, signed=True) as stack,
         serve_loopback(stack.application) as url,
     ):
         run_id = await run_tracing_to_completion(stack)
@@ -2166,7 +2166,7 @@ async def test_fx_tr_step_projection(tmp_path: Path, monkeypatch: pytest.MonkeyP
     artifact download and CLI land (source streams)."""
 
     async with (
-        scoped_stack(tmp_path, monkeypatch) as stack,
+        open_stack(tmp_path, monkeypatch, signed=True) as stack,
         serve_loopback(stack.application) as url,
     ):
         run_id = await run_tracing_to_completion(stack)
@@ -2535,7 +2535,7 @@ async def test_fx_tr_fork_cycle(tmp_path: Path, monkeypatch: pytest.MonkeyPatch)
     failures: list[str] = []
     evidence: dict[str, Any] = {"proof": "FX-TR-FORK-CYCLE", "marker": FORK_MARKER}
     async with (
-        scoped_stack(tmp_path, monkeypatch) as stack,
+        open_stack(tmp_path, monkeypatch, signed=True) as stack,
         serve_loopback(stack.application) as url,
     ):
         run_id = await run_tracing_to_completion(stack)

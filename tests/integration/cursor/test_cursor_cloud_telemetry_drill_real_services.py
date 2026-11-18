@@ -38,12 +38,12 @@ from mission_control.application.secrets.minting import CredentialBinding, Crede
 from mission_control.application.signals.service import IngressKeys, SignalIngressService
 from mission_control.interfaces.http.ingress import create_ingress_app
 from tests.fixtures.mission_control_common_db import CommonDatabase, ingress_login
-from tests.fixtures.scoped_api_stack import until
 from tests.support.integration.cursor.mp09_cloud_segment_loop_real_services import (
     _client,
     _run,
     pg_cloud_unit,
 )
+from tests.support.stack import until
 
 APPLICATION = "biotech"
 ENV_VARS_CLOUD = {"env_vars_ref": "environment:MC_LAUNCH", "client_agent_id": False}

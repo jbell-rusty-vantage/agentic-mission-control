@@ -14,8 +14,9 @@ from tests.fixtures.mission_control_local_agent_server import (
     deterministic_child_definition,
     local_agent_server,
 )
-from tests.fixtures.mission_control_production_stack import open_postgres_production_stack
-from tests.fixtures.rrm009_production_harness import (
+from tests.fixtures.rrm009_production_stack import ANSWER_MARKER, technical_binding
+from tests.support.ids import SCOPE
+from tests.support.stack import (
     ProductionStack,
     _calls,
     _diagnose,
@@ -25,11 +26,10 @@ from tests.fixtures.rrm009_production_harness import (
     _terminal,
     _wait_for,
     canonical_evidence,
+    open_stack,
     promote_generic_artifact,
     record_parity_trace,
 )
-from tests.fixtures.rrm009_production_stack import ANSWER_MARKER, technical_binding
-from tests.support.ids import SCOPE
 
 from mission_control.adapters.postgres.async_subagents.async_subagent_detail_repository import (
     PostgresAsyncSubagentDetailRepository,
@@ -60,7 +60,7 @@ _METADATA_REVISIONS = """
 
 @pytest.fixture
 async def stack(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> AsyncIterator[ProductionStack]:
-    async with open_postgres_production_stack(root=tmp_path, monkeypatch=monkeypatch) as production:
+    async with open_stack(root=tmp_path, monkeypatch=monkeypatch) as production:
         yield production
 
 
@@ -148,7 +148,7 @@ async def test_real_hosted_async_child_cancellation_uses_postgres_detail(
         technical = local_async_binding(endpoint)
         gate = rrm009_cancellation.CancellationGate(window)  # type: ignore[arg-type]
         model_log = []
-        async with open_postgres_production_stack(
+        async with open_stack(
             root=tmp_path,
             monkeypatch=monkeypatch,
             technical_override=technical,
@@ -178,7 +178,7 @@ async def test_real_hosted_async_children_complete_and_settle_in_postgres(
         technical = local_async_binding(endpoint)
         gate = rrm009_cancellation.CancellationGate("completion_wait")
         model_log = []
-        async with open_postgres_production_stack(
+        async with open_stack(
             root=tmp_path,
             monkeypatch=monkeypatch,
             technical_override=technical,

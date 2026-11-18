@@ -15,18 +15,19 @@ from uuid import uuid4
 
 import pytest
 from temporalio.worker import Replayer
-from tests.fixtures.rrm009_production_harness import canonical_evidence, record_parity_trace
-from tests.fixtures.scoped_api_stack import (
-    ScopedStack,
-    admit_and_launch,
-    inspect,
-    scoped_stack,
-    until,
-)
 from tests.support.acceptance.mission_control.authenticated_scoped_runtime import (
     assert_persisted_run_evidence,
     command,
     condition,
+)
+from tests.support.stack import (
+    ScopedStack,
+    admit_and_launch,
+    canonical_evidence,
+    inspect,
+    open_stack,
+    record_parity_trace,
+    until,
 )
 
 from mission_control.adapters.temporal.workflow_sandbox import coordinator_workflow_runner
@@ -49,7 +50,7 @@ async def at_wait(stack: ScopedStack, run_id: str) -> bool:
 async def test_signed_scoped_stagegraph_goal_and_lifecycle_reach_mc_operations(
     tmp_path, monkeypatch
 ):
-    async with scoped_stack(tmp_path, monkeypatch) as stack:
+    async with open_stack(tmp_path, monkeypatch, signed=True) as stack:
         unauthenticated = await stack.http.get(
             "/v1/applications/biotech/runs/absent/inspection",
             headers={"Authorization": ""},

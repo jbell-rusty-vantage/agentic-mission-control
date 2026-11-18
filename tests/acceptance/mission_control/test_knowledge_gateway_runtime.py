@@ -1,6 +1,6 @@
 """T1-MC (Sprint V SV-16): the knowledge gateway through actual local Temporal and PostgreSQL.
 
-The signed scoped stack (`tests/fixtures/scoped_api_stack.py`): a fresh common database with
+The signed scoped stack (`tests/support/stack.py`): a fresh common database with
 the newest built release (1.6.0), a local Temporal dev server, the production workers and the
 configured API, serving `KNOWLEDGE_TEST_APPLICATION` (default `ai-engineer`). The worker
 composes the knowledge lane through the real bootstrap (`compose_knowledge_lane`: settings,
@@ -31,12 +31,12 @@ from uuid import uuid4
 
 import pytest
 import uvicorn
-from tests.fixtures.scoped_api_stack import ScopedStack, inspect, prepare_run, scoped_stack, until
 from tests.support.knowledge.binding import (
     FakeKnowledgeBinding,
     knowledge_http_app,
     real_binding_configured,
 )
+from tests.support.stack import ScopedStack, inspect, open_stack, prepare_run, until
 
 from mission_control.adapters.deep_agents.knowledge_tools import (
     knowledge_tool_components,
@@ -209,9 +209,10 @@ async def test_stage_graph_and_goal_directed_nodes_register_submit_and_assess(
 
     components = knowledge_tool_components(knowledge_tools(cast(Any, None)))
     try:
-        async with scoped_stack(
+        async with open_stack(
             tmp_path,
             monkeypatch,
+            signed=True,
             knowledge_lane=lane,
             knowledge_tools=components,
             application_id=application,

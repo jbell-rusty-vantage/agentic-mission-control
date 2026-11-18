@@ -14,7 +14,6 @@ from uuid import uuid4
 
 import pytest
 from tests.fixtures.manifest_runtime import AUTHOR
-from tests.fixtures.rrm009_production_harness import ProductionStack
 from tests.support.acceptance.mission_control.overnight_goal_directed import (
     goal_launch_bindings,
     goal_manifest,
@@ -24,6 +23,7 @@ from tests.support.acceptance.mission_control.overnight_stagegraph import (
     ROOT,
     production_lifecycle,
 )
+from tests.support.stack import ProductionStack
 
 from mission_control.application.authoring.manifest_submit import SubmitRequest
 from mission_control.contracts.identities import mission_root_id
@@ -403,7 +403,6 @@ async def _run_goal_case(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, scenar
     """Real PostgreSQL/Temporal/KS HTTP; only producer/evaluator cognition is scripted."""
     from datetime import UTC, datetime
 
-    from tests.fixtures.mission_control_production_stack import open_postgres_production_stack
     from tests.fixtures.overnight_goal_model import GoalScript
     from tests.fixtures.overnight_trusted import install_scripted_trusted
     from tests.fixtures.rrm009_production_stack import technical_binding
@@ -411,6 +410,7 @@ async def _run_goal_case(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, scenar
     from tests.support.integration.deep_agents.report_source_real_service import response
     from tests.support.knowledge.content import model_content
     from tests.support.manifest_runtime import host_pins
+    from tests.support.stack import open_stack
 
     from mission_control.adapters.postgres.human_tasks.repository import PostgresHumanTaskRepository
     from mission_control.adapters.temporal.human_gate_wake import TemporalHumanGateWake
@@ -543,7 +543,7 @@ async def _run_goal_case(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, scenar
             holder["lane"] = composed
             return composed
 
-        async with open_postgres_production_stack(
+        async with open_stack(
             root=tmp_path,
             monkeypatch=monkeypatch,
             application_id=application,

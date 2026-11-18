@@ -198,7 +198,6 @@ async def _run_linked_case(tmp_path: Any, monkeypatch: Any, scenario: str) -> No
     from uuid import uuid4
 
     from tests.fixtures.manifest_runtime import AUTHOR
-    from tests.fixtures.mission_control_production_stack import open_postgres_production_stack
     from tests.fixtures.overnight_linked_evidence import export_linked
     from tests.fixtures.overnight_linked_model import linked_components, linked_script
     from tests.fixtures.overnight_linked_probes import LinkedProbe
@@ -215,6 +214,7 @@ async def _run_linked_case(tmp_path: Any, monkeypatch: Any, scenario: str) -> No
     from tests.support.integration.deep_agents.report_source_real_service import command, response
     from tests.support.knowledge.content import model_content
     from tests.support.manifest_runtime import host_pins
+    from tests.support.stack import open_stack
 
     from mission_control.adapters.postgres.chains.exports import PostgresChainStartGate
     from mission_control.adapters.postgres.chains.store import (
@@ -410,7 +410,7 @@ async def _run_linked_case(tmp_path: Any, monkeypatch: Any, scenario: str) -> No
 
             capability_pins_path = biotech_host_pins(capability_pins_path, biotech_profile)
 
-        async with open_postgres_production_stack(
+        async with open_stack(
             root=tmp_path,
             monkeypatch=monkeypatch,
             application_id=application,

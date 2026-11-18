@@ -56,7 +56,6 @@ from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog, publis
 from tests.fixtures.db_env import db_env_name
 from tests.fixtures.manifest_runtime import AUTHOR, ChainScript, chain_components
 from tests.fixtures.mission_control_common_db import ingress_login
-from tests.fixtures.mission_control_production_stack import open_postgres_production_stack
 from tests.fixtures.rrm009_production_stack import technical_binding
 from tests.support.ids import SCOPE, catalog_scope
 from tests.support.integration.postgres.signal_ingress_postgres import FakeOidc, FakeUploads
@@ -68,6 +67,7 @@ from tests.support.manifest_runtime import (
     root_executions,
     write_bindings,
 )
+from tests.support.stack import open_stack
 from tests.unit.authoring.manifest_launch_fixture import deep_agents_chain
 
 pytestmark = pytest.mark.common_db
@@ -124,7 +124,7 @@ async def test_remote_admission_crash_replay_and_current_authority(
     await write_bindings(bindings, technical)
     migrations = sorted((RELEASE / "migrations").glob("*.sql"))
     assert migrations and migrations[-1].name.startswith("0044_")
-    async with open_postgres_production_stack(
+    async with open_stack(
         root=tmp_path,
         monkeypatch=monkeypatch,
         technical_override=technical,

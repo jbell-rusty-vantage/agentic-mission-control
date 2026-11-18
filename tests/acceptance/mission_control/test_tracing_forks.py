@@ -1,7 +1,7 @@
 """FX-TR-FORK-GD (TRACING-PROPOSAL §P5.4, §P5.7; WP-TR-4): the precise Goal Directed fork
 on the production offline stack.
 
-The signed scoped stack (`tests/fixtures/scoped_api_stack.py`): a fresh common database on
+The signed scoped stack (`tests/support/stack.py`): a fresh common database on
 the disposable cluster, a local Temporal dev server, the production workers with
 deterministic Deep Agents cognition (no provider call) and the configured API over loopback
 HTTP. A Goal Directed run (`rrm009_production_stack.goal_blueprint`, `max_iterations=2`:
@@ -40,7 +40,6 @@ from uuid import uuid4
 
 import pytest
 from tests.fixtures import rrm009_production_stack as technical
-from tests.fixtures.scoped_api_stack import ScopedStack, scoped_stack, until
 from tests.support.acceptance.mission_control.cognition_points import (
     BASE,
     all_points,
@@ -49,6 +48,7 @@ from tests.support.acceptance.mission_control.cognition_points import (
     launch,
     snapshot,
 )
+from tests.support.stack import ScopedStack, open_stack, until
 
 from mission_control.adapters.postgres.orchestration.goal_directed_repository import (
     PostgresGoalDirectedDocumentRepository,
@@ -61,7 +61,7 @@ pytestmark = [pytest.mark.psycopg_selector, pytest.mark.common_db]
 EVIDENCE_ROOT = Path(".scratch/tracing-stage-1")
 # Under the 900 s pytest-timeout safety net; a run takes 60-200 s on the host.
 RUN_SECONDS = 600
-# The objective `scoped_api_stack.prepare_run` admits for a Goal Directed run; the derived
+# The objective `tests.support.stack.prepare_run` admits for a Goal Directed run; the derived
 # run carries the same objective (the fork patches nothing).
 OBJECTIVE = "Produce one independently verified technical record."
 FORK_ITERATION = 2
@@ -140,7 +140,7 @@ async def test_goal_directed_fork_at_an_iteration_reuses_earlier_iterations_and_
 
     failures: list[str] = []
     evidence: dict[str, Any] = {"proof": "FX-TR-FORK-GD", "marker": MARKER}
-    async with scoped_stack(tmp_path, monkeypatch) as stack:
+    async with open_stack(tmp_path, monkeypatch, signed=True) as stack:
         # --- The source run: two iterations, executor then verifier, on shared role threads.
         run_id = await launch(stack, "GoalDirected")
         await until(lambda: completed(stack, run_id), seconds=RUN_SECONDS)

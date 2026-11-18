@@ -1,7 +1,7 @@
 """FX-DA-POINTS and FX-DA-POINTS-SG (P1 turn 4, WP-1): the cognition coordinate on the
 production offline stack.
 
-The signed scoped stack (`tests/fixtures/scoped_api_stack.py`): a fresh common database on
+The signed scoped stack (`tests/support/stack.py`): a fresh common database on
 the disposable cluster (release 1.4.3), a local Temporal dev server, the production workers
 with deterministic Deep Agents cognition (no provider call) and the configured API over real
 loopback HTTP. A Goal Directed run (two iterations, executor and verifier on shared role
@@ -21,7 +21,6 @@ from typing import Any
 from uuid import uuid4
 
 import pytest
-from tests.fixtures.scoped_api_stack import inspect, scoped_stack, until
 from tests.support.acceptance.mission_control.cognition_points import (
     BASE,
     all_points,
@@ -34,6 +33,7 @@ from tests.support.acceptance.mission_control.cognition_points import (
     saver_root_checkpoints,
     snapshot,
 )
+from tests.support.stack import inspect, open_stack, until
 
 pytestmark = [pytest.mark.psycopg_selector, pytest.mark.common_db]
 
@@ -49,7 +49,7 @@ def _write_evidence(path: Path, payload: dict[str, Any]) -> None:
 async def test_goal_directed_points_index_every_root_checkpoint_of_iteration_two(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    async with scoped_stack(tmp_path, monkeypatch) as stack:
+    async with open_stack(tmp_path, monkeypatch, signed=True) as stack:
         run_id = await launch(stack, "GoalDirected")
         await until(lambda: completed(stack, run_id), seconds=600)
         points = await all_points(stack, run_id)
@@ -125,7 +125,7 @@ async def test_goal_directed_points_index_every_root_checkpoint_of_iteration_two
 async def test_stage_graph_points_index_each_stage_in_its_own_thread(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    async with scoped_stack(tmp_path, monkeypatch) as stack:
+    async with open_stack(tmp_path, monkeypatch, signed=True) as stack:
         run_id = await launch(stack, "StageGraph")
         await until(lambda: at_wait(stack, run_id), seconds=600)
         await satisfy_wait(stack, run_id)
@@ -189,7 +189,7 @@ async def test_stage_graph_fork_from_a_point_continues_the_copied_thread(
 
     from mission_control.application.execution.run_launch import fork_semantic_input_binding_ref
 
-    async with scoped_stack(tmp_path, monkeypatch) as stack:
+    async with open_stack(tmp_path, monkeypatch, signed=True) as stack:
         run_id = await launch(stack, "StageGraph")
         await until(lambda: at_wait(stack, run_id), seconds=600)
         await satisfy_wait(stack, run_id)
@@ -337,7 +337,7 @@ async def test_interrupt_and_inject_into_running_cognition_marks_the_points(
     monkeypatch.setenv("MISSION_CONTROL_SCRIPTED_MODEL_DELAY_SECONDS", "2.5")
     assert os.environ["MISSION_CONTROL_SCRIPTED_MODEL_DELAY_SECONDS"] == "2.5"
     injected = "Injected mid-turn: switch to the second evidence source before writing."
-    async with scoped_stack(tmp_path, monkeypatch) as stack:
+    async with open_stack(tmp_path, monkeypatch, signed=True) as stack:
         run_id = await launch(stack, "GoalDirected")
 
         async def executor_running() -> bool:

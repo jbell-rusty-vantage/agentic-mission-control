@@ -11,7 +11,7 @@ from itertools import pairwise
 from typing import Any
 from uuid import uuid4
 
-from tests.fixtures.scoped_api_stack import ScopedStack, inspect, prepare_run
+from tests.support.stack import ScopedStack, inspect, prepare_run
 
 BASE = "/v1/applications/biotech/runs"
 

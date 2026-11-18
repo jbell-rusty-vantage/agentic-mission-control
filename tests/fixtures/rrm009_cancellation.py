@@ -38,19 +38,6 @@ from langchain_core.messages import AIMessage, BaseMessage, ToolMessage
 from langgraph_sdk import get_client
 from langgraph_sdk.errors import NotFoundError
 from temporalio.api.enums.v1 import EventType
-from tests.fixtures.rrm009_production_harness import (
-    PRINCIPAL,
-    ProductionStack,
-    _admit,
-    _command,
-    _launch,
-    _receipt_states,
-    _release_wait,
-    _replay,
-    _run,
-    _send,
-    _wait_for,
-)
 from tests.fixtures.rrm009_production_stack import (
     CHILD_MARKER,
     OPERATOR,
@@ -69,6 +56,19 @@ from tests.fixtures.rrm009_production_stack import (
 from tests.support.ids import SCOPE
 from tests.support.model_catalog import checked_in_catalog
 from tests.support.models import since_latest_input, tool_call
+from tests.support.stack import (
+    PRINCIPAL,
+    ProductionStack,
+    _admit,
+    _command,
+    _launch,
+    _receipt_states,
+    _release_wait,
+    _replay,
+    _run,
+    _send,
+    _wait_for,
+)
 
 from mission_control.adapters.agent_server.async_subagents.auth import mint_scope_claim
 from mission_control.adapters.agent_server.async_subagents.bindings import (

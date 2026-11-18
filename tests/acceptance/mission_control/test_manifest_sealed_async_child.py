@@ -29,14 +29,13 @@ from langchain_core.messages import AIMessage, BaseMessage, ToolMessage
 from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog, publish_output_schemas
 from tests.fixtures.manifest_runtime import ChainScript, GoalScript, promise_submitter
 from tests.fixtures.mission_control_local_agent_server import local_agent_server
-from tests.fixtures.mission_control_production_stack import open_postgres_production_stack
-from tests.fixtures.rrm009_production_harness import _diagnose, _run, _terminal, _wait_for
 from tests.fixtures.rrm009_production_stack import call_usage, technical_binding
 from tests.support.acceptance.mission_control import manifest_async_child as base
 from tests.support.ids import SCOPE
 from tests.support.manifest_runtime import OUTPUT_SCHEMAS, host_pins, missions_app, post, submit
 from tests.support.model_catalog import catalog_for
 from tests.support.models import ScriptedChatModel
+from tests.support.stack import _diagnose, _run, _terminal, _wait_for, open_stack
 
 from mission_control.adapters.agent_server.async_subagents.sealed import (
     sealed_child_served_identity,
@@ -227,7 +226,7 @@ async def sealed_launch_stack(
         components = checking_components(technical, script, model_log)
         bindings_path = tmp_path / "manifest-launch-bindings.json"
         await write_sealed_bindings(bindings_path, technical, endpoint)
-        async with open_postgres_production_stack(
+        async with open_stack(
             fixture_owner_prerequisites=True,
             root=tmp_path,
             monkeypatch=monkeypatch,

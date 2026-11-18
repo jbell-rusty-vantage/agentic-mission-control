@@ -1,8 +1,8 @@
 """FX-TR-REMOTE (TRACING-PROPOSAL §P9, WP-TR-5): the remote saver on the production offline
 stack.
 
-The signed scoped stack (`tests/fixtures/scoped_api_stack.py`) with its LangGraph saver DSN
-pointed at `tests/fixtures/tcp_proxy.SaverProxy` (`scoped_stack(..., saver_proxy=)`), so both
+The signed scoped stack (`tests/support/stack.py`) with its LangGraph saver DSN pointed
+at `tests/fixtures/tcp_proxy.SaverProxy` (`open_stack(..., signed=True, saver_proxy=)`), so both
 the workers and the API open the saver through the proxy while the common Mission Control
 database stays direct. `MISSION_CONTROL_POINTS_WALK_BUDGET_MS=50` is set before the stack
 starts. A plain Stage Graph run (draft, declared wait, review) is launched with the proxy
@@ -29,13 +29,6 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-from tests.fixtures.scoped_api_stack import (
-    ScopedStack,
-    inspect,
-    scoped_stack,
-    serve_loopback,
-    until,
-)
 from tests.fixtures.stage2_outputs import write_outputs
 from tests.fixtures.tcp_proxy import SaverProxy
 from tests.support.acceptance.mission_control.cognition_points import (
@@ -52,6 +45,13 @@ from tests.support.acceptance.mission_control.tracing import (
     cli,
     find_keys,
     parse_cli_json,
+)
+from tests.support.stack import (
+    ScopedStack,
+    inspect,
+    open_stack,
+    serve_loopback,
+    until,
 )
 
 pytestmark = [pytest.mark.psycopg_selector, pytest.mark.common_db]
@@ -101,7 +101,7 @@ async def test_fx_tr_remote(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> 
         "saver_delay_seconds": SAVER_DELAY_SECONDS,
     }
     async with (
-        scoped_stack(tmp_path, monkeypatch, saver_proxy=proxy) as stack,
+        open_stack(tmp_path, monkeypatch, signed=True, saver_proxy=proxy) as stack,
         serve_loopback(stack.application) as url,
     ):
         evidence["proxy_port"] = proxy.port

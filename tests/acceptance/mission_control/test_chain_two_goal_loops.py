@@ -46,8 +46,9 @@ from tests.fixtures.manifest_runtime import (
     compose_lifecycle,
     promise_submitter,
 )
-from tests.fixtures.mission_control_production_stack import open_postgres_production_stack
-from tests.fixtures.rrm009_production_harness import (
+from tests.fixtures.rrm009_production_stack import technical_binding
+from tests.support.ids import INSTALLATIONS, SCOPE
+from tests.support.stack import (
     ProductionStack,
     _command,
     _diagnose,
@@ -55,9 +56,8 @@ from tests.fixtures.rrm009_production_harness import (
     _send,
     _terminal,
     _until,
+    open_stack,
 )
-from tests.fixtures.rrm009_production_stack import technical_binding
-from tests.support.ids import INSTALLATIONS, SCOPE
 
 from mission_control.adapters.postgres.chains.store import (
     HOOK_NAME,
@@ -140,7 +140,7 @@ async def chain_stack(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> AsyncI
     script = ChainScript(request_scope=SCOPE)
     model_log: list[dict[str, Any]] = []
     technical = technical_binding()
-    async with open_postgres_production_stack(
+    async with open_stack(
         root=tmp_path,
         monkeypatch=monkeypatch,
         technical_override=technical,

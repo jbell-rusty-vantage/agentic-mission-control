@@ -7,8 +7,7 @@ from __future__ import annotations
 
 import asyncio
 import contextlib
-import json
-from collections.abc import AsyncIterator, Callable
+from collections.abc import AsyncIterator
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
@@ -18,11 +17,6 @@ from uuid import uuid4
 import httpx
 from fastapi import FastAPI
 
-from mission_control.adapters.capabilities.capability_pins import (
-    CapabilityPinError,
-    PinnedSkill,
-    PinnedTool,
-)
 from mission_control.adapters.storage.control_plane_payloads import InMemoryPayloadStore
 from mission_control.adapters.temporal.coordinator_runtime import coordinator_task_queues
 from mission_control.adapters.temporal.submission import TemporalWorkflowSubmitter
@@ -41,7 +35,6 @@ from mission_control.application.installations.registry import (
     InstallationObservation,
 )
 from mission_control.bootstrap.manifests import compose_chain_relay_pump
-from mission_control.bootstrap.settings import get_settings
 from mission_control.bootstrap.technical_api import api
 from mission_control.contracts.identities import parse_request_scope
 from mission_control.domain.authoring.extensions import ExtensionRegistry
@@ -50,10 +43,10 @@ from mission_control.interfaces.http.mission_control import MissionPrincipal, ge
 from mission_control.interfaces.http.missions import router as missions_router
 from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog
 from tests.fixtures.manifest_runtime import AUTHOR, ChainScript
-from tests.fixtures.rrm009_production_harness import ProductionStack
 from tests.fixtures.rrm009_production_stack import AGENT_COGNITIVE_QUEUE, TechnicalBinding
 from tests.support.ids import INSTALLATIONS, SCOPE
 from tests.support.model_catalog import model_binding
+from tests.support.stack import ProductionStack, hermetic_pins
 from tests.unit.authoring.manifest_launch_fixture import (
     deep_agents_chain,
     fixture_bindings,
@@ -165,34 +158,11 @@ async def write_bindings(path: Path, technical: TechnicalBinding) -> None:
 
 
 def host_pins(path: Path) -> Path:
-    """FIXTURE pin file: the deployment pins minus the tool and Skill pins that do not resolve
-    on this host (a git worktree's parent has no ``.tools``/``.agents``; a developer workspace
-    may carry a re-installed Skill whose bytes drifted from the reviewed pin). No manifest here
-    selects a tool or Skill; every other pin is unchanged, and pin drift itself stays covered by
-    the capability-pin tests, which fail closed."""
+    """FIXTURE pin file: `tests.support.stack.hermetic_pins` (the deployment pins without the
+    tool and Skill pins that resolve against host files), the same on every host. No manifest
+    here selects a tool or Skill; pin drift stays covered by the capability-pin tests."""
 
-    source = get_settings().capability_pins_path
-    document = json.loads(source.read_text(encoding="utf-8"))
-
-    def resolves(verify: Callable[[], object]) -> bool:
-        try:
-            verify()
-        except CapabilityPinError:
-            return False
-        return True
-
-    document["tools"] = [
-        item
-        for item in document.get("tools", ())
-        if resolves(PinnedTool.model_validate(item).verify_entrypoint)
-    ]
-    document["skills"] = [
-        item
-        for item in document.get("skills", ())
-        if resolves(PinnedSkill.model_validate(item).bundle)
-    ]
-    path.write_text(json.dumps(document, indent=2), encoding="utf-8")
-    return path
+    return hermetic_pins(path)
 
 
 class CountingAuthor:

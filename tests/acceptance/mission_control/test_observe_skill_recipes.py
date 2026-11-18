@@ -8,8 +8,8 @@ import json
 from pathlib import Path
 
 import pytest
-from tests.fixtures.scoped_api_stack import prepare_run, scoped_stack, serve_loopback
 from tests.support.acceptance.mission_control.wake_channels import finished, missionctl
+from tests.support.stack import open_stack, prepare_run, serve_loopback
 
 pytestmark = [pytest.mark.psycopg_selector, pytest.mark.common_db]
 EXAMPLES = tuple(
@@ -49,7 +49,7 @@ async def test_launch_then_wait_supervise_many_inspect_on_wake_and_ack(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     async with (
-        scoped_stack(tmp_path, monkeypatch) as stack,
+        open_stack(tmp_path, monkeypatch, signed=True) as stack,
         serve_loopback(stack.application) as url,
     ):
         tracked = []

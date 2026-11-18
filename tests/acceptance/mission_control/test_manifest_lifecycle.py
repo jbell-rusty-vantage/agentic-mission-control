@@ -18,16 +18,16 @@ from uuid import uuid4
 
 import pytest
 from tests.fixtures.manifest_runtime import AUTHOR, compose_lifecycle
-from tests.fixtures.mission_control_production_stack import open_postgres_production_stack
-from tests.fixtures.rrm009_production_harness import (
+from tests.support.ids import SCOPE
+from tests.support.stack import (
     ProductionStack,
     _command,
     _run,
     _send,
     _terminal,
     _wait_for,
+    open_stack,
 )
-from tests.support.ids import SCOPE
 
 from mission_control.application.authoring.manifest_submit import SubmitRequest
 from mission_control.domain.policies.contracts import CancelAction
@@ -41,7 +41,7 @@ PROOF = ROOT / ".scratch/fast-track-2026-10-07/E3"
 
 @pytest.fixture
 async def stack(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> AsyncIterator[ProductionStack]:
-    async with open_postgres_production_stack(root=tmp_path, monkeypatch=monkeypatch) as production:
+    async with open_stack(root=tmp_path, monkeypatch=monkeypatch) as production:
         yield production
 
 

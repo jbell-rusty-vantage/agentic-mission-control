@@ -32,15 +32,7 @@ from tests.fixtures.manifest_runtime import ChainScript, GoalScript, promise_sub
 from tests.fixtures.mission_control_local_agent_server import (
     local_agent_server,
 )
-from tests.fixtures.mission_control_production_stack import open_postgres_production_stack
 from tests.fixtures.rrm009_cancellation import TOKEN_ENV
-from tests.fixtures.rrm009_production_harness import (
-    _diagnose,
-    _run,
-    _terminal,
-    _wait_for,
-    canonical_evidence,
-)
 from tests.fixtures.rrm009_production_stack import technical_binding
 from tests.support.acceptance.mission_control.manifest_async_child import (
     ASYNC_CHILD,
@@ -60,6 +52,14 @@ from tests.support.manifest_runtime import (
     submit,
 )
 from tests.support.model_catalog import catalog_for
+from tests.support.stack import (
+    _diagnose,
+    _run,
+    _terminal,
+    _wait_for,
+    canonical_evidence,
+    open_stack,
+)
 
 from mission_control.adapters.postgres.async_subagents.async_subagent_detail_repository import (
     PostgresAsyncSubagentDetailRepository,
@@ -113,7 +113,7 @@ async def async_launch_stack(
         components = spawning_components(technical, script, model_log)
         bindings_path = tmp_path / "manifest-launch-bindings.json"
         await write_async_bindings(bindings_path, technical, endpoint)
-        async with open_postgres_production_stack(
+        async with open_stack(
             fixture_owner_prerequisites=True,
             root=tmp_path,
             monkeypatch=monkeypatch,

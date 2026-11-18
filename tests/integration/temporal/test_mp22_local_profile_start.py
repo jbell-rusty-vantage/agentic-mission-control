@@ -64,8 +64,6 @@ from tests.fixtures.manifest_runtime import (
     chain_components,
     promise_submitter,
 )
-from tests.fixtures.mission_control_production_stack import open_postgres_production_stack
-from tests.fixtures.rrm009_production_harness import _diagnose, _run, _until
 from tests.fixtures.rrm009_production_stack import (
     AGENT_COGNITIVE_QUEUE,
     TechnicalBinding,
@@ -92,6 +90,7 @@ from tests.support.manifest_runtime import (
     submit,
 )
 from tests.support.model_catalog import catalog_for
+from tests.support.stack import _diagnose, _run, _until, open_stack
 from tests.unit.authoring.manifest_launch_fixture import deep_agents_chain, fixture_bindings
 
 pytestmark = pytest.mark.common_db
@@ -152,7 +151,7 @@ async def example_stack(
         bindings_path.write_text, composed.model_dump_json(indent=2), encoding="utf-8"
     )
     pins_path = host_pins(tmp_path / "capability-pins.json")
-    async with open_postgres_production_stack(
+    async with open_stack(
         fixture_owner_prerequisites=True,
         root=tmp_path,
         monkeypatch=monkeypatch,

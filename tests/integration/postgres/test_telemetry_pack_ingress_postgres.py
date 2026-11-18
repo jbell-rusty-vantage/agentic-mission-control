@@ -26,12 +26,12 @@ from mission_control.interfaces.http.ingress import create_ingress_app
 from mission_control.interfaces.mcp.coordinator_http_client import CoordinatorStreamableHttpClient
 from mission_control.interfaces.mcp.signal_tools import SIGNAL_EMIT_TOOL, mount_signal_tools
 from tests.fixtures.projections.rows import INSTRUCTION
-from tests.fixtures.scoped_api_stack import serve_loopback
 from tests.support.integration.postgres.signal_ingress_postgres import (
     Ingress,
     ingress,  # noqa: F401
 )
 from tests.support.providers.cursor import cloud_rows, run_cursor_hooks
+from tests.support.stack import serve_loopback
 
 pytestmark = pytest.mark.common_db
 

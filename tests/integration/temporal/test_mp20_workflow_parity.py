@@ -64,7 +64,6 @@ from tests.fixtures.mp20_parity import (
     manifest_text,
     open_parity_stack,
 )
-from tests.fixtures.rrm009_production_harness import _command, _diagnose, _run, _send, _until
 from tests.support.ids import SCOPE
 from tests.support.integration.temporal.rrm_007_boundary_interventions import replay
 from tests.support.manifest_runtime import (
@@ -80,6 +79,7 @@ from tests.support.manifest_runtime import (
     submit,
 )
 from tests.support.providers.cursor import make_remote
+from tests.support.stack import _command, _diagnose, _run, _send, _until
 from tests.support.temporal import patch_ids
 
 pytestmark = pytest.mark.common_db

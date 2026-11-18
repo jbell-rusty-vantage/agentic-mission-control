@@ -19,8 +19,8 @@ from mission_control.application.execution.harness.lane_turns import LaneExecuti
 from mission_control.domain.execution.environment_preparation import ReadinessLevel
 from mission_control.domain.execution.lanes import CursorExecutionBinding, PreparedSession
 from tests.fixtures.lane_turns import DIGEST, cursor_operation
-from tests.fixtures.mission_control_production_stack import open_postgres_production_stack
 from tests.support.ids import SCOPE
+from tests.support.stack import open_stack
 
 pytestmark = pytest.mark.common_db
 
@@ -29,7 +29,7 @@ pytestmark = pytest.mark.common_db
 async def test_the_production_worker_composes_the_gate_over_postgres(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    async with open_postgres_production_stack(root=tmp_path, monkeypatch=monkeypatch) as stack:
+    async with open_stack(root=tmp_path, monkeypatch=monkeypatch) as stack:
         assert stack.factory.operation is not None
         gate = stack.factory.operation.lane_turns.preparations
         assert isinstance(gate, EnvironmentPreparationService)

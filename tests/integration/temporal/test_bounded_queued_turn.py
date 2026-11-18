@@ -13,8 +13,8 @@ import pytest
 
 from mission_control.bootstrap.settings import get_settings
 from tests.fixtures import rrm009_production_stack as technical
-from tests.fixtures.scoped_api_stack import admit_and_launch, inspect, scoped_stack, until
 from tests.support.manifest_runtime import host_pins
+from tests.support.stack import admit_and_launch, inspect, open_stack, until
 
 pytestmark = pytest.mark.common_db
 MARKER = "SIGNED-QUEUED-NATIVE-TURN-2fcb97"
@@ -59,7 +59,7 @@ async def _prove(root: Path, monkeypatch: pytest.MonkeyPatch) -> None:
 
     monkeypatch.setitem(technical.TECHNICAL_SCRIPTS, "held-first-call", model_call)
     monkeypatch.setenv(technical.SCRIPTED_MODEL_ENV, "held-first-call")
-    async with scoped_stack(root, monkeypatch) as stack:
+    async with open_stack(root, monkeypatch, signed=True) as stack:
         run_id, root_id = await admit_and_launch(stack, "StageGraph")
         await asyncio.wait_for(entered.wait(), 60)
         state = await inspect(stack, run_id)

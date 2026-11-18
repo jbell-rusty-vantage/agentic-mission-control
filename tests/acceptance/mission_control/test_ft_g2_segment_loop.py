@@ -13,11 +13,10 @@ from pathlib import Path
 
 import pytest
 from temporalio.worker import Replayer
-from tests.fixtures.mission_control_production_stack import open_postgres_production_stack
-from tests.fixtures.rrm009_production_harness import ProductionStack
 from tests.support.acceptance.mission_control.postgres_runtime_parity import (
     goal_directed_two_iterations_scenario as goal_scenario,
 )
+from tests.support.stack import ProductionStack, open_stack
 from tests.support.temporal import patch_ids
 
 from mission_control.adapters.temporal.workflow_sandbox import coordinator_workflow_runner
@@ -31,7 +30,7 @@ pytestmark = [pytest.mark.psycopg_selector, pytest.mark.common_db]
 
 @pytest.fixture
 async def stack(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> AsyncIterator[ProductionStack]:
-    async with open_postgres_production_stack(
+    async with open_stack(
         root=tmp_path,
         monkeypatch=monkeypatch,
         extra_environment={"MISSION_CONTROL_LANE_SEGMENT_LOOP": "true"},

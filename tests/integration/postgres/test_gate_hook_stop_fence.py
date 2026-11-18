@@ -21,13 +21,13 @@ from mission_control.domain.execution.network_policy import ResolvedNetworkPolic
 from mission_control.domain.policies.stop_fence import StopFence
 from mission_control.interfaces.http.ingress import create_ingress_app
 from tests.fixtures.lane_turns import cursor_binding, cursor_operation
-from tests.fixtures.scoped_api_stack import serve_loopback
 from tests.support.integration.postgres.signal_ingress_postgres import (
     GATE_CONTEXT,
     Ingress,
     gate_body,
     ingress,  # noqa: F401
 )
+from tests.support.stack import serve_loopback
 
 pytestmark = pytest.mark.common_db
 

@@ -27,8 +27,8 @@ from mission_control.domain.programs.contracts import (
     StageGraphDecisionMutation,
 )
 from tests.fixtures import rrm009_production_stack as technical
-from tests.fixtures.scoped_api_stack import admit_and_launch, inspect, scoped_stack, until
 from tests.support.manifest_runtime import host_pins
+from tests.support.stack import admit_and_launch, inspect, open_stack, until
 
 pytestmark = pytest.mark.common_db
 
@@ -106,7 +106,7 @@ async def _prove(
         return await original(repository, mutation)
 
     monkeypatch.setattr(PostgresRunControlRepository, "commit_command", commit)
-    async with scoped_stack(root, monkeypatch) as stack:
+    async with open_stack(root, monkeypatch, signed=True) as stack:
         run_id, root_id = await admit_and_launch(stack, "StageGraph")
 
         async def completed() -> bool:

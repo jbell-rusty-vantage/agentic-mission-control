@@ -24,7 +24,6 @@ from typing import Any
 
 import pytest
 from tests.fixtures.live_models import write_json
-from tests.fixtures.scoped_api_stack import ScopedStack, scoped_stack, until
 from tests.fixtures.stage2_outputs import run_directory
 from tests.fixtures.stream_capture import StreamCapture, compare, mission_socket, problems
 from tests.support.acceptance.mission_control.cognition_points import (
@@ -34,6 +33,7 @@ from tests.support.acceptance.mission_control.cognition_points import (
     launch,
 )
 from tests.support.acceptance.mission_control.tracing import TRACING, transcript_entries
+from tests.support.stack import ScopedStack, open_stack, until
 
 pytestmark = [pytest.mark.psycopg_selector, pytest.mark.common_db]
 
@@ -43,7 +43,7 @@ async def inject_into(stack: ScopedStack, run_id: str, node_key: str, text: str)
 
     from uuid import uuid4
 
-    from tests.fixtures.scoped_api_stack import inspect
+    from tests.support.stack import inspect
 
     for _attempt in range(12):
         state = await inspect(stack, run_id)
@@ -133,7 +133,7 @@ def assert_stream(report: dict[str, Any]) -> None:
 @pytest.mark.asyncio
 async def test_fx_tr_stream_t0(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     async with (
-        scoped_stack(tmp_path, monkeypatch) as stack,
+        open_stack(tmp_path, monkeypatch, signed=True) as stack,
         mission_socket(stack.application) as socket_url,
     ):
         run_id = await launch(stack, TRACING)
@@ -158,7 +158,7 @@ async def test_fx_tr_reconcile_after_inject_t0(
     the settlement already gave the interrupted turn's points their frame ranges."""
 
     monkeypatch.setenv("MISSION_CONTROL_SCRIPTED_MODEL_DELAY_SECONDS", "2.5")
-    async with scoped_stack(tmp_path, monkeypatch) as stack:
+    async with open_stack(tmp_path, monkeypatch, signed=True) as stack:
         run_id = await launch(stack, TRACING)
 
         async def s1_running() -> bool:
@@ -197,7 +197,7 @@ async def test_fx_tr_cancel_t0(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) 
     )
 
     monkeypatch.setenv("MISSION_CONTROL_SCRIPTED_MODEL_DELAY_SECONDS", "2.5")
-    async with scoped_stack(tmp_path, monkeypatch) as stack:
+    async with open_stack(tmp_path, monkeypatch, signed=True) as stack:
         run_id = await launch(stack, TRACING)
 
         async def s1_running() -> bool:
@@ -233,7 +233,7 @@ async def test_fx_tr_disconnect_t0(tmp_path: Path, monkeypatch: pytest.MonkeyPat
     )
 
     monkeypatch.setenv("MISSION_CONTROL_SCRIPTED_MODEL_FAIL_AT_TOOLS", "1")
-    async with scoped_stack(tmp_path, monkeypatch) as stack:
+    async with open_stack(tmp_path, monkeypatch, signed=True) as stack:
         run_id = await launch(stack, TRACING)
         await until(lambda: terminal(stack, run_id), seconds=300)
         settlements = await settlements_for_run(stack, run_id)
@@ -261,11 +261,11 @@ async def test_failed_producer_behind_a_declared_wait_terminalizes(
     FX-TR-DISCONNECT attempt 1 parked here at the wait). The family skips a wait whose stages
     can never be released and settles the run `failed`, `review` skipped, the wait never set."""
 
-    from tests.fixtures.scoped_api_stack import inspect
     from tests.support.acceptance.mission_control.tracing import settlements_for_run, terminal
+    from tests.support.stack import inspect
 
     monkeypatch.setenv("MISSION_CONTROL_SCRIPTED_MODEL_FAIL_AT_TOOLS", "1")
-    async with scoped_stack(tmp_path, monkeypatch) as stack:
+    async with open_stack(tmp_path, monkeypatch, signed=True) as stack:
         run_id = await launch(stack, "StageGraph")
         await until(lambda: terminal(stack, run_id), seconds=300)
         state = await inspect(stack, run_id)

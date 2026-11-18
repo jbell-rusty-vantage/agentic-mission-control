@@ -17,8 +17,8 @@ from uuid import uuid4
 from mission_control.adapters.postgres.scope import apply_scope
 from mission_control.contracts.identities import mission_root_id
 from tests.fixtures import rrm009_production_stack as technical
-from tests.fixtures.scoped_api_stack import ScopedStack, inspect
 from tests.support.acceptance.mission_control.cognition_points import BASE
+from tests.support.stack import ScopedStack, inspect
 
 TRACING = technical.TRACING_FAMILY
 

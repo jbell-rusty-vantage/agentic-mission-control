@@ -1,6 +1,6 @@
 """Serve the deterministic offline operator API on loopback for wake-channel drills (MO-43).
 
-Starts the signed scoped stack of ``tests/fixtures/scoped_api_stack.py``: a fresh common
+Starts the signed scoped stack of ``tests/support/stack.py``: a fresh common
 database on the disposable cluster named by ``MISSION_CONTROL_TEST_ADMIN_DSN``, a local Temporal
 dev server, and the production workers with deterministic DeepAgents cognition (no provider
 call, nothing paid). It serves the configured API on ``127.0.0.1``, admits one GoalDirected run
@@ -14,17 +14,13 @@ An orchestrating agent then drives the run through the operator API like any coo
 ``missionctl run start``, then ``missionctl wait --run RUN`` as a background task. The stack
 runs until ``--out/stop`` exists (or Ctrl+C) and then drops its database.
 
-The stack sets MISSION_CONTROL_APPLICATION to its application itself; the capability
-resource owner must still exist (MISSION_CONTROL_WORKSPACE_ROOT, or the profile's
-``../../biotech`` from a canonical BellLabs checkout).
-
-Required (OC-R4): set MISSION_CONTROL_APPLICATION, or both MISSION_CONTROL_WORKSPACE_ROOT and
-TEMPORAL_TASK_QUEUE, for the live scripts, the local worker and the technical API; without them
-startup fails with InstallationDefaultUnavailable (there are no defaults).
+The stack is hermetic: it sets its whole configuration itself (application, task queue, an
+empty capability resource owner and a pin file without host-resolved pins), never reads
+``.env`` and drops every Mission Control setting exported by the shell. It needs only
+MISSION_CONTROL_TEST_ADMIN_DSN and a local Node.
 
 Usage:
   MISSION_CONTROL_TEST_ADMIN_DSN=postgresql://...@127.0.0.1:55433/postgres \\
-  MISSION_CONTROL_WORKSPACE_ROOT=<BellLabs>/biotech \\
   uv run --no-sync python scripts/offline_operator_stack.py --out .scratch/wake-drill
 """
 
@@ -43,9 +39,9 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from tests.fixtures.scoped_api_stack import (  # noqa: E402
+from tests.support.stack import (  # noqa: E402
+    open_stack,
     prepare_run,
-    scoped_stack,
     serve_loopback,
 )
 
@@ -69,7 +65,7 @@ def wait_for_stop(stop: Path) -> None:
 async def serve(out: Path, family: str) -> None:
     with tempfile.TemporaryDirectory() as root, pytest.MonkeyPatch.context() as environment:
         async with (
-            scoped_stack(Path(root), environment) as stack,
+            open_stack(Path(root), environment, signed=True) as stack,
             serve_loopback(stack.application) as url,
         ):
             run_id, launch = await prepare_run(stack, family)

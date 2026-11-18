@@ -13,7 +13,13 @@ from mission_control.adapters.postgres.orchestration.goal_directed_repository im
     PostgresGoalDirectedDocumentRepository,
 )
 from mission_control.domain.policies.contracts import RunOutcome
-from tests.fixtures.rrm009_production_harness import (
+from tests.fixtures.rrm009_production_stack import (
+    goal_input,
+    goal_templates,
+    publish_technical_catalog,
+)
+from tests.support.ids import SCOPE
+from tests.support.stack import (
     ProductionStack,
     _admit,
     _calls,
@@ -26,12 +32,6 @@ from tests.fixtures.rrm009_production_harness import (
     canonical_evidence,
     record_parity_trace,
 )
-from tests.fixtures.rrm009_production_stack import (
-    goal_input,
-    goal_templates,
-    publish_technical_catalog,
-)
-from tests.support.ids import SCOPE
 
 
 async def goal_directed_two_iterations_scenario(stack: ProductionStack) -> None:

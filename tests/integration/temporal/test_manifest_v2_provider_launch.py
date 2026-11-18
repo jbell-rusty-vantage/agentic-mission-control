@@ -23,7 +23,7 @@ Production now routes claude/codex units through `lane.turn` segments
 production boundary's own registry here because `compose_lane_registry` composes the real
 harnesses only on an opted-in Linux/WSL worker.
 
-The Temporal server is the production-stack fixture's dev server (``rrm009_production_harness.
+The Temporal server is the production-stack fixture's dev server (``tests.support.stack.
 TEMPORAL_PORT``), as in ``test_manifest_launch_production.py``, not a shared 127.0.0.1:7233.
 """
 
@@ -110,8 +110,6 @@ from mission_control.domain.execution.bindings import ProviderExecutionBinding
 from mission_control.domain.resolution.sealed import SealedLaneBinding
 from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog, publish_output_schemas
 from tests.fixtures.manifest_runtime import ChainScript, chain_components
-from tests.fixtures.mission_control_production_stack import open_postgres_production_stack
-from tests.fixtures.rrm009_production_harness import ProductionStack, _diagnose, _run, _until
 from tests.fixtures.rrm009_production_stack import AGENT_COGNITIVE_QUEUE, technical_binding
 from tests.support.artifacts import MemoryArtifacts
 from tests.support.ids import SCOPE
@@ -138,6 +136,7 @@ from tests.support.providers.codex import (
     load_script,
 )
 from tests.support.providers.codex import admission as codex_admission
+from tests.support.stack import ProductionStack, _diagnose, _run, _until, open_stack
 from tests.unit.authoring.manifest_launch_fixture import fixture_bindings
 
 pytestmark = pytest.mark.common_db
@@ -259,7 +258,7 @@ async def provider_launch(
     )
     bindings_path = tmp_path / "manifest-launch-bindings.json"
     bindings_path.write_text(bindings.model_dump_json(indent=2), encoding="utf-8")
-    async with open_postgres_production_stack(
+    async with open_stack(
         fixture_owner_prerequisites=True,
         root=tmp_path,
         monkeypatch=monkeypatch,

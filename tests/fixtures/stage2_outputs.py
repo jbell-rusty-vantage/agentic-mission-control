@@ -27,7 +27,7 @@ from pathlib import Path
 from typing import Any, Literal
 
 from tests.fixtures.live_models import OUTPUT_ROOT
-from tests.fixtures.scoped_api_stack import ScopedStack
+from tests.support.stack import ScopedStack
 
 BASE = "/v1/applications/biotech/runs"
 REF_PATTERN = re.compile(r"(?:artifact|workspace-candidates?|frame-body)://[^\s\"'<>)\]]+")

@@ -61,7 +61,6 @@ from tests.fixtures.provider_webhooks import (
     delivery_body,
     standard_headers,
 )
-from tests.fixtures.scoped_api_stack import serve_loopback
 from tests.support.integration.postgres.signal_ingress_postgres import (
     CURSOR_MASTER,
     ENV_MASTER,
@@ -75,6 +74,7 @@ from tests.support.integration.postgres.signal_ingress_postgres import (
     ingress,  # noqa: F401
     signal,
 )
+from tests.support.stack import serve_loopback
 
 pytestmark = pytest.mark.common_db
 

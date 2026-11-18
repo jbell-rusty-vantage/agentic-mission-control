@@ -23,17 +23,17 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-from tests.fixtures.scoped_api_stack import (
-    ScopedStack,
-    inspect,
-    prepare_run,
-    scoped_stack,
-    serve_loopback,
-    until,
-)
 from tests.fixtures.stage2_outputs import write_outputs
 from tests.support.acceptance.mission_control.cognition_points import BASE
 from tests.support.acceptance.mission_control.tracing import db_rows, temporal_diagnostics, terminal
+from tests.support.stack import (
+    ScopedStack,
+    inspect,
+    open_stack,
+    prepare_run,
+    serve_loopback,
+    until,
+)
 
 from mission_control.application.programs.goal_directed import OUTPUT_UNPARSEABLE
 from mission_control.contracts.identities import mission_root_id
@@ -75,7 +75,7 @@ async def test_prose_goal_role_settles_failed_output_unparseable(
 ) -> None:
     monkeypatch.setenv("MISSION_CONTROL_SCRIPTED_MODEL", f"prose-{role}")
     async with (
-        scoped_stack(tmp_path, monkeypatch) as stack,
+        open_stack(tmp_path, monkeypatch, signed=True) as stack,
         serve_loopback(stack.application) as url,
     ):
         run_id, body = await prepare_run(stack, "GoalDirected")

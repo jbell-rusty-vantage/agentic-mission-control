@@ -1,6 +1,6 @@
 """MO-43 acceptance (SPEC-04 §6): a background `missionctl wait` is woken by `run.completed`.
 
-The signed scoped stack (`tests/fixtures/scoped_api_stack.py`): the configured API on a fresh
+The signed scoped stack (`tests/support/stack.py`): the configured API on a fresh
 common database (restricted logins, forced RLS) and a local Temporal dev server, production
 workers with deterministic DeepAgents cognition (no provider call), served over real loopback
 HTTP. A GoalDirected run is launched through `POST /runs/{id}/launch`, which subscribes the
@@ -18,8 +18,8 @@ from pathlib import Path
 
 import httpx
 import pytest
-from tests.fixtures.scoped_api_stack import inspect, prepare_run, scoped_stack, serve_loopback
 from tests.support.acceptance.mission_control.wake_channels import finished, missionctl
+from tests.support.stack import inspect, open_stack, prepare_run, serve_loopback
 
 from mission_control.interfaces.mcp.coordinator_http_client import CoordinatorStreamableHttpClient
 
@@ -33,7 +33,7 @@ async def test_background_missionctl_wait_wakes_on_run_completed(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     async with (
-        scoped_stack(tmp_path, monkeypatch) as stack,
+        open_stack(tmp_path, monkeypatch, signed=True) as stack,
         serve_loopback(stack.application) as url,
     ):
         run_id, launch = await prepare_run(stack, "GoalDirected")

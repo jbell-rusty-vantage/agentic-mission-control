@@ -76,8 +76,6 @@ from tests.fixtures.manifest_runtime import (
     chain_components,
     promise_submitter,
 )
-from tests.fixtures.mission_control_production_stack import open_postgres_production_stack
-from tests.fixtures.rrm009_production_harness import _diagnose, _run, _until
 from tests.fixtures.rrm009_production_stack import AGENT_COGNITIVE_QUEUE, technical_binding
 from tests.support.ids import SCOPE
 from tests.support.manifest_runtime import (
@@ -101,6 +99,7 @@ from tests.support.manifest_runtime import (
     write_bindings,
 )
 from tests.support.model_catalog import catalog_for
+from tests.support.stack import _diagnose, _run, _until, open_stack
 from tests.unit.authoring.manifest_launch_fixture import (
     deep_agents_chain,
 )
@@ -120,7 +119,7 @@ async def launch_stack(
     components = chain_components(technical, script, model_log)
     bindings_path = tmp_path / "manifest-launch-bindings.json"
     await write_bindings(bindings_path, technical)
-    async with open_postgres_production_stack(
+    async with open_stack(
         fixture_owner_prerequisites=True,
         root=tmp_path,
         monkeypatch=monkeypatch,

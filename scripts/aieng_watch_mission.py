@@ -2,7 +2,7 @@
 
 The watch runs on the Deep Agents lane.
 
-The signed scoped stack (`tests/fixtures/scoped_api_stack.py`) for the `ai-engineer` application: a
+The signed scoped stack (`tests/support/stack.py`) for the `ai-engineer` application: a
 fresh common database on the disposable cluster named by MISSION_CONTROL_TEST_ADMIN_DSN, a local
 Temporal dev server, the production workers and the configured API. Every GoalDirected role is the
 deterministic technical agent (no provider call); with MISSION_CONTROL_SCRIPTED_MODEL=aieng-watch
@@ -19,7 +19,6 @@ runs.
 
 Usage (from platform/mission-control):
   MISSION_CONTROL_TEST_ADMIN_DSN=postgresql://...@127.0.0.1:55433/postgres \
-  MISSION_CONTROL_WORKSPACE_ROOT=<BellLabs>/biotech \\
   uv run --no-sync python scripts/aieng_watch_mission.py --out <dir> [--ticks tick-1,tick-2,tick-3]
 """
 
@@ -40,7 +39,7 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from tests.fixtures import aieng_watch_tools as W  # noqa: E402, N812
-from tests.fixtures.scoped_api_stack import inspect, prepare_run, scoped_stack, until  # noqa: E402
+from tests.support.stack import inspect, open_stack, prepare_run, until  # noqa: E402
 
 from mission_control.adapters.postgres.knowledge.invocation_locator import (  # noqa: E402
     PostgresInvocationLocator,
@@ -125,9 +124,10 @@ async def serve(out: Path, ticks: list[str]) -> None:
         # from .env must not apply.
         for name in ("MC_AIENG_DB_PROJECT_REF", "MC_AIENG_DB_URL", "MC_AIENG_DB_SECRET_KEY"):
             environment.setenv(name, "")
-        async with scoped_stack(
+        async with open_stack(
             Path(root),
             environment,
+            signed=True,
             application_id="ai-engineer",
             knowledge_tools=components,
             extra_tools=tools,

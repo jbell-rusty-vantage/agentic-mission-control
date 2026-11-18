@@ -10,7 +10,7 @@ from typing import Any
 from uuid import UUID, uuid4
 
 from mission_control.contracts.identities import mission_root_id
-from tests.fixtures.scoped_api_stack import ScopedStack, inspect, until
+from tests.support.stack import ScopedStack, inspect, until
 
 
 async def condition(stack: ScopedStack, run_id: str, field: str, expected: Any) -> bool:

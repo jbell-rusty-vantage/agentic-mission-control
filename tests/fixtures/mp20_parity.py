@@ -1,6 +1,6 @@
 """MP-20 FIXTURES: one production stack with every local lane, scripted at the provider seam.
 
-What is production: the API/worker composition of `open_postgres_production_stack` (real
+What is production: the API/worker composition of `open_stack` (real
 PostgreSQL 17 common component, real Temporal dev server), the public `missions:submit` /
 `missions:start` router, the manifest compile/submit services, the production launch author
 (`compose_manifest_launch_inputs` over a `mc.manifest_launch_bindings.v2` file), the Stage
@@ -56,7 +56,6 @@ from fastapi import FastAPI
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, ToolMessage
 from pydantic import SecretStr
 from temporalio.worker import Worker
-from tests.fixtures import mission_control_production_stack as production_stack_module
 from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog, publish_output_schemas
 from tests.fixtures.manifest_runtime import (
     ChainCognition,
@@ -64,13 +63,12 @@ from tests.fixtures.manifest_runtime import (
     GoalScript,
     promise_submitter,
 )
-from tests.fixtures.mission_control_production_stack import open_postgres_production_stack
-from tests.fixtures.rrm009_production_harness import ProductionStack
 from tests.fixtures.rrm009_production_stack import (
     AGENT_COGNITIVE_QUEUE,
     TechnicalBinding,
     technical_binding,
 )
+from tests.support import stack as production_stack_module
 from tests.support.artifacts import MemoryArtifacts
 from tests.support.artifacts import MemoryArtifacts as CursorArtifacts
 from tests.support.ids import SCOPE
@@ -110,6 +108,7 @@ from tests.support.providers.cursor import (
     make_remote,
     make_repository,
 )
+from tests.support.stack import ProductionStack, open_stack
 from tests.unit.authoring.manifest_launch_fixture import fixture_bindings
 
 from mission_control.adapters.claude.harness import (
@@ -1440,7 +1439,7 @@ async def open_parity_stack(tmp_path: Path, monkeypatch: Any) -> AsyncIterator[P
     bindings_path = tmp_path / "manifest-launch-bindings.json"
     bindings_path.write_text(bindings.model_dump_json(indent=2), encoding="utf-8")
     isolate_temporal(monkeypatch)
-    async with open_postgres_production_stack(
+    async with open_stack(
         fixture_owner_prerequisites=True,
         root=tmp_path,
         monkeypatch=monkeypatch,

@@ -12,13 +12,12 @@ import pytest
 from temporalio import activity
 from temporalio.worker import Replayer
 from tests.fixtures import rrm009_production_stack as technical
-from tests.fixtures.rrm009_production_harness import canonical_evidence
-from tests.fixtures.scoped_api_stack import admit_and_launch, inspect, scoped_stack, until
 from tests.support.acceptance.mission_control.authenticated_scoped_runtime import (
     assert_persisted_run_evidence,
     command,
     condition,
 )
+from tests.support.stack import admit_and_launch, canonical_evidence, inspect, open_stack, until
 from tests.support.unit.orchestration.goal_schema_completion import (
     OUTPUT,
     SUMMARY,
@@ -110,7 +109,7 @@ async def test_signed_goal_named_outputs_delayed_publication_and_cancellation(
         monkeypatch.setattr(GoalDirectedOperationPreparationService, "prepare", admitted_verifier)
     calls = []
     original_capture = PostgresArtifactBytes.capture
-    async with scoped_stack(tmp_path, monkeypatch) as stack:
+    async with open_stack(tmp_path, monkeypatch, signed=True) as stack:
 
         async def capture(adapter, source_ref, *, request_scope, max_text_bytes):
             if source_ref not in {OUTPUT, SUMMARY}:

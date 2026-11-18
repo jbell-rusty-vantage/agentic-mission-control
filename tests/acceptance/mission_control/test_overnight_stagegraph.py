@@ -168,7 +168,6 @@ async def _run_stagegraph_case(
     """Real PostgreSQL/Temporal/KS HTTP; only producer/evaluator cognition is scripted."""
     from datetime import UTC, datetime
 
-    from tests.fixtures.mission_control_production_stack import open_postgres_production_stack
     from tests.fixtures.overnight_stagegraph_model import StageGraphScript, stagegraph_components
     from tests.fixtures.overnight_stagegraph_recovery import SavedConsumerRestart
     from tests.fixtures.overnight_trusted import install_scripted_trusted
@@ -177,6 +176,7 @@ async def _run_stagegraph_case(
     from tests.support.integration.deep_agents.report_source_real_service import response
     from tests.support.knowledge.content import model_content
     from tests.support.manifest_runtime import host_pins
+    from tests.support.stack import open_stack
 
     from mission_control.adapters.postgres.human_tasks.repository import PostgresHumanTaskRepository
     from mission_control.adapters.postgres.knowledge.output_contracts import (
@@ -315,7 +315,7 @@ async def _run_stagegraph_case(
             holder["lane"] = composed
             return composed
 
-        async with open_postgres_production_stack(
+        async with open_stack(
             root=tmp_path,
             monkeypatch=monkeypatch,
             application_id=application,

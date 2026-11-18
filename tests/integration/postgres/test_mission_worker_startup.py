@@ -42,7 +42,7 @@ from tests.fixtures.mission_control_common_db import (
     common_database,
     provision_runtime,
 )
-from tests.fixtures.mission_control_production_stack import start_local
+from tests.support.stack import start_local
 
 pytestmark = [pytest.mark.psycopg_selector, pytest.mark.common_db]
 

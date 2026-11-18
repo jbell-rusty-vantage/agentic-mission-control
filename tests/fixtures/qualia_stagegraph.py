@@ -362,10 +362,10 @@ async def run_pilot(
     resume_source: str | None = None,
     resume_run_id: str | None = None,
 ) -> dict[str, Any]:
-    from tests.fixtures.mission_control_production_stack import open_postgres_production_stack
     from tests.fixtures.overnight_stagegraph_evidence import export_stagegraph
     from tests.support.acceptance.mission_control.overnight_stagegraph import run_stagegraph_fixture
     from tests.support.manifest_runtime import host_pins
+    from tests.support.stack import open_stack
 
     from mission_control.adapters.postgres.knowledge.output_contracts import (
         PostgresOutputContractStore,
@@ -501,7 +501,7 @@ async def run_pilot(
                     installation_id="0192a4f0-0000-7000-8000-00000000b10e",
                 )
 
-            async with open_postgres_production_stack(
+            async with open_stack(
                 root=runtime_root,
                 monkeypatch=monkeypatch,
                 application_id="biotech",

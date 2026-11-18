@@ -23,7 +23,6 @@ from tests.fixtures.catalog.fast_track_catalog import fixture_definitions
 from tests.fixtures.manifest_runtime import ChainCognition, ChainScript
 from tests.fixtures.mission_control_local_agent_server import deterministic_child_definition
 from tests.fixtures.rrm009_cancellation import TOKEN_ENV
-from tests.fixtures.rrm009_production_harness import ProductionStack
 from tests.fixtures.rrm009_production_stack import (
     AGENT_COGNITIVE_QUEUE,
     TechnicalBinding,
@@ -32,6 +31,7 @@ from tests.fixtures.rrm009_production_stack import (
 from tests.support.manifest_runtime import MISSION_2, evaluable, pubmed_digest
 from tests.support.model_catalog import model_binding
 from tests.support.models import ScriptedChatModel
+from tests.support.stack import ProductionStack
 from tests.unit.authoring.manifest_launch_fixture import (
     deep_agents_chain,
     fixture_bindings,

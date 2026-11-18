@@ -1,6 +1,6 @@
 """Mission Manifest lifecycle on the real local stack (FT-E3, FT-D3).
 
-``ProductionStack`` (``tests.fixtures.mission_control_production_stack``) runs the governed
+``ProductionStack`` (``tests.support.stack``) runs the governed
 API, the production Temporal workers and the deterministic local cognition on a disposable
 common-component database. This module composes the manifest lifecycle over it: compile
 resolves against the seeded catalog fixture (in memory, no provider), submit publishes the
@@ -26,7 +26,6 @@ from typing import Any, cast
 
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, ToolMessage
 from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog
-from tests.fixtures.rrm009_production_harness import ProductionStack
 from tests.fixtures.rrm009_production_stack import (
     Cognition,
     TechnicalBinding,
@@ -35,6 +34,7 @@ from tests.fixtures.rrm009_production_stack import (
     call_usage,
 )
 from tests.support.models import ScriptedChatModel
+from tests.support.stack import ProductionStack
 
 from mission_control.adapters.postgres.control_plane.definition_repository import (
     PostgresDefinitionRepository,
