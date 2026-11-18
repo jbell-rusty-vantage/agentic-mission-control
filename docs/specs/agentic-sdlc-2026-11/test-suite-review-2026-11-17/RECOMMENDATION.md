@@ -1,6 +1,6 @@
 # Mission Control test suite review: which test doubles to keep and what to remove
 
-Date: 2026-11-17. Part of the agentic SDLC upgrade. Status: accepted for implementation (AS-D50, OVE-238).
+Date: 2026-11-17. Part of the agentic SDLC upgrade. Status: implemented on `main` 2026-11-17/18 (AS-D50, OVE-238); see [Outcome](#outcome-2026-11-18). Sections 1-8 are the recommendation as accepted.
 
 ## Where this leaves the owner goal
 
@@ -333,3 +333,64 @@ Everything else in this document is a default I would apply in startup mode.
   - `unit/operations/test_rrm_009_cancellation_composition.py::test_composition_resources_are_closed_when_build_or_worker_start_fails` builds settings as a `SimpleNamespace`, which lacks the new field. This is the drift section 1 warns about: a hand-made stand-in for our own `Settings` instead of `isolated_settings()`.
   - `unit/operations/test_sprint_oc_runtime_env.py::test_real_settings_loader_takes_nothing_unlisted_from_an_owner_env` writes the value `poison61` into every field, and the new field's host:port pattern rejects it.
   - Both belong in step 0.
+
+## Outcome (2026-11-18)
+
+Implemented on `main`, from 51a34f5f to 380fb9fb, by Opus 5.5 agents in isolated worktrees, merged one at a time. Nothing is pushed.
+
+**Where the owner goal stands.** Two parts of the Deep Agents path now run in `make check`:
+
+- **G1, manifest to turn.** A manifest goes through compile, the sealed binding, materialization and one scripted `create_deep_agent` turn: `tests/unit/deep_agents/test_manifest_to_turn.py`.
+- **G2, promise to fulfillment.** A named output promise goes through `submit_output`, settlement and fulfillment.
+
+Both canonical end-to-end proofs have a CI job (G5) and pass in a clean checkout with only `MISSION_CONTROL_TEST_ADMIN_DSN` set (verified). G1 found the next blocker on that path: a node's own `environment.budget` never bounds its Deep Agents turn (OVE-241, strict xfail).
+
+| What | Before | After (verified) |
+| --- | --- | --- |
+| Collected tests | 9,672 | 9,172 (9,028 in `tests/`, 144 in `integrations/biotech/tests`) |
+| Fast gate (`tests/unit`, `tests/architecture`, `tests/conformance`) | 8,577 passed, 2 failed, 38.5 min serial; xdist broken | 7,987 passed, 0 failed, 12 skipped, 3 xfailed; `-n 2` in 17 min |
+| Biotech tests (`make test-biotech`, now in `make check`) | in the kernel tree | 135 passed, 7 skipped (opt-in sibling checkout), 2 xfailed |
+| Files importing a `test_*.py` module | 515 | 0 |
+| Hand-written chat-model classes | 52 | 1 (`tests/support/models.py::ScriptedChatModel`) |
+| Clock classes | 21 | 1 (`tests/support/clock.py`) |
+| Temporal start-or-skip blocks | 46 in 25 files | 0 (`tests/support/temporal.py`, which fails instead of skipping) |
+| Production-stack builders | 4 | 1 hermetic `tests/support/stack.py`; `mp20_parity` kept separately |
+| Knowledge Services fakes | 3 | 1 (`tests/support/knowledge/binding.py`) |
+| Provider-API fakes | spread under `tests/unit/<lane>` | one per provider in `tests/support/providers/` |
+| In-memory port fakes checked against PostgreSQL | 3 ports | 8 ports (G3 added run control, operation journal, frames, output contracts and knowledge stores) |
+| Test-only code in `src` | `adapters/operations/conformance.py` | moved to `tests/support/deep_agents_runtime.py` |
+| Dead `src` and scripts | - | 2,271 + 2,165 lines removed |
+
+The first of two final gate runs had one failure that the second run did not reproduce. Its name was not captured, so it is recorded here as an unidentified flake; the load-sensitive `test_bootstrap_cli` timeout is the likely candidate. Lint (ruff), formatting and `make typecheck` (mypy, 1,073 files) pass.
+
+**Defects the work found**
+
+| Defect | Disposition |
+| --- | --- |
+| `uuid4()` inside a `parametrize` list broke pytest-xdist | fixed |
+| Two failing unit tests: a `SimpleNamespace` stood in for `Settings`, and the new locator setting was not allowlisted in the runtime env | fixed (OVE-237) |
+| The frozen seed digest needed CRLF bytes, so every fresh or Linux checkout failed four seed tests | fixed (`-text`) |
+| The end-to-end stack read the developer `.env` and needed sibling checkouts | fixed: the stack is hermetic |
+| A node budget is not applied on the Deep Agents lane | OVE-241 |
+| PostgreSQL adapters leak raw `asyncpg.UniqueViolationError` | OVE-242 |
+| In-memory fakes disagreed with PostgreSQL in 19 places (tenant isolation, idempotency, ordering, refusals) | 16 fixed in the fakes, 3 reported |
+| A Cursor precompact run settles `completed` instead of `budget_exceeded` | strict xfail, to triage |
+| The `run_plan_v3` schema-digest pin is stale | strict xfail; re-pin is an owner decision |
+
+**Still open under OVE-238**
+
+These are marked `TODO(OVE-238)` in code where they apply.
+
+- **Fakes not yet replaced:**
+  - the closed-workflow refusal matrix still uses a SQL-text pool;
+  - the native-write and WI-07 bridges are hand-written fakes;
+  - `test_goal_schema_runtime` still has three class patches;
+  - `FakeSealedBinding` has 9 remaining uses;
+  - `FakeOutputs` is not folded; folding it would change what 10 tests assert.
+- **Pre-patch replays.** The patched pre-patch workflow cases have no recorded histories to replay.
+- **Open decision.** Whether `stack.py`'s `serve_application` should become the default.
+- **Integration and acceptance on `main`.** Many tests already fail or are environment-blocked on main: a missing `mission_event.unit_key` column, the Codex owner home, unmet owner prerequisites, Temporal on 7233, and a sibling `knowledge-services` for the overnight drills. Not yet triaged.
+- **Remaining `scripts` -> `tests.support` imports.** The disposable drills use them on purpose: `offline_operator_stack`, `aieng_watch_mission`, `fast_track_dry_run`, `qualify_two_disposables`, and `experiments/knowledge_loop`.
+- **Mirror modules.** 207 mirror modules in `tests/support/{unit,integration,acceptance}` are behaviour-named but not merged.
+
+The rename map is in [RENAMES.tsv](RENAMES.tsv).

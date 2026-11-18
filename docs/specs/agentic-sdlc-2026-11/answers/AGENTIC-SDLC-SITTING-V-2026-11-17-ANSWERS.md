@@ -9,7 +9,7 @@ harness_session: claude-code:be854e8a-7732-4f82-ab93-13e494df34b6
 interview: ../test-suite-review-2026-11-17/RECOMMENDATION.md
 sitting: "V"
 date: 2026-11-17
-status: open
+status: final
 ---
 
 # AGENTIC-SDLC, sitting V: answers
@@ -53,8 +53,8 @@ Items raised that belong to another round or sitting, with the round that takes 
 
 ## Conversion checklist
 
-- [ ] Decisions folded into the decision logs of the specification and supplements (links in **Folded**)
+- [x] Decisions folded into the decision logs of the specification and supplements (links in **Folded**)
 - [ ] ADR candidates written for decisions with a lasting reason
 - [ ] Glossary terms added through `domain-modeling`
-- [ ] Linear: a comment on each decided issue; an issue filed for each accepted piece of work, ids in **Becomes**
-- [ ] Ledger: this file's row and the instruction's row updated
+- [x] Linear: a comment on each decided issue; an issue filed for each accepted piece of work, ids in **Becomes**
+- [x] Ledger: this file's row and the instruction's row updated
