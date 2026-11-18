@@ -11,10 +11,12 @@ import argparse
 import asyncio
 import json
 import sys
+from collections.abc import Awaitable, Callable
 from contextlib import suppress
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
+from typing import Any
 
 import asyncpg
 from temporalio.client import Client, WorkflowFailureError
@@ -40,6 +42,7 @@ from mission_control.application.authoring.manifest_launch_inputs import (
     binding_ref,
 )
 from mission_control.application.authoring.service import ControlPlaneService
+from mission_control.application.execution.run_control_repository import RunControlRepository
 from mission_control.application.execution.service import (
     AdmissionPolicyRegistry,
     F1RunConfigurationVerifier,
@@ -87,9 +90,19 @@ class InstalledBootstrapProbe:
         application: ApplicationBinding,
         run_control: RunControlService,
         author: ManifestLaunchInputAuthor,
+        *,
+        command_results: RunControlRepository | None = None,
+        temporal: Client | None = None,
+        wait_for: Callable[[Awaitable[Any], float], Awaitable[Any]] | None = None,
     ):
         self._pool, self._settings, self._application = pool, settings, application
         self._runs, self._author = run_control, author
+        # Seams, each defaulting to the installation's own: the run-control rows that record
+        # the probe's start command, the Temporal client from settings, and the client-side
+        # result bound (`asyncio.wait_for`).
+        self._command_results = command_results
+        self._temporal = temporal
+        self._wait_for = wait_for or asyncio.wait_for
 
     async def describe(
         self, scope: str, run_id: str, key: str, prerequisite_id: str, purpose: str
@@ -227,7 +240,10 @@ class InstalledBootstrapProbe:
             if started.status is not CommandStatus.ACCEPTED:
                 raise ValueError("the governed lifecycle refused the isolated probe start")
         else:
-            prior = await PostgresRunControlRepository(self._pool).get_command_result(
+            results = self._command_results
+            if results is None:
+                results = PostgresRunControlRepository(self._pool)
+            prior = await results.get_command_result(
                 plan.request_scope, plan.run_id, "owner-bootstrap", command_id
             )
             if prior is None or prior.status is not CommandStatus.ACCEPTED:
@@ -243,9 +259,11 @@ class InstalledBootstrapProbe:
                 )
             }
         )
-        client = await Client.connect(
-            self._settings.temporal_address, namespace=self._settings.temporal_namespace
-        )
+        client = self._temporal
+        if client is None:
+            client = await Client.connect(
+                self._settings.temporal_address, namespace=self._settings.temporal_namespace
+            )
         workflow_id = "owner-bootstrap-" + bootstrap_identity(plan)
         try:
             handle = await client.start_workflow(
@@ -261,13 +279,13 @@ class InstalledBootstrapProbe:
         except WorkflowAlreadyStartedError:
             handle = client.get_workflow_handle(workflow_id, result_type=OperationWorkflowResult)
         try:
-            completed = await asyncio.wait_for(handle.result(), timeout=plan.timeout_seconds + 5)
+            completed = await self._wait_for(handle.result(), plan.timeout_seconds + 5)
         except TimeoutError:
             await handle.cancel()
             # Give the workflow cancellation path time to settle/end the provider before
             # the server hard execution bound; never claim cleanup from a cancel request.
             with suppress(Exception):
-                await asyncio.wait_for(handle.result(), timeout=20)
+                await self._wait_for(handle.result(), 20)
             raise ValueError(
                 "bounded probe timed out; cancellation requested; inspect cleanup before retry"
             ) from None

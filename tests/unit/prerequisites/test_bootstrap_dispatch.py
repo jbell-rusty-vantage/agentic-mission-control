@@ -18,19 +18,35 @@ from mission_control.domain.policies.contracts import CommandStatus, RunPhase
 from tests.support.unit.prerequisites.owner_bootstrap import probe_template
 
 
-async def test_duplicate_dispatch_reuses_result_with_explicit_type_and_current_run_revision(
-    monkeypatch,
-):
+class AcceptedStart:
+    """Run-control rows recording that the probe's own start command was accepted."""
+
+    async def get_command_result(
+        self, request_scope: str, run_id: str, idempotency_issuer: str, command_id: str
+    ) -> SimpleNamespace | None:
+        if idempotency_issuer != "owner-bootstrap":
+            return None
+        return SimpleNamespace(status=CommandStatus.ACCEPTED)
+
+
+def probe(runs, temporal, **seams) -> InstalledBootstrapProbe:
+    return InstalledBootstrapProbe(
+        None,
+        Settings(_env_file=None, temporal_task_queue="mc"),
+        None,
+        runs,
+        None,
+        command_results=AcceptedStart(),
+        temporal=temporal,
+        **seams,
+    )
+
+
+async def test_duplicate_dispatch_reuses_result_with_explicit_type_and_current_run_revision():
     plan, template = probe_template()
     request = bounded_probe_request(plan, template)
     runs = AsyncMock()
     runs.get_run.return_value = SimpleNamespace(phase=RunPhase.ACTIVE, version=2)
-    repository = AsyncMock()
-    repository.get_command_result.return_value = SimpleNamespace(status=CommandStatus.ACCEPTED)
-    monkeypatch.setattr(
-        "mission_control.bootstrap.owner_probe.PostgresRunControlRepository",
-        lambda pool: repository,
-    )
     handle = SimpleNamespace(
         result=AsyncMock(return_value=SimpleNamespace(disposition="completed"))
     )
@@ -45,12 +61,7 @@ async def test_duplicate_dispatch_reuses_result_with_explicit_type_and_current_r
         return handle
 
     temporal.get_workflow_handle = existing
-    monkeypatch.setattr(
-        "mission_control.bootstrap.owner_probe.Client.connect", AsyncMock(return_value=temporal)
-    )
-    port = InstalledBootstrapProbe(
-        None, Settings(_env_file=None, temporal_task_queue="mc"), None, runs, None
-    )
+    port = probe(runs, temporal)
     identity = await port.start(plan, request)
     assert identity == "owner-bootstrap-" + bootstrap_identity(plan)
     assert captured == [(identity, {"result_type": OperationWorkflowResult})]
@@ -66,19 +77,13 @@ async def test_duplicate_dispatch_reuses_result_with_explicit_type_and_current_r
     runs.execute.assert_not_awaited()
 
 
-async def test_workflow_failure_is_sanitized_and_client_timeout_precedes_server(monkeypatch):
+async def test_workflow_failure_is_sanitized_and_client_timeout_precedes_server():
     import pytest
     from temporalio.client import WorkflowFailureError
 
     plan, template = probe_template()
     runs = AsyncMock()
     runs.get_run.return_value = SimpleNamespace(phase=RunPhase.ACTIVE, version=2)
-    repository = AsyncMock()
-    repository.get_command_result.return_value = SimpleNamespace(status=CommandStatus.ACCEPTED)
-    monkeypatch.setattr(
-        "mission_control.bootstrap.owner_probe.PostgresRunControlRepository",
-        lambda pool: repository,
-    )
     handle = SimpleNamespace(
         result=AsyncMock(
             side_effect=WorkflowFailureError(
@@ -88,37 +93,21 @@ async def test_workflow_failure_is_sanitized_and_client_timeout_precedes_server(
         cancel=AsyncMock(),
     )
     temporal = SimpleNamespace(start_workflow=AsyncMock(return_value=handle))
-    monkeypatch.setattr(
-        "mission_control.bootstrap.owner_probe.Client.connect",
-        AsyncMock(return_value=temporal),
-    )
-    port = InstalledBootstrapProbe(
-        None, Settings(_env_file=None, temporal_task_queue="mc"), None, runs, None
-    )
+    port = probe(runs, temporal)
     with pytest.raises(ValueError, match="workflow failed") as failure:
         await port.start(plan, bounded_probe_request(plan, template))
     assert "private-provider-body" not in str(failure.value)
     handle.cancel.assert_not_awaited()  # Already closed; no claim of provider cleanup.
 
 
-async def test_client_timeout_requests_cancel_and_waits_for_bounded_cleanup(monkeypatch):
+async def test_client_timeout_requests_cancel_and_waits_for_bounded_cleanup():
     import pytest
 
     plan, template = probe_template()
     runs = AsyncMock()
     runs.get_run.return_value = SimpleNamespace(phase=RunPhase.ACTIVE, version=2)
-    repository = AsyncMock()
-    repository.get_command_result.return_value = SimpleNamespace(status=CommandStatus.ACCEPTED)
-    monkeypatch.setattr(
-        "mission_control.bootstrap.owner_probe.PostgresRunControlRepository",
-        lambda pool: repository,
-    )
     handle = SimpleNamespace(result=AsyncMock(), cancel=AsyncMock())
     temporal = SimpleNamespace(start_workflow=AsyncMock(return_value=handle))
-    monkeypatch.setattr(
-        "mission_control.bootstrap.owner_probe.Client.connect",
-        AsyncMock(return_value=temporal),
-    )
     waits = []
 
     async def wait_for(awaitable, timeout):  # noqa: ASYNC109
@@ -128,10 +117,8 @@ async def test_client_timeout_requests_cancel_and_waits_for_bounded_cleanup(monk
             raise TimeoutError
         return SimpleNamespace(disposition="cancelled")
 
-    monkeypatch.setattr("mission_control.bootstrap.owner_probe.asyncio.wait_for", wait_for)
-    port = InstalledBootstrapProbe(
-        None, Settings(_env_file=None, temporal_task_queue="mc"), None, runs, None
-    )
+    # The client-side result bound is network timing: an injected wait that times out once.
+    port = probe(runs, temporal, wait_for=wait_for)
     with pytest.raises(ValueError, match="cancellation requested"):
         await port.start(plan, bounded_probe_request(plan, template))
     assert waits == [plan.timeout_seconds + 5, 20]
