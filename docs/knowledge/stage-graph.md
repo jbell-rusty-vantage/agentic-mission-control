@@ -126,6 +126,6 @@ Built / specified / goal: scheduling, routes, groups, one revisit region, gates 
   [lowering](../../src/mission_control/domain/authoring/manifest_lowering.py), [fork templates](../../src/mission_control/application/programs/fork_templates.py).
 - Tests: [Stage Graph v2](../../tests/unit/orchestration/test_stagegraph_v2.py), [routes and groups](../../tests/unit/orchestration/test_wi08_graph_routes.py),
   [Revisit Regions](../../tests/unit/orchestration/test_wi08_revisit_regions.py), [authoring](../../tests/unit/authoring/test_wi08_graph_authoring.py),
-  [Temporal and replay](../../tests/integration/temporal/test_wi08_graph_routes_temporal.py), [legacy replay](../../tests/integration/temporal/test_wi08_legacy_stagegraph_replay.py),
+  [Temporal and replay](../../tests/integration/temporal/test_wi08_graph_routes_temporal.py), [legacy replay](../../tests/integration/temporal/test_replay_histories.py),
   [failed producer behind a wait](../../tests/acceptance/mission_control/test_tracing_stream.py), [W2 fixtures](../../tests/fixtures/manifests/sprint-oc-w2/).
 - Proof status: [control board](../specs/provider-consolidation-2026-10/sprint-oc/NEXT-SESSION.md) (`:69-87` Qualia seven-stage graph, `:32-58` AI Engineer, `:119-121` W1 unreleased).

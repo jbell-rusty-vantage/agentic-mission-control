@@ -7,8 +7,8 @@ GoalDirected run over in-memory run control, journal and lineage, with a real
 executor runs and applied at the iteration boundary (RRM-007); the resume continues the
 frontier. Every executor and verifier operation is verified by the real run-control
 authority, journaled, fenced and settled exactly once; the family consumes each settlement
-and records no operation usage itself. Captured histories replay, carry the RRM-016 patch,
-and pre-change histories keep their own `record_usage` commands.
+and records no operation usage itself. The histories captured here replay, with their
+RRM-016 and RRM-019 markers, in `test_replay_histories.py`.
 """
 
 from __future__ import annotations
@@ -313,53 +313,11 @@ async def test_family_fails_closed_without_a_run_control_settlement() -> None:
     assert "record_usage" not in activities.lifecycle_kinds
 
 
-@pytest.mark.asyncio
-async def test_pre_change_goal_directed_history_keeps_its_own_usage_commands() -> None:
-    """The pre-change history has no RRM-016 patch and replays its `record_usage` path."""
-
-    history = WorkflowHistory.from_json(
-        "family/pre-goal/1",
-        (PRE_CHANGE / "goal_directed_two_iterations.run1.json").read_text("utf-8"),
-    )
-    assert JOURNALED_SETTLEMENT_PATCH not in patch_ids(history)
-    usage_commands = [
-        item for item in lifecycle_command_ids(history) if item.startswith("goal:usage:")
-    ]
-    assert len(usage_commands) == 4  # executor and verifier of two iterations
-    await Replayer(
-        workflows=[GoalDirectedWorkflow, OperationWorkflow],
-        workflow_runner=coordinator_workflow_runner(),
-    ).replay_workflow(history)
-
-
 def test_operation_result_contract_is_unchanged() -> None:
     """The family consumes settlements through reconciliation; the operation result payload
     (a Temporal payload in every captured history) gains no field."""
 
     assert "settlement" not in OperationExecutionResult.model_fields
-
-
-@pytest.mark.asyncio
-async def test_post_change_goal_directed_history_replays_on_the_journaled_path() -> None:
-    """The captured RRM-016 history (pause, resume, four journaled settlements) replays; later
-    tickets that change the family must keep it replaying."""
-
-    history = WorkflowHistory.from_json(
-        "family/rrm-016-post-change/1", _read_history(POST_CHANGE / POST_CHANGE_HISTORY)
-    )
-    assert JOURNALED_SETTLEMENT_PATCH in patch_ids(history)
-    assert [item for item in lifecycle_command_ids(history) if item.startswith("goal:usage:")] == [
-        "goal:usage:baseline"
-    ]
-    assert [
-        item["operation_role"]
-        for name in ("goaldirected.prepare_executor", "goaldirected.prepare_verifier")
-        for item in scheduled_activity_inputs(history, name)
-    ] == ["executor", "executor", "verifier", "verifier"]
-    await Replayer(
-        workflows=[GoalDirectedWorkflow, OperationWorkflow],
-        workflow_runner=coordinator_workflow_runner(),
-    ).replay_workflow(history)
 
 
 @pytest.mark.asyncio
@@ -408,26 +366,6 @@ async def test_iterations_with_distinct_output_refs_terminalize(
     capture = os.getenv("RRM019_CAPTURE_HISTORY_DIR")
     if capture:  # re-capture the committed post-change fixture (see RRM019_POST_CHANGE)
         _write_history(Path(capture) / RRM019_HISTORY, history.to_json())
-
-
-@pytest.mark.asyncio
-async def test_rrm_019_distinct_outputs_history_replays() -> None:
-    """The captured RRM-019 history (two iterations, distinct output refs, the verified final
-    output promoted) replays; later tickets that change the family must keep it replaying."""
-
-    history = WorkflowHistory.from_json(
-        "family/rrm-019-post-change/1", _read_history(RRM019_POST_CHANGE / RRM019_HISTORY)
-    )
-    assert VERIFIED_TERMINAL_OUTPUTS_PATCH in patch_ids(history)
-    assert [
-        item.split(":")[2:5]
-        for item in lifecycle_command_ids(history)
-        if item.startswith("goal:output:")
-    ] == [["artifact", "rrm016", "2"]]
-    await Replayer(
-        workflows=[GoalDirectedWorkflow, OperationWorkflow],
-        workflow_runner=coordinator_workflow_runner(),
-    ).replay_workflow(history)
 
 
 # --- Review fix 2: an outside command between a settlement read and the next command ------
@@ -624,19 +562,3 @@ async def test_outside_cancel_enters_the_cancellation_boundary_not_a_lifecycle_f
     # No re-admission, and no second cancel from the family.
     assert _admission_attempts(history) == [("executor", 1, 1), ("verifier", 1, 1)]
     assert not [item for item in lifecycle_command_ids(history) if item.endswith(":cancel")]
-
-
-@pytest.mark.asyncio
-async def test_stale_version_retry_history_replays() -> None:
-    """The captured stale-retry history replays; RRM-008 changes this path and must keep it
-    replaying."""
-
-    history = WorkflowHistory.from_json(
-        "family/rrm-016-stale-retry/1", _read_history(POST_CHANGE / STALE_RETRY_HISTORY)
-    )
-    assert {JOURNALED_SETTLEMENT_PATCH, STALE_VERSION_RETRY_PATCH} <= patch_ids(history)
-    assert [item[2] for item in _admission_attempts(history)].count(2) == 2
-    await Replayer(
-        workflows=[GoalDirectedWorkflow, OperationWorkflow],
-        workflow_runner=coordinator_workflow_runner(),
-    ).replay_workflow(history)
