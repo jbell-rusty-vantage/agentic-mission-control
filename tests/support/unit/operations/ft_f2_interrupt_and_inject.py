@@ -7,34 +7,24 @@ from __future__ import annotations
 
 from typing import Any
 
-from langchain_core.messages import BaseMessage
-
 from mission_control.application.execution.boundary_interventions import BoundaryInterventionService
 from mission_control.application.execution.harness.inject import InjectionSettings
 from mission_control.application.missions.service import MissionControlService
 from mission_control.domain.policies.contracts import ActorContext
 from tests.fixtures.checkpoint_recovery import (
     RecoveryHarness,
-    ScriptedRecoveryModel,
     recovery_harness,
 )
+from tests.support.models import ScriptedChatModel
 from tests.support.run_control import actor
 
 FAST = InjectionSettings(poll_seconds=0.01, settle_grace_seconds=0.3, settle_poll_seconds=0.01)
 
 
-class RecordingModel(ScriptedRecoveryModel):
-    """The RRM-004 script, plus the text of every human message each call saw."""
+def human_texts(model: ScriptedChatModel) -> list[list[str]]:
+    """The text of every human message each call saw."""
 
-    def _observe(self, messages: list[BaseMessage]) -> tuple[int, int]:
-        self.__dict__.setdefault("humans", []).append(
-            [str(item.content) for item in messages if item.type == "human"]
-        )
-        return super()._observe(messages)
-
-    @property
-    def humans(self) -> list[list[str]]:
-        return self.__dict__.get("humans", [])
+    return [[str(item.content) for item in batch if item.type == "human"] for batch in model.seen]
 
 
 def operator() -> ActorContext:
@@ -45,7 +35,7 @@ def operator() -> ActorContext:
 
 
 async def harness_with_injections() -> RecoveryHarness:
-    return await recovery_harness(model=RecordingModel(), injection_settings=FAST)
+    return await recovery_harness(injection_settings=FAST)
 
 
 def facade(harness: RecoveryHarness) -> MissionControlService:

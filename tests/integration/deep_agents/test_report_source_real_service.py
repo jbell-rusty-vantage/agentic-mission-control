@@ -21,7 +21,7 @@ from tests.fixtures.checkpoint_lineage import bind_unit, stage_unit
 from tests.fixtures.lane_bindings import lane_fields
 from tests.fixtures.mission_control_common_db import create_common_database, drop_common_database
 from tests.integration.deep_agents.report_source_replay import admit, consume_and_replay
-from tests.support.integration.deep_agents.report_source_context import FullContextReader
+from tests.support.integration.deep_agents.report_source_context import FULL_CONTEXT_READER
 from tests.support.integration.deep_agents.report_source_real_service import command, response
 from tests.support.integration.deep_agents.wi02_transfer_plan_lane import _invocation, _selection
 from tests.support.knowledge.content import model_content
@@ -343,9 +343,9 @@ async def _run_report_source_fixture(tmp_path, application, *, capture_mode=Fals
                 )
             }
         )
-        FullContextReader.expected = judged["body"].encode()
-        FullContextReader.observed = {}
-        FullContextReader.file_path = f"/inputs/draft/{exact.id}_{exact.version}/body.md"
+        FULL_CONTEXT_READER.expected = judged["body"].encode()
+        FULL_CONTEXT_READER.observed = {}
+        FULL_CONTEXT_READER.file_path = f"/inputs/draft/{exact.id}_{exact.version}/body.md"
         receiver = Receiver()
         result = await consume_and_replay(
             database,
@@ -359,8 +359,7 @@ async def _run_report_source_fixture(tmp_path, application, *, capture_mode=Fals
         )
         assert result.output_text == "entire context read"
         received = (
-            "\n".join(FullContextReader.observed[i] for i in sorted(FullContextReader.observed))
-            + "\n"
+            "\n".join(line for _, line in sorted(FULL_CONTEXT_READER.observed.items())) + "\n"
         )
         assert received == judged["body"]
         plan = await transfers.get(database.scope(), receiver.plan.plan_id)

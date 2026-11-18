@@ -79,10 +79,10 @@ from tests.fixtures.goal_directed_journaled import (
     SCOPE as GOAL_SCOPE,
 )
 from tests.fixtures.goal_directed_journaled import (
-    GoalScriptedModel,
     admit_goal_run,
     compose_goal_directed,
     goal_blueprint,
+    goal_model,
     goal_run_control,
     goal_start_action,
 )
@@ -423,7 +423,7 @@ async def test_the_forked_runs_first_packet_restores_the_snapshot_and_carries_th
         results=InMemoryArtifactPayloadStore(),
         bindings=InMemoryOperationBindingRepository(),
         saver=InMemorySaver(),
-        model=GoalScriptedModel(),
+        model=goal_model(),
         blueprint=goal_blueprint(),
         context_packs=packs,
         context_inputs=staging,

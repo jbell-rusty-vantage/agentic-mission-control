@@ -25,16 +25,16 @@ from hashlib import sha256
 from typing import Any, cast
 
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, ToolMessage
-from langchain_core.outputs import ChatGeneration, ChatResult
 from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog
 from tests.fixtures.rrm009_production_harness import ProductionStack
 from tests.fixtures.rrm009_production_stack import (
+    Cognition,
     TechnicalBinding,
-    _LoggedModel,
     _template,
     _workspace,
     call_usage,
 )
+from tests.support.models import ScriptedChatModel
 
 from mission_control.adapters.postgres.control_plane.definition_repository import (
     PostgresDefinitionRepository,
@@ -308,7 +308,8 @@ def candidate_ref(
 _INDEX = re.compile(r"This index: (\S+?)/\.mission/context\.md")
 
 
-class ChainModel(_LoggedModel):
+@dataclass(kw_only=True)
+class ChainCognition(Cognition):
     """A Goal Loop role scripted per admitted configuration.
 
     Executor, by tool messages since its latest input: read ``.mission/context.md`` and
@@ -326,7 +327,7 @@ class ChainModel(_LoggedModel):
     def _llm_type(self) -> str:
         return "ft-d3-chain"
 
-    def _reply(self, messages: list[BaseMessage]) -> ChatResult:
+    def _reply(self, messages: list[BaseMessage]) -> AIMessage:
         human_indexes = [index for index, item in enumerate(messages) if item.type == "human"]
         since_input = messages[human_indexes[-1] :] if human_indexes else messages
         tools = [item for item in since_input if isinstance(item, ToolMessage)]
@@ -377,14 +378,8 @@ class ChainModel(_LoggedModel):
             }
         )
 
-    async def _agenerate(
-        self,
-        messages: list[BaseMessage],
-        stop: list[str] | None = None,
-        run_manager: Any = None,
-        **kwargs: Any,
-    ) -> ChatResult:
-        del stop, run_manager, kwargs
+    async def __call__(self, messages: list[BaseMessage], call: int) -> AIMessage:
+        del call
         reply = self._reply(messages)
         document = self.script.pending.pop((self.run_id, self.operation_id, self.attempt), None)
         if document is not None and self.script.submit is not None:
@@ -425,22 +420,20 @@ class ChainModel(_LoggedModel):
             "output_contract_ref": goal.output_contract,
         }
 
-    def _call(self, name: str, args: dict[str, Any]) -> ChatResult:
+    def _call(self, name: str, args: dict[str, Any]) -> AIMessage:
         call_id = sha256(f"{self.operation_id}:{name}".encode()).hexdigest()[:12]
-        message = AIMessage(
+        return AIMessage(
             content="",
             tool_calls=[{"name": name, "args": args, "id": f"ftd3-{call_id}", "type": "tool_call"}],
             usage_metadata=call_usage(),
         )
-        return ChatResult(generations=[ChatGeneration(message=message)])
 
-    def _final(self, body: dict[str, Any]) -> ChatResult:
-        message = AIMessage(content=json.dumps(body, sort_keys=True), usage_metadata=call_usage())
-        return ChatResult(generations=[ChatGeneration(message=message)])
+    def _final(self, body: dict[str, Any]) -> AIMessage:
+        return AIMessage(content=json.dumps(body, sort_keys=True), usage_metadata=call_usage())
 
 
 def promise_submitter(pool: Any, request_scope: str) -> Any:
-    """W1 (OVE-169): the scripted equivalent of the lane's ``submit_output`` for ``ChainModel``.
+    """W1 (OVE-169): the scripted equivalent of the lane's ``submit_output`` for ``ChainCognition``.
 
     For the executor's invocation it pins the run's active promise revisions (as the knowledge
     toolset's ``begin`` does), submits the written document for every declared *required*
@@ -532,12 +525,12 @@ def promise_submitter(pool: Any, request_scope: str) -> Any:
 def chain_components(
     technical: TechnicalBinding, script: ChainScript, model_log: list[dict[str, Any]]
 ) -> DeploymentCapabilityComponents:
-    """The qualification's components with the parent model replaced by ``ChainModel``."""
+    """The qualification's components with the parent model replaced by ``ChainCognition``."""
 
     base = technical.components(model_log)
 
-    def parent(bound: Any, _secrets: Any) -> ChainModel:
-        return ChainModel(
+    def parent(bound: Any, _secrets: Any) -> ScriptedChatModel:
+        return ChainCognition(
             run_id=bound.run_id,
             operation_id=bound.operation_id,
             log=model_log,
@@ -549,7 +542,7 @@ def chain_components(
                 for slot in bound.workspace.slot_bindings
                 if slot.access == "exclusive_write"
             ),
-        )
+        ).model()
 
     return replace(
         base,

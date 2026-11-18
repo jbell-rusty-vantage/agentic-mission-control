@@ -19,13 +19,13 @@ import asyncio
 import json
 import time
 from collections.abc import AsyncIterator
+from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, cast
 
 import pytest
 from langchain_core.messages import AIMessage, BaseMessage, ToolMessage
-from langchain_core.outputs import ChatGeneration, ChatResult
 from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog, publish_output_schemas
 from tests.fixtures.manifest_runtime import ChainScript, GoalScript, promise_submitter
 from tests.fixtures.mission_control_local_agent_server import local_agent_server
@@ -36,6 +36,7 @@ from tests.support.acceptance.mission_control import manifest_async_child as bas
 from tests.support.ids import SCOPE
 from tests.support.manifest_runtime import OUTPUT_SCHEMAS, host_pins, missions_app, post, submit
 from tests.support.model_catalog import catalog_for
+from tests.support.models import ScriptedChatModel
 
 from mission_control.adapters.agent_server.async_subagents.sealed import (
     sealed_child_served_identity,
@@ -85,7 +86,8 @@ POLICY = "policy:async-result:typed-manifest@1"
 MAX_CHECKS = 12
 
 
-class CheckingChainModel(base.SpawningChainModel):
+@dataclass(kw_only=True)
+class CheckingChainCognition(base.SpawningChainCognition):
     """Spawns the async child, checks it until the governed check admits its result (pausing
     between checks so the server can run it), records what it saw, then does scripted work."""
 
@@ -96,7 +98,7 @@ class CheckingChainModel(base.SpawningChainModel):
     def _check_id(self, index: int) -> str:
         return f"wi23-check-{index}-" + sha256_digest(self.operation_id)[7:19]
 
-    def _reply(self, messages: list[BaseMessage]) -> ChatResult:
+    def _reply(self, messages: list[BaseMessage]) -> AIMessage:
         role = self.operation_id.rsplit("/", 1)[-1].split(":", 1)[0]
         first = "goal-iteration/1/" in self.operation_id
         spawned = [
@@ -114,7 +116,7 @@ class CheckingChainModel(base.SpawningChainModel):
             if checks:
                 time.sleep(1.0)  # the child runs on the server meanwhile
             task_id = str(spawned[-1].content).rsplit("task_id: ", 1)[-1].strip()
-            message = AIMessage(
+            return AIMessage(
                 content="",
                 tool_calls=[
                     {
@@ -126,7 +128,6 @@ class CheckingChainModel(base.SpawningChainModel):
                 ],
                 usage_metadata=call_usage(),
             )
-            return ChatResult(generations=[ChatGeneration(message=message)])
         if admitted and role == "executor" and first:
             self.log.append(
                 {
@@ -158,8 +159,8 @@ def checking_components(
 
     components = base.spawning_components(technical, script, model_log)
 
-    def parent(bound: Any, _secrets: Any) -> CheckingChainModel:
-        return CheckingChainModel(
+    def parent(bound: Any, _secrets: Any) -> ScriptedChatModel:
+        return CheckingChainCognition(
             run_id=bound.run_id,
             operation_id=bound.operation_id,
             log=model_log,
@@ -171,7 +172,7 @@ def checking_components(
                 for slot in bound.workspace.slot_bindings
                 if slot.access == "exclusive_write"
             ),
-        )
+        ).model()
 
     return replace(
         components,

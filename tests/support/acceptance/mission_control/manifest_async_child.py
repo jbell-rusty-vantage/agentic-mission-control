@@ -12,7 +12,6 @@ from typing import Any
 
 from fastapi import FastAPI
 from langchain_core.messages import AIMessage, BaseMessage, ToolMessage
-from langchain_core.outputs import ChatGeneration, ChatResult
 
 from mission_control.application.authoring.manifest_launch_inputs import (
     AsyncSubagentGraphBinding,
@@ -21,7 +20,7 @@ from mission_control.application.authoring.manifest_launch_inputs import (
 from mission_control.domain.authoring.canonical import sha256_digest
 from mission_control.domain.authoring.manifest import canonical_manifest_bytes, load_manifest_yaml
 from tests.fixtures.catalog.fast_track_catalog import fixture_definitions
-from tests.fixtures.manifest_runtime import ChainModel, ChainScript
+from tests.fixtures.manifest_runtime import ChainCognition, ChainScript
 from tests.fixtures.mission_control_local_agent_server import deterministic_child_definition
 from tests.fixtures.rrm009_cancellation import TOKEN_ENV
 from tests.fixtures.rrm009_production_harness import ProductionStack
@@ -32,6 +31,7 @@ from tests.fixtures.rrm009_production_stack import (
 )
 from tests.support.manifest_runtime import MISSION_2, evaluable, pubmed_digest
 from tests.support.model_catalog import model_binding
+from tests.support.models import ScriptedChatModel
 from tests.unit.authoring.manifest_launch_fixture import (
     deep_agents_chain,
     fixture_bindings,
@@ -44,8 +44,9 @@ OBJECTIVE = "Reply with exactly PONG."
 POLICY = "policy:async-result:technical-child@1"
 
 
-class SpawningChainModel(ChainModel):
-    """`ChainModel` that spawns the manifest's async child once, in iteration 1 of the executor,
+@dataclass(kw_only=True)
+class SpawningChainCognition(ChainCognition):
+    """`ChainCognition` that spawns the manifest's async child once, in iteration 1 of the executor,
     then does its scripted work as if the spawn had not happened."""
 
     @property
@@ -55,7 +56,7 @@ class SpawningChainModel(ChainModel):
     def _spawn_id(self) -> str:
         return "p1-spawn-" + sha256_digest(self.operation_id)[7:23]
 
-    def _reply(self, messages: list[BaseMessage]) -> ChatResult:
+    def _reply(self, messages: list[BaseMessage]) -> AIMessage:
         role = self.operation_id.rsplit("/", 1)[-1].split(":", 1)[0]
         first_iteration = "goal-iteration/1/" in self.operation_id
         spawned = any(
@@ -64,7 +65,7 @@ class SpawningChainModel(ChainModel):
         )
         if role == "executor" and first_iteration and not spawned:
             self._record("parent", messages)
-            message = AIMessage(
+            return AIMessage(
                 content="",
                 tool_calls=[
                     {
@@ -76,7 +77,6 @@ class SpawningChainModel(ChainModel):
                 ],
                 usage_metadata=call_usage(),
             )
-            return ChatResult(generations=[ChatGeneration(message=message)])
         # Hide the spawn exchange from the scripted executor so its tool counting holds.
         visible = [
             item
@@ -97,8 +97,8 @@ def spawning_components(
 ) -> Any:
     base = technical.components(model_log)
 
-    def parent(bound: Any, _secrets: Any) -> SpawningChainModel:
-        return SpawningChainModel(
+    def parent(bound: Any, _secrets: Any) -> ScriptedChatModel:
+        return SpawningChainCognition(
             run_id=bound.run_id,
             operation_id=bound.operation_id,
             log=model_log,
@@ -110,7 +110,7 @@ def spawning_components(
                 for slot in bound.workspace.slot_bindings
                 if slot.access == "exclusive_write"
             ),
-        )
+        ).model()
 
     return replace(
         base, model_factories={**base.model_factories, technical.binding.model.ref.digest: parent}

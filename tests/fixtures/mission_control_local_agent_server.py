@@ -24,10 +24,10 @@ from typing import Any
 import httpx
 import pytest
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, ToolMessage
-from langchain_core.outputs import ChatGeneration, ChatResult
-from tests.fixtures.rrm009_production_stack import _LoggedModel, call_usage
+from tests.fixtures.rrm009_production_stack import call_usage
 from tests.support.ids import SCOPE
 from tests.support.model_catalog import checked_in_catalog
+from tests.support.models import ScriptedChatModel, tool_call
 
 from mission_control.adapters.agent_server.async_subagents.auth import mint_scope_claim
 from mission_control.adapters.agent_server.async_subagents.bindings import (
@@ -80,30 +80,15 @@ def deterministic_child_definition() -> HostedAsyncSubagentDefinition:
     return replace(base, profile=profile, binding=binding)
 
 
-class DeterministicHostedChild(_LoggedModel):
-    @property
-    def _llm_type(self) -> str:
-        return "mission-control-local-child"
+def hosted_child_script(messages: list[BaseMessage], call: int) -> AIMessage:
+    """Wait once when asked to (a bounded tool call), then answer PONG."""
 
-    def _reply(self, messages: list[BaseMessage]) -> ChatResult:
-        human = " ".join(str(item.content) for item in messages if isinstance(item, HumanMessage))
-        has_wait_result = any(isinstance(item, ToolMessage) for item in messages)
-        if "wait" in human.lower() and not has_wait_result:
-            message = AIMessage(
-                content="",
-                tool_calls=[
-                    {
-                        "name": "wait_seconds",
-                        "args": {"seconds": 90},
-                        "id": "bounded-local-wait",
-                        "type": "tool_call",
-                    }
-                ],
-                usage_metadata=call_usage(),
-            )
-        else:
-            message = AIMessage(content="PONG", usage_metadata=call_usage())
-        return ChatResult(generations=[ChatGeneration(message=message)])
+    del call
+    human = " ".join(str(item.content) for item in messages if isinstance(item, HumanMessage))
+    has_wait_result = any(isinstance(item, ToolMessage) for item in messages)
+    if "wait" in human.lower() and not has_wait_result:
+        return tool_call("wait_seconds", {"seconds": 90}, "bounded-local-wait")
+    return AIMessage(content="PONG")
 
 
 _stack: AsyncExitStack | None = None
@@ -124,10 +109,10 @@ async def graph(config: dict) -> Any:
             registry = replace(
                 hosting_registry(definition),
                 model_factories={
-                    definition.binding.model.ref.digest: lambda bound, _secrets: (
-                        DeterministicHostedChild(
-                            run_id=bound.run_id, operation_id=bound.operation_id, log=[]
-                        )
+                    definition.binding.model.ref.digest: lambda _bound, _secrets: ScriptedChatModel(
+                        script=hosted_child_script,
+                        label="mission-control-local-child",
+                        usage=call_usage(),
                     )
                 },
             )

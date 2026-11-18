@@ -15,7 +15,8 @@ from __future__ import annotations
 import asyncio
 from dataclasses import dataclass, field
 
-from tests.fixtures.checkpoint_recovery import ScriptedRecoveryModel, SimulatedWorkerCrash
+from tests.fixtures.checkpoint_recovery import SimulatedWorkerCrash
+from tests.support.models import ScriptedChatModel
 
 from mission_control.domain.execution.contracts import RuntimeInvocation
 from mission_control.domain.execution.invocation_settlement import SettlementOutcome, WaitReason
@@ -36,7 +37,7 @@ class DurableEffectDouble:
     _crash_on: set[int] = field(default_factory=set)
     _gates: dict[int, tuple[asyncio.Event, asyncio.Event]] = field(default_factory=dict)
 
-    def attach(self, model: ScriptedRecoveryModel, *, answer_turns: tuple[int, ...]) -> None:
+    def attach(self, model: ScriptedChatModel, *, answer_turns: tuple[int, ...]) -> None:
         """One native write in every answer turn of cognition (a rerun would write again)."""
 
         for call in answer_turns:

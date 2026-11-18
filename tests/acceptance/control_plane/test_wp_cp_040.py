@@ -11,14 +11,15 @@ from tests.fixtures.checkpoint_lineage import (
 )
 from tests.fixtures.lane_bindings import lane_fields
 from tests.support.deep_agents import (
-    SessionProbeModel,
-    SkillReadingModel,
     cognitive_schemas,
     exact,
     exact_fixture,
+    observed_human_counts,
     planned_invocation,
     registry,
     runtime_invocation,
+    session_probe_model,
+    skill_reading_model,
     unit_bound,
 )
 from tests.support.operations import operation_request
@@ -197,7 +198,7 @@ def test_channel_collision_and_context_secret_material_fail_closed() -> None:
 @pytest.mark.asyncio
 async def test_actual_deep_agent_progressively_loads_skill_md_into_messages() -> None:
     binding, _profile, bundle = exact_fixture()
-    model = SkillReadingModel()
+    model = skill_reading_model()
     adapter = DeepAgentRuntimeAdapter(ExactDeepAgentMaterializer(registry(binding, bundle, model)))
     lineage = CheckpointLineageService(InMemoryCheckpointLineageRepository())
     result = await adapter.execute(await planned_invocation(unit_bound(binding), lineage), {})
@@ -208,7 +209,7 @@ async def test_actual_deep_agent_progressively_loads_skill_md_into_messages() ->
     assert inspection["skills_metadata"][0]["name"] == "exact-binding-proof"
     assert "SKILL-MD-IN-MESSAGES-040" in (inspection["skill_instruction_messages"][0]["content"])
     assert inspection["skill_instruction_messages"][0]["path"].endswith("SKILL.md")
-    assert model.calls == 2
+    assert len(model.calls) == 2
 
 
 @pytest.mark.asyncio
@@ -229,7 +230,7 @@ async def test_shared_session_reuse_is_ordered_and_same_unit_never_reappends_pro
     """
 
     binding, _profile, bundle = exact_fixture()
-    model = SessionProbeModel(observed_human_counts=[])
+    model = session_probe_model()
     adapter = DeepAgentRuntimeAdapter(ExactDeepAgentMaterializer(registry(binding, bundle, model)))
     lineage = CheckpointLineageService(InMemoryCheckpointLineageRepository())
     first_unit = unit_bound(binding, iteration=1)
@@ -243,7 +244,7 @@ async def test_shared_session_reuse_is_ordered_and_same_unit_never_reappends_pro
     assert reconstructed.checkpoint.result_key == first_result.checkpoint.result_key
     assert reconstructed.output_text == first_result.output_text
     assert reconstructed.usage == first_result.usage
-    assert model.observed_human_counts == [1]
+    assert observed_human_counts(model) == [1]
     with pytest.raises(CheckpointLineageInDoubt, match="unsettled transition"):
         await planned_invocation(first_unit, lineage, attempt=2)
 
@@ -254,7 +255,7 @@ async def test_shared_session_reuse_is_ordered_and_same_unit_never_reappends_pro
         adapter, lineage, unit_bound(binding, iteration=3, session_generation=2)
     )
 
-    assert model.observed_human_counts == [1, 2, 1]
+    assert observed_human_counts(model) == [1, 2, 1]
     assert second_transition.namespace == first_transition.namespace
     assert second_transition.source_key == first_transition.result_key
     assert fresh_transition.namespace != first_transition.namespace
@@ -289,7 +290,7 @@ async def test_invocation_is_root_namespaced_pinned_sync_durable_and_fully_stamp
     monkeypatch.setattr(adapter_module, "create_deep_agent", recording_create)
     binding, _profile, bundle = exact_fixture()
     saver = InMemorySaver()
-    exact_registry = registry(binding, bundle, SessionProbeModel(observed_human_counts=[]))
+    exact_registry = registry(binding, bundle, session_probe_model())
     exact_registry = ExactComponentRegistry(
         model_factories=exact_registry.model_factories,
         skill_bundles=exact_registry.skill_bundles,
@@ -356,7 +357,7 @@ async def test_source_state_schema_mismatch_fails_closed_before_model_invocation
     assert drifted.cognitive_state_schema.schema_digest != (
         binding.cognitive_state_schema.schema_digest
     )
-    model = SessionProbeModel(observed_human_counts=[])
+    model = session_probe_model()
     adapter = DeepAgentRuntimeAdapter(ExactDeepAgentMaterializer(registry(binding, bundle, model)))
     lineage = CheckpointLineageService(InMemoryCheckpointLineageRepository())
     await execute_and_observe(adapter, lineage, unit_bound(binding, iteration=1))
@@ -364,13 +365,13 @@ async def test_source_state_schema_mismatch_fails_closed_before_model_invocation
 
     with pytest.raises(IncompatibleCheckpointSchema, match="REQ-CP-CS-007"):
         await adapter.execute(second, {})
-    assert model.observed_human_counts == [1]
+    assert observed_human_counts(model) == [1]
 
 
 @pytest.mark.asyncio
 async def test_unplanned_or_drifted_invocation_is_refused_before_materialization() -> None:
     binding, _profile, bundle = exact_fixture()
-    model = SessionProbeModel(observed_human_counts=[])
+    model = session_probe_model()
     adapter = DeepAgentRuntimeAdapter(ExactDeepAgentMaterializer(registry(binding, bundle, model)))
     lineage = CheckpointLineageService(InMemoryCheckpointLineageRepository())
     planned = await planned_invocation(unit_bound(binding), lineage)
@@ -383,7 +384,7 @@ async def test_unplanned_or_drifted_invocation_is_refused_before_materialization
     drifted_plan = planned.checkpoint_plan.model_copy(update={"checkpointer_ref_digest": DIGEST_A})
     with pytest.raises(DeepAgentMaterializationError, match="does not match"):
         await adapter.execute(planned.model_copy(update={"checkpoint_plan": drifted_plan}), {})
-    assert model.observed_human_counts == []
+    assert observed_human_counts(model) == []
 
 
 @pytest.mark.asyncio
@@ -403,7 +404,7 @@ async def test_runtime_package_drift_fails_before_model_or_sandbox_effects() -> 
     def model_factory(_binding, _secrets):  # type: ignore[no-untyped-def]
         nonlocal calls
         calls += 1
-        return SkillReadingModel()
+        return skill_reading_model()
 
     exact_registry = registry(binding, bundle)
     exact_registry = ExactComponentRegistry(
@@ -530,7 +531,7 @@ async def test_operation_service_pins_records_and_links_the_result_checkpoint() 
             del request, binding
 
     binding, _profile, bundle = exact_fixture()
-    model = SessionProbeModel(observed_human_counts=[])
+    model = session_probe_model()
     repository = InMemoryCheckpointLineageRepository()
     assets = ConformanceAssetVerifier(
         mcp_schema_digests={"fixture-mcp": MCP_DIGEST},
@@ -575,6 +576,6 @@ async def test_operation_service_pins_records_and_links_the_result_checkpoint() 
     assert result.checkpoint_transition_id == transition.transition_id
     assert transition.result_manifest_ref.startswith("operation-settlement:")
     assert replay == result
-    assert model.observed_human_counts == [1]
+    assert observed_human_counts(model) == [1]
     attempts = await repository.list_attempts("tenant-1", request.runtime_unit.unit_key)
     assert [(item.attempt.attempt, item.dispatching) for item in attempts] == [(1, True)]

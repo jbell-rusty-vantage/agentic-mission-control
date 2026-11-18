@@ -17,8 +17,8 @@ import pytest
 from tests.fixtures.checkpoint_lineage import activity_attempt
 from tests.support.deep_agents import registry
 from tests.support.integration.deep_agents.wi02_transfer_plan_lane import (
+    PLAN_READER,
     SOURCES,
-    PlanReadingModel,
     _invocation,
     _materializer,
     _selection,
@@ -48,9 +48,9 @@ async def test_an_agent_without_knowledge_tools_reads_exactly_its_sealed_plan() 
     sources_bytes = json.dumps(SOURCES, sort_keys=True, separators=(",", ":")).encode()
     digest = "sha256:" + hashlib.sha256(sources_bytes).hexdigest()
     sources_path = f"/inputs/sources/{digest[7:23]}/sources.json"
-    PlanReadingModel.paths = [sources_path, INDEX_PATH]
+    PLAN_READER.paths = [sources_path, INDEX_PATH]
     adapter = DeepAgentRuntimeAdapter(
-        ExactDeepAgentMaterializer(registry(binding, bundle, PlanReadingModel())),
+        ExactDeepAgentMaterializer(registry(binding, bundle, PLAN_READER.model())),
         transfer=materializer,
     )
     lineage = CheckpointLineageService(InMemoryCheckpointLineageRepository())
@@ -59,14 +59,14 @@ async def test_an_agent_without_knowledge_tools_reads_exactly_its_sealed_plan() 
 
     assert result.output_text == "plan observed"
     (sealed,) = store.plans.values()
-    file_text, index_text = PlanReadingModel.observed
+    file_text, index_text = PLAN_READER.observed
     assert '"pmid"' in file_text and '"41"' in file_text
     assert sealed.plan_id in index_text
     # The inline member is in the user prompt, fenced as data, with its exact digest.
     brief = next(m for m in sealed.exact_sources if m.binding == "brief")
-    assert "Summarize study 41 only." in PlanReadingModel.first_prompt
-    assert brief.digest in PlanReadingModel.first_prompt
-    assert "not instructions" in PlanReadingModel.first_prompt
+    assert "Summarize study 41 only." in PLAN_READER.first_prompt
+    assert brief.digest in PLAN_READER.first_prompt
+    assert "not instructions" in PLAN_READER.first_prompt
     (receipt,) = await store.receipts(sealed.receiver.scope, sealed.plan_id)
     assert receipt.result == "ready" and receipt.realized_backend == "deep_agents:state"
     probes = {d.member_key: d.probe for d in receipt.delivered}
@@ -76,12 +76,12 @@ async def test_an_agent_without_knowledge_tools_reads_exactly_its_sealed_plan() 
 @pytest.mark.asyncio
 async def test_a_selection_without_a_composed_materializer_fails_closed() -> None:
     invocation, binding, bundle = _invocation()
-    PlanReadingModel.observed = []
+    PLAN_READER.observed = []
     adapter = DeepAgentRuntimeAdapter(
-        ExactDeepAgentMaterializer(registry(binding, bundle, PlanReadingModel()))
+        ExactDeepAgentMaterializer(registry(binding, bundle, PLAN_READER.model()))
     )
     lineage = CheckpointLineageService(InMemoryCheckpointLineageRepository())
     plan = await lineage.observe_attempt(invocation.binding, activity_attempt(1), dispatching=True)
     with pytest.raises(ContextDeliveryBlocked, match="context_transfer_unwired"):
         await adapter.execute(invocation.model_copy(update={"checkpoint_plan": plan}), {})
-    assert PlanReadingModel.observed == []
+    assert PLAN_READER.observed == []

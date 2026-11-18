@@ -24,7 +24,7 @@ from tests.support.integration.deep_agents.checkpoint_lineage_postgres_saver imp
     delivery,
     root_lineage,
 )
-from tests.support.integration.deep_agents.report_source_context import FullContextReader
+from tests.support.integration.deep_agents.report_source_context import FULL_CONTEXT_READER
 from tests.support.operations import MCP_DIGEST, SKILL_DIGEST, operation_request
 from tests.support.run_control import actor, command
 from tests.support.run_control import request as run_request
@@ -66,14 +66,6 @@ from mission_control.domain.policies.contracts import (
     ReserveBudgetAction,
     StartAction,
 )
-
-
-class CountingReader(FullContextReader):
-    calls: int = 0
-
-    def _generate(self, *args, **kwargs):
-        self.calls += 1
-        return super()._generate(*args, **kwargs)
 
 
 async def admit(pool, scope):
@@ -131,7 +123,7 @@ async def consume_and_replay(
     )
     dsn = runtime_checkpoint_conninfo(await provision_runtime(database), SAVER_SCHEMA)
     payloads = InMemoryArtifactPayloadStore()
-    model = CountingReader()
+    model = FULL_CONTEXT_READER.model()
 
     def service(saver):
         components = replace(
@@ -171,8 +163,8 @@ async def consume_and_replay(
         result = await service(saver).execute(request, delivery(1, binding.runtime_unit))
         assert result.status == "completed", result
         chain = await root_lineage(saver, namespace)
-        assert chain and model.calls > 0
-    calls = model.calls
+        assert chain and len(model.calls) > 0
+    calls = len(model.calls)
     lineage = PostgresCheckpointLineageRepository(pool)
     transitions = await lineage.list_transitions(scope, namespace)
     assert len(transitions) == 1
@@ -181,7 +173,7 @@ async def consume_and_replay(
     async with AsyncPostgresSaver.from_conn_string(dsn) as saver:
         duplicate = await service(saver).execute(request, delivery(2, binding.runtime_unit))
         assert duplicate == result
-        assert model.calls == calls
+        assert len(model.calls) == calls
         assert len(await root_lineage(saver, namespace)) == len(chain)
     assert await lineage.list_transitions(scope, namespace) == transitions
     return result

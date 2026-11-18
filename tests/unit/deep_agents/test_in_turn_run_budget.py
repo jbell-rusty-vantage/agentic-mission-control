@@ -17,10 +17,7 @@ from typing import Any
 
 import pytest
 from langchain.agents import create_agent
-from langchain_core.callbacks import CallbackManagerForLLMRun
-from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, ToolMessage
-from langchain_core.outputs import ChatGeneration, ChatResult
 from langchain_core.tools import tool
 
 from mission_control.adapters.deep_agents.adapter import (
@@ -35,6 +32,7 @@ from mission_control.adapters.deep_agents.budget import (
     BudgetStopMiddleware,
     turn_stop_marker,
 )
+from tests.support.models import ScriptedChatModel
 
 USAGE = {"input_tokens": 40, "output_tokens": 10, "total_tokens": 50}
 RUN_DIMENSIONS = ("model.turns", "tokens.total", "tool.calls.total")
@@ -50,39 +48,16 @@ def note(text: str) -> str:
     return f"noted {text}"
 
 
-class AlwaysCallsTools(BaseChatModel):
+def always_calls_tools(messages: list[BaseMessage], call: int) -> AIMessage:
     """A verifier that never decides: every answer asks for one more tool call."""
 
-    calls: int = 0
-
-    @property
-    def _llm_type(self) -> str:
-        return "always-calls-tools"
-
-    def bind_tools(self, tools: Sequence[Any], **kwargs: Any) -> AlwaysCallsTools:
-        del tools, kwargs
-        return self
-
-    def _generate(
-        self,
-        messages: list[BaseMessage],
-        stop: list[str] | None = None,
-        run_manager: CallbackManagerForLLMRun | None = None,
-        **kwargs: Any,
-    ) -> ChatResult:
-        del messages, stop, run_manager, kwargs
-        self.calls += 1
-        if self.calls > 50:
-            raise RuntimeError("the turn is unbounded")
-        message = AIMessage(
-            content="",
-            id=f"a-{self.calls}",
-            tool_calls=[
-                {"name": "note", "args": {"text": str(self.calls)}, "id": f"t{self.calls}"}
-            ],
-            usage_metadata=dict(USAGE),  # type: ignore[arg-type]
-        )
-        return ChatResult(generations=[ChatGeneration(message=message)])
+    del messages
+    return AIMessage(
+        content="",
+        id=f"a-{call}",
+        tool_calls=[{"name": "note", "args": {"text": str(call)}, "id": f"t{call}"}],
+        usage_metadata=dict(USAGE),  # type: ignore[arg-type]
+    )
 
 
 def _invocation(
@@ -101,7 +76,7 @@ def _invocation(
 @pytest.mark.asyncio
 async def test_a_turn_that_keeps_calling_tools_stops_at_the_run_tool_call_budget() -> None:
     executed.clear()
-    model = AlwaysCallsTools()
+    model = ScriptedChatModel(script=always_calls_tools, label="always-calls-tools")
     invocation = _invocation({"goal.iterations": 1}, remaining={"tool.calls.total": 3})
     calls = _ModelCallObserver()
     spend = _TurnSpend(calls)
@@ -116,7 +91,7 @@ async def test_a_turn_that_keeps_calling_tools_stops_at_the_run_tool_call_budget
     # Three tool calls ran; the fourth was refused before it ran; the fifth model call was
     # answered by the stop.
     assert executed == ["1", "2", "3"]
-    assert model.calls == 4
+    assert len(model.calls) == 4
     refused = [
         message
         for message in messages
@@ -141,7 +116,7 @@ async def test_a_turn_that_keeps_calling_tools_stops_at_the_run_tool_call_budget
 @pytest.mark.asyncio
 async def test_a_turn_stops_past_the_runs_remaining_tokens() -> None:
     executed.clear()
-    model = AlwaysCallsTools()
+    model = ScriptedChatModel(script=always_calls_tools, label="always-calls-tools")
     invocation = _invocation({"goal.iterations": 1}, remaining={"tokens.total": 120})
     calls = _ModelCallObserver()
     spend = _TurnSpend(calls)
@@ -152,7 +127,7 @@ async def test_a_turn_stops_past_the_runs_remaining_tokens() -> None:
         {"messages": [HumanMessage(content="verify")]}, config={"callbacks": [calls]}
     )
 
-    assert model.calls == 3  # 50, 100, 150 > 120
+    assert len(model.calls) == 3  # 50, 100, 150 > 120
     assert _budget_stop_of(result["messages"]) == {"tokens.total": {"limit": 120, "spent": 150}}
 
 

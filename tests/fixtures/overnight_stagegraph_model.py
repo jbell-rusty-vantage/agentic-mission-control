@@ -13,8 +13,8 @@ from dataclasses import dataclass, field, replace
 from typing import Any
 
 from langchain_core.messages import AIMessage, BaseMessage, ToolMessage
-from langchain_core.outputs import ChatGeneration, ChatResult
-from tests.fixtures.rrm009_production_stack import _LoggedModel, call_usage
+from tests.fixtures.rrm009_production_stack import Cognition, call_usage
+from tests.support.models import ScriptedChatModel
 
 
 @dataclass
@@ -35,7 +35,8 @@ def _document(message: ToolMessage) -> dict[str, Any]:
     return json.loads(str(content))
 
 
-class StageGraphModel(_LoggedModel):
+@dataclass(kw_only=True)
+class StageGraphCognition(Cognition):
     script: Any
     position: str
 
@@ -43,7 +44,7 @@ class StageGraphModel(_LoggedModel):
     def _llm_type(self) -> str:
         return "overnight-scripted-stagegraph"
 
-    def _reply(self, messages: list[BaseMessage]) -> ChatResult:
+    def _reply(self, messages: list[BaseMessage]) -> AIMessage:
         self._record("parent", messages)
         tools = [item for item in messages if isinstance(item, ToolMessage)]
         if self.position == "produce":
@@ -52,7 +53,7 @@ class StageGraphModel(_LoggedModel):
             return self._consumer(tools)
         raise AssertionError(f"unexpected authored position: {self.position}")
 
-    def _producer(self, tools: list[ToolMessage]) -> ChatResult:
+    def _producer(self, tools: list[ToolMessage]) -> AIMessage:
         if self.script.prior_report is not None:
             return self._isolation_producer(tools)
         if not tools:
@@ -103,7 +104,7 @@ class StageGraphModel(_LoggedModel):
             )
         return self._final()
 
-    def _isolation_producer(self, tools: list[ToolMessage]) -> ChatResult:
+    def _isolation_producer(self, tools: list[ToolMessage]) -> AIMessage:
         def report_at(index: int, name: str) -> dict[str, str]:
             answer = _document(tools[index])
             assert answer.get("ok"), answer
@@ -166,7 +167,7 @@ class StageGraphModel(_LoggedModel):
             )
         return self._final()
 
-    def _consumer(self, tools: list[ToolMessage]) -> ChatResult:
+    def _consumer(self, tools: list[ToolMessage]) -> AIMessage:
         if not tools:
             return self._call("read_file", {"file_path": "/.mission/transfer.json"}, 0)
         if len(tools) == 1:
@@ -214,9 +215,9 @@ class StageGraphModel(_LoggedModel):
         assert _document(tools[-1]).get("ok"), tools[-1].content
         return self._final()
 
-    def _call(self, name: str, args: dict[str, Any], ordinal: int) -> ChatResult:
+    def _call(self, name: str, args: dict[str, Any], ordinal: int) -> AIMessage:
         self.script.calls.append({"run_id": self.run_id, "position": self.position, "tool": name})
-        message = AIMessage(
+        return AIMessage(
             content="",
             tool_calls=[
                 {
@@ -228,20 +229,13 @@ class StageGraphModel(_LoggedModel):
             ],
             usage_metadata=call_usage(),
         )
-        return ChatResult(generations=[ChatGeneration(message=message)])
 
-    def _final(self) -> ChatResult:
-        return ChatResult(
-            generations=[
-                ChatGeneration(
-                    message=AIMessage(
-                        content=json.dumps(
-                            {"answer": "Named outputs submitted", "facts": {}, "output_refs": []}
-                        ),
-                        usage_metadata=call_usage(),
-                    )
-                )
-            ]
+    def _final(self) -> AIMessage:
+        return AIMessage(
+            content=json.dumps(
+                {"answer": "Named outputs submitted", "facts": {}, "output_refs": []}
+            ),
+            usage_metadata=call_usage(),
         )
 
 
@@ -250,16 +244,16 @@ def stagegraph_components(
 ) -> Any:
     base = technical.components(log)
 
-    def parent(bound: Any, _secrets: Any) -> StageGraphModel:
+    def parent(bound: Any, _secrets: Any) -> ScriptedChatModel:
         assert ":stage:" in bound.operation_id, "model binding must name a concrete stage"
         position = bound.operation_id.split(":stage:", 1)[1].split(":", 1)[0]
-        return StageGraphModel(
+        return StageGraphCognition(
             run_id=bound.run_id,
             operation_id=bound.operation_id,
             log=log,
             script=script,
             position=position,
-        )
+        ).model()
 
     return replace(
         base, model_factories={**base.model_factories, technical.binding.model.ref.digest: parent}

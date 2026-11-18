@@ -69,10 +69,10 @@ from tests.fixtures.goal_directed_journaled import (
     SCOPE,
     TOKENS_PER_OPERATION,
     GoalComposition,
-    GoalScriptedModel,
     admit_goal_run,
     compose_goal_directed,
     goal_blueprint,
+    goal_model,
     goal_run_control,
     goal_run_input,
     turns_by_operation,
@@ -139,7 +139,7 @@ async def _composition(run_control: Any) -> GoalComposition:
         results=InMemoryArtifactPayloadStore(),
         bindings=InMemoryOperationBindingRepository(),
         saver=InMemorySaver(),
-        model=GoalScriptedModel(),
+        model=goal_model(),
         blueprint=goal_blueprint(),
     )
 
@@ -250,7 +250,7 @@ async def test_journaled_goal_directed_run_settles_each_operation_once_through_a
     assert {item.verifier_session_id for item in composition.documents.verifications} != {
         first.session_id
     }
-    assert not any(item["system_has_goal_context"] for item in composition.model.turns)
+    assert not any(item["system_has_goal_context"] for item in composition.model.script.turns)
 
     # The family recorded no operation usage: only the run-level baseline release.
     assert [item for item in lifecycle_command_ids(history) if item.startswith("goal:usage:")] == [
@@ -372,7 +372,7 @@ async def test_iterations_with_distinct_output_refs_terminalize(
 
     run_control = goal_run_control()
     composition = await _composition(run_control)
-    composition.model.stable_output_ref = False
+    composition.model.script.stable_output_ref = False
     run_id = await admit_goal_run(run_control, "rrm-019-distinct-output-refs")
     family_worker, cognitive_worker = _workers(workflow_env, composition)
     async with family_worker, cognitive_worker:
@@ -593,7 +593,7 @@ async def test_outside_commands_between_settlement_and_next_command_do_not_fail_
     assert len(operation_usage) == 4
     assert budget.consumed.get("tokens.total") == 4 * TOKENS_PER_OPERATION
     assert not any(budget.reserved.values())
-    assert len(composition.model.turns) == 8
+    assert len(composition.model.script.turns) == 8
 
 
 @pytest.mark.asyncio

@@ -195,7 +195,7 @@ async def test_stage_graph_and_goal_directed_nodes_register_submit_and_assess(
             "KNOWLEDGE_ISSUER_RETIRING_KEY_FILE": str(tmp_path / "issuer-retiring.jwk.json"),
         }.items():
             monkeypatch.setenv(name, value)
-    monkeypatch.setenv("MISSION_CONTROL_TECHNICAL_KNOWLEDGE", "1")
+    monkeypatch.setenv("MISSION_CONTROL_SCRIPTED_MODEL", "technical-knowledge")
 
     async def lane(settings: Any, pool: Any) -> Any:
         async with pool.acquire() as connection, connection.transaction(readonly=True):
@@ -226,7 +226,7 @@ async def test_stage_graph_and_goal_directed_nodes_register_submit_and_assess(
                 text = text.replace('"aiengineer-postgres"', json.dumps(binding))
                 payload = tmp_path / "registration-payload.json"
                 payload.write_text(text, encoding="utf-8")
-                monkeypatch.setenv("MISSION_CONTROL_TECHNICAL_KNOWLEDGE_PAYLOAD", str(payload))
+                monkeypatch.setenv("MISSION_CONTROL_SCRIPTED_MODEL_KNOWLEDGE_PAYLOAD", str(payload))
             await _run_cases(stack, application, binding, real, fake)
     finally:
         if served is not None:

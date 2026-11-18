@@ -13,14 +13,9 @@ in-memory saver and deterministic models. It pins three production-composition f
 from __future__ import annotations
 
 import json
-from collections.abc import Sequence
-from typing import Any
 
 import pytest
-from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import AIMessage, BaseMessage, ToolMessage
-from langchain_core.outputs import ChatGeneration, ChatResult
-from langchain_core.tools import BaseTool
 
 from mission_control.adapters.deep_agents import (
     DeepAgentRuntimeAdapter,
@@ -41,6 +36,7 @@ from mission_control.domain.execution.contracts import (
     SyncSubagentProfile,
 )
 from tests.support.deep_agents import exact, exact_fixture, planned_invocation, registry, unit_bound
+from tests.support.models import ScriptedChatModel
 
 CHILD = "technical-child"
 SECRET_ARGUMENT = "do-not-persist-this-argument-value"
@@ -50,59 +46,31 @@ def _usage(total: int) -> dict[str, int]:
     return {"input_tokens": total - 1, "output_tokens": 1, "total_tokens": total}
 
 
-class _Scripted(BaseChatModel):
-    calls: int = 0
-
-    def bind_tools(self, tools: Sequence[BaseTool | dict[str, Any] | type | Any], **kwargs: Any):  # type: ignore[no-untyped-def,override]
-        del tools, kwargs
-        return self
-
-    def _generate(self, messages: list[BaseMessage], stop=None, run_manager=None, **kwargs):  # type: ignore[no-untyped-def,override]
-        del stop, run_manager, kwargs
-        self.calls += 1
-        return ChatResult(generations=[ChatGeneration(message=self._reply(messages))])
-
-    async def _agenerate(self, messages: list[BaseMessage], stop=None, run_manager=None, **kwargs):  # type: ignore[no-untyped-def,override]
-        return self._generate(messages, stop, run_manager, **kwargs)
-
-    def _reply(self, messages: list[BaseMessage]) -> AIMessage:
-        raise NotImplementedError
-
-
-class ParentModel(_Scripted):
-    @property
-    def _llm_type(self) -> str:
-        return "rrm009-parent"
-
-    def _reply(self, messages: list[BaseMessage]) -> AIMessage:
-        if not any(isinstance(item, ToolMessage) for item in messages):
-            return AIMessage(
-                content="",
-                tool_calls=[
-                    {
-                        "name": "task",
-                        "args": {"description": SECRET_ARGUMENT, "subagent_type": CHILD},
-                        "id": "call-task-1",
-                        "type": "tool_call",
-                    }
-                ],
-                usage_metadata=_usage(5),  # type: ignore[arg-type]
-            )
-        child = next(item for item in messages if isinstance(item, ToolMessage))
+def parent_script(messages: list[BaseMessage], call: int) -> AIMessage:
+    del call
+    if not any(isinstance(item, ToolMessage) for item in messages):
         return AIMessage(
-            content=json.dumps({"child": str(child.content)}),
-            usage_metadata=_usage(7),  # type: ignore[arg-type]
+            content="",
+            tool_calls=[
+                {
+                    "name": "task",
+                    "args": {"description": SECRET_ARGUMENT, "subagent_type": CHILD},
+                    "id": "call-task-1",
+                    "type": "tool_call",
+                }
+            ],
+            usage_metadata=_usage(5),  # type: ignore[arg-type]
         )
+    child = next(item for item in messages if isinstance(item, ToolMessage))
+    return AIMessage(
+        content=json.dumps({"child": str(child.content)}),
+        usage_metadata=_usage(7),  # type: ignore[arg-type]
+    )
 
 
-class ChildModel(_Scripted):
-    @property
-    def _llm_type(self) -> str:
-        return "rrm009-child"
-
-    def _reply(self, messages: list[BaseMessage]) -> AIMessage:
-        del messages
-        return AIMessage(content="CHILD-OK", usage_metadata=_usage(11))  # type: ignore[arg-type]
+def child_script(messages: list[BaseMessage], call: int) -> AIMessage:
+    del messages, call
+    return AIMessage(content="CHILD-OK", usage_metadata=_usage(11))  # type: ignore[arg-type]
 
 
 @pytest.mark.asyncio
@@ -122,7 +90,8 @@ async def test_sync_subagent_runs_and_its_usage_is_charged_to_the_parent() -> No
         writable_paths=("/workspace/child",),
     )
     binding, _profile, bundle = exact_fixture(sync_subagents=(child,), with_child_slices=True)
-    parent, child_model = ParentModel(), ChildModel()
+    parent = ScriptedChatModel(script=parent_script, label="rrm009-parent")
+    child_model = ScriptedChatModel(script=child_script, label="rrm009-child")
     base = registry(binding, bundle, parent)
     exact_registry = ExactComponentRegistry(
         model_factories={
@@ -149,7 +118,7 @@ async def test_sync_subagent_runs_and_its_usage_is_charged_to_the_parent() -> No
     result = await adapter.execute(invocation, {})
 
     assert json.loads(result.output_text) == {"child": "CHILD-OK"}
-    assert (parent.calls, child_model.calls) == (2, 1)
+    assert (len(parent.calls), len(child_model.calls)) == (2, 1)
     # Parent turns 2 (5 + 7 tokens) plus the child's turn (11 tokens).
     expected = {
         key: value

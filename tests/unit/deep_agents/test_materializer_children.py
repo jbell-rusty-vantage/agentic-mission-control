@@ -33,7 +33,7 @@ from mission_control.domain.execution.contracts import (
     DeepAgentSkillComponent,
     SyncSubagentProfile,
 )
-from tests.support.deep_agents import SkillReadingModel, exact_fixture, skill_bundle
+from tests.support.deep_agents import exact_fixture, skill_bundle, skill_reading_model
 
 
 def _child(prompt: str, **overrides: Any) -> SyncSubagentProfile:
@@ -60,7 +60,7 @@ def _child(prompt: str, **overrides: Any) -> SyncSubagentProfile:
 
 def _registry(binding: Any, bundle: Any, **extra: Any) -> ExactComponentRegistry:
     return ExactComponentRegistry(
-        model_factories={binding.model.ref.digest: lambda _b, _s: SkillReadingModel()},
+        model_factories={binding.model.ref.digest: lambda _b, _s: skill_reading_model()},
         skill_bundles={bundle.bundle_digest: bundle, **extra.get("skill_bundles", {})},
         sandbox_factories={binding.sandbox.ref.digest: StateSandboxFactory()},
         checkpointers={binding.checkpointer_ref.digest: InMemorySaver()},
@@ -250,7 +250,7 @@ async def test_manifest_facts_are_stable_across_two_prepares_of_the_same_binding
 
 def _materialized(binding: Any, subagents: tuple[dict[str, object], ...]) -> Any:
     return MaterializedDeepAgentArguments(
-        model=SkillReadingModel(),
+        model=skill_reading_model(),
         tools=(),
         middleware=(),
         subagents=subagents,
@@ -300,7 +300,7 @@ def test_the_implicit_general_purpose_child_is_never_added() -> None:
                     "name": "general",
                     "description": "The declared general child.",
                     "system_prompt": "general",
-                    "model": SkillReadingModel(),
+                    "model": skill_reading_model(),
                     "tools": [],
                     "skills": [],
                 },

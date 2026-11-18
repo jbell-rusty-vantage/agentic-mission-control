@@ -5,8 +5,11 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
+
+from langchain_core.messages import AIMessage
 
 from mission_control.bootstrap.application_profiles import load_application_profile
 from mission_control.bootstrap.model_profiles import load_model_catalog_file, models_path
@@ -181,13 +184,13 @@ def biotech_components(technical: Any, script: Any, log: list[dict[str, Any]], t
     from dataclasses import replace
 
     from langchain_core.messages import ToolMessage
-    from langchain_core.outputs import ChatResult
-    from tests.fixtures.overnight_linked_model import LinkedSourceModel
+    from tests.fixtures.overnight_linked_model import LinkedSourceCognition
     from tests.fixtures.overnight_linked_repair_model import file_text
-    from tests.fixtures.overnight_stagegraph_model import StageGraphModel, _document
+    from tests.fixtures.overnight_stagegraph_model import StageGraphCognition, _document
 
-    class BiotechConsumer(StageGraphModel):
-        def _consumer(self, tools: list[ToolMessage]) -> ChatResult:
+    @dataclass(kw_only=True)
+    class BiotechConsumer(StageGraphCognition):
+        def _consumer(self, tools: list[ToolMessage]) -> AIMessage:
             if not tools:
                 return self._call("read_file", {"file_path": "/.mission/transfer.json"}, 0)
             index = json.loads(file_text(tools[0]))
@@ -229,14 +232,14 @@ def biotech_components(technical: Any, script: Any, log: list[dict[str, Any]], t
     def factory(bound: Any, _secrets: Any) -> Any:
         if bound.operation_id.startswith("goal-iteration/"):
             assert bound.run_id == script.source_run
-            return LinkedSourceModel(
+            return LinkedSourceCognition(
                 run_id=bound.run_id,
                 operation_id=bound.operation_id,
                 log=log,
                 script=script.source,
                 output_contract_ref=script.source.output_contract_ref,
                 obligation_refs=script.source.obligation_refs,
-            )
+            ).model()
         assert bound.run_id == script.consumer_run and ":stage:consume:" in bound.operation_id
         return BiotechConsumer(
             run_id=bound.run_id,
@@ -244,7 +247,7 @@ def biotech_components(technical: Any, script: Any, log: list[dict[str, Any]], t
             position="consume",
             script=script.consumer,
             log=log,
-        )
+        ).model()
 
     return replace(
         base, model_factories={**base.model_factories, technical.binding.model.ref.digest: factory}

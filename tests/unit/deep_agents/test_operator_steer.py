@@ -10,7 +10,6 @@ from typing import Any
 
 import pytest
 from langchain.agents import create_agent
-from langchain_core.language_models.fake_chat_models import FakeMessagesListChatModel
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
 from langchain_core.tools import tool
 from langgraph.checkpoint.memory import InMemorySaver
@@ -30,6 +29,7 @@ from mission_control.application.execution.harness.inject import (
 from mission_control.domain.authoring.canonical import sha256_digest
 from mission_control.domain.execution.contracts import PromptSegment, PromptTrustClass
 from mission_control.domain.execution.lane_turns import LANE_COMMAND_SEMANTICS
+from tests.support.models import ScriptedChatModel
 
 KEY = "binding-1"
 
@@ -44,17 +44,19 @@ def segment(text: str, ref: str = "context-packet:sha256:1") -> PromptSegment:
     )
 
 
-class RecordingModel(FakeMessagesListChatModel):
-    """Scripted replies; records every call's input messages."""
+REPLIES = (
+    AIMessage(content="", tool_calls=[{"name": "look", "args": {}, "id": "t1"}]),
+    AIMessage(content="done"),
+)
+# The scripted model of the latest `agent_and_inbox`; it records every call's input messages.
+MODELS: list[ScriptedChatModel] = []
 
-    seen: list[list[BaseMessage]] = []
 
-    def _generate(self, messages: list[BaseMessage], *args: Any, **kwargs: Any) -> Any:
-        type(self).seen.append(list(messages))
-        return super()._generate(messages, *args, **kwargs)
+def replies(messages: list[BaseMessage], call: int) -> AIMessage:
+    """The two replies, over and over."""
 
-    def bind_tools(self, tools: Any, **kwargs: Any) -> Any:
-        return self
+    del messages
+    return REPLIES[(call - 1) % len(REPLIES)]
 
 
 def agent_and_inbox(steer_during_tool: str | None) -> tuple[Any, SteerInbox, InMemorySaver]:
@@ -68,13 +70,8 @@ def agent_and_inbox(steer_during_tool: str | None) -> tuple[Any, SteerInbox, InM
             inbox.put(KEY, SteerItem(delivery_key="cmd-1", segment=segment(steer_during_tool)))
         return "nothing here"
 
-    RecordingModel.seen = []
-    model = RecordingModel(
-        responses=[
-            AIMessage(content="", tool_calls=[{"name": "look", "args": {}, "id": "t1"}]),
-            AIMessage(content="done"),
-        ]
-    )
+    model = ScriptedChatModel(script=replies, usage=None)
+    MODELS[:] = [model]
     saver = InMemorySaver()
     agent = create_agent(
         model=model,
@@ -91,7 +88,7 @@ async def test_a_steer_reaches_the_next_model_call_and_the_checkpointed_state() 
     config = {"configurable": {"thread_id": "t"}}
     result = await agent.ainvoke({"messages": [HumanMessage(content="task")]}, config)
 
-    second_call = RecordingModel.seen[1]
+    second_call = MODELS[-1].seen[1]
     steer = second_call[-1]
     assert isinstance(steer, HumanMessage)
     assert steer.content.startswith(STEER_PREAMBLE)

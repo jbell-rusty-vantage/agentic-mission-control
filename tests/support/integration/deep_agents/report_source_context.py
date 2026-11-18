@@ -6,23 +6,23 @@ Moved from tests/integration/deep_agents/test_report_source_context.py.
 from __future__ import annotations
 
 import re
-from typing import ClassVar
+from dataclasses import dataclass, field
 
 from langchain_core.messages import AIMessage, BaseMessage, ToolMessage
-from langchain_core.outputs import ChatGeneration, ChatResult
 
-from tests.support.integration.deep_agents.wi02_transfer_plan_lane import PlanReadingModel
+from tests.support.models import ScriptedChatModel
 
 
-class FullContextReader(PlanReadingModel):
-    expected: ClassVar[bytes] = b""
-    file_path: ClassVar[str] = ""
-    observed: ClassVar[dict[int, str]] = {}
+@dataclass
+class FullContextReader:
+    """Reads `file_path` in 150-line pages, then records the lines it saw (`observed`)."""
 
-    def _generate(
-        self, messages: list[BaseMessage], stop=None, run_manager=None, **kwargs
-    ) -> ChatResult:
-        del stop, run_manager, kwargs
+    expected: bytes = b""
+    file_path: str = ""
+    observed: dict[int, str] = field(default_factory=dict)
+
+    def __call__(self, messages: list[BaseMessage], call: int) -> AIMessage:
+        del call
         results = [message for message in messages if isinstance(message, ToolMessage)]
         self.observed.clear()
         for result in results:
@@ -33,7 +33,7 @@ class FullContextReader(PlanReadingModel):
                     self.observed[line] = self.observed.get(line, "") + match[3]
         count = len(self.expected.decode().splitlines())
         if not results:
-            message = AIMessage(
+            return AIMessage(
                 content="",
                 tool_calls=[
                     {
@@ -45,6 +45,11 @@ class FullContextReader(PlanReadingModel):
                     for offset in range(0, count, 150)
                 ],
             )
-        else:
-            message = AIMessage(content="entire context read")
-        return ChatResult(generations=[ChatGeneration(message=message)])
+        return AIMessage(content="entire context read")
+
+    def model(self) -> ScriptedChatModel:
+        return ScriptedChatModel(script=self, label="wi02-plan-reader", usage=None)
+
+
+# The one full-context reader the report-source tests configure and read back.
+FULL_CONTEXT_READER = FullContextReader()

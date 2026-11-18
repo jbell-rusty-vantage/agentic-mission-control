@@ -13,11 +13,11 @@ exactly once.
 from __future__ import annotations
 
 import asyncio
-from typing import Any
+from dataclasses import dataclass, field
 from uuid import uuid4
 
 import pytest
-from langchain_core.messages import BaseMessage
+from langchain_core.messages import AIMessage, BaseMessage
 from langgraph.checkpoint.memory import InMemorySaver
 from temporalio.testing import WorkflowEnvironment
 from temporalio.worker import Worker
@@ -56,10 +56,11 @@ from mission_control.domain.policies.mailbox import MailboxState
 from tests.fixtures.goal_directed_journaled import (
     _ROLE,
     SCOPE,
-    GoalScriptedModel,
+    GoalScript,
     admit_goal_run,
     compose_goal_directed,
     goal_blueprint,
+    goal_model,
     goal_run_control,
     goal_run_input,
 )
@@ -72,23 +73,19 @@ QUEUE = "ft-f2-inject"
 INJECTED = "Redirect: cite the 2024 meta-analysis first."
 
 
-class SteerableModel(GoalScriptedModel):
+@dataclass
+class SteerableScript(GoalScript):
     """The RRM-016 script reading its role from the operation's own input; an injected
     follow-up message (no role marker) is data the script records and otherwise skips."""
 
-    def _observe(self, messages: list[BaseMessage]) -> tuple[int, int]:
-        injected = [
-            str(item.content)
-            for item in messages
-            if item.type == "human" and not _ROLE.search(str(item.content))
-        ]
-        self.__dict__.setdefault("injected", []).append(injected)
-        kept = [
-            item
-            for item in messages
-            if not (item.type == "human" and not _ROLE.search(str(item.content)))
-        ]
-        return super()._observe(kept)
+    injected: list[list[str]] = field(default_factory=list)
+
+    def __call__(self, messages: list[BaseMessage], call: int) -> AIMessage:
+        def is_injected(item: BaseMessage) -> bool:
+            return item.type == "human" and not _ROLE.search(str(item.content))
+
+        self.injected.append([str(item.content) for item in messages if is_injected(item)])
+        return super().__call__([item for item in messages if not is_injected(item)], call)
 
 
 def operator() -> ActorContext:
@@ -109,7 +106,8 @@ async def test_interrupt_and_inject_replaces_the_running_executor_turn_on_tempor
         artifacts=FakeArtifacts({}, scope=None), selections=selections, staging=staging
     )
     mailbox = MailboxDeliveryService(repository.mailbox, run_control)
-    model = SteerableModel()
+    script = SteerableScript()
+    model = goal_model(script)
     composition = await compose_goal_directed(
         run_control=run_control,
         journal=MemoryOperationJournal(),
@@ -205,8 +203,7 @@ async def test_interrupt_and_inject_replaces_the_running_executor_turn_on_tempor
     (packet,) = follow_ups
     (item,) = [i for i in packet.items if i.source_kind == ContextSourceKind.QUEUED_INSTRUCTION]
     assert item.inline is not None and item.inline.text == INJECTED
-    seen: list[Any] = model.__dict__["injected"]
-    assert any(any(INJECTED in text for text in call) for call in seen)
+    assert any(any(INJECTED in text for text in call) for call in script.injected)
     # Exactly one interrupt for the duplicated request.
     events = [record.envelope.event_type for record in repository._outbox.values()]
     assert events.count("command.delivered") == 1

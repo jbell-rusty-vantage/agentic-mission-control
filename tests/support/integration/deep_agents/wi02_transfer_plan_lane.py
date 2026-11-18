@@ -5,13 +5,10 @@ Moved from tests/integration/deep_agents/test_wi02_transfer_plan_lane.py.
 
 from __future__ import annotations
 
-from collections.abc import Sequence
-from typing import Any, ClassVar
+from dataclasses import dataclass, field
+from typing import Any
 
-from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, ToolMessage
-from langchain_core.outputs import ChatGeneration, ChatResult
-from langchain_core.tools import BaseTool
 
 from mission_control.adapters.knowledge.memory import InMemoryTransferPlanStore
 from mission_control.application.context.materialization import (
@@ -39,46 +36,28 @@ from mission_control.domain.execution.contracts import (
 from tests.fixtures.lane_bindings import lane_fields
 from tests.support.deep_agents import exact_fixture, unit_bound
 from tests.support.knowledge.stores import InMemoryStaging
+from tests.support.models import ScriptedChatModel
 from tests.support.operations import operation_request
 
 SOURCES = {"records": [{"pmid": "41"}]}
 
 
-class PlanReadingModel(BaseChatModel):
+@dataclass
+class PlanReader:
     """Reads the plan's file and index on its first turn, then records what it saw."""
 
-    paths: ClassVar[list[str]] = []
-    observed: ClassVar[list[str]] = []
-    first_prompt: ClassVar[str] = ""
+    paths: list[str] = field(default_factory=list)
+    observed: list[str] = field(default_factory=list)
+    first_prompt: str = ""
 
-    @property
-    def _llm_type(self) -> str:
-        return "wi02-plan-reader"
-
-    def bind_tools(
-        self,
-        tools: Sequence[BaseTool | dict[str, Any] | type | Any],
-        *,
-        tool_choice: str | None = None,
-        **kwargs: Any,
-    ) -> BaseChatModel:
-        del tools, tool_choice, kwargs
-        return self
-
-    def _generate(
-        self,
-        messages: list[BaseMessage],
-        stop: list[str] | None = None,
-        run_manager: Any = None,
-        **kwargs: Any,
-    ) -> ChatResult:
-        del stop, run_manager, kwargs
+    def __call__(self, messages: list[BaseMessage], call: int) -> AIMessage:
+        del call
         results = [item for item in messages if isinstance(item, ToolMessage)]
         if not results:
-            PlanReadingModel.first_prompt = "\n".join(
+            self.first_prompt = "\n".join(
                 str(item.content) for item in messages if isinstance(item, HumanMessage)
             )
-            message = AIMessage(
+            return AIMessage(
                 content="",
                 tool_calls=[
                     {
@@ -87,13 +66,18 @@ class PlanReadingModel(BaseChatModel):
                         "id": f"read-{index}",
                         "type": "tool_call",
                     }
-                    for index, path in enumerate(PlanReadingModel.paths)
+                    for index, path in enumerate(self.paths)
                 ],
             )
-        else:
-            PlanReadingModel.observed = [str(item.content) for item in results]
-            message = AIMessage(content="plan observed")
-        return ChatResult(generations=[ChatGeneration(message=message)])
+        self.observed = [str(item.content) for item in results]
+        return AIMessage(content="plan observed")
+
+    def model(self) -> ScriptedChatModel:
+        return ScriptedChatModel(script=self, label="wi02-plan-reader", usage=None)
+
+
+# The one plan reader the WI-02 tests configure (`paths`) and read back (`observed`).
+PLAN_READER = PlanReader()
 
 
 def _selection() -> TransferSelection:

@@ -172,29 +172,23 @@ async def test_a_child_agent_of_the_verifier_inherits_the_role_and_cannot_submit
     import json
 
     from langchain.agents import create_agent
-    from langchain_core.language_models.fake_chat_models import GenericFakeChatModel
     from langchain_core.messages import AIMessage, ToolMessage
 
     from mission_control.adapters.deep_agents.knowledge_tools import CURRENT_INVOCATION
-
-    class _Child(GenericFakeChatModel):
-        def bind_tools(self, tools: Any, **kwargs: Any) -> Any:
-            del tools, kwargs
-            return self
+    from tests.support.models import ScriptedChatModel
 
     def child() -> Any:
         call = {"obligation": "stage.report", "items": [REPORT]}
         return create_agent(
-            _Child(
-                messages=iter(
-                    [
-                        AIMessage(
-                            content="",
-                            tool_calls=[{"name": "submit_output", "args": call, "id": "c1"}],
-                        ),
-                        AIMessage(content="done"),
-                    ]
-                )
+            ScriptedChatModel.from_messages(
+                [
+                    AIMessage(
+                        content="",
+                        tool_calls=[{"name": "submit_output", "args": call, "id": "c1"}],
+                    ),
+                    AIMessage(content="done"),
+                ],
+                usage=None,
             ),
             tools=[h.support.tools["submit_output"]],
         )

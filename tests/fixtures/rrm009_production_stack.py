@@ -21,21 +21,20 @@ import json
 import os
 import sys
 import time
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field, fields
 from datetime import UTC, datetime
 from hashlib import sha256
 from pathlib import Path
 from typing import Any, Literal
 
-from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, ToolMessage
-from langchain_core.outputs import ChatGeneration, ChatResult
 from langchain_core.tools import BaseTool
 from tests.fixtures import rrm009_mcp_server
 from tests.fixtures.lane_bindings import lane_fields
 from tests.support.deep_agents import MCP_TOOL_SCHEMA_DIGEST, exact, exact_fixture
 from tests.support.ids import SCOPE
+from tests.support.models import ScriptedChatModel, since_latest_input, tool_call
 from tests.support.operations import operation_request
 from tests.support.run_control import request as run_request
 
@@ -120,6 +119,11 @@ GOAL_OBLIGATION = "fixture-obligation"
 GOAL_OUTPUT_CONTRACT = "fixture-output"
 INPUT_CONTRACT = "contract:rrm009-input@1"
 INVARIANT = "contract:rrm009-invariant@1"
+# The production-stack parent model: the named script (TECHNICAL_SCRIPTS) and its fault knobs.
+SCRIPTED_MODEL_ENV = "MISSION_CONTROL_SCRIPTED_MODEL"
+SCRIPTED_MODEL_DELAY_ENV = "MISSION_CONTROL_SCRIPTED_MODEL_DELAY_SECONDS"
+SCRIPTED_MODEL_FAIL_AT_ENV = "MISSION_CONTROL_SCRIPTED_MODEL_FAIL_AT_TOOLS"
+SCRIPTED_MODEL_KNOWLEDGE_PAYLOAD_ENV = "MISSION_CONTROL_SCRIPTED_MODEL_KNOWLEDGE_PAYLOAD"
 CHILD_NAME = "technical-child"
 CHILD_MARKER = "RRM009-CHILD-OK"
 ANSWER_MARKER = "RRM009-OK"
@@ -732,7 +736,7 @@ class TechnicalBinding:
     hook_component: DeepAgentHookScriptComponent
     # Sprint V SV-16 (T1-MC): the knowledge tool components the templates bind; empty unless
     # a knowledge-enabled stack sets them (the model then calls `report_register` and
-    # `submit_output` when `MISSION_CONTROL_TECHNICAL_KNOWLEDGE=1`).
+    # `submit_output` under the `technical-knowledge` script).
     knowledge_tools: tuple[Any, ...] = ()
     # Build 08 loop 8 (AI Engineer watch mission): extra tool implementations by component
     # digest; the components themselves go
@@ -750,16 +754,10 @@ class TechnicalBinding:
             # no vendor or model id and stand in for the WP-CP-040 qualification pin.
             qualification=True,
             model_factories={
-                self.binding.model.ref.digest: lambda bound, _secrets: TechnicalModel(
-                    run_id=bound.run_id,
-                    operation_id=bound.operation_id,
-                    operation_attempt=bound.operation_attempt,
-                    execution_generation=bound.execution_generation,
-                    log=model_log,
+                self.binding.model.ref.digest: lambda bound, _secrets: technical_model(
+                    bound, model_log
                 ),
-                self.child_model_ref.digest: lambda bound, _secrets: ChildModel(
-                    run_id=bound.run_id, operation_id=bound.operation_id, log=model_log
-                ),
+                self.child_model_ref.digest: lambda bound, _secrets: child_model(bound, model_log),
             },
             prompts={
                 self.child_prompt_ref.digest: (
@@ -1090,263 +1088,303 @@ def call_usage() -> dict[str, int]:
     return {"input_tokens": 2, "output_tokens": 3, "total_tokens": TOKENS_PER_CALL}
 
 
-class _LoggedModel(BaseChatModel):
+@dataclass(kw_only=True)
+class Invocation:
+    """The node invocation a production-stack model serves; every call goes to the shared log."""
+
     run_id: str
     operation_id: str
-    log: Any  # a shared list; pydantic would copy a validated `list`
-    # Build 08 loop 8: the invocation identity a watch tool call names (defaults keep older
-    # factories valid).
+    log: Any  # a shared list
+    # Build 08 loop 8: the invocation identity a watch tool call names.
     operation_attempt: int = 1
     execution_generation: int = 1
 
-    def bind_tools(
-        self,
-        tools: Sequence[BaseTool | dict[str, Any] | type | Any],
-        *,
-        tool_choice: str | None = None,
-        **kwargs: Any,
-    ) -> BaseChatModel:
-        del tools, tool_choice, kwargs
-        return self
+    @classmethod
+    def of(cls, bound: Any, log: Any) -> Invocation:
+        return cls(
+            run_id=bound.run_id,
+            operation_id=bound.operation_id,
+            log=log,
+            operation_attempt=int(getattr(bound, "operation_attempt", 1)),
+            execution_generation=int(getattr(bound, "execution_generation", 1)),
+        )
 
-    def _record(self, kind: str, messages: list[BaseMessage]) -> tuple[int, int]:
-        tools = sum(isinstance(item, ToolMessage) for item in messages)
-        humans = sum(isinstance(item, HumanMessage) for item in messages)
+    def record(self, kind: str, messages: Sequence[BaseMessage]) -> None:
         self.log.append(
             {
                 "model": kind,
                 "run_id": self.run_id,
                 "operation": self.operation_id,
-                "tools": tools,
-                "humans": humans,
+                "tools": sum(isinstance(item, ToolMessage) for item in messages),
+                "humans": sum(isinstance(item, HumanMessage) for item in messages),
                 "pid": os.getpid(),
             }
         )
-        return tools, humans
 
-    def _generate(
-        self,
-        messages: list[BaseMessage],
-        stop: list[str] | None = None,
-        run_manager: Any = None,
-        **kwargs: Any,
-    ) -> ChatResult:
-        del stop, run_manager, kwargs
-        return self._reply(messages)
-
-    async def _agenerate(
-        self,
-        messages: list[BaseMessage],
-        stop: list[str] | None = None,
-        run_manager: Any = None,
-        **kwargs: Any,
-    ) -> ChatResult:
-        del stop, run_manager, kwargs
-        return self._reply(messages)
-
-    def _reply(self, messages: list[BaseMessage]) -> ChatResult:
-        raise NotImplementedError
+    _record = record
 
 
-class ChildModel(_LoggedModel):
-    """The sync subagent's cognition: one answer carrying the child marker."""
+@dataclass(kw_only=True)
+class Cognition(Invocation):
+    """A script object for one invocation, for cognition with many steps: a subclass answers
+    in `_reply` (an `async __call__` may await after it); `model()` wraps it in the one LLM
+    double."""
 
     @property
     def _llm_type(self) -> str:
-        return "rrm-009-child"
+        return "production-stack-cognition"
 
-    def _reply(self, messages: list[BaseMessage]) -> ChatResult:
-        self._record("child", messages)
-        return ChatResult(
-            generations=[
-                ChatGeneration(message=AIMessage(content=CHILD_MARKER, usage_metadata=call_usage()))
-            ]
+    def _reply(self, messages: list[BaseMessage]) -> AIMessage:
+        raise NotImplementedError
+
+    def __call__(self, messages: list[BaseMessage], call: int) -> Any:
+        del call
+        return self._reply(messages)
+
+    def model(self) -> ScriptedChatModel:
+        return ScriptedChatModel(
+            script=self, label=self._llm_type, usage=call_usage(), max_calls=200
         )
 
 
-class TechnicalModel(_LoggedModel):
+# A production-stack script: `(invocation, messages, call) -> AIMessage` (or an awaitable).
+type InvocationScript = Callable[[Invocation, list[BaseMessage], int], Any]
+
+
+def invocation_model(
+    invocation: Invocation, script: InvocationScript, label: str
+) -> ScriptedChatModel:
+    """The one LLM double, answering for one invocation."""
+
+    return ScriptedChatModel(
+        script=lambda messages, call: script(invocation, messages, call),
+        label=label,
+        usage=call_usage(),
+        max_calls=200,
+    )
+
+
+def child_script(invocation: Invocation, messages: list[BaseMessage], call: int) -> AIMessage:
+    """The sync subagent's cognition: one answer carrying the child marker."""
+
+    del call
+    invocation.record("child", messages)
+    return AIMessage(content=CHILD_MARKER)
+
+
+def child_model(bound: Any, log: Any) -> ScriptedChatModel:
+    return invocation_model(Invocation.of(bound, log), child_script, "rrm-009-child")
+
+
+def technical_turn(
+    invocation: Invocation,
+    messages: list[BaseMessage],
+    *,
+    extra: Callable[[Invocation, list[BaseMessage], int], dict[str, Any] | None] | None = None,
+    prose_role: str = "",
+    answer: Callable[[Invocation, list[BaseMessage]], dict[str, Any]] | None = None,
+) -> AIMessage:
     """The parent's cognition, by tool-message count since its latest input:
 
     0: `task` (the in-process sync subagent); 1: `write_file` into the writable slot (a
     GoalDirected operation writes into its role root's `/work` slot);
-    2: `lookup_binding_marker` (the exact MCP tool); 3: the typed answer. GoalDirected
-    operations answer with their role's observation; StageGraph operations with an
-    artifact ref derived from their admitted objective.
+    2: `lookup_binding_marker` (the exact MCP tool); then the `extra` steps of the named
+    script; then the typed answer (`technical_answer`). GoalDirected operations answer with
+    their role's observation; StageGraph operations with an artifact ref derived from their
+    admitted objective. With `prose_role`, that Goal Directed role answers in prose, as a real
+    model without a structured output binding does (Tracing Stage 2, F-T3-1).
+
+    Two fault knobs apply to every named script: `SCRIPTED_MODEL_DELAY_ENV` (a per-call delay
+    that widens the window in which an `interrupt_and_inject` lands inside a running turn) and
+    `SCRIPTED_MODEL_FAIL_AT_ENV=N` (the call after N tool results fails as a cut provider
+    stream does; FX-TR-DISCONNECT).
     """
 
-    @property
-    def _llm_type(self) -> str:
-        return "rrm-009-technical"
-
-    def _reply(self, messages: list[BaseMessage]) -> ChatResult:
-        # P1 turn 4 (intervention drills): a per-call delay widens the window in which an
-        # `interrupt_and_inject` can land inside a running turn (0 by default).
-        delay = float(os.environ.get("MISSION_CONTROL_TECHNICAL_MODEL_DELAY_SECONDS", "0") or 0)
-        if delay > 0:
-            time.sleep(delay)
-        human_indexes = [index for index, item in enumerate(messages) if item.type == "human"]
-        since_input = messages[human_indexes[-1] :] if human_indexes else messages
-        tools = sum(isinstance(item, ToolMessage) for item in since_input)
-        self._record("parent", messages)
-        # Tracing Stage 2 (FX-TR-DISCONNECT, T0): `MISSION_CONTROL_TECHNICAL_FAIL_AT_TOOLS=N`
-        # makes the parent's call after N tool results fail as a cut provider stream does.
-        fail_at = os.environ.get("MISSION_CONTROL_TECHNICAL_FAIL_AT_TOOLS", "")
-        if fail_at and tools == int(fail_at):
-            raise ConnectionError("simulated provider disconnect mid-turn")
-        if tools == 0:
-            call = {
-                "name": "task",
-                "args": {
-                    "description": f"Reply with exactly {CHILD_MARKER}.",
-                    "subagent_type": CHILD_NAME,
-                },
-            }
-        elif tools == 1:
-            objective = _text(since_input, (HumanMessage,))
-            call = {
-                "name": "write_file",
-                "args": {
-                    "file_path": _report_path(self.operation_id),
-                    "content": f"# RRM-009 report\n\nobjective-digest: {_digest16(objective)}\n",
-                },
-            }
-        elif tools == 2:
-            call = {"name": "lookup_binding_marker", "args": {"code": MCP_CODE}}
-        elif os.environ.get("MISSION_CONTROL_TECHNICAL_AIENG_WATCH") == "1" and (
-            watch := _aieng_watch_step(self, since_input, tools)
-        ):
-            # Build 08 loop 8: the AI Engineer knowledge-loop watch tick
-            # (tests/fixtures/aieng_watch_tools.py).
-            call = watch
-        elif tools == 3 and os.environ.get("MISSION_CONTROL_TECHNICAL_KNOWLEDGE") == "1":
-            # SV-16 (T1-MC): register the operation's report through the knowledge gateway.
-            # A real executor needs a full `research-report/v2` registration: the test writes a
-            # tenant-substituted template (MISSION_CONTROL_TECHNICAL_KNOWLEDGE_PAYLOAD) and each
-            # operation registers it under its own report id; the fake takes any document.
-            unique = _digest16(f"{self.run_id}/{self.operation_id}")
-            template = os.environ.get("MISSION_CONTROL_TECHNICAL_KNOWLEDGE_PAYLOAD", "")
-            if template:
-                from tests.support.knowledge.content import fresh_registration, model_content
-
-                # W1 D1: the model submits content; the host binds producer and digests.
-                report = model_content(
-                    fresh_registration(
-                        json.loads(Path(template).read_text(encoding="utf-8")), unique
-                    )
-                )
-            else:
-                from tests.support.knowledge.content import model_report
-
-                report = model_report(f"report-{unique}")
-            call = {"name": "report_register", "args": {"report": report}}
-        elif tools == 4 and os.environ.get("MISSION_CONTROL_TECHNICAL_KNOWLEDGE") == "1":
-            # ... and submit the exact handle the receipt named for the `report` obligation.
-            registered = json.loads(
-                next(
-                    str(item.content)
-                    for item in reversed(since_input)
-                    if isinstance(item, ToolMessage)
-                )
-            )
-            affected = (registered.get("result") or {}).get("affected") or []
-            items = [
-                {"kind": "handle", "ref": entry["handle"], "digest": entry["digest"]}
-                for entry in affected
-                if "/report/" in entry["handle"]
-            ] or [
-                {
-                    "kind": "path",
-                    "ref": _report_path(self.operation_id),
-                    "digest": "sha256:" + "0" * 64,
-                }
-            ]
-            call = {"name": "submit_output", "args": {"obligation": "report", "items": items}}
-        else:
-            # Tracing Stage 2 (F-T3-1, T0): `MISSION_CONTROL_TECHNICAL_PROSE_ROLE=executor` (or
-            # `verifier`) makes that Goal Directed role answer in prose, as a real model
-            # without a structured output binding does; every other operation still answers
-            # its typed JSON.
-            role = os.environ.get("MISSION_CONTROL_TECHNICAL_PROSE_ROLE", "")
-            prose = bool(role) and (
-                self.operation_id.endswith(f"/{role}") or f"/{role}:" in self.operation_id
-            )
-            return ChatResult(
-                generations=[
-                    ChatGeneration(
-                        message=AIMessage(
-                            content=(
-                                PROSE_EXECUTOR_ANSWER
-                                if prose
-                                else json.dumps(self._answer(since_input), sort_keys=True)
-                            ),
-                            usage_metadata=call_usage(),
-                        )
-                    )
-                ]
-            )
-        message = AIMessage(
-            content="",
-            tool_calls=[
-                {
-                    **call,
-                    "id": f"rrm009-{call['name']}-{_digest16(self.operation_id)}",
-                    "type": "tool_call",
-                }
-            ],
-            usage_metadata=call_usage(),
-        )
-        return ChatResult(generations=[ChatGeneration(message=message)])
-
-    def _answer(self, since_input: list[BaseMessage]) -> dict[str, Any]:
-        tool_text = _text(since_input, (ToolMessage,))
-        facts = {
-            "child": CHILD_MARKER in tool_text,
-            "mcp": f"MCP-BOUND::{MCP_CODE}::EXACT" in tool_text,
+    delay = float(os.environ.get(SCRIPTED_MODEL_DELAY_ENV, "0") or 0)
+    if delay > 0:
+        time.sleep(delay)
+    since_input = since_latest_input(messages)
+    tools = sum(isinstance(item, ToolMessage) for item in since_input)
+    invocation.record("parent", messages)
+    fail_at = os.environ.get(SCRIPTED_MODEL_FAIL_AT_ENV, "")
+    if fail_at and tools == int(fail_at):
+        raise ConnectionError("simulated provider disconnect mid-turn")
+    call: dict[str, Any] | None
+    if tools == 0:
+        call = {
+            "name": "task",
+            "args": {
+                "description": f"Reply with exactly {CHILD_MARKER}.",
+                "subagent_type": CHILD_NAME,
+            },
         }
-        if ":stage:" in self.operation_id:
-            stage = self.operation_id.split(":stage:", 1)[1].split(":", 1)[0]
-            admitted = _text(since_input, (HumanMessage,))
-            return {
-                "answer": ANSWER_MARKER,
-                "facts": facts,
-                "output_refs": [f"artifact:rrm009:{stage}:{_digest16(admitted)}"],
-                # FX-TR: the `S2` stage evaluation (`cycle` twice, then `accept`); empty for
-                # every other stage, so the two-stage blueprint's answers are unchanged.
-                **tracing_cycle_evaluation(self.operation_id),
-            }
-        role = self.operation_id.rsplit("/", 1)[-1]
-        iteration = int(self.operation_id.split("goal-iteration/", 1)[1].split("/", 1)[0])
-        if role == "executor":
-            return {
-                "schema_version": "belllabs.goal-executor-observation.v1",
-                "disposition": "completed",
-                "output_refs": [f"artifact:rrm009-goal:{iteration}"],
-                "completion_claim": iteration >= 2,
-                "accepted_fact_refs": [f"fact:rrm009:{iteration}"],
-                "evidence_refs": [f"evidence:rrm009-goal:executor:{iteration}"],
-                "handoff": None,
-                "output_contract_ref": GOAL_OUTPUT_CONTRACT,
-            }
-        accepted = iteration >= 2
+    elif tools == 1:
+        objective = _text(since_input, (HumanMessage,))
+        call = {
+            "name": "write_file",
+            "args": {
+                "file_path": _report_path(invocation.operation_id),
+                "content": f"# RRM-009 report\n\nobjective-digest: {_digest16(objective)}\n",
+            },
+        }
+    elif tools == 2:
+        call = {"name": "lookup_binding_marker", "args": {"code": MCP_CODE}}
+    else:
+        call = extra(invocation, since_input, tools) if extra is not None else None
+    if call is None:
+        operation_id = invocation.operation_id
+        prose = bool(prose_role) and (
+            operation_id.endswith(f"/{prose_role}") or f"/{prose_role}:" in operation_id
+        )
+        if prose:
+            return AIMessage(content=PROSE_EXECUTOR_ANSWER)
+        body = (answer or technical_answer)(invocation, since_input)
+        return AIMessage(content=json.dumps(body, sort_keys=True))
+    return tool_call(
+        call["name"],
+        call["args"],
+        f"rrm009-{call['name']}-{_digest16(invocation.operation_id)}",
+    )
+
+
+def technical_answer(invocation: Invocation, since_input: list[BaseMessage]) -> dict[str, Any]:
+    tool_text = _text(since_input, (ToolMessage,))
+    facts = {
+        "child": CHILD_MARKER in tool_text,
+        "mcp": f"MCP-BOUND::{MCP_CODE}::EXACT" in tool_text,
+    }
+    operation_id = invocation.operation_id
+    if ":stage:" in operation_id:
+        stage = operation_id.split(":stage:", 1)[1].split(":", 1)[0]
+        admitted = _text(since_input, (HumanMessage,))
         return {
-            "schema_version": "belllabs.goal-verifier-observation.v1",
-            "decision": "accepted" if accepted else "rejected",
-            "progress_made": True,
-            "accepted_obligation_refs": [GOAL_OBLIGATION] if accepted else [],
-            "findings": [],
-            "evidence_refs": [f"evidence:rrm009-goal:verifier:{iteration}"],
-            "unmet_obligations": [] if accepted else [GOAL_OBLIGATION],
-            "obligation_applicability": [[GOAL_OBLIGATION, True]],
+            "answer": ANSWER_MARKER,
+            "facts": facts,
+            "output_refs": [f"artifact:rrm009:{stage}:{_digest16(admitted)}"],
+            # FX-TR: the `S2` stage evaluation (`cycle` twice, then `accept`); empty for
+            # every other stage, so the two-stage blueprint's answers are unchanged.
+            **tracing_cycle_evaluation(operation_id),
+        }
+    role = operation_id.rsplit("/", 1)[-1]
+    iteration = int(operation_id.split("goal-iteration/", 1)[1].split("/", 1)[0])
+    if role == "executor":
+        return {
+            "schema_version": "belllabs.goal-executor-observation.v1",
+            "disposition": "completed",
+            "output_refs": [f"artifact:rrm009-goal:{iteration}"],
+            "completion_claim": iteration >= 2,
+            "accepted_fact_refs": [f"fact:rrm009:{iteration}"],
+            "evidence_refs": [f"evidence:rrm009-goal:executor:{iteration}"],
+            "handoff": None,
             "output_contract_ref": GOAL_OUTPUT_CONTRACT,
         }
+    accepted = iteration >= 2
+    return {
+        "schema_version": "belllabs.goal-verifier-observation.v1",
+        "decision": "accepted" if accepted else "rejected",
+        "progress_made": True,
+        "accepted_obligation_refs": [GOAL_OBLIGATION] if accepted else [],
+        "findings": [],
+        "evidence_refs": [f"evidence:rrm009-goal:verifier:{iteration}"],
+        "unmet_obligations": [] if accepted else [GOAL_OBLIGATION],
+        "obligation_applicability": [[GOAL_OBLIGATION, True]],
+        "output_contract_ref": GOAL_OUTPUT_CONTRACT,
+    }
+
+
+def _knowledge_step(
+    invocation: Invocation, since_input: list[BaseMessage], tools: int
+) -> dict[str, Any] | None:
+    """SV-16 (T1-MC): register the operation's report through the knowledge gateway (tool 3),
+    then submit the exact handle the receipt named for the `report` obligation (tool 4).
+
+    A real executor needs a full `research-report/v2` registration: the test writes a
+    tenant-substituted template (`SCRIPTED_MODEL_KNOWLEDGE_PAYLOAD_ENV`) and each operation
+    registers it under its own report id; the fake takes any document.
+    """
+
+    if tools == 3:
+        unique = _digest16(f"{invocation.run_id}/{invocation.operation_id}")
+        template = os.environ.get(SCRIPTED_MODEL_KNOWLEDGE_PAYLOAD_ENV, "")
+        if template:
+            from tests.support.knowledge.content import fresh_registration, model_content
+
+            # W1 D1: the model submits content; the host binds producer and digests.
+            report = model_content(
+                fresh_registration(json.loads(Path(template).read_text(encoding="utf-8")), unique)
+            )
+        else:
+            from tests.support.knowledge.content import model_report
+
+            report = model_report(f"report-{unique}")
+        return {"name": "report_register", "args": {"report": report}}
+    if tools == 4:
+        registered = json.loads(
+            next(
+                str(item.content) for item in reversed(since_input) if isinstance(item, ToolMessage)
+            )
+        )
+        affected = (registered.get("result") or {}).get("affected") or []
+        items = [
+            {"kind": "handle", "ref": entry["handle"], "digest": entry["digest"]}
+            for entry in affected
+            if "/report/" in entry["handle"]
+        ] or [
+            {
+                "kind": "path",
+                "ref": _report_path(invocation.operation_id),
+                "digest": "sha256:" + "0" * 64,
+            }
+        ]
+        return {"name": "submit_output", "args": {"obligation": "report", "items": items}}
+    return None
 
 
 def _aieng_watch_step(
-    model: Any, since_input: list[BaseMessage], tools: int
+    invocation: Invocation, since_input: list[BaseMessage], tools: int
 ) -> dict[str, Any] | None:
+    """Build 08 loop 8: the AI Engineer knowledge-loop watch tick
+    (tests/fixtures/aieng_watch_tools.py)."""
+
     from tests.fixtures.aieng_watch_tools import watch_step
 
-    return watch_step(model, since_input, tools)
+    return watch_step(invocation, since_input, tools)
+
+
+# The named scripts of the technical parent model. The worker selects one per call by
+# `SCRIPTED_MODEL_ENV` (default `technical`); a test may register its own (`monkeypatch.setitem`).
+TECHNICAL_SCRIPTS: dict[str, InvocationScript] = {
+    "technical": lambda invocation, messages, call: technical_turn(invocation, messages),
+    "technical-knowledge": lambda invocation, messages, call: technical_turn(
+        invocation, messages, extra=_knowledge_step
+    ),
+    "aieng-watch": lambda invocation, messages, call: technical_turn(
+        invocation, messages, extra=_aieng_watch_step
+    ),
+    "prose-executor": lambda invocation, messages, call: technical_turn(
+        invocation, messages, prose_role="executor"
+    ),
+    "prose-verifier": lambda invocation, messages, call: technical_turn(
+        invocation, messages, prose_role="verifier"
+    ),
+}
+
+
+def selected_script(invocation: Invocation, messages: list[BaseMessage], call: int) -> Any:
+    """The named technical script `SCRIPTED_MODEL_ENV` selects, read at every call."""
+
+    name = os.environ.get(SCRIPTED_MODEL_ENV, "") or "technical"
+    if name not in TECHNICAL_SCRIPTS:
+        raise KeyError(
+            f"{SCRIPTED_MODEL_ENV}={name!r} names no script: {sorted(TECHNICAL_SCRIPTS)}"
+        )
+    return TECHNICAL_SCRIPTS[name](invocation, messages, call)
+
+
+def technical_model(bound: Any, log: Any) -> ScriptedChatModel:
+    """The parent's model for one bound invocation (`selected_script`)."""
+
+    return invocation_model(Invocation.of(bound, log), selected_script, "rrm-009-technical")
 
 
 def _report_path(operation_id: str) -> str:

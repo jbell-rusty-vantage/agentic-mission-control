@@ -14,7 +14,6 @@ from typing import Any
 import pytest
 from langchain.agents import create_agent
 from langchain.agents.structured_output import ToolStrategy
-from langchain_core.language_models.fake_chat_models import GenericFakeChatModel
 from langchain_core.messages import AIMessage
 from langgraph.checkpoint.memory import InMemorySaver
 from pydantic import BaseModel
@@ -25,6 +24,7 @@ from mission_control.adapters.deep_agents.adapter import (
 )
 from mission_control.adapters.deep_agents.budget import BudgetStopMiddleware, is_turn_stop
 from mission_control.domain.programs.goal_directed_runtime import GoalVerifierObservation
+from tests.support.models import ScriptedChatModel
 
 
 def test_a_pydantic_structured_response_becomes_the_structured_output() -> None:
@@ -54,12 +54,6 @@ class Verdict(BaseModel):
     met: bool
 
 
-class _ToolModel(GenericFakeChatModel):
-    def bind_tools(self, tools: Any, **kwargs: Any) -> Any:
-        del tools, kwargs
-        return self
-
-
 async def _turn(agent: Any, config: dict[str, Any], text: str) -> Any:
     """One turn on the shared thread; returns the result checkpoint's snapshot."""
 
@@ -82,7 +76,7 @@ async def test_a_later_turn_on_the_thread_does_not_return_the_earlier_verdict(
         *([AIMessage(content="plain text, no verdict")] if ending == "text" else []),
         AIMessage(content="", tool_calls=[{"name": "Verdict", "args": {"met": False}, "id": "v3"}]),
     ]
-    model = _ToolModel(messages=iter(answers))
+    model = ScriptedChatModel.from_messages(answers, usage=None)
     spent = {"tokens.total": 0}
     saver = InMemorySaver()
     agent = create_agent(

@@ -1,8 +1,7 @@
 from __future__ import annotations
 
 import json
-from collections.abc import Sequence
-from dataclasses import asdict
+from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from pathlib import Path
 from types import SimpleNamespace
@@ -11,8 +10,6 @@ from typing import Any
 import pytest
 from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import AIMessage, BaseMessage, ToolMessage
-from langchain_core.outputs import ChatGeneration, ChatResult
-from langchain_core.tools import BaseTool
 from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.store.memory import InMemoryStore
 from temporalio import activity
@@ -27,6 +24,7 @@ from tests.fixtures.goal_directed_journaled import (
 )
 from tests.fixtures.lane_bindings import LANE_REBINDERS, lane_fields
 from tests.support.deep_agents import exact_fixture
+from tests.support.models import ScriptedChatModel, tool_call
 from tests.support.operations import operation_request
 from tests.support.temporal import cancelled_operation_result, start_workflow_env
 
@@ -221,80 +219,24 @@ def _verifier_payload(run_id: str, iteration: int) -> dict[str, object]:
     }
 
 
-class GoalSandboxModel(BaseChatModel):
+@dataclass
+class GoalSandboxScript:
+    """One Goal Directed role's cognition in the Docker sandbox; it records what it observed."""
+
     role: str
     iteration: int
     run_id: str
     workspace_path: str
-    observations: list[dict[str, object]]
+    observations: list[dict[str, object]] = field(default_factory=list)
 
-    @property
-    def _llm_type(self) -> str:
-        return "wp-bp-020-sandbox-scripted"
-
-    def bind_tools(
-        self,
-        tools: Sequence[BaseTool | dict[str, Any] | type | Any],
-        *,
-        tool_choice: str | None = None,
-        **kwargs: Any,
-    ) -> BaseChatModel:
-        del tools, tool_choice, kwargs
-        return self
-
-    def _generate(
-        self,
-        messages: list[BaseMessage],
-        stop: list[str] | None = None,
-        run_manager: Any = None,
-        **kwargs: Any,
-    ) -> ChatResult:
-        del stop, run_manager, kwargs
+    def __call__(self, messages: list[BaseMessage], call: int) -> AIMessage:
+        del call
         tool_result = next(
             (message for message in reversed(messages) if isinstance(message, ToolMessage)),
             None,
         )
-        if tool_result is None:
-            prior_ai_outputs = sum(
-                isinstance(message, AIMessage) and bool(message.content) for message in messages
-            )
-            rendered = "\n".join(str(message.content) for message in messages)
-            self.observations.append(
-                {
-                    "role": self.role,
-                    "iteration": self.iteration,
-                    "prior_ai_outputs": prior_ai_outputs,
-                    "typed_handoff_present": (self.iteration == 1 or "goal-handoff:" in rendered),
-                }
-            )
-            if self.role == "executor" and self.iteration == 1:
-                command = (
-                    f"mkdir -p {self.workspace_path} && "
-                    f"printf 'durable-sandbox-artifact' > {self.workspace_path}/artifact.txt && "
-                    f"cat {self.workspace_path}/artifact.txt"
-                )
-            elif self.role == "executor":
-                command = f"cat {self.workspace_path}/artifact.txt"
-            else:
-                command = (
-                    f"mkdir -p {self.workspace_path} && "
-                    f"printf 'verified-{self.iteration}' > "
-                    f"{self.workspace_path}/verification.txt && "
-                    f"cat {self.workspace_path}/verification.txt"
-                )
-            message = AIMessage(
-                content="",
-                tool_calls=[
-                    {
-                        "name": "execute",
-                        "args": {"command": command},
-                        "id": f"sandbox-{self.role}-{self.iteration}",
-                        "type": "tool_call",
-                    }
-                ],
-                usage_metadata={"input_tokens": 2, "output_tokens": 3, "total_tokens": 5},
-            )
-        else:
+        usage = {"input_tokens": 2, "output_tokens": 3, "total_tokens": 5}
+        if tool_result is not None:
             if self.role == "executor" and self.iteration == 2:
                 assert "durable-sandbox-artifact" in str(tool_result.content)
             payload = (
@@ -302,11 +244,40 @@ class GoalSandboxModel(BaseChatModel):
                 if self.role == "executor"
                 else _verifier_payload(self.run_id, self.iteration)
             )
-            message = AIMessage(
-                content=json.dumps(payload, sort_keys=True),
-                usage_metadata={"input_tokens": 2, "output_tokens": 3, "total_tokens": 5},
+            return AIMessage(content=json.dumps(payload, sort_keys=True), usage_metadata=usage)
+        prior_ai_outputs = sum(
+            isinstance(message, AIMessage) and bool(message.content) for message in messages
+        )
+        rendered = "\n".join(str(message.content) for message in messages)
+        self.observations.append(
+            {
+                "role": self.role,
+                "iteration": self.iteration,
+                "prior_ai_outputs": prior_ai_outputs,
+                "typed_handoff_present": (self.iteration == 1 or "goal-handoff:" in rendered),
+            }
+        )
+        if self.role == "executor" and self.iteration == 1:
+            command = (
+                f"mkdir -p {self.workspace_path} && "
+                f"printf 'durable-sandbox-artifact' > {self.workspace_path}/artifact.txt && "
+                f"cat {self.workspace_path}/artifact.txt"
             )
-        return ChatResult(generations=[ChatGeneration(message=message)])
+        elif self.role == "executor":
+            command = f"cat {self.workspace_path}/artifact.txt"
+        else:
+            command = (
+                f"mkdir -p {self.workspace_path} && "
+                f"printf 'verified-{self.iteration}' > "
+                f"{self.workspace_path}/verification.txt && "
+                f"cat {self.workspace_path}/verification.txt"
+            )
+        return tool_call(
+            "execute",
+            {"command": command},
+            f"sandbox-{self.role}-{self.iteration}",
+            usage_metadata=usage,
+        )
 
 
 class Documents:
@@ -352,7 +323,7 @@ class Templates:
 class SandboxRolloverActivities:
     def __init__(self, *, workspace_root: Path) -> None:
         self.documents = Documents()
-        self.models: list[GoalSandboxModel] = []
+        self.models: list[GoalSandboxScript] = []
         self.checkpoints: list[CheckpointCapture | None] = []
         self.cancelled_operations: list[str] = []
         deep_binding, _profile, bundle = exact_fixture(sandbox_backend="docker")
@@ -410,15 +381,14 @@ class SandboxRolloverActivities:
             parts = operation_id.split("/")
             iteration = int(parts[1])
             role = parts[2]
-            model = GoalSandboxModel(
+            script = GoalSandboxScript(
                 role=role,
                 iteration=iteration,
                 run_id=binding.run_id,
                 workspace_path=binding.workspace.exclusive_write_paths[0],
-                observations=[],
             )
-            self.models.append(model)
-            return model
+            self.models.append(script)
+            return ScriptedChatModel(script=script, label="wp-bp-020-sandbox-scripted")
 
         registry = ExactComponentRegistry(
             model_factories={deep_binding.model.ref.digest: model_factory},

@@ -10,10 +10,10 @@ operation, attempt, generation, lane); the AI Engineer side writes it into
 runs `origin_kind = 'mission'`. Budget enforcement across runs lives on the AI Engineer side (the
 mission row's `budget_cost_usd` against the spend of its sweeps).
 
-The deterministic technical model calls them in a fixed order when
-`MISSION_CONTROL_TECHNICAL_AIENG_WATCH=1` (`watch_step`): the GoalDirected executor of iteration 1
-runs one watch tick (releases, due, rerun, admit) and the verifier of iteration 1 reads the tick
-back (status). No model provider is called.
+The deterministic technical model calls them in a fixed order under the `aieng-watch` script
+(`MISSION_CONTROL_SCRIPTED_MODEL=aieng-watch`, `watch_step`): the GoalDirected executor of
+iteration 1 runs one watch tick (releases, due, rerun, admit) and the verifier of iteration 1
+reads the tick back (status). No model provider is called.
 """
 
 from __future__ import annotations

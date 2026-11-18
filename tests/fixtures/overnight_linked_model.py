@@ -8,9 +8,8 @@ from dataclasses import dataclass, field, replace
 from typing import Any
 
 from langchain_core.messages import AIMessage, ToolMessage
-from langchain_core.outputs import ChatResult
-from tests.fixtures.overnight_goal_model import GoalModel, GoalScript
-from tests.fixtures.overnight_stagegraph_model import StageGraphModel, StageGraphScript
+from tests.fixtures.overnight_goal_model import GoalCognition, GoalScript
+from tests.fixtures.overnight_stagegraph_model import StageGraphCognition, StageGraphScript
 
 
 @dataclass
@@ -42,10 +41,11 @@ def linked_script(report: dict[str, Any]) -> LinkedScript:
     )
 
 
-class LinkedSourceModel(GoalModel):
+@dataclass(kw_only=True)
+class LinkedSourceCognition(GoalCognition):
     """One grounded source iteration, with its independent actual verifier read."""
 
-    def _answer(self, payload: dict[str, Any]) -> ChatResult:
+    def _answer(self, payload: dict[str, Any]) -> AIMessage:
         if "decision" in payload:
             payload = {
                 **payload,
@@ -59,10 +59,11 @@ class LinkedSourceModel(GoalModel):
         return super()._answer(payload)
 
 
-class LinkedConsumerModel(StageGraphModel):
+@dataclass(kw_only=True)
+class LinkedConsumerCognition(StageGraphCognition):
     linked: Any
 
-    def _consumer(self, tools: list[ToolMessage]) -> ChatResult:
+    def _consumer(self, tools: list[ToolMessage]) -> AIMessage:
         if tools:
             from tests.fixtures.overnight_goal_model import HANDLE
 
@@ -74,14 +75,12 @@ class LinkedConsumerModel(StageGraphModel):
                 selected,
                 exact,
             )
-        response = super()._consumer(tools)
-        message = response.generations[0].message
-        assert isinstance(message, AIMessage)
+        message = super()._consumer(tools)
         for call in message.tool_calls:
             if call["name"] == "submit_output":
                 summary = call["args"]["items"][0]["text"]
                 self.linked.summaries.append(summary)
-        return response
+        return message
 
 
 def linked_components(technical: Any, script: LinkedScript, log: list[dict[str, Any]]) -> Any:
@@ -90,23 +89,23 @@ def linked_components(technical: Any, script: LinkedScript, log: list[dict[str, 
     def factory(bound: Any, _secrets: Any) -> Any:
         if bound.operation_id.startswith("goal-iteration/"):
             assert bound.run_id == script.source_run
-            return LinkedSourceModel(
+            return LinkedSourceCognition(
                 run_id=bound.run_id,
                 operation_id=bound.operation_id,
                 log=log,
                 script=script.source,
                 output_contract_ref=script.source.output_contract_ref,
                 obligation_refs=script.source.obligation_refs,
-            )
+            ).model()
         assert ":stage:consume:" in bound.operation_id, bound.operation_id
-        return LinkedConsumerModel(
+        return LinkedConsumerCognition(
             run_id=bound.run_id,
             operation_id=bound.operation_id,
             position="consume",
             script=script.consumer,
             linked=script,
             log=log,
-        )
+        ).model()
 
     return replace(
         base, model_factories={**base.model_factories, technical.binding.model.ref.digest: factory}

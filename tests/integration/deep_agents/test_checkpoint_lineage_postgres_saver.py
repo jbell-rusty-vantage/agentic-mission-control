@@ -25,7 +25,7 @@ from langgraph.store.memory import InMemoryStore
 from tests.fixtures.checkpoint_lineage import bind_unit, goal_unit, stage_unit
 from tests.fixtures.lane_bindings import lane_fields
 from tests.fixtures.mission_control_common_db import CommonDatabase, provision_runtime
-from tests.support.deep_agents import SessionProbeModel, exact_fixture
+from tests.support.deep_agents import exact_fixture, observed_human_counts, session_probe_model
 from tests.support.deep_agents_runtime import (
     ConformanceAssetVerifier,
     ConformanceBudgetAuthority,
@@ -41,6 +41,7 @@ from tests.support.integration.deep_agents.checkpoint_lineage_postgres_saver imp
     root,
     root_lineage,
 )
+from tests.support.models import ScriptedChatModel
 from tests.support.operations import MCP_DIGEST, SKILL_DIGEST, operation_request
 from tests.support.run_control import actor, command
 from tests.support.run_control import request as run_request
@@ -119,7 +120,7 @@ class Stack:
     journal: PostgresAtomicOperationJournalRepository
     coordinator: JournaledOperationExecutionCoordinator
     service: OperationExecutionService
-    model: SessionProbeModel
+    model: ScriptedChatModel
     binding: DeepAgentExecutionBinding
     drifted_binding: DeepAgentExecutionBinding
 
@@ -147,7 +148,7 @@ async def stack(common_db: CommonDatabase) -> AsyncIterator[Stack]:
             drifted_binding, _drifted_profile, _drifted_bundle = exact_fixture(
                 with_child_slices=True
             )
-            model = SessionProbeModel(observed_human_counts=[])
+            model = session_probe_model()
             adapter = DeepAgentRuntimeAdapter(
                 ExactDeepAgentMaterializer(
                     ExactComponentRegistry(
@@ -325,13 +326,13 @@ async def test_operation_before_after_checkpoints_and_idempotent_duplicate_deliv
     assert PROMPT not in lineage_rows and "unused" not in lineage_rows
 
     # Duplicate delivery: the settled unit returns unchanged with no provider work.
-    calls_before = list(stack.model.observed_human_counts)
+    calls_before = list(observed_human_counts(stack.model))
     duplicate = await stack.service.execute(request, delivery(3, unit))
     # RRM-004: the manifest commits to the digest-bound output payload, so the settled
     # replay restores `output_text` and `structured_output` and returns unchanged.
     assert duplicate == result
     assert duplicate.output_text == "human-count:1"
-    assert stack.model.observed_human_counts == calls_before == [1]
+    assert observed_human_counts(stack.model) == calls_before == [1]
     assert len(await root_lineage(stack.saver, namespace)) == len(chain)
     assert await stack.lineage.list_transitions(SCOPE, namespace) == (transition,)
     attempts = await stack.lineage.list_attempts(SCOPE, unit.unit_key)
@@ -395,7 +396,7 @@ async def test_goal_session_lineage_is_linear_rollover_is_empty_and_schema_gated
     assert rolled.namespace.endswith("/session/2/role/executor")
     assert rolled.source_key is None
     assert verified.namespace.endswith("/session/1/role/verifier")
-    assert stack.model.observed_human_counts == [1, 2, 1, 1]
+    assert observed_human_counts(stack.model) == [1, 2, 1, 1]
 
     # Linear stamped lineage: the shared thread attributes every checkpoint to its writer.
     owners = [
@@ -415,7 +416,7 @@ async def test_goal_session_lineage_is_linear_rollover_is_empty_and_schema_gated
     incident = await stack.lineage.get_incident(SCOPE, drifted.unit_key, 1)
     assert incident is not None and incident.reason == "schema_mismatch"
     assert parked.reconciliation_incident_id == incident.incident_id
-    assert stack.model.observed_human_counts == [1, 2, 1, 1]
+    assert observed_human_counts(stack.model) == [1, 2, 1, 1]
     assert await stack.lineage.get_namespace_head(SCOPE, session) == two.result_key
 
 
@@ -426,9 +427,7 @@ async def test_root_checkpoint_namespace_decision_reverified_on_postgres_saver(
     """RRM-001 section 8 #1: a custom root `checkpoint_ns` breaks state reads, so BellLabs
     isolates by thread and always runs the root graph at `checkpoint_ns=""`."""
 
-    agent = create_deep_agent(
-        model=SessionProbeModel(observed_human_counts=[]), checkpointer=stack.saver
-    )
+    agent = create_deep_agent(model=session_probe_model(), checkpointer=stack.saver)
     custom: RunnableConfig = {
         "configurable": {"thread_id": f"rrm-003-ns-probe-{uuid4()}", "checkpoint_ns": "belllabs"}
     }

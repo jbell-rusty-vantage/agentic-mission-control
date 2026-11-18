@@ -334,8 +334,8 @@ async def test_interrupt_and_inject_into_running_cognition_marks_the_points(
 
     import os
 
-    monkeypatch.setenv("MISSION_CONTROL_TECHNICAL_MODEL_DELAY_SECONDS", "2.5")
-    assert os.environ["MISSION_CONTROL_TECHNICAL_MODEL_DELAY_SECONDS"] == "2.5"
+    monkeypatch.setenv("MISSION_CONTROL_SCRIPTED_MODEL_DELAY_SECONDS", "2.5")
+    assert os.environ["MISSION_CONTROL_SCRIPTED_MODEL_DELAY_SECONDS"] == "2.5"
     injected = "Injected mid-turn: switch to the second evidence source before writing."
     async with scoped_stack(tmp_path, monkeypatch) as stack:
         run_id = await launch(stack, "GoalDirected")

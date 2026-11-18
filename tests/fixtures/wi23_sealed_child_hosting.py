@@ -18,9 +18,8 @@ from pathlib import Path
 from typing import Any
 
 import asyncpg
-from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
-from langchain_core.outputs import ChatGeneration, ChatResult
+from tests.support.models import ScriptedChatModel
 
 from mission_control.adapters.agent_server.async_subagents.sealed import (
     SealedChildGraphFactory,
@@ -43,40 +42,25 @@ from mission_control.domain.execution.contracts import (
 )
 
 
-class SealedLocalChild(BaseChatModel):
+def sealed_local_child(expected_prompt: str) -> ScriptedChatModel:
     """Answers with a marker when its system prompt carries the sealed prompt, and the objective."""
 
-    expected_prompt: str = ""
-
-    @property
-    def _llm_type(self) -> str:
-        return "wi23-sealed-local-child"
-
-    def bind_tools(self, tools: Any, *, tool_choice: Any = None, **kwargs: Any) -> BaseChatModel:
-        del tools, tool_choice, kwargs
-        return self
-
-    def _generate(
-        self, messages: list[BaseMessage], stop: Any = None, run_manager: Any = None, **kwargs: Any
-    ) -> ChatResult:
-        del stop, run_manager, kwargs
+    def script(messages: list[BaseMessage], call: int) -> AIMessage:
+        del call
         system = " ".join(
             str(item.content) for item in messages if getattr(item, "type", "") == "system"
         )
         human = [str(item.content) for item in messages if isinstance(item, HumanMessage)]
-        sealed = bool(self.expected_prompt) and self.expected_prompt in system
+        sealed = bool(expected_prompt) and expected_prompt in system
         marker = "SEALED-PROMPT-SEEN" if sealed else ""
         reply = f"{marker} PONG for: {human[-1] if human else ''}".strip()
-        return ChatResult(
-            generations=[
-                ChatGeneration(
-                    message=AIMessage(
-                        content=[{"type": "text", "text": reply}],
-                        usage_metadata={"input_tokens": 3, "output_tokens": 2, "total_tokens": 5},
-                    )
-                )
-            ]
-        )
+        return AIMessage(content=[{"type": "text", "text": reply}])
+
+    return ScriptedChatModel(
+        script=script,
+        label="wi23-sealed-local-child",
+        usage={"input_tokens": 3, "output_tokens": 2, "total_tokens": 5},
+    )
 
 
 class _Custody:
@@ -107,9 +91,7 @@ async def _build(
 ) -> Any:
     base = ExactComponentRegistry(
         model_factories={
-            sealed.binding.model.ref.digest: lambda _b, _s: SealedLocalChild(
-                expected_prompt=sealed.system_prompt
-            )
+            sealed.binding.model.ref.digest: lambda _b, _s: sealed_local_child(sealed.system_prompt)
         }
     )
     adapter = DeepAgentRuntimeAdapter(

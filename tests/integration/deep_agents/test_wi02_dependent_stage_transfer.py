@@ -19,7 +19,7 @@ from tests.fixtures.checkpoint_lineage import activity_attempt
 from tests.support.clock import Clock
 from tests.support.deep_agents import registry
 from tests.support.integration.deep_agents.wi02_transfer_plan_lane import (
-    PlanReadingModel,
+    PLAN_READER,
     _invocation,
     _selection,
 )
@@ -176,18 +176,18 @@ async def test_the_dependent_stage_reads_its_exact_upstream_report_through_the_p
     fake, outputs, store, _staging, support, materializer = _stack()
     invocation, binding, bundle = _dependent(TENANT)
     package = _submitted(fake, outputs, invocation.binding.run_id)
-    PlanReadingModel.paths = [
+    PLAN_READER.paths = [
         "/inputs/draft/report-7_research-report.v2/body.md",
     ]
-    PlanReadingModel.observed = []
+    PLAN_READER.observed = []
     adapter = DeepAgentRuntimeAdapter(
-        ExactDeepAgentMaterializer(registry(binding, bundle, PlanReadingModel())),
+        ExactDeepAgentMaterializer(registry(binding, bundle, PLAN_READER.model())),
         transfer=materializer,
         knowledge=support,  # type: ignore[arg-type]
     )
     result = await _run(adapter, invocation)
     assert result.output_text == "plan observed"
-    (observed,) = PlanReadingModel.observed
+    (observed,) = PLAN_READER.observed
     assert "Exact upstream findings" in observed
     (plan,) = store.plans.values()
     assert plan.boundary.value == "dependent_stage"
@@ -201,9 +201,9 @@ async def test_a_changed_or_unavailable_upstream_member_blocks_the_dependent_sta
     fake, outputs, store, staging, support, materializer = _stack()
     invocation, binding, bundle = _dependent(TENANT)
     _submitted(fake, outputs, invocation.binding.run_id)
-    PlanReadingModel.paths = ["/inputs/draft/report-7_research-report.v2/body.md"]
+    PLAN_READER.paths = ["/inputs/draft/report-7_research-report.v2/body.md"]
     adapter = DeepAgentRuntimeAdapter(
-        ExactDeepAgentMaterializer(registry(binding, bundle, PlanReadingModel())),
+        ExactDeepAgentMaterializer(registry(binding, bundle, PLAN_READER.model())),
         transfer=materializer,
         knowledge=support,  # type: ignore[arg-type]
     )
@@ -215,15 +215,15 @@ async def test_a_changed_or_unavailable_upstream_member_blocks_the_dependent_sta
     assert body.custody_ref is not None
     original = staging.objects[body.custody_ref]
     staging.objects[body.custody_ref] = original + b"tampered"
-    PlanReadingModel.observed = []
+    PLAN_READER.observed = []
     with pytest.raises(ContextDeliveryBlocked, match="DIGEST_MISMATCH"):
         await _run(adapter, invocation)  # a restart redelivers
-    assert PlanReadingModel.observed == []
+    assert PLAN_READER.observed == []
     # (2) The exact upstream revision is no longer available at KS: readiness stops too.
     staging.objects[body.custody_ref] = original
     fake.packages.clear()
     with pytest.raises(ContextDeliveryBlocked):
         await _run(adapter, invocation)
-    assert PlanReadingModel.observed == []
+    assert PLAN_READER.observed == []
     receipts = await store.receipts(plan.receiver.scope, plan.plan_id)
     assert [receipt.result for receipt in receipts] == ["ready", "refused", "refused"]

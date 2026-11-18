@@ -12,7 +12,6 @@ from typing import Any
 
 import pytest
 from langchain.agents import create_agent
-from langchain_core.language_models.fake_chat_models import GenericFakeChatModel
 from langchain_core.messages import AIMessage
 from langchain_core.tools import tool
 
@@ -21,6 +20,7 @@ from mission_control.adapters.deep_agents.budget import (
     BudgetStopMiddleware,
     is_turn_stop,
 )
+from tests.support.models import ScriptedChatModel
 
 
 def test_the_stop_names_the_exceeded_dimension_only_past_the_cap() -> None:
@@ -40,20 +40,6 @@ def test_an_unbounded_operation_never_stops() -> None:
     assert middleware.stop_message() is None
 
 
-class ToolModel(GenericFakeChatModel):
-    """The fake chat model, accepting the agent's tool binding and counting its calls."""
-
-    calls: int = 0
-
-    def bind_tools(self, tools: Any, **kwargs: Any) -> Any:
-        del tools, kwargs
-        return self
-
-    async def _agenerate(self, *args: Any, **kwargs: Any) -> Any:
-        self.calls += 1
-        return await super()._agenerate(*args, **kwargs)
-
-
 @tool
 def note(text: str) -> str:
     """Record a note."""
@@ -70,14 +56,14 @@ async def test_an_agent_stops_calling_its_model_past_the_cap() -> None:
             usage_metadata={"input_tokens": 40, "output_tokens": 10, "total_tokens": 50},
         )
 
-    model = ToolModel(messages=iter([answer(index) for index in range(10)]))
+    model = ScriptedChatModel.from_messages(answer(index) for index in range(10))
 
     def spent() -> dict[str, Any]:
-        return {"tokens.total": 50 * model.calls, "model.turns": model.calls}
+        return {"tokens.total": 50 * len(model.calls), "model.turns": len(model.calls)}
 
     agent = create_agent(
         model, tools=[note], middleware=[BudgetStopMiddleware({"tokens.total": 120}, spent)]
     )
     result = await agent.ainvoke({"messages": [{"role": "user", "content": "go"}]})
-    assert model.calls == 3  # 50, 100, 150: the third call crossed the 120-token cap
+    assert len(model.calls) == 3  # 50, 100, 150: the third call crossed the 120-token cap
     assert is_turn_stop(result["messages"][-1])

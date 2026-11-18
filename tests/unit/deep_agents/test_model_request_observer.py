@@ -13,15 +13,11 @@ from __future__ import annotations
 
 import hashlib
 import json
-from collections.abc import Sequence
 from typing import Any
 from uuid import uuid5
 
 import pytest
-from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import AIMessage, BaseMessage, ToolMessage
-from langchain_core.outputs import ChatGeneration, ChatResult
-from langchain_core.tools import BaseTool
 
 from mission_control.adapters.deep_agents import DeepAgentRuntimeAdapter, ExactDeepAgentMaterializer
 from mission_control.adapters.deep_agents.frames import model_request_capture
@@ -38,76 +34,44 @@ from mission_control.domain.frames.body import canonical_bytes
 from mission_control.domain.frames.contracts import FrameKind, HarnessExecutionHandle
 from tests.support.deep_agents import registry
 from tests.support.ids import INSTALLATION, SCOPE
+from tests.support.models import ScriptedChatModel
 from tests.support.unit.frames.deep_agents_frames import _planned, _store_for, _unit_binding
 
 SKILL_MD = "/skills/exact-binding-proof/SKILL.md"
 
 
-class ThreeCallModel(BaseChatModel):
+def three_calls(messages: list[BaseMessage], call: int) -> AIMessage:
     """Call 1 reads the Skill, call 2 lists the Skill root, call 3 answers."""
 
-    calls: int = 0
-    seen_batches: list[list[BaseMessage]] = []
-
-    @property
-    def _llm_type(self) -> str:
-        return "three-call-scripted"
-
-    def bind_tools(
-        self,
-        tools: Sequence[BaseTool | dict[str, Any] | type | Any],
-        *,
-        tool_choice: str | None = None,
-        **kwargs: Any,
-    ) -> BaseChatModel:
-        del tools, tool_choice, kwargs
-        return self
-
-    def _generate(
-        self,
-        messages: list[BaseMessage],
-        stop: list[str] | None = None,
-        run_manager: Any = None,
-        **kwargs: Any,
-    ) -> ChatResult:
-        del stop, run_manager, kwargs
-        self.calls += 1
-        self.seen_batches.append(list(messages))
-        tools = [item for item in messages if isinstance(item, ToolMessage)]
-        usage = {
-            "input_tokens": 5 * self.calls,
-            "output_tokens": 2,
-            "total_tokens": 5 * self.calls + 2,
-        }
-        if len(tools) == 0:
-            message = AIMessage(
-                content="",
-                tool_calls=[
-                    {
-                        "name": "read_file",
-                        "args": {"file_path": SKILL_MD, "limit": 1000},
-                        "id": "req-read-1",
-                        "type": "tool_call",
-                    }
-                ],
-                usage_metadata=usage,
-            )
-        elif len(tools) == 1:
-            message = AIMessage(
-                content="",
-                tool_calls=[
-                    {
-                        "name": "ls",
-                        "args": {"path": "/skills/exact-binding-proof"},
-                        "id": "req-ls-2",
-                        "type": "tool_call",
-                    }
-                ],
-                usage_metadata=usage,
-            )
-        else:
-            message = AIMessage(content="Three calls observed.", usage_metadata=usage)
-        return ChatResult(generations=[ChatGeneration(message=message)])
+    tools = [item for item in messages if isinstance(item, ToolMessage)]
+    usage = {"input_tokens": 5 * call, "output_tokens": 2, "total_tokens": 5 * call + 2}
+    if len(tools) == 0:
+        return AIMessage(
+            content="",
+            tool_calls=[
+                {
+                    "name": "read_file",
+                    "args": {"file_path": SKILL_MD, "limit": 1000},
+                    "id": "req-read-1",
+                    "type": "tool_call",
+                }
+            ],
+            usage_metadata=usage,
+        )
+    if len(tools) == 1:
+        return AIMessage(
+            content="",
+            tool_calls=[
+                {
+                    "name": "ls",
+                    "args": {"path": "/skills/exact-binding-proof"},
+                    "id": "req-ls-2",
+                    "type": "tool_call",
+                }
+            ],
+            usage_metadata=usage,
+        )
+    return AIMessage(content="Three calls observed.", usage_metadata=usage)
 
 
 class RecordingPromoter:
@@ -140,10 +104,10 @@ def _step_of(key: str, thread: str) -> int:
     return int(step)
 
 
-async def _run(capture: FrameCapture) -> tuple[Any, Any, Any, ThreeCallModel, RecordingPromoter]:
+async def _run(capture: FrameCapture) -> tuple[Any, Any, Any, ScriptedChatModel, RecordingPromoter]:
     binding, bundle, unit = _unit_binding()
     store = _store_for(unit)
-    model = ThreeCallModel()
+    model = ScriptedChatModel(script=three_calls, label="three-call-scripted")
     adapter = DeepAgentRuntimeAdapter(
         ExactDeepAgentMaterializer(registry(binding, bundle, model)),
         frames=store,
@@ -170,7 +134,7 @@ async def test_three_model_calls_leave_three_model_request_frames_before_their_r
     thread = binding.cognitive_session_namespace
     requests = [frame for frame in frames if frame.kind == FrameKind.MODEL_REQUEST]
     responses = [frame for frame in frames if frame.kind == FrameKind.MESSAGE]
-    assert model.calls == len(requests) == len(responses) == 3
+    assert len(model.calls) == len(requests) == len(responses) == 3
     # Each request precedes the response of its call and follows the previous response.
     for index, (request, response) in enumerate(zip(requests, responses, strict=True)):
         assert request.arrival_ordinal < response.arrival_ordinal
@@ -190,7 +154,7 @@ async def test_three_model_calls_leave_three_model_request_frames_before_their_r
     assert all(body["model"]["invocation_params_digest"].startswith("sha256:") for body in bodies)
     # `ls_provider` of a model without an override: the class name, lowercased
     # (langchain_core `_get_ls_params` fallback); real providers set it themselves.
-    assert bodies[0]["model"]["provider"] == "threecallmodel"
+    assert bodies[0]["model"]["provider"] == "scriptedchatmodel"
     assert (
         bodies[0]["tool_choice"] is None and bodies[0]["tools"] == []
     )  # the fixture binds no tools
@@ -240,7 +204,7 @@ async def test_three_model_calls_leave_three_model_request_frames_before_their_r
     assert execution.start is not None
     assert execution.start.native_identity["frame_capture_profile"] == "standard"
     # The request batch the observer recorded is the batch the model received.
-    assert len(model.seen_batches[-1]) == 1 + len(final["messages"])
+    assert len(model.seen[-1]) == 1 + len(final["messages"])
 
 
 @pytest.mark.asyncio

@@ -11,17 +11,14 @@ re-observing the same unit adds zero rows; another tenant reads nothing.
 from __future__ import annotations
 
 import json
-from collections.abc import AsyncIterator, Sequence
+from collections.abc import AsyncIterator
 from dataclasses import dataclass
 from typing import Any
 from uuid import uuid4
 
 import asyncpg
 import pytest
-from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import AIMessage, BaseMessage, ToolMessage
-from langchain_core.outputs import ChatGeneration, ChatResult
-from langchain_core.tools import BaseTool
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 from langgraph.store.memory import InMemoryStore
 from tests.fixtures.checkpoint_lineage import bind_unit, stage_unit
@@ -37,6 +34,7 @@ from tests.support.deep_agents_runtime import (
     ConformanceSecretResolver,
 )
 from tests.support.ids import canonical_scope
+from tests.support.models import ScriptedChatModel, tool_call
 from tests.support.operations import MCP_DIGEST, SKILL_DIGEST, operation_request
 from tests.support.run_control import ALL_PERMISSIONS, actor, command
 from tests.support.run_control import request as run_request
@@ -98,53 +96,21 @@ SCOPE = canonical_scope("tenant-1")
 SECRET = "fixture-openai-key-value-123"
 
 
-class ToolCallingUsageModel(BaseChatModel):
+def tool_calling_usage(messages: list[BaseMessage], call: int) -> AIMessage:
     """Reads its pinned SKILL.md through `read_file`, then answers; reports token usage."""
 
-    calls: int = 0
-
-    @property
-    def _llm_type(self) -> str:
-        return "c1-tool-calling-usage"
-
-    def bind_tools(
-        self,
-        tools: Sequence[BaseTool | dict[str, Any] | type | Any],
-        *,
-        tool_choice: str | None = None,
-        **kwargs: Any,
-    ) -> BaseChatModel:
-        del tools, tool_choice, kwargs
-        return self
-
-    def _generate(
-        self,
-        messages: list[BaseMessage],
-        stop: list[str] | None = None,
-        run_manager: Any = None,
-        **kwargs: Any,
-    ) -> ChatResult:
-        del stop, run_manager, kwargs
-        self.calls += 1
-        if not any(isinstance(item, ToolMessage) for item in messages):
-            message = AIMessage(
-                content="",
-                tool_calls=[
-                    {
-                        "name": "read_file",
-                        "args": {"file_path": "/skills/exact-binding-proof/SKILL.md", "limit": 50},
-                        "id": "c1-read",
-                        "type": "tool_call",
-                    }
-                ],
-                usage_metadata={"input_tokens": 3, "output_tokens": 1, "total_tokens": 4},
-            )
-        else:
-            message = AIMessage(
-                content="FRAMES-OK",
-                usage_metadata={"input_tokens": 5, "output_tokens": 2, "total_tokens": 7},
-            )
-        return ChatResult(generations=[ChatGeneration(message=message)])
+    del call
+    if not any(isinstance(item, ToolMessage) for item in messages):
+        return tool_call(
+            "read_file",
+            {"file_path": "/skills/exact-binding-proof/SKILL.md", "limit": 50},
+            "c1-read",
+            usage_metadata={"input_tokens": 3, "output_tokens": 1, "total_tokens": 4},
+        )
+    return AIMessage(
+        content="FRAMES-OK",
+        usage_metadata={"input_tokens": 5, "output_tokens": 2, "total_tokens": 7},
+    )
 
 
 class AcceptingAuthority:
@@ -165,7 +131,7 @@ class Stack:
     run_id: str
     service: OperationExecutionService
     frames: PostgresFrameRepository
-    model: ToolCallingUsageModel
+    model: ScriptedChatModel
     binding: DeepAgentExecutionBinding
 
 
@@ -190,7 +156,7 @@ async def stack(common_db: CommonDatabase) -> AsyncIterator[Stack]:
         saver_dsn = runtime_checkpoint_conninfo(checkpoint_dsn, SAVER_SCHEMA)
         async with AsyncPostgresSaver.from_conn_string(saver_dsn) as saver:
             binding, _profile, bundle = exact_fixture()
-            model = ToolCallingUsageModel()
+            model = ScriptedChatModel(script=tool_calling_usage, label="c1-tool-calling-usage")
             frames = PostgresFrameRepository(pool)
             adapter = DeepAgentRuntimeAdapter(
                 ExactDeepAgentMaterializer(
@@ -311,7 +277,7 @@ async def test_local_model_unit_leaves_ordered_deduplicated_frames(
     request = await bound_request(stack, unit)
     result = await stack.service.execute(request, delivery(1, unit))
     assert result.status == "completed"
-    assert stack.model.calls == 2
+    assert len(stack.model.calls) == 2
 
     run_uuid = await stack.frames.run_uuid(SCOPE, stack.run_id)
     assert run_uuid is not None

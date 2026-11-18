@@ -16,7 +16,6 @@ from __future__ import annotations
 
 import json
 import textwrap
-from collections.abc import Sequence
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
@@ -24,10 +23,7 @@ from typing import Any
 import pytest
 from deepagents import create_deep_agent
 from deepagents.backends import StateBackend
-from langchain_core.callbacks import CallbackManagerForLLMRun
-from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, ToolMessage
-from langchain_core.outputs import ChatGeneration, ChatResult
 from langchain_core.tools import tool
 
 from mission_control.adapters.deep_agents.hook_contributions import DeepAgentCandidateWorkspace
@@ -56,6 +52,7 @@ from mission_control.domain.context.contributions import (
 )
 from tests.fixtures.hook_contributions import InMemoryInstallStore, RecordingOperationRequests
 from tests.support.knowledge.stores import InMemoryStaging
+from tests.support.models import ScriptedChatModel
 
 SCOPE = "mc/11111111-1111-1111-1111-111111111111/biotech/22222222-2222-2222-2222-222222222222"
 BODY = "prepared by hook\n"
@@ -127,35 +124,21 @@ def shell(command: str) -> str:
     return f"ran {command}"
 
 
-class ScriptedModel(BaseChatModel):
+def contributing_script(messages: list[BaseMessage], call: int) -> AIMessage:
     """Turn 1 runs ``shell``; turn 2 reads two files; turn 3 answers. No provider call."""
 
-    @property
-    def _llm_type(self) -> str:
-        return "scripted-wi17-fixture"
-
-    def bind_tools(self, tools: Sequence[Any], **kwargs: Any) -> ScriptedModel:
-        return self
-
-    def _generate(
-        self,
-        messages: list[BaseMessage],
-        stop: list[str] | None = None,
-        run_manager: CallbackManagerForLLMRun | None = None,
-        **kwargs: Any,
-    ) -> ChatResult:
-        done = sum(isinstance(message, ToolMessage) for message in messages)
-        if done == 0:
-            calls = [{"name": "shell", "args": {"command": "pytest -q"}, "id": "call-1"}]
-        elif done == 1:
-            calls = [
-                {"name": "read_file", "args": {"file_path": "/prepared/notes.md"}, "id": "call-2"},
-                {"name": "read_file", "args": {"file_path": "/other/secret.md"}, "id": "call-3"},
-            ]
-        else:
-            calls = []
-        reply = AIMessage(id=f"msg-{done}", content="" if calls else "finished", tool_calls=calls)
-        return ChatResult(generations=[ChatGeneration(message=reply)])
+    del call
+    done = sum(isinstance(message, ToolMessage) for message in messages)
+    if done == 0:
+        calls = [{"name": "shell", "args": {"command": "pytest -q"}, "id": "call-1"}]
+    elif done == 1:
+        calls = [
+            {"name": "read_file", "args": {"file_path": "/prepared/notes.md"}, "id": "call-2"},
+            {"name": "read_file", "args": {"file_path": "/other/secret.md"}, "id": "call-3"},
+        ]
+    else:
+        calls = []
+    return AIMessage(id=f"msg-{done}", content="" if calls else "finished", tool_calls=calls)
 
 
 def _script(tmp_path: Path, name: str, body: str) -> Path:
@@ -247,7 +230,9 @@ def _agent(
         workspace=DeepAgentCandidateWorkspace(backend),
     )
     agent = create_deep_agent(
-        model=ScriptedModel(),
+        model=ScriptedChatModel(
+            script=contributing_script, label="scripted-wi17-fixture", usage=None
+        ),
         tools=[shell],
         middleware=[HookScriptMiddleware(dispatcher)],
         backend=backend,

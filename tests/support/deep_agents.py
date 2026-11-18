@@ -1,21 +1,18 @@
 """Deep Agents binding builders and async-subagent doubles, from test_wp_cp_040 and test_wp_cp_045.
 
 exact_fixture, registry, unit_bound and planned_invocation build an exact Deep Agents
-binding; SkillReadingModel and SessionProbeModel are scripted chat models; the
+binding; skill_reading_model and session_probe_model script the chat model; the
 DeterministicProvider/OrderedDetails/OrderedAuthority group drives async subagents.
 """
 
 from __future__ import annotations
 
 import sys
-from collections.abc import Sequence
 from datetime import UTC, datetime
-from typing import Any, Literal
+from typing import Literal
 
 from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import AIMessage, BaseMessage, ToolMessage
-from langchain_core.outputs import ChatGeneration, ChatResult
-from langchain_core.tools import BaseTool
 from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.store.memory import InMemoryStore
 
@@ -78,6 +75,7 @@ from mission_control.domain.execution.materialization import (
 )
 from tests.fixtures.checkpoint_lineage import activity_attempt, bind_unit, goal_unit, stage_unit
 from tests.fixtures.lane_bindings import lane_fields
+from tests.support.models import ScriptedChatModel, tool_call
 from tests.support.operations import operation_request
 
 MCP_TOOL_SCHEMA_DIGEST = "sha256:bb30ffeeaa9cc8d145c2160ac76df146df61820df24db1078c4db98573714a99"
@@ -368,94 +366,38 @@ def exact_fixture(
     return binding, profile, bundle
 
 
-class SkillReadingModel(BaseChatModel):
-    calls: int = 0
+def read_skill_script(messages: list[BaseMessage], call: int) -> AIMessage:
+    """Read the bound Skill on the first call, then answer with its marker."""
 
-    @property
-    def _llm_type(self) -> str:
-        return "wp-cp-040-scripted"
-
-    def bind_tools(
-        self,
-        tools: Sequence[BaseTool | dict[str, Any] | type | Any],
-        *,
-        tool_choice: str | None = None,
-        **kwargs: Any,
-    ) -> BaseChatModel:
-        del tools, tool_choice, kwargs
-        return self
-
-    def _generate(
-        self,
-        messages: list[BaseMessage],
-        stop: list[str] | None = None,
-        run_manager: Any = None,
-        **kwargs: Any,
-    ) -> ChatResult:
-        del stop, run_manager, kwargs
-        self.calls += 1
-        read = next((item for item in messages if isinstance(item, ToolMessage)), None)
-        if read is None:
-            message = AIMessage(
-                content="",
-                tool_calls=[
-                    {
-                        "name": "read_file",
-                        "args": {
-                            "file_path": "/skills/exact-binding-proof/SKILL.md",
-                            "limit": 1000,
-                        },
-                        "id": "skill-read-040",
-                        "type": "tool_call",
-                    }
-                ],
-            )
-        else:
-            message = AIMessage(content="SKILL-MD-IN-MESSAGES-040 observed and followed.")
-        return ChatResult(generations=[ChatGeneration(message=message)])
-
-
-class SessionProbeModel(BaseChatModel):
-    observed_human_counts: list[int] = []
-
-    @property
-    def _llm_type(self) -> str:
-        return "wp-cp-040-session-probe"
-
-    def bind_tools(
-        self,
-        tools: Sequence[BaseTool | dict[str, Any] | type | Any],
-        *,
-        tool_choice: str | None = None,
-        **kwargs: Any,
-    ) -> BaseChatModel:
-        del tools, tool_choice, kwargs
-        return self
-
-    def _generate(
-        self,
-        messages: list[BaseMessage],
-        stop: list[str] | None = None,
-        run_manager: Any = None,
-        **kwargs: Any,
-    ) -> ChatResult:
-        del stop, run_manager, kwargs
-        human_count = sum(message.type == "human" for message in messages)
-        self.observed_human_counts.append(human_count)
-        return ChatResult(
-            generations=[
-                ChatGeneration(
-                    message=AIMessage(
-                        content=f"human-count:{human_count}",
-                        usage_metadata={
-                            "input_tokens": 2,
-                            "output_tokens": 3,
-                            "total_tokens": 5,
-                        },
-                    )
-                )
-            ]
+    del call
+    if not any(isinstance(item, ToolMessage) for item in messages):
+        return tool_call(
+            "read_file",
+            {"file_path": "/skills/exact-binding-proof/SKILL.md", "limit": 1000},
+            "skill-read-040",
         )
+    return AIMessage(content="SKILL-MD-IN-MESSAGES-040 observed and followed.")
+
+
+def skill_reading_model() -> ScriptedChatModel:
+    return ScriptedChatModel(script=read_skill_script, label="wp-cp-040-scripted", usage=None)
+
+
+def session_probe_script(messages: list[BaseMessage], call: int) -> AIMessage:
+    """Answer with the number of human messages the call observed."""
+
+    del call
+    return AIMessage(content=f"human-count:{sum(item.type == 'human' for item in messages)}")
+
+
+def session_probe_model() -> ScriptedChatModel:
+    return ScriptedChatModel(script=session_probe_script, label="wp-cp-040-session-probe")
+
+
+def observed_human_counts(model: ScriptedChatModel) -> list[int]:
+    """The human-message count of each call, in call order."""
+
+    return [call.humans for call in model.calls]
 
 
 def runtime_invocation(binding: DeepAgentExecutionBinding) -> RuntimeInvocation:
@@ -531,7 +473,7 @@ def registry(
     bundle: ResolvedSkillBundle,
     model: BaseChatModel | None = None,
 ) -> ExactComponentRegistry:
-    selected = model or SkillReadingModel()
+    selected = model or skill_reading_model()
     return ExactComponentRegistry(
         model_factories={binding.model.ref.digest: lambda _binding, _secrets: selected},
         skill_bundles={bundle.bundle_digest: bundle},

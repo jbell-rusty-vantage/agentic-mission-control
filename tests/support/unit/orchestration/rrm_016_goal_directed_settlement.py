@@ -36,10 +36,10 @@ from tests.fixtures.checkpoint_recovery import AcceptingAuthority
 from tests.fixtures.goal_directed_journaled import (
     SCOPE,
     GoalComposition,
-    GoalScriptedModel,
     admit_goal_run,
     compose_goal_directed,
     goal_blueprint,
+    goal_model,
     goal_run_control,
     goal_run_input,
     goal_start_action,
@@ -57,7 +57,7 @@ async def _composition(*, journaled: bool = True) -> tuple[GoalComposition, str]
         results=InMemoryArtifactPayloadStore(),
         bindings=InMemoryOperationBindingRepository(),
         saver=InMemorySaver(),
-        model=GoalScriptedModel(),
+        model=goal_model(),
         blueprint=goal_blueprint(),
     )
     if not journaled:

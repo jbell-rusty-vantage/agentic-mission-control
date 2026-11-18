@@ -18,7 +18,6 @@ import pytest
 from langchain.agents import create_agent
 from langchain.agents.structured_output import ToolStrategy
 from langchain_anthropic import ChatAnthropic
-from langchain_core.language_models.fake_chat_models import GenericFakeChatModel
 from langchain_core.load import dumpd
 from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
 from langchain_core.tools import tool
@@ -31,6 +30,7 @@ from mission_control.adapters.deep_agents.structured_response import (
     response_schema,
     with_auto_tool_choice,
 )
+from tests.support.models import ScriptedChatModel
 
 DEPLOYMENTS = Path(__file__).resolve().parents[3] / "deployments"
 
@@ -50,16 +50,8 @@ def ping(text: str) -> str:
     return f"pong {text}"
 
 
-class _Scripted(GenericFakeChatModel):
-    calls: int = 0
-
-    def bind_tools(self, tools: Any, **kwargs: Any) -> Any:
-        del tools, kwargs
-        return self
-
-    async def _agenerate(self, *args: Any, **kwargs: Any) -> Any:
-        type(self).calls += 1
-        return await super()._agenerate(*args, **kwargs)
+# The scripted model of the latest `_agent`.
+MODELS: list[ScriptedChatModel] = []
 
 
 def _call(args: Any, call_id: str, name: str = "Verdict") -> dict[str, Any]:
@@ -67,9 +59,9 @@ def _call(args: Any, call_id: str, name: str = "Verdict") -> dict[str, Any]:
 
 
 def _agent(answers: list[AIMessage]) -> Any:
-    _Scripted.calls = 0
+    MODELS[:] = [ScriptedChatModel.from_messages(answers, usage=None)]
     return create_agent(
-        _Scripted(messages=iter(answers)),
+        MODELS[-1],
         tools=[ping],
         response_format=ToolStrategy(response_schema(Verdict)),
         middleware=[RequireStructuredResponse(["Verdict"])],
@@ -117,7 +109,7 @@ async def test_refused_response_calls_are_retried_within_one_bound() -> None:
     ]
     result = await _run(_agent(invalid))
     assert result.get("structured_response") is None
-    assert _Scripted.calls == MAX_ATTEMPTS  # never an unbounded validation loop
+    assert len(MODELS[-1].calls) == MAX_ATTEMPTS  # never an unbounded validation loop
     refused = [m for m in result["messages"] if isinstance(m, ToolMessage)]
     assert len(refused) == MAX_ATTEMPTS
     assert all(ATTEMPT_MARKER in m.additional_kwargs for m in refused)

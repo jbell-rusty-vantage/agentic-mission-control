@@ -157,7 +157,7 @@ async def test_fx_tr_reconcile_after_inject_t0(
     into S1's running turn, the run to completion, then `points:reconcile` writes nothing:
     the settlement already gave the interrupted turn's points their frame ranges."""
 
-    monkeypatch.setenv("MISSION_CONTROL_TECHNICAL_MODEL_DELAY_SECONDS", "2.5")
+    monkeypatch.setenv("MISSION_CONTROL_SCRIPTED_MODEL_DELAY_SECONDS", "2.5")
     async with scoped_stack(tmp_path, monkeypatch) as stack:
         run_id = await launch(stack, TRACING)
 
@@ -196,7 +196,7 @@ async def test_fx_tr_cancel_t0(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) 
         terminal,
     )
 
-    monkeypatch.setenv("MISSION_CONTROL_TECHNICAL_MODEL_DELAY_SECONDS", "2.5")
+    monkeypatch.setenv("MISSION_CONTROL_SCRIPTED_MODEL_DELAY_SECONDS", "2.5")
     async with scoped_stack(tmp_path, monkeypatch) as stack:
         run_id = await launch(stack, TRACING)
 
@@ -232,7 +232,7 @@ async def test_fx_tr_disconnect_t0(tmp_path: Path, monkeypatch: pytest.MonkeyPat
         terminal,
     )
 
-    monkeypatch.setenv("MISSION_CONTROL_TECHNICAL_FAIL_AT_TOOLS", "1")
+    monkeypatch.setenv("MISSION_CONTROL_SCRIPTED_MODEL_FAIL_AT_TOOLS", "1")
     async with scoped_stack(tmp_path, monkeypatch) as stack:
         run_id = await launch(stack, TRACING)
         await until(lambda: terminal(stack, run_id), seconds=300)
@@ -264,7 +264,7 @@ async def test_failed_producer_behind_a_declared_wait_terminalizes(
     from tests.fixtures.scoped_api_stack import inspect
     from tests.support.acceptance.mission_control.tracing import settlements_for_run, terminal
 
-    monkeypatch.setenv("MISSION_CONTROL_TECHNICAL_FAIL_AT_TOOLS", "1")
+    monkeypatch.setenv("MISSION_CONTROL_SCRIPTED_MODEL_FAIL_AT_TOOLS", "1")
     async with scoped_stack(tmp_path, monkeypatch) as stack:
         run_id = await launch(stack, "StageGraph")
         await until(lambda: terminal(stack, run_id), seconds=300)

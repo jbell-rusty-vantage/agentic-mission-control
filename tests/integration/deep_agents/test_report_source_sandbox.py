@@ -8,14 +8,13 @@ from __future__ import annotations
 
 import importlib.util
 import re
-from dataclasses import replace
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 
 import pytest
-from langchain_core.messages import AIMessage, ToolMessage
-from langchain_core.outputs import ChatGeneration, ChatResult
+from langchain_core.messages import AIMessage, BaseMessage, ToolMessage
 from tests.support.deep_agents import exact_fixture, planned_invocation, registry, unit_bound
-from tests.support.integration.deep_agents.wi02_transfer_plan_lane import PlanReadingModel
+from tests.support.models import ScriptedChatModel
 from tests.support.unit.report_source_context import context
 
 from mission_control.adapters.capabilities.capability_bundles import bundle_digest, bytes_digest
@@ -31,17 +30,18 @@ from mission_control.application.execution.operations.checkpoint_lineage import 
 from mission_control.domain.execution.contracts import DeepAgentExecutionBinding
 
 
-class SandboxSkillReader(PlanReadingModel):
-    expected: dict[str, str]
-    observed_text: dict[str, str] = {}
-    calls: int = 0
+@dataclass
+class SandboxSkillReader:
+    """Reads every expected Skill file whole, then records the text it saw (`observed_text`)."""
 
-    def _generate(self, messages, stop=None, run_manager=None, **kwargs):
-        del stop, run_manager, kwargs
-        self.calls += 1
+    expected: dict[str, str]
+    observed_text: dict[str, str] = field(default_factory=dict)
+
+    def __call__(self, messages: list[BaseMessage], call: int) -> AIMessage:
+        del call
         results = [item for item in messages if isinstance(item, ToolMessage)]
         if not results:
-            message = AIMessage(
+            return AIMessage(
                 content="",
                 tool_calls=[
                     {
@@ -57,17 +57,15 @@ class SandboxSkillReader(PlanReadingModel):
                     for path, text in self.expected.items()
                 ],
             )
-        else:
-            for item in results:
-                lines = {}
-                for row in str(item.content).split("\n"):
-                    match = re.match(r"^\s*(\d+)(?:\.(\d+))?  (.*)$", row)
-                    if match:
-                        number = int(match[1])
-                        lines[number] = lines.get(number, "") + match[3]
-                self.observed_text[item.tool_call_id] = "\n".join(lines[n] for n in sorted(lines))
-            message = AIMessage(content="all sandbox skills read")
-        return ChatResult(generations=[ChatGeneration(message=message)])
+        for item in results:
+            lines = {}
+            for row in str(item.content).split("\n"):
+                match = re.match(r"^\s*(\d+)(?:\.(\d+))?  (.*)$", row)
+                if match:
+                    number = int(match[1])
+                    lines[number] = lines.get(number, "") + match[3]
+            self.observed_text[item.tool_call_id] = "\n".join(lines[n] for n in sorted(lines))
+        return AIMessage(content="all sandbox skills read")
 
 
 @pytest.mark.asyncio
@@ -134,14 +132,15 @@ async def test_prepared_skills_are_discovered_and_fully_read(tmp_path: Path, mon
             **{**binding.model_dump(exclude={"binding_digest"}), "skills": tuple(components)}
         )
     )
-    model = SandboxSkillReader(expected=expected)
+    reader = SandboxSkillReader(expected=expected)
+    model = ScriptedChatModel(script=reader, label="wi02-plan-reader", usage=None)
     components_registry = replace(registry(binding, original, model), skill_bundles=bundles)
     adapter = DeepAgentRuntimeAdapter(ExactDeepAgentMaterializer(components_registry))
     lineage = CheckpointLineageService(InMemoryCheckpointLineageRepository())
     result = await adapter.execute(await planned_invocation(binding, lineage), {})
     assert result.output_text == "all sandbox skills read"
-    assert model.observed_text == expected
-    assert model.calls == 2
+    assert reader.observed_text == expected
+    assert len(model.calls) == 2
     inspection = result.event_payloads[0]
     assert {row["name"] for row in inspection["skills_metadata"]} == {
         component.skill_name for component in components

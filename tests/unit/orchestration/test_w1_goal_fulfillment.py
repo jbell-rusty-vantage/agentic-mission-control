@@ -55,7 +55,7 @@ def _frontier(**fields: Any) -> FulfillmentResult:
 
 async def _verified(result: FulfillmentResult | None) -> tuple[Any, RecordingConvergence, str]:
     composition, run_id = await _composition()
-    composition.model.accept_at = 1  # the scripted verifier accepts iteration 1
+    composition.model.script.accept_at = 1  # the scripted verifier accepts iteration 1
     convergence = RecordingConvergence(result)
     composition.family._results._fulfillment = convergence
     observed = await _run_iteration_one(composition, run_id)

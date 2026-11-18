@@ -83,17 +83,17 @@ def test_scripted_model_factory_accepts_the_actual_lane_binding_type() -> None:
 
 def test_negative_script_preserves_index_digest_after_typed_refusal() -> None:
     from langchain_core.messages import HumanMessage, ToolMessage
-    from tests.fixtures.overnight_stagegraph_model import StageGraphModel, StageGraphScript
+    from tests.fixtures.overnight_stagegraph_model import StageGraphCognition, StageGraphScript
 
     digest = "sha256:" + "a" * 64
     handle = "kh:aiengineer-postgres/report/exact@research-report.v2"
-    model = StageGraphModel(
+    model = StageGraphCognition(
         run_id="run",
         operation_id="execution-epoch:1:stage:consume:slot:execute",
         log=[],
         position="consume",
         script=StageGraphScript(report={}, wrong_digest_probe=True),
-    )
+    ).model()
     messages = [
         HumanMessage(content="Read the selected exact report."),
         ToolMessage(

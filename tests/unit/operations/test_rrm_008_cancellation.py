@@ -73,10 +73,10 @@ from tests.fixtures.checkpoint_recovery import (
 )
 from tests.fixtures.goal_directed_journaled import (
     SCOPE,
-    GoalScriptedModel,
     RecordingGoalDocuments,
     admit_goal_run,
     goal_blueprint,
+    goal_model,
     goal_run_control,
     goal_run_input,
     goal_start_action,
@@ -811,7 +811,7 @@ async def test_child_result_decision_is_crash_safe_and_idempotent(after_write: b
 async def _goal_harness(label: str) -> tuple[RecoveryHarness, Any, Any, str]:
     run_control = goal_run_control()
     harness = await recovery_harness(
-        model=GoalScriptedModel(), real_authority=True, run_control=run_control
+        model=goal_model(), real_authority=True, run_control=run_control
     )
     run_id = await admit_goal_run(run_control, f"rrm-008-session-{label}")
     started = await run_control.execute(
@@ -884,10 +884,10 @@ async def test_shared_session_head_advances_over_a_unit_settled_without_completi
         expected = CheckpointClassification.INTERRUPTED
     else:
         # A budget violation after the terminal leaf: the unit fails, its lineage is complete.
-        harness.model.tokens_per_call = operation.budget_limits["tokens.total"]
+        harness.model.script.tokens_per_call = operation.budget_limits["tokens.total"]
         settled = await harness.run(operation)
         assert (settled.status, settled.failure_code) == ("failed", "budget_exceeded")
-        harness.model.tokens_per_call = 5
+        harness.model.script.tokens_per_call = 5
         expected = CheckpointClassification.NOT_SUBMITTED
     unit = operation.runtime_unit
     assert unit is not None
@@ -970,11 +970,11 @@ async def test_failed_unit_lost_before_its_journal_settlement_settles_its_record
         harness.model.fail_on(2, ValueError("provider rejected the second call"))
         expected_code = "runtime_failed"
     else:
-        harness.model.tokens_per_call = operation.budget_limits["tokens.total"]
+        harness.model.script.tokens_per_call = operation.budget_limits["tokens.total"]
         expected_code = "budget_exceeded"
     harness.crashable.crash_before_settlement = True
     await harness.crash(operation)
-    harness.model.tokens_per_call = 5
+    harness.model.script.tokens_per_call = 5
 
     # The crash window: result and transition recorded, head sealed, nothing settled.
     recorded = await harness.lineage.get_result(SCOPE, unit.unit_key, 1)

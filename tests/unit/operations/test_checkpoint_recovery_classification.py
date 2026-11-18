@@ -92,9 +92,9 @@ async def _final_messages(harness: RecoveryHarness, namespace: str, leaf_id: str
 
     from deepagents import create_deep_agent
 
-    from tests.fixtures.checkpoint_recovery import ScriptedRecoveryModel
+    from tests.fixtures.checkpoint_recovery import recovery_model
 
-    reader = create_deep_agent(model=ScriptedRecoveryModel(), checkpointer=harness.saver)
+    reader = create_deep_agent(model=recovery_model(), checkpointer=harness.saver)
     state = await reader.aget_state(_root(namespace, leaf_id))
     return list(state.values["messages"])
 

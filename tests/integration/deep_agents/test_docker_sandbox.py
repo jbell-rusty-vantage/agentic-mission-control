@@ -1,17 +1,13 @@
 from __future__ import annotations
 
-from collections.abc import Sequence
 from pathlib import Path
-from typing import Any
 
 import pytest
-from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import AIMessage, BaseMessage, ToolMessage
-from langchain_core.outputs import ChatGeneration, ChatResult
-from langchain_core.tools import BaseTool
 from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.store.memory import InMemoryStore
 from tests.support.deep_agents import exact_fixture, planned_invocation, unit_bound
+from tests.support.models import ScriptedChatModel, tool_call
 
 from mission_control.adapters.deep_agents import (
     DeepAgentRuntimeAdapter,
@@ -29,59 +25,26 @@ from mission_control.domain.execution.contracts import (
 )
 
 
-class SandboxedFileModel(BaseChatModel):
-    calls: int = 0
-    workspace_path: str
+def sandboxed_file_model(workspace_path: str) -> ScriptedChatModel:
+    """Write and read back a file in the sandbox workspace, then report what it saw."""
 
-    @property
-    def _llm_type(self) -> str:
-        return "docker-sandbox-scripted"
-
-    def bind_tools(
-        self,
-        tools: Sequence[BaseTool | dict[str, Any] | type | Any],
-        *,
-        tool_choice: str | None = None,
-        **kwargs: Any,
-    ) -> BaseChatModel:
-        del tools, tool_choice, kwargs
-        return self
-
-    def _generate(
-        self,
-        messages: list[BaseMessage],
-        stop: list[str] | None = None,
-        run_manager: Any = None,
-        **kwargs: Any,
-    ) -> ChatResult:
-        del stop, run_manager, kwargs
-        self.calls += 1
+    def script(messages: list[BaseMessage], call: int) -> AIMessage:
+        del call
         tool_result = next(
             (message for message in reversed(messages) if isinstance(message, ToolMessage)),
             None,
         )
-        if tool_result is None:
-            message = AIMessage(
-                content="",
-                tool_calls=[
-                    {
-                        "name": "execute",
-                        "args": {
-                            "command": (
-                                f"mkdir -p {self.workspace_path} && "
-                                "printf 'sandboxed-deep-agent' > "
-                                f"{self.workspace_path}/result.txt && "
-                                f"cat {self.workspace_path}/result.txt"
-                            )
-                        },
-                        "id": "docker-execute-proof",
-                        "type": "tool_call",
-                    }
-                ],
-            )
-        else:
-            message = AIMessage(content=f"observed:{tool_result.content}")
-        return ChatResult(generations=[ChatGeneration(message=message)])
+        if tool_result is not None:
+            return AIMessage(content=f"observed:{tool_result.content}")
+        command = (
+            f"mkdir -p {workspace_path} && "
+            "printf 'sandboxed-deep-agent' > "
+            f"{workspace_path}/result.txt && "
+            f"cat {workspace_path}/result.txt"
+        )
+        return tool_call("execute", {"command": command}, "docker-execute-proof")
+
+    return ScriptedChatModel(script=script, label="docker-sandbox-scripted", usage=None)
 
 
 @pytest.mark.asyncio
@@ -89,7 +52,7 @@ async def test_real_deep_agent_executes_inside_ephemeral_docker_sandbox(
     tmp_path: Path,
 ) -> None:
     binding, _profile, bundle = exact_fixture(sandbox_backend="docker")
-    model = SandboxedFileModel(workspace_path=binding.workspace.exclusive_write_paths[0])
+    model = sandboxed_file_model(binding.workspace.exclusive_write_paths[0])
     registry = ExactComponentRegistry(
         model_factories={binding.model.ref.digest: lambda _binding, _secrets: model},
         skill_bundles={bundle.bundle_digest: bundle},
@@ -108,7 +71,7 @@ async def test_real_deep_agent_executes_inside_ephemeral_docker_sandbox(
     inspection = result.event_payloads[0]
     assert inspection["sandbox_execute_called"] is True
     assert inspection["authority_enforcement"] == ("immutable_host_binding_executable_sandbox")
-    assert model.calls == 2
+    assert len(model.calls) == 2
 
 
 @pytest.mark.asyncio

@@ -18,10 +18,8 @@ from typing import Any
 
 import pytest
 from deepagents.backends import StateBackend
-from langchain_core.callbacks import CallbackManagerForLLMRun
 from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, ToolMessage
-from langchain_core.outputs import ChatGeneration, ChatResult
 from langchain_core.tools import tool
 
 from mission_control.adapters.deep_agents.adapter import (
@@ -47,39 +45,15 @@ from mission_control.adapters.deep_agents.compaction import (
     StopGuardedSummarizationMiddleware,
 )
 from mission_control.adapters.deep_agents.hooks import _stopped
+from tests.support.models import Script, ScriptedChatModel
 
 USAGE = {"input_tokens": 40, "output_tokens": 10, "total_tokens": 50}
 
 
-class Scripted(BaseChatModel):
+def scripted(respond: Script, label: str = "model") -> ScriptedChatModel:
     """A chat model answering from `respond(messages, call)`; it counts its calls."""
 
-    respond: Any
-    label: str = "model"
-    calls: int = 0
-
-    @property
-    def _llm_type(self) -> str:
-        return f"scripted-turn-stops-{self.label}"
-
-    def bind_tools(self, tools: Sequence[Any], **kwargs: Any) -> Scripted:
-        del tools, kwargs
-        return self
-
-    def _generate(
-        self,
-        messages: list[BaseMessage],
-        stop: list[str] | None = None,
-        run_manager: CallbackManagerForLLMRun | None = None,
-        **kwargs: Any,
-    ) -> ChatResult:
-        del stop, run_manager, kwargs
-        self.calls += 1
-        if self.calls > 20:
-            raise RuntimeError("scripted model looped")
-        message = self.respond(messages, self.calls)
-        message.id = message.id or f"{self.label}-{self.calls}"
-        return ChatResult(generations=[ChatGeneration(message=message)])
+    return ScriptedChatModel(script=respond, label=label, usage=None, max_calls=20)
 
 
 @tool
@@ -170,8 +144,8 @@ def _never_fenced() -> FenceStopMiddleware:
 
 @pytest.mark.asyncio
 async def test_past_the_cap_the_summarizer_makes_no_paid_call_before_the_stop() -> None:
-    model = Scripted(respond=_noting("n"))
-    summary = Scripted(respond=_summary, label="summary")
+    model = scripted(_noting("n"))
+    summary = scripted(_summary, label="summary")
     calls = _ModelCallObserver()
     budget = BudgetStopMiddleware({"tokens.total": 40}, calls.spent)
     agent, _backend = _agent(model, summary, fence=_never_fenced(), budget=budget)
@@ -181,24 +155,24 @@ async def test_past_the_cap_the_summarizer_makes_no_paid_call_before_the_stop() 
     )
 
     # Call 1 spent 50 > 40; at call 2 the history (3 messages) would trigger summarization.
-    assert model.calls == 1
-    assert summary.calls == 0, "no summarization call after the cap"
+    assert len(model.calls) == 1
+    assert len(summary.calls) == 0, "no summarization call after the cap"
     assert turn_stop_marker(result["messages"][-1]) == BUDGET_STOP
 
 
 @pytest.mark.asyncio
 async def test_behind_the_fence_the_summarizer_makes_no_paid_call_before_the_stop() -> None:
-    model = Scripted(respond=_noting("n"))
-    summary = Scripted(respond=_summary, label="summary")
+    model = scripted(_noting("n"))
+    summary = scripted(_summary, label="summary")
 
     async def fenced() -> str | None:
-        return "run is stop-fenced" if model.calls >= 1 else None
+        return "run is stop-fenced" if len(model.calls) >= 1 else None
 
     agent, _backend = _agent(model, summary, fence=FenceStopMiddleware(fenced))
 
     result = await agent.ainvoke({"messages": [HumanMessage(content="go")]})
 
-    assert model.calls == 1 and summary.calls == 0
+    assert len(model.calls) == 1 and len(summary.calls) == 0
     assert turn_stop_marker(result["messages"][-1]) == FENCE_STOP
 
 
@@ -218,9 +192,9 @@ async def test_a_running_sync_child_is_stopped_past_the_cap_inside_the_child() -
             usage_metadata=dict(USAGE),  # type: ignore[arg-type]
         )
 
-    model = Scripted(respond=parent, label="parent")
-    child = Scripted(respond=_noting("c"), label="child")
-    summary = Scripted(respond=_summary, label="summary")
+    model = scripted(parent, label="parent")
+    child = scripted(_noting("c"), label="child")
+    summary = scripted(_summary, label="summary")
     calls = _ModelCallObserver()
     budget = BudgetStopMiddleware({"tokens.total": 120}, calls.spent)
     spec = {
@@ -238,21 +212,21 @@ async def test_a_running_sync_child_is_stopped_past_the_cap_inside_the_child() -
 
     # parent 50, child 100, child 150 > 120: the child's third call is answered by the stop
     # inside the child, and the parent's next call by the parent's.
-    assert (model.calls, child.calls) == (1, 2)
+    assert (len(model.calls), len(child.calls)) == (1, 2)
     task_result = next(
         message for message in result["messages"] if isinstance(message, ToolMessage)
     )
     assert "operation budget is exhausted" in str(task_result.content)
     assert turn_stop_marker(result["messages"][-1]) == BUDGET_STOP
-    assert summary.calls == 0
+    assert len(summary.calls) == 0
 
 
 def test_child_specs_carry_the_stops_and_a_stop_guarded_summarizer() -> None:
-    child = Scripted(respond=_noting("c"), label="child")
+    child = scripted(_noting("c"), label="child")
     fence = _never_fenced()
     budget = BudgetStopMiddleware({"tokens.total": 1}, lambda: {"tokens.total": 0})
     materialized = _materialized(
-        Scripted(respond=_noting("n")),
+        scripted(_noting("n")),
         (),
         [{"name": "writer", "description": "d", "system_prompt": "p", "model": child}],
     )
@@ -267,7 +241,7 @@ def test_child_specs_carry_the_stops_and_a_stop_guarded_summarizer() -> None:
 
 @pytest.mark.asyncio
 async def test_the_child_summarizer_answers_with_the_stop_without_summarizing() -> None:
-    child = Scripted(respond=_summary, label="child")
+    child = scripted(_summary, label="child")
     budget = BudgetStopMiddleware({"tokens.total": 1}, lambda: {"tokens.total": 2})
     guard = StopGuardedSummarizationMiddleware.guarding(child, StateBackend(), [budget])
     handled: list[Any] = []
@@ -277,7 +251,7 @@ async def test_the_child_summarizer_answers_with_the_stop_without_summarizing() 
         return AIMessage(content="model")
 
     stop = await guard.awrap_model_call(SimpleNamespace(state={}, messages=[]), handler)
-    assert turn_stop_marker(stop) == BUDGET_STOP and not handled and child.calls == 0
+    assert turn_stop_marker(stop) == BUDGET_STOP and not handled and len(child.calls) == 0
     assert turn_stop_marker(guard.wrap_model_call(SimpleNamespace(), handler)) == BUDGET_STOP
 
 

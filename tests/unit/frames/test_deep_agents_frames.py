@@ -32,8 +32,9 @@ from mission_control.application.frames.streams import frame_envelope
 from mission_control.domain.frames.contracts import FrameKind
 from mission_control.domain.subscriptions.streams import StreamScope
 from tests.fixtures.provider_frames import in_memory_store, opened_writer
-from tests.support.deep_agents import SkillReadingModel, registry
+from tests.support.deep_agents import registry, skill_reading_model
 from tests.support.ids import INSTALLATION, SCOPE
+from tests.support.models import ScriptedChatModel
 from tests.support.unit.frames.deep_agents_frames import _planned, _store_for, _unit_binding
 
 
@@ -41,7 +42,7 @@ from tests.support.unit.frames.deep_agents_frames import _planned, _store_for, _
 async def test_actual_deep_agent_run_leaves_an_ordered_deduplicated_frame_sequence() -> None:
     binding, bundle, unit = _unit_binding()
     store = _store_for(unit)
-    model = SkillReadingModel()
+    model = skill_reading_model()
     closures = InMemoryWorkspaceClosures()
     adapter = DeepAgentRuntimeAdapter(
         ExactDeepAgentMaterializer(registry(binding, bundle, model)),
@@ -153,7 +154,7 @@ async def test_actual_deep_agent_run_leaves_an_ordered_deduplicated_frame_sequen
         backfilled.provider_key
         == f"{binding.cognitive_session_namespace}::{result_id}::skill-read-040:tool_call_completed"
     )
-    assert model.calls == 2
+    assert len(model.calls) == 2
 
 
 class _Writer:
@@ -599,44 +600,28 @@ async def test_a_real_parallel_task_step_binds_each_child_by_its_tool_run() -> N
     stream namespace, one per `task` call of the parallel step."""
 
     from deepagents import create_deep_agent
-    from langchain_core.language_models import BaseChatModel
     from langchain_core.messages import BaseMessage, HumanMessage
-    from langchain_core.outputs import ChatGeneration, ChatResult
 
     from mission_control.adapters.deep_agents.adapter import _TaskNamespaceObserver
 
     totals = {"Review A.": 7, "Review B.": 11}
 
-    class Scripted(BaseChatModel):
-        @property
-        def _llm_type(self) -> str:
-            return "scripted-parallel-tasks"
+    def script(messages: list[BaseMessage], call: int) -> AIMessage:
+        del call
+        first = next(item for item in messages if isinstance(item, HumanMessage))
+        text = str(first.content)
+        if text in totals:  # a child: answer with its own usage
+            usage = {"input_tokens": 1, "output_tokens": 1, "total_tokens": totals[text]}
+            return AIMessage("ok", id=f"child-{text}", usage_metadata=usage)  # type: ignore[arg-type]
+        if any(isinstance(item, ToolMessage) for item in messages):
+            return AIMessage("done", id="parent-2")
+        return AIMessage(
+            "",
+            id="parent-1",
+            tool_calls=[_task_call("task-a", "Review A."), _task_call("task-b", "Review B.")],
+        )
 
-        def bind_tools(self, tools: Any, **kwargs: Any) -> Scripted:
-            del tools, kwargs
-            return self
-
-        def _generate(self, messages: list[BaseMessage], *args: Any, **kwargs: Any) -> ChatResult:
-            del args, kwargs
-            first = next(item for item in messages if isinstance(item, HumanMessage))
-            text = str(first.content)
-            if text in totals:  # a child: answer with its own usage
-                usage = {"input_tokens": 1, "output_tokens": 1, "total_tokens": totals[text]}
-                message = AIMessage("ok", id=f"child-{text}", usage_metadata=usage)  # type: ignore[arg-type]
-            elif any(isinstance(item, ToolMessage) for item in messages):
-                message = AIMessage("done", id="parent-2")
-            else:
-                message = AIMessage(
-                    "",
-                    id="parent-1",
-                    tool_calls=[
-                        _task_call("task-a", "Review A."),
-                        _task_call("task-b", "Review B."),
-                    ],
-                )
-            return ChatResult(generations=[ChatGeneration(message=message)])
-
-    model = Scripted()
+    model = ScriptedChatModel(script=script, label="scripted-parallel-tasks", usage=None)
     agent = create_deep_agent(
         model=model,
         subagents=[

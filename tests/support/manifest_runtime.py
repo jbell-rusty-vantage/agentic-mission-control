@@ -70,7 +70,7 @@ KEY = parse_request_scope(SCOPE)
 OWNER_KEY = (KEY.installation_id, KEY.application_id, KEY.tenant_id)
 SCOPED = "installation_id = $1 AND application_id = $2 AND tenant_id = $3"
 PREFIX = f"/v1/applications/{KEY.application_id}"
-# FIXTURE catalog schema for every declared output here: the document `ChainModel` writes.
+# FIXTURE catalog schema for every declared output here: the document `ChainCognition` writes.
 CLAIM_DOCUMENT = {
     "type": "object",
     "required": ["obligation", "iteration", "rows"],
@@ -97,9 +97,10 @@ def evaluable(manifest_yaml: str) -> str:
     """FIXTURE transform: keep only what this deployment can evaluate and the FIXTURE writes.
 
     No assessment evaluator is bound, so assessment criteria are dropped, and a compound
-    acceptance keeps its schema operand. A Goal Loop declares only its first output: `ChainModel`
-    writes one document and names no output bindings, and several Goal Directed outputs need the
-    deployment's named executor-observation schema, which these bindings do not configure.
+    acceptance keeps its schema operand. A Goal Loop declares only its first output:
+    `ChainCognition` writes one document and names no output bindings, and several Goal Directed
+    outputs need the deployment's named executor-observation schema, which these bindings do not
+    configure.
     Criteria citing an undeclared output go with it. Every remaining schema is in
     `OUTPUT_SCHEMAS`.
     """

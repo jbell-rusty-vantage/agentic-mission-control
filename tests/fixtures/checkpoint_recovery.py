@@ -13,22 +13,18 @@ worker restart) lives in `tests/integration/temporal/test_rrm_004_worker_restart
 
 from __future__ import annotations
 
-import asyncio
 import json
-from collections.abc import Awaitable, Callable, Sequence
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 from datetime import timedelta
 from types import SimpleNamespace
 from typing import Any
 
 from langchain_core.language_models import BaseChatModel
-from langchain_core.messages import AIMessage, BaseMessage, ToolMessage
-from langchain_core.outputs import ChatGeneration, ChatResult
-from langchain_core.tools import BaseTool
+from langchain_core.messages import AIMessage, BaseMessage
 from langgraph.checkpoint.base import BaseCheckpointSaver
 from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.store.memory import InMemoryStore
-from pydantic import PrivateAttr
 from tests.fixtures.checkpoint_lineage import bind_unit, stage_unit
 from tests.fixtures.lane_bindings import lane_fields
 from tests.support.clock import Clock
@@ -40,6 +36,7 @@ from tests.support.deep_agents_runtime import (
     ConformanceSecretResolver,
 )
 from tests.support.journal import MemoryOperationJournal
+from tests.support.models import Script, ScriptedChatModel, tool_call, tool_messages
 from tests.support.operations import MCP_DIGEST, SKILL_DIGEST, operation_request
 from tests.support.run_control import actor, command, reconciler_command
 from tests.support.run_control import request as run_request
@@ -118,115 +115,39 @@ class SimulatedWorkerCrash(BaseException):
     """A hard worker loss: nothing in the operation boundary handles or reports it."""
 
 
-class ScriptedRecoveryModel(BaseChatModel):
-    """Deterministic two-turn cognition: one `write_todos` tool call, then the answer.
+def recovery_reply(tools: int) -> AIMessage:
+    """The RRM-004 cognition: one `write_todos` tool call, then the answer."""
 
-    Every call is logged with the number of human and tool messages it observed, so tests
-    assert model invocations, prompt (human-message) counts and tool executions directly.
-    A call can fail like a provider, run a hook first, or block on a gate to model a slow
-    (zombie) holder. Worker crashes are injected at the checkpointer (`CrashingSaver`):
+    if tools == 0:
+        return tool_call(
+            "write_todos",
+            {"todos": [{"content": "recover", "status": "completed"}]},
+            "rrm004-write-todos",
+        )
+    return AIMessage(content=json.dumps({"answer": RESULT_MARKER, "tool_results": tools}))
+
+
+def recovery_script(messages: list[BaseMessage], call: int) -> AIMessage:
+    """Answer by the number of tool results the call observed (`recovery_reply`)."""
+
+    del call
+    return recovery_reply(len(tool_messages(messages)))
+
+
+def recovery_model(script: Script = recovery_script) -> ScriptedChatModel:
+    """Deterministic two-turn cognition, `TOKENS_PER_CALL` tokens a call.
+
+    Tests assert model invocations, prompt (human-message) counts and tool executions from
+    `calls`. A call can fail like a provider, run a hook first, or block on a gate to model a
+    slow (zombie) holder. Worker crashes are injected at the checkpointer (`CrashingSaver`):
     LangChain's model plumbing does not propagate a `BaseException` raised inside a call.
     """
 
-    _log: list[tuple[int, int]] = PrivateAttr(default_factory=list)
-    _fail_on: dict[int, Exception] = PrivateAttr(default_factory=dict)
-    _before: dict[int, Callable[[], Awaitable[None]]] = PrivateAttr(default_factory=dict)
-    _gate_on: int | None = PrivateAttr(default=None)
-    _gate: asyncio.Event | None = PrivateAttr(default=None)
-    _gate_entered: asyncio.Event | None = PrivateAttr(default=None)
-
-    @property
-    def _llm_type(self) -> str:
-        return "rrm-004-scripted-recovery"
-
-    @property
-    def calls(self) -> list[tuple[int, int]]:
-        return self._log
-
-    def before_call(self, call: int, hook: Callable[[], Awaitable[None]]) -> None:
-        self._before[call] = hook
-
-    def fail_on(self, call: int, error: Exception) -> None:
-        """An ordinary provider exception (not a worker loss) on the given call."""
-
-        self._fail_on[call] = error
-
-    def gate_on(self, call: int) -> tuple[asyncio.Event, asyncio.Event]:
-        self._gate_on = call
-        self._gate = asyncio.Event()
-        self._gate_entered = asyncio.Event()
-        return self._gate_entered, self._gate
-
-    def bind_tools(
-        self,
-        tools: Sequence[BaseTool | dict[str, Any] | type | Any],
-        *,
-        tool_choice: str | None = None,
-        **kwargs: Any,
-    ) -> BaseChatModel:
-        del tools, tool_choice, kwargs
-        return self
-
-    def _observe(self, messages: list[BaseMessage]) -> tuple[int, int]:
-        human = sum(message.type == "human" for message in messages)
-        tools = sum(isinstance(message, ToolMessage) for message in messages)
-        self._log.append((human, tools))
-        index = len(self._log)
-        if index in self._fail_on:
-            raise self._fail_on[index]
-        return index, tools
-
-    @staticmethod
-    def _reply(tools: int) -> ChatResult:
-        usage = {"input_tokens": 2, "output_tokens": 3, "total_tokens": TOKENS_PER_CALL}
-        if tools == 0:
-            message = AIMessage(
-                content="",
-                tool_calls=[
-                    {
-                        "name": "write_todos",
-                        "args": {"todos": [{"content": "recover", "status": "completed"}]},
-                        "id": "rrm004-write-todos",
-                        "type": "tool_call",
-                    }
-                ],
-                usage_metadata=usage,
-            )
-        else:
-            message = AIMessage(
-                content=json.dumps({"answer": RESULT_MARKER, "tool_results": tools}),
-                usage_metadata=usage,
-            )
-        return ChatResult(generations=[ChatGeneration(message=message)])
-
-    def _generate(
-        self,
-        messages: list[BaseMessage],
-        stop: list[str] | None = None,
-        run_manager: Any = None,
-        **kwargs: Any,
-    ) -> ChatResult:
-        del stop, run_manager, kwargs
-        _index, tools = self._observe(messages)
-        return self._reply(tools)
-
-    async def _agenerate(
-        self,
-        messages: list[BaseMessage],
-        stop: list[str] | None = None,
-        run_manager: Any = None,
-        **kwargs: Any,
-    ) -> ChatResult:
-        del stop, run_manager, kwargs
-        hook = self._before.get(len(self._log) + 1)
-        if hook is not None:
-            await hook()
-        index, tools = self._observe(messages)
-        if index == self._gate_on:
-            assert self._gate is not None and self._gate_entered is not None
-            self._gate_entered.set()
-            await self._gate.wait()
-        return self._reply(tools)
+    return ScriptedChatModel(
+        script=script,
+        label="rrm-004-scripted-recovery",
+        usage={"input_tokens": 2, "output_tokens": 3, "total_tokens": TOKENS_PER_CALL},
+    )
 
 
 class CrashingSaver(InMemorySaver):
@@ -464,7 +385,7 @@ class RecoveryHarness:
     lineage: InMemoryCheckpointLineageRepository
     clock: Clock
     saver: CrashingSaver
-    model: ScriptedRecoveryModel
+    model: ScriptedChatModel
     runtime: InjectingRuntime
     service: OperationExecutionService
     reconciliation: UnitReconciliationService
@@ -585,7 +506,7 @@ class RecoveryHarness:
 
 async def recovery_harness(
     *,
-    model: ScriptedRecoveryModel | None = None,
+    model: ScriptedChatModel | None = None,
     real_authority: bool = False,
     fork_reuse: Any = None,
     run_control: RunControlService | None = None,
@@ -617,7 +538,7 @@ async def recovery_harness(
     )
     assert started.status == CommandStatus.ACCEPTED
     binding, _profile, bundle = exact_fixture()
-    model = model or ScriptedRecoveryModel()
+    model = model or recovery_model()
     saver = saver or CrashingSaver()
     runtime = InjectingRuntime(
         DeepAgentRuntimeAdapter(

@@ -7,8 +7,8 @@ typed executor observation `disposition: failed` whose `irrecoverable_failure_re
 `output_unparseable:`, not retried; payload validation errors are non-retryable on the activity
 and its remaining retries are bounded.
 
-The scripted executor answers prose under `MISSION_CONTROL_TECHNICAL_EXECUTOR_PROSE=1`; the
-verifier still answers its typed observation. Asserted on the production offline stack: the
+The scripted role answers prose under `MISSION_CONTROL_SCRIPTED_MODEL=prose-<role>`; the other
+role still answers its typed observation. Asserted on the production offline stack: the
 run reaches a terminal state, the persisted executor iteration carries the typed failure, every
 `reconcile_operation` activity of the family ran exactly once, and `run inspect` shows the
 failure reason. The owner's files (§4a) are written under
@@ -73,7 +73,7 @@ async def reconcile_attempts(stack: ScopedStack, run_id: str) -> list[dict[str, 
 async def test_prose_goal_role_settles_failed_output_unparseable(
     role: str, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    monkeypatch.setenv("MISSION_CONTROL_TECHNICAL_PROSE_ROLE", role)
+    monkeypatch.setenv("MISSION_CONTROL_SCRIPTED_MODEL", f"prose-{role}")
     async with (
         scoped_stack(tmp_path, monkeypatch) as stack,
         serve_loopback(stack.application) as url,

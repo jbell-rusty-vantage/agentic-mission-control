@@ -5,7 +5,7 @@ seeded catalog fixture with a test-only lane override (both missions on `deep_ag
 manifest file is unchanged), submitted through the FT-E3 submit and started through the
 governed launch. The stack is the production composition on a disposable common-component
 PostgreSQL with the local Temporal dev server and deterministic local cognition
-(``ChainModel``, no provider, no paid effect). The chain reducer runs as the canonical
+(``ChainCognition``, no provider, no paid effect). The chain reducer runs as the canonical
 ledger's post-append hook (as the API and worker compose it) and a chain relay loop delivers
 its outbox intents through ``LaunchServiceChainStarter``.
 

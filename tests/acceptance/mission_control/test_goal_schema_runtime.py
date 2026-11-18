@@ -64,11 +64,9 @@ async def test_signed_goal_named_outputs_delayed_publication_and_cancellation(
             }
         )
 
-    original_answer = technical.TechnicalModel._answer
-
-    def answer(model, messages):
-        body = original_answer(model, messages)
-        if model.operation_id.endswith("/executor"):
+    def answer(invocation, messages):
+        body = technical.technical_answer(invocation, messages)
+        if invocation.operation_id.endswith("/executor"):
             body.update(
                 output_refs=[OUTPUT, SUMMARY],
                 output_bindings={
@@ -79,7 +77,14 @@ async def test_signed_goal_named_outputs_delayed_publication_and_cancellation(
         return body
 
     monkeypatch.setattr(technical, "goal_blueprint", blueprint)
-    monkeypatch.setattr(technical.TechnicalModel, "_answer", answer)
+    monkeypatch.setitem(
+        technical.TECHNICAL_SCRIPTS,
+        "schema-outputs",
+        lambda invocation, messages, _call: technical.technical_turn(
+            invocation, messages, answer=answer
+        ),
+    )
+    monkeypatch.setenv(technical.SCRIPTED_MODEL_ENV, "schema-outputs")
     waiting = asyncio.Event()
     release_preparation = asyncio.Event()
     cancel_preparation = cancel_pending in {"preparation", "delayed_delivery"}

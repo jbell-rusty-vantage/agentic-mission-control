@@ -49,16 +49,16 @@ async def _prove(root: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     )
     entered, release = asyncio.Event(), asyncio.Event()
     visible: list[list[str]] = []
-    generate = technical.TechnicalModel._agenerate
 
-    async def model_call(self: Any, messages: Any, *args: Any, **kwargs: Any) -> Any:
+    async def model_call(invocation: Any, messages: Any, call: int) -> Any:
         if not entered.is_set():
             entered.set()
             await release.wait()
         visible.append([str(item.content) for item in messages if item.type == "human"])
-        return await generate(self, messages, *args, **kwargs)
+        return technical.technical_turn(invocation, messages)
 
-    monkeypatch.setattr(technical.TechnicalModel, "_agenerate", model_call)
+    monkeypatch.setitem(technical.TECHNICAL_SCRIPTS, "held-first-call", model_call)
+    monkeypatch.setenv(technical.SCRIPTED_MODEL_ENV, "held-first-call")
     async with scoped_stack(root, monkeypatch) as stack:
         run_id, root_id = await admit_and_launch(stack, "StageGraph")
         await asyncio.wait_for(entered.wait(), 60)

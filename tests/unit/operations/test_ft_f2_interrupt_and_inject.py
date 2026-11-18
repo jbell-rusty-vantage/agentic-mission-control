@@ -54,14 +54,15 @@ from mission_control.domain.policies.mailbox import MailboxState
 from tests.fixtures.checkpoint_recovery import (
     RecoveryHarness,
     recovery_harness,
+    recovery_model,
     stage_recovery_unit,
 )
 from tests.support.run_control import command
 from tests.support.unit.operations.ft_f2_interrupt_and_inject import (
     FAST,
-    RecordingModel,
     facade,
     harness_with_injections,
+    human_texts,
     operator,
     states,
     status_of,
@@ -75,7 +76,7 @@ async def cancel_and_replace_harness() -> RecoveryHarness:
     declare it) on the real Deep Agents lane, which itself now steers cooperatively."""
 
     return await recovery_harness(
-        model=RecordingModel(), injection_settings=FAST, interrupt_semantics="cancel_and_replace"
+        model=recovery_model(), injection_settings=FAST, interrupt_semantics="cancel_and_replace"
     )
 
 
@@ -125,10 +126,10 @@ async def test_inject_steers_the_running_turn_without_cancelling_it() -> None:
     # The first call ran to its end (nothing cancelled); the steer reached the turn's next
     # model call, after the tool result, once.
     assert harness.model.calls == [(1, 0), (2, 1)]
-    assert all(INJECTED not in text for text in harness.model.humans[0])
-    follow = harness.model.humans[1]
+    assert all(INJECTED not in text for text in human_texts(harness.model)[0])
+    follow = human_texts(harness.model)[1]
     assert INJECTED in follow[-1]
-    assert sum(INJECTED in text for call in harness.model.humans for text in call) == 1
+    assert sum(INJECTED in text for call in human_texts(harness.model) for text in call) == 1
     status = await status_of(harness, receipt)
     assert "delivered" in states(status) and "applied" in states(status)
     delivered = next(r for r in status.receipts if r.state == "delivered").delivery_report
@@ -196,7 +197,7 @@ async def test_inject_with_a_running_tool_that_completes_during_cancel_settles_f
     observed = status.receipts[3].delivery_report
     assert observed.settled_effect_ids == ("tool-effect:push-branch",)
     # The replacement continued after the tool step: one tool result and the injected item.
-    assert INJECTED in harness.model.humans[-1][-1]
+    assert INJECTED in human_texts(harness.model)[-1][-1]
 
 
 @pytest.mark.asyncio

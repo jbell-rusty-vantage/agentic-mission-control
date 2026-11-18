@@ -5,8 +5,8 @@ The watch runs on the Deep Agents lane.
 The signed scoped stack (`tests/fixtures/scoped_api_stack.py`) for the `ai-engineer` application: a
 fresh common database on the disposable cluster named by MISSION_CONTROL_TEST_ADMIN_DSN, a local
 Temporal dev server, the production workers and the configured API. Every GoalDirected role is the
-deterministic technical agent (no provider call); with MISSION_CONTROL_TECHNICAL_AIENG_WATCH=1 its
-executor of iteration 1 calls the five AI Engineer watch tools
+deterministic technical agent (no provider call); with MISSION_CONTROL_SCRIPTED_MODEL=aieng-watch
+its executor of iteration 1 calls the five AI Engineer watch tools
 (`tests/fixtures/aieng_watch_tools.py`): releases, due, rerun, admit; its verifier reads the tick
 back. Runs are serial ticks; each run's Mission Control mission id is read from its inspection and
 registered for the tools before launch. The AI Engineer missions' budgets bound the work across
@@ -119,7 +119,7 @@ async def run_tick(stack: Any, name: str, missions: dict[str, str], out: Path) -
 
 async def serve(out: Path, ticks: list[str]) -> None:
     components, tools = W.build_watch_tools()
-    os.environ["MISSION_CONTROL_TECHNICAL_AIENG_WATCH"] = "1"
+    os.environ["MISSION_CONTROL_SCRIPTED_MODEL"] = "aieng-watch"
     with tempfile.TemporaryDirectory() as root, pytest.MonkeyPatch.context() as environment:
         # The stack is local (loopback disposable cluster): the remote AI Engineer project fields
         # from .env must not apply.

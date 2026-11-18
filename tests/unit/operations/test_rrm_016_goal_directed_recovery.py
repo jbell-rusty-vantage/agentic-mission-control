@@ -27,9 +27,9 @@ from tests.fixtures.checkpoint_recovery import (
 from tests.fixtures.goal_directed_journaled import (
     SCOPE,
     TOKENS_PER_OPERATION,
-    GoalScriptedModel,
     RecordingGoalDocuments,
     admit_goal_run,
+    goal_model,
     goal_run_control,
     goal_start_action,
     goal_templates,
@@ -49,7 +49,7 @@ async def _goal_unit(window: str) -> tuple[Any, Any, Any, str]:
     """A started GoalDirected run on the harness, and its prepared executor operation."""
 
     run_control = goal_run_control()
-    model = GoalScriptedModel()
+    model = goal_model()
     harness = await recovery_harness(model=model, real_authority=True, run_control=run_control)
     # The harness admitted and started its own run; the GoalDirected unit uses a run whose
     # budget bounds the iteration reservation.

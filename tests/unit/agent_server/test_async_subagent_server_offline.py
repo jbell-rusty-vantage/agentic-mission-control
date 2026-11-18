@@ -42,7 +42,7 @@ from mission_control.adapters.deep_agents.materializer import (
     ExactModelFactory,
 )
 from tests.support.model_catalog import checked_in_catalog
-from tests.support.unit.agent_server.async_subagent_server_offline import ScriptedChildModel
+from tests.support.unit.agent_server.async_subagent_server_offline import scripted_child_model
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 ROOT_LANGGRAPH = PROJECT_ROOT / "agent_server" / "langgraph.json"
@@ -152,7 +152,7 @@ def test_served_identities_are_the_exact_binding_digests() -> None:
 async def test_hosted_graph_is_built_through_the_canonical_adapter_and_stamps_identity() -> None:
     definition = technical_child_definition()
     base = hosting_registry(definition)
-    model = ScriptedChildModel()
+    model = scripted_child_model()
     registry = ExactComponentRegistry(
         model_factories={definition.binding.model.ref.digest: lambda _b, _s: model},
         prompts=base.prompts,
@@ -184,7 +184,7 @@ async def test_hosted_graph_is_built_through_the_canonical_adapter_and_stamps_id
             "total_tokens": 2,
         }
     ]
-    assert model.calls == 1
+    assert len(model.calls) == 1
     assert "wait_seconds" in tool_names or any(
         isinstance(item, BaseTool) and item.name == "wait_seconds" for item in definition.tools
     )

@@ -41,7 +41,7 @@ from mission_control.domain.capabilities.features import (
 )
 from mission_control.domain.execution.contracts import DeepAgentExecutionBinding
 from mission_control.domain.execution.errors import DeepAgentMaterializationError
-from tests.support.deep_agents import SkillReadingModel, exact_fixture
+from tests.support.deep_agents import exact_fixture, skill_reading_model
 
 ANTHROPIC_SECRET = {"environment:ANTHROPIC_API_KEY": "test-anthropic-key"}
 
@@ -87,7 +87,7 @@ class _CapturingFactory:
     def __call__(self, binding: DeepAgentExecutionBinding, secrets: Any) -> BaseChatModel:
         del secrets
         self.bindings.append(binding)
-        return SkillReadingModel()
+        return skill_reading_model()
 
 
 def _registry(binding: Any, bundle: Any, factory: Any) -> ExactComponentRegistry:

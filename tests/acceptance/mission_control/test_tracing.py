@@ -1343,7 +1343,7 @@ async def test_fx_tr_hook(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> No
     `hook_invoked` and `hook_result` frames with the kernel hooks' ids first (`KERNEL_HOOK_IDS`
     order) per tool call, and its annotation reaches the tool result; the `usage` frames'
     token sum equals the unit's settlement usage; then, in a second run with
-    `MISSION_CONTROL_TECHNICAL_MODEL_DELAY_SECONDS=2.5`, `cancel --urgency immediate` while a
+    `MISSION_CONTROL_SCRIPTED_MODEL_DELAY_SECONDS=2.5`, `cancel --urgency immediate` while a
     turn runs yields a `hook_result` frame with `decision: deny` from `mc.stop_fence` (or the
     run ends `cancelled` with the fence recorded; the evidence says which).
 
@@ -1514,7 +1514,7 @@ async def test_fx_tr_hook(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> No
             )
 
         # 3. The stop fence: cancel immediately inside a running turn of a second run.
-        monkeypatch.setenv("MISSION_CONTROL_TECHNICAL_MODEL_DELAY_SECONDS", "2.5")
+        monkeypatch.setenv("MISSION_CONTROL_SCRIPTED_MODEL_DELAY_SECONDS", "2.5")
         second = await launch(stack, TRACING)
 
         async def active() -> bool:
@@ -1525,7 +1525,7 @@ async def test_fx_tr_hook(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> No
         await asyncio.sleep(6.0)
         command = await cancel_immediately(stack, second)
         await until(lambda: terminal(stack, second), seconds=400)
-        monkeypatch.delenv("MISSION_CONTROL_TECHNICAL_MODEL_DELAY_SECONDS", raising=False)
+        monkeypatch.delenv("MISSION_CONTROL_SCRIPTED_MODEL_DELAY_SECONDS", raising=False)
         state = await inspect(stack, second)
         second_frames = await frames_for_run(stack, second)
         fence = [

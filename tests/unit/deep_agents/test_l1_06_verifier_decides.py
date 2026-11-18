@@ -15,17 +15,13 @@ from __future__ import annotations
 
 import json
 import re
-from collections.abc import Sequence
 from types import SimpleNamespace
 from typing import Any
 
 import pytest
 from langchain.agents import create_agent
 from langchain.agents.structured_output import ToolStrategy
-from langchain_core.callbacks import CallbackManagerForLLMRun
-from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
-from langchain_core.outputs import ChatGeneration, ChatResult
 from langchain_core.tools import tool
 
 from mission_control.adapters.deep_agents.adapter import (
@@ -36,6 +32,7 @@ from mission_control.adapters.deep_agents.adapter import (
 )
 from mission_control.adapters.deep_agents.budget import BudgetStopMiddleware
 from mission_control.domain.programs.goal_directed_runtime import GoalVerifierObservation
+from tests.support.models import ScriptedChatModel
 from tests.support.unit.authoring.l1_06_goal_verifier_objective import E4, loop_templates, text_of
 
 USAGE = {"input_tokens": 900, "output_tokens": 100, "total_tokens": 1000}
@@ -51,58 +48,34 @@ def read_file(file_path: str) -> str:
     return "Mistral 7B | 7-billion-parameter | arxiv-2310.06825-abstract"
 
 
-class PromptDrivenVerifier(BaseChatModel):
+def prompt_driven_verifier(messages: list[BaseMessage], call: int) -> AIMessage:
     """Reads the subject the objective names, then returns the verdict its contract dictates."""
 
-    calls: int = 0
-
-    @property
-    def _llm_type(self) -> str:
-        return "prompt-driven-verifier"
-
-    def bind_tools(self, tools: Sequence[Any], **kwargs: Any) -> PromptDrivenVerifier:
-        del tools, kwargs
-        return self
-
-    def _generate(
-        self,
-        messages: list[BaseMessage],
-        stop: list[str] | None = None,
-        run_manager: CallbackManagerForLLMRun | None = None,
-        **kwargs: Any,
-    ) -> ChatResult:
-        del stop, run_manager, kwargs
-        self.calls += 1
-        prompt = str(next(item for item in messages if item.type == "human").content)
-        if self.calls == 1:
-            subject = re.search(r"binding (subject-[a-z0-9-]+)", prompt)
-            assert subject is not None, "the objective names no subject binding"
-            call = {"name": "read_file", "args": {"file_path": f"inputs/{subject.group(1)}/"}}
-        else:
-            obligations = re.search(
-                r"accepted_obligation_refs: on accepted exactly (\[.*?\])", prompt
-            )
-            contract = re.search(
-                r"output_contract_ref: exactly one of .*?else (output:\S+?)\)", prompt
-            )
-            assert obligations is not None and contract is not None, "no verdict contract"
-            verdict = {
-                "decision": "accepted",
-                "progress_made": True,
-                "accepted_obligation_refs": json.loads(obligations.group(1)),
-                "findings": ["brief_submitted: met - the brief restates the map"],
-                "evidence_refs": read[-1:],
-                "unmet_obligations": [],
-                "output_contract_ref": contract.group(1),
-            }
-            call = {"name": "GoalVerifierObservation", "args": verdict}
-        message = AIMessage(
-            content="",
-            id=f"a-{self.calls}",
-            tool_calls=[{**call, "id": f"t{self.calls}", "type": "tool_call"}],
-            usage_metadata=dict(USAGE),
-        )
-        return ChatResult(generations=[ChatGeneration(message=message)])
+    prompt = str(next(item for item in messages if item.type == "human").content)
+    if call == 1:
+        subject = re.search(r"binding (subject-[a-z0-9-]+)", prompt)
+        assert subject is not None, "the objective names no subject binding"
+        request = {"name": "read_file", "args": {"file_path": f"inputs/{subject.group(1)}/"}}
+    else:
+        obligations = re.search(r"accepted_obligation_refs: on accepted exactly (\[.*?\])", prompt)
+        contract = re.search(r"output_contract_ref: exactly one of .*?else (output:\S+?)\)", prompt)
+        assert obligations is not None and contract is not None, "no verdict contract"
+        verdict = {
+            "decision": "accepted",
+            "progress_made": True,
+            "accepted_obligation_refs": json.loads(obligations.group(1)),
+            "findings": ["brief_submitted: met - the brief restates the map"],
+            "evidence_refs": read[-1:],
+            "unmet_obligations": [],
+            "output_contract_ref": contract.group(1),
+        }
+        request = {"name": "GoalVerifierObservation", "args": verdict}
+    return AIMessage(
+        content="",
+        id=f"a-{call}",
+        tool_calls=[{**request, "id": f"t{call}", "type": "tool_call"}],
+        usage_metadata=dict(USAGE),
+    )
 
 
 @pytest.mark.asyncio
@@ -121,7 +94,7 @@ async def test_a_verifier_that_reads_the_subject_then_returns_the_verdict_settle
     calls = _ModelCallObserver()
     spend = _TurnSpend(calls)
     budget = BudgetStopMiddleware(_turn_limits(invocation), spend, admit_tool_call=spend.admit)
-    model = PromptDrivenVerifier()
+    model = ScriptedChatModel(script=prompt_driven_verifier, label="prompt-driven-verifier")
     agent = create_agent(
         model,
         tools=[read_file],
@@ -133,7 +106,7 @@ async def test_a_verifier_that_reads_the_subject_then_returns_the_verdict_settle
         {"messages": [HumanMessage(content=text_of(template))]}, config={"callbacks": [calls]}
     )
 
-    assert model.calls <= 3
+    assert len(model.calls) <= 3
     assert read == ["inputs/subject-root-brief/"]
     assert _budget_stop_of(result["messages"]) == {}
     observation = GoalVerifierObservation.model_validate(result["structured_response"])

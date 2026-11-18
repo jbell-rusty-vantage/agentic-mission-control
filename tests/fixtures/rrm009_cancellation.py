@@ -35,7 +35,6 @@ from uuid import uuid4
 
 from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import AIMessage, BaseMessage, ToolMessage
-from langchain_core.outputs import ChatGeneration, ChatResult
 from langgraph_sdk import get_client
 from langgraph_sdk.errors import NotFoundError
 from temporalio.api.enums.v1 import EventType
@@ -55,18 +54,21 @@ from tests.fixtures.rrm009_production_harness import (
 from tests.fixtures.rrm009_production_stack import (
     CHILD_MARKER,
     OPERATOR,
-    ChildModel,
+    Invocation,
+    InvocationScript,
     TechnicalBinding,
     TechnicalCatalog,
-    TechnicalModel,
-    call_usage,
+    invocation_model,
     publish_technical_catalog,
     stage_input,
     stage_templates,
+    technical_answer,
     technical_binding,
+    technical_model,
 )
 from tests.support.ids import SCOPE
 from tests.support.model_catalog import checked_in_catalog
+from tests.support.models import since_latest_input, tool_call
 
 from mission_control.adapters.agent_server.async_subagents.auth import mint_scope_claim
 from mission_control.adapters.agent_server.async_subagents.bindings import (
@@ -157,78 +159,43 @@ class CancellationGate:
     restart_workers: bool = False
 
 
-def _since_input(messages: list[BaseMessage]) -> list[BaseMessage]:
-    human = [index for index, item in enumerate(messages) if item.type == "human"]
-    return messages[human[-1] :] if human else messages
-
-
-class GatedChildModel(ChildModel):
+def gated_child_script(gate: CancellationGate) -> InvocationScript:
     """The sync subagent's model call that never returns: the cancel lands inside it."""
 
-    gate: Any
-
-    async def _agenerate(
-        self,
-        messages: list[BaseMessage],
-        stop: list[str] | None = None,
-        run_manager: Any = None,
-        **kwargs: Any,
-    ) -> ChatResult:
-        del stop, run_manager, kwargs
-        self._record("child", messages)
-        self.gate.held.set()
+    async def script(invocation: Invocation, messages: list[BaseMessage], call: int) -> AIMessage:
+        del call
+        invocation.record("child", messages)
+        gate.held.set()
         await asyncio.Event().wait()
         raise AssertionError("a cancelled sync child call never returns")
 
+    return script
 
-class SpawningModel(TechnicalModel):
+
+def spawning_script(gate: CancellationGate) -> InvocationScript:
     """The parent's cognition: one `start_async_task` (a real hosted child), then either a
     held call (`cognition`) or the final answer (`completion_wait`)."""
 
-    gate: Any
-
-    async def _agenerate(
-        self,
-        messages: list[BaseMessage],
-        stop: list[str] | None = None,
-        run_manager: Any = None,
-        **kwargs: Any,
-    ) -> ChatResult:
-        del stop, run_manager, kwargs
-        since = _since_input(messages)
+    async def script(invocation: Invocation, messages: list[BaseMessage], call: int) -> AIMessage:
+        del call
+        since = since_latest_input(messages)
         tools = sum(isinstance(item, ToolMessage) for item in since)
-        self._record("parent", messages)
+        invocation.record("parent", messages)
         if tools == 0:
-            message = AIMessage(
-                content="",
-                tool_calls=[
-                    {
-                        "name": "start_async_task",
-                        "args": {
-                            "description": ASYNC_CHILD_OBJECTIVE,
-                            "subagent_type": ASYNC_CHILD_NAME,
-                        },
-                        "id": f"rrm009-spawn-{self.operation_id[-12:]}",
-                        "type": "tool_call",
-                    }
-                ],
-                usage_metadata=call_usage(),
+            return tool_call(
+                "start_async_task",
+                {"description": ASYNC_CHILD_OBJECTIVE, "subagent_type": ASYNC_CHILD_NAME},
+                f"rrm009-spawn-{invocation.operation_id[-12:]}",
             )
-            return ChatResult(generations=[ChatGeneration(message=message)])
-        if self.gate.window == "cognition":
-            self.gate.held.set()
+        if gate.window == "cognition":
+            gate.held.set()
             await asyncio.Event().wait()
             raise AssertionError("a cancelled parent call never returns")
         # A completion-wait parent still owes its stage's required output slot.
         # Reuse the technical model's deterministic stage record after spawning.
-        answer = self._answer(since)
-        return ChatResult(
-            generations=[
-                ChatGeneration(
-                    message=AIMessage(content=json.dumps(answer), usage_metadata=call_usage())
-                )
-            ]
-        )
+        return AIMessage(content=json.dumps(technical_answer(invocation, since)))
+
+    return script
 
 
 def async_child_binding(endpoint: str) -> tuple[TechnicalBinding, AsyncSubagentContract]:
@@ -260,16 +227,14 @@ def cancellation_components(
 
     def parent(bound: Any, _secrets: Any) -> BaseChatModel:
         if gate.window == "sync_child":
-            return TechnicalModel(
-                run_id=bound.run_id, operation_id=bound.operation_id, log=model_log
-            )
-        return SpawningModel(
-            run_id=bound.run_id, operation_id=bound.operation_id, log=model_log, gate=gate
+            return technical_model(bound, model_log)
+        return invocation_model(
+            Invocation.of(bound, model_log), spawning_script(gate), "rrm-009-technical"
         )
 
     def child(bound: Any, _secrets: Any) -> BaseChatModel:
-        return GatedChildModel(
-            run_id=bound.run_id, operation_id=bound.operation_id, log=model_log, gate=gate
+        return invocation_model(
+            Invocation.of(bound, model_log), gated_child_script(gate), "rrm-009-child"
         )
 
     return DeploymentCapabilityComponents(

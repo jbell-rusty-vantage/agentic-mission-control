@@ -19,7 +19,6 @@ import pytest
 from langchain.agents import create_agent
 from langchain.agents.structured_output import ProviderStrategy, ToolStrategy
 from langchain_anthropic import ChatAnthropic
-from langchain_core.language_models.fake_chat_models import GenericFakeChatModel
 from langchain_core.messages import AIMessage
 from langchain_core.tools import tool
 from pydantic import BaseModel, SecretStr, ValidationError
@@ -41,6 +40,7 @@ from mission_control.domain.execution.errors import DeepAgentMaterializationErro
 from mission_control.domain.programs.goal_directed_runtime import GoalExecutorObservation
 from mission_control.domain.resolution.profiles import ModelProfile, ModelRoute
 from mission_control.domain.resolution.resolved import LaneCompileRefused
+from tests.support.models import ScriptedChatModel
 
 DEPLOYMENTS = Path(__file__).resolve().parents[3] / "deployments"
 
@@ -129,16 +129,6 @@ def test_the_materializer_wraps_the_schema_in_the_declared_strategy() -> None:
         response_format_for(Verdict, _component(None))
 
 
-class _RecordingModel(GenericFakeChatModel):
-    """Records what `create_agent` binds; answers from its scripted messages."""
-
-    bound: list[dict[str, Any]] = []
-
-    def bind_tools(self, tools: Any, **kwargs: Any) -> Any:
-        type(self).bound.append({"tools": [getattr(t, "name", t) for t in tools], **kwargs})
-        return self
-
-
 @tool
 def ping(text: str) -> str:
     """Echo the text."""
@@ -148,20 +138,19 @@ def ping(text: str) -> str:
 @pytest.mark.asyncio
 @pytest.mark.parametrize("strategy", ["tool_forced", "provider_native"])
 async def test_only_tool_forced_forces_tool_choice(strategy: str) -> None:
-    _RecordingModel.bound = []
     answer = (
         AIMessage(content="", tool_calls=[{"name": "Verdict", "args": {"met": True}, "id": "v"}])
         if strategy == "tool_forced"
         else AIMessage(content='{"met": true}')
     )
     agent = create_agent(
-        _RecordingModel(messages=iter([answer])),
+        model := ScriptedChatModel.from_messages([answer], usage=None),
         tools=[ping],
         response_format=response_format_for(Verdict, _component(strategy)),
     )
     result = await agent.ainvoke({"messages": [{"role": "user", "content": "go"}]})
     assert result["structured_response"] == Verdict(met=True)
-    (bound,) = _RecordingModel.bound
+    (bound,) = model.bound
     if strategy == "tool_forced":
         assert bound["tool_choice"] == "any" and "Verdict" in bound["tools"]
     else:
@@ -397,14 +386,6 @@ def test_tool_auto_never_forces_the_tool_in_the_anthropic_request() -> None:
     assert {item["name"] for item in payload["tools"]} == {"ping", tool.name}
 
 
-class _AutoModel(GenericFakeChatModel):
-    bound: list[dict[str, Any]] = []
-
-    def bind_tools(self, tools: Any, **kwargs: Any) -> Any:
-        type(self).bound.append({"tools": [getattr(t, "name", t) for t in tools], **kwargs})
-        return self
-
-
 @pytest.mark.asyncio
 async def test_tool_auto_reminds_a_turn_that_ends_without_the_call_then_gives_up() -> None:
     from mission_control.adapters.deep_agents.structured_response import (
@@ -414,14 +395,14 @@ async def test_tool_auto_reminds_a_turn_that_ends_without_the_call_then_gives_up
         with_auto_tool_choice,
     )
 
-    _AutoModel.bound = []
     answers = [
         AIMessage(content="done, I think"),
         AIMessage(content="", tool_calls=[{"name": "Verdict", "args": {"met": True}, "id": "v"}]),
     ]
+    model = ScriptedChatModel.from_messages(answers, usage=None)
     strategy = response_format_for(Verdict, _component("tool_auto"))
     agent = create_agent(
-        with_auto_tool_choice(_AutoModel(messages=iter(answers))),
+        with_auto_tool_choice(model),
         tools=[ping],
         response_format=strategy,
         middleware=[RequireStructuredResponse(["Verdict"])],
@@ -432,17 +413,17 @@ async def test_tool_auto_reminds_a_turn_that_ends_without_the_call_then_gives_up
         m for m in result["messages"] if str(getattr(m, "content", "")).startswith(REMINDER_PREFIX)
     ]
     assert len(reminders) == 1
-    assert all(item["tool_choice"] == "auto" for item in _AutoModel.bound)
+    assert model.bound and all(item["tool_choice"] == "auto" for item in model.bound)
 
     # A model that never calls it: bounded reminders, then the turn ends without a result.
-    _AutoModel.bound = []
     silent = [AIMessage(content=f"text {i}") for i in range(MAX_REMINDERS + 1)]
+    model = ScriptedChatModel.from_messages(silent, usage=None)
     agent = create_agent(
-        with_auto_tool_choice(_AutoModel(messages=iter(silent))),
+        with_auto_tool_choice(model),
         tools=[ping],
         response_format=strategy,
         middleware=[RequireStructuredResponse(["Verdict"])],
     )
     ended = await agent.ainvoke({"messages": [{"role": "user", "content": "go"}]})
     assert "structured_response" not in ended or ended["structured_response"] is None
-    assert len(_AutoModel.bound) == MAX_REMINDERS + 1
+    assert len(model.bound) == MAX_REMINDERS + 1

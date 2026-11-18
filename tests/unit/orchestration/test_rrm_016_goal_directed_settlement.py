@@ -255,7 +255,7 @@ async def test_operations_settle_once_and_the_family_consumes_the_settlement() -
     assert again.settlement.usage == executor_settlement.usage
 
     # The goal context reached the model only as user content, never the system prompt.
-    assert not any(item["system_has_goal_context"] for item in composition.model.turns)
+    assert not any(item["system_has_goal_context"] for item in composition.model.script.turns)
 
 
 @pytest.mark.asyncio

@@ -8,6 +8,7 @@ from typing import Any
 from uuid import uuid4
 
 import pytest
+from langchain_core.messages import AIMessage, BaseMessage
 
 from mission_control.application.execution.operations.operation_execution import (
     OperationStopFencePending,
@@ -29,15 +30,18 @@ from tests.fixtures.checkpoint_lineage import bind_unit
 from tests.fixtures.checkpoint_recovery import (
     SimulatedWorkerCrash,
     recovery_harness,
+    recovery_model,
+    recovery_reply,
+    recovery_script,
     stage_recovery_unit,
 )
 from tests.fixtures.lane_bindings import lane_fields
 from tests.support.run_control import command
 from tests.support.unit.operations.ft_f2_interrupt_and_inject import (
     FAST,
-    RecordingModel,
     facade,
     harness_with_injections,
+    human_texts,
     operator,
     states,
     status_of,
@@ -149,7 +153,7 @@ async def test_queue_while_running_continues_once_and_recovers_native_input(
         result = await asyncio.wait_for(running, 30)
     assert result.status == "completed"
     assert len(harness.model.calls) == 3, "original two calls plus one queued follow-up"
-    assert len(harness.model.humans[-1]) == 2 and MARKER in harness.model.humans[-1][-1]
+    assert len(human_texts(harness.model)[-1]) == 2 and MARKER in human_texts(harness.model)[-1][-1]
     assert result.usage.amounts["tokens.total"] == 15
     status = await status_of(harness, receipt)
     assert states(status) == ["accepted", "queued", "delivered", "observed", "applied"]
@@ -198,19 +202,17 @@ async def test_queued_turn_at_exact_cap_preserves_completed_spend_and_checkpoint
     assert "applied" not in states(await status_of(harness, receipt))
 
 
-class FailingQueuedModel(RecordingModel):
-    async def _agenerate(self, messages: Any, *args: Any, **kwargs: Any) -> Any:
-        if len(self.calls) == 2:
-            self._observe(messages)
-            return self._reply(0)  # a completed, charged follow-up model/tool call
-        if len(self.calls) >= 3:
-            raise ConnectionError("queued follow-up provider failure")
-        return await super()._agenerate(messages, *args, **kwargs)
+def failing_queued(messages: list[BaseMessage], call: int) -> AIMessage:
+    if call == 3:
+        return recovery_reply(0)  # a completed, charged follow-up model/tool call
+    if call >= 4:
+        raise ConnectionError("queued follow-up provider failure")
+    return recovery_script(messages, call)
 
 
 @pytest.mark.asyncio
 async def test_failed_queued_follow_up_charges_original_and_new_completed_calls() -> None:
-    harness = await recovery_harness(model=FailingQueuedModel(), injection_settings=FAST)
+    harness = await recovery_harness(model=recovery_model(failing_queued), injection_settings=FAST)
     request = await roomy_request(harness)
     entered, gate = harness.model.gate_on(1)
     running = asyncio.create_task(harness.run(request))
@@ -264,7 +266,7 @@ async def test_early_follow_up_failure_cannot_replace_known_usage_with_empty_usa
 @pytest.mark.asyncio
 async def test_paused_boundary_starts_no_queued_turn_until_resume() -> None:
     harness = await recovery_harness(
-        model=RecordingModel(),
+        model=recovery_model(),
         injection_settings=FAST,
         real_authority=True,
     )
@@ -325,7 +327,7 @@ async def test_cancel_at_completed_boundary_runs_no_queued_follow_up_and_retains
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     harness = await recovery_harness(
-        model=RecordingModel(),
+        model=recovery_model(),
         injection_settings=FAST,
         real_authority=True,
     )

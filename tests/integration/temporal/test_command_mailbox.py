@@ -50,10 +50,10 @@ from mission_control.domain.policies.contracts import ActorContext, RunOutcome
 from mission_control.domain.policies.mailbox import MailboxState
 from tests.fixtures.goal_directed_journaled import (
     SCOPE,
-    GoalScriptedModel,
     admit_goal_run,
     compose_goal_directed,
     goal_blueprint,
+    goal_model,
     goal_run_control,
     goal_run_input,
 )
@@ -104,7 +104,7 @@ async def test_queued_instruction_is_consumed_once_across_a_worker_restart(
         results=InMemoryArtifactPayloadStore(),
         bindings=InMemoryOperationBindingRepository(),
         saver=InMemorySaver(),
-        model=GoalScriptedModel(),
+        model=goal_model(),
         blueprint=goal_blueprint(),
         context_packs=packs,
         context_inputs=staging,

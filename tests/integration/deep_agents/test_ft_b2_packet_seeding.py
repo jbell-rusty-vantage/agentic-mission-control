@@ -9,17 +9,14 @@ seeded into the invocation's ``files`` input, so the agent's first-turn ``ls`` a
 from __future__ import annotations
 
 import hashlib
-from collections.abc import Sequence
 from typing import Any
 
 import pytest
-from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import AIMessage, BaseMessage, ToolMessage
-from langchain_core.outputs import ChatGeneration, ChatResult
-from langchain_core.tools import BaseTool
 from tests.fixtures.checkpoint_lineage import activity_attempt
 from tests.fixtures.lane_bindings import lane_fields
 from tests.support.deep_agents import exact_fixture, registry, unit_bound
+from tests.support.models import ScriptedChatModel
 from tests.support.operations import operation_request
 
 from mission_control.adapters.deep_agents.adapter import (
@@ -71,54 +68,36 @@ class Reader:
         return self.objects[durable_ref]
 
 
-class InputListingModel(BaseChatModel):
-    observed: list[str] = []
+def input_listing_model(observed: list[str] | None = None) -> ScriptedChatModel:
+    """List the seeded inputs and read the packet index, then record what the tools returned
+    into `observed`."""
 
-    @property
-    def _llm_type(self) -> str:
-        return "ft-b2-input-listing"
-
-    def bind_tools(
-        self,
-        tools: Sequence[BaseTool | dict[str, Any] | type | Any],
-        *,
-        tool_choice: str | None = None,
-        **kwargs: Any,
-    ) -> BaseChatModel:
-        del tools, tool_choice, kwargs
-        return self
-
-    def _generate(
-        self,
-        messages: list[BaseMessage],
-        stop: list[str] | None = None,
-        run_manager: Any = None,
-        **kwargs: Any,
-    ) -> ChatResult:
-        del stop, run_manager, kwargs
+    def script(messages: list[BaseMessage], call: int) -> AIMessage:
+        del call
         results = [item for item in messages if isinstance(item, ToolMessage)]
-        if not results:
-            message = AIMessage(
-                content="",
-                tool_calls=[
-                    {
-                        "name": "ls",
-                        "args": {"path": "/inputs/sources"},
-                        "id": "ls-inputs",
-                        "type": "tool_call",
-                    },
-                    {
-                        "name": "read_file",
-                        "args": {"file_path": "/.mission/context.md", "limit": 50},
-                        "id": "read-index",
-                        "type": "tool_call",
-                    },
-                ],
-            )
-        else:
-            InputListingModel.observed = [str(item.content) for item in results]
-            message = AIMessage(content="inputs observed")
-        return ChatResult(generations=[ChatGeneration(message=message)])
+        if results:
+            if observed is not None:
+                observed[:] = [str(item.content) for item in results]
+            return AIMessage(content="inputs observed")
+        return AIMessage(
+            content="",
+            tool_calls=[
+                {
+                    "name": "ls",
+                    "args": {"path": "/inputs/sources"},
+                    "id": "ls-inputs",
+                    "type": "tool_call",
+                },
+                {
+                    "name": "read_file",
+                    "args": {"file_path": "/.mission/context.md", "limit": 50},
+                    "id": "read-index",
+                    "type": "tool_call",
+                },
+            ],
+        )
+
+    return ScriptedChatModel(script=script, label="ft-b2-input-listing", usage=None)
 
 
 def _context_slots(owner: WorkspaceOwner) -> tuple[WorkspaceSlotBinding, ...]:
@@ -208,7 +187,8 @@ async def test_packet_inputs_are_seeded_before_the_first_model_call() -> None:
             "/.mission/context.md": CONTEXT_MD.encode(),
         }
     )
-    model = InputListingModel()
+    observed: list[str] = []
+    model = input_listing_model(observed)
     adapter = DeepAgentRuntimeAdapter(
         ExactDeepAgentMaterializer(registry(binding, bundle, model)), context_inputs=reader
     )
@@ -217,7 +197,7 @@ async def test_packet_inputs_are_seeded_before_the_first_model_call() -> None:
     result = await adapter.execute(invocation.model_copy(update={"checkpoint_plan": plan}), {})
 
     assert result.output_text == "inputs observed"
-    listing, index = InputListingModel.observed
+    listing, index = observed
     assert "/inputs/sources/source_manifest.json" in listing
     assert "Mission context packet" in index
     assert len(reader.requests) == 2
@@ -230,7 +210,7 @@ async def test_seeding_refuses_a_digest_mismatch() -> None:
     reader = Reader({"x": b"unrelated"})
     reader.objects = dict.fromkeys(_all_refs(invocation), b"tampered")
     adapter = DeepAgentRuntimeAdapter(
-        ExactDeepAgentMaterializer(registry(binding, bundle, InputListingModel())),
+        ExactDeepAgentMaterializer(registry(binding, bundle, input_listing_model())),
         context_inputs=reader,
     )
     with pytest.raises(Exception, match="digest mismatch"):
@@ -241,7 +221,7 @@ async def test_seeding_refuses_a_digest_mismatch() -> None:
 async def test_bound_context_inputs_without_a_reader_fail_closed() -> None:
     invocation, binding, bundle = _invocation_with_context_inputs()
     adapter = DeepAgentRuntimeAdapter(
-        ExactDeepAgentMaterializer(registry(binding, bundle, InputListingModel()))
+        ExactDeepAgentMaterializer(registry(binding, bundle, input_listing_model()))
     )
     with pytest.raises(Exception, match="no durable input reader"):
         await adapter._context_seed_files(invocation)

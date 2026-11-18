@@ -2,7 +2,7 @@
 
 Real local services: the production API/worker composition on a disposable common-component
 PostgreSQL 17 (``MISSION_CONTROL_TEST_ADMIN_DSN``) with the local Temporal dev server and
-deterministic local cognition (``ChainModel``; no provider, no paid effect).
+deterministic local cognition (``ChainCognition``; no provider, no paid effect).
 
 What is production here: the launch input author (``compose_manifest_launch_inputs`` over the
 settings-declared ``MANIFEST_LAUNCH_BINDINGS_PATH``), the public ``POST .../missions:submit``

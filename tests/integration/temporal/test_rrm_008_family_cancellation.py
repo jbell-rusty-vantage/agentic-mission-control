@@ -87,10 +87,10 @@ from tests.fixtures.goal_directed_journaled import (
     SCOPE,
     ExactLifecycleBinding,
     GoalComposition,
-    GoalScriptedModel,
     admit_goal_run,
     compose_goal_directed,
     goal_blueprint,
+    goal_model,
     goal_run_control,
     goal_run_input,
 )
@@ -446,7 +446,7 @@ async def test_cancel_accepted_before_the_family_starts_terminalizes_through_the
 # --- GoalDirected ---------------------------------------------------------------------------------
 
 
-async def _goal_composition(run_control: Any, model: GoalScriptedModel) -> GoalComposition:
+async def _goal_composition(run_control: Any, model: Any) -> GoalComposition:
     return await compose_goal_directed(
         run_control=run_control,
         journal=MemoryOperationJournal(),
@@ -492,7 +492,7 @@ async def test_goal_directed_cancel_during_executor_cognition_finishes_the_saga(
     async with workflow_environment() as environment:
         run_control = goal_run_control()
         authority = Authority(environment.client, run_control)
-        model = GoalScriptedModel()
+        model = goal_model()
         composition = await _goal_composition(run_control, model)
         run_id = await admit_goal_run(run_control, "rrm-008-goal-cancel")
         entered, _gate = model.gate_on(1)

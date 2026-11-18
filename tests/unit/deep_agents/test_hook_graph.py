@@ -2,17 +2,13 @@
 
 from __future__ import annotations
 
-from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
 
 import pytest
 from deepagents import create_deep_agent
 from deepagents.backends import StateBackend
-from langchain_core.callbacks import CallbackManagerForLLMRun
-from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, ToolMessage
-from langchain_core.outputs import ChatGeneration, ChatResult
 from langchain_core.tools import tool
 
 from mission_control.adapters.deep_agents.hooks import (
@@ -29,6 +25,7 @@ from mission_control.adapters.deep_agents.hooks import (
 )
 from mission_control.contracts.hooks import HookScope
 from mission_control.domain.capabilities.hooks import KERNEL_HOOK_IDS, HookEvent
+from tests.support.models import ScriptedChatModel
 
 POLICY = Path(__file__).resolve().parents[3] / "scripts" / "hooks" / "policy_template" / "policy.py"
 EXECUTED: list[str] = []
@@ -41,39 +38,25 @@ def shell(command: str) -> str:
     return f"ran {command}"
 
 
-class ScriptedModel(BaseChatModel):
+def shell_model(command: str = "rm -rf /") -> ScriptedChatModel:
     """First turn calls ``shell``; second turn answers. No provider is contacted."""
 
-    command: str = "rm -rf /"
-
-    @property
-    def _llm_type(self) -> str:
-        return "scripted-hook-fixture"
-
-    def bind_tools(self, tools: Sequence[Any], **kwargs: Any) -> ScriptedModel:
-        return self
-
-    def _generate(
-        self,
-        messages: list[BaseMessage],
-        stop: list[str] | None = None,
-        run_manager: CallbackManagerForLLMRun | None = None,
-        **kwargs: Any,
-    ) -> ChatResult:
+    def script(messages: list[BaseMessage], call: int) -> AIMessage:
+        del call
         usage = {"input_tokens": 3, "output_tokens": 2, "total_tokens": 5}
         if any(isinstance(message, ToolMessage) for message in messages):
-            reply = AIMessage(id="msg-2", content="finished", usage_metadata=usage)
-        else:
-            reply = AIMessage(
-                id="msg-1",
-                content="",
-                tool_calls=[{"name": "shell", "args": {"command": self.command}, "id": "call-1"}],
-                usage_metadata=usage,
-            )
-        return ChatResult(generations=[ChatGeneration(message=reply)])
+            return AIMessage(id="msg-2", content="finished", usage_metadata=usage)
+        return AIMessage(
+            id="msg-1",
+            content="",
+            tool_calls=[{"name": "shell", "args": {"command": command}, "id": "call-1"}],
+            usage_metadata=usage,
+        )
+
+    return ScriptedChatModel(script=script, label="scripted-hook-fixture")
 
 
-def _agent(model: ScriptedModel, ports: KernelHookPorts, tmp_path: Path) -> Any:
+def _agent(model: ScriptedChatModel, ports: KernelHookPorts, tmp_path: Path) -> Any:
     dispatcher = HookDispatcher(
         context=HookContext(scope=HookScope(installation_id="i", application_id="biotech")),
         kernel_hooks=ports.build(),
@@ -109,7 +92,7 @@ async def test_policy_hook_governs_the_shell_tool_in_a_compiled_graph(
 ) -> None:
     EXECUTED.clear()
     frames = RecordingFrameSink()
-    agent = _agent(ScriptedModel(command=command), KernelHookPorts(frames=frames), tmp_path)
+    agent = _agent(shell_model(command=command), KernelHookPorts(frames=frames), tmp_path)
     result = await agent.ainvoke({"messages": [HumanMessage(content="clean up")]})
     tool_messages = [m for m in result["messages"] if isinstance(m, ToolMessage)]
     assert ([command] == EXECUTED) is executed
@@ -135,7 +118,7 @@ async def test_stream_ports_emit_hook_and_usage_events_through_the_graph_stream(
     sink = StreamFrameSink()
     usage = StreamUsageRecorder()
     agent = _agent(
-        ScriptedModel(command="pytest -q"), KernelHookPorts(frames=sink, usage=usage), tmp_path
+        shell_model(command="pytest -q"), KernelHookPorts(frames=sink, usage=usage), tmp_path
     )
     customs: list[dict[str, Any]] = []
     async for mode, chunk in agent.astream(

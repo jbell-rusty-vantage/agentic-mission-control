@@ -78,15 +78,15 @@ async def _prove(
     )
     held = asyncio.Event()
     release = asyncio.Event()
-    native_generate = technical.TechnicalModel._agenerate
 
-    async def generate(model: Any, *args: Any, **kwargs: Any):
-        if hold_sibling and ":stage:review:" in model.operation_id:
+    async def generate(invocation: Any, messages: Any, call: int):
+        if hold_sibling and ":stage:review:" in invocation.operation_id:
             held.set()
             await asyncio.wait_for(release.wait(), 120)
-        return await native_generate(model, *args, **kwargs)
+        return technical.technical_turn(invocation, messages)
 
-    monkeypatch.setattr(technical.TechnicalModel, "_agenerate", generate)
+    monkeypatch.setitem(technical.TECHNICAL_SCRIPTS, "held-review", generate)
+    monkeypatch.setenv(technical.SCRIPTED_MODEL_ENV, "held-review")
     held_proof: dict[str, Any] = {}
     original = PostgresRunControlRepository.commit_command
     barrier = asyncio.Barrier(2)

@@ -7,7 +7,7 @@ the production launch author over a `mc.manifest_launch_bindings` file whose
 `deep_agents_async_graphs` names the served graph, the Deep Agents lane adapter sealing the
 `AsyncSubagentContract` and the deployment credential into the operation's `secret_refs`, the
 governed async middleware, the Agent Server auth and the post-cognition admission and
-settlement in Postgres. What is FIXTURE: the deterministic parent (`ChainModel` that spawns
+settlement in Postgres. What is FIXTURE: the deterministic parent (`ChainCognition` that spawns
 once before its scripted work) and the deterministic hosted child the local server serves, so
 nothing is paid.
 

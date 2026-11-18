@@ -398,7 +398,7 @@ async def test_parent_deep_agent_start_async_task_reserves_and_links_before_the_
         InMemoryCheckpointLineageRepository,
     )
     from mission_control.domain.execution.contracts import DeepAgentExecutionBinding
-    from tests.fixtures.rrm013_live_stack import ParentSpawnModel
+    from tests.fixtures.rrm013_live_stack import PARENT_OBJECTIVE, parent_spawn_model
     from tests.support.deep_agents import exact_fixture, planned_invocation, unit_bound
 
     client = FakeAgentProtocolClient(served=SERVED)
@@ -411,7 +411,7 @@ async def test_parent_deep_agent_start_async_task_reserves_and_links_before_the_
             "async_subagents": (agreement,),
         }
     )
-    model = ParentSpawnModel(subagent_type=agreement.name)
+    model = parent_spawn_model(subagent_type=agreement.name)
     details = InMemoryAsyncSubagentDetailRepository()
     authority = InMemoryAsyncSubagentAuthority()
     provider = DeepAgentsAsyncSubagentAdapter(secrets=SECRETS, request_scope="tenant-1")
@@ -469,7 +469,7 @@ async def test_parent_deep_agent_start_async_task_reserves_and_links_before_the_
     # The same tool call (a resumed invocation) rebuilds the same child identity.
     middleware = Factory().middleware(invocation.binding, (agreement,), {})
     spawn = middleware.spawn_request(
-        description=model.objective, contract=agreement, tool_call_id="rrm013-start-async-task"
+        description=PARENT_OBJECTIVE, contract=agreement, tool_call_id="rrm013-start-async-task"
     )
     assert spawn.idempotency_key == "rrm013-start-async-task"
     assert (await service.spawn(spawn)).child_execution_id == child.child_execution_id

@@ -14,9 +14,8 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from langchain_core.messages import AIMessage, BaseMessage, ToolMessage
-from langchain_core.outputs import ChatGeneration, ChatResult
 from tests.fixtures.overnight_stagegraph_model import _document
-from tests.fixtures.rrm009_production_stack import _LoggedModel, call_usage
+from tests.fixtures.rrm009_production_stack import Cognition, call_usage
 
 from mission_control.domain.programs.goal_directed_runtime import (
     GoalNamedExecutorObservation,
@@ -98,7 +97,8 @@ class GoalScript:
             assert old.isdisjoint(new), "immutable candidate member IDs must differ"
 
 
-class GoalModel(_LoggedModel):
+@dataclass(kw_only=True)
+class GoalCognition(Cognition):
     script: Any
     # Must come from the compiled binding, not the historical RRM-016 constants.
     output_contract_ref: str
@@ -108,7 +108,7 @@ class GoalModel(_LoggedModel):
     def _llm_type(self) -> str:
         return "overnight-scripted-goal-directed"
 
-    def _reply(self, messages: list[BaseMessage]) -> ChatResult:
+    def _reply(self, messages: list[BaseMessage]) -> AIMessage:
         try:
             return self._respond(messages)
         except AssertionError as error:
@@ -124,7 +124,7 @@ class GoalModel(_LoggedModel):
             )
             raise
 
-    def _respond(self, messages: list[BaseMessage]) -> ChatResult:
+    def _respond(self, messages: list[BaseMessage]) -> AIMessage:
         self._record("parent", messages)
         contexts = [
             (index, str(message.content))
@@ -160,7 +160,7 @@ class GoalModel(_LoggedModel):
             return self._producer(iteration, tools)
         return self._verifier(iteration, tools)
 
-    def _producer(self, iteration: int, tools: list[ToolMessage]) -> ChatResult:
+    def _producer(self, iteration: int, tools: list[ToolMessage]) -> AIMessage:
         if not tools:
             candidate = deepcopy(self.script.candidates[iteration - 1])
             if iteration == 2:
@@ -229,7 +229,7 @@ class GoalModel(_LoggedModel):
         )
         return self._answer(observation.model_dump(mode="json"))
 
-    def _verifier(self, iteration: int, tools: list[ToolMessage]) -> ChatResult:
+    def _verifier(self, iteration: int, tools: list[ToolMessage]) -> AIMessage:
         if not tools:
             return self._call(
                 "read_file", {"file_path": "/.mission/transfer.json"}, iteration, "verifier", 0
@@ -277,7 +277,7 @@ class GoalModel(_LoggedModel):
 
     def _call(
         self, name: str, args: dict[str, Any], iteration: int, role: str, ordinal: int
-    ) -> ChatResult:
+    ) -> AIMessage:
         self.script.calls.append(
             {
                 "run_id": self.run_id,
@@ -287,33 +287,21 @@ class GoalModel(_LoggedModel):
                 "tool": name,
             }
         )
-        return ChatResult(
-            generations=[
-                ChatGeneration(
-                    message=AIMessage(
-                        content="",
-                        tool_calls=[
-                            {
-                                "name": name,
-                                "args": args,
-                                "id": f"goal-{iteration}-{role}-{ordinal}",
-                                "type": "tool_call",
-                            }
-                        ],
-                        usage_metadata=call_usage(),
-                    )
-                )
-            ]
+        return AIMessage(
+            content="",
+            tool_calls=[
+                {
+                    "name": name,
+                    "args": args,
+                    "id": f"goal-{iteration}-{role}-{ordinal}",
+                    "type": "tool_call",
+                }
+            ],
+            usage_metadata=call_usage(),
         )
 
-    def _answer(self, payload: dict[str, Any]) -> ChatResult:
-        return ChatResult(
-            generations=[
-                ChatGeneration(
-                    message=AIMessage(
-                        content=json.dumps(payload),
-                        usage_metadata=call_usage(),
-                    )
-                )
-            ]
+    def _answer(self, payload: dict[str, Any]) -> AIMessage:
+        return AIMessage(
+            content=json.dumps(payload),
+            usage_metadata=call_usage(),
         )

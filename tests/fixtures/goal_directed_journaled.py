@@ -25,11 +25,8 @@ from types import SimpleNamespace
 from typing import Any
 
 from langchain_core.messages import AIMessage, BaseMessage, ToolMessage
-from langchain_core.outputs import ChatGeneration, ChatResult
 from langgraph.checkpoint.base import BaseCheckpointSaver
 from langgraph.store.memory import InMemoryStore
-from pydantic import PrivateAttr
-from tests.fixtures.checkpoint_recovery import ScriptedRecoveryModel
 from tests.fixtures.lane_bindings import LANE_REBINDERS, lane_fields
 from tests.support.deep_agents_runtime import (
     ConformanceAssetVerifier,
@@ -38,6 +35,7 @@ from tests.support.deep_agents_runtime import (
     ConformanceSandbox,
     ConformanceSecretResolver,
 )
+from tests.support.models import ScriptedChatModel, tool_call
 from tests.support.operations import MCP_DIGEST, SKILL_DIGEST, operation_request
 from tests.support.run_control import ConfigurationVerifier, actor
 from tests.support.run_control import request as run_request
@@ -354,7 +352,8 @@ _ROLE = re.compile(r"'operation_role': '(executor|verifier)'")
 _ITERATION = re.compile(r"'goal_iteration': (\d+)")
 
 
-class GoalScriptedModel(ScriptedRecoveryModel):
+@dataclass
+class GoalScript:
     """Two turns per operation: `write_todos`, then the role's typed observation.
 
     The role and iteration are read from the goal-context segment of the latest human
@@ -372,18 +371,15 @@ class GoalScriptedModel(ScriptedRecoveryModel):
     # RRM-008 review F3: like a real provider, refuse a prompt in which an AI message's
     # `tool_calls` are not all answered by tool messages (an OpenAI 400).
     validate_tool_pairing: bool = True
-    _turns: list[dict[str, Any]] = PrivateAttr(default_factory=list)
+    turns: list[dict[str, Any]] = field(default_factory=list)
 
-    @property
-    def turns(self) -> list[dict[str, Any]]:
-        return self._turns
-
-    def _observe(self, messages: list[BaseMessage]) -> tuple[int, int]:
+    def __call__(self, messages: list[BaseMessage], call: int) -> AIMessage:
+        del call
         if self.validate_tool_pairing:
             unanswered: set[str] = set()
             for item in messages:
                 if isinstance(item, AIMessage) and item.tool_calls:
-                    unanswered |= {str(call["id"]) for call in item.tool_calls}
+                    unanswered |= {str(tool["id"]) for tool in item.tool_calls}
                 elif isinstance(item, ToolMessage):
                     unanswered.discard(str(item.tool_call_id))
             if unanswered:
@@ -398,48 +394,37 @@ class GoalScriptedModel(ScriptedRecoveryModel):
         iteration_match = _ITERATION.search(content)
         assert role_match is not None and iteration_match is not None, content
         tools = sum(isinstance(item, ToolMessage) for item in messages[last_human:])
-        human = len(human_indexes)
-        self._log.append((human, tools))
-        self._turns.append(
-            {
-                "role": role_match.group(1),
-                "iteration": int(iteration_match.group(1)),
-                "human_messages": human,
-                "system_has_goal_context": any(
-                    item.type == "system" and "goal_revision_id" in str(item.content)
-                    for item in messages
-                ),
-            }
-        )
-        index = len(self._log)
-        if index in self._fail_on:
-            raise self._fail_on[index]
-        return index, tools
-
-    def _reply(self, tools: int) -> ChatResult:  # type: ignore[override]
+        turn = {
+            "role": role_match.group(1),
+            "iteration": int(iteration_match.group(1)),
+            "human_messages": len(human_indexes),
+            "system_has_goal_context": any(
+                item.type == "system" and "goal_revision_id" in str(item.content)
+                for item in messages
+            ),
+        }
+        self.turns.append(turn)
         usage = {"input_tokens": 2, "output_tokens": 3, "total_tokens": self.tokens_per_call}
-        turn = self.turns[-1]
         if tools == 0:
-            message = AIMessage(
-                content="",
-                tool_calls=[
-                    {
-                        "name": "write_todos",
-                        "args": {"todos": [{"content": "verify", "status": "completed"}]},
-                        "id": f"rrm016-{turn['role']}-{turn['iteration']}",
-                        "type": "tool_call",
-                    }
-                ],
+            return tool_call(
+                "write_todos",
+                {"todos": [{"content": "verify", "status": "completed"}]},
+                f"rrm016-{turn['role']}-{turn['iteration']}",
                 usage_metadata=usage,
             )
-        else:
-            payload = (
-                executor_payload(turn["iteration"], self.accept_at, self.stable_output_ref)
-                if turn["role"] == "executor"
-                else verifier_payload(turn["iteration"], self.accept_at)
-            )
-            message = AIMessage(content=json.dumps(payload), usage_metadata=usage)
-        return ChatResult(generations=[ChatGeneration(message=message)])
+        payload = (
+            executor_payload(turn["iteration"], self.accept_at, self.stable_output_ref)
+            if turn["role"] == "executor"
+            else verifier_payload(turn["iteration"], self.accept_at)
+        )
+        return AIMessage(content=json.dumps(payload), usage_metadata=usage)
+
+
+def goal_model(script: GoalScript | None = None) -> ScriptedChatModel:
+    """The GoalDirected cognition (`GoalScript`, reachable as `model.script`) behind the RRM-004
+    fault hooks."""
+
+    return ScriptedChatModel(script=script or GoalScript(), label="rrm-016-goal-scripted")
 
 
 def executor_payload(
@@ -479,7 +464,7 @@ def verifier_payload(iteration: int, accept_at: int) -> dict[str, object]:
 def deep_agent_registry(
     binding: DeepAgentExecutionBinding,
     bundle: ResolvedSkillBundle,
-    model: GoalScriptedModel,
+    model: ScriptedChatModel,
     saver: BaseCheckpointSaver[Any],
 ) -> ExactComponentRegistry:
     return ExactComponentRegistry(
@@ -566,7 +551,7 @@ class GoalComposition:
     # `RecordingGoalDocuments` (in memory) unless a durable repository was composed (RRM-018).
     documents: Any
     templates: dict[str, OperationExecutionRequest]
-    model: GoalScriptedModel
+    model: ScriptedChatModel
     binding: DeepAgentExecutionBinding
     extras: dict[str, Any] = field(default_factory=dict)
 
@@ -579,7 +564,7 @@ async def compose_goal_directed(
     results: ResultPayloadStore,
     bindings: OperationBindingRepository,
     saver: BaseCheckpointSaver[Any],
-    model: GoalScriptedModel,
+    model: ScriptedChatModel,
     blueprint: GoalDirectedBlueprint,
     claimed_by: str = "operation-runtime:rrm-016",
     template_provider: GoalOperationTemplateProvider | None = None,
@@ -747,10 +732,12 @@ def preparer(
     )
 
 
-def turns_by_operation(model: GoalScriptedModel) -> list[tuple[str, int, int]]:
+def turns_by_operation(model: ScriptedChatModel) -> list[tuple[str, int, int]]:
     """(role, iteration, human messages) for every model call, in call order."""
 
-    return [(item["role"], item["iteration"], item["human_messages"]) for item in model.turns]
+    return [
+        (item["role"], item["iteration"], item["human_messages"]) for item in model.script.turns
+    ]
 
 
 __all__: Sequence[str] = (
@@ -761,12 +748,13 @@ __all__: Sequence[str] = (
     "TOKENS_PER_OPERATION",
     "FixtureGoalSettlements",
     "GoalComposition",
-    "GoalScriptedModel",
+    "GoalScript",
     "RecordingGoalDocuments",
     "admit_goal_run",
     "compose_goal_directed",
     "goal_authority",
     "goal_blueprint",
+    "goal_model",
     "goal_run_control",
     "goal_run_input",
     "goal_start_action",

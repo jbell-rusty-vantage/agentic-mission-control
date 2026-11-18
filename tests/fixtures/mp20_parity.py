@@ -11,7 +11,7 @@ and the production chain release hook and relay pump.
 
 What is FIXTURE (injected at the provider client/launcher seam only):
 
-* Deep Agents: the parent chat model (`ParityModel`, a `ChainModel` that also scripts Stage
+* Deep Agents: the parent chat model (`ParityCognition`, a `ChainCognition` that also scripts Stage
   Graph stages); every tool, middleware and workspace path is the real Deep Agents runtime.
 * Claude Agent SDK: `ResponderClient` (a `tests/support/providers/claude.FixtureClient` whose
   turns are computed from the leased workspace instead of a JSONL file).
@@ -53,13 +53,17 @@ from uuid import uuid4
 import httpx
 from claude_agent_sdk.types import ClaudeAgentOptions
 from fastapi import FastAPI
-from langchain_core.messages import BaseMessage, HumanMessage, ToolMessage
-from langchain_core.outputs import ChatResult
+from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, ToolMessage
 from pydantic import SecretStr
 from temporalio.worker import Worker
 from tests.fixtures import mission_control_production_stack as production_stack_module
 from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog, publish_output_schemas
-from tests.fixtures.manifest_runtime import ChainModel, ChainScript, GoalScript, promise_submitter
+from tests.fixtures.manifest_runtime import (
+    ChainCognition,
+    ChainScript,
+    GoalScript,
+    promise_submitter,
+)
 from tests.fixtures.mission_control_production_stack import open_postgres_production_stack
 from tests.fixtures.rrm009_production_harness import ProductionStack
 from tests.fixtures.rrm009_production_stack import (
@@ -77,6 +81,7 @@ from tests.support.integration.temporal.manifest_v2_provider_launch import (
 )
 from tests.support.manifest_runtime import host_pins, missions_app
 from tests.support.model_catalog import catalog_for, model_binding
+from tests.support.models import ScriptedChatModel
 from tests.support.providers.claude import (
     FIXTURE_ENVIRON,
     FixtureClient,
@@ -479,7 +484,7 @@ HANDOFF_PADDING = 70_000
 # FIXTURE catalog output schemas for the parity manifests' declared outputs: they describe the
 # documents the FIXTURE lanes write, which the runtime validates at settlement. Stage outputs are
 # `stage_document`s; a Goal Loop iteration is a session lane's `goal_document` (with `lane`) or
-# Deep Agents' `ChainModel` document (with `rows`), so the goal note requires what both carry.
+# Deep Agents' `ChainCognition` document (with `rows`), so the goal note requires what both carry.
 _STAGE_NOTE = {
     "type": "object",
     "required": ["mission", "node", "lane", "inputs", "body"],
@@ -669,11 +674,12 @@ def _numbered(text: str) -> str:
     return re.sub(r"(?m)^\s*\d+(?:\.\d+)?(?:\t|  )", "", text)
 
 
-class ParityModel(ChainModel):
-    """`ChainModel` for Goal Loops; Stage Graph stages read the packet, write their output into
+@dataclass(kw_only=True)
+class ParityCognition(ChainCognition):
+    """`ChainCognition` for Goal Loops; Stage Graph stages read the packet, write their output into
     the writable slot and answer with the obligation refs the plan names."""
 
-    def _reply(self, messages: list[BaseMessage]) -> ChatResult:
+    def _reply(self, messages: list[BaseMessage]) -> AIMessage:
         if "goal-iteration/" in self.operation_id:
             return super()._reply(messages)
         self._record("parent", messages)
@@ -734,15 +740,14 @@ class ParityModel(ChainModel):
         # No `output_refs` key: the runtime's registered captures are the stage's outputs.
         return self._final({"obligation_refs": list(plan.obligations)})
 
-    def _call(self, name: str, args: dict[str, Any]) -> ChatResult:
+    def _call(self, name: str, args: dict[str, Any]) -> AIMessage:
         # `read_file_<n>` keeps every tool call id distinct while calling `read_file`.
-        result = super()._call(name, args)
+        message = super()._call(name, args)
         if name.startswith("read_file_"):
-            message = result.generations[0].message
-            call = dict(message.tool_calls[0])  # type: ignore[attr-defined]
+            call = dict(message.tool_calls[0])
             call["name"] = "read_file"
-            message.tool_calls = [call]  # type: ignore[attr-defined]
-        return result
+            message.tool_calls = [call]  # type: ignore[list-item]
+        return message
 
 
 def parity_components(
@@ -750,8 +755,8 @@ def parity_components(
 ) -> Any:
     base = technical.components(model_log)
 
-    def parent(bound: Any, _secrets: Any) -> ParityModel:
-        return ParityModel(
+    def parent(bound: Any, _secrets: Any) -> ScriptedChatModel:
+        return ParityCognition(
             run_id=bound.run_id,
             operation_id=bound.operation_id,
             log=model_log,
@@ -763,7 +768,7 @@ def parity_components(
                 for slot in bound.workspace.slot_bindings
                 if slot.access == "exclusive_write"
             ),
-        )
+        ).model()
 
     return replace(
         base,

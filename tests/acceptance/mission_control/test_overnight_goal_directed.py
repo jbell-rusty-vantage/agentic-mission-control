@@ -33,19 +33,19 @@ pytestmark = pytest.mark.psycopg_selector
 
 
 def goal_components(technical: Any, script: Any, log: list[dict[str, Any]]) -> Any:
-    from tests.fixtures.overnight_goal_model import GoalModel
+    from tests.fixtures.overnight_goal_model import GoalCognition
 
     base = technical.components(log)
 
     def factory(bound: Any, _secrets: Any) -> Any:
-        return GoalModel(
+        return GoalCognition(
             run_id=bound.run_id,
             operation_id=bound.operation_id,
             log=log,
             script=script,
             output_contract_ref=script.output_contract_ref,
             obligation_refs=script.obligation_refs,
-        )
+        ).model()
 
     return replace(
         base, model_factories={**base.model_factories, technical.binding.model.ref.digest: factory}

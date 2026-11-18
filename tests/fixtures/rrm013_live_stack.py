@@ -13,15 +13,14 @@ from typing import Any
 from urllib.parse import quote
 
 import asyncpg
-from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import AIMessage, BaseMessage, ToolMessage
-from langchain_core.outputs import ChatGeneration, ChatResult
 from langchain_core.tools import BaseTool
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 from tests.fixtures.checkpoint_lineage import bind_unit, stage_unit
 from tests.fixtures.checkpoint_recovery import governed_workspace
 from tests.fixtures.lane_bindings import lane_fields
 from tests.support.model_catalog import checked_in_catalog
+from tests.support.models import ScriptedChatModel, tool_call
 from tests.support.run_control import actor, command
 from tests.support.run_control import request as run_request
 
@@ -75,71 +74,36 @@ TOKEN_REF = f"environment:{TOKEN_ENV}"
 SCOPE = "tenant-1"
 CHILD_NAME = "technical-child"
 PARENT_SPAWN_TOOL_CALL_ID = "rrm013-start-async-task"
+PARENT_OBJECTIVE = "Reply with exactly the word PONG."
 
 
-class ParentSpawnModel(BaseChatModel):
+def parent_spawn_model(
+    *,
+    objective: str = PARENT_OBJECTIVE,
+    subagent_type: str = CHILD_NAME,
+    log_path: str | None = None,
+) -> ScriptedChatModel:
     """Deterministic parent cognition: one `start_async_task` call, then a report.
 
-    Every call is appended to a shared JSON log with the process ID so the crash-window proofs
-    can assert which process executed which turn.
+    With `log_path`, every call is appended to a shared JSON log with the process ID so the
+    crash-window proofs can assert which process executed which turn.
     """
 
-    objective: str = "Reply with exactly the word PONG."
-    subagent_type: str = CHILD_NAME
-    log_path: str | None = None
-
-    @property
-    def _llm_type(self) -> str:
-        return "rrm-013-parent-spawn"
-
-    def bind_tools(
-        self, tools: Sequence[Any], *, tool_choice: Any = None, **kwargs: Any
-    ) -> BaseChatModel:
-        del tools, tool_choice, kwargs
-        return self
-
-    def _reply(self, messages: list[BaseMessage]) -> ChatResult:
-        tool_messages = [item for item in messages if isinstance(item, ToolMessage)]
-        if self.log_path:
-            with Path(self.log_path).open("a", encoding="utf-8") as handle:
-                handle.write(
-                    json.dumps({"pid": os.getpid(), "tool_messages": len(tool_messages)}) + "\n"
-                )
-        usage = {"input_tokens": 2, "output_tokens": 3, "total_tokens": 5}
-        if not tool_messages:
-            message = AIMessage(
-                content="",
-                tool_calls=[
-                    {
-                        "name": "start_async_task",
-                        "args": {
-                            "description": self.objective,
-                            "subagent_type": self.subagent_type,
-                        },
-                        "id": PARENT_SPAWN_TOOL_CALL_ID,
-                        "type": "tool_call",
-                    }
-                ],
-                usage_metadata=usage,
+    def script(messages: list[BaseMessage], call: int) -> AIMessage:
+        del call
+        results = [item for item in messages if isinstance(item, ToolMessage)]
+        if log_path:
+            with Path(log_path).open("a", encoding="utf-8") as handle:
+                handle.write(json.dumps({"pid": os.getpid(), "tool_messages": len(results)}) + "\n")
+        if not results:
+            return tool_call(
+                "start_async_task",
+                {"description": objective, "subagent_type": subagent_type},
+                PARENT_SPAWN_TOOL_CALL_ID,
             )
-        else:
-            message = AIMessage(
-                content=json.dumps({"spawned": str(tool_messages[-1].content)}),
-                usage_metadata=usage,
-            )
-        return ChatResult(generations=[ChatGeneration(message=message)])
+        return AIMessage(content=json.dumps({"spawned": str(results[-1].content)}))
 
-    def _generate(
-        self, messages: list[BaseMessage], stop: Any = None, run_manager: Any = None, **kwargs: Any
-    ) -> ChatResult:
-        del stop, run_manager, kwargs
-        return self._reply(messages)
-
-    async def _agenerate(
-        self, messages: list[BaseMessage], stop: Any = None, run_manager: Any = None, **kwargs: Any
-    ) -> ChatResult:
-        del stop, run_manager, kwargs
-        return self._reply(messages)
+    return ScriptedChatModel(script=script, label="rrm-013-parent-spawn")
 
 
 class CrashWindowProvider:
@@ -189,7 +153,7 @@ class LiveStack:
     authority: PostgresAsyncSubagentAuthority
     binding: DeepAgentExecutionBinding
     contract: AsyncSubagentContract
-    model: ParentSpawnModel
+    model: ScriptedChatModel
 
 
 class _MiddlewareFactory:

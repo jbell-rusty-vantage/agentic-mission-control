@@ -10,7 +10,7 @@ from pathlib import Path
 import pytest
 from tests.fixtures.checkpoint_lineage import activity_attempt
 from tests.support.deep_agents import registry
-from tests.support.integration.deep_agents.report_source_context import FullContextReader
+from tests.support.integration.deep_agents.report_source_context import FULL_CONTEXT_READER
 from tests.support.integration.deep_agents.wi02_transfer_plan_lane import (
     _invocation,
     _materializer,
@@ -53,24 +53,25 @@ async def test_real_agent_reads_all_verified_context_bytes(tmp_path: Path, appli
         update={"binding": invocation.binding.model_copy(update={"transfer": selection})}
     )
     materializer, store = _materializer()
-    FullContextReader.expected = expected
-    FullContextReader.observed = {}
-    FullContextReader.file_path = (
+    FULL_CONTEXT_READER.expected = expected
+    FULL_CONTEXT_READER.observed = {}
+    FULL_CONTEXT_READER.file_path = (
         f"/inputs/foundation/{context.digest(expected)[7:23]}/foundation.txt"
     )
     adapter = DeepAgentRuntimeAdapter(
-        ExactDeepAgentMaterializer(registry(binding, bundle, FullContextReader())),
+        ExactDeepAgentMaterializer(registry(binding, bundle, FULL_CONTEXT_READER.model())),
         transfer=materializer,
     )
     lineage = CheckpointLineageService(InMemoryCheckpointLineageRepository())
     plan = await lineage.observe_attempt(invocation.binding, activity_attempt(1), dispatching=True)
     result = await adapter.execute(invocation.model_copy(update={"checkpoint_plan": plan}), {})
     assert result.output_text == "entire context read"
-    assert sorted(FullContextReader.observed) == list(
+    assert sorted(FULL_CONTEXT_READER.observed) == list(
         range(1, len(expected.decode().splitlines()) + 1)
     )
     observed = (
-        "\n".join(FullContextReader.observed[i] for i in sorted(FullContextReader.observed)) + "\n"
+        "\n".join(FULL_CONTEXT_READER.observed[i] for i in sorted(FULL_CONTEXT_READER.observed))
+        + "\n"
     )
     assert observed.encode() == expected
     (sealed,) = store.plans.values()

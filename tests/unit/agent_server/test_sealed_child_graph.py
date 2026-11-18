@@ -39,7 +39,7 @@ from mission_control.domain.execution.async_subagent_reconciliation import (
 from mission_control.domain.execution.contracts import AsyncSubagentContract
 from mission_control.domain.execution.errors import DeepAgentMaterializationError
 from tests.support.deep_agents import exact_fixture
-from tests.support.unit.agent_server.async_subagent_server_offline import ScriptedChildModel
+from tests.support.unit.agent_server.async_subagent_server_offline import scripted_child_model
 from tests.support.unit.operations.async_child_check_time_admission import _sealed_contract
 
 SCOPE = "tenant-1"
@@ -132,7 +132,7 @@ async def test_the_sealed_child_compiles_through_the_worker_adapter_and_stamps_i
     contract = _contract()
     sealed = contract.child_binding
     assert sealed is not None
-    model = ScriptedChildModel()
+    model = scripted_child_model()
     base = ExactComponentRegistry(
         model_factories={sealed.binding.model.ref.digest: lambda *_: model}
     )
@@ -165,7 +165,7 @@ async def test_the_sealed_child_compiles_through_the_worker_adapter_and_stamps_i
             )
     stamp = AsyncServedGraphIdentity.model_validate(result["belllabs_served_graph"])
     assert stamp.matches(contract)
-    assert result["messages"][-1].content == "PONG" and model.calls == 1
+    assert result["messages"][-1].content == "PONG" and len(model.calls) == 1
     assert build_sealed_child_graph  # the deployment's builder composes the same two steps
 
 
