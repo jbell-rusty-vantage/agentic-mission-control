@@ -5,6 +5,9 @@ packages/mission-control-db-contract/releases/** text eol=lf
 packages/mission-control-db-contract/releases/*/component/migrations/0002_authoring.sql -text
 packages/mission-control-db-contract/releases/*/component/migrations/0004_capability_artifacts.sql -text
 packages/mission-control-db-contract/seeds/** text eol=lf
+# Applied with CRLF bytes: generate_catalog_seeds.py freezes digest 0adf290a over exactly these
+# bytes, so every checkout must reproduce them (LF normalization broke fresh and Linux checkouts).
+packages/mission-control-db-contract/seeds/common/mc.catalog.knowledge-tools-1.1.0.json -text
 deployments/*/release.lock.json text eol=lf
 # Hosted pack digests (the pack digest a saved agent is keyed by) hash LF bytes on every host.
 deployments/hosted-packs/** text eol=lf
