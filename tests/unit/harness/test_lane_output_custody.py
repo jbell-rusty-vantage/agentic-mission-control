@@ -4,7 +4,7 @@ Offline (G1). With a custody port composed, a file the agent wrote under the lea
 `outputs/` is registered through it (the port's ref replaces the opaque staged locator);
 without one, the lane stages it exactly as before. The production port
 (`WorkspaceCandidateLaneOutputs`) is covered in `tests/unit/operations/test_lane_outputs.py`
-and end to end in `tests/integration/temporal/test_mp20_workflow_parity.py`.
+and end to end in `tests/integration/temporal/test_cross_lane_workflow_parity.py`.
 """
 
 from __future__ import annotations

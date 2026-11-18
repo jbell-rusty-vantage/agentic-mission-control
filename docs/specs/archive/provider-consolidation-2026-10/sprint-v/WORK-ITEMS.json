@@ -722,7 +722,7 @@
       "proofs": [
         {
           "tier": "T1-MC",
-          "command": "mission-db release-build --component-root packages/mission-control-db-contract/releases/1.5.0/component (disposable PG17 127.0.0.1:55433); pytest -m common_db tests/integration/postgres/test_sprint_v_release_150.py",
+          "command": "mission-db release-build --component-root packages/mission-control-db-contract/releases/1.5.0/component (disposable PG17 127.0.0.1:55433); pytest -m common_db tests/integration/postgres/test_db_release_150_knowledge_boundary_records.py",
           "result": "passed",
           "count": "4 passed; fingerprint sha256:e18dc014f5c1b3a22d661da44356156ff1e2c0c24fae89275ab7ab96003d79d4",
           "notes": "1.5.0 from the complete 1.4.4 prefix (never 1.4.0 root); 0050..0054; EFFECT_CONFLICT MCE01, SUBMISSION_CONFLICT MCE02; live locks untouched"

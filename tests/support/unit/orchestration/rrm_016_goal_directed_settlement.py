@@ -1,6 +1,6 @@
 """Builders, constants and fakes that other test files import.
 
-Moved from tests/unit/orchestration/test_rrm_016_goal_directed_settlement.py.
+Moved from tests/unit/orchestration/test_goal_loop_operation_settlement.py.
 """
 
 from __future__ import annotations

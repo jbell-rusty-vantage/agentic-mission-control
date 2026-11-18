@@ -93,11 +93,11 @@ on its next pass. Nothing else ends it: the wait is a Temporal timer between set
 (`OperationWorkflow._wait_settlement`, continued as new after its bound), each pass is its own
 activity under its own start-to-close timeout, no model call is made (so no turn budget applies),
 and the parent starts the operation child with no execution timeout; only a cancel ends it. Proof:
-`tests/unit/knowledge/test_w1_d30_uncomposed_evaluators.py` (both families, the real admitted
+`tests/unit/knowledge/test_uncomposed_trusted_settlement.py` (both families, the real admitted
 configuration, no workspace template, judged revisions, release),
 `tests/unit/knowledge/test_knowledge_composition.py` (wiring),
-`tests/integration/postgres/test_w1_d30_uncomposed_postgres.py`; the long-wait behaviour is
-`tests/integration/temporal/test_wi04_saved_settlement_restart.py`.
+`tests/integration/postgres/test_trusted_pinned_report_wait.py`; the long-wait behaviour is
+`tests/integration/temporal/test_saved_settlement_restart.py`.
 
 **Not surfaced as a notice.** These waits are `unavailable` assessments: the coordinator attention
 stream (WI-19) emits notices only for held or rejected assessments, so an exhausted bound or a
@@ -105,12 +105,12 @@ stream (WI-19) emits notices only for held or rejected assessments, so an exhaus
 wait detail, not as an actionable inbox notice.
 
 Built / specified / goal: the bounded attempts, recorded causes, operator reset and observation recovery are implemented and tested
-on PostgreSQL (`tests/integration/postgres/test_w1_d30_uncomposed_postgres.py`); integrated in the paid fixtures; qualified: no (W1).
+on PostgreSQL (`tests/integration/postgres/test_trusted_pinned_report_wait.py`); integrated in the paid fixtures; qualified: no (W1).
 
 ## Citations
 
-- Tests: `tests/unit/knowledge/test_w1_d23_evaluator_causes.py` (request body, causes, bound,
+- Tests: `tests/unit/knowledge/test_evaluator_attempts.py` (request body, causes, bound,
   reset, recovery), `tests/unit/knowledge/test_ks_operation_id_parity.py`,
-  `tests/unit/knowledge/test_w1_d22_handle_operations.py`, `tests/unit/knowledge/test_knowledge_review.py`,
-  `tests/integration/postgres/test_w1_fixg_evaluator_ledger_postgres.py`,
+  `tests/unit/knowledge/test_knowledge_handle_operations.py`, `tests/unit/knowledge/test_knowledge_review.py`,
+  `tests/integration/postgres/test_evaluator_attempt_ledger.py`,
   `packages/mission-control-db-contract/tests/test_release_190_handle_operations.py`.

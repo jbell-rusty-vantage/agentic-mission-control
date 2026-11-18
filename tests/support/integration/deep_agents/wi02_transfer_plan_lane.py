@@ -1,6 +1,6 @@
 """Builders, constants and fakes that other test files import.
 
-Moved from tests/integration/deep_agents/test_wi02_transfer_plan_lane.py.
+Moved from tests/integration/deep_agents/test_transfer_plan_delivery.py.
 """
 
 from __future__ import annotations

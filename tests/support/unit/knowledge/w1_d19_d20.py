@@ -1,6 +1,6 @@
 """Builders, constants and fakes that other test files import.
 
-Moved from tests/unit/knowledge/test_w1_d19_d20.py.
+Moved from tests/unit/knowledge/test_knowledge_refusals.py.
 """
 
 from __future__ import annotations

@@ -130,9 +130,9 @@ Built / specified / goal: packet, selection record, lineage and the continuation
   [pressure](../../src/mission_control/domain/context/pressure.py), [lineage](../../src/mission_control/domain/execution/checkpoint_lineage.py),
   [continuation ledger](../../src/mission_control/adapters/postgres/context/continuation_repository.py), [activities](../../src/mission_control/adapters/temporal/activities/continuation.py),
   [Deep Agents compaction](../../src/mission_control/adapters/deep_agents/compaction.py), [Cursor controls](../../src/mission_control/adapters/cursor/controls.py).
-- Tests: [packer](../../tests/unit/context/test_packer.py), [stage handoff](../../tests/unit/operations/test_ft_b2_stage_handoff.py), [iteration packet](../../tests/unit/orchestration/test_ft_b3_goal_iteration_packet.py),
-  [handoff in PostgreSQL](../../tests/integration/postgres/test_ft_b2_context_handoff.py), [Deep Agents seeding](../../tests/integration/deep_agents/test_ft_b2_packet_seeding.py),
+- Tests: [packer](../../tests/unit/context/test_packer.py), [stage handoff](../../tests/unit/operations/test_stage_handoff.py), [iteration packet](../../tests/unit/orchestration/test_goal_iteration_packet.py),
+  [handoff in PostgreSQL](../../tests/integration/postgres/test_handoff_workspace_materialization.py), [Deep Agents seeding](../../tests/integration/deep_agents/test_context_packet_seeding.py),
   [lineage](../../tests/unit/operations/test_checkpoint_lineage.py), [classification](../../tests/unit/operations/test_checkpoint_recovery_classification.py),
   [checkpoint](../../tests/unit/operations/test_continuation_checkpoint.py), [service](../../tests/unit/operations/test_continuation_service.py),
   [phase machine](../../tests/unit/continuation/test_phase_machine.py), [lane turn](../../tests/unit/continuation/test_lane_turn_continuation.py),
-  [on Temporal](../../tests/integration/temporal/test_mp12_continuation.py), [Deep Agents](../../tests/integration/deep_agents/test_continuation_deep_agents.py).
+  [on Temporal](../../tests/integration/temporal/test_continuation_exactly_once.py), [Deep Agents](../../tests/integration/deep_agents/test_continuation_deep_agents.py).

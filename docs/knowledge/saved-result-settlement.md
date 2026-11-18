@@ -91,7 +91,7 @@ WI-05 bridges native receipt reconciliation into the effect wait. A refused disp
 fenced (`details.fenced`) `journaled_uncommitted` only once `receipt.get` proves no commit; `committed`, `unknown`, a retry's
 refusal or an unstated `UNRESOLVED_EFFECT`/`INTERNAL` leaves it `uncertain`, the settlement waits on
 it and it settles from the receipt KS reconstructs for the original dispatch
-(`tests/unit/knowledge/test_wi04_lane_settlement.py`); the fresh-process native proofs are in KS. The async-children completion still runs inside `execute`, and
+(`tests/unit/knowledge/test_lane_output_settlement.py`); the fresh-process native proofs are in KS. The async-children completion still runs inside `execute`, and
 a crash between cognition and the save is recovered model-free by the checkpoint classification
 (`terminal_unobserved`). The segment-loop path (opt-in `deep_agent_segment_loop`) and
 `GenericArtifactWorkflow` wait durably but do not continue as new. The PostgreSQL live-fence proof covers
@@ -110,12 +110,12 @@ tested on PostgreSQL and Temporal restart (below); integrated with real KS revie
 
 ## Citations
 
-- Unit: `tests/unit/operations/test_wi04_saved_settlement.py` (real `create_deep_agent`; crash after
+- Unit: `tests/unit/operations/test_saved_settlement.py` (real `create_deep_agent`; crash after
   completion, before the save, review wait, effect wait, late acknowledgment, unavailable settlement,
-  cancellation with a pending review and a pending effect), `tests/unit/knowledge/test_wi04_lane_settlement.py`.
-- PostgreSQL 17: `tests/integration/postgres/test_wi04_saved_settlement_postgres.py`,
-  `tests/integration/postgres/test_sprint_oc_release_170.py`.
-- Temporal + PostgreSQL: `tests/integration/temporal/test_wi04_saved_settlement_restart.py`.
+  cancellation with a pending review and a pending effect), `tests/unit/knowledge/test_lane_output_settlement.py`.
+- PostgreSQL 17: `tests/integration/postgres/test_saved_settlement_postgres.py`,
+  `tests/integration/postgres/test_db_release_170_output_contracts_transfer_plans.py`.
+- Temporal + PostgreSQL: `tests/integration/temporal/test_saved_settlement_restart.py`.
 - [Output contracts](output-contracts.md);
   [submission and finalization decision](../adr/0058-composable-output-obligations-and-one-submission-act.md);
   [Temporal sole scheduler](../adr/0004-temporal-sole-scheduler-transactional-outbox.md);

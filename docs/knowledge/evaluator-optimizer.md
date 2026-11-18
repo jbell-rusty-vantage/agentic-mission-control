@@ -89,6 +89,6 @@ Built / specified / goal: the Goal Loop verifier-with-pinned-rubric subset and h
 - Code: [GoalDirected interpreter](../../src/mission_control/domain/programs/goal_directed.py), [verifier contracts](../../src/mission_control/domain/programs/contracts.py),
   [policies](../../src/mission_control/domain/authoring/contracts.py), [application service](../../src/mission_control/application/programs/goal_directed.py),
   [transfer builders](../../src/mission_control/domain/context/transfer_builders.py), [manifest node](../../src/mission_control/domain/authoring/manifest.py).
-- Tests: [verifier loop](../../tests/unit/orchestration/test_wp_bp_020_goal_directed.py), [fulfillment at convergence](../../tests/unit/outputs/test_w1_convergence_fulfillment.py),
+- Tests: [verifier loop](../../tests/unit/orchestration/test_goal_loop_rules.py), [fulfillment at convergence](../../tests/unit/outputs/test_convergence_fulfillment.py),
   [lane support](../../tests/unit/authoring/test_manifest_compile.py).
 - Evidence (integrated, not qualified): [control board](../specs/provider-consolidation-2026-10/sprint-oc/NEXT-SESSION.md) (`:69-87` independent KS verification with real repair; `:362-366` held-repair delivery).

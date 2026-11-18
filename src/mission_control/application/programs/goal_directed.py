@@ -1674,7 +1674,7 @@ DETERMINISTIC_VERIFIER_FAILURES = frozenset(
 )
 # Every other failure code the operation boundary records: not a judgment about the outputs, so
 # the family keeps its typed failure. A new code must be classified in one of the two sets
-# (`tests/unit/orchestration/test_w1_goal_failure_paths.py` enumerates the boundary's codes).
+# (`tests/unit/orchestration/test_goal_failure_paths.py` enumerates the boundary's codes).
 NON_JUDGED_VERIFIER_FAILURES = frozenset(
     {
         "budget_exceeded",

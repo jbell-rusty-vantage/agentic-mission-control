@@ -1,6 +1,6 @@
 """Builders, constants and fakes that other test files import.
 
-Moved from tests/unit/context/test_wi07_current_set_transfer.py.
+Moved from tests/unit/context/test_current_accepted_set_transfer.py.
 """
 
 from __future__ import annotations

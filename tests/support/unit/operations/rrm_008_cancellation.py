@@ -1,6 +1,6 @@
 """Builders, constants and fakes that other test files import.
 
-Moved from tests/unit/operations/test_rrm_008_cancellation.py.
+Moved from tests/unit/operations/test_operation_cancellation.py.
 """
 
 from __future__ import annotations

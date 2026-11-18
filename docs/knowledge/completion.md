@@ -116,6 +116,6 @@ Built / specified / goal: closed AST, fulfillment, reducer terminalization and d
   [Goal service](../../src/mission_control/application/programs/goal_directed.py), [decision writers](../../src/mission_control/adapters/postgres/orchestration/completion_repository.py),
   [coordinator result](../../src/mission_control/domain/coordinator/launch.py), [execution contracts](../../src/mission_control/domain/execution/contracts.py).
 - Tests: [run control](../../tests/unit/run_control/test_run_control.py), [Stage Graph](../../tests/unit/orchestration/test_stagegraph_v2.py),
-  [GoalDirected](../../tests/unit/orchestration/test_wp_bp_020_goal_directed.py), [convergence fulfillment](../../tests/unit/outputs/test_w1_convergence_fulfillment.py),
-  [Goal fulfillment](../../tests/unit/orchestration/test_w1_goal_fulfillment.py), [PostgreSQL fulfillment](../../tests/integration/postgres/test_w1_fulfillment_postgres.py).
+  [GoalDirected](../../tests/unit/orchestration/test_goal_loop_rules.py), [convergence fulfillment](../../tests/unit/outputs/test_convergence_fulfillment.py),
+  [Goal fulfillment](../../tests/unit/orchestration/test_goal_fulfillment.py), [PostgreSQL fulfillment](../../tests/integration/postgres/test_convergence_fulfillment_postgres.py).
 - Schema: [`0003_execution.sql`](../../packages/mission-control-db-contract/component/migrations/0003_execution.sql), [`0004_capability_artifacts.sql`](../../packages/mission-control-db-contract/component/migrations/0004_capability_artifacts.sql).

@@ -1,6 +1,6 @@
 """Builders, constants and fakes that other test files import.
 
-Moved from tests/integration/postgres/test_mp11_approvals_postgres.py.
+Moved from tests/integration/postgres/test_approval_bindings_postgres.py.
 """
 
 from __future__ import annotations

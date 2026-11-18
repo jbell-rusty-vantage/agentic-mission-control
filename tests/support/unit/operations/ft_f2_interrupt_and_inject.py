@@ -1,6 +1,6 @@
 """Builders, constants and fakes that other test files import.
 
-Moved from tests/unit/operations/test_ft_f2_interrupt_and_inject.py.
+Moved from tests/unit/operations/test_interrupt_and_inject.py.
 """
 
 from __future__ import annotations

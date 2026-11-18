@@ -13,7 +13,9 @@ ROOT: Final = Path(__file__).resolve().parents[3]
 QUALIFICATION_DIR: Final = ROOT / "docs" / "qualification" / "lanes"
 # Qualified before live-drill records existed: the FT-G1 Deep Agents lane, qualified by its
 # acceptance suite (application/execution/harness/describe.py, DEEP_AGENTS_DESCRIBE).
-BASELINE_QUALIFICATIONS: Final = {"deep_agents": "tests/acceptance/control_plane/test_wp_cp_040.py"}
+BASELINE_QUALIFICATIONS: Final = {
+    "deep_agents": "tests/acceptance/control_plane/test_deep_agents_lane_materialization.py"
+}
 
 
 def front_matter(profile: str, root: Path = QUALIFICATION_DIR) -> list[dict[str, str]]:

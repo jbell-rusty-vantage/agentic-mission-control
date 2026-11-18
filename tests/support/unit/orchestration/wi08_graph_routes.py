@@ -1,6 +1,6 @@
 """Builders, constants and fakes that other test files import.
 
-Moved from tests/unit/orchestration/test_wi08_graph_routes.py.
+Moved from tests/unit/orchestration/test_graph_routes.py.
 """
 
 from __future__ import annotations

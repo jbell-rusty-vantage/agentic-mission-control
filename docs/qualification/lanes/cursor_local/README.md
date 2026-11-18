@@ -39,7 +39,7 @@ Three facts are kept apart for every control:
 | `end_session` (patch stored before the lease is released) | native | yes | offline: `test_cursor_local.py` | n/a |
 | `pause` | unsupported | no (refused mid-run, boundary only) | `tests/conformance/lanes/test_describe_honesty.py::test_pause_mid_run_is_refused_unless_the_lane_pauses_mid_run` | n/a |
 | `reconcile_dispatch` (MP-06 `DispatchReconcilingLane`) | not a describe cell (frozen `LANE_CONTROLS`) | yes, bounded: `found` only from this process's memory (the SDK store offers no lookup by idempotency key; a process death ends the agent loop with the run), otherwise `unknown`, which parks `in_doubt` | offline: `tests/unit/cursor/test_local_reconcile_and_rehydration.py` | n/a |
-| Host gate (`LANE_UNSUPPORTED_OS`) | n/a | yes: `bridge.host_gate()`, enforced in `prepare`, `start` and `SdkBridgeLauncher.launch` | offline: `tests/unit/cursor/test_host_gate.py` (Windows refused on either loop, Linux/WSL 2/macOS pass); `tests/unit/runtime/test_mp22_local_readiness.py` (preflight) | n/a |
+| Host gate (`LANE_UNSUPPORTED_OS`) | n/a | yes: `bridge.host_gate()`, enforced in `prepare`, `start` and `SdkBridgeLauncher.launch` | offline: `tests/unit/cursor/test_host_gate.py` (Windows refused on either loop, Linux/WSL 2/macOS pass); `tests/unit/runtime/test_local_readiness.py` (preflight) | n/a |
 
 ## Approval coverage (headless `ask` and tool gates)
 

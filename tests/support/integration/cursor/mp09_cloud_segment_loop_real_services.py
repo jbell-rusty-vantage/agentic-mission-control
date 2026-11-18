@@ -1,6 +1,6 @@
 """Builders, constants and fakes that other test files import.
 
-Moved from tests/integration/cursor/test_mp09_cloud_segment_loop_real_services.py.
+Moved from tests/integration/cursor/test_cursor_cloud_segment_loop.py.
 """
 
 from __future__ import annotations

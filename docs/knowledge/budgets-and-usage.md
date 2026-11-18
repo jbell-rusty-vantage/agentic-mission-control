@@ -146,7 +146,7 @@ human and driver rule, not a runtime gate.
   [budget view reader](../../src/mission_control/adapters/postgres/run_control/inspection_repository.py).
 - Tests: [boundary commands, resume re-reserve](../../tests/unit/run_control/test_boundary_commands.py),
   [async child parent budget](../../tests/unit/operations/test_async_child_parent_budget.py),
-  [RRM-008 cancellation settlement](../../tests/unit/operations/test_rrm_008_cancellation.py),
+  [RRM-008 cancellation settlement](../../tests/unit/operations/test_operation_cancellation.py),
   [atomic family admission](../../tests/unit/run_control/test_atomic_family_admission.py),
   [lane settlement usage](../../tests/unit/harness/test_lane_settlement_usage.py),
   [budget stop](../../tests/unit/deep_agents/test_in_turn_run_budget.py),
@@ -155,5 +155,5 @@ human and driver rule, not a runtime gate.
   [turn stops and resumed spend](../../tests/unit/deep_agents/test_turn_stops.py),
   [exactly at the limit exhausts nothing](../../tests/unit/operations/test_fenced_turn.py),
   [disconnect keeps usage and points](../../tests/acceptance/mission_control/test_tracing_stream.py),
-  [inspection sections](../../tests/unit/run_control/test_ft_f6_inspection.py),
-  [capacity wait on Temporal](../../tests/integration/temporal/test_mp06_dispatch_recovery.py).
+  [inspection sections](../../tests/unit/run_control/test_inspection_enrichment.py),
+  [capacity wait on Temporal](../../tests/integration/temporal/test_dispatch_recovery_temporal.py).

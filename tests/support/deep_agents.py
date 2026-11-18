@@ -1,4 +1,6 @@
-"""Deep Agents binding builders and async-subagent doubles, from test_wp_cp_040 and test_wp_cp_045.
+"""Deep Agents binding builders and async-subagent doubles.
+
+Moved from test_deep_agents_lane_materialization and test_async_subagent_governance.
 
 exact_fixture, registry, unit_bound and planned_invocation build an exact Deep Agents
 binding; skill_reading_model and session_probe_model script the chat model; the

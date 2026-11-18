@@ -1,6 +1,6 @@
 """Builders, constants and fakes that other test files import.
 
-Moved from tests/unit/orchestration/test_wp_bp_020_goal_directed.py.
+Moved from tests/unit/orchestration/test_goal_loop_rules.py.
 """
 
 from __future__ import annotations

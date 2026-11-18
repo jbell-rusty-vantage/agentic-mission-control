@@ -1,6 +1,6 @@
 """Builders, constants and fakes that other test files import.
 
-Moved from tests/unit/operations/test_rrm_016_goal_directed_recovery.py.
+Moved from tests/unit/operations/test_goal_loop_crash_recovery.py.
 """
 
 from __future__ import annotations

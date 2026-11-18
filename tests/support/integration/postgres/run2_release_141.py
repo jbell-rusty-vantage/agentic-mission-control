@@ -1,6 +1,6 @@
 """Builders, constants and fakes that other test files import.
 
-Moved from tests/integration/postgres/test_run2_release_141.py.
+Moved from tests/integration/postgres/test_db_release_141_install_upgrade_and_drift.py.
 """
 
 from __future__ import annotations

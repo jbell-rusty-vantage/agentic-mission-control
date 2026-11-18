@@ -1,6 +1,6 @@
 """Builders, constants and fakes that other test files import.
 
-Moved from tests/integration/temporal/test_wi04_saved_settlement_restart.py.
+Moved from tests/integration/temporal/test_saved_settlement_restart.py.
 """
 
 from __future__ import annotations

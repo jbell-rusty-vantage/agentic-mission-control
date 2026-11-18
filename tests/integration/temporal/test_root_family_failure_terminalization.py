@@ -8,9 +8,9 @@ is refused for good; a root history recorded before `w1-d15-root-terminalizes-fa
 replays on the production root without the new activity.
 
 Replaces the `temporalio.workflow`-patching root tests of
-tests/unit/coordinator/test_w1_family_failure_terminalization.py (OVE-238 G4). The real-server
+tests/unit/coordinator/test_failed_run_terminalization.py (OVE-238 G4). The real-server
 cases (a terminated family, an undecodable result, a cancel during terminalization) are in
-test_w1_family_failure_root.py.
+test_root_failure_terminalization.py.
 """
 
 from __future__ import annotations

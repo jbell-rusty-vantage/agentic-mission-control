@@ -1,6 +1,6 @@
 """Builders, constants and fakes that other test files import.
 
-Moved from tests/unit/harness/test_mp06_dispatch_recovery.py.
+Moved from tests/unit/harness/test_dispatch_recovery.py.
 """
 
 from __future__ import annotations

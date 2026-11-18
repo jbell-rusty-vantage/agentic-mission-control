@@ -78,7 +78,7 @@ composition passes the explicit `allow_version_mismatch` override.
 | `tests/unit/codex/test_compaction.py` | `CompactingLane` / `ContextOccupancyLane` isinstance; occupancy never from `total`; compaction refused mid-turn and reported on an idle thread; soft pressure → native compaction through `LaneTurnService` with a continuation coordinator |
 | `tests/unit/codex/test_launcher.py` | no bootstrap import in `adapters/codex`; version pin refusal (and the override); `rows` → required executables; `compose_codex_local` signature |
 | `tests/integration/codex/test_codex_approvals_postgres.py` | real PostgreSQL 17 (127.0.0.1:55433, migration chain through 0033): task + live correlation rows before the decision, `approved` through the production `PostgresApprovalContextProbe` (policy digest = `harness_execution` binding digest), pinned native answer, `lost` correlation after a relaunch |
-| `tests/integration/temporal/test_mp08_codex_lane_turns.py` | real local Temporal (127.0.0.1:7233) + disposable PostgreSQL 17: `OperationWorkflow` drives `lane.turn` segments over the FIXTURE app-server; full turn; reattach after a mid-turn app-server death; bounded segments (`max_frames=3`) complete; every history replayed with `Replayer` |
+| `tests/integration/temporal/test_codex_lane_turns.py` | real local Temporal (127.0.0.1:7233) + disposable PostgreSQL 17: `OperationWorkflow` drives `lane.turn` segments over the FIXTURE app-server; full turn; reattach after a mid-turn app-server death; bounded segments (`max_frames=3`) complete; every history replayed with `Replayer` |
 
 The app-server in every suite is `tests/support/providers/codex.py` (labelled FIXTURE)
 replaying `tests/fixtures/provider_frames/codex/scripts/*.jsonl` (first line `_fixture`,

@@ -358,7 +358,7 @@
         "tracked": false,
         "replacement": [
           {
-            "path": "tests/integration/temporal/test_rrm_016_goal_directed_journaled.py",
+            "path": "tests/integration/temporal/test_journaled_goal_loop.py",
             "exists": true,
             "tracked": true
           }
@@ -584,7 +584,7 @@
         "tracked": false,
         "replacement": [
           {
-            "path": "tests/integration/temporal/test_rrm_008_family_cancellation.py",
+            "path": "tests/integration/temporal/test_workflow_system_cancellation.py",
             "exists": true,
             "tracked": true
           }
@@ -634,7 +634,7 @@
         "tracked": false,
         "replacement": [
           {
-            "path": "tests/unit/operations/test_rrm_009_cancellation_composition.py",
+            "path": "tests/unit/operations/test_cancellation_composition.py",
             "exists": true,
             "tracked": true
           }
@@ -662,7 +662,7 @@
         "tracked": false,
         "replacement": [
           {
-            "path": "tests/integration/temporal/test_rrm_016_goal_directed_journaled.py",
+            "path": "tests/integration/temporal/test_journaled_goal_loop.py",
             "exists": true,
             "tracked": true
           }

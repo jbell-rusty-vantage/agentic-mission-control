@@ -121,6 +121,6 @@ Built / specified / goal: gates, service, transports, approvals and governed eff
   [governed MCP tools](../../src/mission_control/interfaces/mcp/governed_gateway.py).
 - Tests: [rules](../../tests/unit/human_tasks/test_human_gate_rules.py), [interfaces](../../tests/unit/human_tasks/test_human_task_interfaces.py),
   [manifest lowering](../../tests/unit/human_tasks/test_manifest_gate_lowering.py), [Goal review](../../tests/unit/human_tasks/test_goal_review.py),
-  [tasks in PostgreSQL](../../tests/integration/postgres/test_human_gate_tasks_postgres.py), [restart on Temporal](../../tests/integration/temporal/test_mp10_human_gate_restart.py),
-  [denied gate](../../tests/unit/orchestration/test_mp20_stagegraph_concluded_failure.py), [approval broker](../../tests/unit/approvals/test_approval_broker.py),
-  [approvals in PostgreSQL](../../tests/integration/postgres/test_mp11_approvals_postgres.py), [governed effects](../../tests/integration/postgres/test_mp11_governed_postgres.py).
+  [tasks in PostgreSQL](../../tests/integration/postgres/test_human_gate_tasks_postgres.py), [restart on Temporal](../../tests/integration/temporal/test_human_gate_restart.py),
+  [denied gate](../../tests/unit/orchestration/test_stage_graph_concluded_failure.py), [approval broker](../../tests/unit/approvals/test_approval_broker.py),
+  [approvals in PostgreSQL](../../tests/integration/postgres/test_approval_bindings_postgres.py), [governed effects](../../tests/integration/postgres/test_governed_effect_intents.py).

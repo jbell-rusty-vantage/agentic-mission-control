@@ -1,6 +1,6 @@
 """Builders, constants and fakes that other test files import.
 
-Moved from tests/integration/temporal/test_rrm_008_family_cancellation.py.
+Moved from tests/integration/temporal/test_workflow_system_cancellation.py.
 """
 
 from __future__ import annotations

@@ -1,6 +1,6 @@
 """MP-11 governed prepare / review / execute on a disposable PostgreSQL 17 (runtime role, RLS).
 
-SCHEMA: runs on the scratch database of ``test_mp11_approvals_postgres.mp11_db``: the
+SCHEMA: runs on the scratch database of ``test_approval_bindings_postgres.mp11_db``: the
 released chain 0001..0033 (component 1.2.0; MP-11 tables from 0033 section 1).
 
 Proves: prepare persists the intent and its ``governed_effect`` Human Task without executing;

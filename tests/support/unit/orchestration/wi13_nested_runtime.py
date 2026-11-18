@@ -1,6 +1,6 @@
 """Builders, constants and fakes that other test files import.
 
-Moved from tests/unit/orchestration/test_wi13_nested_runtime.py.
+Moved from tests/unit/orchestration/test_nested_body_runtime.py.
 """
 
 from __future__ import annotations

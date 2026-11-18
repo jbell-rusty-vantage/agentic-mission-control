@@ -2,7 +2,7 @@
 
 Offline (T0): the fake Agent Protocol client stands in for the Agent Server and an in-memory
 run control stands in for PostgreSQL; the Postgres proof is
-``tests/integration/postgres/test_wi23_async_children_postgres.py``.
+``tests/integration/postgres/test_async_subordinate_admission.py``.
 
 - Completion alone is not admission; the parent's check admits a completed child through the
   contract's registered policy, exactly once, and the admitted text and its

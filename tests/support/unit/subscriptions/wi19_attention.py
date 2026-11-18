@@ -1,6 +1,6 @@
 """Builders, constants and fakes that other test files import.
 
-Moved from tests/unit/subscriptions/test_wi19_attention.py.
+Moved from tests/unit/subscriptions/test_coordinator_attention.py.
 """
 
 from __future__ import annotations

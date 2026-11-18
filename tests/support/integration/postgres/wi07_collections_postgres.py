@@ -1,6 +1,6 @@
 """Builders, constants and fakes that other test files import.
 
-Moved from tests/integration/postgres/test_wi07_collections_postgres.py.
+Moved from tests/integration/postgres/test_collection_member_assessments.py.
 """
 
 from __future__ import annotations

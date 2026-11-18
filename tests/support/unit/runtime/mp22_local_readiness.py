@@ -1,6 +1,6 @@
 """Builders, constants and fakes that other test files import.
 
-Moved from tests/unit/runtime/test_mp22_local_readiness.py.
+Moved from tests/unit/runtime/test_local_readiness.py.
 """
 
 from __future__ import annotations

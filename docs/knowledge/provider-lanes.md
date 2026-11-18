@@ -149,8 +149,8 @@ Built / specified / goal: both lanes implemented, tested against FIXTURE clients
   [Codex units](../../tests/unit/codex/test_harness.py),
   [Codex segments](../../tests/unit/codex/test_segments.py),
   [Codex compaction](../../tests/unit/codex/test_compaction.py),
-  [Claude on Temporal](../../tests/integration/temporal/test_mp07_claude_lane_turns.py),
-  [Codex on Temporal](../../tests/integration/temporal/test_mp08_codex_lane_turns.py),
+  [Claude on Temporal](../../tests/integration/temporal/test_claude_lane_turns.py),
+  [Codex on Temporal](../../tests/integration/temporal/test_codex_lane_turns.py),
   [Claude broker in PostgreSQL](../../tests/integration/claude/test_claude_broker_postgres.py),
   [Codex approvals in PostgreSQL](../../tests/integration/codex/test_codex_approvals_postgres.py),
   [Codex continuation on Temporal](../../tests/integration/codex/test_codex_continuation_temporal.py).

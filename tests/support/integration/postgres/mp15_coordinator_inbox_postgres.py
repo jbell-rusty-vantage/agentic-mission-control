@@ -1,6 +1,6 @@
 """Builders, constants and fakes that other test files import.
 
-Moved from tests/integration/postgres/test_mp15_coordinator_inbox_postgres.py.
+Moved from tests/integration/postgres/test_coordinator_inbox_postgres.py.
 """
 
 from __future__ import annotations

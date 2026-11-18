@@ -1,6 +1,6 @@
 """Builders, constants and fakes that other test files import.
 
-Moved from tests/integration/postgres/test_sprint_v_release_150.py.
+Moved from tests/integration/postgres/test_db_release_150_knowledge_boundary_records.py.
 """
 
 from __future__ import annotations

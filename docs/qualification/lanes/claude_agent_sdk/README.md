@@ -70,7 +70,7 @@ They prove what the lane does with the pinned SDK's documented shapes, not live 
 
 | Suite | What it proves |
 | --- | --- |
-| `tests/integration/temporal/test_mp07_claude_lane_turns.py` | A claude unit runs through the production `OperationWorkflow` (segment loop, `SEGMENT_LOOP_PATCH`): `activity_task_queue` routes every `lane.turn` to `provider_binding.task_queue`; frames and lane state in PostgreSQL under the runtime role; one live session across segments, one send; an error result settles `failed(capacity)`; every history replays with `Replayer`. |
+| `tests/integration/temporal/test_claude_lane_turns.py` | A claude unit runs through the production `OperationWorkflow` (segment loop, `SEGMENT_LOOP_PATCH`): `activity_task_queue` routes every `lane.turn` to `provider_binding.task_queue`; frames and lane state in PostgreSQL under the runtime role; one live session across segments, one send; an error result settles `failed(capacity)`; every history replays with `Replayer`. |
 | `tests/integration/claude/test_claude_broker_postgres.py` | The same production path with MP-11's PostgreSQL approval repositories (migration 0033): the native request waits on a persisted approval task, a reviewer resolves it through `HumanTaskService`, the production `PostgresApprovalContextProbe` revalidates (its policy digest and generation equal what the lane bound), the correlation is answered; an unanswered request expires its correlation while the task stays pending. |
 
 Command (the DSN is injected by the workspace helper, never printed):
@@ -78,7 +78,7 @@ Command (the DSN is injected by the workspace helper, never printed):
 ```
 bash /c/Users/Pinda/Proyectos/BellLabs/.workspace-setup/mc-integration-20261009/with-test-db.sh \
   uv run --no-sync --group biotech --group dbcontract pytest -p no:cacheprovider -q \
-  tests/integration/temporal/test_mp07_claude_lane_turns.py tests/integration/claude
+  tests/integration/temporal/test_claude_lane_turns.py tests/integration/claude
 ```
 
 ## OS constraints

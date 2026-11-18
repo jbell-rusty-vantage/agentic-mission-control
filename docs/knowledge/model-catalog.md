@@ -52,8 +52,8 @@ one, the lane compiles it into the model component (`settings.use_responses_api`
 sets it false is `api_surface_conflict`) and the trusted evaluators build `ChatOpenAI` with
 `use_responses_api` (`RolePin.api_surface`). Every checked-in OpenAI row (gpt-5.6-terra,
 gpt-5.6-luna, gpt-5.4-mini) declares `responses`; the model keeps its own reasoning. Proof:
-`tests/unit/resolution/test_w1_d24_api_surface.py`, the judge's `/v1/responses` body in
-`tests/unit/knowledge/test_w1_d23_evaluator_causes.py`.
+`tests/unit/resolution/test_openai_responses_surface.py`, the judge's `/v1/responses` body in
+`tests/unit/knowledge/test_evaluator_attempts.py`.
 
 **Structured-output strategy (W1 D16, D18).** A row that `supports` structured output declares
 `structured_output = "tool_forced"` (the schema is a tool the model must call: `tool_choice` any),
@@ -105,7 +105,7 @@ for (absent from `lane list`, OC-R3), `unregistered` for one listed with a runti
 seed workflows; the AI Engineer knowledge schema's model entities are knowledge and unrelated.
 
 One runtime consumer reads prices: the trusted evaluators price `usage.costUsd` from the `models.toml` row (base or long-prompt tier by input tokens;
-`adapters/deep_agents/evaluators.py:22-24,183-186`; test `tests/unit/resolution/test_w1_d24_api_surface.py`). Lane budgets do not yet read prices or windows: Deep Agents reports tokens and turns, not cost
+`adapters/deep_agents/evaluators.py:22-24,183-186`; test `tests/unit/resolution/test_openai_responses_surface.py`). Lane budgets do not yet read prices or windows: Deep Agents reports tokens and turns, not cost
 ([budgets and usage](budgets-and-usage.md), [Deep Agents lane](deep-agents-lane.md)). The example and test launch bindings still bind fixture names `frontier.*`, which the installed catalogs do not declare.
 
 Built / specified / goal: catalog, routes, listing and structured-output binding built and tested; Deep Agents routes both vendors natively; other lanes' routes are declarations only.

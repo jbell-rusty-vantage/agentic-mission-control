@@ -5,7 +5,7 @@ per-member judgments with each member's exact ref and digest, the authored aggre
 mixed held/accepted/rejected members, identity versus revisions, missing coverage, duplicate and
 reordered inputs, concurrent head promotion, host promotion of a member-judged collection only
 on the verifier's acceptance, and the goal-wide current-set index. The PostgreSQL proof of the
-same behaviors is ``tests/integration/postgres/test_wi07_collections_postgres.py``.
+same behaviors is ``tests/integration/postgres/test_collection_member_assessments.py``.
 """
 
 from __future__ import annotations

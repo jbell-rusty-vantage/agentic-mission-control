@@ -1,5 +1,5 @@
 """MO-14 `repo_pr` through the governed gateway on a disposable PostgreSQL 17 (runtime role,
-RLS): the MP-11 scratch database of ``test_mp11_approvals_postgres.mp11_db`` (released chain
+RLS): the MP-11 scratch database of ``test_approval_bindings_postgres.mp11_db`` (released chain
 0001..0034).
 
 Proves on the real stores: a push to a non-`mc/` ref is rejected by the worktree guard; the

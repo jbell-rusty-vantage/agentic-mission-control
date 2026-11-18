@@ -1,7 +1,7 @@
 """WI-19 / OVE-182: coordinator attention as six separate observations, and bounded content.
 
 Deterministic (in-memory stores, FIXTURE clock and nonces); the PostgreSQL behaviour of the 0063
-table is `tests/integration/postgres/test_wi19_attention_postgres.py`. None of this is the
+table is `tests/integration/postgres/test_coordinator_attention_postgres.py`. None of this is the
 selected host: the host stages here are attested by the test, exactly as a host would attest
 them, so these tests prove the server's rules (separation, nonce binding, order, refusal,
 idempotency, budgets), not a real wake.

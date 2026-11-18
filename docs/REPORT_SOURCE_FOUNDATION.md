@@ -29,7 +29,7 @@ bridge. The setup itself performs no network calls or installation.
 
 `partial-fixture.json` records limits, preset guidance, agent-authored decisions and required
 proofs. The runtime loading test is
-`tests/acceptance/control_plane/test_wp_cp_040.py` (hermetic skill bundles); it proves discovery
+`tests/acceptance/control_plane/test_deep_agents_lane_materialization.py` (hermetic skill bundles); it proves discovery
 and complete instruction/context reads, not service integration. Follow the
 [current session instructions](specs/archive/provider-consolidation-2026-10/sessions/SESSION-CODEX-RESUME-2026-10-29.md)
 for the bounded service fixture that ends at submission.
@@ -64,8 +64,8 @@ generator (`scripts/report_source_foundation.py`) were deleted on 2026-11-17 wit
 | --- | --- | --- |
 | Submission | `tests/unit/knowledge/test_submission_foundation.py`, PostgreSQL output-contract regressions | Scripted calls; acknowledgements are not fulfillment |
 | Canonical subsets | `scripts/report_source_context.py`, profiles and unit tests | Bounded read-only context, not write authority or a complete domain schema |
-| Actual receiving bytes | `tests/integration/deep_agents/test_wi02_transfer_plan_lane.py` | Real Deep Agents StateBackend and paginated scripted reader; plan store is in memory |
-| Exact accepted transfer | Existing `test_wi02_dependent_stage_transfer.py` | Real lane; verifying fake KS binding; not the real-service end-to-end chain |
+| Actual receiving bytes | `tests/integration/deep_agents/test_transfer_plan_delivery.py` | Real Deep Agents StateBackend and paginated scripted reader; plan store is in memory |
+| Exact accepted transfer | Existing `test_dependent_stage_transfer.py` | Real lane; verifying fake KS binding; not the real-service end-to-end chain |
 | Joined MC→KS→consumer | `tests/integration/deep_agents/test_report_source_real_service.py` | Real scoped MC tools/stores and KS HTTP/custody, exact Deep Agents read; scripted assessment and controller promotion, not a Temporal mission |
 | KS report repair/restart | KS `apps/verification-executor/src/knowledge-operation/report-source-foundation.integration.test.ts` | Real K01 HTTP registration/read, component PostgreSQL, custody and restarted executor; scripted application-direct judge/auditor, not evaluator HTTP/model qualification |
 

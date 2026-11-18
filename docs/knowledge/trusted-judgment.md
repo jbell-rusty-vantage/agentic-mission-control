@@ -42,7 +42,7 @@ exact decision, supersedes and promotes. `knowledge_apply` resolves decisions fr
 raises a typed refusal whose `issues` carry KS's message (the key id) and the operator action;
 the settlement waits `settlement_unavailable`, and the next pass recovers every observation from
 KS by its dispatch marker and seals, with no paid evaluator rerun. The HTTP client never re-sends
-`invoke` (W1 D25; `tests/unit/knowledge/test_w1_d25_seal_key_wait.py`).
+`invoke` (W1 D25; `tests/unit/knowledge/test_seal_key_wait.py`).
 
 Production composition ([`bootstrap/trusted_judgment.py`](../../src/mission_control/bootstrap/trusted_judgment.py)):
 `compose_knowledge_lane` composes the trusted settlement when both `MC_JUDGE_OPENAI_API_KEY` and
@@ -60,7 +60,7 @@ and its long-prompt tier for every model call. A launch whose Stage Graph has de
 `dependent_inputs_unavailable` when no trusted settlement can compose. Proof:
 `tests/unit/knowledge/test_trusted_judgment.py`, `tests/conformance/test_trusted_assessment_protocol.py`,
 `tests/integration/postgres/test_trusted_judgment_postgres.py` and
-`tests/integration/temporal/test_wi03_trusted_review_restart.py` (deterministic KS double).
+`tests/integration/temporal/test_trusted_review_restart.py` (deterministic KS double).
 
 A role observes a run once (KS refuses a second batch with `evaluator_role_observed`; the bridge
 treats it as observed), so a failing verdict is sticky for that revision and a judge cannot be

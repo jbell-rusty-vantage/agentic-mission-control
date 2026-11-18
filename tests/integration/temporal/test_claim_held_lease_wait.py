@@ -8,7 +8,7 @@ in the details and as `next_retry_delay`), for all three attempts of the first r
 completes. Before the fix the unit failed after the first round (session 12, run eb311192).
 The rounds are bounded, a refusal naming no deadline is not waited on, and a cancel during the
 wait reconciles through `operation.cancel` without another round (OVE-238 G4: these replace the
-`temporalio.workflow`-patching tests of tests/unit/operations/test_d39_claim_held_retry.py).
+`temporalio.workflow`-patching tests of tests/unit/operations/test_claim_held_retry.py).
 """
 
 from __future__ import annotations

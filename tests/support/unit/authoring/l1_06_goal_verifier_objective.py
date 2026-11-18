@@ -1,6 +1,6 @@
 """Builders, constants and fakes that other test files import.
 
-Moved from tests/unit/authoring/test_l1_06_goal_verifier_objective.py.
+Moved from tests/unit/authoring/test_goal_verifier_objective.py.
 """
 
 from __future__ import annotations

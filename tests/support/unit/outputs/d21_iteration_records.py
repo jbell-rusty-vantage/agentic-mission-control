@@ -1,8 +1,8 @@
 """W1 D21 promise builders: a per-iteration progress note beside required, expected and
 optional text promises at `root`.
 
-Used by tests/unit/outputs/test_w1_convergence_fulfillment.py and
-tests/integration/postgres/test_wi07_collections_postgres.py.
+Used by tests/unit/outputs/test_convergence_fulfillment.py and
+tests/integration/postgres/test_collection_member_assessments.py.
 """
 
 from __future__ import annotations

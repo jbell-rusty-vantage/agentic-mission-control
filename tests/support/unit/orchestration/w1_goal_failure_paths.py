@@ -1,6 +1,6 @@
 """Builders, constants and fakes that other test files import.
 
-Moved from tests/unit/orchestration/test_w1_goal_failure_paths.py.
+Moved from tests/unit/orchestration/test_goal_failure_paths.py.
 """
 
 from __future__ import annotations

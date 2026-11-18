@@ -132,5 +132,5 @@ Built / specified / goal: chains, release, relay, exact linked exports, adoption
 - Tests: [compile](../../tests/unit/chains/test_chain_compile.py), [reducer](../../tests/unit/chains/test_chain_reducer.py), [interfaces](../../tests/unit/chains/test_chain_interfaces.py),
   [tables](../../tests/integration/postgres/test_mission_chain_tables.py), [release](../../tests/integration/postgres/test_chain_release.py),
   [idempotent start](../../tests/integration/temporal/test_chain_start_idempotent.py), [two linked Goal Loops](../../tests/acceptance/mission_control/test_chain_two_goal_loops.py),
-  [MP-20 parity](../../tests/integration/temporal/test_mp20_workflow_parity.py), [release 1.10.0](../../tests/integration/postgres/test_sprint_oc_release_1100.py).
+  [MP-20 parity](../../tests/integration/temporal/test_cross_lane_workflow_parity.py), [release 1.10.0](../../tests/integration/postgres/test_db_release_1100_linked_exports.py).
 - Proof status: [control board](../specs/provider-consolidation-2026-10/sprint-oc/NEXT-SESSION.md) (`:285-312` linked runs 2-14, `:370` commit `abac1fde`).

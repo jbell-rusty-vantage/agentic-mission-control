@@ -207,30 +207,30 @@ Code follow-ups that do not need the owner are listed in the
 ## Evidence
 
 1. MP-20: [parity record](../parity/multi-provider-2026-10-09.md),
-   [`test_mp20_workflow_parity.py`](../../../../../../../tests/integration/temporal/test_mp20_workflow_parity.py);
+   [`test_mp20_workflow_parity.py`](../../../../../../../tests/integration/temporal/test_cross_lane_workflow_parity.py);
    chain and launch: [`test_manifest_launch_production.py`](../../../../../../../tests/integration/temporal/test_manifest_launch_production.py),
-   [`test_mp22_local_profile_start.py`](../../../../../../../tests/integration/temporal/test_mp22_local_profile_start.py),
+   [`test_mp22_local_profile_start.py`](../../../../../../../tests/integration/temporal/test_manifest_launch_production.py),
    [`test_manifest_submit.py`](../../../../../../../tests/integration/postgres/test_manifest_submit.py) (7 passed after blocker A).
 2. Cursor: [cursor_local](../../../../../../qualification/lanes/cursor_local/README.md), [cursor_cloud](../../../../../../qualification/lanes/cursor_cloud/README.md),
    [lane qualification](../../../../../../qualification/lanes/README.md),
-   [`test_mp09_cloud_segment_loop_real_services.py`](../../../../../../../tests/integration/cursor/test_mp09_cloud_segment_loop_real_services.py).
+   [`test_mp09_cloud_segment_loop_real_services.py`](../../../../../../../tests/integration/cursor/test_cursor_cloud_segment_loop.py).
 3. Claude: [claude_agent_sdk](../../../../../../qualification/lanes/claude_agent_sdk/README.md),
-   [`test_mp07_claude_lane_turns.py`](../../../../../../../tests/integration/temporal/test_mp07_claude_lane_turns.py),
+   [`test_mp07_claude_lane_turns.py`](../../../../../../../tests/integration/temporal/test_claude_lane_turns.py),
    [`test_claude_broker_postgres.py`](../../../../../../../tests/integration/claude/test_claude_broker_postgres.py),
    [`test_claude_continuation_temporal.py`](../../../../../../../tests/integration/claude/test_claude_continuation_temporal.py).
 4. Codex: [codex](../../../../../../qualification/lanes/codex/README.md),
-   [`test_mp08_codex_lane_turns.py`](../../../../../../../tests/integration/temporal/test_mp08_codex_lane_turns.py),
+   [`test_mp08_codex_lane_turns.py`](../../../../../../../tests/integration/temporal/test_codex_lane_turns.py),
    [`test_codex_approvals_postgres.py`](../../../../../../../tests/integration/codex/test_codex_approvals_postgres.py),
    [`test_codex_continuation_temporal.py`](../../../../../../../tests/integration/codex/test_codex_continuation_temporal.py);
    kernel hooks and hook trust (MO-03, 2026-10-13):
    [`test_codex_kernel_hook_drill.py`](../../../../../../../tests/integration/codex/test_codex_kernel_hook_drill.py) (opt-in; the real
    app-server with a local mock model, no provider call),
-   [`test_codex_hook_trust_cli.py`](../../../../../../../tests/integration/codex/test_codex_hook_trust_cli.py),
+   [`test_codex_hook_trust_cli.py`](../../../../../../../tests/integration/codex/test_codex_kernel_hook_drill.py),
    [`test_codex_kernel_hooks_postgres.py`](../../../../../../../tests/integration/codex/test_codex_kernel_hooks_postgres.py) and the
    recorded `hooks/list` of 0.162.1 (`tests/fixtures/provider_frames/codex/hooks_list/`).
 5. Hosted refusals: [`test_multi_provider_contracts.py`](../../../../../../../tests/unit/harness/test_multi_provider_contracts.py),
    [`test_environments.py`](../../../../../../../tests/unit/agentic_components/test_environments.py),
-   [`test_mp22_local_readiness.py`](../../../../../../../tests/unit/runtime/test_mp22_local_readiness.py).
+   [`test_mp22_local_readiness.py`](../../../../../../../tests/unit/runtime/test_local_readiness.py).
 6. Feasibility: [claude_cloud](../lanes/claude_cloud/FEASIBILITY.md) and
    [codex_cloud](../lanes/codex_cloud/FEASIBILITY.md) (2026-10-08) with their 2026-10-09 revalidations.
 

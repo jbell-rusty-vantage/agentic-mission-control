@@ -1,6 +1,6 @@
 """Builders, constants and fakes that other test files import.
 
-Moved from tests/unit/subscriptions/test_mo43_wake_channels.py.
+Moved from tests/unit/subscriptions/test_inbox_wake_channels.py.
 """
 
 from __future__ import annotations

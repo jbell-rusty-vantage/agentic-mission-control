@@ -1,6 +1,6 @@
 """Builders, constants and fakes that other test files import.
 
-Moved from tests/unit/knowledge/test_w1_tool_boundary.py.
+Moved from tests/unit/knowledge/test_knowledge_tool_boundary.py.
 """
 
 from __future__ import annotations

@@ -151,10 +151,10 @@ retention sweeps of retained worktrees not built; cross-lane (local to cloud) fo
 - [Workspace allocator](../../src/mission_control/application/workspaces/service.py),
   [`lane.cleanup`](../../src/mission_control/adapters/temporal/workflows/operation.py),
   [local lane workspaces](../../tests/unit/workspaces/test_local_lane_workspaces.py),
-  [cleanup on real Temporal](../../tests/integration/temporal/test_mo05_workspace_cleanup.py).
+  [cleanup on real Temporal](../../tests/integration/temporal/test_workspace_cleanup.py).
 - Spec: [SPEC-06](../specs/archive/fast-track-2026-10/SPEC-06-interventions-inspection-subscriptions.md) (Fork),
   [ADR-0032](../adr/0032-interventions-real-queue-inject-cancel-fork-and-subscriptions.md).
 - [Real fork and reconciliation tests](../../tests/unit/run_control/test_mission_control_runtime.py).
-- [Fork with instruction](../../tests/unit/run_control/test_ft_f4_fork_instruction.py),
-  [fork in PostgreSQL](../../tests/integration/postgres/test_ft_f4_fork_postgres.py),
-  [lane controls in PostgreSQL](../../tests/integration/postgres/test_ft_g4_lane_controls_postgres.py).
+- [Fork with instruction](../../tests/unit/run_control/test_fork_with_instruction.py),
+  [fork in PostgreSQL](../../tests/integration/postgres/test_fork_lineage_postgres.py),
+  [lane controls in PostgreSQL](../../tests/integration/postgres/test_lane_control_records.py).

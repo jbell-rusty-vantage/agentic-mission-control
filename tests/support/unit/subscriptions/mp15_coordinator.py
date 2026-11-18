@@ -1,6 +1,6 @@
 """Builders, constants and fakes that other test files import.
 
-Moved from tests/unit/subscriptions/test_mp15_coordinator.py.
+Moved from tests/unit/subscriptions/test_coordinator_notifications.py.
 """
 
 from __future__ import annotations

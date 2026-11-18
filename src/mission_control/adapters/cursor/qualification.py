@@ -45,7 +45,7 @@ EVIDENCE_FIXTURES: Final = "tests/unit/harness/test_lane_qualification_fixtures.
 EVIDENCE_HONESTY: Final = "tests/unit/harness/test_describe_honesty.py"
 EVIDENCE_HOOK_ROUNDTRIP: Final = "tests/integration/cursor/test_kernel_hook_roundtrip.py"
 EVIDENCE_MP09_UNIT: Final = "tests/unit/cursor/"
-EVIDENCE_MP09_REAL: Final = "tests/integration/cursor/test_mp09_cloud_segment_loop_real_services.py"
+EVIDENCE_MP09_REAL: Final = "tests/integration/cursor/test_cursor_cloud_segment_loop.py"
 EVIDENCE_SDK_REQUEST: Final = (
     "cursor_sdk==1.0.37 types.py SDKRequestMessage(request_id); no respond API in "
     "_async_run.py/_async_agent.py/_async_client.py"

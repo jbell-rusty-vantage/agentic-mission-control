@@ -25,15 +25,15 @@ Entrypoints:
 - fixtures/
 - qualification/
 - architecture/
+- support/
 - schema_context_helpers.py
-- experiments/ — Isolated experiment tests
 - conftest.py
 Also: golden/
 Tests: tests/architecture/test_package_boundaries.py
 Invariants:
 - Never hide a missing service behind a new default skip.
 - Destructive fixture setup never targets live or unknown databases.
-Explained by (docs/knowledge): cursor-lane, interventions, lanes-and-harness, budgets-and-usage, context-and-continuation, environment-preparation
+Explained by (docs/knowledge): interventions, lanes-and-harness, cursor-lane, budgets-and-usage, context-and-continuation, environment-preparation
 Decided by (docs/adr): ADR-0018, ADR-0019, ADR-0030, ADR-0031, ADR-0005
 Verify: make check; make test-integration; make test-qualification (needs MISSION_CONTROL_TEST_ADMIN_DSN)
 <!-- END:sdlc-module -->

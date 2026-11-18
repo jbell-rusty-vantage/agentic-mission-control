@@ -11,10 +11,10 @@
     "src/mission_control/adapters/cursor/cloud.py": "ae3298440bd90e17230dc1876500ed8a86c82abd8b66d64b3c0565199c100b6d",
     "src/mission_control/application/execution/harness/lane_turns.py": "8cd91773b4cfd9b1e16bbc81a0dbaff774df3cb59071b04e90178419aa8b5f30",
     "src/mission_control/application/execution/harness/describe.py": "3232e359f2fec8da885dbec5cc9b37f96ebb1c341b57db017cda6310741d3125",
-    "tests/unit/runtime/test_run2_cursor_usage.py": "2dfa6f4138a3af890f60c277c7d7a98cfee7462a35d776cfd3e824758c3408fa",
+    "tests/unit/runtime/test_cursor_native_run_usage.py": "2dfa6f4138a3af890f60c277c7d7a98cfee7462a35d776cfd3e824758c3408fa",
     "tests/unit/cursor/test_cloud_usage_unknown.py": "8071f1f81be1fa4e28ff3549114d3cdfd8da0e098fb048a64da00eac5139430f",
-    "tests/unit/temporal/test_run2_managed_budget_composition.py": "bdcfe996b41f8563ded08a6e4faeef08cc7e052b41fa1ce538350b1755b8413a",
-    "tests/unit/subscriptions/test_run2_caller_identity.py": "978a7da7647292d5d4c04d6a91adc5986d2a1f3326b1d62d998d52afd186fc66",
+    "tests/unit/temporal/test_managed_budget_activity.py": "bdcfe996b41f8563ded08a6e4faeef08cc7e052b41fa1ce538350b1755b8413a",
+    "tests/unit/subscriptions/test_subscription_caller_identity.py": "978a7da7647292d5d4c04d6a91adc5986d2a1f3326b1d62d998d52afd186fc66",
     "src/mission_control/application/recovery/terminal_lane_adoption.py": "c5535f30597a70a70783edcd718c6be3e685a8cab57dea84724020fc157a2029",
     "tests/unit/recovery/test_terminal_lane_adoption.py": "9ac2527adb718967ad6bda7ecb9d70dbbf6cbf1ee2f961139c4ced5c95ee3836"
   },
@@ -22,7 +22,7 @@
   "original_canonical_tracked_checked": 3980,
   "expected_owned_tracked_drift": [
     "src/mission_control/adapters/cursor/frames.py",
-    "tests/unit/runtime/test_run2_cursor_usage.py",
+    "tests/unit/runtime/test_cursor_native_run_usage.py",
     "src/mission_control/application/execution/harness/describe.py",
     "src/mission_control/application/execution/harness/lane_turns.py",
     "src/mission_control/adapters/cursor/cloud.py",
@@ -55,7 +55,7 @@
     "RUN-2-EXECUTION-EVIDENCE-2026-10-16.json": "3864840f8dda8018196e7d6a401858d9aa322c636f043dba6f91fb5ab23b175c",
     "RUN-2-EXECUTION-CONTINUATION-EVIDENCE-2026-10-16.json": "f8e0f837b396c72ba8679734f4010709e3eae980be30387017de81fa34f9f208"
   },
-  "canonical_status": " M docs/knowledge/index.md\n M docs/specs/materialization-observation-2026-10/runs/RUN-2-REPORT.md\n M src/mission_control/adapters/cursor/cloud.py\n M src/mission_control/adapters/cursor/frames.py\n M src/mission_control/application/execution/harness/cursor_usage.py\n M src/mission_control/application/execution/harness/describe.py\n M src/mission_control/application/execution/harness/lane_turns.py\n M tests/unit/cursor/test_cloud_usage_unknown.py\n M tests/unit/runtime/test_run2_cursor_usage.py\n?? docs/specs/materialization-observation-2026-10/issues/bash.exe.stackdump\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-ASSESSMENT-EVIDENCE-2026-10-16.json\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-COMPLETION-ASSESSMENT-2026-10-16.md\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-COMPLETION-FINDINGS-2026-10-16.md\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-COMPLETION-PLAN-2026-10-16.md\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-CURRENT-RECONCILIATION-2026-10-16.md\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-EXECUTION-CONTINUATION-EVIDENCE-2026-10-16.json\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-EXECUTION-EVIDENCE-2026-10-16.json\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-EXECUTION-LEDGER-2026-10-16.md\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-G1-ACCEPTANCE-2026-10-16.md\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-INTEGRATION-2026-10-16.md\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-QUALIFICATION-ENVELOPES-2026-10-16.md\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-REMAINING-GATES-2026-10-16.md\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-RESUMPTION-AND-APPROVALS-2026-10-16.md\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-SOL-EXECUTION-2026-10-16.md\n?? src/mission_control/application/recovery/terminal_lane_adoption.py\n?? tests/unit/recovery/test_terminal_lane_adoption.py\n?? tests/unit/subscriptions/test_run2_caller_identity.py\n?? tests/unit/temporal/test_run2_managed_budget_composition.py\n",
+  "canonical_status": " M docs/knowledge/index.md\n M docs/specs/materialization-observation-2026-10/runs/RUN-2-REPORT.md\n M src/mission_control/adapters/cursor/cloud.py\n M src/mission_control/adapters/cursor/frames.py\n M src/mission_control/application/execution/harness/cursor_usage.py\n M src/mission_control/application/execution/harness/describe.py\n M src/mission_control/application/execution/harness/lane_turns.py\n M tests/unit/cursor/test_cloud_usage_unknown.py\n M tests/unit/runtime/test_cursor_native_run_usage.py\n?? docs/specs/materialization-observation-2026-10/issues/bash.exe.stackdump\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-ASSESSMENT-EVIDENCE-2026-10-16.json\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-COMPLETION-ASSESSMENT-2026-10-16.md\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-COMPLETION-FINDINGS-2026-10-16.md\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-COMPLETION-PLAN-2026-10-16.md\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-CURRENT-RECONCILIATION-2026-10-16.md\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-EXECUTION-CONTINUATION-EVIDENCE-2026-10-16.json\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-EXECUTION-EVIDENCE-2026-10-16.json\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-EXECUTION-LEDGER-2026-10-16.md\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-G1-ACCEPTANCE-2026-10-16.md\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-INTEGRATION-2026-10-16.md\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-QUALIFICATION-ENVELOPES-2026-10-16.md\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-REMAINING-GATES-2026-10-16.md\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-RESUMPTION-AND-APPROVALS-2026-10-16.md\n?? docs/specs/materialization-observation-2026-10/runs/RUN-2-SOL-EXECUTION-2026-10-16.md\n?? src/mission_control/application/recovery/terminal_lane_adoption.py\n?? tests/unit/recovery/test_terminal_lane_adoption.py\n?? tests/unit/subscriptions/test_subscription_caller_identity.py\n?? tests/unit/temporal/test_managed_budget_activity.py\n",
   "source_patch_sha256": "eee1d570b3c159b78188d1d5b71a735ee87f0c8f638ede86ad7d6a099e1dec0c",
   "preimages": "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\run2-completion-offline\\.scratch\\run2-completion-20261016\\resumption\\canonical-integration\\preimages",
   "old_v2_manifest_sha256": "f8e0f837b396c72ba8679734f4010709e3eae980be30387017de81fa34f9f208",
@@ -283,7 +283,7 @@
     ".scratch/run2-completion-20261016/resumption/canonical-integration/preimages/src/mission_control/application/execution/harness/describe.py": "66c3a65facf44c5577fbee5b940e54feb6a73950b83bc823e713fca5db83032f",
     ".scratch/run2-completion-20261016/resumption/canonical-integration/preimages/src/mission_control/application/execution/harness/lane_turns.py": "ce20cae335cf88ac3d384af015fc35d3cb247bf45452991a84267a623b7f889b",
     ".scratch/run2-completion-20261016/resumption/canonical-integration/preimages/tests/unit/cursor/test_cloud_usage_unknown.py": "3d111c4a9c6745aa9e44080cb4db78c96315ef7827ee47dd7845b6d7c5dbeb0c",
-    ".scratch/run2-completion-20261016/resumption/canonical-integration/preimages/tests/unit/runtime/test_run2_cursor_usage.py": "fa809325436bc3a71f8ffcc0d6378c1795de55411d543e2b0afe6b22eb13ca0e",
+    ".scratch/run2-completion-20261016/resumption/canonical-integration/preimages/tests/unit/runtime/test_cursor_native_run_usage.py": "fa809325436bc3a71f8ffcc0d6378c1795de55411d543e2b0afe6b22eb13ca0e",
     ".scratch/run2-completion-20261016/resumption/canonical-integration/prepared.json": "a0581d1b1afc2506dbaa7559426331c4e00045a9ce5990951b870b9eeb7085cf",
     ".scratch/run2-completion-20261016/resumption/canonical-process-check.json": "eaf7b89bdafa5195698c3d6d077eb24b82ce9d144c35dec2aff402efe5b13177",
     ".scratch/run2-completion-20261016/resumption/docs-index.txt": "24bebe6e3584a82fbc0280ea4cfbca87a5f30727034feaf97d45f48a52aef6de",
@@ -343,9 +343,9 @@
     "src/mission_control/application/recovery/terminal_lane_adoption.py": "c5535f30597a70a70783edcd718c6be3e685a8cab57dea84724020fc157a2029",
     "tests/unit/cursor/test_cloud_usage_unknown.py": "8071f1f81be1fa4e28ff3549114d3cdfd8da0e098fb048a64da00eac5139430f",
     "tests/unit/recovery/test_terminal_lane_adoption.py": "9ac2527adb718967ad6bda7ecb9d70dbbf6cbf1ee2f961139c4ced5c95ee3836",
-    "tests/unit/runtime/test_run2_cursor_usage.py": "2dfa6f4138a3af890f60c277c7d7a98cfee7462a35d776cfd3e824758c3408fa",
-    "tests/unit/subscriptions/test_run2_caller_identity.py": "978a7da7647292d5d4c04d6a91adc5986d2a1f3326b1d62d998d52afd186fc66",
-    "tests/unit/temporal/test_run2_managed_budget_composition.py": "bdcfe996b41f8563ded08a6e4faeef08cc7e052b41fa1ce538350b1755b8413a"
+    "tests/unit/runtime/test_cursor_native_run_usage.py": "2dfa6f4138a3af890f60c277c7d7a98cfee7462a35d776cfd3e824758c3408fa",
+    "tests/unit/subscriptions/test_subscription_caller_identity.py": "978a7da7647292d5d4c04d6a91adc5986d2a1f3326b1d62d998d52afd186fc66",
+    "tests/unit/temporal/test_managed_budget_activity.py": "bdcfe996b41f8563ded08a6e4faeef08cc7e052b41fa1ce538350b1755b8413a"
   },
   "audit_archive": {
     "path": "C:\\Users\\Pinda\\Documents\\Codex\\2026-10-16\\task\\run2-completion-offline\\.scratch\\run2-completion-20261016\\resumption\\frozen-v3\\resumed-audit.zip",

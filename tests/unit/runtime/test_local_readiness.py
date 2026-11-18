@@ -2,7 +2,7 @@
 
 Pure checks over temporary files; the committed deployment examples are read as-is. The
 cross-cluster guard is exercised with an in-memory presence probe here and against two real
-Temporal namespaces in ``tests/integration/temporal/test_mp22_outage_drill.py``.
+Temporal namespaces in ``tests/integration/temporal/test_cluster_outage_drill.py``.
 """
 
 from __future__ import annotations

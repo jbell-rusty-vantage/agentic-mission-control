@@ -117,4 +117,4 @@ hook is described in [Deep Agents lane](deep-agents-lane.md); closure bodies are
 - Tests: `tests/unit/deep_agents/test_workspace_closure.py`,
   `tests/unit/frames/test_deep_agents_frames.py`,
   `tests/integration/postgres/test_workspace_closures_postgres.py`,
-  `tests/integration/postgres/test_sprint_oc_release_1120.py`.
+  `tests/integration/postgres/test_db_release_1120_workspace_closures.py`.

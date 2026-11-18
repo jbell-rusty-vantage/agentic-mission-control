@@ -32,23 +32,23 @@ class DeepAgentsConformance(LaneAdapter):
     exceptions = MappingProxyType(
         {
             Scenario.START_OBSERVE_SETTLE: _governed(
-                _PROTOCOL, "tests/acceptance/control_plane/test_wp_cp_040.py"
+                _PROTOCOL, "tests/acceptance/control_plane/test_deep_agents_lane_materialization.py"
             ),
             Scenario.REATTACH_MID_STREAM: _governed(
-                _PROTOCOL, "tests/unit/operations/test_rrm_009_cancellation_composition.py"
+                _PROTOCOL, "tests/unit/operations/test_cancellation_composition.py"
             ),
             Scenario.SEND_TURN_WHILE_BUSY: _governed(
-                _PROTOCOL, "tests/unit/run_control/test_ft_f1_command_mailbox.py"
+                _PROTOCOL, "tests/unit/run_control/test_command_mailbox_delivery.py"
             ),
             Scenario.CANCEL: _governed(
-                _PROTOCOL, "tests/unit/operations/test_rrm_008_cancellation.py"
+                _PROTOCOL, "tests/unit/operations/test_operation_cancellation.py"
             ),
             Scenario.INTERRUPT_AND_INJECT: _governed(
-                "tests/unit/operations/test_ft_f2_interrupt_and_inject.py"
+                "tests/unit/operations/test_interrupt_and_inject.py"
             ),
             Scenario.BUDGET_STOP: _governed("tests/unit/operations/test_operation_execution.py"),
             Scenario.FORK_EMULATION: _governed(
-                "tests/unit/run_control/test_ft_f4_fork_instruction.py",
+                "tests/unit/run_control/test_fork_with_instruction.py",
                 "tests/unit/operations/test_fork_reuse_execution.py",
             ),
             Scenario.UNKNOWN_USAGE: _governed(_PROTOCOL),

@@ -1,6 +1,6 @@
 """Builders, constants and fakes that other test files import.
 
-Moved from tests/unit/operations/test_ft_b2_stage_handoff.py.
+Moved from tests/unit/operations/test_stage_handoff.py.
 """
 
 from __future__ import annotations

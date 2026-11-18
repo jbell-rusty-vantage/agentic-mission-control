@@ -497,17 +497,17 @@
       "bytes": 4813
     },
     {
-      "path": "tests/unit/runtime/test_run2_cursor_usage.py",
+      "path": "tests/unit/runtime/test_cursor_native_run_usage.py",
       "sha256": "fa809325436bc3a71f8ffcc0d6378c1795de55411d543e2b0afe6b22eb13ca0e",
       "bytes": 12560
     },
     {
-      "path": "tests/unit/cursor/test_run2_cost.py",
+      "path": "tests/unit/cursor/test_cursor_cost_readers.py",
       "sha256": "616ba55701c432c2a74af449276a848267237d107601d7ef0c87348ac25a7ad5",
       "bytes": 9549
     },
     {
-      "path": "tests/unit/cursor/test_run2_bridge.py",
+      "path": "tests/unit/cursor/test_bridge_errors_and_spawn.py",
       "sha256": "7a167f8c90ae5ba5ab6508f1753d041aba224345c687035aa8cd141fa26697a6",
       "bytes": 9110
     },
@@ -522,7 +522,7 @@
       "bytes": 4615
     },
     {
-      "path": "tests/unit/subscriptions/test_mo43_wake_channels.py",
+      "path": "tests/unit/subscriptions/test_inbox_wake_channels.py",
       "sha256": "3f1458ea7dd85f88e12eab7d8d9590da2f278d01e3bd03d148380521e165091f",
       "bytes": 26287
     },

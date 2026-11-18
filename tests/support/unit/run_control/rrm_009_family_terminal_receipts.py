@@ -1,6 +1,6 @@
 """Builders, constants and fakes that other test files import.
 
-Moved from tests/unit/run_control/test_rrm_009_family_terminal_receipts.py.
+Moved from tests/unit/run_control/test_cancelled_terminalization_receipts.py.
 """
 
 from __future__ import annotations

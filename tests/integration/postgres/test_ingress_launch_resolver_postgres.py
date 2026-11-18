@@ -5,7 +5,7 @@ credential on the restricted runtime role and takes the launching actor from the
 grant for the credential's creator, never from the request payload; a revoked credential, a
 creator without a grant or a manifest the credential does not allow is refused. The launch
 service is a real `ManifestSubmitService`. Moved from
-tests/unit/runtime/test_run2_ingress_composition.py, which faked the asyncpg pool and
+tests/unit/runtime/test_ingress_drainer_composition.py, which faked the asyncpg pool and
 half-constructed the service with `object.__new__` (OVE-238).
 """
 

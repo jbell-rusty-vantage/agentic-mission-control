@@ -1,6 +1,6 @@
 """Builders, constants and fakes that other test files import.
 
-Moved from tests/unit/authoring/test_wi13_nested_authoring.py.
+Moved from tests/unit/authoring/test_nested_body_authoring.py.
 """
 
 from __future__ import annotations

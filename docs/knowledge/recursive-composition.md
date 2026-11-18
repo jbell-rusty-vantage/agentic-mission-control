@@ -154,6 +154,6 @@ Built / specified / goal: nested Goal Loop and Stage Graph bodies built, tested 
 - Spec (harvested at `66185d2e`): OUTPUT-CONTRACTS §9; `00-EXECUTION_PROGRAM_MODEL.md` §§5-6.
 - Code: `domain/authoring/{nested_bodies,nested_lowering,manifest_lowering}.py`, `domain/programs/nested.py`,
   `application/programs/nested_bodies.py`, `adapters/temporal/workflows/{nested_body,stagegraph,goal_directed}.py`.
-- Tests: `tests/unit/authoring/test_wi13_nested_authoring.py`, `tests/unit/orchestration/test_wi13_nested_runtime.py`,
-  `test_wi13_round2.py`, `test_wi13_nested_goal_executor.py`, `tests/integration/temporal/test_wi13_nested_temporal.py`,
-  `tests/integration/postgres/test_wi13_nested_activations_postgres.py`; fixtures `tests/fixtures/manifests/sprint-oc-w5/`.
+- Tests: `tests/unit/authoring/test_nested_body_authoring.py`, `tests/unit/orchestration/test_nested_body_runtime.py`,
+  `test_nested_child_adoption_and_launch.py`, `test_nested_goal_executor.py`, `tests/integration/temporal/test_nested_body_child_runs.py`,
+  `tests/integration/postgres/test_nested_activation_lineage.py`; fixtures `tests/fixtures/manifests/sprint-oc-w5/`.

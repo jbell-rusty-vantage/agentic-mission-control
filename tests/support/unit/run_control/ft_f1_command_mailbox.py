@@ -1,6 +1,6 @@
 """Builders, constants and fakes that other test files import.
 
-Moved from tests/unit/run_control/test_ft_f1_command_mailbox.py.
+Moved from tests/unit/run_control/test_command_mailbox_delivery.py.
 """
 
 from __future__ import annotations

@@ -150,7 +150,7 @@ Built / specified / goal: promises, submission, fulfillment and the transfer bou
   [builders](../../src/mission_control/domain/context/transfer_builders.py), [materializer](../../src/mission_control/application/context/materialization.py),
   [store](../../src/mission_control/adapters/postgres/knowledge/output_contracts.py), [lowering](../../src/mission_control/domain/authoring/manifest_lowering.py).
 - Tests: [fulfillment](../../tests/unit/outputs/test_output_fulfillment.py), [compile](../../tests/unit/authoring/test_output_promises_compile.py),
-  [PostgreSQL](../../tests/integration/postgres/test_output_contracts_postgres.py), [release 1.7.0](../../tests/integration/postgres/test_sprint_oc_release_170.py),
-  [lane settlement](../../tests/unit/knowledge/test_wi04_lane_settlement.py).
+  [PostgreSQL](../../tests/integration/postgres/test_output_contracts_postgres.py), [release 1.7.0](../../tests/integration/postgres/test_db_release_170_output_contracts_transfer_plans.py),
+  [lane settlement](../../tests/unit/knowledge/test_lane_output_settlement.py).
 - Specs: [application ports](../specs/provider-consolidation-2026-10/sprint-oc/APPLICATION-PORTS.md), [implementation](../specs/provider-consolidation-2026-10/sprint-oc/IMPLEMENTATION.md),
   [proofs](../specs/provider-consolidation-2026-10/sprint-oc/PROOFS.md), [report/source foundation](../REPORT_SOURCE_FOUNDATION.md).

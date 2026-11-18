@@ -155,7 +155,7 @@ async def test_a_fresh_worker_reattaches_rehydrates_resumes_the_cursor_and_ends_
     # A new process: a harness with no session memory and a service over the same stores.
     # It is a different worker owner, so the MP-06 ownership fence admits it only after the
     # first owner's session lease has expired (a live foreign lease is refused; see
-    # test_mp06_dispatch_recovery). Its clock therefore runs past that lease.
+    # test_dispatch_recovery). Its clock therefore runs past that lease.
     old_owner = await lanes.states.load(ident.request_scope, ident.harness_execution_id)
     assert old_owner is not None and old_owner.owner is not None
     expired = old_owner.owner.lease_expires_at + timedelta(seconds=1)

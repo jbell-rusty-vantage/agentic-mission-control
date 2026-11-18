@@ -4,8 +4,8 @@
 `ProductionIngressEffects` reads the session binding on the restricted runtime role: a binding
 whose product is not the provider's lane is `webhook_product_version_unbound`; one naming a
 harness execution that was never opened is `webhook_stale_generation`. The accepted path
-(duplicate hint, owner wait, revoked binding) is in test_run2_ingress_drainer_postgres.py.
-Moved from tests/unit/runtime/test_run2_ingress_composition.py, which faked the asyncpg pool
+(duplicate hint, owner wait, revoked binding) is in test_ingress_drainer_claims.py.
+Moved from tests/unit/runtime/test_ingress_drainer_composition.py, which faked the asyncpg pool
 and replaced the effects' private frame repository (OVE-238).
 """
 

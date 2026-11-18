@@ -99,7 +99,7 @@ Built / specified / goal: Stage Graph and Goal Loop subset built and integrated 
   [lowering](../../src/mission_control/domain/authoring/manifest_lowering.py),
   [Deep Agents declaration](../../src/mission_control/adapters/deep_agents/describe.py).
 - Tests: [Stage Graph](../../tests/unit/orchestration/test_stagegraph_v2.py),
-  [GoalDirected](../../tests/unit/orchestration/test_wp_bp_020_goal_directed.py),
+  [GoalDirected](../../tests/unit/orchestration/test_goal_loop_rules.py),
   [lane behavior support](../../tests/unit/authoring/test_manifest_compile.py) (`test_lane_support_matrix`),
   [every behavior parses](../../tests/unit/authoring/test_manifest_schema.py).
 - Proof of integration (not qualification): [control board](../specs/provider-consolidation-2026-10/sprint-oc/NEXT-SESSION.md) (`:32-87` paid Deep Agents fixtures, `:119-121` W1 unreleased).

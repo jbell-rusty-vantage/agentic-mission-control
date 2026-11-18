@@ -4,7 +4,7 @@ Routes return a run's public run key (a UUID string); the journal and inboxes us
 internal `mission_run.run_id`. `PostgresSubscriptionStore.resolve_target` maps either to the
 same target on the restricted runtime role, and another tenant's scope sees nothing (forced
 row-level security, not a WHERE clause). Replaces the SQL-text-matching pool of
-tests/unit/subscriptions/test_run2_caller_identity.py (OVE-238).
+tests/unit/subscriptions/test_subscription_caller_identity.py (OVE-238).
 """
 
 from __future__ import annotations

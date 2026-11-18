@@ -1,6 +1,6 @@
 """Builders, constants and fakes that other test files import.
 
-Moved from tests/integration/temporal/test_rrm_005_search_attributes.py.
+Moved from tests/integration/temporal/test_search_attributes_visibility.py.
 """
 
 from __future__ import annotations

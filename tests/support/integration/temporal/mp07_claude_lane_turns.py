@@ -1,6 +1,6 @@
 """Builders, constants and fakes that other test files import.
 
-Moved from tests/integration/temporal/test_mp07_claude_lane_turns.py.
+Moved from tests/integration/temporal/test_claude_lane_turns.py.
 """
 
 from __future__ import annotations

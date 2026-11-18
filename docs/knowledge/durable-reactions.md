@@ -119,14 +119,14 @@ other invocation, and a refused or cancelled activation never runs.
 **Proof and limits.** Unit: `tests/unit/reactions/test_reaction_planning.py` (compile refusals,
 identity, distinct kinds, each limit, currency) and `test_reaction_operations.py` (binding as an
 ordinary operation, grant and template refusals, one reservation per activation). PostgreSQL:
-`tests/integration/postgres/test_wi22_reactions_postgres.py` (the five triggers on real WI-01/02/04
+`tests/integration/postgres/test_durable_transition_reactions.py` (the five triggers on real WI-01/02/04
 writes, duplicates and racing admitters, both crash windows, stale generation and a real stop fence,
 the self-trigger chain through every kind stopping at its depth and through outputs at each other
 limit, an assessor origin that is never a cause, `CAUSE_UNKNOWN`, capture anomalies and edge facts
 that still commit, writer and executor roles, table guards including `TRUNCATE`); the unit
 suite adds a run whose version moves between read and execute (one reservation) and a release
 after `BINDING_CONFLICT`.
-Temporal: `tests/integration/temporal/test_wi22_reaction_dispatch.py` (the production port starts
+Temporal: `tests/integration/temporal/test_reaction_dispatch_once.py` (the production port starts
 `mc.operation.v1` on a time-skipping server, the relay dies after the start, the redelivery attaches,
 one cognition, the history replays; the operation boundary is the RRM-004 harness with a scripted
 model). Migration 0061 is in the built 1.8.0 component (`releases/README.md:226-232`). Not yet: no manifest surface declares reactions (only the
@@ -150,7 +150,7 @@ Built / specified / goal: capture, admission, outbox dispatch and the ordinary `
   [migration 0061](../../scripts/release_170/0061_durable_transition_reactions.sql), [release 1.8.0](../../packages/mission-control-db-contract/releases/README.md).
 - Tests: [planning](../../tests/unit/reactions/test_reaction_planning.py),
   [operations](../../tests/unit/reactions/test_reaction_operations.py),
-  [PostgreSQL](../../tests/integration/postgres/test_wi22_reactions_postgres.py),
-  [Temporal](../../tests/integration/temporal/test_wi22_reaction_dispatch.py).
+  [PostgreSQL](../../tests/integration/postgres/test_durable_transition_reactions.py),
+  [Temporal](../../tests/integration/temporal/test_reaction_dispatch_once.py).
 - Related: [watchers](watchers.md) (admitted Commands, not operations), [hook contributions](hook-contributions.md),
   [saved-result settlement](saved-result-settlement.md), [mission chains](mission-chains.md) (outbox relay for runs).

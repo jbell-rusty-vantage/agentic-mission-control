@@ -9,8 +9,8 @@ lock selects) into a fresh database.
 
 Moved from the Mission Control integration suite (OVE-238): `test_mission_chain_tables`
 (migration 0028), `test_pre_stage3_database_authority_integration` (0010-0017) and
-`test_release_0033` (0033). Their row-level guard behaviour (forward-only chain links, MP-11 and
-MP-15 guards) needs Mission Control seeds and stays there.
+`test_db_release_120_approval_and_inbox_guards` (0033). Their row-level guard behaviour
+(forward-only chain links, MP-11 and MP-15 guards) needs Mission Control seeds and stays there.
 """
 
 from __future__ import annotations

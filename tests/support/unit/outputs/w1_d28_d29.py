@@ -1,6 +1,6 @@
 """Builders, constants and fakes that other test files import.
 
-Moved from tests/unit/outputs/test_w1_d28_d29.py.
+Moved from tests/unit/outputs/test_official_use.py.
 """
 
 from __future__ import annotations

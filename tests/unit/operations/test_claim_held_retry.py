@@ -110,7 +110,7 @@ def _workflow_clock(monkeypatch: pytest.MonkeyPatch, *, patched: bool) -> list[f
 # TODO(OVE-238): no history recorded before `w1-d39-claim-held-lease-wait` with a refused round
 # exists to replay, so this patched-workflow case stays the only cover of the pre-patch branch.
 # The patched behaviour (the wait, its bound, no deadline, a cancel during the wait) runs on
-# Temporal in tests/integration/temporal/test_d39_claim_held_lease_wait.py.
+# Temporal in tests/integration/temporal/test_claim_held_lease_wait.py.
 @pytest.mark.asyncio
 async def test_a_pre_patch_history_keeps_the_old_failure(monkeypatch: pytest.MonkeyPatch) -> None:
     request = _workflow_request()

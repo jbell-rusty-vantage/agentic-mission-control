@@ -3,7 +3,7 @@
 The receiver is a local asyncio HTTP endpoint on 127.0.0.1 (no external HTTP); the egress
 policy allows loopback explicitly for it, and rejects a destination that resolves into a
 private network before any byte is sent. Coordinator tables come from released migration 0033
-(component 1.2.0) in the scratch database (see `test_mp15_coordinator_inbox_postgres`).
+(component 1.2.0) in the scratch database (see `test_coordinator_inbox_postgres`).
 
 Proves:
 - callback retries re-send the stored notification with one delivery id, verify by signature,

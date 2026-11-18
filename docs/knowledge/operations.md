@@ -83,7 +83,7 @@ API, the chain relay pump and the technical API (`bootstrap/composition.py`, `ma
 **Temporal fallback and Cloud.** The same workflow code runs on local Temporal and Temporal Cloud
 (`TEMPORAL_TARGET`). A cloud outage never moves an active run: new runs may target the local binding, and an
 active run waits for its original cluster or an explicit reconciled successor. The drill on two real namespaces
-(`tests/integration/temporal/test_mp22_outage_drill.py`) proves the guard refuses `RUN_BOUND_TO_OTHER_CLUSTER`,
+(`tests/integration/temporal/test_cluster_outage_drill.py`) proves the guard refuses `RUN_BOUND_TO_OTHER_CLUSTER`,
 `ACTIVE_IN_OTHER_CLUSTER` and `RUN_NOT_PENDING` and starts no second copy; the outage drill itself did not use
 Temporal Cloud, but the Run 2 finish ran materialize-and-run cells on Temporal Cloud and local Temporal
 ([WSL2 worker runbook](../WSL2_WORKER_RUNBOOK.md) section 6). That runbook is the Windows host plus WSL2 worker
@@ -122,10 +122,10 @@ cloud or production deployment is a proposal ([deployment](deployment.md)).
   [preflight and readiness](../../src/mission_control/bootstrap/preflight.py),
   [run launch cluster binding](../../src/mission_control/application/execution/run_launch.py),
   [cluster binding store](../../src/mission_control/adapters/postgres/run_control/cluster_bindings.py).
-- Tests: [local readiness](../../tests/unit/runtime/test_mp22_local_readiness.py),
+- Tests: [local readiness](../../tests/unit/runtime/test_local_readiness.py),
   [cluster refusal](../../tests/unit/run_control/test_run_launch.py),
-  [outage drill](../../tests/integration/temporal/test_mp22_outage_drill.py),
-  [release preflight](../../tests/integration/postgres/test_mp22_db_release_preflight.py),
+  [outage drill](../../tests/integration/temporal/test_cluster_outage_drill.py),
+  [release preflight](../../tests/integration/postgres/test_db_release_preflight.py),
   [local profile start](../../tests/integration/temporal/test_manifest_launch_production.py),
   [0032 cluster binding](../../tests/integration/postgres/test_release_0032_cluster_binding_and_stream_hints.py),
   [worker startup](../../tests/integration/postgres/test_mission_worker_startup.py).

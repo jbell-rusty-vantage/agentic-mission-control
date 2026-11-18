@@ -39,7 +39,7 @@ disposable PostgreSQL 17 server:
 
 The build allocates a fresh `mcdb_release_*` database and drops it. The committed
 manifest and generated contract record the resulting release inputs and schema.
-Tests in `tests/integration/postgres/test_run2_release_141.py` use fresh `mct_*`
+Tests in `tests/integration/postgres/test_db_release_141_install_upgrade_and_drift.py` use fresh `mct_*`
 databases with the real installer for fresh install, 1.4.0 upgrade, seed application
 and replay, drift refusal, preserved receipts, RLS and immutable guards. Their
 temporary locks do not replace `deployments/*/release.lock.json`.
@@ -50,7 +50,7 @@ Local build and tests do not upgrade live installations or qualify a provider la
 
 `1.4.2/component/` is the 1.4.1 prefix plus `0044_ingress_mission_request_idempotency.sql`
 (the ingress mission-request idempotency function). Proof:
-`tests/integration/postgres/test_run2_release_142.py`.
+`tests/integration/postgres/test_db_release_142_install_and_drift_refusal.py`.
 
 ## 1.4.3
 
@@ -129,7 +129,7 @@ exact `required_component_version`; deployment locks are unchanged by this relea
 (verified against its manifest, including the presence of 0042..0049) and refuses existing
 destinations. Build as for 1.4.1 with
 `--component-root packages/mission-control-db-contract/releases/1.5.0/component`. Proof:
-`tests/integration/postgres/test_sprint_v_release_150.py` (fresh install and upgrade from
+`tests/integration/postgres/test_db_release_150_knowledge_boundary_records.py` (fresh install and upgrade from
 1.4.4 with preserved receipts and documents, verify and idempotent re-apply, journal
 idempotency and `EFFECT_CONFLICT`, legal and illegal transitions, appended history,
 immutability for runtime and owner, cross-tenant isolation, lineage, submission, read,
@@ -165,7 +165,7 @@ schema-fit rows for 0050, 0053 and 0054):
 Minor: one table and columns added, and guards that only refuse states 1.5.0 could not
 represent; existing rows keep their meaning and the reader/writer protocol stays
 `mission-control-runtime/1`. `scripts/prepare_release_160.py` reproduces the input tree from the
-built 1.5.0 inputs. Proof: `tests/integration/postgres/test_sprint_v_release_160.py` (fresh
+built 1.5.0 inputs. Proof: `tests/integration/postgres/test_db_release_160_handles_and_delivery_repair.py` (fresh
 install and upgrade from 1.5.0 with preserved receipts and rows, verify and idempotent re-apply,
 handle monotonicity and idempotent cancel, tenant isolation, assessment handoff and basis,
 repair-then-block and the readiness guard). Building it makes 1.6.0 the newest built release the
@@ -212,7 +212,7 @@ All eleven tables carry the installation/application/tenant scope in every key a
 row security, comments and runtime grants without DELETE (column-limited UPDATE only on the two
 heads). Minor: new tables and a basis constraint that only admits new values; the reader/writer
 protocol stays `mission-control-runtime/1`. `scripts/prepare_release_170.py` reproduces the input
-tree from the built 1.6.0 inputs. Proof: `tests/integration/postgres/test_sprint_oc_release_170.py`
+tree from the built 1.6.0 inputs. Proof: `tests/integration/postgres/test_db_release_170_output_contracts_transfer_plans.py`
 (fresh install and upgrade from 1.6.0 with preserved receipts, verify and idempotent re-apply,
 security, head guards) and `tests/integration/postgres/test_output_contracts_postgres.py` (the
 handlers on the real tables). Built 2026-10-27 on the disposable `sprint-v-pg17` server: schema
@@ -293,7 +293,7 @@ container: schema fingerprint
 0066/0067, the 1.8.0 refusal of `report.observe`, every recorded operation under the runtime role,
 control operations refused, verify, idempotent re-apply, runtime security), the package's
 `tests/test_release_190_handle_operations.py` (non-superuser installer upgrade from 1.8.0 and the
-byte-identical inputs) and `tests/unit/knowledge/test_w1_d22_handle_operations.py`. Building it makes
+byte-identical inputs) and `tests/unit/knowledge/test_knowledge_handle_operations.py`. Building it makes
 1.9.0 the newest built release the repository fixture installs.
 
 ## 1.10.0
@@ -312,7 +312,7 @@ Minor; reader/writer protocol unchanged. `scripts/prepare_release_1100.py` repro
 from the built 1.9.0 inputs. Schema fingerprint
 `sha256:0ec08735ca9265dc97f30409b3d0008eccc4edf1deca63e163b9890582dba223`, contract
 `sha256:dbc7d5f9…9760`, manifest file `sha256:bc9ae9dd…a431`; source revision `git:3bed59fd…`.
-Proof: `tests/integration/postgres/test_sprint_oc_release_1100.py` and the package's
+Proof: `tests/integration/postgres/test_db_release_1100_linked_exports.py` and the package's
 `tests/test_release_1100_prefix.py`. Built and committed in `abac1fde` (2026-10-30); fresh install
 and upgrade from 1.9.0 pass on local disposable PostgreSQL (integrated locally). **No deployment
 lock and no remote install.**
@@ -332,7 +332,7 @@ Minor; reader/writer protocol unchanged. `scripts/prepare_release_1110.py` repro
 from the built 1.10.0 inputs. Schema fingerprint
 `sha256:de10791b71f556e0a8761a3e6c298108452a96c2ae66ad31fb33b45dee9efd95`, contract
 `sha256:0139750f…5783`, manifest file `sha256:f0cc28a6…2fa8`; source revision `git:3bed59fd…`.
-Proof: `tests/integration/postgres/test_sprint_oc_release_1110.py` and the package's
+Proof: `tests/integration/postgres/test_db_release_1110_export_writer_grants.py` and the package's
 `tests/test_release_1110_prefix.py`; the 1.11.0 fresh/upgrade security regression passed locally
 (10 checks; `docs/specs/provider-consolidation-2026-10/sprint-oc/NEXT-SESSION.md`, linked-chain
 section). Committed in `abac1fde`. **No deployment lock and no remote install.**
@@ -354,7 +354,7 @@ Minor; reader/writer protocol unchanged. `scripts/prepare_release_1120.py` repro
 from the built 1.11.0 inputs. Schema fingerprint
 `sha256:729c2e9dc10701da5113114004fd0378a3053776de219dd5e899d64404834cce`, contract
 `sha256:ca241f7b…50af`, manifest file `sha256:57e591fa…410a`; source revision `git:9b01982e…`.
-Proof: `tests/integration/postgres/test_sprint_oc_release_1120.py` (fresh and upgrade from 1.11.0,
+Proof: `tests/integration/postgres/test_db_release_1120_workspace_closures.py` (fresh and upgrade from 1.11.0,
 append-only, tenant isolation, expiry) and the package's `tests/test_release_1120_prefix.py`.
 Committed in `03f11594` (2026-10-31); integrated by the provenance proof run (eight closures,
 `docs/specs/provider-consolidation-2026-10/sprint-oc/provenance-2026-10-31/REPORT.md`). Building it

@@ -84,5 +84,5 @@ AWS hosting, hosted Agent Server and sandboxes are proposals; local-to-cloud ses
   [cloud runtime](../../deployments/cloud_runtime/README.md), [AWS worker](../../deployments/worker-aws/README.md).
 - Code: [cluster binding](../../src/mission_control/application/execution/run_launch.py),
   [ingress routes](../../src/mission_control/interfaces/http/ingress.py).
-- Tests: [outage drill](../../tests/integration/temporal/test_mp22_outage_drill.py),
-  [ingress drainer](../../tests/integration/postgres/test_run2_ingress_drainer_postgres.py).
+- Tests: [outage drill](../../tests/integration/temporal/test_cluster_outage_drill.py),
+  [ingress drainer](../../tests/integration/postgres/test_ingress_drainer_claims.py).

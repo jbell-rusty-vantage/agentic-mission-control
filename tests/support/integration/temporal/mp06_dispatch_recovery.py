@@ -1,6 +1,6 @@
 """Builders, constants and fakes that other test files import.
 
-Moved from tests/integration/temporal/test_mp06_dispatch_recovery.py.
+Moved from tests/integration/temporal/test_dispatch_recovery_temporal.py.
 """
 
 from __future__ import annotations

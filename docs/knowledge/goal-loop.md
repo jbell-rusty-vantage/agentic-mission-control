@@ -129,11 +129,11 @@ Built / specified / goal: executor/verifier iterations, convergence, Goal Revisi
   [goal context](../../src/mission_control/application/programs/goal_context.py),
   [workflow](../../src/mission_control/adapters/temporal/workflows/goal_directed.py),
   [human review rules](../../src/mission_control/domain/programs/human_review.py).
-- Tests: [GoalDirected](../../tests/unit/orchestration/test_wp_bp_020_goal_directed.py),
-  [W1 failure paths](../../tests/unit/orchestration/test_w1_goal_failure_paths.py),
-  [fulfillment at the boundary](../../tests/unit/orchestration/test_w1_goal_fulfillment.py),
-  [convergence fulfillment](../../tests/unit/outputs/test_w1_convergence_fulfillment.py),
-  [PostgreSQL fulfillment](../../tests/integration/postgres/test_w1_fulfillment_postgres.py),
+- Tests: [GoalDirected](../../tests/unit/orchestration/test_goal_loop_rules.py),
+  [W1 failure paths](../../tests/unit/orchestration/test_goal_failure_paths.py),
+  [fulfillment at the boundary](../../tests/unit/orchestration/test_goal_fulfillment.py),
+  [convergence fulfillment](../../tests/unit/outputs/test_convergence_fulfillment.py),
+  [PostgreSQL fulfillment](../../tests/integration/postgres/test_convergence_fulfillment_postgres.py),
   [unparseable answers](../../tests/acceptance/mission_control/test_goal_output_unparseable.py),
-  [family failure root](../../tests/integration/temporal/test_w1_family_failure_root.py).
+  [family failure root](../../tests/integration/temporal/test_root_failure_terminalization.py).
 - Proof status: [control board](../specs/provider-consolidation-2026-10/sprint-oc/NEXT-SESSION.md) (`:199-215` GoalDirected bounded gates, `:119-121` W1 unreleased).

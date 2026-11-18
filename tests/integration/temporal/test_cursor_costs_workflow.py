@@ -10,7 +10,7 @@
 
 `cursor.costs.reconcile`, `lane.turn` and `lane.cleanup` are stand-ins at the activity
 boundary. Replaces the `temporalio.workflow`-patching workflow tests of
-tests/unit/runtime/test_run2_cursor_costs.py and tests/unit/runtime/test_run2_integration_joins.py.
+tests/unit/runtime/test_cursor_costs.py and tests/unit/runtime/test_worker_boundary_joins.py.
 """
 
 from __future__ import annotations

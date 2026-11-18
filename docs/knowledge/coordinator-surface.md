@@ -156,5 +156,5 @@ control plane are goals.
   [event envelope](../../src/mission_control/domain/subscriptions/contracts.py),
   [attention rules](../../src/mission_control/domain/coordinator/attention.py).
 - Tests: [wake channels](../../tests/acceptance/mission_control/test_wake_channels.py),
-  [attention PostgreSQL](../../tests/integration/postgres/test_wi19_attention_postgres.py),
+  [attention PostgreSQL](../../tests/integration/postgres/test_coordinator_attention_postgres.py),
   [public interfaces](../../tests/unit/mission_control/test_public_interfaces.py).

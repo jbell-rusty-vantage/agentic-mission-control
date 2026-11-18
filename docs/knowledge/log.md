@@ -100,8 +100,8 @@
   revocation ends it (D28: no reference-use port was composed before).
 - [Output contracts](output-contracts.md): a submitted, finalized but unaccepted promise reads
   `SUBMITTED_NOT_ACCEPTED` and counts as submitted (expected and optional shortfalls visible), never
-  `MISSING` (D29). Proof: `tests/unit/outputs/test_w1_d28_d29.py`,
-  `tests/integration/postgres/test_w1_d28_d29_postgres.py`.
+  `MISSING` (D29). Proof: `tests/unit/outputs/test_official_use.py`,
+  `tests/integration/postgres/test_approved_report_fulfillment_revocation.py`.
 ## 2026-10-29 (OVE-169 W1 fix D27)
 
 - [Output contracts](output-contracts.md): the GoalDirected verifier shares the producer's owner
@@ -122,7 +122,7 @@
   relays), so API and workers share the evaluator environment; a worker lacking the keys is caught
   by the mid-run wait (the revision waits with the cause; already-judged revisions never re-held).
   Proof:
-  `tests/unit/knowledge/test_w1_d30_uncomposed_evaluators.py`, `test_w1_d30_uncomposed_postgres.py`.
+  `tests/unit/knowledge/test_uncomposed_trusted_settlement.py`, `test_trusted_pinned_report_wait.py`.
 
 ## 2026-10-29 (W1 D26 / OVE-169)
 
@@ -131,8 +131,8 @@
   liabilities for operator reconciliation (escalating only when the previous attempt was refused
   at the same run version); each liability holds an `operator_reconciliation` wait and a blocked
   notice, closed by the audited `reconcile_terminal_liability` command. Proof:
-  `tests/unit/coordinator/test_w1_d26_liability_terminalization.py`,
-  `tests/integration/temporal/test_w1_d26_liability_root.py`.
+  `tests/unit/coordinator/test_unsettled_liability_terminalization.py`,
+  `tests/integration/temporal/test_root_liability_terminalization.py`.
 ## 2026-10-29 (W1 D25 / OVE-169: seal-key registration)
 
 - Runtime generator: `ks-executor.env` names `KS_KNOWLEDGE_SEAL_ISSUER=knowledge-services`; `install.env`
@@ -141,11 +141,11 @@
   pin the executor key's public half through the KS CLI `knowledge-db seal-key`; KS refuses an
   unregistered key `CAPABILITY_UNAVAILABLE` / `seal_key_unregistered` with the key id
   ([RUNTIME-ENVIRONMENT.md](../specs/provider-consolidation-2026-10/sprint-oc/release/RUNTIME-ENVIRONMENT.md)).
-- Proof: `tests/unit/operations/test_sprint_oc_runtime_env.py`.
+- Proof: `tests/unit/operations/test_runtime_env_generator.py`.
 - Review S1: [Trusted judgment](trusted-judgment.md): a `seal_key_*` seal refusal is an actionable
   `settlement_unavailable` wait (key id and operator action in `issues`); the next pass recovers
   the observations and seals without rerunning paid evaluators; `report.seal` `invoke` is never
-  re-sent by the HTTP client. Proof: `tests/unit/knowledge/test_w1_d25_seal_key_wait.py`.
+  re-sent by the HTTP client. Proof: `tests/unit/knowledge/test_seal_key_wait.py`.
 
 ## 2026-10-29 (W1 D24 and the auditor handle gap / OVE-169)
 
@@ -157,8 +157,8 @@
 - [Evaluator attempts and observation recovery](evaluator-attempts.md) (new, split from trusted
   judgment): causes, the bound and reset, dispatch markers, recovery; KS operation-id golden
   vectors from KS's own code (`scripts/ks_operation_id_parity.mjs`).
-- Proof: `tests/unit/resolution/test_w1_d24_api_surface.py`,
-  `tests/unit/knowledge/test_w1_d23_evaluator_causes.py`, `test_ks_operation_id_parity.py`.
+- Proof: `tests/unit/resolution/test_openai_responses_surface.py`,
+  `tests/unit/knowledge/test_evaluator_attempts.py`, `test_ks_operation_id_parity.py`.
 ## 2026-10-29 (OVE-176 WI-13 round 2: launcher, adoption, review fixes)
 
 - [Recursive composition](recursive-composition.md): the production launcher and composition
@@ -175,10 +175,10 @@
   `goaldirected.reconcile_nested_executor`); exact exports, contained budget, governed
   cancel/pause/resume; lineage table in unregistered `scripts/release_200/0071` (renumbered from 0068 on 2026-11-01).
 - [Workflow systems](workflow-systems.md): pointer to the recursive execution.
-- Proof: `tests/unit/authoring/test_wi13_nested_authoring.py`,
-  `tests/unit/orchestration/test_wi13_nested_runtime.py`,
-  `tests/integration/temporal/test_wi13_nested_temporal.py`,
-  `tests/integration/postgres/test_wi13_nested_activations_postgres.py`; W5 fixtures
+- Proof: `tests/unit/authoring/test_nested_body_authoring.py`,
+  `tests/unit/orchestration/test_nested_body_runtime.py`,
+  `tests/integration/temporal/test_nested_body_child_runs.py`,
+  `tests/integration/postgres/test_nested_activation_lineage.py`; W5 fixtures
   `tests/fixtures/manifests/sprint-oc-w5/`.
 
 ## 2026-10-29 (W1 blockers D22/D23 / OVE-169: MC 1.9.0, trusted handles, evaluator causes)
@@ -192,7 +192,7 @@
   its concrete cause on the revision's one standing wait assessment; billed runs per revision and
   role are bounded at 2 across passes (`mc-evaluator-attempts:<role>:<n>`), then the settlement waits
   with reason `evaluator_attempts_exhausted` (D23).
-- Proof: `tests/unit/knowledge/test_w1_d23_evaluator_causes.py`, `test_w1_d22_handle_operations.py`;
+- Proof: `tests/unit/knowledge/test_evaluator_attempts.py`, `test_knowledge_handle_operations.py`;
   `tests/integration/postgres/test_sprint_oc_release_190.py`; package `tests/test_release_190_handle_operations.py`.
 
 ## 2026-10-29 (OVE-170 WI-07 review S1-S3, N1)
@@ -201,7 +201,7 @@
   `PostgresMemberDecisions` verifies cited member decisions against bridge-recorded 0059 rows bound
   to the exact member (fail closed on read errors); iteration scope declares a per-iteration
   record; a failed Application Profile load is logged. Proof:
-  `tests/integration/postgres/test_wi07_collections_postgres.py`, `tests/unit/outputs/test_collections.py`.
+  `tests/integration/postgres/test_collection_member_assessments.py`, `tests/unit/outputs/test_collections.py`.
 
 ## 2026-10-29 (OVE-170 WI-07 confirm-review fixes B2', N1)
 
@@ -210,7 +210,7 @@
   only citations a `MemberDecisionPort` verifies standing for the exact member (none composed in
   production yet: they wait); the trusted pin comes from the Application Profile with no default
   (`None` fails closed). Proof: `tests/unit/outputs/test_collections.py`,
-  `tests/unit/context/test_wi07_current_set_transfer.py`.
+  `tests/unit/context/test_current_accepted_set_transfer.py`.
 
 ## 2026-10-29 (W1 defect D21: per-iteration records)
 
@@ -218,7 +218,7 @@
   or control_record promise with `scope: iteration` (the progress note) is promoted from its
   iteration's finalized submission whatever the verifier's verdict (§7 handoff note); every other
   promise keeps the accepted-verdict gate. Proof: `tests/unit/outputs/test_d21_iteration_records.py`,
-  `tests/integration/postgres/test_wi07_collections_postgres.py::test_d21_text_and_progress_note_fulfillment_on_postgres`.
+  `tests/integration/postgres/test_collection_member_assessments.py::test_d21_text_and_progress_note_fulfillment_on_postgres`.
 
 ## 2026-10-28 (OVE-170 WI-07: report collections and current accepted sets)
 
@@ -234,16 +234,16 @@
 - Review fixes: trusted-pinned member requirements count only KS-cited member assessments (host
   passes never promote); optional-only collections never auto-promote; a collection blocked by held
   or rejected members is not a delivered subject; inline manifests deliver their canonical document.
-- Proof: `tests/unit/outputs/test_collections.py`, `tests/unit/knowledge/test_wi07_report_collections.py`,
-  `tests/unit/context/test_wi07_current_set_transfer.py`,
-  `tests/integration/postgres/test_wi07_collections_postgres.py`.
+- Proof: `tests/unit/outputs/test_collections.py`, `tests/unit/knowledge/test_report_collections.py`,
+  `tests/unit/context/test_current_accepted_set_transfer.py`,
+  `tests/integration/postgres/test_collection_member_assessments.py`.
 ## 2026-10-28 (OVE-169 W1 blockers D19, D20)
 
 - [Trusted judgment](trusted-judgment.md): the auditor census spans name their basis (the live
   census was refused "not a valid discovery"); KS refusal issues reach the log, the wait detail and
   inspection (`finding_details`); KS-built evaluation-context parity; typed registration collisions
-  with an actionable tool refusal. Proof: `test_evaluator_parity.py`, `test_w1_d19_d20.py`,
-  `tests/integration/postgres/test_w1_d20_postgres.py`.
+  with an actionable tool refusal. Proof: `test_evaluator_parity.py`, `test_knowledge_refusals.py`,
+  `tests/integration/postgres/test_refused_census_inspection.py`.
 ## 2026-10-29 (OVE-169 W1 fix D18)
 
 - [Model Catalog](model-catalog.md): a third structured-output strategy `tool_auto` (ordinary tool,
@@ -261,8 +261,8 @@
   stage and applies to legacy graphs too (S3); group selection may exceed the quorum (N2).
 - Seed `mc.catalog.artifact-schemas@1.0.1` (successor; 1.0.0 untouched) carries the W2
   graph-variant schemas. [Removal guide](../specs/archive/mc-surfaces-2026-10/docs/REMOVAL_GUIDE.md) records the rollback hazard.
-- Proof: `tests/unit/orchestration/test_wi08_revisit_regions.py`,
-  `tests/integration/temporal/test_wi08_graph_routes_temporal.py`,
+- Proof: `tests/unit/orchestration/test_revisit_regions.py`,
+  `tests/integration/temporal/test_graph_routes_temporal.py`,
   `tests/integration/temporal/test_wi08_legacy_stagegraph_replay.py`,
   `tests/unit/capability/test_graph_route_schema_seeds.py`.
 
@@ -280,11 +280,11 @@
   opt-out is an authored `required: false` binding. Compile refuses a Stage Graph whose completed
   family record would exceed the 64 KiB family mutation bound (W1 D10 lesson). Bounded Revisit
   Regions remain unimplemented.
-- Proof: `tests/unit/orchestration/test_wi08_graph_routes.py`,
-  `tests/unit/orchestration/test_wi08_route_facts.py`,
-  `tests/unit/authoring/test_wi08_graph_authoring.py`,
-  `tests/unit/context/test_wi08_dependent_release.py`,
-  `tests/integration/temporal/test_wi08_graph_routes_temporal.py` (Temporal test server, replay).
+- Proof: `tests/unit/orchestration/test_graph_routes.py`,
+  `tests/unit/orchestration/test_route_facts.py`,
+  `tests/unit/authoring/test_graph_route_authoring.py`,
+  `tests/unit/context/test_dependent_stage_release.py`,
+  `tests/integration/temporal/test_graph_routes_temporal.py` (Temporal test server, replay).
 
 ## 2026-10-28 (OVE-169 W1 fixes D11, D12, D13, D16, D17)
 
@@ -303,7 +303,7 @@
   every family; provider_native schemas are checked against Anthropic's `output_config.format`
   subset; list-of-objects JSON strings are coerced; refusal redaction is wider.
 - Proof: `tests/unit/deep_agents/test_structured_output_strategy.py`,
-  `tests/unit/knowledge/test_w1_tool_boundary.py`.
+  `tests/unit/knowledge/test_knowledge_tool_boundary.py`.
 ## 2026-10-28 (OVE-169 W1: explicit fulfillment, review fixes)
 
 - [Completion](completion.md): the GoalDirected convergence boundary records `Fulfillment@1`
@@ -327,10 +327,10 @@
 - [Lifecycle](lifecycle.md): the bounded recovery for a cancel the family cannot reach (immediate
   cancel, then terminate the family workflow, never the root); the Sprint OC operator grant holds
   `workflow_run.admin`.
-- Proof: `tests/unit/orchestration/test_w1_goal_failure_paths.py`,
-  `tests/unit/coordinator/test_w1_family_failure_terminalization.py`,
-  `tests/integration/temporal/test_w1_family_failure_root.py`,
-  `tests/unit/operations/test_sprint_oc_deployment_file.py`.
+- Proof: `tests/unit/orchestration/test_goal_failure_paths.py`,
+  `tests/unit/coordinator/test_failed_run_terminalization.py`,
+  `tests/integration/temporal/test_root_failure_terminalization.py`,
+  `tests/unit/operations/test_deployment_file_script.py`.
 
 ## 2026-10-28 (OVE-169 W1 blocker D9)
 
@@ -355,7 +355,7 @@
   (D3).
 - Proof: `tests/unit/knowledge/test_report_registration.py`, `test_knowledge_review.py`,
   `test_knowledge_composition.py`, `tests/unit/mission_control/test_api_event_loop.py`,
-  `tests/unit/operations/test_sprint_oc_runtime_env.py`.
+  `tests/unit/operations/test_runtime_env_generator.py`.
 - Review round 1: a cross-scope external ref refuses `RECORD_SCOPE_MISMATCH`; the parity fixture's
   generator is committed (`scripts/ks_registration_parity.mjs`, KS commit in its provenance) with
   page-region, external-assertion and table shapes; the review route resolves the run, requires the
@@ -394,8 +394,8 @@
   (real-unrun).
 - [Wake channels](wake-channels.md): a webhook 2xx is transport, never acknowledgment; pages
   carry notice digests.
-- Proof: `tests/unit/subscriptions/test_wi19_attention.py`, `test_wi19_interfaces.py`,
-  `tests/integration/postgres/test_wi19_attention_postgres.py`, updated MP-15/MO-43 webhook tests.
+- Proof: `tests/unit/subscriptions/test_coordinator_attention.py`, `test_attention_surfaces.py`,
+  `tests/integration/postgres/test_coordinator_attention_postgres.py`, updated MP-15/MO-43 webhook tests.
 - Review round 1: wake and visible are host-attested and bound to a per-delivery nonce that only
   the delivered payload carries (never an inspection read); stages ordered on server receive time
   (`STAGE_ORDER_VIOLATED`); the content purpose is declared at subscribe time and excerpts are
@@ -414,8 +414,8 @@
   `adopt_async_task_output` offers the exact bytes to a parent promise through `SubmitOutput@2`.
 - [Deep Agents lane](deep-agents-lane.md): the async child paragraph points to the new concept.
 - Proof: unit (`test_async_child_sealed_binding`, `test_async_child_check_time_admission`,
-  `test_sealed_child_graph`), `tests/integration/postgres/test_wi23_async_children_postgres.py`,
-  `tests/integration/agent_server/test_wi23_sealed_child_server.py` (real local Agent Server)
+  `test_sealed_child_graph`), `tests/integration/postgres/test_async_subordinate_admission.py`,
+  `tests/integration/agent_server/test_sealed_subordinate_server.py` (real local Agent Server)
   and `tests/acceptance/mission_control/test_manifest_sealed_async_child.py` (manifest, Temporal,
   PostgreSQL, real server; deterministic models). Paid C10-C13 observation is W5.
 
@@ -428,8 +428,8 @@
   its `mc.reaction.dispatch` outbox intent in one transaction, the limits (time, recursion,
   activations, rate, spend), dispatch currency (stale generation, fence, terminal) and the ordinary
   `mc.operation.v1` start (`AdmittedReactionOperations`, `TemporalReactionStarter`).
-- Proof: `tests/unit/reactions/`, `tests/integration/postgres/test_wi22_reactions_postgres.py`,
-  `tests/integration/temporal/test_wi22_reaction_dispatch.py`.
+- Proof: `tests/unit/reactions/`, `tests/integration/postgres/test_durable_transition_reactions.py`,
+  `tests/integration/temporal/test_reaction_dispatch_once.py`.
 - Review fixes: host-derived `cause_ref` for every kind (never the assessor origin) with
   `CAUSE_UNKNOWN` failing closed; attempt-numbered run-control reservations that survive a busy
   run, and release on a refusal after reserving; guarded capture with
@@ -450,8 +450,8 @@
 - Proof: `packages/mission-control-db-contract/tests/test_logins.py`,
   `tests/unit/knowledge/test_independent_evaluators.py`, `tests/unit/knowledge/test_trusted_judgment.py`,
   `tests/unit/context/test_transfer_materializer.py`,
-  `tests/unit/operations/test_sprint_oc_deployment_file.py`,
-  `tests/unit/operations/test_sprint_oc_runtime_env.py`.
+  `tests/unit/operations/test_deployment_file_script.py`,
+  `tests/unit/operations/test_runtime_env_generator.py`.
 
 ## 2026-10-28 (WI-05 / OVE-167: native commits across missing protocol receipts)
 
@@ -465,7 +465,7 @@
   effect receipts of another run (fork/child: `EFFECT_FOREIGN_RUN`) or without a mission
   (`EFFECT_ORIGIN_UNPROVEN`) refuse typed; an uncomposed port is `EFFECT_EVIDENCE_UNWIRED`; startup
   refuses a KS component older than 2.5.0 (`knowledge_component_supported`).
-- Proof: `tests/unit/knowledge/test_gateway.py`, `tests/unit/knowledge/test_wi04_lane_settlement.py`,
+- Proof: `tests/unit/knowledge/test_gateway.py`, `tests/unit/knowledge/test_lane_output_settlement.py`,
   `tests/unit/outputs/test_output_fulfillment.py`,
   `tests/integration/postgres/test_knowledge_gateway_postgres.py`.
 
@@ -502,14 +502,14 @@
   promises and inline/code-change `submit_output`; WI-04 limits (family inputs stay optional).
   [Execution](temporal-synthesis.md): durable settlement waits. [Completion](completion.md): execution
   outcome vs settlement. [Deep Agents lane](deep-agents-lane.md): `settle_invocation`.
-- Proof: `tests/unit/operations/test_wi04_saved_settlement.py`,
-  `tests/unit/knowledge/test_wi04_lane_settlement.py`,
-  `tests/integration/postgres/test_wi04_saved_settlement_postgres.py`,
-  `tests/integration/temporal/test_wi04_saved_settlement_restart.py` (generic durable waits; real KS
+- Proof: `tests/unit/operations/test_saved_settlement.py`,
+  `tests/unit/knowledge/test_lane_output_settlement.py`,
+  `tests/integration/postgres/test_saved_settlement_postgres.py`,
+  `tests/integration/temporal/test_saved_settlement_restart.py` (generic durable waits; real KS
   and native paths are WI-03/WI-05). Review fixes: save before the fence/usage checks, fenced waits
   only drop reviews, typed too-large/conflict outcomes, live fence, configurable cap, effect deadline
   incident, review alarms, continue-as-new, `GenericArtifactWorkflow` waits
-  (`tests/integration/temporal/test_wi04_generic_artifact_wait.py`).
+  (`tests/integration/temporal/test_generic_artifact_settlement_wait.py`).
   Re-review: durable effect-wait anchor (`effect_wait_since`, once per operator decision); an
   abandoned saved result charges its known spend.
 
@@ -522,7 +522,7 @@
   fulfillable through a receiving-backend read. [Knowledge Services boundary](knowledge-services.md):
   M04 run-wide delivery removed; `readSelected` payload with purpose.
 - Proof: `tests/unit/context/test_transfer_plan.py`, `tests/unit/context/test_transfer_materializer.py`,
-  `tests/integration/deep_agents/test_wi02_transfer_plan_lane.py` (a real Deep Agent without
+  `tests/integration/deep_agents/test_transfer_plan_delivery.py` (a real Deep Agent without
   knowledge tools reads its plan), `tests/integration/postgres/test_knowledge_gateway_postgres.py`
   (0057 rows), `tests/unit/outputs/test_output_fulfillment.py` (file realization).
 

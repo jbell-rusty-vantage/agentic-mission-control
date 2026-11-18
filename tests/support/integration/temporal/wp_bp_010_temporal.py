@@ -1,6 +1,6 @@
 """Builders, constants and fakes that other test files import.
 
-Moved from tests/integration/temporal/test_wp_bp_010_temporal.py.
+Moved from tests/integration/temporal/test_stage_graph_workflow_temporal.py.
 """
 
 from __future__ import annotations

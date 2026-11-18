@@ -86,7 +86,7 @@ dormant, closed` with `closure_outcome` `mission_accepted, not_accepted, abandon
 is not what the code uses. The activation vocabulary is the same story (see [completion](completion.md)).
 Mission-level `paused` and `blocked` are run or activation facts in the specification, not mission lifecycle.
 
-Built / specified / goal: admission, ordered commands, boundary delivery, family-failure terminalization and operator reconciliation built, tested on PostgreSQL and real Temporal (`tests/integration/temporal/test_w1_family_failure_root.py`); the specified mission and run state machines are specified only; changing a run's policy mid-run is a goal ([revisions](revisions.md)).
+Built / specified / goal: admission, ordered commands, boundary delivery, family-failure terminalization and operator reconciliation built, tested on PostgreSQL and real Temporal (`tests/integration/temporal/test_root_failure_terminalization.py`); the specified mission and run state machines are specified only; changing a run's policy mid-run is a goal ([revisions](revisions.md)).
 
 # Citations
 
@@ -96,4 +96,4 @@ Built / specified / goal: admission, ordered commands, boundary delivery, family
 - [Boundary relay](../../src/mission_control/application/execution/boundary_relay.py).
 - [PostgreSQL HTTP lifecycle proof](../../tests/integration/postgres/test_mission_control_lifecycle_postgres.py).
 - [Family failure terminalization](../../src/mission_control/application/execution/family_failure.py)
-  and its proof `tests/integration/temporal/test_w1_family_failure_root.py`.
+  and its proof `tests/integration/temporal/test_root_failure_terminalization.py`.

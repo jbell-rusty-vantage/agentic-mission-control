@@ -149,12 +149,12 @@ Built / specified / goal: queue, add context, interrupt-and-inject (Deep Agents 
   [interrupt and inject](../../src/mission_control/application/execution/harness/inject.py),
   [dispatch journal](../../src/mission_control/application/execution/harness/dispatch.py),
   [mission service](../../src/mission_control/application/missions/service.py).
-- Tests: [mailbox](../../tests/unit/run_control/test_ft_f1_command_mailbox.py), [mailbox in PostgreSQL](../../tests/integration/postgres/test_command_mailbox_postgres.py),
-  [mailbox on Temporal](../../tests/integration/temporal/test_command_mailbox.py), [interrupt and inject](../../tests/unit/operations/test_ft_f2_interrupt_and_inject.py),
-  [inject in PostgreSQL](../../tests/integration/postgres/test_ft_f2_inject_postgres.py), [inject on Temporal](../../tests/integration/temporal/test_ft_f2_inject.py),
+- Tests: [mailbox](../../tests/unit/run_control/test_command_mailbox_delivery.py), [mailbox in PostgreSQL](../../tests/integration/postgres/test_command_mailbox_postgres.py),
+  [mailbox on Temporal](../../tests/integration/temporal/test_command_mailbox.py), [interrupt and inject](../../tests/unit/operations/test_interrupt_and_inject.py),
+  [inject in PostgreSQL](../../tests/integration/postgres/test_interrupt_and_inject_postgres.py), [inject on Temporal](../../tests/integration/temporal/test_interrupt_and_inject_temporal.py),
   [stop fence](../../tests/unit/run_control/test_stop_fence.py), [fence backing](../../tests/unit/run_control/test_run_fence_backing.py),
   [fenced turn](../../tests/unit/operations/test_fenced_turn.py), [turn stops](../../tests/unit/deep_agents/test_turn_stops.py),
   [immediate cancel at T0](../../tests/acceptance/mission_control/test_tracing_stream.py) (`test_fx_tr_cancel_t0`),
-  [stop fence in PostgreSQL](../../tests/integration/postgres/test_stop_fence.py), [immediate cancel on Temporal](../../tests/integration/temporal/test_ft_f3_immediate_cancel.py),
-  [cancel and replace on Temporal](../../tests/integration/temporal/test_mp06_dispatch_recovery.py), [inspection](../../tests/unit/run_control/test_ft_f6_inspection.py),
+  [stop fence in PostgreSQL](../../tests/integration/postgres/test_stop_fence.py), [immediate cancel on Temporal](../../tests/integration/temporal/test_immediate_cancel.py),
+  [cancel and replace on Temporal](../../tests/integration/temporal/test_dispatch_recovery_temporal.py), [inspection](../../tests/unit/run_control/test_inspection_enrichment.py),
   [cognition points](../../tests/acceptance/mission_control/test_cognition_points.py).

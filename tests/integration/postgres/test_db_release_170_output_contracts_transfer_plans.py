@@ -4,7 +4,7 @@ WI-01: output-contract tables. WI-02 (0057): the M04 plan/receipt/outbox tables 
 the sealed ``transfer_plan``, ``transfer_delivery_receipt`` and ``transfer_member_delivery`` exist
 with their guards (immutable rows, ready only with headroom, files probed through the backend).
 WI-04 (0058): ``invocation_settlement`` exists under forced row security without DELETE (its
-guard is proven through the store in ``test_wi04_saved_settlement_postgres.py``).
+guard is proven through the store in ``test_saved_settlement_postgres.py``).
 
 Fresh install and upgrade from 1.6.0 with preserved receipts and finalizations, verify and an
 idempotent re-apply, forced row security, comments and runtime grants without DELETE on every

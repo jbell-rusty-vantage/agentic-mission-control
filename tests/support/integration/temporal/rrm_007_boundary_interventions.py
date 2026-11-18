@@ -1,6 +1,6 @@
 """Builders, constants and fakes that other test files import.
 
-Moved from tests/integration/temporal/test_rrm_007_boundary_interventions.py.
+Moved from tests/integration/temporal/test_boundary_interventions_temporal.py.
 """
 
 from __future__ import annotations

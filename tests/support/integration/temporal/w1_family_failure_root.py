@@ -1,6 +1,6 @@
 """Builders, constants and fakes that other test files import.
 
-Moved from tests/integration/temporal/test_w1_family_failure_root.py.
+Moved from tests/integration/temporal/test_root_failure_terminalization.py.
 """
 
 from __future__ import annotations

@@ -1,7 +1,7 @@
 # ruff: noqa: C408
 """Builders, constants and fakes that other test files import.
 
-Moved from tests/unit/cursor/test_run2_released_bridge_sweep.py.
+Moved from tests/unit/cursor/test_released_bridge_sweep.py.
 """
 
 from datetime import UTC, datetime, timedelta

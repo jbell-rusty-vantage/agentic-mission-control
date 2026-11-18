@@ -50,7 +50,7 @@ Tests: packages/mission-control-db-contract/tests
 Invariants:
 - A release is immutable once applied: add a new component version and seed version, never edit bytes.
 - Every apply, runtime-apply and seed-apply writes a receipt; verify compares fingerprint and contract digest.
-Explained by (docs/knowledge): capability-seeds, persistence, capabilities, completion, database-component, environment-preparation
+Explained by (docs/knowledge): capability-seeds, persistence, database-component, capabilities, completion, environment-preparation
 Decided by (docs/adr): ADR-0002, ADR-0003, ADR-0009, ADR-0023, ADR-0033
 Verify: make test-db-contract (disposable PostgreSQL 17 + pgvector, MISSION_CONTROL_TEST_ADMIN_DSN set); mission-db qualify (two-target proof)
 <!-- END:sdlc-module -->

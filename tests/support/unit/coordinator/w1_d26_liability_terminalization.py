@@ -1,6 +1,6 @@
 """Builders, constants and fakes that other test files import.
 
-Moved from tests/unit/coordinator/test_w1_d26_liability_terminalization.py.
+Moved from tests/unit/coordinator/test_unsettled_liability_terminalization.py.
 """
 
 from __future__ import annotations

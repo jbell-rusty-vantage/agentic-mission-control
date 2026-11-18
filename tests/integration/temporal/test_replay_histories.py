@@ -117,7 +117,7 @@ def _rrm007_pre_change(path: Path, history: WorkflowHistory) -> None:
 
 def _rrm016_post_change(path: Path, history: WorkflowHistory) -> None:
     """Captured from the RRM-016 journaled GoalDirected family
-    (`test_rrm_016_goal_directed_journaled`, `RRM016_CAPTURE_HISTORY_DIR`)."""
+    (`test_journaled_goal_loop`, `RRM016_CAPTURE_HISTORY_DIR`)."""
 
     assert JOURNALED_SETTLEMENT_PATCH in patch_ids(history)
     if path.name == "goal_directed_journaled_pause_resume.run1.json":

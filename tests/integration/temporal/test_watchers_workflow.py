@@ -6,7 +6,8 @@ same journal acts twice (SPEC-04 §5, §8 "Watchers").
 evaluation service; the journal and the command path are the in-memory FIXTURE ports
 (`tests/unit/watchers/fakes.py`). A timeline releases each observation into the journal once
 workflow time reaches it, so the run unfolds over two simulated hours in seconds. The same
-service over PostgreSQL is proven in `tests/integration/postgres/test_mo44_watchers_postgres.py`.
+service over PostgreSQL is proven in
+`tests/integration/postgres/test_watcher_evaluator_postgres.py`.
 
 Sample watchers (SPEC-04 §5.1): `ci-red-fix` (signal + condition -> instruct, max 3, 10 min
 apart), `stalled` (absence of frames and signals for 20 min while active -> notify + probe,
