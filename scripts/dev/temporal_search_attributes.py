@@ -62,9 +62,13 @@ async def _register(client: Client, namespace: str, within_seconds: float) -> tu
     while True:
         try:
             return await register_belllabs_search_attributes(client, namespace)
-        except SearchAttributeRegistrationError as error:
-            if "conflicting type" in str(error) or loop.time() >= deadline:
+        except Exception as error:  # the listing raises the server's RPC error unwrapped
+            if "conflicting type" in str(error):
                 raise
+            if loop.time() >= deadline:
+                if isinstance(error, SearchAttributeRegistrationError):
+                    raise
+                raise SearchAttributeRegistrationError(str(error)) from error
             print(f"registration not accepted yet, retrying: {error}", file=sys.stderr)
             await asyncio.sleep(2)
 
@@ -76,9 +80,11 @@ async def _verified(client: Client, namespace: str, within_seconds: float) -> No
         try:
             await verify_belllabs_search_attributes(client, namespace)
             return
-        except SearchAttributeRegistrationError:
+        except Exception as error:
             if loop.time() >= deadline:
-                raise
+                if isinstance(error, SearchAttributeRegistrationError):
+                    raise
+                raise SearchAttributeRegistrationError(str(error)) from error
             await asyncio.sleep(2)
 
 
