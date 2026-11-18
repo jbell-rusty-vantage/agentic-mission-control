@@ -51,6 +51,11 @@ from mission_control.domain.programs.contracts import (
 )
 
 
+# TODO(OVE-238): this fake matches SQL text. Its 22 refusal states (an extra or missing harness
+# execution, a foreign session, a pending command, an active claim, unknown cost authority...)
+# each need their own fixture rows on the disposable database rather than the in-place edits
+# these cases make (not done in AS-S5 for size); move them to
+# tests/integration/postgres/test_closed_workflow_recovery_postgres.py with a row builder per case.
 class Connection:
     def __init__(self, rows, head, settlement, binding, run):
         self.rows, self.head, self.settlement, self.binding, self.run = (
