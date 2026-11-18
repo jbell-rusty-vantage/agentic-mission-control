@@ -52,6 +52,9 @@ def handle(name: str) -> CandidateRef:
     )
 
 
+# TODO(OVE-238): a hand-written TrustedJudgmentBridge; TrustedSettlement takes the concrete
+# bridge, so run test_wi07_report_collections over the real one on TrustedKnowledgeState with
+# a ScriptedRunner (tests/support/trusted_knowledge.py). Not done in AS-S5 for size.
 @dataclass
 class ScriptedBridge:
     """Records one cited assessment per exact revision and promotes a pass (CAS), like the

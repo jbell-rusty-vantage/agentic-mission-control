@@ -74,6 +74,9 @@ def resolution(decision: Ref, *, pending: bool, admitted: bool = True) -> Decisi
     )
 
 
+# TODO(OVE-238): a hand-written TrustedJudgmentBridge; run test_native_write over the real
+# bridge on FakeKnowledgeBinding/TrustedKnowledgeState (tests/support/trusted_knowledge.py
+# World.bridge; the fake KS already serves report.decide). Not done in AS-S5 for size.
 @dataclass
 class Bridge:
     store: InMemoryUseDecisionStore
@@ -113,6 +116,8 @@ class Plans:
         )
 
 
+# TODO(OVE-238): a hand-written ContentResolutionService; use the real resolution service
+# over the fake KS content (tests/support/knowledge/content.py). Not done in AS-S5 for size.
 class Reports:
     async def resolve(self, item: Any, access: Any, *, purpose: str) -> Any:
         assert item.ref == HANDLE and item.digest == DIGEST and purpose == "official"
