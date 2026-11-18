@@ -24,11 +24,6 @@ from tests.unit.subscriptions.fakes import MISSION, RUN, SCOPE, InMemoryStore
 
 PUBLIC_RUN = UUID("10000000-0000-7000-8000-000000000002")
 INTERNAL_RUN = RUN
-DATA_SCOPE = (
-    UUID("00000000-0000-7000-8000-0000000000aa"),
-    "biotech",
-    UUID("00000000-0000-7000-8000-0000000000bb"),
-)
 CALLER = ActorContext(actor_id="full3-caller", permissions=frozenset({"workflow_run.read"}))
 OTHER = ActorContext(actor_id="other-caller", permissions=CALLER.permissions)
 
