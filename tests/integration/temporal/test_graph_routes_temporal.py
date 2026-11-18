@@ -44,7 +44,7 @@ from mission_control.domain.programs.contracts import (
 )
 from mission_control.domain.programs.interpreter import StageGraphInterpreter
 from mission_control.domain.programs.routing import ROUTE_FACTS_KEY
-from tests.support.integration.temporal.wp_bp_010_temporal import (
+from tests.support.integration.temporal.stage_graph_workflow_temporal import (
     QUEUE,
     FakeStageGraphActivities,
     _operation,

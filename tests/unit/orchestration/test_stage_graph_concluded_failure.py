@@ -18,7 +18,7 @@ from mission_control.domain.programs.contracts import (
     StageGraphCompletionProposal,
 )
 from mission_control.domain.programs.interpreter import StageGraphInterpreter
-from tests.support.unit.orchestration.mp20_stagegraph_concluded_failure import _run
+from tests.support.unit.orchestration.stage_graph_concluded_failure import _run
 
 RUN_ID = "run-mp20-concluded"
 

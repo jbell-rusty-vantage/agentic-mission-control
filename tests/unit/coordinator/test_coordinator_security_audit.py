@@ -56,9 +56,7 @@ from mission_control.domain.coordinator.contracts import (
 )
 from mission_control.domain.coordinator.errors import CoordinatorDomainError
 from mission_control.interfaces.mcp.coordinator_server import CoordinatorPrincipal
-from tests.support.operations import operation_request
-from tests.support.unit.coordinator.coordinator_facade import concrete_facade
-from tests.support.unit.web_research.web_research_live_adapters import (
+from tests.support.biotech.web_research_live_adapters import (
     BROWSER_REF,
     BROWSER_RUNTIME,
     FIRECRAWL_RUNTIME,
@@ -66,6 +64,8 @@ from tests.support.unit.web_research.web_research_live_adapters import (
     FakeBrowserRunner,
     FakeScreenshots,
 )
+from tests.support.operations import operation_request
+from tests.support.unit.coordinator.coordinator_facade import concrete_facade
 
 SENTINEL = "sk-proj-SENTINEL_OPENAI_KEY_1234567890"
 NOW = datetime(2026, 7, 26, 18, 0, tzinfo=UTC)

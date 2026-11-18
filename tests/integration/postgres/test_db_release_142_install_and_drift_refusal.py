@@ -8,7 +8,7 @@ import pytest
 
 from mission_control_db_contract.deployment import apply_release, plan_release, verify_release
 from mission_control_db_contract.errors import ContractError
-from tests.support.integration.postgres.run2_release_141 import (
+from tests.support.integration.postgres.db_release_141_install_upgrade_and_drift import (
     PACKAGE,
     VERSIONS,
     assert_runtime_security,
@@ -17,7 +17,9 @@ from tests.support.integration.postgres.run2_release_141 import (
     release_at,
     retained_release_130,
 )
-from tests.support.integration.postgres.run2_release_142 import preserve_document
+from tests.support.integration.postgres.db_release_142_install_and_drift_refusal import (
+    preserve_document,
+)
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.common_db]
 SUCCESSOR = PACKAGE / "releases/1.4.2/component"

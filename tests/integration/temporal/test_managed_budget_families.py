@@ -41,7 +41,7 @@ from mission_control.domain.programs.contracts import (
     StageGraphAdmissionActivityRequest,
     StageGraphAdmissionActivityResult,
 )
-from tests.support.integration.temporal.rrm_007_boundary_interventions import (
+from tests.support.integration.temporal.boundary_interventions_temporal import (
     SCOPE,
     Authority,
     GovernedGoalActivities,
@@ -51,7 +51,7 @@ from tests.support.integration.temporal.rrm_007_boundary_interventions import (
     _state_is,
     until,
 )
-from tests.support.integration.temporal.wp_bp_010_temporal import _blueprint, _run_input
+from tests.support.integration.temporal.stage_graph_workflow_temporal import _blueprint, _run_input
 from tests.support.providers.managed_agents import managed_binding, managed_operation
 from tests.support.temporal import start_workflow_env
 

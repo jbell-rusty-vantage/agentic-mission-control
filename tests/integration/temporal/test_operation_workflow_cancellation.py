@@ -43,7 +43,7 @@ from tests.support.checkpoint_recovery import (
     recovery_harness,
     stage_recovery_unit,
 )
-from tests.support.integration.temporal.rrm_008_operation_workflow_cancellation import (
+from tests.support.integration.temporal.operation_workflow_cancellation import (
     WORKFLOW_QUEUE,
     _replays,
     _request,

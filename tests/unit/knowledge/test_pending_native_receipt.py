@@ -168,7 +168,7 @@ async def test_composed_recovery_callback_uses_the_configured_nondefault_pin():
     from tests.support.native_receipt_selection import PIN as CUSTOM_PIN
     from tests.support.native_receipt_selection import pending_receipt_case
     from tests.support.unit.knowledge.native_write import DIGEST, PLAN, Plans
-    from tests.support.unit.outputs.w1_d28_d29 import HANDLE
+    from tests.support.unit.outputs.official_use import HANDLE
 
     case = await pending_receipt_case()
     await case.select()

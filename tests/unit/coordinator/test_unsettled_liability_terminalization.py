@@ -42,9 +42,9 @@ from mission_control.domain.programs.family_failure import (
 )
 from tests.support.journaled_goal_loop import SCOPE
 from tests.support.run_control import command
-from tests.support.unit.coordinator.w1_d26_liability_terminalization import _stuck_unit
-from tests.support.unit.coordinator.w1_family_failure_terminalization import _request
-from tests.support.unit.subscriptions.mp15_coordinator import classify_type
+from tests.support.unit.coordinator.failed_run_terminalization import _request
+from tests.support.unit.coordinator.unsettled_liability_terminalization import _stuck_unit
+from tests.support.unit.subscriptions.coordinator_notifications import classify_type
 
 
 async def _closed(composition: Any, run_id: str, service: FamilyFailureTerminalization) -> Any:

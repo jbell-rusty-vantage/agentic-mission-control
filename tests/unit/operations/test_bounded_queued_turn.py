@@ -37,7 +37,7 @@ from tests.support.checkpoint_recovery import (
 )
 from tests.support.lane_bindings import lane_fields
 from tests.support.run_control import command
-from tests.support.unit.operations.ft_f2_interrupt_and_inject import (
+from tests.support.unit.operations.interrupt_and_inject import (
     FAST,
     facade,
     harness_with_injections,

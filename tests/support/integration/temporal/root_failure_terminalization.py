@@ -20,8 +20,10 @@ from mission_control.domain.programs.contracts import (
     StageGraphRunInput,
 )
 from tests.support.integration.temporal.chain_start_idempotent import revision
-from tests.support.integration.temporal.wp_bp_010_temporal import _blueprint
-from tests.support.integration.temporal.wp_bp_010_temporal import _run_input as stage_run_input
+from tests.support.integration.temporal.stage_graph_workflow_temporal import _blueprint
+from tests.support.integration.temporal.stage_graph_workflow_temporal import (
+    _run_input as stage_run_input,
+)
 from tests.support.unit.coordinator.root_result_materialization import SCOPE
 
 QUEUE = "w1-family-failure-root"

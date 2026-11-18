@@ -52,7 +52,7 @@ from mission_control.interfaces.socketio.auth import SocketAuthRejected, token_e
 from tests.support.db import CommonDatabase
 from tests.support.db_builders import owner_rows
 from tests.support.ids import tenant_id
-from tests.support.integration.postgres.mp11_approvals_postgres import (
+from tests.support.integration.postgres.approval_bindings_postgres import (
     admitted_run,
     mp11_db,  # noqa: F401
 )

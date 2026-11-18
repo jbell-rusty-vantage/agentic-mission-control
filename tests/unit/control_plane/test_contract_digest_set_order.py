@@ -372,7 +372,7 @@ async def test_graph_admission_and_reconciliation_ids_are_independent_of_set_ite
     from biotech_mission_adapters.application.schema.supporting_graph_reconciliation import (
         _reconciliation_request_digest,
     )
-    from tests.support.unit.schema.schema_grounding_services import _reconciliation_fixture
+    from tests.support.biotech.schema_grounding_services import _reconciliation_fixture
 
     request, _records, _factory = await _reconciliation_fixture()
     first_request, second_request = with_different_set_orders(request)
@@ -486,7 +486,7 @@ async def test_web_research_record_digests_are_independent_of_set_iteration_orde
         _append,
     )
     from biotech_mission_adapters.domain.coordinator.web_research_runtime import PublicGoalAdmission
-    from tests.support.unit.web_research.web_research_semantic_handlers import (
+    from tests.support.biotech.web_research_semantic_handlers import (
         request as stage_request,
     )
 

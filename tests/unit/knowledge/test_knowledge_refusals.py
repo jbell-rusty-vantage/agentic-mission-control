@@ -25,7 +25,7 @@ from mission_control.domain.knowledge.effects import JournalState
 from tests.support.knowledge.content import model_report
 from tests.support.knowledge.gateway import lane
 from tests.support.trusted_knowledge import ScriptedRunner, evaluators, world
-from tests.support.unit.knowledge.w1_d19_d20 import census_refusal
+from tests.support.unit.knowledge.knowledge_refusals import census_refusal
 
 pytestmark = pytest.mark.asyncio
 

@@ -65,24 +65,24 @@ from mission_control.domain.programs.watchers import (
 from tests.support.boundary_commands import declared_wait, states
 from tests.support.db import CommonDatabase
 from tests.support.db_builders import admit_unit_attempt, scoped_command
-from tests.support.integration.postgres.manifest_submit import (
-    OWNER,
-    Stack,
-    goal_loop_manifest,
-    request,
-)
-from tests.support.integration.postgres.mo44_watchers_postgres import (
-    FixedProgram,
-    eventually,
-    local_temporal,
-)
-from tests.support.integration.postgres.mp15_coordinator_inbox_postgres import (
+from tests.support.integration.postgres.coordinator_inbox_postgres import (
     COORDINATOR,
     append_fixture_events,
     inbox_service,
     mission_service,
     owner_fetch,
     subscribe,
+)
+from tests.support.integration.postgres.manifest_submit import (
+    OWNER,
+    Stack,
+    goal_loop_manifest,
+    request,
+)
+from tests.support.integration.postgres.watcher_evaluator_postgres import (
+    FixedProgram,
+    eventually,
+    local_temporal,
 )
 from tests.support.provider_frames import observation
 from tests.support.unit.watchers.watcher_manifest import definition, event_wait_document

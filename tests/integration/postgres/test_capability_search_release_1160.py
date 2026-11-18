@@ -36,7 +36,7 @@ from tests.support.integration.postgres.capability_search_projection_postgres im
     spec,
     tool,
 )
-from tests.support.integration.postgres.run2_release_141 import (
+from tests.support.integration.postgres.db_release_141_install_upgrade_and_drift import (
     PACKAGE,
     VERSIONS,
     disposable,

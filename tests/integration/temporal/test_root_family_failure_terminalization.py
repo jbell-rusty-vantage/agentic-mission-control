@@ -35,7 +35,7 @@ from mission_control.domain.programs.family_failure import (
     FamilyFailureTerminalizationRequest,
     FamilyFailureTerminalizationResult,
 )
-from tests.support.integration.temporal.w1_family_failure_root import (
+from tests.support.integration.temporal.root_failure_terminalization import (
     QUEUE,
     PrePatchMissionRun,
     admitted_root,

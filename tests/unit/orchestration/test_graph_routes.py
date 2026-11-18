@@ -28,7 +28,7 @@ from mission_control.domain.authoring.stagegraph_builder import (
     StageReleaseGroupSpec,
     build_stagegraph_v2,
 )
-from tests.support.unit.orchestration.wi08_graph_routes import Driver
+from tests.support.unit.orchestration.graph_routes import Driver
 
 
 def _route(

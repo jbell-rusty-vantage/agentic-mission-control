@@ -49,7 +49,7 @@ from mission_control.interfaces.mcp.knowledge_review_tools import (
 )
 from tests.support.knowledge.gateway import INSTALLATION, TENANT
 from tests.support.trusted_knowledge import PRODUCER, ScriptedRunner, evaluators, head_of, world
-from tests.support.unit.subscriptions.mo43_wake_channels import missionctl  # noqa: F401
+from tests.support.unit.subscriptions.inbox_wake_channels import missionctl  # noqa: F401
 
 pytestmark = pytest.mark.asyncio
 

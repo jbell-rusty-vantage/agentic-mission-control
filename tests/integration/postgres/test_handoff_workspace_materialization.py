@@ -51,9 +51,11 @@ from mission_control.domain.context.render import context_selection_record
 from mission_control.domain.execution.contracts import CapturedWorkspaceCandidate, WorkspaceOwner
 from mission_control.domain.policies.errors import IdempotencyConflict
 from tests.support.db import CommonDatabase
-from tests.support.integration.temporal.wp_bp_010_temporal import RecordingOperationBindings
+from tests.support.integration.temporal.stage_graph_workflow_temporal import (
+    RecordingOperationBindings,
+)
 from tests.support.lane_bindings import LANE_REBINDERS
-from tests.support.unit.operations.ft_b2_stage_handoff import (
+from tests.support.unit.operations.stage_handoff import (
     _compiled_template,
     _downstream_request,
 )

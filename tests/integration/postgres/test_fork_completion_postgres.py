@@ -111,7 +111,12 @@ from tests.support.knowledge.gateway import MISSION, lane
 from tests.support.knowledge.stores import InMemoryStaging
 from tests.support.manifests.seeded_catalog import fast_track_catalog
 from tests.support.run_forks import technical_snapshot
-from tests.support.unit.context.wi07_current_set_transfer import OVERHEAD, SANDBOX, Backend, bounds
+from tests.support.unit.context.current_accepted_set_transfer import (
+    OVERHEAD,
+    SANDBOX,
+    Backend,
+    bounds,
+)
 from tests.support.unit.orchestration.stagegraph_v2 import operation_slot
 from tests.unit.outputs.scenario import host_access, obligation, promises, text
 

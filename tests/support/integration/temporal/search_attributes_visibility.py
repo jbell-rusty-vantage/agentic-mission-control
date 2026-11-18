@@ -19,7 +19,9 @@ from mission_control.domain.programs.contracts import (
     StageGraphAdmissionActivityResult,
 )
 from mission_control.domain.programs.runtime_units import stage_runtime_unit
-from tests.support.integration.temporal.wp_bp_010_temporal import FakeStageGraphActivities
+from tests.support.integration.temporal.stage_graph_workflow_temporal import (
+    FakeStageGraphActivities,
+)
 
 
 async def _start_local() -> WorkflowEnvironment:

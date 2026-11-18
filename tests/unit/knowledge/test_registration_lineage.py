@@ -9,8 +9,8 @@ from mission_control.adapters.knowledge.memory import InMemoryLineageStore
 from mission_control.domain.knowledge.lineage import ProvenanceRole
 from tests.support.knowledge.content import model_report, report_package
 from tests.support.knowledge.gateway import lane
+from tests.support.unit.knowledge.knowledge_tool_boundary import _calls
 from tests.support.unit.knowledge.registration_lineage import registration_entries
-from tests.support.unit.knowledge.w1_tool_boundary import _calls
 
 
 async def test_two_registrations_shared_body_keep_original_producer_and_new_report_producer():

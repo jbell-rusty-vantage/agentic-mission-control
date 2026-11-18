@@ -48,13 +48,13 @@ from mission_control.domain.programs.goal_directed_runtime import (
 )
 from tests.support.checkpoint_lineage import activity_attempt
 from tests.support.journaled_goal_loop import SCOPE, goal_blueprint, goal_run_input
-from tests.support.unit.orchestration.rrm_016_goal_directed_settlement import (
+from tests.support.unit.orchestration.goal_failure_paths import _executor_dispatch
+from tests.support.unit.orchestration.goal_loop_operation_settlement import (
     _claim,
     _composition,
     _preparation,
     _reconciliation,
 )
-from tests.support.unit.orchestration.w1_goal_failure_paths import _executor_dispatch
 
 # The real W1 dry-run context packet was 8,524 characters (W1-EVIDENCE session 3, dry 2).
 PACKET_CHARS = 8_524

@@ -41,7 +41,7 @@ from mission_control.domain.programs.contracts import (
     StageGraphResultActivityRequest,
     StageGraphResultActivityResult,
 )
-from tests.support.integration.temporal.rrm_007_boundary_interventions import (
+from tests.support.integration.temporal.boundary_interventions_temporal import (
     ROOT_WORKFLOWS,
     SCOPE,
     Authority,
@@ -49,15 +49,17 @@ from tests.support.integration.temporal.rrm_007_boundary_interventions import (
     replay,
     until,
 )
-from tests.support.integration.temporal.rrm_008_family_cancellation import (
+from tests.support.integration.temporal.stage_graph_workflow_temporal import QUEUE, _blueprint
+from tests.support.integration.temporal.stage_graph_workflow_temporal import (
+    _run_input as stage_input,
+)
+from tests.support.integration.temporal.workflow_system_cancellation import (
     BASELINE,
     CancellableStageGraphActivities,
     _await_completion,
     _cancel,
     terminalize_through_run_control,
 )
-from tests.support.integration.temporal.wp_bp_010_temporal import QUEUE, _blueprint
-from tests.support.integration.temporal.wp_bp_010_temporal import _run_input as stage_input
 from tests.support.temporal import patch_ids, workflow_environment
 
 

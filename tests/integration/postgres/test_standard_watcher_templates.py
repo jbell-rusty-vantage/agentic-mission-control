@@ -17,8 +17,8 @@ from mission_control.domain.programs.watchers import compile_watcher, wait_condi
 from tests.support.boundary_commands import declared_wait
 from tests.support.db import CommonDatabase
 from tests.support.db_builders import admit_unit_attempt, scoped_command
-from tests.support.integration.postgres.mo44_watchers_postgres import FixedProgram
-from tests.support.integration.postgres.mp15_coordinator_inbox_postgres import mission_service
+from tests.support.integration.postgres.coordinator_inbox_postgres import mission_service
+from tests.support.integration.postgres.watcher_evaluator_postgres import FixedProgram
 from tests.support.unit.watchers.standard_library import DATA, LIBRARY
 
 pytestmark = pytest.mark.common_db

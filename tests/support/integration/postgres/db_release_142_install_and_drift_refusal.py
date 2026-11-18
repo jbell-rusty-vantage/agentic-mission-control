@@ -7,7 +7,9 @@ from __future__ import annotations
 
 from uuid import uuid4
 
-from tests.support.integration.postgres.run2_release_141 import insert_document
+from tests.support.integration.postgres.db_release_141_install_upgrade_and_drift import (
+    insert_document,
+)
 
 
 async def preserve_document(connection, target):

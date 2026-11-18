@@ -56,7 +56,7 @@ from tests.support.journaled_goal_loop import (
 )
 from tests.support.lane_bindings import lane_fields
 from tests.support.run_control import actor, command
-from tests.support.unit.orchestration.rrm_016_goal_directed_settlement import (
+from tests.support.unit.orchestration.goal_loop_operation_settlement import (
     _claim,
     _composition,
     _now,

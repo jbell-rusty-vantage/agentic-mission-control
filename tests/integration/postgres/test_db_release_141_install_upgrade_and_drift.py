@@ -10,7 +10,7 @@ from mission_control.application.execution.harness.describe import declared_matr
 from mission_control_db_contract.deployment import apply_release, plan_release, verify_release
 from mission_control_db_contract.errors import ContractError
 from mission_control_db_contract.seeds import load_bundles, seed_apply, seed_plan
-from tests.support.integration.postgres.run2_release_141 import (
+from tests.support.integration.postgres.db_release_141_install_upgrade_and_drift import (
     PACKAGE,
     VERSIONS,
     assert_runtime_security,

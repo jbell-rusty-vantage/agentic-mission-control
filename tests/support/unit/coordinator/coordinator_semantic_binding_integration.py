@@ -31,9 +31,9 @@ from mission_control.application.programs.goal_directed import (
 )
 from mission_control.domain.authoring.canonical import sha256_digest
 from mission_control.domain.execution.contracts import OperationAttemptIdentity
+from tests.support.biotech.schema_grounding_services import _reconciliation_fixture
 from tests.support.operations import operation_request
 from tests.support.unit.coordinator.coordinator_launch_preparation import NOW, SCOPE
-from tests.support.unit.schema.schema_grounding_services import _reconciliation_fixture
 
 
 def _operation_template(operation_id: str):

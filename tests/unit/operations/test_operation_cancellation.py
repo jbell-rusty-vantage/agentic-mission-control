@@ -93,9 +93,9 @@ from tests.support.unit.operations.checkpoint_recovery_classification import (
     _root_checkpoints,
     _write_foreign_root_checkpoint,
 )
-from tests.support.unit.operations.rrm_008_cancellation import _liability, _settlements
-from tests.support.unit.operations.rrm_016_goal_directed_recovery import _Templates
-from tests.support.unit.orchestration.rrm_016_goal_directed_settlement import _preparation
+from tests.support.unit.operations.goal_loop_crash_recovery import _Templates
+from tests.support.unit.operations.operation_cancellation import _liability, _settlements
+from tests.support.unit.orchestration.goal_loop_operation_settlement import _preparation
 
 CANCEL_REASON = "operation cancelled by the governed cancellation saga"
 

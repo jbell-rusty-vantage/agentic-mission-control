@@ -43,7 +43,7 @@ from mission_control.domain.programs.contracts import (
     StageGraphCompletionProposal,
     StageGraphRunResult,
 )
-from tests.support.integration.temporal.w1_family_failure_root import (
+from tests.support.integration.temporal.root_failure_terminalization import (
     PrePatchMissionRun,
     admitted_root,
 )

@@ -22,7 +22,7 @@ from mission_control.domain.programs.contracts import (
     StageGraphAdmissionActivityRequest,
 )
 from mission_control.domain.programs.interpreter import StageGraphInterpreter
-from tests.support.integration.temporal.wp_bp_010_temporal import (
+from tests.support.integration.temporal.stage_graph_workflow_temporal import (
     DIGEST,
     NOW,
     QUEUE,

@@ -37,8 +37,12 @@ from mission_control.domain.programs.family_failure import (
     FamilyFailureTerminalizationResult,
 )
 from mission_control.domain.programs.goal_directed_runtime import GoalOperationDispatch
-from tests.support.integration.temporal.rrm_005_search_attributes import _start_local
-from tests.support.integration.temporal.w1_family_failure_root import QUEUE, FailingFamily, _root
+from tests.support.integration.temporal.root_failure_terminalization import (
+    QUEUE,
+    FailingFamily,
+    _root,
+)
+from tests.support.integration.temporal.search_attributes_visibility import _start_local
 from tests.support.temporal import patch_ids
 from tests.support.unit.coordinator.root_result_materialization import SCOPE
 

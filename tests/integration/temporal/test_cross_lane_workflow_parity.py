@@ -50,7 +50,7 @@ from mission_control.domain.policies.contracts import ActorContext, CancelAction
 from mission_control.domain.policies.mailbox import MailboxState
 from mission_control.domain.programs.human_gate import HumanResolutionRequest
 from tests.support.ids import SCOPE
-from tests.support.integration.temporal.rrm_007_boundary_interventions import replay
+from tests.support.integration.temporal.boundary_interventions_temporal import replay
 from tests.support.lane_parity_stack import (
     CURSOR_PROFILES,
     LOCAL_PROFILES,

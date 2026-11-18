@@ -52,7 +52,7 @@ from mission_control.interfaces.mcp.subscriptions import (
 )
 from tests.support.manifests.interfaces import FakeLifecycle
 from tests.support.unit.coordinator.coordinator_mcp_read_surface import FakeFacade
-from tests.support.unit.subscriptions.mo43_wake_channels import (
+from tests.support.unit.subscriptions.inbox_wake_channels import (
     LAUNCHER,
     READ,
     inbox_app,

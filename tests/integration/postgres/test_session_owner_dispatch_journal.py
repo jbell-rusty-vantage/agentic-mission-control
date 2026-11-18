@@ -37,7 +37,7 @@ from tests.support.lanes import (
     ScriptedSessionLane,
     scripted_frames,
 )
-from tests.support.unit.harness.mp06_dispatch_recovery import turn_request
+from tests.support.unit.harness.dispatch_recovery import turn_request
 
 pytestmark = pytest.mark.common_db
 LEASE = timedelta(seconds=30)

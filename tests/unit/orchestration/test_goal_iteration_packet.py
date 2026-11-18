@@ -39,12 +39,12 @@ from tests.support.journaled_goal_loop import (
     SCOPE,
     goal_blueprint,
 )
-from tests.support.unit.operations.ft_b2_stage_handoff import FakeSelections
-from tests.support.unit.orchestration.ft_b3_goal_iteration_packet import (
+from tests.support.unit.operations.stage_handoff import FakeSelections
+from tests.support.unit.orchestration.goal_iteration_packet import (
     _composition,
     _executor_result,
 )
-from tests.support.unit.orchestration.rrm_016_goal_directed_settlement import (
+from tests.support.unit.orchestration.goal_loop_operation_settlement import (
     _claim,
     _preparation,
     _run_iteration_one,

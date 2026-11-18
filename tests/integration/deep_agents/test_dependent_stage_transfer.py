@@ -18,7 +18,7 @@ import pytest
 from tests.support.checkpoint_lineage import activity_attempt
 from tests.support.clock import Clock
 from tests.support.deep_agents import registry
-from tests.support.integration.deep_agents.wi02_transfer_plan_lane import (
+from tests.support.integration.deep_agents.transfer_plan_delivery import (
     PLAN_READER,
     _invocation,
     _selection,

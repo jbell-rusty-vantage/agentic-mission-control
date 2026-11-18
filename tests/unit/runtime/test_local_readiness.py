@@ -47,7 +47,7 @@ from mission_control.bootstrap.preflight import (
 from mission_control.bootstrap.settings import Settings, get_settings
 from mission_control.domain.authoring.canonical import sha256_digest
 from tests.support.model_catalog import fixture_model_catalog, fixture_model_profile
-from tests.support.unit.runtime.mp22_local_readiness import (
+from tests.support.unit.runtime.local_readiness import (
     AUTH_EXAMPLE,
     BINDINGS_EXAMPLE,
     EXPECTED_OWNER_POINTERS,

@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import UTC, datetime
 
 import pytest
-from tests.support.unit.web_research.web_research_semantic_handlers import (
+from tests.support.biotech.web_research_semantic_handlers import (
     BROWSER_RUNTIME,
     FIRECRAWL_RUNTIME,
     TAVILY_RUNTIME,

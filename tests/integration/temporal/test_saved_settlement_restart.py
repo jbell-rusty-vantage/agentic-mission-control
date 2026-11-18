@@ -50,7 +50,7 @@ from mission_control.domain.execution.invocation_settlement import (
 )
 from tests.support.checkpoint_recovery import recovery_harness, stage_recovery_unit
 from tests.support.db import CommonDatabase
-from tests.support.integration.temporal.wi04_saved_settlement_restart import (
+from tests.support.integration.temporal.saved_settlement_restart import (
     _replays,
     _scheduled,
     _Stack,

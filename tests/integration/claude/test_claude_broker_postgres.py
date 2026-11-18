@@ -39,7 +39,7 @@ from mission_control.application.human_tasks.service import HumanTaskService
 from mission_control.domain.execution.contracts import OperationWorkflowResult
 from mission_control.domain.policies.contracts import ActorContext
 from tests.support.db import CommonDatabase
-from tests.support.integration.temporal.mp07_claude_lane_turns import (
+from tests.support.integration.temporal.claude_lane_turns import (
     WORKER,
     claude_unit,
     operation_workers,

@@ -333,7 +333,7 @@ def test_rejected_candidate_resolves_dependencies_without_creating_execution(kin
         "omitted" if kind == "optional" else "failed"
     )
     assert interpreter.failure_completion(rejected) is None  # independent b remains admissible
-    from tests.support.unit.orchestration.mp20_stagegraph_concluded_failure import _run
+    from tests.support.unit.orchestration.stage_graph_concluded_failure import _run
 
     completed = _run(interpreter, rejected, "b", "completed")
     ready = [

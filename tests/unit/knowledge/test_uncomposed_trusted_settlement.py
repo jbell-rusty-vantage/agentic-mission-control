@@ -25,7 +25,7 @@ from mission_control.application.knowledge.trusted_settlement import (
 )
 from mission_control.domain.execution.invocation_settlement import SettlementOutcome, WaitReason
 from mission_control.domain.outputs.contracts import EvaluationScope, OutputForm, Requirement
-from tests.support.unit.knowledge.wi07_report_collections import PIN, run_iteration, stack_with
+from tests.support.unit.knowledge.report_collections import PIN, run_iteration, stack_with
 from tests.unit.outputs.scenario import obligation
 
 
@@ -242,7 +242,7 @@ async def test_a_finally_judged_revision_is_never_held_again() -> None:
     """Review item 2: a credential-less worker resuming a run does not re-hold a revision a
     credentialed worker already judged (pass or fail); a pending review still holds."""
 
-    from tests.support.unit.knowledge.wi07_report_collections import ScriptedBridge, settlement
+    from tests.support.unit.knowledge.report_collections import ScriptedBridge, settlement
 
     for verdict, held in (("pass", False), ("fail", False), ("review", True)):
         stack = await stack_with(EvaluationScope.INVOCATION)
@@ -259,7 +259,7 @@ async def test_the_wait_releases_once_a_composed_settlement_runs() -> None:
     """Review item 3c: the same saved result waits under a worker without credentials, then a
     worker with a composed trusted settlement judges and promotes it on its next pass."""
 
-    from tests.support.unit.knowledge.wi07_report_collections import ScriptedBridge, settlement
+    from tests.support.unit.knowledge.report_collections import ScriptedBridge, settlement
 
     stack = await stack_with(EvaluationScope.INVOCATION)
     access = await run_iteration(stack, 1, "a")

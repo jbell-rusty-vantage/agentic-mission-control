@@ -36,7 +36,7 @@ from mission_control.domain.programs.goal_directed_runtime import (
     GoalOperationPreparationRequest,
     GoalOperationReconciliationRequest,
 )
-from tests.support.integration.temporal.wp_bp_020_temporal import (
+from tests.support.integration.temporal.goal_loop_workflow_temporal import (
     NOW,
     FakeGoalDirectedActivities,
     _operation,

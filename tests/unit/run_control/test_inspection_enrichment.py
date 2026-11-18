@@ -41,7 +41,7 @@ from tests.support.transcripts import (
     transcript_frames,
 )
 from tests.support.unit.coordinator.coordinator_mcp_read_surface import FakeFacade
-from tests.support.unit.run_control.ft_f1_command_mailbox import (
+from tests.support.unit.run_control.command_mailbox_delivery import (
     SCOPE,
     Resolver,
     World,

@@ -39,8 +39,8 @@ from tests.support.db import (
     migration_paths_with,
 )
 from tests.support.db_builders import owner_rows
-from tests.support.integration.postgres.wi07_collections_postgres import AT, access_for
-from tests.support.unit.knowledge.wi07_report_collections import (
+from tests.support.integration.postgres.collection_member_assessments import AT, access_for
+from tests.support.unit.knowledge.report_collections import (
     PIN,
     CurrentUse,
     ScriptedBridge,
@@ -283,7 +283,7 @@ async def test_the_verifier_plan_seals_the_current_set_index_in_the_plan_table(
     )
     from mission_control.domain.outputs.current_set import CURRENT_SET_BINDING
     from tests.support.knowledge.stores import InMemoryStaging
-    from tests.support.unit.context.wi07_current_set_transfer import (
+    from tests.support.unit.context.current_accepted_set_transfer import (
         Backend,
         request,
         verifier_selection,
@@ -344,7 +344,7 @@ async def test_d21_text_and_progress_note_fulfillment_on_postgres(wi07_db: Commo
     and fulfilled; a per-iteration progress note is fulfilled after a rejected verdict while
     the summary is not; expected shortfall visible; optional silent."""
 
-    from tests.support.unit.outputs.d21_iteration_records import promises
+    from tests.support.unit.outputs.iteration_records import promises
 
     pool = await wi07_db.pool()
     try:
@@ -406,7 +406,7 @@ async def test_trusted_member_decisions_verify_against_recorded_bridge_decisions
     from mission_control.application.outputs.fulfillment import AssessmentInput, HostAccess
     from mission_control.application.ports.knowledge import RecordedUseDecision
     from mission_control.domain.knowledge.judgment import TRUSTED_BRIDGE_ACTOR, decision_evidence
-    from tests.support.unit.knowledge.wi07_report_collections import Lineage
+    from tests.support.unit.knowledge.report_collections import Lineage
     from tests.support.unit.outputs.collections import TRUSTED_PIN
 
     pool = await wi07_db.pool()

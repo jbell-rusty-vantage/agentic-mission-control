@@ -15,7 +15,7 @@ import pytest
 from mission_control.domain.outputs.contracts import FulfillmentResult
 from mission_control.domain.programs.runtime_units import goal_operation_id
 from tests.support.journaled_goal_loop import SCOPE
-from tests.support.unit.orchestration.rrm_016_goal_directed_settlement import (
+from tests.support.unit.orchestration.goal_loop_operation_settlement import (
     _composition,
     _run_iteration_one,
 )

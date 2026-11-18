@@ -16,7 +16,7 @@ import tomllib
 from pathlib import Path
 
 import pytest
-from tests.support.architecture.package_boundaries import APPLICATION_NEEDLES
+from tests.support.application_needles import APPLICATION_NEEDLES
 
 ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = ROOT / "src" / "mission_control"

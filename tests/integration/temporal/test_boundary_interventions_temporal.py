@@ -45,7 +45,7 @@ from mission_control.domain.programs.contracts import (
     StageGraphCompletionActivityRequest,
     StageGraphCompletionActivityResult,
 )
-from tests.support.integration.temporal.rrm_007_boundary_interventions import (
+from tests.support.integration.temporal.boundary_interventions_temporal import (
     GOAL_QUEUE,
     ROOT_WORKFLOWS,
     SCOPE,
@@ -64,11 +64,13 @@ from tests.support.integration.temporal.rrm_007_boundary_interventions import (
     resume,
     until,
 )
-from tests.support.integration.temporal.wp_bp_010_temporal import (
+from tests.support.integration.temporal.stage_graph_workflow_temporal import (
     QUEUE,
     _blueprint,
 )
-from tests.support.integration.temporal.wp_bp_010_temporal import _run_input as stage_input
+from tests.support.integration.temporal.stage_graph_workflow_temporal import (
+    _run_input as stage_input,
+)
 
 # --- Authority and transport ---------------------------------------------------------------
 

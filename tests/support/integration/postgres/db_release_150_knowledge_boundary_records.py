@@ -11,7 +11,7 @@ from uuid import uuid4
 import asyncpg
 import pytest
 
-from tests.support.integration.postgres.run2_release_141 import context
+from tests.support.integration.postgres.db_release_141_install_upgrade_and_drift import context
 
 
 async def create_tenant(connection, target):

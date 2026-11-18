@@ -58,9 +58,14 @@ from mission_control.domain.programs.goal_directed_runtime import (
     GoalOperationReconciliationRequest,
     GoalOperationReconciliationResult,
 )
-from tests.support.integration.temporal.wp_bp_010_temporal import QUEUE, FakeStageGraphActivities
-from tests.support.integration.temporal.wp_bp_020_temporal import FakeGoalDirectedActivities
-from tests.support.integration.temporal.wp_bp_020_temporal import _run_input as goal_input
+from tests.support.integration.temporal.goal_loop_workflow_temporal import (
+    FakeGoalDirectedActivities,
+)
+from tests.support.integration.temporal.goal_loop_workflow_temporal import _run_input as goal_input
+from tests.support.integration.temporal.stage_graph_workflow_temporal import (
+    QUEUE,
+    FakeStageGraphActivities,
+)
 from tests.support.run_control import command, request, service
 from tests.support.temporal import wait_heartbeating
 

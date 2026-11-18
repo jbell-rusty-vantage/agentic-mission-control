@@ -42,7 +42,7 @@ from mission_control.application.subscriptions.coordinator_service import (
 from mission_control.contracts.contracts import MissionCommandRequest
 from mission_control.domain.policies.mailbox import MailboxState
 from tests.support.db import CommonDatabase
-from tests.support.integration.postgres.mp15_coordinator_inbox_postgres import (
+from tests.support.integration.postgres.coordinator_inbox_postgres import (
     COORDINATOR,
     append_fixture_events,
     inbox_service,

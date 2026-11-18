@@ -5,7 +5,7 @@ import json
 
 import pytest
 from tests.schema_context_helpers import SDL, accepted, catalog
-from tests.support.unit.schema.schema_grounding_services import NOW, _reconciliation_fixture
+from tests.support.biotech.schema_grounding_services import NOW, _reconciliation_fixture
 
 from biotech_mission_adapters.application.schema.schema_catalog import CATALOG_GENERATOR_VERSION
 from biotech_mission_adapters.application.schema.schema_catalog_build import (

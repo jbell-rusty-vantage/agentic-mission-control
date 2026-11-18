@@ -22,7 +22,7 @@ from tests.support.checkpoint_lineage import bind_unit, stage_unit
 from tests.support.db import create_common_database, drop_common_database
 from tests.support.integration.deep_agents.report_source_context import FULL_CONTEXT_READER
 from tests.support.integration.deep_agents.report_source_real_service import command, response
-from tests.support.integration.deep_agents.wi02_transfer_plan_lane import _invocation, _selection
+from tests.support.integration.deep_agents.transfer_plan_delivery import _invocation, _selection
 from tests.support.knowledge.content import model_content
 from tests.support.knowledge.stores import InMemoryStaging
 from tests.support.lane_bindings import lane_fields

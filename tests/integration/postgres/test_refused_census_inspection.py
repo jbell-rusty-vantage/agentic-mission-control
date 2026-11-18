@@ -25,7 +25,7 @@ from mission_control.application.knowledge.judgment import TrustedJudgmentRefuse
 from tests.support.db import CommonDatabase
 from tests.support.integration.postgres.trusted_judgment_postgres import access_for
 from tests.support.trusted_knowledge import ScriptedRunner, evaluators, world
-from tests.support.unit.knowledge.w1_d19_d20 import census_refusal
+from tests.support.unit.knowledge.knowledge_refusals import census_refusal
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.common_db]
 

@@ -30,7 +30,7 @@ from mission_control.application.subscriptions.coordinator_service import (
 from mission_control.contracts.contracts import MissionCommandRequest
 from mission_control.domain.policies.contracts import ActorContext
 from tests.support.clock import Clock
-from tests.support.unit.subscriptions.mp15_coordinator import classify_type
+from tests.support.unit.subscriptions.coordinator_notifications import classify_type
 from tests.unit.subscriptions.coordinator_fakes import (
     MISSION,
     RUN,

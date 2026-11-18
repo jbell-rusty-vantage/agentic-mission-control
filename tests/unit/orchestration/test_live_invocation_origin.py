@@ -38,8 +38,10 @@ from mission_control.domain.execution.live_invocation import (
 )
 from mission_control.domain.programs.goal_directed import GoalDirectedInterpreter
 from mission_control.domain.programs.goal_directed_runtime import GoalOperationPreparationRequest
-from tests.support.integration.temporal.wp_bp_010_temporal import RecordingOperationBindings
-from tests.support.integration.temporal.wp_bp_020_temporal import _run_input
+from tests.support.integration.temporal.goal_loop_workflow_temporal import _run_input
+from tests.support.integration.temporal.stage_graph_workflow_temporal import (
+    RecordingOperationBindings,
+)
 from tests.support.lane_bindings import LANE_REBINDERS, lane_fields
 from tests.support.manifests.launch_inputs import (
     MINIMAL,
@@ -51,7 +53,7 @@ from tests.support.manifests.launch_inputs import (
     resolver,
     served_with_mcp,
 )
-from tests.support.unit.operations.ft_b2_stage_handoff import _downstream_request
+from tests.support.unit.operations.stage_handoff import _downstream_request
 from tests.unit.authoring.manifest_launch_fixture import (
     deep_agents_chain,
     fixture_bindings,

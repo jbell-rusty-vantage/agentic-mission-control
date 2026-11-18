@@ -11,7 +11,7 @@ from mission_control.application.outputs.fulfillment import TrustedReferenceUses
 from mission_control.domain.outputs.contracts import OutputForm
 from tests.support.knowledge.gateway import MISSION, lane
 from tests.support.unit.knowledge.native_write import DIGEST, PLAN, RUN_DECISION, Bridge, service
-from tests.support.unit.outputs.w1_d28_d29 import (
+from tests.support.unit.outputs.official_use import (
     HANDLE,
     bridge_judges,
     report_candidate,

@@ -49,8 +49,8 @@ from mission_control.domain.programs.family_failure import (
 )
 from tests.support.journaled_goal_loop import SCOPE, goal_start_action
 from tests.support.run_control import command
-from tests.support.unit.coordinator.w1_family_failure_terminalization import _request
-from tests.support.unit.orchestration.rrm_016_goal_directed_settlement import (
+from tests.support.unit.coordinator.failed_run_terminalization import _request
+from tests.support.unit.orchestration.goal_loop_operation_settlement import (
     _claim,
     _composition,
     _preparation,

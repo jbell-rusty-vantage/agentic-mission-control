@@ -7,7 +7,7 @@ from mission_control.application.execution.harness.lane_turns import LaneTurnSer
 from mission_control.application.execution.harness.sessions import WorkerSessionManager
 from mission_control.application.workspaces.placement import PlacementAdmission
 from mission_control.domain.execution.placement import PlacementLimit
-from tests.support.integration.temporal.mp06_dispatch_recovery import (
+from tests.support.integration.temporal.dispatch_recovery_temporal import (
     _activity_worker,
     _client,
     _replayed,

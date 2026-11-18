@@ -21,8 +21,8 @@ from mission_control.application.knowledge.trusted_settlement import (
 from mission_control.domain.execution.invocation_settlement import SettlementOutcome
 from mission_control.domain.outputs.contracts import OutputForm, Requirement
 from tests.support.db import CommonDatabase
-from tests.support.integration.postgres.wi07_collections_postgres import access_for
-from tests.support.unit.knowledge.wi07_report_collections import PIN, handle
+from tests.support.integration.postgres.collection_member_assessments import access_for
+from tests.support.unit.knowledge.report_collections import PIN, handle
 from tests.unit.outputs.scenario import build_stack, obligation
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.common_db]

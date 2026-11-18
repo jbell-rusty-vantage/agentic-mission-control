@@ -38,7 +38,7 @@ from mission_control.domain.execution.invocation_settlement import (
 from mission_control.domain.knowledge.effects import JournalState
 from tests.support.checkpoint_recovery import recovery_harness, stage_recovery_unit
 from tests.support.db import CommonDatabase
-from tests.support.integration.temporal.wi04_saved_settlement_restart import (
+from tests.support.integration.temporal.saved_settlement_restart import (
     _replays,
     _scheduled,
     _Stack,
@@ -54,7 +54,7 @@ from tests.support.unit.knowledge.native_write import (
     accepted_report,
     service,
 )
-from tests.support.unit.outputs.w1_d28_d29 import HANDLE
+from tests.support.unit.outputs.official_use import HANDLE
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.common_db]
 

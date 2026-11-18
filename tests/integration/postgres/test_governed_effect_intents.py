@@ -54,7 +54,7 @@ from mission_control.interfaces.mcp.governed_gateway import (
 from tests.support.clock import Clock
 from tests.support.db import CommonDatabase
 from tests.support.db_builders import owner_rows
-from tests.support.integration.postgres.mp11_approvals_postgres import (
+from tests.support.integration.postgres.approval_bindings_postgres import (
     admitted_run,
     mp11_db,  # noqa: F401
 )

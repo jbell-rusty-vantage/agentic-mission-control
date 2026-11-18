@@ -13,7 +13,7 @@ from mission_control.adapters.cursor.bridge_recovery import (
 )
 from mission_control.adapters.postgres.lanes import workspace_leases
 from mission_control.application.agentic_components.placement import STATE_ROOT
-from tests.support.unit.cursor.run2_released_bridge_sweep import SCOPE, lease
+from tests.support.unit.cursor.released_bridge_sweep import SCOPE, lease
 
 
 class Store:

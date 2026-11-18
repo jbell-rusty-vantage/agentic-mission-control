@@ -26,7 +26,7 @@ from mission_control.domain.programs.contracts import (
     StageGraphCompletionActivityRequest,
     StageGraphCompletionActivityResult,
 )
-from tests.support.integration.temporal.rrm_007_boundary_interventions import (
+from tests.support.integration.temporal.boundary_interventions_temporal import (
     Authority,
     GovernedStageGraphActivities,
     until,

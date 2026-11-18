@@ -41,7 +41,7 @@ from mission_control.domain.coordinator.attention import (
 )
 from mission_control.domain.policies.contracts import ActorContext
 from tests.support.clock import SECOND, Clock
-from tests.support.unit.subscriptions.wi19_attention import DIGEST, Outputs, output
+from tests.support.unit.subscriptions.coordinator_attention import DIGEST, Outputs, output
 from tests.unit.subscriptions.coordinator_fakes import (
     RUN,
     InMemoryAttentionStore,

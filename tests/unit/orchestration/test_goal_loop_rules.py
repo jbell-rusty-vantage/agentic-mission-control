@@ -24,7 +24,7 @@ from mission_control.domain.programs.goal_directed import (
 )
 from mission_control.domain.programs.goal_directed_runtime import route_goal_async_subgoal
 from mission_control.domain.programs.runtime_units import goal_runtime_unit
-from tests.support.unit.orchestration.wp_bp_020_goal_directed import (
+from tests.support.unit.orchestration.goal_loop_rules import (
     _blueprint,
     _claim,
     _execution,
@@ -593,7 +593,7 @@ def _preparation(role: str):
     from mission_control.domain.programs.goal_directed_runtime import (
         GoalOperationPreparationRequest,
     )
-    from tests.support.integration.temporal.wp_bp_020_temporal import _run_input
+    from tests.support.integration.temporal.goal_loop_workflow_temporal import _run_input
 
     run = _run_input()
     kernel = GoalDirectedInterpreter(GENERIC_GOAL_DIRECTED)

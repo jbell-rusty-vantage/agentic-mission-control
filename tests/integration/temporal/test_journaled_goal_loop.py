@@ -65,7 +65,7 @@ from mission_control.domain.programs.goal_directed_runtime import (
     GoalOperationReconciliationRequest,
     GoalOperationReconciliationResult,
 )
-from tests.support.integration.temporal.rrm_007_boundary_interventions import (
+from tests.support.integration.temporal.boundary_interventions_temporal import (
     Authority,
     _phase_is,
     _state_is,
@@ -74,8 +74,12 @@ from tests.support.integration.temporal.rrm_007_boundary_interventions import (
     resume,
     until,
 )
-from tests.support.integration.temporal.wp_bp_020_temporal import FakeGoalDirectedActivities
-from tests.support.integration.temporal.wp_bp_020_temporal import _run_input as fake_goal_input
+from tests.support.integration.temporal.goal_loop_workflow_temporal import (
+    FakeGoalDirectedActivities,
+)
+from tests.support.integration.temporal.goal_loop_workflow_temporal import (
+    _run_input as fake_goal_input,
+)
 from tests.support.journal import MemoryOperationJournal
 from tests.support.journaled_goal_loop import (
     SCOPE,

@@ -11,7 +11,7 @@ import asyncpg
 
 from mission_control.domain.authoring.contracts import PublishedDefinition
 from mission_control_db_contract.seeds import seed_apply, seed_plan
-from tests.support.integration.postgres.run2_release_141 import VERSIONS
+from tests.support.integration.postgres.db_release_141_install_upgrade_and_drift import VERSIONS
 
 ROOT = Path(__file__).resolve().parents[4]
 PACKAGE = ROOT / "packages/mission-control-db-contract"

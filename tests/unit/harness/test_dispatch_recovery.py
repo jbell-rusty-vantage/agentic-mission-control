@@ -59,7 +59,7 @@ from tests.support.lanes import (
     lane_stack,
     scripted_frames,
 )
-from tests.support.unit.harness.mp06_dispatch_recovery import BOUNDS, turn_request
+from tests.support.unit.harness.dispatch_recovery import BOUNDS, turn_request
 
 T0 = datetime(2026, 10, 8, 12, 0, tzinfo=UTC)
 

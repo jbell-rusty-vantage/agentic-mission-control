@@ -21,7 +21,7 @@ from mission_control.domain.outputs.contracts import (
     Enforcement,
     OutputForm,
 )
-from tests.support.unit.outputs.w1_d28_d29 import (
+from tests.support.unit.outputs.official_use import (
     bridge_judges,
     make_stack,
     report_candidate,

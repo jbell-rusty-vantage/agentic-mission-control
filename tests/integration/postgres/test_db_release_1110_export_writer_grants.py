@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 from mission_control_db_contract.deployment import plan_release, verify_release
-from tests.support.integration.postgres.run2_release_141 import (
+from tests.support.integration.postgres.db_release_141_install_upgrade_and_drift import (
     PACKAGE,
     VERSIONS,
     disposable,
@@ -13,7 +13,7 @@ from tests.support.integration.postgres.run2_release_141 import (
     install,
     release_at,
 )
-from tests.support.integration.postgres.sprint_v_release_150 import (
+from tests.support.integration.postgres.db_release_150_knowledge_boundary_records import (
     as_role,
     create_tenant,
     raises_sqlstate,

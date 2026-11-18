@@ -57,7 +57,7 @@ from tests.support.db import (
     common_database,
     migration_paths_with,
 )
-from tests.support.integration.postgres.mp15_coordinator_inbox_postgres import (
+from tests.support.integration.postgres.coordinator_inbox_postgres import (
     owner_fetch,
     started_run,
 )

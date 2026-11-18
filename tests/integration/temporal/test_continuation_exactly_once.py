@@ -102,8 +102,10 @@ from tests.support.db import CommonDatabase
 from tests.support.db_builders import admit_unit_attempt
 from tests.support.deep_agents_runtime import ConformanceAuthority
 from tests.support.integration.postgres.continuation_postgres import continuation_actor
-from tests.support.integration.temporal.wp_bp_020_temporal import FakeGoalDirectedActivities
-from tests.support.integration.temporal.wp_bp_020_temporal import _run_input as goal_input
+from tests.support.integration.temporal.goal_loop_workflow_temporal import (
+    FakeGoalDirectedActivities,
+)
+from tests.support.integration.temporal.goal_loop_workflow_temporal import _run_input as goal_input
 from tests.support.knowledge.stores import InMemoryStaging
 from tests.support.lanes import (
     SOURCE_SESSION,

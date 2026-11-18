@@ -23,7 +23,7 @@ from mission_control.domain.policies.forks import RunSnapshotManifest
 from mission_control.domain.policies.mailbox import MailboxEntry
 from tests.support.knowledge.stores import InMemoryStaging
 from tests.support.unit.context.fork_conversation_custody import custody
-from tests.support.unit.operations.ft_b2_stage_handoff import FakeArtifacts, FakeSelections
+from tests.support.unit.operations.stage_handoff import FakeArtifacts, FakeSelections
 from tests.unit.context.packets import SEALED_AT
 
 

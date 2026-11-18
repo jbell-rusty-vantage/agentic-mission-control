@@ -83,7 +83,7 @@ from mission_control.domain.programs.goal_directed_runtime import (
     GoalOperationReconciliationRequest,
     GoalOperationReconciliationResult,
 )
-from tests.support.integration.temporal.rrm_007_boundary_interventions import (
+from tests.support.integration.temporal.boundary_interventions_temporal import (
     GOAL_QUEUE,
     ROOT_WORKFLOWS,
     Authority,
@@ -97,17 +97,19 @@ from tests.support.integration.temporal.rrm_007_boundary_interventions import (
     replay,
     until,
 )
-from tests.support.integration.temporal.rrm_008_family_cancellation import (
+from tests.support.integration.temporal.goal_loop_workflow_temporal import _run_input as goal_input
+from tests.support.integration.temporal.goal_loop_workflow_temporal import fake_settlement
+from tests.support.integration.temporal.stage_graph_workflow_temporal import QUEUE, _blueprint
+from tests.support.integration.temporal.stage_graph_workflow_temporal import (
+    _run_input as stage_input,
+)
+from tests.support.integration.temporal.workflow_system_cancellation import (
     BASELINE,
     CANCEL_HEARTBEAT_SECONDS,
     CancellableStageGraphActivities,
     _await_completion,
     _cancel,
 )
-from tests.support.integration.temporal.wp_bp_010_temporal import QUEUE, _blueprint
-from tests.support.integration.temporal.wp_bp_010_temporal import _run_input as stage_input
-from tests.support.integration.temporal.wp_bp_020_temporal import _run_input as goal_input
-from tests.support.integration.temporal.wp_bp_020_temporal import fake_settlement
 from tests.support.journal import MemoryOperationJournal
 from tests.support.journaled_goal_loop import (
     SCOPE,

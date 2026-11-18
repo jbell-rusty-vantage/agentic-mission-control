@@ -37,8 +37,8 @@ from tests.support.journaled_goal_loop import (
     preparer,
 )
 from tests.support.run_control import command
-from tests.support.unit.operations.rrm_016_goal_directed_recovery import _Templates
-from tests.support.unit.orchestration.rrm_016_goal_directed_settlement import (
+from tests.support.unit.operations.goal_loop_crash_recovery import _Templates
+from tests.support.unit.orchestration.goal_loop_operation_settlement import (
     _claim,
     _preparation,
     _reconciliation,

@@ -20,7 +20,7 @@ from mission_control.domain.execution.contracts import (
     PromptTrustClass,
     is_purpose_card,
 )
-from tests.support.unit.authoring.l1_06_goal_verifier_objective import E4, loop_templates, text_of
+from tests.support.unit.authoring.goal_verifier_objective import E4, loop_templates, text_of
 
 E1 = "e1-goal-loop-report.mission.yml"
 

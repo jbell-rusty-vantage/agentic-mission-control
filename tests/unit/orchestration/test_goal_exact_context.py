@@ -10,7 +10,7 @@ from mission_control.application.programs.goal_context import resolve_goal_conte
 from mission_control.domain.context.packet import ContextTrust, ExpandMode
 from mission_control.domain.execution.contracts import PromptTrustClass
 from tests.support.unit.orchestration.goal_exact_context import fixture, redigest
-from tests.support.unit.orchestration.rrm_016_goal_directed_settlement import (
+from tests.support.unit.orchestration.goal_loop_operation_settlement import (
     _claim,
     _composition,
     _preparation,

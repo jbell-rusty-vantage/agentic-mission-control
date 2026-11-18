@@ -38,7 +38,7 @@ from mission_control.application.secrets.minting import CredentialBinding, Crede
 from mission_control.application.signals.service import IngressKeys, SignalIngressService
 from mission_control.interfaces.http.ingress import create_ingress_app
 from tests.support.db import CommonDatabase, ingress_login
-from tests.support.integration.cursor.mp09_cloud_segment_loop_real_services import (
+from tests.support.integration.cursor.cursor_cloud_segment_loop import (
     _client,
     _run,
     pg_cloud_unit,

@@ -31,7 +31,8 @@ from mission_control.interfaces.http.output_inspection import router as outputs_
 from mission_control.interfaces.mcp.coordinator_http_client import (
     CoordinatorStreamableHttpClient,
 )
-from tests.support.unit.subscriptions.mo43_wake_channels import (
+from tests.support.unit.subscriptions.attention_surfaces import FakeReader
+from tests.support.unit.subscriptions.inbox_wake_channels import (
     KEY,
     LAUNCHER,
     _principal,
@@ -42,7 +43,6 @@ from tests.support.unit.subscriptions.mo43_wake_channels import (
     run_inbox,
     terminal,
 )
-from tests.support.unit.subscriptions.wi19_interfaces import FakeReader
 from tests.unit.subscriptions.coordinator_fakes import (
     RUN,
     InMemoryAttentionStore,

@@ -260,7 +260,7 @@ async def test_the_file_a_session_lane_packet_names_registers_to_the_declared_sl
     from mission_control.domain.authoring.contracts import StageOutputSlot
     from mission_control.domain.programs.completion import OutputSchemaBinding
     from mission_control.domain.programs.interpreter import StageGraphInterpreter
-    from tests.support.integration.temporal.wp_bp_010_temporal import _blueprint
+    from tests.support.integration.temporal.stage_graph_workflow_temporal import _blueprint
 
     schema: dict[str, object] = {"type": "object"}
     slot = StageOutputSlot(

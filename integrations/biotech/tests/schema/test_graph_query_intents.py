@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import pytest
-from tests.support.unit.schema.graph_query_intents import _intent
+from tests.support.biotech.graph_query_intents import _intent
 
 from biotech_mission_adapters.application.schema.graph_query import (
     compile_query_intent,

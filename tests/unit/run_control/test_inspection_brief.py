@@ -21,7 +21,7 @@ from mission_control.application.execution.boundary_interventions import Boundar
 from mission_control.application.missions.inspection import InspectionSources
 from mission_control.application.missions.service import MissionControlService
 from mission_control.domain.authoring.brief import MissionBrief
-from tests.support.unit.run_control.ft_f1_command_mailbox import SCOPE, World, operator
+from tests.support.unit.run_control.command_mailbox_delivery import SCOPE, World, operator
 
 BRIEF: dict[str, Any] = {
     "purpose": "system",

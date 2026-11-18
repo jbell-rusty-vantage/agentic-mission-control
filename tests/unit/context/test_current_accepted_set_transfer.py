@@ -31,7 +31,7 @@ from mission_control.domain.outputs.current_set import (
     with_current_set_index,
 )
 from tests.support.knowledge.stores import InMemoryStaging
-from tests.support.unit.context.wi07_current_set_transfer import (
+from tests.support.unit.context.current_accepted_set_transfer import (
     AT,
     RUN,
     SANDBOX,

@@ -52,12 +52,14 @@ from mission_control.domain.coordinator.launch import (
     WorkflowResultRecord,
 )
 from mission_control.domain.policies.contracts import ActorContext, RunOutcome, RunPhase
-from tests.support.integration.temporal.rrm_005_search_attributes import (
+from tests.support.integration.temporal.search_attributes_visibility import (
     UnitBoundStageGraphActivities,
     _start_local,
 )
-from tests.support.integration.temporal.wp_bp_010_temporal import QUEUE, _blueprint
-from tests.support.integration.temporal.wp_bp_010_temporal import _run_input as stage_run_input
+from tests.support.integration.temporal.stage_graph_workflow_temporal import QUEUE, _blueprint
+from tests.support.integration.temporal.stage_graph_workflow_temporal import (
+    _run_input as stage_run_input,
+)
 from tests.support.run_control import request as run_request
 from tests.support.run_control import service as run_control_service
 from tests.support.temporal import patch_ids

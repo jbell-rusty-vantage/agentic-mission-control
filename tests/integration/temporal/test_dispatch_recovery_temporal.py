@@ -54,7 +54,7 @@ from mission_control.domain.execution.lanes import (
 from mission_control.domain.policies.stop_fence import EffectAdmission, StopFence
 from tests.support.db import CommonDatabase
 from tests.support.db_builders import pg_lane_unit
-from tests.support.integration.temporal.mp06_dispatch_recovery import (
+from tests.support.integration.temporal.dispatch_recovery_temporal import (
     _activity_worker,
     _client,
     _replayed,

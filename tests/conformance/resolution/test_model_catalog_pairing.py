@@ -26,8 +26,8 @@ from mission_control.bootstrap.model_profiles import (
 from mission_control.domain.resolution.resolved import ResolutionRefused, ResolvedRuntime
 from tests.conformance.lanes.compile.stub import NARROW_DECLARATION, STUB_DECLARATION
 from tests.conformance.resolution.fixtures import APPLICATIONS
-from tests.support.conformance.resolution.resolver_conformance import _registration, _selection
 from tests.support.model_catalog import DEPLOYMENTS, checked_in_catalog
+from tests.support.resolver_conformance import _registration, _selection
 
 # PROOFS §6 (OC-D185): role -> (pin, fallback).
 PINS = {

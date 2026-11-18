@@ -23,7 +23,7 @@ from mission_control.domain.authoring.manifest_lowering import lower_mission, ou
 from mission_control.domain.authoring.nested_bodies import NestedBodyError
 from mission_control.domain.authoring.nested_lowering import nested_definition
 from mission_control.domain.programs.stagegraph_bounds import stagegraph_payload_problems
-from tests.support.unit.authoring.wi13_nested_authoring import W5, definition, document
+from tests.support.unit.authoring.nested_body_authoring import W5, definition, document
 
 
 def issues(doc: dict[str, Any]) -> list[tuple[str, str]]:

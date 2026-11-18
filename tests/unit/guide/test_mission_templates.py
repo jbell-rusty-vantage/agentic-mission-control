@@ -31,7 +31,7 @@ from mission_control.domain.authoring.brief import MissionBrief
 from mission_control.domain.authoring.extensions import ExtensionRegistry
 from mission_control.domain.authoring.manifest import load_manifest_yaml
 from mission_control.domain.authoring.manifest_v2 import BRIEF_MISSING, MANIFEST_V2_LITERAL
-from tests.support.architecture.package_boundaries import APPLICATION_NEEDLES
+from tests.support.application_needles import APPLICATION_NEEDLES
 from tests.support.manifests.compile import scope, service
 from tests.support.manifests.seeded_catalog import fast_track_catalog
 from tests.unit.guide.support import SANDBOXES, full_guide

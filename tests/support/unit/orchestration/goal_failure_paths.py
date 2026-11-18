@@ -9,7 +9,7 @@ from typing import Any
 
 from mission_control.domain.programs.goal_directed_runtime import GoalOperationDispatch
 from tests.support.journaled_goal_loop import SCOPE
-from tests.support.unit.orchestration.rrm_016_goal_directed_settlement import (
+from tests.support.unit.orchestration.goal_loop_operation_settlement import (
     _claim,
     _composition,
     _preparation,

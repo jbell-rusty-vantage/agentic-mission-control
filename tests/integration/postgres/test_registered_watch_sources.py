@@ -21,12 +21,12 @@ from mission_control.application.watchers.service import WatcherEvaluationServic
 from mission_control.bootstrap.watch_sources import RegisteredWatchSources, SourceWatchRegistration
 from tests.support.db import CommonDatabase
 from tests.support.db_builders import admit_unit_attempt
-from tests.support.integration.postgres.mo44_watchers_postgres import (
+from tests.support.integration.postgres.coordinator_inbox_postgres import mission_service
+from tests.support.integration.postgres.watcher_evaluator_postgres import (
     FixedProgram,
     eventually,
     local_temporal,
 )
-from tests.support.integration.postgres.mp15_coordinator_inbox_postgres import mission_service
 from tests.support.unit.watchers.watcher_planner import plan, watcher
 from tests.unit.watchers.fakes import T0
 

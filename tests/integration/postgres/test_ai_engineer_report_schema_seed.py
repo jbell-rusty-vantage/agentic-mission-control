@@ -42,7 +42,7 @@ from tests.support.integration.postgres.ai_engineer_report_schema_seed import (
 
 # The established synthetic Supabase-shaped Storage stand-in (FT-A2); it is not Supabase.
 from tests.support.integration.postgres.capability_bundles_publish import SYNTHETIC_STORAGE
-from tests.support.integration.postgres.run2_release_141 import (
+from tests.support.integration.postgres.db_release_141_install_upgrade_and_drift import (
     VERSIONS,
     disposable,
     install,

@@ -32,7 +32,7 @@ from mission_control.adapters.temporal.workflows.operation import (
 )
 from mission_control.domain.frames.contracts import FrameKind
 from tests.support.db import CommonDatabase
-from tests.support.integration.cursor.mp09_cloud_segment_loop_real_services import (
+from tests.support.integration.cursor.cursor_cloud_segment_loop import (
     _client,
     _run,
     pg_cloud_unit,

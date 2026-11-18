@@ -21,7 +21,7 @@ from tests.support.unit.knowledge.native_write import (
     service,
 )
 from tests.support.unit.knowledge.native_write_recovery import IntentPreview
-from tests.support.unit.outputs.w1_d28_d29 import HANDLE
+from tests.support.unit.outputs.official_use import HANDLE
 from tests.unit.outputs.scenario import digest_of
 
 pytestmark = pytest.mark.asyncio

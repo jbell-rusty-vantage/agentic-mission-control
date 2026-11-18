@@ -54,17 +54,23 @@ from mission_control.domain.programs.search_attributes import (
     visibility_run_query,
 )
 from tests.support.checkpoint_lineage import BINDING
-from tests.support.integration.temporal.rrm_005_search_attributes import (
+from tests.support.integration.temporal.goal_loop_workflow_temporal import (
+    FakeGoalDirectedActivities,
+)
+from tests.support.integration.temporal.goal_loop_workflow_temporal import (
+    _run_input as goal_run_input,
+)
+from tests.support.integration.temporal.search_attributes_visibility import (
     UnitBoundStageGraphActivities,
     _start_local,
 )
-from tests.support.integration.temporal.wp_bp_010_temporal import (
+from tests.support.integration.temporal.stage_graph_workflow_temporal import (
     QUEUE,
     _blueprint,
 )
-from tests.support.integration.temporal.wp_bp_010_temporal import _run_input as stage_run_input
-from tests.support.integration.temporal.wp_bp_020_temporal import FakeGoalDirectedActivities
-from tests.support.integration.temporal.wp_bp_020_temporal import _run_input as goal_run_input
+from tests.support.integration.temporal.stage_graph_workflow_temporal import (
+    _run_input as stage_run_input,
+)
 from tests.support.run_control import request as run_request
 from tests.support.run_control import service as run_control_service
 

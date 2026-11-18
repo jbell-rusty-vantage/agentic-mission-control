@@ -34,7 +34,7 @@ from tests.conformance.lanes.compile.stub import (
     STUB_DECLARATION,
 )
 from tests.conformance.resolution.fixtures import AI_ENGINEER, APPLICATIONS, BIOTECH, MODELS
-from tests.support.conformance.resolution.resolver_conformance import _registration, _selection
+from tests.support.resolver_conformance import _registration, _selection
 
 
 def _resolver(

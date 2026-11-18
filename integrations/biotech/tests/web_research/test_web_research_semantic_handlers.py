@@ -7,8 +7,7 @@ from typing import Any, cast
 
 import pytest
 from pydantic import ValidationError
-from tests.support.lane_bindings import LANE_REBINDERS
-from tests.support.unit.web_research.web_research_semantic_handlers import (
+from tests.support.biotech.web_research_semantic_handlers import (
     BLUEPRINT_DIGEST,
     BROWSER_RUNTIME,
     CONFIGURATION_DIGEST,
@@ -25,6 +24,7 @@ from tests.support.unit.web_research.web_research_semantic_handlers import (
     request,
     runtime,
 )
+from tests.support.lane_bindings import LANE_REBINDERS
 
 from biotech_mission_adapters.application.web_research.web_research_repository import (
     InMemoryWebResearchRecordRepository,

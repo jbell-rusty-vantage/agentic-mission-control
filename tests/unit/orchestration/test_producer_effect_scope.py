@@ -4,7 +4,7 @@ import pytest
 
 from mission_control.application.programs.service import producer_effects_settled
 from mission_control.domain.policies.contracts import EffectLedgerState
-from tests.support.unit.operations.rrm_009_cancellation_composition import _claim
+from tests.support.unit.operations.cancellation_composition import _claim
 
 RESERVATION = "reservation:run-1:operation:formulations:attempt:1"
 KEY = "stagegraph:run-1:operation:formulations:attempt:1:generation:1"
@@ -291,7 +291,7 @@ async def test_nested_body_requires_stored_activation_receipt_and_parent_usage(c
     from mission_control.domain.programs.nested import NestedProjection
     from tests.support.run_control import command
     from tests.support.unit.orchestration.completion_validation_service import prepared
-    from tests.support.unit.orchestration.wi13_nested_runtime import body
+    from tests.support.unit.orchestration.nested_body_runtime import body
 
     fixture = await prepared(release_usage=False)
     candidate = fixture.result
@@ -418,7 +418,7 @@ async def test_never_activated_nested_body_persists_zero_usage_and_removes_empty
     )
     from mission_control.domain.programs.nested import NestedSettlementRequest
     from tests.support.run_control import service
-    from tests.support.unit.orchestration.wi13_nested_runtime import (
+    from tests.support.unit.orchestration.nested_body_runtime import (
         NOW,
         SCOPE,
         body,

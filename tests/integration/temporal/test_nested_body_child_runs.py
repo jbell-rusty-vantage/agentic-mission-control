@@ -74,7 +74,7 @@ from mission_control.domain.programs.nested import (
     project_exports,
     stage_result,
 )
-from tests.support.integration.temporal.wp_bp_010_temporal import (
+from tests.support.integration.temporal.stage_graph_workflow_temporal import (
     DIGEST,
     QUEUE,
     FakeStageGraphActivities,
@@ -530,7 +530,9 @@ def goal_activities(nested: NestedActivities) -> list[object]:
         GoalDirectedOperationResultService,
     )
     from mission_control.domain.programs.contracts import GoalVerificationResult
-    from tests.support.integration.temporal.wp_bp_020_temporal import FakeGoalDirectedActivities
+    from tests.support.integration.temporal.goal_loop_workflow_temporal import (
+        FakeGoalDirectedActivities,
+    )
 
     documents = GoalDocuments()
     results = GoalDirectedOperationResultService(documents=documents)  # type: ignore[arg-type]
@@ -578,7 +580,9 @@ def goal_activities(nested: NestedActivities) -> list[object]:
 @pytest.mark.asyncio
 async def test_a_goal_loop_executor_body_runs_as_a_child_graph_each_iteration() -> None:
     from mission_control.adapters.temporal.workflows.goal_directed import GoalDirectedWorkflow
-    from tests.support.integration.temporal.wp_bp_020_temporal import _run_input as goal_input
+    from tests.support.integration.temporal.goal_loop_workflow_temporal import (
+        _run_input as goal_input,
+    )
 
     nested = NestedActivities()
     activities = goal_activities(nested)

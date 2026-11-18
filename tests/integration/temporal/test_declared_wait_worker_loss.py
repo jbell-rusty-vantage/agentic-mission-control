@@ -16,14 +16,18 @@ from mission_control.adapters.temporal.workflows.stagegraph import (
     wait_condition_id,
 )
 from mission_control.domain.policies.contracts import SatisfyWaitAction
-from tests.support.integration.temporal.rrm_007_boundary_interventions import (
+from tests.support.integration.temporal.boundary_interventions_temporal import (
     Authority,
     GovernedStageGraphActivities,
     _has_wait,
     _state_is,
     until,
 )
-from tests.support.integration.temporal.wp_bp_010_temporal import QUEUE, _blueprint, _run_input
+from tests.support.integration.temporal.stage_graph_workflow_temporal import (
+    QUEUE,
+    _blueprint,
+    _run_input,
+)
 from tests.support.temporal import start_workflow_env
 
 

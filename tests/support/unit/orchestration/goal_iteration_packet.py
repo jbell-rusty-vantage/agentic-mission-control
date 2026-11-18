@@ -35,7 +35,7 @@ from tests.support.journaled_goal_loop import (
 )
 from tests.support.knowledge.stores import InMemoryStaging
 from tests.support.run_control import command
-from tests.support.unit.operations.ft_b2_stage_handoff import FakeArtifacts, FakeSelections
+from tests.support.unit.operations.stage_handoff import FakeArtifacts, FakeSelections
 
 
 async def _composition(

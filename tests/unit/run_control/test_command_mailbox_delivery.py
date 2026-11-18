@@ -65,7 +65,7 @@ from tests.support.run_control import (
 )
 from tests.support.run_control import actor as control_actor
 from tests.support.unit.coordinator.coordinator_mcp_read_surface import FakeFacade
-from tests.support.unit.run_control.ft_f1_command_mailbox import (
+from tests.support.unit.run_control.command_mailbox_delivery import (
     NOW,
     SCOPE,
     Resolver,

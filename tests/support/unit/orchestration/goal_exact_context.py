@@ -10,12 +10,12 @@ from mission_control.application.execution.operations.operation_execution import
     bind_operation_execution_request,
 )
 from mission_control.domain.authoring.canonical import sha256_digest
-from tests.support.unit.orchestration.rrm_016_goal_directed_settlement import (
+from tests.support.unit.orchestration.goal_loop_operation_settlement import (
     _claim,
     _composition,
     _preparation,
 )
-from tests.support.unit.orchestration.wp_bp_020_goal_directed import _execution, _verification
+from tests.support.unit.orchestration.goal_loop_rules import _execution, _verification
 
 
 def redigest(verification, **changes):

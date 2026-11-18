@@ -8,7 +8,7 @@ from types import SimpleNamespace
 
 import pytest
 from mcp.types import TextContent
-from tests.support.unit.web_research.web_research_live_adapters import (
+from tests.support.biotech.web_research_live_adapters import (
     BROWSER_REF,
     BROWSER_RUNTIME,
     FIRECRAWL_RUNTIME,

@@ -37,8 +37,8 @@ from mission_control.interfaces.http.mission_control import (
     get_mission_principal,
 )
 from tests.conformance.lanes.compile.stub import NARROW_DECLARATION
-from tests.support.conformance.resolution.resolver_conformance import _registration
 from tests.support.model_catalog import checked_in_catalog
+from tests.support.resolver_conformance import _registration
 
 
 def _registry() -> LaneRegistry:

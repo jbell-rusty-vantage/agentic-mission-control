@@ -38,7 +38,7 @@ from tests.support.checkpoint_recovery import (
     stage_recovery_unit,
 )
 from tests.support.lane_bindings import lane_fields
-from tests.support.unit.operations.rrm_008_cancellation import _liability, _settlements
+from tests.support.unit.operations.operation_cancellation import _liability, _settlements
 
 SCOPE = "tenant-1"
 

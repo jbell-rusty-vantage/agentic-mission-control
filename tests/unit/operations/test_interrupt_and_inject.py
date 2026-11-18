@@ -58,7 +58,7 @@ from tests.support.checkpoint_recovery import (
     stage_recovery_unit,
 )
 from tests.support.run_control import command
-from tests.support.unit.operations.ft_f2_interrupt_and_inject import (
+from tests.support.unit.operations.interrupt_and_inject import (
     FAST,
     facade,
     harness_with_injections,
@@ -462,7 +462,7 @@ async def test_protocol_cancel_and_replace_settles_then_sends_the_replacement_tu
 async def test_http_accepts_interrupt_and_inject_with_202_and_a_command_record() -> None:
     from fastapi.testclient import TestClient
 
-    from tests.support.unit.run_control.ft_f1_command_mailbox import World, _app
+    from tests.support.unit.run_control.command_mailbox_delivery import World, _app
 
     world = await World().start()
     app, _scope = _app(world)
@@ -493,7 +493,7 @@ async def test_cli_command_inject_sends_interrupt_and_inject_without_a_boundary(
     from fastapi.testclient import TestClient
 
     from mission_control.interfaces.cli.main import main
-    from tests.support.unit.run_control.ft_f1_command_mailbox import World, _app
+    from tests.support.unit.run_control.command_mailbox_delivery import World, _app
 
     world = await World().start()
     app, _scope = _app(world)
@@ -550,8 +550,8 @@ async def test_mcp_mission_command_send_admits_interrupt_and_inject_like_http() 
         ScopedRunControl,
     )
     from tests.support.unit.coordinator.coordinator_mcp_read_surface import FakeFacade
-    from tests.support.unit.run_control.ft_f1_command_mailbox import SCOPE, Resolver, World, _app
-    from tests.support.unit.run_control.ft_f1_command_mailbox import operator as f1_operator
+    from tests.support.unit.run_control.command_mailbox_delivery import SCOPE, Resolver, World, _app
+    from tests.support.unit.run_control.command_mailbox_delivery import operator as f1_operator
 
     world = await World().start()
     grants = f1_operator().permissions

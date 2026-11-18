@@ -39,15 +39,15 @@ from mission_control.interfaces.mcp.subscriptions import (
     McpSubscriptionBridge,
     register_subscription_tools,
 )
-from tests.support.unit.subscriptions.mo43_wake_channels import (
+from tests.support.unit.subscriptions.attention_surfaces import FakeReader
+from tests.support.unit.subscriptions.coordinator_attention import Outputs, output
+from tests.support.unit.subscriptions.inbox_wake_channels import (
     INSTALLATION,
     KEY,
     TENANT,
     _registry,
     missionctl,  # noqa: F401
 )
-from tests.support.unit.subscriptions.wi19_attention import Outputs, output
-from tests.support.unit.subscriptions.wi19_interfaces import FakeReader
 from tests.unit.subscriptions.coordinator_fakes import RUN
 from tests.unit.subscriptions.fakes import SCOPE
 

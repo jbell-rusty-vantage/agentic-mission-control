@@ -7,14 +7,14 @@ from mission_control.application.knowledge.toolset import InlineItem, _candidate
 from mission_control.application.programs.goal_directed import bind_fulfillment
 from mission_control.domain.outputs.contracts import Enforcement, OutputForm
 from tests.support.knowledge.gateway import call, harness
-from tests.support.unit.orchestration.wp_bp_020_goal_directed import (
+from tests.support.unit.orchestration.goal_loop_rules import (
     _blueprint,
     _claim,
     _execution,
     _verification,
 )
+from tests.support.unit.outputs.convergence_fulfillment import _observation
 from tests.support.unit.outputs.output_fulfillment import make_stack
-from tests.support.unit.outputs.w1_convergence_fulfillment import _observation
 from tests.unit.outputs.scenario import obligation, text
 
 

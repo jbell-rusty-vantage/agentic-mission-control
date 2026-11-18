@@ -42,7 +42,7 @@ from tests.qualification.two_project.release_install import (
     write_target,
 )
 from tests.support.db import common_database
-from tests.support.unit.runtime.mp22_local_readiness import (
+from tests.support.unit.runtime.local_readiness import (
     AUTH_EXAMPLE,
     BINDINGS_EXAMPLE,
     PROFILE_EXAMPLE,

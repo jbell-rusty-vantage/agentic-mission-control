@@ -23,7 +23,7 @@ from mission_control.application.outputs.submission_service import SubmissionSer
 from mission_control.domain.outputs.contracts import (
     EvaluationScope,
 )
-from tests.support.unit.knowledge.wi07_report_collections import (
+from tests.support.unit.knowledge.report_collections import (
     ScriptedBridge,
     handle,
     invocation,

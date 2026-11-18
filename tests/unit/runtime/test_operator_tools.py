@@ -14,7 +14,7 @@ from tests.support.unit.mission_control.authentication import NOW
 from tests.support.unit.mission_control.authentication import (
     authenticated_world as authenticated_world,
 )
-from tests.support.unit.runtime.mp22_local_readiness import (
+from tests.support.unit.runtime.local_readiness import (
     BINDINGS_EXAMPLE,
     owner_selections,
     profile,

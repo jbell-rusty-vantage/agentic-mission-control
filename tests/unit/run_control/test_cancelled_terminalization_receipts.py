@@ -20,7 +20,7 @@ from mission_control.domain.policies.contracts import (
     RunOutcome,
     RunPhase,
 )
-from tests.support.unit.run_control.rrm_009_family_terminal_receipts import (
+from tests.support.unit.run_control.cancelled_terminalization_receipts import (
     assert_ledger_closed,
     cancelled_run,
     terminal_family_service,
