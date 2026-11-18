@@ -20,25 +20,21 @@ from tests.support.unit.context.transfer_materializer import (
 )
 
 
-async def test_current_use_unavailable_cannot_redeliver_a_sealed_ready_plan(monkeypatch):
+async def test_current_use_unavailable_cannot_redeliver_a_sealed_ready_plan():
     from mission_control.application.knowledge.judgment import EvaluatorUnavailable
 
-    h = setup(monkeypatch)
+    h = setup()
     first = await h.s.materializer.materialize(h.s.request(h.selection), FakeBackend())
     assert first.receipt.result == "ready"
-
-    async def unavailable(access, revision):
-        raise EvaluatorUnavailable("current service unavailable")
-
-    monkeypatch.setattr(h.resolver, "_recheck", unavailable)
+    h.recheck.failure = EvaluatorUnavailable("current service unavailable")
     with pytest.raises(ContextDeliveryBlocked) as refused:
         await h.s.materializer.materialize(h.s.request(h.selection, attempt=2), FakeBackend())
     assert "LINK_CURRENT_USE_UNAVAILABLE" in str(refused.value)
     assert not h.s.outputs.assessments  # no semantic rejection invented by unavailability
 
 
-async def test_exact_export_delivers_and_redelivers_original_after_newer_source_head(monkeypatch):
-    h = setup(monkeypatch)
+async def test_exact_export_delivers_and_redelivers_original_after_newer_source_head():
+    h = setup()
     first = await h.s.materializer.materialize(h.s.request(h.selection), FakeBackend())
     assert h.s.package.body in dict(first.files).values()
     assert all(m.linked_source.source_run_id == SOURCE for m in first.plan.exact_sources)
@@ -67,10 +63,8 @@ async def test_exact_export_delivers_and_redelivers_original_after_newer_source_
         ({"gate_ref": "changed"}, "LINK_EXPORT_DIGEST"),
     ],
 )
-async def test_export_tampering_or_receiver_mismatch_refuses_before_bytes(
-    monkeypatch, change, code
-):
-    h = setup(monkeypatch)
+async def test_export_tampering_or_receiver_mismatch_refuses_before_bytes(change, code):
+    h = setup()
     h.exports.export = h.export.model_copy(update=change)
     with pytest.raises(ContextDeliveryBlocked) as refused:
         await h.s.materializer.materialize(h.s.request(h.selection), FakeBackend())
@@ -87,16 +81,16 @@ async def test_export_tampering_or_receiver_mismatch_refuses_before_bytes(
         {"obligation_revision": 2},
     ],
 )
-async def test_wrong_exact_source_identity_refuses(monkeypatch, change):
-    h = setup(monkeypatch)
+async def test_wrong_exact_source_identity_refuses(change):
+    h = setup()
     h.rows[h.revision.revision_id] = h.revision.model_copy(update=change)
     with pytest.raises(ContextDeliveryBlocked) as refused:
         await h.s.materializer.materialize(h.s.request(h.selection), FakeBackend())
     assert refused.value.refusals[0].code == "LINK_OUTPUT_MISMATCH"
 
 
-async def test_source_revocation_blocks_sealed_redelivery(monkeypatch):
-    h = setup(monkeypatch)
+async def test_source_revocation_blocks_sealed_redelivery():
+    h = setup()
     await h.s.materializer.materialize(h.s.request(h.selection), FakeBackend())
     h.s.outputs.assessments.append(_trusted(h.revision, "review", 1, None))
     with pytest.raises(ContextDeliveryBlocked) as refused:
@@ -104,8 +98,8 @@ async def test_source_revocation_blocks_sealed_redelivery(monkeypatch):
     assert any(item.code == "LINK_OUTPUT_REVOKED" for item in refused.value.refusals)
 
 
-async def test_repair_subject_delivers_held_bytes_and_full_findings_without_adoption(monkeypatch):
-    h = setup(monkeypatch, repair=True)
+async def test_repair_subject_delivers_held_bytes_and_full_findings_without_adoption():
+    h = setup(repair=True)
     h.s.outputs.assessments.append(_trusted(h.revision, "review", 1, None))
     result = await h.s.materializer.materialize(h.s.request(h.selection), FakeBackend())
     assert h.s.package.body in dict(result.files).values()
@@ -118,8 +112,8 @@ async def test_repair_subject_delivers_held_bytes_and_full_findings_without_adop
     assert not any(entry.fact.role.value == "adopter" for _, entry in h.s.lineage.entries)
 
 
-async def test_unreleased_export_and_foreign_receiver_access_refuse(monkeypatch):
-    h = setup(monkeypatch)
+async def test_unreleased_export_and_foreign_receiver_access_refuse():
+    h = setup()
     h.exports.export = None
     with pytest.raises(ContextDeliveryBlocked) as refused:
         await h.s.materializer.materialize(h.s.request(h.selection), FakeBackend())
@@ -141,8 +135,8 @@ async def test_unreleased_export_and_foreign_receiver_access_refuse(monkeypatch)
     assert refused.value.refusals[0].code == "LINK_RECEIVER_AUTHORITY"
 
 
-def test_export_contract_and_additive_source_identity_are_closed(monkeypatch):
-    h = setup(monkeypatch)
+def test_export_contract_and_additive_source_identity_are_closed():
+    h = setup()
     with pytest.raises(ValidationError):
         InputSource.model_validate(
             {
@@ -159,8 +153,8 @@ def test_export_contract_and_additive_source_identity_are_closed(monkeypatch):
         linked_mission(dependent(), (h.export, h.export))
 
 
-async def test_pinned_export_for_other_receiver_refuses_even_with_correct_digest(monkeypatch):
-    h = setup(monkeypatch)
+async def test_pinned_export_for_other_receiver_refuses_even_with_correct_digest():
+    h = setup()
     foreign = h.export.model_copy(update={"receiver_run_id": "other-consumer"})
     h.exports.export = foreign
     selection = linked_mission(dependent(), (foreign,))
@@ -169,10 +163,10 @@ async def test_pinned_export_for_other_receiver_refuses_even_with_correct_digest
     assert refused.value.refusals[0].code == "LINK_RECEIVER_MISMATCH"
 
 
-async def test_source_owner_and_current_receiver_access_are_checked(monkeypatch):
+async def test_source_owner_and_current_receiver_access_are_checked():
     from mission_control.application.context.materialization import AccessCheck
 
-    h = setup(monkeypatch)
+    h = setup()
     h.s.outputs.obligations[0] = h.s.outputs.obligations[0].model_copy(
         update={"owner_position": "sibling"}
     )
@@ -189,17 +183,19 @@ async def test_source_owner_and_current_receiver_access_are_checked(monkeypatch)
             assert context.access.origin.run_id == RUN
             return AccessCheck(ok=False, ref=member.access_ref, code="RECEIVER_ACCESS_REVOKED")
 
+    # TODO(OVE-238): the shared seam() composes the materializer's access ports; swap this
+    # private map entry for a constructor input when transfer_materializer moves to support.
     h.s.materializer._access["linked_export"] = LinkedExportAccess(h.resolver, Revoked())
     with pytest.raises(ContextDeliveryBlocked) as refused:
         await h.s.materializer.materialize(h.s.request(h.selection, attempt=2), FakeBackend())
     assert any(item.code == "RECEIVER_ACCESS_REVOKED" for item in refused.value.refusals)
 
 
-def test_goal_repair_preserves_own_subject_and_link_but_evaluator_never_inherits(monkeypatch):
+def test_goal_repair_preserves_own_subject_and_link_but_evaluator_never_inherits():
     from mission_control.domain.context import transfer_builders as builders
     from mission_control.domain.context.transfer import Boundary, ProducerAttempt
 
-    h = setup(monkeypatch)
+    h = setup()
     prior = builders.next_iteration(dependent(), [("root", "root.report")])
     repair = builders.authorized_subjects(
         prior,

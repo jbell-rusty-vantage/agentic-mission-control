@@ -29,7 +29,52 @@ class Exports:
         return (self.export,)
 
 
-def setup(monkeypatch, *, repair=False):
+class SourceRunOutputs:
+    """The receiver's output store, plus the source run's exact reads: `output_revision`
+    serves `rows` (recording each read) and `obligation_revision` the store's obligations.
+    Every other read delegates to the store, so tests that change it are seen."""
+
+    def __init__(self, outputs, rows, reads):
+        self._outputs = outputs
+        self._rows = rows
+        self._reads = reads
+
+    def __getattr__(self, name):
+        return getattr(self._outputs, name)
+
+    async def output_revision(self, scope, revision_id):
+        self._reads.append((scope, revision_id))
+        return self._rows.get(revision_id)
+
+    async def obligation_revision(self, scope, run_id, key, revision_no):
+        assert run_id == SOURCE
+        return next(
+            (
+                item
+                for item in self._outputs.obligations
+                if item.key == key and item.revision == revision_no
+            ),
+            None,
+        )
+
+
+class Recheck:
+    """The current-use recheck: records each check, or raises `failure` once it is set."""
+
+    def __init__(self):
+        self.checks = []
+        self.failure: Exception | None = None
+
+    async def __call__(self, access, revision):
+        if self.failure is not None:
+            raise self.failure
+        self.checks.append((access.origin.run_id, revision.run_id, revision.revision_id))
+
+
+def setup(_monkeypatch=None, *, repair=False):
+    """The linked-transfer harness. The positional argument is ignored (callers that still
+    pass `monkeypatch`); nothing here patches."""
+
     s = seam()
     s.accept_report()
     revision = s.outputs.accepted[0].model_copy(update={"run_id": SOURCE})
@@ -66,30 +111,12 @@ def setup(monkeypatch, *, repair=False):
     )
     exports = Exports(export)
     reads = []
-    checks = []
-
-    async def output(scope, revision_id):
-        reads.append((scope, revision_id))
-        return rows.get(revision_id)
-
-    async def obligation(scope, run_id, key, revision_no):
-        assert run_id == SOURCE
-        return next(
-            (
-                item
-                for item in s.outputs.obligations
-                if item.key == key and item.revision == revision_no
-            ),
-            None,
-        )
-
-    async def recheck(access, revision):
-        checks.append((access.origin.run_id, revision.run_id, revision.revision_id))
-
-    monkeypatch.setattr(s.outputs, "output_revision", output, raising=False)
-    monkeypatch.setattr(s.outputs, "obligation_revision", obligation, raising=False)
+    recheck = Recheck()
     resolver = LinkedExportResolver(
-        exports, s.outputs, s.materializer._resolvers["produced_output"], recheck=recheck
+        exports,
+        SourceRunOutputs(s.outputs, rows, reads),
+        s.materializer._resolvers["produced_output"],
+        recheck=recheck,
     )
     s.materializer._resolvers["linked_export"] = resolver
     s.materializer._access["linked_export"] = LinkedExportAccess(
@@ -103,7 +130,8 @@ def setup(monkeypatch, *, repair=False):
         revision=revision,
         rows=rows,
         reads=reads,
-        checks=checks,
+        checks=recheck.checks,
+        recheck=recheck,
         selection=selection,
         resolver=resolver,
     )
