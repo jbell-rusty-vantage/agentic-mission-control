@@ -155,8 +155,13 @@ async def follow_command_receipts(
     *,
     poll_interval: float,
     window: float,
+    service: MissionControlService | None = None,
 ) -> str:
-    """Emit each later receipt state of one admitted command; returns the last stage."""
+    """Emit each later receipt state of one admitted command; returns the last stage.
+
+    ``service`` is the ledger reader; by default the principal's application service is
+    resolved from ``app`` on every poll, so a service that goes away ends the following.
+    """
 
     if receipt.delivery is None:
         return receipt.admission.status.value
@@ -191,9 +196,8 @@ async def follow_command_receipts(
             return "unfollowed"
         await asyncio.sleep(min(poll_interval, remaining))
         try:
-            statuses = await mission_service(app, principal).commands(
-                command.run_id, principal.actor
-            )
+            reader = service if service is not None else mission_service(app, principal)
+            statuses = await reader.commands(command.run_id, principal.actor)
         except (StreamFailure, MissionControlRejected, RunControlNotFound):
             return stage
         status = _matching(statuses, command_id, issuer)

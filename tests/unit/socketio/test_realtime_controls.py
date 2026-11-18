@@ -13,8 +13,10 @@ import time
 from typing import Any
 from uuid import uuid4
 
-import pytest
-
+from mission_control.application.execution.boundary_interventions import (
+    BoundaryInterventionService,
+)
+from mission_control.application.missions.service import MissionControlService
 from mission_control.contracts.contracts import MissionCommandReceipt
 from mission_control.contracts.realtime import (
     CLIENT_EVENTS,
@@ -22,8 +24,7 @@ from mission_control.contracts.realtime import (
     CommandReceiptProgress,
     LineageNotice,
 )
-from mission_control.domain.policies.contracts import CommandStatus, ReceiptState
-from mission_control.interfaces.socketio import commands as socket_commands
+from mission_control.domain.policies.contracts import ActorContext, CommandStatus, ReceiptState
 from mission_control.interfaces.socketio.commands import (
     SocketCommand,
     follow_command_receipts,
@@ -135,17 +136,18 @@ async def test_the_lineage_event_lists_then_updates_subordinates_by_reference() 
         await client.close()
 
 
-class LedgerService:
-    """The application read handler `MissionControlService.commands` over the in-memory
-    run-control ledger (the same ledger `GET /runs/{run_id}/commands` reads)."""
+def ledger(run_service: Any) -> MissionControlService:
+    """The application read handler over the in-memory run-control ledger (the same ledger
+    `GET /runs/{run_id}/commands` reads)."""
 
-    def __init__(self, run_service: Any) -> None:
-        self.run_service = run_service
-        self.reads = 0
+    return MissionControlService(
+        run_service, BoundaryInterventionService(run_service), request_scope="tenant-1"
+    )
 
-    async def commands(self, run_id: str, actor: Any) -> Any:
-        self.reads += 1
-        return await self.run_service.list_boundary_commands("tenant-1", run_id)
+
+def reader() -> Any:
+    actor = ActorContext(actor_id="operator", permissions=frozenset({"workflow_run.read"}))
+    return type("P", (), {"application_id": "biotech", "actor": actor})()
 
 
 async def accepted_pause() -> tuple[Any, str, MissionCommandReceipt]:
@@ -177,28 +179,24 @@ def socket_command(run_id: str) -> SocketCommand:
     )
 
 
-async def test_later_receipt_states_are_followed_once_in_ledger_order(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
+async def test_later_receipt_states_are_followed_once_in_ledger_order() -> None:
     run_service, run_id, receipt = await accepted_pause()
     assert receipt_stage(receipt) == ("accepted", False)
-    ledger = LedgerService(run_service)
-    monkeypatch.setattr(socket_commands, "mission_service", lambda _app, _principal: ledger)
     emitted: list[dict[str, Any]] = []
 
     async def emit(body: dict[str, Any]) -> None:
         emitted.append(body)
 
-    principal: Any = type("P", (), {"application_id": "biotech", "actor": None})()
     follower = asyncio.create_task(
         follow_command_receipts(
             None,  # type: ignore[arg-type]
-            principal,
+            reader(),
             socket_command(run_id),
             receipt,
             emit,
             poll_interval=0.02,
             window=5.0,
+            service=ledger(run_service),
         )
     )
     await asyncio.sleep(0.1)
@@ -228,27 +226,22 @@ async def test_later_receipt_states_are_followed_once_in_ledger_order(
     assert progress[-1].receipt["rejection_reason"] == "superseded"
 
 
-async def test_receipt_following_is_bounded_and_ends_as_unfollowed(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
+async def test_receipt_following_is_bounded_and_ends_as_unfollowed() -> None:
     run_service, run_id, receipt = await accepted_pause()
-    monkeypatch.setattr(
-        socket_commands, "mission_service", lambda _app, _principal: LedgerService(run_service)
-    )
     emitted: list[dict[str, Any]] = []
 
     async def emit(body: dict[str, Any]) -> None:
         emitted.append(body)
 
-    principal: Any = type("P", (), {"application_id": "biotech", "actor": None})()
     stage = await follow_command_receipts(
         None,  # type: ignore[arg-type]
-        principal,
+        reader(),
         socket_command(run_id),
         receipt,
         emit,
         poll_interval=0.02,
         window=0.2,
+        service=ledger(run_service),
     )
     assert stage == "unfollowed"
     (last,) = emitted
