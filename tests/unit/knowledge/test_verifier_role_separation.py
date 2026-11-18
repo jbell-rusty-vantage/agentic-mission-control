@@ -20,6 +20,7 @@ from mission_control.adapters.deep_agents.knowledge_tools import (
     knowledge_capability_id,
     live_invocation,
 )
+from mission_control.adapters.outputs.memory import InMemoryOutputContractStore
 from mission_control.application.authoring import manifest_launch_inputs
 from mission_control.application.authoring.manifest_launch_inputs import (
     ManifestLaunchBindingError,
@@ -33,7 +34,6 @@ from mission_control.application.outputs.submission_service import SubmissionSer
 from mission_control.domain.graph_runtime.identities import GoalDirectedUnitLocation
 from mission_control.domain.outputs.contracts import OutputForm
 from tests.fixtures.lane_bindings import lane_fields
-from tests.fixtures.output_contracts import InMemoryOutputContractStore
 from tests.support.knowledge.credentials import BINDING
 from tests.support.knowledge.gateway import RUN, lane
 from tests.support.manifests.launch_inputs import (

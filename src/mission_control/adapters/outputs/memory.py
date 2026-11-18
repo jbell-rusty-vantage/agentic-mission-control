@@ -1,4 +1,4 @@
-"""In-memory ``OutputContractStore`` with the release 1.7.0 rules, for unit tests.
+"""In-process ``OutputContractStore`` with the release 1.7.0 rules (never composed at launch).
 
 It shares the submission rows with :class:`InMemorySubmissionStore` (same scoped key, same
 ``SubmissionConflict`` / ``SubmissionClosed``) and mirrors the SQL guards: immutable revisions,
@@ -15,8 +15,7 @@ from datetime import datetime
 from typing import Any
 from uuid import uuid4
 
-from tests.support.knowledge.stores import InMemorySubmissionStore
-
+from mission_control.adapters.knowledge.memory import InMemorySubmissionStore
 from mission_control.application.ports.knowledge import (
     SubmissionCandidate,
     SubmissionClosed,

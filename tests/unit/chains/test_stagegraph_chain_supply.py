@@ -14,12 +14,12 @@ from dataclasses import replace
 
 import pytest
 
+from mission_control.adapters.outputs.memory import InMemoryOutputContractStore
 from mission_control.application.outputs.fulfillment import OutputFulfillmentService
 from mission_control.application.outputs.submission_service import SubmissionService
 from mission_control.domain.authoring.contracts import StageGraphBlueprint
 from mission_control.domain.authoring.manifest_lowering import output_promises
 from mission_control.domain.composition.chain import compile_chain
-from tests.fixtures.output_contracts import InMemoryOutputContractStore
 from tests.support.knowledge.gateway import RUN, lane
 from tests.support.manifests.experiment_loop import FIXTURES, compiled
 from tests.unit.outputs.scenario import host_access

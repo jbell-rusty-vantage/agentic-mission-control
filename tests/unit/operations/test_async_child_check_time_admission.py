@@ -439,8 +439,8 @@ async def test_the_boundary_never_redecides_a_child_admitted_at_check_under_eith
 async def test_adopting_the_same_tool_call_twice_submits_once() -> None:
     """Review S3: the tool call id is the submission key; a retry is the same act."""
 
+    from mission_control.adapters.outputs.memory import InMemoryOutputContractStore
     from mission_control.application.knowledge.access import InvocationAccess
-    from tests.fixtures.output_contracts import InMemoryOutputContractStore
     from tests.support.knowledge.gateway import origin
     from tests.unit.outputs.scenario import build_stack, obligation
 

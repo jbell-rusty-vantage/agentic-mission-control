@@ -1,6 +1,6 @@
 """WI-07 / OVE-170: report collections assessed per member and accumulated current sets.
 
-Through the ordinary handlers (in-memory 1.7.0 rules, ``tests/fixtures/output_contracts.py``):
+Through the ordinary handlers (in-memory 1.7.0 rules, ``mission_control.adapters.outputs.memory``):
 per-member judgments with each member's exact ref and digest, the authored aggregate rule,
 mixed held/accepted/rejected members, identity versus revisions, missing coverage, duplicate and
 reordered inputs, concurrent head promotion, host promotion of a member-judged collection only
@@ -17,6 +17,7 @@ from typing import Any
 import pytest
 from pydantic import ValidationError
 
+from mission_control.adapters.outputs.memory import InMemoryOutputContractStore
 from mission_control.application.knowledge.access import InvocationAccess
 from mission_control.application.outputs.fulfillment import PromoteOutput
 from mission_control.domain.outputs.contracts import (
@@ -32,7 +33,6 @@ from mission_control.domain.outputs.contracts import (
     collection_digest,
 )
 from mission_control.domain.outputs.current_set import build_current_set_index
-from tests.fixtures.output_contracts import InMemoryOutputContractStore
 from tests.support.knowledge.gateway import origin
 from tests.support.unit.outputs.collections import (
     TRUSTED_PIN,

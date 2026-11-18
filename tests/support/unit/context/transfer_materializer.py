@@ -11,6 +11,12 @@ from collections.abc import Sequence
 from dataclasses import dataclass, field
 from datetime import timedelta
 
+from mission_control.adapters.knowledge.memory import (
+    InMemoryKnowledgeHandleStore,
+    InMemoryKnowledgeJournal,
+    InMemoryLineageStore,
+    InMemoryTransferPlanStore,
+)
 from mission_control.application.context.materialization import (
     ApplicationSelectorResolver,
     ArtifactResolver,
@@ -53,13 +59,7 @@ from tests.support.knowledge.credentials import (
     knowledge_port,
 )
 from tests.support.knowledge.gateway import TENANT, origin
-from tests.support.knowledge.stores import (
-    InMemoryKnowledgeHandleStore,
-    InMemoryKnowledgeJournal,
-    InMemoryLineageStore,
-    InMemoryStaging,
-    InMemoryTransferPlanStore,
-)
+from tests.support.knowledge.stores import InMemoryStaging
 
 RUN = "22222222-2222-4222-8222-222222222222"
 OVERHEAD = HostOverhead(host_state_tokens=800, tool_schema_tokens=400, skill_tokens=100)

@@ -15,6 +15,12 @@ from typing import Any
 from mission_control.adapters.deep_agents.knowledge_tools import KnowledgeLaneSupport
 from mission_control.adapters.knowledge.decisions import InMemoryUseDecisionStore
 from mission_control.adapters.knowledge.invocation_locator import InMemoryInvocationLocator
+from mission_control.adapters.knowledge.memory import (
+    InMemoryKnowledgeHandleStore,
+    InMemoryKnowledgeJournal,
+    InMemoryLineageStore,
+    InMemorySubmissionStore,
+)
 from mission_control.application.knowledge.access import (
     InvocationAccess,
     RecoveryAccess,
@@ -36,12 +42,6 @@ from tests.support.knowledge.credentials import (
     RecordingMinter,
     SteppingClock,
     knowledge_port,
-)
-from tests.support.knowledge.stores import (
-    InMemoryKnowledgeHandleStore,
-    InMemoryKnowledgeJournal,
-    InMemoryLineageStore,
-    InMemorySubmissionStore,
 )
 
 INSTALLATION = "00000000-0000-7000-8000-000000000001"

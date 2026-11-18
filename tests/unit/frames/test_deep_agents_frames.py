@@ -22,6 +22,7 @@ from mission_control.adapters.deep_agents.frames import (
     frame_message_body,
     materialization_manifest,
 )
+from mission_control.adapters.deep_agents.workspace_closure import InMemoryWorkspaceClosures
 from mission_control.application.execution.operations.checkpoint_lineage import (
     CheckpointLineageService,
     InMemoryCheckpointLineageRepository,
@@ -36,7 +37,6 @@ from tests.fixtures.provider_frames import (
     in_memory_store,
     opened_writer,
 )
-from tests.fixtures.workspace_closures import InMemoryWorkspaceClosures
 from tests.support.deep_agents import SkillReadingModel, registry
 from tests.support.unit.frames.deep_agents_frames import _planned, _store_for, _unit_binding
 

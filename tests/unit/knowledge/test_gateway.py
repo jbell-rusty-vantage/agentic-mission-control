@@ -21,6 +21,10 @@ from mission_control.adapters.knowledge.credentials import (
     CredentialRejected,
     generate_signing_key,
 )
+from mission_control.adapters.knowledge.memory import (
+    InMemoryKnowledgeHandleStore,
+    InMemoryKnowledgeJournal,
+)
 from mission_control.application.knowledge.access import (
     CredentialMismatch,
     InvocationAccess,
@@ -51,7 +55,6 @@ from tests.support.knowledge.credentials import (
     knowledge_port,
 )
 from tests.support.knowledge.gateway import TENANT, TRANSPORTS, call, harness, origin
-from tests.support.knowledge.stores import InMemoryKnowledgeHandleStore, InMemoryKnowledgeJournal
 
 FIXTURES = Path(__file__).resolve().parents[2] / "fixtures" / "knowledge_protocol"
 GOLDEN = json.loads(

@@ -22,6 +22,10 @@ from pydantic import SecretStr
 
 from mission_control.adapters.deep_agents import evaluators
 from mission_control.adapters.deep_agents.evaluators import JudgeAnswer
+from mission_control.adapters.knowledge.memory import (
+    InMemoryKnowledgeHandleStore,
+    InMemoryKnowledgeJournal,
+)
 from mission_control.application.knowledge.evaluator_plans import JUDGE_CREDENTIAL
 from mission_control.application.knowledge.gateway import KnowledgeGateway
 from mission_control.application.knowledge.judgment import (
@@ -40,7 +44,6 @@ from mission_control.application.knowledge.trusted_settlement import (
 from mission_control.domain.execution.invocation_settlement import SettlementOutcome, WaitReason
 from tests.support.knowledge.binding import FakeKnowledgeBinding
 from tests.support.knowledge.credentials import AUDIENCE, BINDING, knowledge_port
-from tests.support.knowledge.stores import InMemoryKnowledgeHandleStore, InMemoryKnowledgeJournal
 from tests.support.trusted_knowledge import JUDGE_PIN, PROFILES, ScriptedRunner, World, world
 from tests.support.trusted_knowledge import evaluators as trusted_evaluators
 from tests.support.unit.knowledge.independent_evaluators import bindings

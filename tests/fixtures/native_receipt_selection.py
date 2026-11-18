@@ -3,7 +3,6 @@
 from dataclasses import dataclass, replace
 from typing import Any
 
-from tests.fixtures.output_contracts import InMemoryOutputContractStore
 from tests.support.knowledge.gateway import MISSION, lane
 from tests.support.unit.knowledge.native_write import DIGEST, PLAN, RUN_DECISION, Bridge, service
 from tests.support.unit.outputs.w1_d28_d29 import (
@@ -15,6 +14,7 @@ from tests.support.unit.outputs.w1_d28_d29 import (
 from tests.unit.outputs.scenario import build_stack, fulfillment, obligation
 
 from mission_control.adapters.knowledge.decisions import InMemoryUseDecisionStore
+from mission_control.adapters.outputs.memory import InMemoryOutputContractStore
 from mission_control.application.knowledge.effect_receipts import JournalEffectReceipts
 from mission_control.application.knowledge.toolset import LiveInvocation, ReadScope
 from mission_control.application.outputs.fulfillment import TrustedReferenceUses

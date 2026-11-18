@@ -15,6 +15,7 @@ from typing import Any
 
 import pytest
 
+from mission_control.adapters.outputs.memory import InMemoryOutputContractStore
 from mission_control.application.knowledge.trusted_settlement import (
     pending_or_raise,
 )
@@ -22,7 +23,6 @@ from mission_control.application.outputs.submission_service import SubmissionSer
 from mission_control.domain.outputs.contracts import (
     EvaluationScope,
 )
-from tests.fixtures.output_contracts import InMemoryOutputContractStore
 from tests.support.unit.knowledge.wi07_report_collections import (
     ScriptedBridge,
     handle,

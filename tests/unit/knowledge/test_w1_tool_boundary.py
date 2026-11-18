@@ -28,6 +28,7 @@ from mission_control.adapters.deep_agents.knowledge_tools import (
     served_knowledge_tools,
 )
 from mission_control.adapters.deep_agents.materializer import tool_schema_digest
+from mission_control.adapters.outputs.memory import InMemoryOutputContractStore
 from mission_control.application.knowledge.toolset import (
     MAX_COERCED_ARGUMENT_BYTES,
     TOOL_DESCRIPTIONS,
@@ -41,7 +42,6 @@ from mission_control.application.outputs.submission_service import SubmissionSer
 from mission_control.application.ports.knowledge import KnowledgeProtocolRefusal
 from mission_control.contracts.knowledge_protocol import digest_canonical
 from mission_control.domain.outputs.contracts import OutputForm
-from tests.fixtures.output_contracts import InMemoryOutputContractStore
 from tests.support.knowledge.content import model_report
 from tests.support.knowledge.credentials import BINDING
 from tests.support.knowledge.gateway import RUN, Lane, lane

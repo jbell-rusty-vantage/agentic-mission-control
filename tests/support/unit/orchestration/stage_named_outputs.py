@@ -3,10 +3,10 @@
 Moved from tests/unit/orchestration/test_stage_named_outputs.py.
 """
 
+from mission_control.adapters.outputs.memory import InMemoryOutputContractStore
 from mission_control.application.programs.named_outputs import NamedStageOutputs
 from mission_control.domain.outputs.contracts import Cardinality, Enforcement, OutputForm
 from mission_control.domain.programs.contracts import StageCandidateIdentity, StageExecutionIdentity
-from tests.fixtures.output_contracts import InMemoryOutputContractStore
 from tests.support.unit.outputs.output_fulfillment import invocation
 from tests.unit.outputs.scenario import build_stack, obligation
 

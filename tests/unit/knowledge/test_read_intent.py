@@ -20,6 +20,7 @@ from mission_control.adapters.deep_agents.knowledge_tools import (
     knowledge_capability_id,
     knowledge_tool_components,
 )
+from mission_control.adapters.knowledge.memory import InMemoryRetainedReadStore
 from mission_control.application.knowledge.operations import KnowledgeRefused
 from mission_control.application.knowledge.read_intent import (
     observation_id,
@@ -45,7 +46,6 @@ from mission_control.contracts.knowledge_protocol import (
 from tests.support.knowledge.content import read_intent_answer
 from tests.support.knowledge.credentials import BINDING
 from tests.support.knowledge.gateway import RUN, TENANT, TRANSPORTS, harness, lane
-from tests.support.knowledge.stores import InMemoryRetainedReadStore
 from tests.support.unit.knowledge.read_intent import GOVERNORS, request
 
 

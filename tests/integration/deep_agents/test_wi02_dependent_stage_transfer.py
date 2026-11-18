@@ -33,16 +33,16 @@ from tests.support.knowledge.credentials import (
     knowledge_port,
 )
 from tests.support.knowledge.gateway import TENANT, origin
-from tests.support.knowledge.stores import (
-    InMemoryKnowledgeHandleStore,
-    InMemoryKnowledgeJournal,
-    InMemoryStaging,
-    InMemoryTransferPlanStore,
-)
+from tests.support.knowledge.stores import InMemoryStaging
 from tests.support.unit.context.transfer_materializer import FakeOutputs
 
 from mission_control.adapters.deep_agents.adapter import DeepAgentRuntimeAdapter
 from mission_control.adapters.deep_agents.materializer import ExactDeepAgentMaterializer
+from mission_control.adapters.knowledge.memory import (
+    InMemoryKnowledgeHandleStore,
+    InMemoryKnowledgeJournal,
+    InMemoryTransferPlanStore,
+)
 from mission_control.application.context.materialization import (
     ContextDeliveryBlocked,
     KnowledgeReadAccess,

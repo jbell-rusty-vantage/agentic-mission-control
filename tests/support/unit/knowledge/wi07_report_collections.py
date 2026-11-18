@@ -9,6 +9,7 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import Any
 
+from mission_control.adapters.outputs.memory import InMemoryOutputContractStore
 from mission_control.application.knowledge.access import InvocationAccess
 from mission_control.application.knowledge.judgment import TrustedOutcome
 from mission_control.application.knowledge.trusted_settlement import TrustedPlan, TrustedSettlement
@@ -25,7 +26,6 @@ from mission_control.domain.outputs.contracts import (
     OutputForm,
     Requirement,
 )
-from tests.fixtures.output_contracts import InMemoryOutputContractStore
 from tests.support.knowledge.gateway import origin
 from tests.unit.outputs.scenario import Stack, build_stack, digest_of, obligation
 

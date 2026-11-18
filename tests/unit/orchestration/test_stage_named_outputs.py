@@ -2,6 +2,7 @@
 
 import pytest
 
+from mission_control.adapters.outputs.memory import InMemoryOutputContractStore
 from mission_control.application.programs.named_outputs import NamedStageOutputs
 from mission_control.domain.authoring.canonical import sha256_digest
 from mission_control.domain.authoring.contracts import StageNode, StageOutputSlot
@@ -12,7 +13,6 @@ from mission_control.domain.outputs.contracts import (
     Requirement,
 )
 from mission_control.domain.programs.completion import OutputSchemaBinding, SchemaCriterion
-from tests.fixtures.output_contracts import InMemoryOutputContractStore
 from tests.support.unit.orchestration.stage_named_outputs import identity, setup
 from tests.support.unit.orchestration.stagegraph_v2 import operation_slot
 from tests.support.unit.outputs.output_fulfillment import invocation

@@ -15,6 +15,11 @@ from datetime import timedelta
 
 import pytest
 
+from mission_control.adapters.knowledge.memory import (
+    InMemoryKnowledgeHandleStore,
+    InMemoryKnowledgeJournal,
+    InMemorySubmissionStore,
+)
 from mission_control.application.context.resolution import (
     ContentResolutionService,
     ResolutionRefused,
@@ -44,11 +49,6 @@ from tests.support.knowledge.credentials import (
     knowledge_port,
 )
 from tests.support.knowledge.gateway import TENANT, origin
-from tests.support.knowledge.stores import (
-    InMemoryKnowledgeHandleStore,
-    InMemoryKnowledgeJournal,
-    InMemorySubmissionStore,
-)
 
 
 @dataclass

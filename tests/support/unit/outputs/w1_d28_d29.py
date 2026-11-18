@@ -8,6 +8,7 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from typing import Any
 
+from mission_control.adapters.outputs.memory import InMemoryOutputContractStore
 from mission_control.application.knowledge.access import InvocationAccess
 from mission_control.application.outputs.fulfillment import (
     AssessmentInput,
@@ -21,7 +22,6 @@ from mission_control.domain.outputs.contracts import (
     OutputObligation,
     Requirement,
 )
-from tests.fixtures.output_contracts import InMemoryOutputContractStore
 from tests.support.knowledge.gateway import origin
 from tests.unit.outputs.scenario import Stack, build_stack, digest_of, obligation
 

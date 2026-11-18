@@ -13,6 +13,7 @@ from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, ToolMe
 from langchain_core.outputs import ChatGeneration, ChatResult
 from langchain_core.tools import BaseTool
 
+from mission_control.adapters.knowledge.memory import InMemoryTransferPlanStore
 from mission_control.application.context.materialization import (
     LiteralResolver,
     TransferMaterializer,
@@ -37,7 +38,7 @@ from mission_control.domain.execution.contracts import (
 )
 from tests.fixtures.lane_bindings import lane_fields
 from tests.support.deep_agents import exact_fixture, unit_bound
-from tests.support.knowledge.stores import InMemoryStaging, InMemoryTransferPlanStore
+from tests.support.knowledge.stores import InMemoryStaging
 from tests.support.operations import operation_request
 
 SOURCES = {"records": [{"pmid": "41"}]}

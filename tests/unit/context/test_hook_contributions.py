@@ -21,6 +21,7 @@ from datetime import UTC, datetime
 import pytest
 from pydantic import ValidationError
 
+from mission_control.adapters.outputs.memory import InMemoryOutputContractStore
 from mission_control.application.context.hook_contributions import (
     ContributionSession,
     ContributionTarget,
@@ -51,7 +52,6 @@ from tests.fixtures.hook_contributions import (
     MemoryWorkspace,
     RecordingOperationRequests,
 )
-from tests.fixtures.output_contracts import InMemoryOutputContractStore
 from tests.support.knowledge.stores import InMemoryStaging
 from tests.support.unit.outputs.output_fulfillment import invocation
 from tests.unit.outputs.scenario import build_stack, codes, obligation

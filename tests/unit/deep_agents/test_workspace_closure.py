@@ -22,6 +22,7 @@ from pydantic import ValidationError
 
 from mission_control.adapters.deep_agents.docker_sandbox import slot_host_path
 from mission_control.adapters.deep_agents.workspace_closure import (
+    InMemoryWorkspaceClosures,
     capture_closure,
     listing_command,
     parse_listing,
@@ -43,7 +44,6 @@ from mission_control.domain.execution.workspace_closure import (
 )
 from mission_control.domain.graph_runtime.identities import QualifiedCheckpointKey
 from mission_control.domain.resolution.profiles import WorkspaceClosureProfile
-from tests.fixtures.workspace_closures import InMemoryWorkspaceClosures
 from tests.support.unit.deep_agents.workspace_closure import _digest, _workspace
 
 RUN = "run-closure-1"

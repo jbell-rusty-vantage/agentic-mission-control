@@ -13,6 +13,7 @@ import dataclasses
 import pytest
 from pydantic import ValidationError
 
+from mission_control.adapters.outputs.memory import InMemoryOutputContractStore
 from mission_control.application.knowledge.effect_receipts import JournalEffectReceipts
 from mission_control.application.outputs.fulfillment import (
     AssessmentInput,
@@ -52,7 +53,6 @@ from mission_control.domain.outputs.successors import (
     WeakeningGrant,
     classify_successor,
 )
-from tests.fixtures.output_contracts import InMemoryOutputContractStore
 from tests.support.knowledge.gateway import call as gateway_call
 from tests.support.knowledge.gateway import harness as gateway_harness
 from tests.support.unit.outputs.output_fulfillment import invocation, make_stack

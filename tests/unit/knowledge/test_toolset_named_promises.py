@@ -11,10 +11,10 @@ from dataclasses import replace
 
 import pytest
 
+from mission_control.adapters.outputs.memory import InMemoryOutputContractStore
 from mission_control.application.outputs.fulfillment import OutputFulfillmentService
 from mission_control.application.outputs.submission_service import SubmissionService
 from mission_control.domain.outputs.contracts import OutputForm
-from tests.fixtures.output_contracts import InMemoryOutputContractStore
 from tests.support.knowledge.credentials import BINDING
 from tests.support.knowledge.gateway import RUN, lane
 from tests.unit.outputs.scenario import host_access, obligation, promises

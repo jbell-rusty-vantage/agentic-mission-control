@@ -61,9 +61,9 @@ async def test_valid_artifact_derives_obligation_without_provider_assertion() ->
 
 
 async def test_finalized_named_schema_submission_derives_criterion_from_exact_value():
+    from mission_control.adapters.outputs.memory import InMemoryOutputContractStore
     from mission_control.application.programs.named_outputs import NamedStageOutputs
     from mission_control.domain.outputs.contracts import OutputForm
-    from tests.fixtures.output_contracts import InMemoryOutputContractStore
     from tests.support.unit.outputs.output_fulfillment import invocation
     from tests.unit.outputs.scenario import build_stack, obligation, promises, schema, structured
 
@@ -132,10 +132,10 @@ async def test_route_facts_read_the_accepted_named_output_revision_exactly():
     """L1-02 (E3 ed9951b6): a stage whose schema output is a `submit_output` revision has its
     route facts read from that accepted revision's canonical value (digest-bound), so a
     first_match route on them releases instead of holding `route-exhausted`."""
+    from mission_control.adapters.outputs.memory import InMemoryOutputContractStore
     from mission_control.application.programs.named_outputs import NamedStageOutputs
     from mission_control.domain.outputs.contracts import OutputForm
     from mission_control.domain.programs.routing import ROUTE_FACTS_KEY
-    from tests.fixtures.output_contracts import InMemoryOutputContractStore
     from tests.support.unit.outputs.output_fulfillment import invocation
     from tests.unit.outputs.scenario import build_stack, obligation, promises, schema, structured
 

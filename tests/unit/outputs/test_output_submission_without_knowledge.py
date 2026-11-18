@@ -21,10 +21,10 @@ from mission_control.adapters.deep_agents.knowledge_tools import (
     served_knowledge_tools,
     served_output_tools,
 )
+from mission_control.adapters.outputs.memory import InMemoryOutputContractStore
 from mission_control.application.outputs.fulfillment import OutputFulfillmentService
 from mission_control.application.outputs.submission_service import SubmissionService
 from mission_control.domain.outputs.contracts import Enforcement, OutputForm
-from tests.fixtures.output_contracts import InMemoryOutputContractStore
 from tests.support.knowledge.gateway import RUN, lane
 from tests.unit.outputs.scenario import host_access, obligation, promises
 

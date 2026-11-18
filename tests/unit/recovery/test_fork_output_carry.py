@@ -15,10 +15,10 @@ from types import SimpleNamespace
 from typing import Any
 
 import pytest
-from tests.fixtures.output_contracts import InMemoryOutputContractStore
 from tests.support.knowledge.gateway import MISSION, lane
 from tests.unit.outputs.scenario import host_access, obligation, promises, text
 
+from mission_control.adapters.outputs.memory import InMemoryOutputContractStore
 from mission_control.application.knowledge.toolset import LiveInvocation
 from mission_control.application.outputs.adoption import OutputAdoptionService
 from mission_control.application.outputs.fulfillment import OutputFulfillmentService, PromoteOutput

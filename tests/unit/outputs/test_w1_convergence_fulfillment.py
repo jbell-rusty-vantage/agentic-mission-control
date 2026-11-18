@@ -14,6 +14,7 @@ from datetime import UTC, datetime
 
 import pytest
 
+from mission_control.adapters.outputs.memory import InMemoryOutputContractStore
 from mission_control.application.knowledge.access import InvocationAccess
 from mission_control.application.outputs.fulfillment import (
     OutputFulfillmentService,
@@ -21,7 +22,6 @@ from mission_control.application.outputs.fulfillment import (
 )
 from mission_control.application.programs.goal_directed import bind_fulfillment
 from mission_control.domain.outputs.contracts import Enforcement, OutputForm, Requirement
-from tests.fixtures.output_contracts import InMemoryOutputContractStore
 from tests.support.knowledge.gateway import origin
 from tests.support.unit.outputs.w1_convergence_fulfillment import _observation
 from tests.unit.outputs.scenario import (

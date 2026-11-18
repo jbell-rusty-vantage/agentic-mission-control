@@ -13,6 +13,8 @@ import json
 
 import pytest
 
+from mission_control.adapters.knowledge.memory import InMemoryTransferPlanStore
+from mission_control.adapters.outputs.memory import InMemoryOutputContractStore
 from mission_control.application.context.materialization import (
     ApplicationSelectorResolver,
     ContextDeliveryBlocked,
@@ -28,8 +30,7 @@ from mission_control.domain.outputs.current_set import (
     CURRENT_SET_FILE,
     with_current_set_index,
 )
-from tests.fixtures.output_contracts import InMemoryOutputContractStore
-from tests.support.knowledge.stores import InMemoryStaging, InMemoryTransferPlanStore
+from tests.support.knowledge.stores import InMemoryStaging
 from tests.support.unit.context.wi07_current_set_transfer import (
     AT,
     RUN,

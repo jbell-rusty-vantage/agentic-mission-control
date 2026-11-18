@@ -8,6 +8,11 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
+from mission_control.adapters.knowledge.memory import (
+    InMemoryKnowledgeHandleStore,
+    InMemoryKnowledgeJournal,
+)
+from mission_control.adapters.outputs.memory import InMemoryOutputContractStore
 from mission_control.application.knowledge.access import InvocationAccess
 from mission_control.application.knowledge.gateway import KnowledgeGateway
 from mission_control.application.knowledge.judgment import (
@@ -22,7 +27,6 @@ from mission_control.application.knowledge.judgment import (
 from mission_control.domain.knowledge.judgment import CognitionIdentity, EvaluatorPin
 from mission_control.domain.outputs.contracts import OutputForm, Requirement
 from mission_control.domain.resolution.resolved import OutputContractProfile
-from tests.fixtures.output_contracts import InMemoryOutputContractStore
 from tests.support.knowledge.binding import FakeKnowledgeBinding
 from tests.support.knowledge.credentials import (
     AUDIENCE,
@@ -32,7 +36,6 @@ from tests.support.knowledge.credentials import (
     knowledge_port,
 )
 from tests.support.knowledge.gateway import origin
-from tests.support.knowledge.stores import InMemoryKnowledgeHandleStore, InMemoryKnowledgeJournal
 from tests.support.knowledge.trusted import ReportState, TrustedKnowledgeState, ks_ref
 from tests.unit.outputs.scenario import build_stack, obligation, text
 
