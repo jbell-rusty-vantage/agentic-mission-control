@@ -202,11 +202,29 @@ async def test_completion_replay_refuses_inconsistent_persisted_evidence(monkeyp
     assert snapshot(repository) == before
 
 
+class PreDigestRunControl:
+    """Run control as a release before `completion_request_digest` existed recorded it: the
+    family mutation it commits omits that additive field (a legacy rejected proposal)."""
+
+    def __init__(self, control):
+        self._control = control
+
+    def __getattr__(self, name):
+        return getattr(self._control, name)
+
+    async def execute_family_admission(self, command, mutation, *args, **kwargs):
+        payload = {
+            key: value
+            for key, value in mutation.decision_payload.items()
+            if key != "completion_request_digest"
+        }
+        legacy = mutation.model_copy(update={"decision_payload": payload})
+        return await self._control.execute_family_admission(command, legacy, *args, **kwargs)
+
+
 @pytest.mark.asyncio
 @pytest.mark.parametrize("legacy", [False, True])
-async def test_rejected_completion_replays_and_later_proposal_uses_next_identity(
-    monkeypatch, legacy
-):
+async def test_rejected_completion_replays_and_later_proposal_uses_next_identity(legacy):
     from mission_control.domain.policies.errors import IdempotencyConflict
 
     control, repository, request = await completion()
@@ -217,15 +235,9 @@ async def test_rejected_completion_replays_and_later_proposal_uses_next_identity
             "reservations": {"held": {"tokens.total": 1}},
         }
     )
-    service = StageGraphDecisionService(control, repository)
-    original = service._mutation
-
-    def old_mutation(*args, **kwargs):
-        kwargs["decision_payload"].pop("completion_request_digest", None)
-        return original(*args, **kwargs)
-
-    if legacy:
-        monkeypatch.setattr(service, "_mutation", old_mutation)
+    service = StageGraphDecisionService(
+        PreDigestRunControl(control) if legacy else control, repository
+    )
     result = await service.complete(request)
     assert not result.accepted and result.reason_code == "budget_not_settled"
     before = snapshot(repository)
