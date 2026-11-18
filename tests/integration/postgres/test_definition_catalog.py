@@ -23,17 +23,13 @@ from mission_control.domain.authoring.errors import (
     ReferenceMismatch,
     RetiredDefinition,
 )
-from tests.fixtures.mission_control_common_db import (
-    AI_ENGINEER_INSTALLATION_ID,
-    CommonDatabase,
-    catalog_scope,
-    common_database,
-)
+from tests.fixtures.mission_control_common_db import CommonDatabase, common_database
 from tests.support.db_builders import (
     AI_ENGINEER_CATALOG,
     BIOTECH_CATALOG,
     add_disabled_installation,
 )
+from tests.support.ids import AI_ENGINEER_INSTALLATION_ID, catalog_scope
 from tests.support.unit.coordinator.coordinator_facade import coordinator_skill, propose_prompt
 
 pytestmark = pytest.mark.common_db

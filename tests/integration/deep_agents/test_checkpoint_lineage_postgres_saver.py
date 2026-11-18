@@ -24,11 +24,7 @@ from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 from langgraph.store.memory import InMemoryStore
 from tests.fixtures.checkpoint_lineage import bind_unit, goal_unit, stage_unit
 from tests.fixtures.lane_bindings import lane_fields
-from tests.fixtures.mission_control_common_db import (
-    CommonDatabase,
-    canonical_scope,
-    provision_runtime,
-)
+from tests.fixtures.mission_control_common_db import CommonDatabase, provision_runtime
 from tests.support.deep_agents import SessionProbeModel, exact_fixture
 from tests.support.deep_agents_runtime import (
     ConformanceAssetVerifier,
@@ -37,6 +33,7 @@ from tests.support.deep_agents_runtime import (
     ConformanceSandbox,
     ConformanceSecretResolver,
 )
+from tests.support.ids import canonical_scope
 from tests.support.integration.deep_agents.checkpoint_lineage_postgres_saver import (
     SAVER_SCHEMA,
     AcceptingAuthority,

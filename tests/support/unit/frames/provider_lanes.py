@@ -16,7 +16,8 @@ from mission_control.application.frames.provider_mapping import (
 )
 from mission_control.application.frames.writer import FrameWriter
 from mission_control.domain.frames.contracts import FrameObservation, LaneProfile, ProviderFrame
-from tests.fixtures.provider_frames import SCOPE, StepClock, harness_start, in_memory_store
+from tests.fixtures.provider_frames import StepClock, harness_start, in_memory_store
+from tests.support.ids import SCOPE
 
 FIXTURES = Path(__file__).resolve().parents[3] / "unit" / "frames" / "fixtures"
 

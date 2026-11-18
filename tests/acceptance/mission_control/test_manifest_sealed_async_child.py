@@ -32,8 +32,9 @@ from tests.fixtures.mission_control_local_agent_server import local_agent_server
 from tests.fixtures.mission_control_production_stack import open_postgres_production_stack
 from tests.fixtures.models import catalog_for
 from tests.fixtures.rrm009_production_harness import _diagnose, _run, _terminal, _wait_for
-from tests.fixtures.rrm009_production_stack import SCOPE, call_usage, technical_binding
+from tests.fixtures.rrm009_production_stack import call_usage, technical_binding
 from tests.support.acceptance.mission_control import manifest_async_child as base
+from tests.support.ids import SCOPE
 from tests.support.manifest_runtime import OUTPUT_SCHEMAS, host_pins, missions_app, post, submit
 
 from mission_control.adapters.agent_server.async_subagents.sealed import (

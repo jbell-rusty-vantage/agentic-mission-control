@@ -19,7 +19,7 @@ from mission_control.interfaces.http.mission_control import MissionPrincipal
 from mission_control.interfaces.socketio.app import MissionSocketConfig, mount_mission_socketio
 from mission_control.interfaces.socketio.auth import SocketAuthRejected, token_expiry
 from mission_control.interfaces.socketio.server import STREAM_SERVICES, MissionSocketLimits
-from tests.fixtures.provider_frames import INSTALLATION, SCOPE, TENANT
+from tests.support.ids import INSTALLATION, SCOPE, TENANT
 from tests.unit.socketio.harness import fixture_token
 from tests.unit.streams.fakes import FakeStreamSource
 

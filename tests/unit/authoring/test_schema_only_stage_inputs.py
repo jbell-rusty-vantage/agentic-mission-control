@@ -135,10 +135,10 @@ async def test_full_qualia_graph_optional_plain_text_keeps_narrow_launch_eligibi
     )
     from mission_control.application.programs.stage_inputs import stagegraph_authored_inputs
     from mission_control.domain.authoring.extensions import ExtensionRegistry
-    from tests.fixtures.mission_control_common_db import canonical_scope
     from tests.fixtures.qualia_full_manifest import full_manifest
     from tests.fixtures.qualia_stagegraph import RECORD_SCHEMA
     from tests.fixtures.qualia_web_tools import build_qualia_web_tools
+    from tests.support.ids import canonical_scope
 
     definitions, search = await fast_track_catalog()
     web = build_qualia_web_tools(tmp_path / "web", environment={})

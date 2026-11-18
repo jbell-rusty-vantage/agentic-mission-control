@@ -20,7 +20,7 @@ from mission_control.domain.execution.environment_preparation import ReadinessLe
 from mission_control.domain.execution.lanes import CursorExecutionBinding, PreparedSession
 from tests.fixtures.lane_turns import DIGEST, cursor_operation
 from tests.fixtures.mission_control_production_stack import open_postgres_production_stack
-from tests.fixtures.rrm009_production_stack import SCOPE
+from tests.support.ids import SCOPE
 
 pytestmark = pytest.mark.common_db
 

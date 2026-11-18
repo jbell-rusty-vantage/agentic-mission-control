@@ -7,7 +7,8 @@ import json
 
 import pytest
 from tests.fixtures.checkpoint_recovery import FixtureControlPlane
-from tests.fixtures.lane_turns import SCOPE, cursor_operation, lane_stack
+from tests.fixtures.lane_turns import cursor_operation, lane_stack
+from tests.support.ids import SCOPE
 from tests.support.journal import MemoryOperationJournal
 from tests.support.run_control import ConfigurationVerifier, actor, command, request, service
 

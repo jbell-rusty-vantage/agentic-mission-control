@@ -37,7 +37,7 @@ from mission_control.application.context.hydrators import LaneHydratorRegistry
 from mission_control.application.execution.harness.controls import SessionHandoverLane
 from mission_control.domain.context.checkpoint import continuation_delivery
 from mission_control.domain.execution.lanes import LaneSegmentBounds
-from tests.fixtures.continuation import CONT_SCOPE
+from tests.support.ids import SCOPE
 from tests.support.knowledge.stores import InMemoryStaging
 from tests.support.providers.codex import codex_stack
 
@@ -53,11 +53,11 @@ def test_the_registration_resolves_this_lane_only_and_stays_unqualified(tmp_path
     registry = LaneHydratorRegistry()
     registry.register(codex_continuation_registration(stack.harness, InMemoryStaging()))
     assert registry.profiles() == ("codex",)
-    assert isinstance(registry.hydrator("codex", CONT_SCOPE), CodexSessionHydrator)
-    assert isinstance(registry.snapshots("codex", CONT_SCOPE), CodexWorkspaceSnapshots)
+    assert isinstance(registry.hydrator("codex", SCOPE), CodexSessionHydrator)
+    assert isinstance(registry.snapshots("codex", SCOPE), CodexWorkspaceSnapshots)
     assert registry.registration("codex").qualified is False
     with pytest.raises(ContinuationRejected):
-        registry.hydrator("claude_agent_sdk", CONT_SCOPE)
+        registry.hydrator("claude_agent_sdk", SCOPE)
     assert stack.harness.describe().features["continuation"].qualified is False
     assert isinstance(stack.harness, SessionHandoverLane)
     # The continuation turn is a `turn/start` sent only on the idle fresh thread.
@@ -69,12 +69,12 @@ async def test_snapshots_refuse_a_thread_this_worker_does_not_hold(tmp_path: Pat
     snapshots = CodexWorkspaceSnapshots(stack.harness, InMemoryStaging())
     with pytest.raises(ContinuationRejected) as rejected:
         await snapshots.snapshot(
-            request_scope=CONT_SCOPE, run_key="run-1", session_ref="thr-elsewhere", roots=()
+            request_scope=SCOPE, run_key="run-1", session_ref="thr-elsewhere", roots=()
         )
     assert rejected.value.code == "CHECKPOINT_INVALID"
-    assert await snapshots.load(request_scope=CONT_SCOPE, snapshot_ref="other:1") is None
+    assert await snapshots.load(request_scope=SCOPE, snapshot_ref="other:1") is None
     missing = f"{WORKSPACE_SNAPSHOT_PREFIX}missing"
-    assert await snapshots.load(request_scope=CONT_SCOPE, snapshot_ref=missing) is None
+    assert await snapshots.load(request_scope=SCOPE, snapshot_ref=missing) is None
 
 
 # --- the phase machine: boundary, phases, activated target, continuation turn -------------------

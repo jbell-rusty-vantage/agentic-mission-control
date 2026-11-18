@@ -16,8 +16,8 @@ from mission_control.application.execution.service import (
 )
 from mission_control.domain.policies.errors import ConfigurationVerificationFailed
 from tests.fixtures.manifest_runtime import AUTHOR
-from tests.fixtures.mission_control_common_db import canonical_scope
 from tests.fixtures.qualia_fork_contract import QualiaForkPrograms
+from tests.support.ids import canonical_scope
 from tests.support.run_control import request
 from tests.support.unit.qualia_fork_contract import AT, fixture
 

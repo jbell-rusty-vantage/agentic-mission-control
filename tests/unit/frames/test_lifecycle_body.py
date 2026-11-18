@@ -9,12 +9,12 @@ from mission_control.domain.frames.body import frame_body_object
 from mission_control.domain.frames.contracts import FrameKind, ProviderFrame
 from mission_control.domain.frames.lifecycle import lifecycle_body
 from tests.fixtures.provider_frames import (
-    SCOPE,
     harness_start,
     in_memory_store,
     observation,
     provider_frame,
 )
+from tests.support.ids import SCOPE
 
 
 def test_lifecycle_summary_excludes_text_and_nested_secrets() -> None:

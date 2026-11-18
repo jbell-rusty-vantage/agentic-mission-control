@@ -57,7 +57,7 @@ from mission_control.domain.capabilities.hooks import KERNEL_HOOK_IDS, HookDecis
 from mission_control.domain.capabilities.host_support import LaneProfile
 from mission_control.domain.frames.contracts import FrameKind
 from mission_control.domain.policies.stop_fence import StopFence
-from tests.fixtures.lane_turns import INSTALLATION, SCOPE, TENANT
+from tests.support.ids import INSTALLATION, SCOPE, TENANT
 
 HEID = UUID("55555555-5555-4555-8555-555555555555")
 RUN = "run-1"

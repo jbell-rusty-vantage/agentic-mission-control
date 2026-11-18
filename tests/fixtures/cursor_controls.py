@@ -19,8 +19,9 @@ from typing import Any
 from uuid import UUID, uuid4
 
 from tests.fixtures.checkpoint_recovery import stage_recovery_unit
-from tests.fixtures.lane_turns import SCOPE, LaneStack, lane_stack
+from tests.fixtures.lane_turns import LaneStack, lane_stack
 from tests.support.deep_agents_runtime import ConformanceRuntime
+from tests.support.ids import SCOPE
 from tests.support.providers.cursor import LocalStack, local_stack
 from tests.support.run_control import actor as control_actor
 from tests.support.run_control import request as run_request
@@ -457,7 +458,8 @@ async def seal_and_transfer(stack: ControlStack) -> tuple[dict[str, Any], Any]:
     """`request_continuation` through B4: request, seal from the live session's workspace
     (the lease, or the run branch), transfer with the lane's hydrator (a new agent)."""
 
-    from tests.fixtures.continuation import CONT_SCOPE, build_service, facts, seal_target, trigger
+    from tests.fixtures.continuation import build_service, facts, seal_target, trigger
+    from tests.support.ids import SCOPE
 
     from mission_control.adapters.cursor.controls import (
         CursorCloudSessionHydrator,
@@ -482,7 +484,7 @@ async def seal_and_transfer(stack: ControlStack) -> tuple[dict[str, Any], Any]:
     service = wired["service"]
     transfer = await service.request(
         trigger(),
-        request_scope=CONT_SCOPE,
+        request_scope=SCOPE,
         run_key="run-continuation-1",
         activation_key="unit-collect-1",
         logical_execution_id="logical-collect-1",
@@ -499,10 +501,10 @@ async def seal_and_transfer(stack: ControlStack) -> tuple[dict[str, Any], Any]:
             ),
         ),
         seal_target(),
-        request_scope=CONT_SCOPE,
+        request_scope=SCOPE,
     )
     assert sealed.checkpoint is not None, sealed.transfer
-    outcome = await service.transfer(transfer.transfer_id, hydrator, request_scope=CONT_SCOPE)
+    outcome = await service.transfer(transfer.transfer_id, hydrator, request_scope=SCOPE)
     return wired, outcome
 
 

@@ -46,7 +46,6 @@ from tests.fixtures.manifest_runtime import (
     compose_lifecycle,
     promise_submitter,
 )
-from tests.fixtures.mission_control_common_db import INSTALLATIONS
 from tests.fixtures.mission_control_production_stack import open_postgres_production_stack
 from tests.fixtures.rrm009_production_harness import (
     ProductionStack,
@@ -57,7 +56,8 @@ from tests.fixtures.rrm009_production_harness import (
     _terminal,
     _until,
 )
-from tests.fixtures.rrm009_production_stack import SCOPE, technical_binding
+from tests.fixtures.rrm009_production_stack import technical_binding
+from tests.support.ids import INSTALLATIONS, SCOPE
 
 from mission_control.adapters.postgres.chains.store import (
     HOOK_NAME,

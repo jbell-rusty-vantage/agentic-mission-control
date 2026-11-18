@@ -53,13 +53,9 @@ from tests.fixtures.checkpoint_lineage import (
     stage_unit,
 )
 from tests.fixtures.lane_turns import LaneStack, cursor_binding, cursor_operation, lane_stack
-from tests.fixtures.mission_control_common_db import (
-    AI_ENGINEER_INSTALLATION_ID,
-    COMPONENT_VERSION,
-    CommonDatabase,
-    catalog_scope,
-)
+from tests.fixtures.mission_control_common_db import COMPONENT_VERSION, CommonDatabase
 from tests.fixtures.provider_frames import BINDING_DIGEST
+from tests.support.ids import AI_ENGINEER_INSTALLATION_ID, catalog_scope
 from tests.support.run_control import command as unit_command
 from tests.support.run_control import request as unit_request
 from tests.support.run_control import service as run_control_service

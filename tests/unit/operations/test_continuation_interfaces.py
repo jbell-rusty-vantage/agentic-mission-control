@@ -44,16 +44,9 @@ from mission_control.domain.policies.reducer import required_action_permissions
 from mission_control.interfaces.cli import main as cli
 from mission_control.interfaces.http.continuation import router
 from mission_control.interfaces.http.mission_control import MissionPrincipal, get_mission_principal
-from tests.fixtures.continuation import (
-    CONT_SCOPE,
-    RUN_KEY,
-    build_service,
-    facts,
-    seal_target,
-    trigger,
-)
-from tests.fixtures.provider_frames import INSTALLATION, TENANT
+from tests.fixtures.continuation import RUN_KEY, build_service, facts, seal_target, trigger
 from tests.support.boundary_commands import TARGET, started
+from tests.support.ids import INSTALLATION, SCOPE, TENANT
 from tests.support.run_control import actor as control_actor
 from tests.support.run_control import service
 
@@ -252,7 +245,7 @@ async def _sealed_store() -> tuple[dict[str, Any], Any]:
     )
     transfer = await wired["service"].request(
         trigger(),
-        request_scope=CONT_SCOPE,
+        request_scope=SCOPE,
         run_key=RUN_KEY,
         activation_key="unit-collect-1",
         logical_execution_id="logical-collect-1",
@@ -261,7 +254,7 @@ async def _sealed_store() -> tuple[dict[str, Any], Any]:
     )
     long_actions = facts(pending_actions=tuple(f"step {index}: " + "a" * 900 for index in range(8)))
     outcome = await wired["service"].seal(
-        transfer.transfer_id, long_actions, seal_target(), request_scope=CONT_SCOPE
+        transfer.transfer_id, long_actions, seal_target(), request_scope=SCOPE
     )
     return wired, outcome
 
@@ -306,7 +299,7 @@ async def test_http_and_cli_read_checkpoints_with_large_bodies_redacted(
     wired, outcome = await _sealed_store()
     checkpoint = outcome.checkpoint
     reads = CheckpointReadService(
-        InMemoryCheckpoints(wired["store"]), wired["store"], request_scope=CONT_SCOPE
+        InMemoryCheckpoints(wired["store"]), wired["store"], request_scope=SCOPE
     )
     client = TestClient(http_app(reads, frozenset({"workflow_run.read"})))
     base = f"/v1/applications/biotech/runs/{RUN_KEY}/checkpoints"

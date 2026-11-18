@@ -49,11 +49,9 @@ from mission_control.interfaces.http.human_tasks import router
 from mission_control.interfaces.http.mission_control import MissionPrincipal, get_mission_principal
 from mission_control.interfaces.socketio.app import MissionSocketConfig, mount_mission_socketio
 from mission_control.interfaces.socketio.auth import SocketAuthRejected, token_expiry
-from tests.fixtures.mission_control_common_db import (
-    CommonDatabase,
-    tenant_id,
-)
+from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.support.db_builders import owner_rows
+from tests.support.ids import tenant_id
 from tests.support.integration.postgres.mp11_approvals_postgres import (
     admitted_run,
     mp11_db,  # noqa: F401

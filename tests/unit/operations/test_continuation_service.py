@@ -21,14 +21,8 @@ from mission_control.domain.context.checkpoint import (
     ContinuationTriggerKind,
 )
 from mission_control.domain.policies.contracts import RecordContinuationAction
-from tests.fixtures.continuation import (
-    CONT_SCOPE,
-    RUN_KEY,
-    build_service,
-    facts,
-    seal_target,
-    trigger,
-)
+from tests.fixtures.continuation import RUN_KEY, build_service, facts, seal_target, trigger
+from tests.support.ids import SCOPE
 
 SESSION_FILES = {
     "thread-collect-1": {
@@ -40,7 +34,7 @@ SESSION_FILES = {
 
 async def _request(service: Any, **overrides: Any) -> Any:
     values: dict[str, Any] = {
-        "request_scope": CONT_SCOPE,
+        "request_scope": SCOPE,
         "run_key": RUN_KEY,
         "activation_key": "unit-collect-1",
         "logical_execution_id": "logical-collect-1",
@@ -102,7 +96,7 @@ async def test_trigger_is_idempotent_and_carries_its_lane_delivery() -> None:
     assert first.status == TransferStatus.REQUESTED
     cursor = await _request(wired["service"], lane_profile="cursor_local")
     assert cursor.transfer_id == first.transfer_id  # same trigger, same logical execution
-    pending = await wired["service"].pending(CONT_SCOPE, RUN_KEY)
+    pending = await wired["service"].pending(SCOPE, RUN_KEY)
     assert [item.transfer_id for item in pending] == [first.transfer_id]
 
 
@@ -111,7 +105,7 @@ async def test_admitted_compactor_output_is_merged_and_validated() -> None:
     wired = build_service(session_files=SESSION_FILES, compactor=GoodCompactor())
     transfer = await _request(wired["service"])
     outcome = await wired["service"].seal(
-        transfer.transfer_id, facts(), seal_target(), request_scope=CONT_SCOPE
+        transfer.transfer_id, facts(), seal_target(), request_scope=SCOPE
     )
     checkpoint = outcome.checkpoint
     assert checkpoint.valid
@@ -136,7 +130,7 @@ async def test_failed_compaction_parks_retries_falls_back_then_fails_explicitly(
     )
     transfer = await _request(wired["service"])
     outcome = await wired["service"].seal(
-        transfer.transfer_id, facts(), seal_target(), request_scope=CONT_SCOPE
+        transfer.transfer_id, facts(), seal_target(), request_scope=SCOPE
     )
     assert outcome.checkpoint is None
     assert outcome.transfer.status == TransferStatus.FAILED
@@ -150,9 +144,7 @@ async def test_failed_compaction_parks_retries_falls_back_then_fails_explicitly(
     assert [item.event for item in actions] == ["continuation_failed"]
     # A fresh session never starts without a sealed valid checkpoint.
     with pytest.raises(ContinuationRejected) as raised:
-        await wired["service"].transfer(
-            transfer.transfer_id, FakeHydrator(), request_scope=CONT_SCOPE
-        )
+        await wired["service"].transfer(transfer.transfer_id, FakeHydrator(), request_scope=SCOPE)
     assert raised.value.code == CHECKPOINT_INVALID
 
 
@@ -165,7 +157,7 @@ async def test_human_review_when_policy_requires_it() -> None:
     )
     transfer = await _request(wired["service"])
     outcome = await wired["service"].seal(
-        transfer.transfer_id, facts(), seal_target(), request_scope=CONT_SCOPE
+        transfer.transfer_id, facts(), seal_target(), request_scope=SCOPE
     )
     assert outcome.transfer.status == TransferStatus.HUMAN_REVIEW
 
@@ -179,10 +171,10 @@ async def test_invalid_checkpoints_are_sealed_as_evidence_but_never_transferred(
     )
     transfer = await _request(wired["service"])
     outcome = await wired["service"].seal(
-        transfer.transfer_id, facts(), seal_target(), request_scope=CONT_SCOPE
+        transfer.transfer_id, facts(), seal_target(), request_scope=SCOPE
     )
     assert outcome.transfer.status == TransferStatus.FAILED
-    stored = await wired["service"].checkpoints(CONT_SCOPE, RUN_KEY)
+    stored = await wired["service"].checkpoints(SCOPE, RUN_KEY)
     assert len(stored) == 1 and stored[0].checkpoint.validator.result == "invalid"
     events = [(item.event, item.validator_result) for item in wired["events"].actions]
     assert events == [("checkpoint_sealed", "invalid"), ("continuation_failed", None)]
@@ -195,7 +187,7 @@ async def test_governor_exhaustion_is_a_governed_terminal_outcome() -> None:
     )
     transfer = await _request(wired["service"])
     outcome = await wired["service"].seal(
-        transfer.transfer_id, facts(), seal_target(), request_scope=CONT_SCOPE
+        transfer.transfer_id, facts(), seal_target(), request_scope=SCOPE
     )
     assert outcome.transfer.status == TransferStatus.GOVERNOR_EXHAUSTED
     assert outcome.transfer.failure_reason == "continuation_governor_exhausted: max_transfers"
@@ -212,11 +204,9 @@ async def test_transfer_hydrates_writes_transferred_and_releases_after_session_i
     )
     service = wired["service"]
     transfer = await _request(service)
-    sealed = await service.seal(
-        transfer.transfer_id, facts(), seal_target(), request_scope=CONT_SCOPE
-    )
+    sealed = await service.seal(transfer.transfer_id, facts(), seal_target(), request_scope=SCOPE)
     hydrator = FakeHydrator()
-    outcome = await service.transfer(transfer.transfer_id, hydrator, request_scope=CONT_SCOPE)
+    outcome = await service.transfer(transfer.transfer_id, hydrator, request_scope=SCOPE)
     request = hydrator.requests[0]
     assert request.checkpoint.checkpoint_id == sealed.checkpoint.checkpoint_id
     assert "pending_commitments" in request.prompt_text or "Pending" in request.prompt_text
@@ -232,11 +222,11 @@ async def test_transfer_hydrates_writes_transferred_and_releases_after_session_i
     assert not outcome.transfer.released
     assert wired["mailbox"].released == {}
     confirmation.initialized = True
-    released = await service.release_if_hydrated(transfer.transfer_id, request_scope=CONT_SCOPE)
+    released = await service.release_if_hydrated(transfer.transfer_id, request_scope=SCOPE)
     assert released.released
     assert wired["mailbox"].released[transfer.transfer_id] == ("cmd-held-1",)
     # Replays are no-ops.
-    again = await service.transfer(transfer.transfer_id, hydrator, request_scope=CONT_SCOPE)
+    again = await service.transfer(transfer.transfer_id, hydrator, request_scope=SCOPE)
     assert again.transfer.status == TransferStatus.TRANSFERRED and len(hydrator.requests) == 1
 
 
@@ -245,13 +235,13 @@ async def test_restored_digest_mismatch_fails_the_transfer_with_checkpoint_inval
     wired = build_service(session_files=SESSION_FILES)
     service = wired["service"]
     transfer = await _request(service)
-    await service.seal(transfer.transfer_id, facts(), seal_target(), request_scope=CONT_SCOPE)
+    await service.seal(transfer.transfer_id, facts(), seal_target(), request_scope=SCOPE)
     with pytest.raises(ContinuationRejected) as raised:
         await service.transfer(
-            transfer.transfer_id, FakeHydrator(corrupt=True), request_scope=CONT_SCOPE
+            transfer.transfer_id, FakeHydrator(corrupt=True), request_scope=SCOPE
         )
     assert raised.value.code == CHECKPOINT_INVALID
-    stored = await wired["store"].get(CONT_SCOPE, transfer.transfer_id)
+    stored = await wired["store"].get(SCOPE, transfer.transfer_id)
     assert stored.status == TransferStatus.FAILED
     assert stored.failure_reason.startswith(CHECKPOINT_INVALID)
 
@@ -264,11 +254,11 @@ async def test_second_transfer_counts_against_governors() -> None:
     )
     service = wired["service"]
     first = await _request(service)
-    await service.seal(first.transfer_id, facts(), seal_target(), request_scope=CONT_SCOPE)
-    await service.transfer(first.transfer_id, FakeHydrator(), request_scope=CONT_SCOPE)
+    await service.seal(first.transfer_id, facts(), seal_target(), request_scope=SCOPE)
+    await service.transfer(first.transfer_id, FakeHydrator(), request_scope=SCOPE)
     second = await service.request(
         trigger(ContinuationTriggerKind.TURN_COUNT, "policy://turns/40"),
-        request_scope=CONT_SCOPE,
+        request_scope=SCOPE,
         run_key=RUN_KEY,
         activation_key="unit-collect-1",
         logical_execution_id="logical-collect-1",
@@ -276,7 +266,5 @@ async def test_second_transfer_counts_against_governors() -> None:
         source_session_ref="thread-collect-1~continuation~x",
     )
     assert second.ledger.transfers == 1
-    outcome = await service.seal(
-        second.transfer_id, facts(), seal_target(), request_scope=CONT_SCOPE
-    )
+    outcome = await service.seal(second.transfer_id, facts(), seal_target(), request_scope=SCOPE)
     assert outcome.transfer.status == TransferStatus.GOVERNOR_EXHAUSTED

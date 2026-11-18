@@ -36,8 +36,8 @@ from mission_control.domain.context.checkpoint import (
 )
 from mission_control.domain.execution.bindings import ProviderExecutionBinding
 from mission_control.domain.execution.lane_turns import LaneSegmentBounds, LaneTurnRequest
-from tests.fixtures.continuation import CONT_SCOPE
 from tests.fixtures.lane_turns import RecordingSignals
+from tests.support.ids import SCOPE
 from tests.support.knowledge.stores import InMemoryStaging
 from tests.support.providers.claude import (
     PROFILE,
@@ -275,13 +275,13 @@ async def test_hydration_refuses_a_session_this_worker_does_not_hold(tmp_path: P
     snapshots = ClaudeWorkspaceSnapshots(stack.harness, staging)
     with pytest.raises(ContinuationRejected) as rejected:
         await snapshots.snapshot(
-            request_scope=CONT_SCOPE, run_key="run-1", session_ref="sess-elsewhere", roots=()
+            request_scope=SCOPE, run_key="run-1", session_ref="sess-elsewhere", roots=()
         )
     assert rejected.value.code == "CHECKPOINT_INVALID"
-    assert await snapshots.load(request_scope=CONT_SCOPE, snapshot_ref="other:1") is None
+    assert await snapshots.load(request_scope=SCOPE, snapshot_ref="other:1") is None
     assert (
         await snapshots.load(
-            request_scope=CONT_SCOPE, snapshot_ref=f"{WORKSPACE_SNAPSHOT_PREFIX}missing"
+            request_scope=SCOPE, snapshot_ref=f"{WORKSPACE_SNAPSHOT_PREFIX}missing"
         )
         is None
     )
@@ -292,11 +292,11 @@ def test_the_registration_resolves_this_lane_only_and_stays_unqualified(tmp_path
     registry = LaneHydratorRegistry()
     registry.register(claude_continuation_registration(harness, InMemoryStaging()))
     assert registry.profiles() == (PROFILE,)
-    assert isinstance(registry.hydrator(PROFILE, CONT_SCOPE), ClaudeSessionHydrator)
-    assert isinstance(registry.snapshots(PROFILE, CONT_SCOPE), ClaudeWorkspaceSnapshots)
+    assert isinstance(registry.hydrator(PROFILE, SCOPE), ClaudeSessionHydrator)
+    assert isinstance(registry.snapshots(PROFILE, SCOPE), ClaudeWorkspaceSnapshots)
     assert registry.registration(PROFILE).qualified is False
     with pytest.raises(ContinuationRejected):
-        registry.hydrator("codex", CONT_SCOPE)
+        registry.hydrator("codex", SCOPE)
     # The declared describe states the emulated transfer, never qualified without a drill.
     cell = harness.describe().features["continuation"]
     assert cell.status == "emulated" and cell.implemented and not cell.qualified

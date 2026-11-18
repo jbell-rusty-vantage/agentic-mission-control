@@ -24,8 +24,8 @@ from mission_control.domain.execution.contracts import (
 )
 from tests.fixtures.checkpoint_lineage import activity_attempt, bind_unit, stage_unit
 from tests.fixtures.lane_bindings import lane_fields
-from tests.fixtures.provider_frames import INSTALLATION, SCOPE
 from tests.support.deep_agents import exact_fixture
+from tests.support.ids import INSTALLATION, SCOPE
 from tests.support.operations import operation_request
 
 

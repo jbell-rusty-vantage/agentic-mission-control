@@ -37,8 +37,9 @@ import pytest
 from temporalio.client import Client
 from temporalio.testing import WorkflowEnvironment
 from temporalio.worker import Worker
-from tests.fixtures.mission_control_common_db import CommonDatabase, canonical_scope
+from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.fixtures.mission_control_production_stack import start_local
+from tests.support.ids import canonical_scope
 from tests.support.integration.temporal.rrm_007_boundary_interventions import (
     GOAL_QUEUE,
     Authority,

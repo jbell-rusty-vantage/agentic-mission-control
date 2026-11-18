@@ -68,8 +68,8 @@ from mission_control.domain.execution.lanes import (
     StartRequest,
     TurnHandle,
 )
-from tests.fixtures.lane_turns import SCOPE
 from tests.support.artifacts import MemoryArtifacts
+from tests.support.ids import SCOPE
 from tests.support.providers.claude import SESSION_ID, ClaudeStack, claude_operation, claude_stack
 from tests.support.unit.claude.claude_harness import _fields, _identity
 

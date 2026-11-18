@@ -24,6 +24,7 @@ from tests.support.deep_agents_runtime import (
     ConformanceSandbox,
     ConformanceSecretResolver,
 )
+from tests.support.ids import SCOPE
 from tests.support.operations import MCP_DIGEST, SKILL_DIGEST
 
 from mission_control.adapters.cursor.describe import CURSOR_LOCAL_DESCRIBE
@@ -66,9 +67,6 @@ from mission_control.domain.execution.lanes import (
     UsageRequest,
 )
 
-INSTALLATION = UUID("11111111-1111-4111-8111-111111111111")
-TENANT = UUID("22222222-2222-4222-8222-222222222222")
-SCOPE = f"mc/{INSTALLATION}/biotech/{TENANT}"
 LANE_QUEUE = "lane-turn-conformance"
 DIGEST = "sha256:" + "c" * 64
 RUN_UUID = UUID("33333333-3333-4333-8333-333333333333")

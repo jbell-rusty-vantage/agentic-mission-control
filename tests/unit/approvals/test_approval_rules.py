@@ -24,7 +24,7 @@ from mission_control.domain.execution.approvals import (
     NativeApprovalCorrelation,
 )
 from mission_control.domain.programs.human_gate import HumanResolutionRequest
-from tests.fixtures.provider_frames import SCOPE
+from tests.support.ids import SCOPE
 from tests.unit.approvals.fixtures import (
     EXECUTION,
     OPENED_AT,

@@ -93,8 +93,8 @@ from mission_control.domain.execution.lane_requirements import RequirementSet, a
 from tests.fixtures.applications import installed_applications
 from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog
 from tests.fixtures.environment_kits import StaticDefinitions
-from tests.fixtures.mission_control_common_db import canonical_scope
 from tests.fixtures.models import bindings_catalog
+from tests.support.ids import canonical_scope
 from tests.support.manifests.v2_launch import (
     AT,
     BINDINGS,

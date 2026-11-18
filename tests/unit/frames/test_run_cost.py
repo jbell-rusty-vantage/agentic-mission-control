@@ -25,7 +25,8 @@ from mission_control.domain.frames.contracts import FrameKind
 from mission_control.domain.policies.contracts import ActorContext
 from mission_control.domain.resolution.profiles import ModelProfile
 from tests.conformance.resolution.fixtures import MODELS
-from tests.fixtures.provider_frames import FIXTURE_RUN, SCOPE, provider_frame
+from tests.fixtures.provider_frames import FIXTURE_RUN, provider_frame
+from tests.support.ids import SCOPE
 
 CHEAP = "priced-small"
 TIERED = "priced-tiered"

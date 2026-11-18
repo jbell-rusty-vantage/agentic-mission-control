@@ -69,11 +69,11 @@ from tests.fixtures.models import catalog_for
 from tests.fixtures.rrm009_production_harness import _diagnose, _run, _until
 from tests.fixtures.rrm009_production_stack import (
     AGENT_COGNITIVE_QUEUE,
-    SCOPE,
     TechnicalBinding,
     technical_binding,
 )
 from tests.support.deep_agents import exact_fixture
+from tests.support.ids import SCOPE
 from tests.support.manifest_runtime import (
     MISSION_2,
     OUTPUT_SCHEMAS,

@@ -82,7 +82,6 @@ from mission_control.domain.execution.contracts import (
 )
 from mission_control.domain.execution.lanes import CursorExecutionBinding, WorkspacePolicyPin
 from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog
-from tests.fixtures.mission_control_common_db import canonical_scope
 from tests.fixtures.projections.rows import (
     fixture_rows,
     hook_row,
@@ -90,6 +89,7 @@ from tests.fixtures.projections.rows import (
     tavily_row,
     verifier_row,
 )
+from tests.support.ids import canonical_scope
 from tests.support.manifests.cursor_launch import CLOUD, LOCAL, ROOT, seeds_publish_module
 from tests.support.manifests.v2_launch import (
     BINDINGS,

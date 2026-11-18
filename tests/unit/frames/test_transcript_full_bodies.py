@@ -33,7 +33,6 @@ from mission_control.domain.execution.contracts import (
 from mission_control.domain.policies.contracts import ActorContext
 from mission_control.interfaces.http.mission_control import MissionPrincipal, get_mission_principal
 from mission_control.interfaces.http.transcript import ARTIFACT_BODY_READERS
-from tests.fixtures.provider_frames import INSTALLATION, OTHER_SCOPE, SCOPE, TENANT
 from tests.fixtures.transcripts import (
     RUN_KEY,
     SECRET_VALUE,
@@ -42,6 +41,7 @@ from tests.fixtures.transcripts import (
     transcript_events,
     transcript_frames,
 )
+from tests.support.ids import INSTALLATION, OTHER_SCOPE, SCOPE, TENANT
 from tests.support.unit.frames.run_list_and_search import MemoryDocuments
 from tests.support.unit.frames.transcript_interfaces import http_app
 

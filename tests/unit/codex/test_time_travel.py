@@ -51,7 +51,7 @@ from mission_control.domain.execution.cognition_points import (
 )
 from mission_control.domain.execution.lane_turns import NativeRefs
 from mission_control.domain.execution.lanes import LaneSeedHead, PrepareRequest, StartRequest
-from tests.fixtures.lane_turns import SCOPE
+from tests.support.ids import SCOPE
 from tests.support.providers.codex import CodexStack, codex_operation, codex_stack
 from tests.unit.codex.drive import fields, observed, sent, started
 

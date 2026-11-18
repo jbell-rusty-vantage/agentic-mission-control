@@ -51,7 +51,8 @@ from mission_control.domain.authoring.manifest import canonical_manifest_bytes, 
 from mission_control.domain.coordinator.launch import BlueprintFamily, WorkflowSubmission
 from mission_control.domain.policies.contracts import ActorContext
 from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog
-from tests.fixtures.mission_control_common_db import CommonDatabase, catalog_scope
+from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.ids import catalog_scope
 
 ROOT = Path(__file__).resolve().parents[4]
 MINIMAL = ROOT / "tests/fixtures/manifests/minimal-stage-graph.yml"

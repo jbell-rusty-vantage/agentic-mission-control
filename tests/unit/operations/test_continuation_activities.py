@@ -20,14 +20,8 @@ from mission_control.application.context.continuation import (
     HydrationRequest,
     TransferStatus,
 )
-from tests.fixtures.continuation import (
-    CONT_SCOPE,
-    RUN_KEY,
-    build_service,
-    facts,
-    seal_target,
-    trigger,
-)
+from tests.fixtures.continuation import RUN_KEY, build_service, facts, seal_target, trigger
+from tests.support.ids import SCOPE
 
 
 class Hydrator:
@@ -50,7 +44,7 @@ async def test_request_seal_transfer_through_activities() -> None:
     transfer = await env.run(
         activities.request,
         ContinuationRequestInput(
-            request_scope=CONT_SCOPE,
+            request_scope=SCOPE,
             run_key=RUN_KEY,
             activation_key="unit-collect-1",
             logical_execution_id="logical-collect-1",
@@ -62,7 +56,7 @@ async def test_request_seal_transfer_through_activities() -> None:
     sealed = await env.run(
         activities.seal,
         ContinuationSealInput(
-            request_scope=CONT_SCOPE,
+            request_scope=SCOPE,
             transfer_id=transfer.transfer_id,
             facts=facts(),
             target=seal_target(),
@@ -72,7 +66,7 @@ async def test_request_seal_transfer_through_activities() -> None:
     moved = await env.run(
         activities.transfer,
         ContinuationTransferInput(
-            request_scope=CONT_SCOPE, transfer_id=transfer.transfer_id, lane_profile="deep_agents"
+            request_scope=SCOPE, transfer_id=transfer.transfer_id, lane_profile="deep_agents"
         ),
     )
     assert moved.transfer.status == TransferStatus.TRANSFERRED
@@ -87,7 +81,7 @@ async def test_activity_failures_are_typed_and_non_retryable() -> None:
         await env.run(
             activities.transfer,
             ContinuationTransferInput(
-                request_scope=CONT_SCOPE, transfer_id="nope", lane_profile="deep_agents"
+                request_scope=SCOPE, transfer_id="nope", lane_profile="deep_agents"
             ),
         )
     assert missing.value.type == "unsupported_control" and missing.value.non_retryable
@@ -95,7 +89,7 @@ async def test_activity_failures_are_typed_and_non_retryable() -> None:
         await env.run(
             activities.release,
             ContinuationTransferInput(
-                request_scope=CONT_SCOPE, transfer_id="nope", lane_profile="deep_agents"
+                request_scope=SCOPE, transfer_id="nope", lane_profile="deep_agents"
             ),
         )
     assert unknown.value.type == "not_found" and unknown.value.non_retryable

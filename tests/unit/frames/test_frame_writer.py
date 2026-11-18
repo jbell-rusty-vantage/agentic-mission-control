@@ -37,8 +37,6 @@ from mission_control.domain.frames.contracts import (
 )
 from mission_control.domain.policies.contracts import ActorContext
 from tests.fixtures.provider_frames import (
-    OTHER_SCOPE,
-    SCOPE,
     StepClock,
     harness_start,
     in_memory_store,
@@ -46,6 +44,7 @@ from tests.fixtures.provider_frames import (
     opened_writer,
     turn_observations,
 )
+from tests.support.ids import OTHER_SCOPE, SCOPE
 
 
 @pytest.mark.asyncio

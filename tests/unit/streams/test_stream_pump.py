@@ -17,7 +17,7 @@ from mission_control.application.streams.pump import (
     envelope_size,
 )
 from mission_control.domain.frames.contracts import FrameKind
-from tests.fixtures.provider_frames import OTHER_SCOPE, SCOPE
+from tests.support.ids import OTHER_SCOPE, SCOPE
 from tests.support.unit.streams.stream_pump import FAST, Recorder, until
 from tests.support.unit.streams.stream_service import (
     READER,

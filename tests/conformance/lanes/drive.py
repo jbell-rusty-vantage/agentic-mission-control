@@ -36,8 +36,9 @@ from mission_control.domain.execution.lanes import (
 )
 from mission_control.domain.policies.contracts import ActorContext
 from tests.conformance.lanes.contract import ContinuationPorts, LaneFake
-from tests.fixtures.continuation import CONT_SCOPE, build_service, facts, seal_target, trigger
-from tests.fixtures.lane_turns import SCOPE, RecordingSignals
+from tests.fixtures.continuation import build_service, facts, seal_target, trigger
+from tests.fixtures.lane_turns import RecordingSignals
+from tests.support.ids import SCOPE
 from tests.unit.approvals.fixtures import answer
 
 # Bounds every scenario segment runs under: short enough to fail fast, long enough for a
@@ -230,7 +231,7 @@ async def seal_and_transfer(fake: LaneFake, ports: ContinuationPorts) -> Any:
     service = build_service(snapshots=ports.snapshots, staging=ports.staging)["service"]
     transfer = await service.request(
         trigger(),
-        request_scope=CONT_SCOPE,
+        request_scope=SCOPE,
         run_key="run-continuation-1",
         activation_key="unit-collect-1",
         logical_execution_id="logical-collect-1",
@@ -247,10 +248,10 @@ async def seal_and_transfer(fake: LaneFake, ports: ContinuationPorts) -> Any:
             ),
         ),
         seal_target(),
-        request_scope=CONT_SCOPE,
+        request_scope=SCOPE,
     )
     assert sealed.checkpoint is not None, sealed.transfer
-    return await service.transfer(transfer.transfer_id, ports.hydrator, request_scope=CONT_SCOPE)
+    return await service.transfer(transfer.transfer_id, ports.hydrator, request_scope=SCOPE)
 
 
 __all__ = [

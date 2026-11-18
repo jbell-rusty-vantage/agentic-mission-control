@@ -685,7 +685,8 @@ async def test_a_session_lane_settlement_writes_its_cognition_points_through_the
         InMemoryCheckpointLineageRepository,
     )
     from mission_control.domain.execution.cognition_points import CognitionPointFilter
-    from tests.fixtures.lane_turns import ACTIVATION_UUID, RUN_UUID, SCOPE
+    from tests.fixtures.lane_turns import ACTIVATION_UUID, RUN_UUID
+    from tests.support.ids import SCOPE
     from tests.support.unit.harness.lane_turn_points import PointLane, _unit_operation
 
     operation = _unit_operation()

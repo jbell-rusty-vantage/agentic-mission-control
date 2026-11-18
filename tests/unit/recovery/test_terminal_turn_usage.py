@@ -5,12 +5,12 @@ from uuid import uuid4
 
 import pytest
 from tests.fixtures.provider_frames import (
-    SCOPE,
     harness_start,
     in_memory_store,
     observation,
     opened_writer,
 )
+from tests.support.ids import SCOPE
 
 from mission_control.adapters.postgres.frames import identity
 from mission_control.domain.frames.contracts import FrameKind, LaneProfile

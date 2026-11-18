@@ -33,7 +33,7 @@ from mission_control.interfaces.mcp.human_task_tools import (
     ScopedHumanTasks,
     register_human_task_tools,
 )
-from tests.fixtures.provider_frames import INSTALLATION, SCOPE, TENANT
+from tests.support.ids import INSTALLATION, SCOPE, TENANT
 from tests.unit.human_tasks.fixtures import activation, later, spec
 
 BASE = "/v1/applications/biotech"

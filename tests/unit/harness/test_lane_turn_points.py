@@ -48,12 +48,12 @@ from mission_control.domain.frames.contracts import FrameKind, LaneProfile
 from tests.fixtures.lane_turns import (
     ACTIVATION_UUID,
     RUN_UUID,
-    SCOPE,
     RecordingSignals,
     lane_stack,
     scripted_frames,
 )
 from tests.fixtures.provider_frames import provider_frame
+from tests.support.ids import SCOPE
 from tests.support.unit.harness.lane_turn_points import PointLane, _attempt, _unit_operation
 
 NOW = datetime(2026, 11, 5, 12, 0, tzinfo=UTC)

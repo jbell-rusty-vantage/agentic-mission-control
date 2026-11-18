@@ -15,7 +15,7 @@ from mission_control.interfaces.socketio.commands import (
     forward_human_task_resolution,
     parse_human_task_resolution,
 )
-from tests.fixtures.provider_frames import SCOPE
+from tests.support.ids import SCOPE
 from tests.support.unit.approvals.approval_task_interfaces import BASE, _app, _compose, _principal
 from tests.unit.approvals.fixtures import REVIEWER, permission_request
 

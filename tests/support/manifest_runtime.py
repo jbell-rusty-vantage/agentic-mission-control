@@ -50,10 +50,10 @@ from mission_control.interfaces.http.mission_control import MissionPrincipal, ge
 from mission_control.interfaces.http.missions import router as missions_router
 from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog
 from tests.fixtures.manifest_runtime import AUTHOR, ChainScript
-from tests.fixtures.mission_control_common_db import INSTALLATIONS
 from tests.fixtures.models import model_binding
 from tests.fixtures.rrm009_production_harness import ProductionStack
-from tests.fixtures.rrm009_production_stack import AGENT_COGNITIVE_QUEUE, SCOPE, TechnicalBinding
+from tests.fixtures.rrm009_production_stack import AGENT_COGNITIVE_QUEUE, TechnicalBinding
+from tests.support.ids import INSTALLATIONS, SCOPE
 from tests.unit.authoring.manifest_launch_fixture import (
     deep_agents_chain,
     fixture_bindings,

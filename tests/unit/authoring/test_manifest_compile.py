@@ -44,7 +44,7 @@ from mission_control.interfaces.mcp.mission_tools import (
     register_manifest_tools,
 )
 from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog
-from tests.fixtures.provider_frames import SCOPE
+from tests.support.ids import SCOPE
 from tests.support.manifests.compile import (
     AT,
     MINIMAL,

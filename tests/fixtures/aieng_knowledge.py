@@ -286,7 +286,7 @@ class AiengKnowledgeBridge(QualiaKnowledgeBridge):
 
     def mc_installation_id(self, producer: Mapping[str, Any]) -> str:
         # The AI Engineer KS component has its own installation; the MC run belongs to MC's.
-        from tests.fixtures.mission_control_common_db import AI_ENGINEER_INSTALLATION_ID
+        from tests.support.ids import AI_ENGINEER_INSTALLATION_ID
 
         return str(AI_ENGINEER_INSTALLATION_ID)
 

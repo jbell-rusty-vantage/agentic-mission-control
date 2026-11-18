@@ -47,9 +47,10 @@ from mission_control.domain.policies.mailbox import (
     content_digest,
     inline_content_ref,
 )
-from tests.fixtures.continuation import CONT_SCOPE, build_service, trigger
+from tests.fixtures.continuation import build_service, trigger
 from tests.fixtures.lane_turns import cursor_operation
 from tests.fixtures.mp12_lanes import Crashes, FakeHydrator
+from tests.support.ids import SCOPE
 
 SOURCE = "agent-fake-1"
 FILES = {
@@ -79,7 +80,7 @@ class Wired:
     async def request(self, ref: str = "command://cmd-continue-1") -> ContinuationTransfer:
         return await self.service.request(
             trigger(ref=ref),
-            request_scope=CONT_SCOPE,
+            request_scope=SCOPE,
             run_key=self.run_key,
             activation_key=self.identity.activation_key,
             logical_execution_id=self.identity.activation_key,
@@ -88,10 +89,10 @@ class Wired:
         )
 
     async def drive(self, transfer_id: str) -> ContinuationTransfer:
-        return await self.phases.drive(transfer_id, self.context, request_scope=CONT_SCOPE)
+        return await self.phases.drive(transfer_id, self.context, request_scope=SCOPE)
 
     async def advance(self, transfer_id: str) -> ContinuationTransfer:
-        return await self.phases.advance(transfer_id, self.context, request_scope=CONT_SCOPE)
+        return await self.phases.advance(transfer_id, self.context, request_scope=SCOPE)
 
 
 async def wire(
@@ -108,7 +109,7 @@ async def wire(
     hydrator = hydrator or FakeHydrator()
     states = InMemoryLaneExecutionStateStore()
     await states.record(
-        CONT_SCOPE,
+        SCOPE,
         identity.harness_execution_id,
         LaneExecutionUpdate(native_session_ref=SOURCE, native_turn_ref="run-fake-1"),
     )
@@ -131,7 +132,7 @@ async def wire(
         harness_execution_id=str(identity.harness_execution_id),
         generation=1,
         turn_no=1,
-        lane_state=await states.load(CONT_SCOPE, identity.harness_execution_id),
+        lane_state=await states.load(SCOPE, identity.harness_execution_id),
     )
     coordinator = LaneContinuationCoordinator(wired["store"])
     return Wired(wired, phases, hydrator, states, context, run_key, identity, coordinator)
@@ -157,7 +158,7 @@ async def test_phases_run_in_order_and_activation_records_matching_digests() -> 
     assert (activated.source_generation, activated.target_generation) == (1, 2)
     assert activated.target_turn_no == 2 and activated.target_session_ref == "agent-fake-2"
     # The digests the target received are the digests that were sealed and prepared.
-    stored = await w.service.checkpoint(CONT_SCOPE, w.run_key, activated.checkpoint_id)
+    stored = await w.service.checkpoint(SCOPE, w.run_key, activated.checkpoint_id)
     packet = w.wired["selections"].packets[
         stored.checkpoint.context_packet_ref.removeprefix("context_packet:").rsplit("#", 1)[0]
     ]
@@ -172,7 +173,7 @@ async def test_phases_run_in_order_and_activation_records_matching_digests() -> 
     assert stored.checkpoint.identities.source_agent_session_ref == SOURCE
     # Holds were released only after the activation; the lane state moved to the target.
     assert w.wired["mailbox"].released[transfer.transfer_id] == ("cmd-held-1", "cmd-held-2")
-    state = await w.states.load(CONT_SCOPE, w.identity.harness_execution_id)
+    state = await w.states.load(SCOPE, w.identity.harness_execution_id)
     assert state is not None and state.native_session_ref == "agent-fake-2"
     assert [item.event for item in w.wired["events"].actions] == [
         "checkpoint_sealed",
@@ -196,7 +197,7 @@ async def test_a_crash_after_any_persisted_phase_resumes_to_one_activated_target
     transfer = await w.request()
     with pytest.raises(RuntimeError, match="worker lost"):
         await w.drive(transfer.transfer_id)
-    stored = await w.service.transfer_store.get(CONT_SCOPE, transfer.transfer_id)
+    stored = await w.service.transfer_store.get(SCOPE, transfer.transfer_id)
     assert stored is not None and stored.phase == crash_at, "the phase was persisted first"
     if crash_at in {ContinuationPhase.VERIFIED, ContinuationPhase.HYDRATED}:
         assert stored.fencing and not stored.released
@@ -207,7 +208,7 @@ async def test_a_crash_after_any_persisted_phase_resumes_to_one_activated_target
     assert [item.phase for item in activated.phases] == list(PHASE_ORDER[1:]), "no repeats"
     assert len(w.hydrator.requests) == 1, "the recorded hydration is never repeated"
     assert all(item is not None for item in _digests(activated))
-    siblings = await w.service.transfer_store.for_run(CONT_SCOPE, w.run_key)
+    siblings = await w.service.transfer_store.for_run(SCOPE, w.run_key)
     assert [item.activated for item in siblings] == [True]
     assert w.wired["mailbox"].released[transfer.transfer_id] == ("cmd-held-1", "cmd-held-2")
 
@@ -218,7 +219,7 @@ async def test_a_hydration_receipt_lost_before_its_phase_persisted_is_redone_onc
     transfer = await w.request()
     with pytest.raises(ConnectionError):
         await w.drive(transfer.transfer_id)
-    stored = await w.service.transfer_store.get(CONT_SCOPE, transfer.transfer_id)
+    stored = await w.service.transfer_store.get(SCOPE, transfer.transfer_id)
     assert stored is not None and stored.phase == ContinuationPhase.TARGET_PREPARED
     activated = await w.drive(transfer.transfer_id)
     assert activated.activated and activated.target_session_ref == "agent-fake-3"
@@ -232,12 +233,12 @@ async def test_a_failed_target_keeps_the_holds_and_lifts_the_fence() -> None:
     with pytest.raises(ContinuationRejected) as rejected:
         await w.drive(transfer.transfer_id)
     assert rejected.value.code == CHECKPOINT_INVALID
-    failed = await w.service.transfer_store.get(CONT_SCOPE, transfer.transfer_id)
+    failed = await w.service.transfer_store.get(SCOPE, transfer.transfer_id)
     assert failed is not None
     assert (failed.status, failed.phase) == (TransferStatus.FAILED, ContinuationPhase.HYDRATED)
     assert failed.ended and not failed.fencing and not failed.released
     assert w.wired["mailbox"].released == {}, "a failed target consumes no held entry"
-    state = await w.states.load(CONT_SCOPE, w.identity.harness_execution_id)
+    state = await w.states.load(SCOPE, w.identity.harness_execution_id)
     assert state is not None and state.native_session_ref == SOURCE, "the source stays"
     assert [item.event for item in w.wired["events"].actions] == [
         "checkpoint_sealed",
@@ -266,13 +267,11 @@ async def test_two_verified_transfers_activate_exactly_one_target_generation() -
     with pytest.raises(ContinuationRejected) as conflict:
         await w.advance(second.transfer_id)
     assert conflict.value.code == "continuation_generation_conflict"
-    loser = await w.service.transfer_store.get(CONT_SCOPE, second.transfer_id)
+    loser = await w.service.transfer_store.get(SCOPE, second.transfer_id)
     assert loser is not None and loser.status == TransferStatus.FAILED and not loser.released
     assert w.wired["mailbox"].released == {first.transfer_id: ("cmd-held-1", "cmd-held-2")}
     activated = [
-        item
-        for item in await w.service.transfer_store.for_run(CONT_SCOPE, w.run_key)
-        if item.activated
+        item for item in await w.service.transfer_store.for_run(SCOPE, w.run_key) if item.activated
     ]
     assert [item.transfer_id for item in activated] == [first.transfer_id]
 
@@ -282,26 +281,26 @@ async def test_the_coordinator_reads_pending_fencing_and_activated_turns() -> No
     w = await wire()
     transfer = await w.request()
     heid = str(w.identity.harness_execution_id)
-    pending = await w.coordinator.pending(CONT_SCOPE, w.run_key, source_session_ref=SOURCE)
+    pending = await w.coordinator.pending(SCOPE, w.run_key, source_session_ref=SOURCE)
     assert pending is not None and pending.transfer_id == transfer.transfer_id
-    assert await w.coordinator.fencing(CONT_SCOPE, w.run_key, harness_execution_id=heid) is None
+    assert await w.coordinator.fencing(SCOPE, w.run_key, harness_execution_id=heid) is None
     frozen = await w.advance(transfer.transfer_id)
     assert frozen.phase == ContinuationPhase.FROZEN
-    fencing = await w.coordinator.fencing(CONT_SCOPE, w.run_key, harness_execution_id=heid)
+    fencing = await w.coordinator.fencing(SCOPE, w.run_key, harness_execution_id=heid)
     assert fencing is not None and fencing.transfer_id == transfer.transfer_id
-    assert await w.coordinator.pending(CONT_SCOPE, w.run_key, source_session_ref=SOURCE) is None
+    assert await w.coordinator.pending(SCOPE, w.run_key, source_session_ref=SOURCE) is None
     oracle = ContinuationHoldOracle(w.wired["store"])
-    assert await oracle.open_hold(CONT_SCOPE, w.run_key) == transfer.transfer_id
+    assert await oracle.open_hold(SCOPE, w.run_key) == transfer.transfer_id
     activated = await w.drive(transfer.transfer_id)
-    assert await w.coordinator.fencing(CONT_SCOPE, w.run_key, harness_execution_id=heid) is None
-    assert await oracle.open_hold(CONT_SCOPE, w.run_key) is None
+    assert await w.coordinator.fencing(SCOPE, w.run_key, harness_execution_id=heid) is None
+    assert await oracle.open_hold(SCOPE, w.run_key) is None
     found = await w.coordinator.activated_for_turn(
-        CONT_SCOPE, w.run_key, harness_execution_id=heid, turn_no=2
+        SCOPE, w.run_key, harness_execution_id=heid, turn_no=2
     )
     assert found is not None and found.transfer_id == activated.transfer_id
     assert (
         await w.coordinator.activated_for_turn(
-            CONT_SCOPE, w.run_key, harness_execution_id=heid, turn_no=3
+            SCOPE, w.run_key, harness_execution_id=heid, turn_no=3
         )
         is None
     )

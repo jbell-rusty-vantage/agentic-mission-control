@@ -120,8 +120,9 @@ from mission_control.domain.execution.lane_turns import CleanupOutcome, LaneTurn
 from mission_control.domain.frames.contracts import LaneProfile
 from mission_control.domain.policies.contracts import ActorContext
 from tests.fixtures.lane_bindings import lane_fields
-from tests.fixtures.lane_turns import LANE_QUEUE, SCOPE, LaneStack, lane_stack
+from tests.fixtures.lane_turns import LANE_QUEUE, LaneStack, lane_stack
 from tests.support.artifacts import MemoryArtifacts
+from tests.support.ids import SCOPE
 
 FIXTURE_ROOT = Path(__file__).resolve().parents[2] / "fixtures" / "provider_frames" / "codex"
 SCRIPTS = FIXTURE_ROOT / "scripts"

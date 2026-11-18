@@ -26,11 +26,7 @@ from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 from langgraph.store.memory import InMemoryStore
 from tests.fixtures.checkpoint_lineage import bind_unit, stage_unit
 from tests.fixtures.lane_bindings import lane_fields
-from tests.fixtures.mission_control_common_db import (
-    CommonDatabase,
-    canonical_scope,
-    provision_runtime,
-)
+from tests.fixtures.mission_control_common_db import CommonDatabase, provision_runtime
 from tests.support.db_builders import owner_rows
 from tests.support.deep_agents import exact_fixture
 from tests.support.deep_agents_runtime import (
@@ -40,6 +36,7 @@ from tests.support.deep_agents_runtime import (
     ConformanceSandbox,
     ConformanceSecretResolver,
 )
+from tests.support.ids import canonical_scope
 from tests.support.operations import MCP_DIGEST, SKILL_DIGEST, operation_request
 from tests.support.run_control import ALL_PERMISSIONS, actor, command
 from tests.support.run_control import request as run_request

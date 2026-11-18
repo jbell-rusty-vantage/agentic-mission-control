@@ -27,11 +27,11 @@ from tests.fixtures.rrm009_production_harness import (
     record_parity_trace,
 )
 from tests.fixtures.rrm009_production_stack import (
-    SCOPE,
     goal_input,
     goal_templates,
     publish_technical_catalog,
 )
+from tests.support.ids import SCOPE
 
 
 async def goal_directed_two_iterations_scenario(stack: ProductionStack) -> None:

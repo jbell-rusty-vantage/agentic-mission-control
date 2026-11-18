@@ -18,7 +18,7 @@ from mission_control.application.execution.approvals_memory import (
 from mission_control.application.execution.stop_fence import InMemoryStopFenceRepository
 from mission_control.domain.execution.approvals import NativeApprovalCorrelation
 from mission_control.domain.policies.stop_fence import StopFence
-from tests.fixtures.provider_frames import SCOPE
+from tests.support.ids import SCOPE
 from tests.support.unit.approvals.approval_broker import OWNER, _compose
 from tests.unit.approvals.fixtures import (
     OTHER_POLICY,

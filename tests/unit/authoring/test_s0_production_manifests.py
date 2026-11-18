@@ -18,7 +18,7 @@ from mission_control.domain.authoring.contracts import PublishedDefinition
 from mission_control.domain.authoring.extensions import ExtensionRegistry
 from mission_control.domain.authoring.manifest import canonical_manifest_bytes, load_manifest_yaml
 from tests.fixtures.capability_search_catalog import NOW, SEEDS, build_catalog
-from tests.fixtures.mission_control_common_db import canonical_scope
+from tests.support.ids import canonical_scope
 
 ROOT = Path(__file__).resolve().parents[3]
 EXAMPLES = ROOT / "tests/fixtures/manifests/materialization-observation"

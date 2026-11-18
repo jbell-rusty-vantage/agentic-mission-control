@@ -50,7 +50,6 @@ from mission_control.domain.policies.reducer import (
 from tests.fixtures.provider_frames import (
     FIXTURE_ACTIVATION,
     FIXTURE_HARNESS,
-    SCOPE,
     StepClock,
     deep_agents_turn_frames,
     harness_start,
@@ -58,6 +57,7 @@ from tests.fixtures.provider_frames import (
     provider_frame,
     turn_observations,
 )
+from tests.support.ids import SCOPE
 from tests.support.run_control import ALL_PERMISSIONS, actor, command, request
 from tests.support.run_control import service as run_control_service
 from tests.support.unit.frames.frame_facts import _RunControl

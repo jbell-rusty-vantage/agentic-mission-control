@@ -13,7 +13,7 @@ from mission_control.adapters.capabilities.capability_bundles import bundle_dige
 from mission_control.adapters.deep_agents.materializer import ResolvedHookScriptBundle
 from mission_control.domain.authoring.contracts import DefinitionKind, ExactDefinitionRef
 from mission_control.domain.execution.contracts import DeepAgentHookScriptComponent
-from tests.fixtures.lane_turns import INSTALLATION, TENANT
+from tests.support.ids import INSTALLATION, TENANT
 
 
 def _component(hook_id: str, order: int, files: tuple[tuple[str, bytes], ...]) -> Any:

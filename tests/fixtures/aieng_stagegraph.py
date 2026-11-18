@@ -93,7 +93,7 @@ def ledgers(
 
 
 def knowledge_origin(invocation: str) -> dict[str, Any]:
-    from tests.fixtures.mission_control_common_db import canonical_scope
+    from tests.support.ids import canonical_scope
 
     from mission_control.application.knowledge.access import instant
     from mission_control.contracts.knowledge_protocol import Origin
@@ -230,7 +230,6 @@ async def run_aieng(
     )
     from tests.fixtures.aieng_knowledge import build_aieng_knowledge_tools
     from tests.fixtures.aieng_web_tools import build_aieng_web_tools
-    from tests.fixtures.mission_control_common_db import AI_ENGINEER_INSTALLATION_ID
     from tests.fixtures.mission_control_production_stack import open_postgres_production_stack
     from tests.fixtures.overnight_stagegraph_evidence import export_stagegraph
     from tests.fixtures.qualia_control_api import qualia_control_api
@@ -241,6 +240,7 @@ async def run_aieng(
     from tests.fixtures.qualia_stagegraph import build_bindings, lifecycle_for
     from tests.fixtures.rrm009_production_stack import technical_binding
     from tests.support.acceptance.mission_control.overnight_stagegraph import run_stagegraph_fixture
+    from tests.support.ids import AI_ENGINEER_INSTALLATION_ID
     from tests.support.manifest_runtime import host_pins
 
     from mission_control.adapters.postgres.knowledge.output_contracts import (

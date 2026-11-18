@@ -54,8 +54,8 @@ async def test_submitted_configuration_forks_through_real_admission_contract(
             F1RunConfigurationVerifier,
             RunControlService,
         )
-        from tests.fixtures.mission_control_common_db import catalog_scope
         from tests.fixtures.qualia_fork_contract import QualiaForkPrograms
+        from tests.support.ids import catalog_scope
         from tests.support.unit.qualia_fork_contract import fixture
 
         definitions, payloads, extensions, _, _, texts = await fixture(tmp_path)

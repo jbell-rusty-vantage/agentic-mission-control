@@ -56,7 +56,6 @@ from tests.fixtures.rrm009_production_harness import (
 from tests.fixtures.rrm009_production_stack import (
     CHILD_MARKER,
     OPERATOR,
-    SCOPE,
     ChildModel,
     TechnicalBinding,
     TechnicalCatalog,
@@ -67,6 +66,7 @@ from tests.fixtures.rrm009_production_stack import (
     stage_templates,
     technical_binding,
 )
+from tests.support.ids import SCOPE
 
 from mission_control.adapters.agent_server.async_subagents.auth import mint_scope_claim
 from mission_control.adapters.agent_server.async_subagents.bindings import (

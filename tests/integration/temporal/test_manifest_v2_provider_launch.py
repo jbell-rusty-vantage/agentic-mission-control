@@ -113,12 +113,9 @@ from tests.fixtures.manifest_runtime import ChainScript, chain_components
 from tests.fixtures.mission_control_production_stack import open_postgres_production_stack
 from tests.fixtures.models import catalog_for, model_binding
 from tests.fixtures.rrm009_production_harness import ProductionStack, _diagnose, _run, _until
-from tests.fixtures.rrm009_production_stack import (
-    AGENT_COGNITIVE_QUEUE,
-    SCOPE,
-    technical_binding,
-)
+from tests.fixtures.rrm009_production_stack import AGENT_COGNITIVE_QUEUE, technical_binding
 from tests.support.artifacts import MemoryArtifacts
+from tests.support.ids import SCOPE
 from tests.support.integration.temporal.manifest_v2_provider_launch import (
     AUTH_PROFILES,
     ROOT,

@@ -49,7 +49,6 @@ from tests.fixtures.rrm009_production_harness import (
 )
 from tests.fixtures.rrm009_production_stack import (
     AGENT_COGNITIVE_QUEUE,
-    SCOPE,
     publish_technical_catalog,
     stage_input,
     stage_templates,
@@ -58,6 +57,7 @@ from tests.fixtures.run_authority_digest import run_authority_digest
 from tests.support.acceptance.mission_control.postgres_runtime_parity import (
     goal_directed_two_iterations_scenario,
 )
+from tests.support.ids import SCOPE
 
 from mission_control.adapters.postgres.orchestration.stagegraph_repository import (
     PostgresStageGraphOperationTemplateRepository,

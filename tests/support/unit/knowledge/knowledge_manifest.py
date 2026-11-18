@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from tests.fixtures.mission_control_common_db import canonical_scope
+from tests.support.ids import canonical_scope
 
 ROOT = Path(__file__).resolve().parents[4]
 MANIFEST = ROOT / "tests/fixtures/manifests/knowledge-tools-stage-graph.yml"

@@ -24,7 +24,7 @@ from mission_control.application.installations.registry import (
 from mission_control.domain.policies.contracts import ActorContext
 from mission_control.interfaces.http.human_tasks import router
 from mission_control.interfaces.http.mission_control import MissionPrincipal, get_mission_principal
-from tests.fixtures.provider_frames import INSTALLATION, SCOPE, TENANT
+from tests.support.ids import INSTALLATION, SCOPE, TENANT
 from tests.unit.approvals.fixtures import POLICY, REVIEWER
 from tests.unit.human_tasks.fixtures import activation
 

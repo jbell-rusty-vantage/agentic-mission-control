@@ -27,7 +27,7 @@ from tests.fixtures.rrm009_production_harness import (
     _terminal,
     _wait_for,
 )
-from tests.fixtures.rrm009_production_stack import SCOPE
+from tests.support.ids import SCOPE
 
 from mission_control.application.authoring.manifest_submit import SubmitRequest
 from mission_control.domain.policies.contracts import CancelAction

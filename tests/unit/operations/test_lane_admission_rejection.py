@@ -41,7 +41,8 @@ from mission_control.domain.policies.contracts import (
 )
 from mission_control.domain.policies.errors import IdempotencyConflict
 from tests.fixtures.checkpoint_recovery import FixtureControlPlane, governed_workspace
-from tests.fixtures.lane_turns import SCOPE, RecordingSignals, cursor_operation, lane_stack
+from tests.fixtures.lane_turns import RecordingSignals, cursor_operation, lane_stack
+from tests.support.ids import SCOPE
 from tests.support.journal import MemoryOperationJournal
 from tests.support.run_control import actor, command, request, service
 

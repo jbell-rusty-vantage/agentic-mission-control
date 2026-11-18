@@ -55,7 +55,7 @@ from mission_control.interfaces.mcp.human_task_tools import (
     ScopedHumanTasks,
     register_human_task_tools,
 )
-from tests.fixtures.provider_frames import SCOPE
+from tests.support.ids import SCOPE
 from tests.unit.approvals.fixtures import POLICY, REVIEWER, RUN, RecordingExecutor, answer
 
 AGENT = ActorContext(actor_id="agent:lane", permissions=frozenset({GOVERNED_EFFECT_PERMISSION}))

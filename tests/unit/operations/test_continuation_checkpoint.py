@@ -41,15 +41,8 @@ from mission_control.domain.context.checkpoint import (
     verify_restore,
 )
 from mission_control.domain.context.packet import ContextPacket, ContextPurpose, ExpansionTier
-from tests.fixtures.continuation import (
-    CONT_SCOPE,
-    NOW,
-    RUN_KEY,
-    build_service,
-    facts,
-    seal_target,
-    trigger,
-)
+from tests.fixtures.continuation import NOW, RUN_KEY, build_service, facts, seal_target, trigger
+from tests.support.ids import SCOPE
 
 # workflow-types/08 section 6, field by field, as SPEC-02 names them.
 SECTION_6_FIELDS = {
@@ -93,16 +86,14 @@ async def _sealed(**kwargs: Any) -> tuple[dict[str, Any], Any]:
     service = wired["service"]
     transfer = await service.request(
         trigger(),
-        request_scope=CONT_SCOPE,
+        request_scope=SCOPE,
         run_key=RUN_KEY,
         activation_key="unit-collect-1",
         logical_execution_id="logical-collect-1",
         lane_profile="deep_agents",
         source_session_ref="thread-collect-1",
     )
-    outcome = await service.seal(
-        transfer.transfer_id, facts(), seal_target(), request_scope=CONT_SCOPE
-    )
+    outcome = await service.seal(transfer.transfer_id, facts(), seal_target(), request_scope=SCOPE)
     return wired, outcome
 
 
@@ -384,7 +375,7 @@ async def test_unsupported_lane_trigger_is_rejected() -> None:
     with pytest.raises(ContinuationRejected) as raised:
         await wired["service"].request(
             trigger(),
-            request_scope=CONT_SCOPE,
+            request_scope=SCOPE,
             run_key=RUN_KEY,
             activation_key="unit-collect-1",
             logical_execution_id="logical-collect-1",

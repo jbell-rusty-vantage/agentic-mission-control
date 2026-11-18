@@ -39,8 +39,7 @@ from mission_control.domain.policies.contracts import ActorContext
 from mission_control.interfaces.http.mission_control import MissionPrincipal, get_mission_principal
 from mission_control.interfaces.http.missions import router
 from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog
-from tests.fixtures.mission_control_common_db import canonical_scope
-from tests.fixtures.provider_frames import INSTALLATION, TENANT
+from tests.support.ids import INSTALLATION, TENANT, canonical_scope
 
 ROOT = Path(__file__).resolve().parents[3]
 

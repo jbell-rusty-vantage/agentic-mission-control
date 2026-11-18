@@ -44,9 +44,9 @@ from mission_control.domain.execution.contracts import (
 )
 from tests.fixtures.applications import installed_applications
 from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog
-from tests.fixtures.mission_control_common_db import canonical_scope
 from tests.fixtures.models import bindings_catalog
 from tests.support.deep_agents import exact_fixture
+from tests.support.ids import canonical_scope
 from tests.support.manifests.launch_inputs import MINIMAL, admitted
 from tests.unit.authoring.manifest_launch_fixture import (
     fixture_bindings,

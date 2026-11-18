@@ -5,7 +5,8 @@ from datetime import UTC, datetime, timedelta
 from unittest.mock import AsyncMock
 
 import pytest
-from tests.fixtures.provider_frames import SCOPE, in_memory_store, observation, opened_writer
+from tests.fixtures.provider_frames import in_memory_store, observation, opened_writer
+from tests.support.ids import SCOPE
 
 from mission_control.adapters.postgres.frames import repository
 from mission_control.application.execution.harness.dispatch import SessionOwner, StaleSessionOwner

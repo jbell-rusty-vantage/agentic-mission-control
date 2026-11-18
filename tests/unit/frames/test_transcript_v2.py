@@ -52,9 +52,6 @@ from tests.fixtures.provider_frames import (
     FIXTURE_ACTIVATION,
     FIXTURE_HARNESS,
     FRAME_NOW,
-    INSTALLATION,
-    SCOPE,
-    TENANT,
     provider_frame,
 )
 from tests.fixtures.transcripts import (
@@ -66,6 +63,7 @@ from tests.fixtures.transcripts import (
     transcript_events,
     transcript_frames,
 )
+from tests.support.ids import INSTALLATION, SCOPE, TENANT
 from tests.support.unit.frames.transcript_interfaces import _cli_transport, http_app
 
 UNIT = "bl-unit-v1:" + "7c" * 32

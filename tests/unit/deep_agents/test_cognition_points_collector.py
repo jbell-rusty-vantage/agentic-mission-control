@@ -41,8 +41,8 @@ from mission_control.domain.execution.cognition_points import (
 )
 from mission_control.domain.frames.contracts import FrameKind
 from mission_control.domain.graph_runtime.identities import QualifiedCheckpointKey
-from tests.fixtures.provider_frames import SCOPE as FRAME_SCOPE
 from tests.fixtures.provider_frames import in_memory_store, opened_writer
+from tests.support.ids import SCOPE as FRAME_SCOPE
 from tests.support.unit.deep_agents.cognition_points_collector import (
     DIGEST,
     THREAD,

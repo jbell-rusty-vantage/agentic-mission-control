@@ -23,7 +23,7 @@ from mission_control.domain.capabilities.hooks import HookDecision, HookEvent
 from mission_control.domain.frames.contracts import FrameKind
 from mission_control.domain.policies.stop_fence import STOP_FENCED, StopFence
 from mission_control.interfaces.http.hook_callback import create_hook_callback_app
-from tests.fixtures.lane_turns import SCOPE
+from tests.support.ids import SCOPE
 from tests.support.unit.harness.hook_callback import HEID, RUN, Stack, _context
 
 PRE_TOOL = {

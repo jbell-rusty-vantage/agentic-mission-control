@@ -25,7 +25,8 @@ from mission_control.domain.execution.contracts import (
 )
 from mission_control.domain.execution.lane_turns import LaneTurnRequest
 from tests.fixtures.checkpoint_recovery import stage_recovery_unit
-from tests.fixtures.lane_turns import ACTIVATION_UUID, RUN_UUID, SCOPE, RecordingSignals, lane_stack
+from tests.fixtures.lane_turns import ACTIVATION_UUID, RUN_UUID, RecordingSignals, lane_stack
+from tests.support.ids import SCOPE
 from tests.support.unit.harness.lane_turn_points import _attempt
 
 NOW = datetime(2026, 11, 5, 12, 0, tzinfo=UTC)

@@ -42,10 +42,7 @@ from tests.fixtures.rrm009_production_harness import (
     _wait_for,
     canonical_evidence,
 )
-from tests.fixtures.rrm009_production_stack import (
-    SCOPE,
-    technical_binding,
-)
+from tests.fixtures.rrm009_production_stack import technical_binding
 from tests.support.acceptance.mission_control.manifest_async_child import (
     ASYNC_CHILD,
     POLICY,
@@ -55,6 +52,7 @@ from tests.support.acceptance.mission_control.manifest_async_child import (
     spawning_components,
     write_async_bindings,
 )
+from tests.support.ids import SCOPE
 from tests.support.manifest_runtime import (
     OUTPUT_SCHEMAS,
     host_pins,

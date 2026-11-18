@@ -21,7 +21,8 @@ from mission_control.domain.execution.contracts import (
     OperationExecutionRequest,
 )
 from tests.fixtures.checkpoint_recovery import stage_recovery_unit
-from tests.fixtures.lane_turns import SCOPE, ScriptedSessionLane, cursor_operation
+from tests.fixtures.lane_turns import ScriptedSessionLane, cursor_operation
+from tests.support.ids import SCOPE
 
 
 @dataclass

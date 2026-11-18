@@ -23,7 +23,7 @@ import uvicorn
 from mission_control.adapters.cursor.hooks_callback import kernel_hook_script
 from mission_control.domain.policies.stop_fence import StopFence
 from mission_control.interfaces.http.hook_callback import create_hook_callback_app
-from tests.fixtures.lane_turns import SCOPE
+from tests.support.ids import SCOPE
 from tests.support.unit.harness.hook_callback import HEID, RUN, SCOPE_BLOCK, Stack, _context
 
 

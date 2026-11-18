@@ -16,7 +16,7 @@ from mission_control.application.authoring.manifest_launch_inputs import _goal_a
 from mission_control.application.programs.goal_directed import _iteration_transfer
 from mission_control.domain.authoring.manifest import parse_manifest_yaml
 from mission_control.domain.authoring.mission_definition import manifest_to_definitions
-from tests.fixtures.mission_control_common_db import canonical_scope
+from tests.support.ids import canonical_scope
 from tests.support.manifests.launch_inputs import admitted, compile_programs, resolver
 from tests.unit.authoring.manifest_launch_fixture import fixture_bindings, fixture_served
 

@@ -79,11 +79,8 @@ from tests.fixtures.manifest_runtime import (
 from tests.fixtures.mission_control_production_stack import open_postgres_production_stack
 from tests.fixtures.models import catalog_for
 from tests.fixtures.rrm009_production_harness import _diagnose, _run, _until
-from tests.fixtures.rrm009_production_stack import (
-    AGENT_COGNITIVE_QUEUE,
-    SCOPE,
-    technical_binding,
-)
+from tests.fixtures.rrm009_production_stack import AGENT_COGNITIVE_QUEUE, technical_binding
+from tests.support.ids import SCOPE
 from tests.support.manifest_runtime import (
     MISSION_2,
     OUTPUT_SCHEMAS,

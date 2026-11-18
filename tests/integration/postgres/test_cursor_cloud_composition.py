@@ -25,7 +25,8 @@ from mission_control.domain.execution.lane_turns import LaneTurnRequest
 from mission_control.domain.execution.lanes import CursorExecutionBinding
 from tests.fixtures.isolated_settings import isolated_settings
 from tests.fixtures.lane_turns import ACTIVATION_UUID, RUN_UUID, RecordingSignals, lane_stack
-from tests.fixtures.mission_control_common_db import CommonDatabase, catalog_scope
+from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.ids import catalog_scope
 from tests.support.providers.cursor import (
     API_KEY,
     FakeCloudApi,

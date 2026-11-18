@@ -26,8 +26,9 @@ from mission_control.interfaces.mcp.transcript_tools import (
     ScopedTranscripts,
     register_transcript_tools,
 )
-from tests.fixtures.provider_frames import SCOPE, provider_frame
+from tests.fixtures.provider_frames import provider_frame
 from tests.fixtures.transcripts import RUN_KEY, InMemoryMissionEvents, StaticFrames
+from tests.support.ids import SCOPE
 
 CARD = f"{PURPOSE_CARD_HEADER}\n\nWhy the mission exists and what this node's part is."
 

@@ -10,7 +10,7 @@ from mission_control.domain.execution.contracts import (
     ArtifactMetadataRevision,
     ArtifactPromotionState,
 )
-from tests.fixtures.mission_control_common_db import canonical_scope
+from tests.support.ids import canonical_scope
 from tests.support.unit.workspaces.artifact_promotion import CONTENT_DIGEST, NOW, OWNER
 
 

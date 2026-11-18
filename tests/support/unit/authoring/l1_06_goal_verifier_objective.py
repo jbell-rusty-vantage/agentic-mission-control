@@ -15,7 +15,7 @@ from mission_control.adapters.deep_agents.knowledge_tools import (
 )
 from mission_control.domain.authoring.mission_definition import MissionDefinition
 from mission_control.domain.execution.contracts import OperationExecutionRequest
-from tests.fixtures.mission_control_common_db import canonical_scope
+from tests.support.ids import canonical_scope
 from tests.support.manifests.experiment_loop import rendered
 from tests.support.manifests.launch_inputs import admitted, compile_programs, resolver
 from tests.unit.authoring.manifest_launch_fixture import fixture_bindings, fixture_served

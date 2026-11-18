@@ -36,7 +36,7 @@ from mission_control.domain.capabilities.host_support import LaneProfile
 from mission_control.domain.policies.contracts import ActorContext
 from mission_control.domain.prerequisites import PrerequisiteStanding
 from mission_control.interfaces.mcp.mission_tools import ScopedManifests
-from tests.fixtures.provider_frames import SCOPE
+from tests.support.ids import SCOPE
 from tests.support.manifests.compile import http_app
 from tests.support.manifests.interfaces import FakeLifecycle, manifests, principal
 from tests.support.unit.prerequisites.preflight import definition

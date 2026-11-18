@@ -10,8 +10,9 @@ from mission_control.adapters.postgres.workspaces.artifact_repository import (
     PostgresArtifactDurableReferenceRepository,
 )
 from mission_control.domain.policies.errors import IdempotencyConflict, RunControlNotFound
-from tests.fixtures.mission_control_common_db import CommonDatabase, canonical_scope
+from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.support.db_builders import insert_fixture_run
+from tests.support.ids import canonical_scope
 from tests.support.integration.postgres.artifact_promotion_postgres_integration import (
     admitted_revision,
 )

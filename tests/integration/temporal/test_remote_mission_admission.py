@@ -55,9 +55,10 @@ from mission_control.interfaces.http.ingress import create_ingress_app
 from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog, publish_output_schemas
 from tests.fixtures.db_env import db_env_name
 from tests.fixtures.manifest_runtime import AUTHOR, ChainScript, chain_components
-from tests.fixtures.mission_control_common_db import catalog_scope, ingress_login
+from tests.fixtures.mission_control_common_db import ingress_login
 from tests.fixtures.mission_control_production_stack import open_postgres_production_stack
-from tests.fixtures.rrm009_production_stack import SCOPE, technical_binding
+from tests.fixtures.rrm009_production_stack import technical_binding
+from tests.support.ids import SCOPE, catalog_scope
 from tests.support.integration.postgres.signal_ingress_postgres import FakeOidc, FakeUploads
 from tests.support.manifest_runtime import (
     MISSION_2,

@@ -22,7 +22,7 @@ from mission_control.application.prerequisites.setup import (
 from mission_control.domain.prerequisites import EvidenceRefused, VerificationMethod
 from mission_control.interfaces.cli import main as cli
 from mission_control.interfaces.cli.setup import render_wizard
-from tests.fixtures.provider_frames import SCOPE
+from tests.support.ids import SCOPE
 from tests.support.manifests.compile import http_app
 from tests.support.manifests.interfaces import FakeLifecycle, manifests
 

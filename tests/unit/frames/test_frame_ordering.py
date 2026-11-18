@@ -20,12 +20,12 @@ from mission_control.domain.frames.facts import (
 )
 from mission_control.domain.policies.contracts import StartAction
 from tests.fixtures.provider_frames import (
-    SCOPE,
     harness_start,
     in_memory_store,
     observation,
     provider_frame,
 )
+from tests.support.ids import SCOPE
 from tests.support.run_control import ALL_PERMISSIONS, actor, command, request
 from tests.support.run_control import service as run_control_service
 from tests.support.unit.frames.frame_facts import _RunControl

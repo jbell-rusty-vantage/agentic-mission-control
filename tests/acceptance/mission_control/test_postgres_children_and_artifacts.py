@@ -28,7 +28,8 @@ from tests.fixtures.rrm009_production_harness import (
     promote_generic_artifact,
     record_parity_trace,
 )
-from tests.fixtures.rrm009_production_stack import ANSWER_MARKER, SCOPE, technical_binding
+from tests.fixtures.rrm009_production_stack import ANSWER_MARKER, technical_binding
+from tests.support.ids import SCOPE
 
 from mission_control.adapters.postgres.async_subagents.async_subagent_detail_repository import (
     PostgresAsyncSubagentDetailRepository,

@@ -32,8 +32,6 @@ from tests.fixtures.db_env import db_env_name
 from tests.fixtures.mission_control_common_db import (
     COMPONENT_VERSION,
     CommonDatabase,
-    canonical_scope,
-    catalog_scope,
     create_common_database,
     drop_common_database,
     provision_runtime,
@@ -52,6 +50,7 @@ from tests.fixtures.rrm009_production_stack import (
     technical_admission_policies,
     technical_binding,
 )
+from tests.support.ids import canonical_scope, catalog_scope
 
 from mission_control.adapters.postgres.connections import (
     create_application_family_writer_pool,

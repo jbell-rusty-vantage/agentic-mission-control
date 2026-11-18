@@ -6,6 +6,8 @@ from datetime import UTC, datetime, timedelta
 from typing import Any
 from uuid import UUID, uuid4, uuid5
 
+from tests.support.ids import INSTALLATION, SCOPE
+
 from mission_control.application.frames.sink import InMemoryFrameStore, harness_execution_id
 from mission_control.application.frames.writer import FrameWriter
 from mission_control.domain.frames.contracts import (
@@ -16,11 +18,6 @@ from mission_control.domain.frames.contracts import (
     LaneProfile,
 )
 
-INSTALLATION = UUID("0192a4f0-0000-7000-8000-00000000b10e")
-TENANT = UUID("1b0e1c4e-6d0f-5c6b-9a4e-0d6d6f1c2a01")
-OTHER_TENANT = UUID("1b0e1c4e-6d0f-5c6b-9a4e-0d6d6f1c2a02")
-SCOPE = f"mc/{INSTALLATION}/biotech/{TENANT}"
-OTHER_SCOPE = f"mc/{INSTALLATION}/biotech/{OTHER_TENANT}"
 FRAME_NOW = datetime(2026, 10, 7, 12, 0, tzinfo=UTC)
 BINDING_DIGEST = "sha256:" + "b" * 64
 

@@ -65,12 +65,12 @@ from tests.fixtures.models import catalog_for, model_binding
 from tests.fixtures.rrm009_production_harness import ProductionStack
 from tests.fixtures.rrm009_production_stack import (
     AGENT_COGNITIVE_QUEUE,
-    SCOPE,
     TechnicalBinding,
     technical_binding,
 )
 from tests.support.artifacts import MemoryArtifacts
 from tests.support.artifacts import MemoryArtifacts as CursorArtifacts
+from tests.support.ids import SCOPE
 from tests.support.integration.temporal.manifest_v2_provider_launch import (
     AUTH_PROFILES,
     _PayloadInputs,

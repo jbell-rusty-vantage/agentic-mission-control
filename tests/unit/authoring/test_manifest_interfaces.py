@@ -31,7 +31,7 @@ from mission_control.interfaces.mcp.mission_tools import (
     ScopedManifests,
     register_manifest_tools,
 )
-from tests.fixtures.provider_frames import SCOPE
+from tests.support.ids import SCOPE
 from tests.support.manifests.compile import MINIMAL, http_app
 from tests.support.manifests.interfaces import MISSION_ID, FakeLifecycle, manifests, principal
 

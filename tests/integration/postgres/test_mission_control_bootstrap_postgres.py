@@ -28,9 +28,9 @@ from mission_control.bootstrap.common_installation import inspect_common_install
 from tests.fixtures.mission_control_common_db import (
     COMPONENT_VERSION,
     CommonDatabase,
-    catalog_scope,
     common_database,
 )
+from tests.support.ids import catalog_scope
 from tests.support.unit.control_plane.agentic_asset_definitions import skill_definition
 
 pytestmark = pytest.mark.common_db

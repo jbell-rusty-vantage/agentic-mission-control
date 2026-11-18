@@ -23,10 +23,11 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
 from urllib.parse import quote, urlsplit, urlunsplit
-from uuid import UUID, uuid5
+from uuid import UUID
 
 import asyncpg
 import pytest
+from tests.support.ids import INSTALLATIONS, canonical_scope, tenant_id
 
 ROOT = Path(__file__).resolve().parents[2]
 _PACKAGE_ROOT = ROOT / "packages" / "mission-control-db-contract"
@@ -63,14 +64,6 @@ COMPONENT_VERSION = json.loads((COMPONENT_ROOT / "release-spec.json").read_bytes
 ]
 WRITER_VERSION = "mission-control-runtime/1"
 
-_NAMESPACE = UUID("6d9c2f6e-6a43-4c7e-9a52-6f3b1b7f2a10")
-
-BIOTECH_INSTALLATION_ID = UUID("0192a4f0-0000-7000-8000-00000000b10e")
-AI_ENGINEER_INSTALLATION_ID = UUID("0192a4f0-0000-7000-8000-0000000a1e00")
-INSTALLATIONS = {
-    "biotech": (BIOTECH_INSTALLATION_ID, "mcdisposablebiotech"),
-    "ai-engineer": (AI_ENGINEER_INSTALLATION_ID, "mcdisposableaieng"),
-}
 CAPABILITY_ROLES = (
     "mission_control_runtime",
     "mission_control_family_writer",
@@ -84,22 +77,6 @@ RUNTIME_DESCRIPTOR = json.loads(
         encoding="utf-8"
     )
 )
-
-
-def tenant_id(name: str, application_id: str = "biotech") -> UUID:
-    """Deterministic test tenant UUID; equal names in two apps intentionally collide."""
-    del application_id
-    return uuid5(_NAMESPACE, f"tenant:{name}")
-
-
-def canonical_scope(name: str = "tenant-1", application_id: str = "biotech") -> str:
-    installation_id, _ref = INSTALLATIONS[application_id]
-    return f"mc/{installation_id}/{application_id}/{tenant_id(name, application_id)}"
-
-
-def catalog_scope(application_id: str = "biotech") -> str:
-    installation_id, _ref = INSTALLATIONS[application_id]
-    return f"mc/{installation_id}/{application_id}/catalog"
 
 
 DEFAULT_TENANTS = ("tenant-1", "tenant-2", "tenant-3", "tenant-a", "tenant-b", "operator")

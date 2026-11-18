@@ -282,7 +282,7 @@ def manifest_for(web: Any, *, vendor: str = "firecrawl", scenario: str = "pilot"
 
 @asynccontextmanager
 async def knowledge_host(root: Path, *, module: str = "qualia-fixture-host.ts") -> Any:
-    from tests.fixtures.mission_control_common_db import canonical_scope
+    from tests.support.ids import canonical_scope
     from tests.support.integration.deep_agents.report_source_real_service import response
 
     from mission_control.application.knowledge.access import instant

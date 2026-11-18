@@ -7,6 +7,7 @@ from collections.abc import Mapping, Sequence
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
+from tests.support.ids import INSTALLATION, TENANT
 from tests.support.knowledge.stores import InMemoryStaging
 
 from mission_control.application.context.continuation import (
@@ -44,11 +45,10 @@ from mission_control.domain.context.packet import (
 )
 from mission_control.domain.context.render import ContextSelectionRecord
 
-CONT_SCOPE = "mc/0192a4f0-0000-7000-8000-00000000b10e/biotech/1b0e1c4e-6d0f-5c6b-9a4e-0d6d6f1c2a01"
 PACKET_SCOPE = PacketScope(
-    installation_id="0192a4f0-0000-7000-8000-00000000b10e",
+    installation_id=str(INSTALLATION),
     application_id="biotech",
-    tenant_id="1b0e1c4e-6d0f-5c6b-9a4e-0d6d6f1c2a01",
+    tenant_id=str(TENANT),
 )
 RUN_KEY = "run-continuation-1"
 NOW = datetime(2026, 10, 8, 9, 0, tzinfo=UTC)

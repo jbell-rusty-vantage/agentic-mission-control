@@ -32,16 +32,10 @@ from mission_control.application.frames.reducer import DeriveContext, derive
 from mission_control.domain.context.checkpoint import ContinuationTriggerKind
 from mission_control.domain.frames.contracts import FrameKind, LaneProfile
 from mission_control.domain.frames.facts import CompactionObservedFact
-from tests.fixtures.continuation import (
-    CONT_SCOPE,
-    RUN_KEY,
-    build_service,
-    facts,
-    seal_target,
-    trigger,
-)
+from tests.fixtures.continuation import RUN_KEY, build_service, facts, seal_target, trigger
 from tests.fixtures.continuation_graph import TASK, compaction_agent, stream_turn
 from tests.fixtures.provider_frames import harness_start, in_memory_store, opened_writer
+from tests.support.ids import SCOPE
 from tests.support.knowledge.stores import InMemoryStaging
 
 SOURCE_THREAD = "thread-collect-1"
@@ -97,7 +91,7 @@ async def test_forced_summarization_seals_a_checkpoint_and_hydrates_a_fresh_thre
     assert isinstance(result["messages"][-1], AIMessage)
 
     # 1. Both compaction frames, persisted through the FrameSink in arrival order.
-    frames = await store.frames_for_run(CONT_SCOPE, run_id)
+    frames = await store.frames_for_run(SCOPE, run_id)
     kinds = [frame.kind for frame in frames]
     assert FrameKind.BEFORE_COMPACTION in kinds and FrameKind.AFTER_COMPACTION in kinds
     first_before = kinds.index(FrameKind.BEFORE_COMPACTION)
@@ -153,19 +147,17 @@ async def test_forced_summarization_seals_a_checkpoint_and_hydrates_a_fresh_thre
     service = wired["service"]
     transfer = await service.request(
         trigger(ContinuationTriggerKind.PROVIDER_COMPACTION, f"provider_frame:{after.frame_id}"),
-        request_scope=CONT_SCOPE,
+        request_scope=SCOPE,
         run_key=RUN_KEY,
         activation_key="unit-collect-1",
         logical_execution_id="logical-collect-1",
         lane_profile="deep_agents",
         source_session_ref=SOURCE_THREAD,
     )
-    sealed = await service.seal(
-        transfer.transfer_id, facts(), seal_target(), request_scope=CONT_SCOPE
-    )
+    sealed = await service.seal(transfer.transfer_id, facts(), seal_target(), request_scope=SCOPE)
     assert sealed.checkpoint is not None and sealed.checkpoint.valid
     snapshot = await snapshots.load(
-        request_scope=CONT_SCOPE, snapshot_ref=sealed.checkpoint.workspace_snapshot_ref
+        request_scope=SCOPE, snapshot_ref=sealed.checkpoint.workspace_snapshot_ref
     )
     assert snapshot is not None
     assert set(snapshot.manifest) == {
@@ -175,7 +167,7 @@ async def test_forced_summarization_seals_a_checkpoint_and_hydrates_a_fresh_thre
 
     # 5. Transfer: a new thread seeded from the checkpoint packet.
     hydrator = DeepAgentsSessionHydrator(graph=agent, backend=backend, bytes_source=staging)
-    outcome = await service.transfer(transfer.transfer_id, hydrator, request_scope=CONT_SCOPE)
+    outcome = await service.transfer(transfer.transfer_id, hydrator, request_scope=SCOPE)
     target = outcome.transfer.target_session_ref
     assert outcome.transfer.status == TransferStatus.TRANSFERRED
     assert target is not None and target != SOURCE_THREAD and target.startswith(SOURCE_THREAD)
@@ -210,6 +202,6 @@ async def test_forced_summarization_seals_a_checkpoint_and_hydrates_a_fresh_thre
         for message in continued["messages"]
     )
 
-    released = await service.release_if_hydrated(transfer.transfer_id, request_scope=CONT_SCOPE)
+    released = await service.release_if_hydrated(transfer.transfer_id, request_scope=SCOPE)
     assert released.released
     assert wired["mailbox"].released[transfer.transfer_id] == ("cmd-held-1",)

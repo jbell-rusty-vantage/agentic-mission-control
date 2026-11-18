@@ -40,9 +40,9 @@ from mission_control.domain.execution.contracts import (
     DeepAgentModelComponent,
 )
 from tests.fixtures.applications import installed_applications
-from tests.fixtures.mission_control_common_db import canonical_scope
 from tests.fixtures.models import bindings_catalog
 from tests.support.deep_agents import exact_fixture
+from tests.support.ids import canonical_scope
 from tests.support.manifests.launch_inputs import (
     MINIMAL,
     MISSION_2,

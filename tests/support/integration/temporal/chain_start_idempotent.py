@@ -14,7 +14,7 @@ from mission_control.application.execution.service import RunControlService
 from mission_control.domain.authoring.canonical import sha256_digest
 from mission_control.domain.authoring.fixtures import GENERIC_GOAL_DIRECTED
 from mission_control.domain.programs.contracts import GoalDirectedRunInput, GoalRevision
-from tests.fixtures.mission_control_common_db import canonical_scope
+from tests.support.ids import canonical_scope
 
 SCOPE = canonical_scope("tenant-1")
 NOW = datetime(2026, 10, 8, 12, tzinfo=UTC)

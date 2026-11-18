@@ -35,8 +35,8 @@ from mission_control.application.execution.stop_fence import InMemoryStopFenceRe
 from mission_control.application.human_tasks.memory import InMemoryHumanTaskRepository
 from mission_control.application.human_tasks.service import HumanTaskService
 from mission_control.domain.policies.contracts import ActorContext
-from tests.fixtures.provider_frames import SCOPE
 from tests.support.artifacts import MemoryArtifacts
+from tests.support.ids import SCOPE
 from tests.unit.approvals.fixtures import POLICY, REVIEWER, RUN, answer
 from tests.unit.effects.support import (
     API,

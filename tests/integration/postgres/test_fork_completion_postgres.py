@@ -104,8 +104,9 @@ from mission_control.domain.programs.contracts import (
     StageGraphRunInput,
 )
 from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog
-from tests.fixtures.mission_control_common_db import CommonDatabase, catalog_scope
+from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.fixtures.run_forks import technical_snapshot
+from tests.support.ids import catalog_scope
 from tests.support.integration.postgres.manifest_submit import MINIMAL, OWNER, RecordingSubmitter
 from tests.support.integration.postgres.manifest_submit import request as submit_request
 from tests.support.knowledge.gateway import MISSION, lane

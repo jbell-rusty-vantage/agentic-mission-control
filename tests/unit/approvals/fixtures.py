@@ -22,7 +22,7 @@ from mission_control.application.execution.approvals_governed import (
     GovernedIntent,
 )
 from mission_control.domain.execution.approvals import NativeApprovalCorrelation
-from tests.fixtures.provider_frames import SCOPE
+from tests.support.ids import SCOPE
 
 OPENED_AT = datetime(2026, 10, 8, 12, 0, tzinfo=UTC)
 POLICY = "sha256:" + "a" * 64

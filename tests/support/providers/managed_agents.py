@@ -65,9 +65,10 @@ from mission_control.application.secrets.broker import SecretBroker
 from mission_control.domain.execution.bindings import ProviderExecutionBinding
 from mission_control.domain.execution.contracts import OperationExecutionRequest
 from tests.fixtures.lane_bindings import lane_fields
-from tests.fixtures.lane_turns import DIGEST, SCOPE
+from tests.fixtures.lane_turns import DIGEST
 from tests.fixtures.session_retention import RecordingDeletionScheduler
 from tests.support.artifacts import MemoryArtifacts
+from tests.support.ids import SCOPE
 
 API_KEY: Final = "fake-anthropic-key-for-tests"
 PAGE_SIZE: Final = 2

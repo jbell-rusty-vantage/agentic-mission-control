@@ -66,15 +66,9 @@ from mission_control.interfaces.mcp.cognition_point_tools import (
     register_cognition_point_tools,
 )
 from mission_control.interfaces.mcp.coordinator_server import CoordinatorPrincipal, _principal_call
-from tests.fixtures.provider_frames import (
-    FIXTURE_HARNESS,
-    FIXTURE_RUN,
-    INSTALLATION,
-    SCOPE,
-    TENANT,
-    provider_frame,
-)
+from tests.fixtures.provider_frames import FIXTURE_HARNESS, FIXTURE_RUN, provider_frame
 from tests.support.frames import store_holding
+from tests.support.ids import INSTALLATION, SCOPE, TENANT
 
 RUN = str(FIXTURE_RUN)
 NOW = datetime(2026, 10, 21, 12, 0, tzinfo=UTC)

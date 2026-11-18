@@ -33,7 +33,6 @@ from tests.fixtures.rrm009_production_stack import (
     LANGGRAPH_SCHEMA,
     OPERATOR,
     REPORT_PATH,
-    SCOPE,
     WAIT_ID,
     TechnicalBinding,
     TechnicalCatalog,
@@ -41,6 +40,7 @@ from tests.fixtures.rrm009_production_stack import (
     publish_technical_catalog,
     stage_templates,
 )
+from tests.support.ids import SCOPE
 
 from mission_control.adapters.operations.runtime_ports import (
     FilesystemArtifactPayloadStore,

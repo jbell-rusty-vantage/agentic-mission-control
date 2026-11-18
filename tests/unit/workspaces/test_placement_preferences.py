@@ -9,7 +9,7 @@ from mission_control.application.prerequisites.service import (
 )
 from mission_control.application.workspaces.preferences import FreshPlacementEligibility
 from mission_control.domain.authoring.manifest_v2 import EnvironmentV2
-from tests.fixtures.provider_frames import SCOPE
+from tests.support.ids import SCOPE
 from tests.support.manifests.compile import minimal, scope, service, text
 from tests.support.unit.prerequisites.preflight import definition
 

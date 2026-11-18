@@ -279,7 +279,7 @@ def test_a_real_goal_directed_verifier_template_lacks_the_producer_tools() -> No
     )
     from mission_control.application.knowledge.toolset import TOOL_NAMES
     from mission_control.domain.execution.contracts import DeepAgentExecutionBinding
-    from tests.fixtures.mission_control_common_db import canonical_scope
+    from tests.support.ids import canonical_scope
     from tests.support.manifests.launch_inputs import compile_programs, resolver
     from tests.unit.authoring.manifest_launch_fixture import fixture_bindings, fixture_served
 

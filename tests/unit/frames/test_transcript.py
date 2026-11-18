@@ -29,7 +29,7 @@ from mission_control.domain.frames.transcript import (
     TranscriptQuery,
 )
 from mission_control.domain.policies.contracts import ActorContext
-from tests.fixtures.provider_frames import FIXTURE_ACTIVATION, SCOPE
+from tests.fixtures.provider_frames import FIXTURE_ACTIVATION
 from tests.fixtures.transcripts import (
     READER,
     RUN_KEY,
@@ -40,6 +40,7 @@ from tests.fixtures.transcripts import (
     transcript_events,
     transcript_frames,
 )
+from tests.support.ids import SCOPE
 
 GOLDENS = Path(__file__).parent / "goldens"
 
