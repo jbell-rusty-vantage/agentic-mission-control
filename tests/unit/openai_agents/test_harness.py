@@ -11,10 +11,8 @@ from mission_control.application.execution.harness.lane_turns import (
 from mission_control.domain.execution.bindings import ProviderExecutionBinding
 from mission_control.domain.execution.lanes import (
     CancelTurnRequest,
-    EndSessionRequest,
     ObserveRequest,
     PrepareRequest,
-    ReattachRequest,
     SendTurnRequest,
     StartRequest,
 )
@@ -67,37 +65,11 @@ async def observe(stack: AgentsStack, turn, after=None):
     ]
 
 
-async def test_start_observe_settle_and_custody_before_retention(tmp_path: Path) -> None:
-    stack = agents_stack(tmp_path)
-    session = await start(stack)
-    turn = await send(stack, session)
-    events = await observe(stack, turn)
-    final = events[-1]
-    assert final.terminal
-    facts = stack.harness.closing_facts(turn, final)
-    assert facts.native_status == "finished"
-    assert facts.result_excerpt == "Completed answer."
-    assert facts.usage.total_tokens == 10
-    assert facts.cost_disposition == "unknown"
-    paths = [r.path for r in stack.api.requests]
-    assert paths.index(f"/agents/sessions/{session.native_session_ref}/events") < next(
-        i
-        for i, r in enumerate(stack.api.requests)
-        if r.method == "POST" and r.path.endswith("/events")
-    )
-    receipt = await stack.harness.end_session(
-        EndSessionRequest(**fields(stack, "end"), session=session, reason="done")
-    )
-    assert receipt.released and receipt.artifact_refs and stack.deletions.orders
-    assert session.native_session_ref in stack.api.sessions_store
-
-
-async def test_busy_does_not_steer_and_cancel_retries_conflict(tmp_path: Path) -> None:
+async def test_cancel_retries_a_conflict_until_the_turn_closes_cancelled(tmp_path: Path) -> None:
+    # The busy half of this test is the conformance send-while-busy scenario.
     stack = agents_stack(tmp_path, ("held",))
     session = await start(stack)
     turn = await send(stack, session)
-    assert (await send(stack, session, 2)).status == "busy"
-    assert len(stack.api.sends) == 1
     stack.api.cancel_conflicts = 1
     cancel = await stack.harness.cancel_turn(
         CancelTurnRequest(**fields(stack, "cancel"), turn=turn, reason="owner stop")
@@ -105,38 +77,6 @@ async def test_busy_does_not_steer_and_cancel_retries_conflict(tmp_path: Path) -
     assert cancel.acknowledged and stack.api.cancel_count == 2
     final = (await observe(stack, turn))[-1]
     assert stack.harness.closing_facts(turn, final).native_status == "cancelled"
-
-
-async def test_reattach_after_worker_loss_recovers_final_items_with_stable_keys(
-    tmp_path: Path,
-) -> None:
-    stack = agents_stack(tmp_path, ("held",))
-    session = await start(stack)
-    turn = await send(stack, session)
-    stack.api.release()
-    original = await observe(stack, turn)
-    # Lose every process-local summary and item. The provider history survives.
-    stack.harness._sessions.clear()
-    identity = LaneExecutionIdentity.of(stack.operation, "codex_agents", 1)
-    stack.harness.stage(str(identity.harness_execution_id), stack.operation)
-    await stack.harness.reattach(
-        ReattachRequest(
-            **fields(stack, "reattach"),
-            native_session_ref=session.native_session_ref,
-            native_turn_ref=turn.native_turn_ref,
-        )
-    )
-    restored = await observe(stack, turn, original[-2].cursor)
-    assert restored[-1].provider_key == original[-1].provider_key
-    assert stack.harness.final_text(turn, restored[-1]) == "Completed answer."
-    assert len(stack.api.sends) == 1
-
-
-async def test_unknown_turn_usage_stays_unknown(tmp_path: Path) -> None:
-    stack = agents_stack(tmp_path, ("no_usage",))
-    final = (await observe(stack, await send(stack, await start(stack))))[-1]
-    assert final.body["turn"]["usage"] is None
-    assert stack.harness.closing_facts(None, final).usage.disposition == "unknown"
 
 
 @pytest.mark.parametrize("status", ["suspended", "expired", "reset"])

@@ -18,21 +18,6 @@ from tests.unit.cursor.support import heid_of, lanes_for, signals, turn
 PROFILE = "cursor_cloud"
 
 
-@pytest.mark.parametrize("shape", ["totals_only", "empty", "unavailable"])
-async def test_usage_the_provider_does_not_report_for_this_run_stays_unknown(
-    tmp_path: Path, shape: str
-) -> None:
-    stack = cloud_stack(tmp_path, cost=1_250_000, api_changes={"usage_shape": shape})
-    lanes = lanes_for(stack)
-    result = await lanes.service.turn(turn(stack, PROFILE), signals(lanes, stack, PROFILE))
-    assert result.done and result.closing_facts is not None
-    facts = result.closing_facts
-    assert facts.usage.disposition == "unknown" and facts.usage.total_tokens == 0
-    assert facts.cost_disposition == "settled", "exact-run cost is independent of unknown tokens"
-    assert facts.usage.cost_micros_usd == 1_250_000
-    assert result.usage_estimate is not None and result.usage_estimate.disposition == "unknown"
-
-
 async def test_reported_usage_settles_and_the_agent_total_is_never_attributed_to_a_run(
     tmp_path: Path,
 ) -> None:

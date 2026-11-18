@@ -88,19 +88,3 @@ async def test_a_429_on_a_later_run_is_capacity_and_nothing_is_sent_twice(tmp_pa
     accepted = await stack.harness.send_turn(send_request(stack, PROFILE, heid, agent_id, 2))
     assert accepted.native_turn_ref is not None and accepted.status == "accepted"
     assert len(stack.api.created_runs) == 2
-
-
-async def test_agent_busy_stays_wait_then_send_with_one_request_and_no_run(tmp_path: Path) -> None:
-    stack = cloud_stack(tmp_path)
-    lanes = lanes_for(stack)
-    assert (await lanes.service.turn(turn(stack, PROFILE), signals(lanes, stack, PROFILE))).done
-    heid = heid_of(stack, PROFILE)
-    agent_id = next(iter(stack.api.agents))
-    stack.harness.stage(heid, stack.operation)
-    stack.api.busy = True
-    busy = await stack.harness.send_turn(send_request(stack, PROFILE, heid, agent_id, 2))
-    assert busy.status == "busy" and busy.native_turn_ref is None
-    posts = [r for r in stack.api.requests if r.method == "POST" and r.url.path.endswith("/runs")]
-    assert len(posts) == 1 and stack.api.created_runs == [stack.api.run_id]
-    assert stack.harness.describe().delivery_semantics["queue_instruction"] == "wait_then_send"
-    assert stack.harness.describe().delivery_semantics["resume"] == "wait_then_send"

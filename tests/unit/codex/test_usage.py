@@ -15,9 +15,13 @@ import pytest
 
 from mission_control.adapters.codex.frames import TurnUsageTracker, occupancy_from_usage
 from mission_control.adapters.codex.protocol import ThreadTokenUsage, TokenUsageBreakdown
+from mission_control.adapters.codex.usage import observed_usage
 from mission_control.application.frames.kinds import classify
 from mission_control.domain.execution.lanes import CancelTurnRequest, UsageRequest
-from mission_control.domain.frames.contracts import LaneProfile
+from mission_control.domain.frames.contracts import FrameKind, LaneProfile
+from tests.conformance.lanes.adapters.codex import CodexConformance
+from tests.conformance.lanes.contract import Script
+from tests.conformance.lanes.drive import cancel_held, cancel_request, held_turn, settled
 from tests.support.providers.codex import FixtureLauncher, codex_stack
 from tests.unit.codex.drive import fields, observed, sent, started
 
@@ -266,3 +270,35 @@ async def test_late_previous_turn_companion_invalidates_persisted_replacement_at
         == "unknown"
     )
     await launcher.shutdown()
+
+
+# Moved from tests/conformance/lanes/test_session_turns.py: the codex-only cancel without
+# counters, driven through the conformance adapter's production lane turn service.
+async def test_codex_interrupted_without_counters_retains_reconciliation(tmp_path: Path) -> None:
+    fake = await CodexConformance(held_usage=False).open(tmp_path, Script.HELD_TURN)
+    task = await held_turn(fake, cancel=True)
+    outcome = await cancel_held(fake, task)
+    result = settled(outcome)
+    assert fake.cancels() >= 1
+    assert not outcome.settled
+    assert (result.status, result.failure_code) == (
+        "in_doubt",
+        "codex_usage_requires_reconciliation",
+    )
+    assert "tokens.total" not in result.usage.amounts
+    reports = observed_usage(fake.frames())
+    assert reports and all(report.disposition == "unknown" for report in reports.values())
+    assert all(report.total_tokens == 0 for report in reports.values())
+    assert any(frame.kind == FrameKind.RUN_RESULT for frame in fake.frames())
+    assert not fake.control.lanes.budget.settlements
+    assert await fake.control.lanes.boundary.lane_settlement(fake.operation) is None
+    sends = fake.sends()
+    again = await fake.control.service.cancel(cancel_request(fake))
+    assert not again.settled
+    # Cleanup can leave no fresh provider observation on a later control. The
+    # durable operation stays unsettled; an absent result never means free usage.
+    assert again.operation_result is None
+    assert await fake.control.lanes.boundary.lane_settlement(fake.operation) is None
+    assert fake.sends() == sends
+    assert observed_usage(fake.frames()) == reports
+    assert not fake.control.lanes.budget.settlements

@@ -1,16 +1,16 @@
 """MP-08: the `codex` lane over the FIXTURE app-server, driven by `LaneTurnService`.
 
-Deterministic outcomes for: a full turn (every event a frame, unknown kinds stay unknown,
-no credential in the child environment, project trust materialized); queued sends on an
-active thread (`busy`, never a `turn/start` that would steer); explicit steering applied to
-the exact turn or `stale_target` when the turn completed first; interrupt with the terminal
-completion observed; a lost `turn/start` response reconciled from thread history and never
-re-sent; a disconnect ending the segment and the next segment reattaching from history; a
-limit refusal as `ProviderCapacityLimited` journaled `declined`; the describe matrix
-implemented cell by cell; the binding's approval policy is exactly the pinned enum.
-Approvals (MP-11 broker) are in `test_approvals.py`, segment cursors in `test_segments.py`,
-MP-12 compaction/occupancy in `test_compaction.py`, launcher/composition in
-`test_launcher.py`.
+Codex translation only; the shared session scenarios (busy sends, cancel, interrupt, describe
+honesty) run in `tests/conformance/lanes`. Deterministic outcomes for: a full turn (every event
+a frame, unknown kinds stay unknown, no credential in the child environment, project trust
+materialized, the pinned `thread/start` wire); explicit steering applied to the exact turn or
+`stale_target` when the turn completed first; a lost `turn/start` response reconciled from
+thread history and never re-sent; a disconnect ending the segment and the next segment
+reattaching from history; a limit refusal as `ProviderCapacityLimited` journaled `declined`;
+the describe's codex version and identity pins; the binding's approval policy is exactly the
+pinned enum. Approvals (MP-11 broker) are in `test_approvals.py`, segment cursors in
+`test_segments.py`, MP-12 compaction/occupancy in `test_compaction.py`, launcher/composition in
+`test_launcher.py`, cancel without usage counters in `test_usage.py`.
 """
 
 from __future__ import annotations
@@ -27,25 +27,16 @@ from mission_control.adapters.codex.launcher import child_environment, subproces
 from mission_control.adapters.codex.transport import ResponseLost
 from mission_control.application.agentic_components.placement import LaneProjectionError
 from mission_control.application.execution.child_environment import provider_child_environment
-from mission_control.application.execution.harness.controls import TurnTextStaging
 from mission_control.application.execution.harness.dispatch import (
     DispatchReconcilingLane,
     ProviderCapacityLimited,
-    SteeringLane,
-)
-from mission_control.application.execution.harness.protocol import (
-    HARNESS_PROTOCOL_METHODS,
-    implements,
 )
 from mission_control.domain.execution.contracts import OperationExecutionResult
-from mission_control.domain.execution.lane_turns import LANE_COMMAND_SEMANTICS, LaneCancelRequest
 from mission_control.domain.execution.lanes import (
-    CancelTurnRequest,
     PrepareRequest,
     SendTurnRequest,
     SessionHandle,
     StartRequest,
-    StatusRequest,
     TurnHandle,
 )
 from mission_control.domain.frames.body import frame_body_object
@@ -250,37 +241,6 @@ async def test_a_full_turn_persists_every_event_as_frames_and_settles(tmp_path: 
 # --- queued sends never become active-turn steering -----------------------------------------
 
 
-async def test_a_send_on_an_active_thread_is_busy_and_never_a_turn_start(tmp_path: Path) -> None:
-    stack = codex_stack(tmp_path, "turn_hold")
-    session = await _started(stack)
-    first = await _sent(stack, session, "turn:1")
-    assert first.native_turn_ref == "turn-0002" and first.status == "accepted"
-    server = stack.launcher.server
-    await asyncio.wait_for(server.held.wait(), timeout=5)
-
-    queued = await _sent(stack, session, "turn:2")
-    again = await _sent(stack, session, "turn:2")
-    assert queued.status == "busy" and again.status == "busy"
-    assert [m for m, _p in server.records].count("turn/start") == 1
-    assert server.steer_by_turn_start == 0, "a turn/start on an active thread would steer it"
-    assert stack.harness.active_turn(stack.heid) == first.native_turn_ref
-
-    server.release.set()
-    frames = [
-        frame
-        async for frame in stack.harness.observe(
-            __import__(
-                "mission_control.domain.execution.lanes", fromlist=["ObserveRequest"]
-            ).ObserveRequest(**_fields(stack), turn=first, after=None, max_frames=100)
-        )
-    ]
-    assert frames[-1].terminal
-    # Idle now: the queued send goes through as a new turn with its own identity.
-    later = await _sent(stack, session, "turn:2")
-    assert later.status == "accepted" and later.native_turn_ref not in {None, first.native_turn_ref}
-    assert [m for m, _p in server.records].count("turn/start") == 2
-
-
 # --- explicit steering --------------------------------------------------------------------
 
 
@@ -314,67 +274,7 @@ async def test_steer_lands_on_the_exact_turn_or_is_a_typed_stale_target(
     server.steer_received.set()
 
 
-async def test_the_describe_interrupt_cell_follows_the_frozen_table(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    from mission_control.adapters.codex.protocol import codex_local_describe
-    from mission_control.application.execution.harness.inject import resolve_interrupt_mode
-
-    launcher = FixtureLauncher()
-    harness, *_rest = build_harness(tmp_path, launcher)
-    declared = LANE_COMMAND_SEMANTICS["interrupt_and_inject"]["codex"]
-    assert harness.describe().delivery_semantics["interrupt_and_inject"] == declared
-    assert resolve_interrupt_mode("codex", harness.describe(), harness) == declared
-    assert codex_local_describe() == harness.describe()
-    # The lane implements `turn/steer`: once the table and the declared matrix both say
-    # `cooperative_inject` (a qualified decision), the same harness steers.
-    monkeypatch.setitem(
-        LANE_COMMAND_SEMANTICS["interrupt_and_inject"], "codex", "cooperative_inject"
-    )
-    steering = harness.describe().model_copy(
-        update={
-            "delivery_semantics": {
-                **harness.describe().delivery_semantics,
-                "interrupt_and_inject": "cooperative_inject",
-            }
-        }
-    )
-    assert resolve_interrupt_mode("codex", steering, harness) == "cooperative_inject"
-    assert isinstance(harness, SteeringLane)
-
-
 # --- interrupt: terminal completion is observed ---------------------------------------------
-
-
-async def test_cancel_turn_interrupts_and_observes_the_terminal_completion(tmp_path: Path) -> None:
-    stack = codex_stack(tmp_path, "turn_hold")
-    session = await _started(stack)
-    turn = await _sent(stack, session)
-    server = stack.launcher.server
-    await asyncio.wait_for(server.held.wait(), timeout=5)
-
-    receipt = await stack.harness.cancel_turn(
-        CancelTurnRequest(**_fields(stack), turn=turn, reason="command")
-    )
-    assert receipt.acknowledged and not receipt.already_terminal
-    assert receipt.native_status == "interrupted", "observed from turn/completed, not assumed"
-    assert server.interrupts == [turn.native_turn_ref]
-    status = await stack.harness.status(StatusRequest(**_fields(stack), session=session, turn=turn))
-    assert status.terminal and status.idle and status.status == "interrupted"
-    again = await stack.harness.cancel_turn(
-        CancelTurnRequest(**_fields(stack), turn=turn, reason="command")
-    )
-    assert again.already_terminal and again.native_status == "interrupted"
-    from mission_control.domain.execution.lanes import ObserveRequest
-
-    frames = [
-        frame
-        async for frame in stack.harness.observe(
-            ObserveRequest(**_fields(stack), turn=turn, after=None, max_frames=100)
-        )
-    ]
-    facts = stack.harness.closing_facts(turn, frames[-1])
-    assert frames[-1].terminal and facts.native_status == "cancelled"
 
 
 async def _held(stack: Any) -> None:
@@ -396,36 +296,6 @@ async def _held(stack: Any) -> None:
             await asyncio.sleep(0.01)
 
     await asyncio.wait_for(watch(), 10)
-
-
-async def test_lane_cancel_without_usage_retains_reconciliation_after_native_cancel(
-    tmp_path: Path,
-) -> None:
-    stack = codex_stack(tmp_path, "turn_hold")
-    signals = RecordingSignals(stack.lanes.frames, stack.identity.harness_execution_id, cancel=True)
-    task = asyncio.create_task(stack.lanes.service.turn(stack.turn(segment=BOUNDS), signals))
-    await _held(stack)
-    task.cancel()
-    with pytest.raises(asyncio.CancelledError):
-        await task
-    outcome = await stack.lanes.service.cancel(
-        LaneCancelRequest.model_validate(
-            {"operation": stack.operation, "lane_profile": "codex", "generation": 1}
-        )
-    )
-    settled = OperationExecutionResult.model_validate(outcome.operation_result)
-    assert (settled.status, settled.failure_code) == (
-        "in_doubt",
-        "codex_usage_requires_reconciliation",
-    ), "native cancellation does not establish zero usage"
-    assert stack.launcher.server.interrupts, "the requested cancel reached the provider"
-    ended = next(frame for frame in stack.frames() if frame.kind == FrameKind.TURN_ENDED)
-    assert (
-        frame_body_object(ended.body_excerpt, ended.body_bytes, ended.lifecycle_body)["turn"][
-            "status"
-        ]
-        == "interrupted"
-    )
 
 
 # --- lost response: reconciled from thread history, never re-sent ---------------------------
@@ -580,30 +450,17 @@ async def test_a_mid_turn_usage_limit_preserves_capacity_error_while_usage_is_un
 # --- describe and host constraints ----------------------------------------------------------
 
 
-async def test_the_describe_matrix_is_implemented_cell_by_cell(tmp_path: Path) -> None:
+def test_the_describe_pins_the_codex_versions_and_identity(tmp_path: Path) -> None:
+    """Cell-by-cell describe honesty is the conformance suite's; these are the codex pins."""
+
     harness, *_rest = build_harness(tmp_path, FixtureLauncher())
     describe = harness.describe()
     assert describe.is_v2 and describe.qualified is False
     assert describe.lane_profile == "codex" and describe.placement == "worker_hosted"
-    for operation in HARNESS_PROTOCOL_METHODS:
-        if operation == "describe":
-            continue
-        assert describe.control(operation) in {"native", "emulated"}, operation
-        assert implements(harness, operation), operation
-    # Cross-provider control: `fork` is emulated by `time_travel.seed_fork`, never a harness op.
-    assert describe.controls["fork"] == "emulated" and not hasattr(harness, "fork")
     assert describe.time_travel is not None and describe.time_travel.fork == "R3"
-    assert callable(harness.turn_points) and callable(harness.fork_thread)
-    assert describe.controls["pause"] == "emulated" and callable(harness.hold_approvals)
-    assert isinstance(harness, SteeringLane)
-    assert isinstance(harness, DispatchReconcilingLane)
-    assert isinstance(harness, TurnTextStaging)
     assert describe.identity.session_ref == "thread_id" and describe.identity.turn_ref == "turn_id"
     assert describe.identity.effect_ref == "item_id"
     assert describe.versions["codex_cli"] == "0.162.1"
-    assert describe.compaction_control == "native" and callable(harness.compact)
-    assert callable(harness.context_occupancy)
-    assert all(not evidence.qualified for evidence in describe.features.values())
     assert describe.features["environment_selection"].status == "unsupported"
     assert describe.delivery_semantics["queue_instruction"] == "wait_then_send"
 

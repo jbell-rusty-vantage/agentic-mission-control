@@ -245,53 +245,6 @@ async def test_cancel_and_replace_drains_the_interrupted_turn_before_the_replace
     assert harness.closing_facts(turn2, final[-1]).result_excerpt.startswith("INTENDED")
 
 
-async def test_interrupt_and_inject_through_lane_turn_replaces_inside_the_segment(
-    tmp_path: Path,
-) -> None:
-    from mission_control.domain.execution.contracts import OperationExecutionRequest
-    from tests.fixtures.cursor_controls import FAST, admitted_unit, compose_control_stack
-
-    run_control, repository, run_id, unit, changes = await admitted_unit((), None)
-    operation = OperationExecutionRequest.model_validate(
-        {**claude_operation().model_dump(mode="python"), **changes}
-    )
-    stack = claude_stack(tmp_path, script="interrupted_then_replaced", operation=operation)
-    control = compose_control_stack(
-        stack,
-        stack.harness,
-        stack.frames,
-        operation,
-        run_control=run_control,
-        repository=repository,
-        run_id=run_id,
-        unit=unit,
-        settings=FAST,
-        profile=PROFILE,
-    )
-    identity = LaneExecutionIdentity.of(operation, PROFILE, 1)
-    signals = RecordingSignals(stack.frames, identity.harness_execution_id)
-    running = asyncio.create_task(control.service.turn(control.turn(segment=SMALL), signals))
-    await asyncio.wait_for((await stack.factory.connected()).held.wait(), timeout=10)
-    receipt = await control.command("interrupt_and_inject", "Use release/2.3.")
-    result = await asyncio.wait_for(running, timeout=30)
-    assert result.done and result.closing_facts is not None
-    assert result.closing_facts.native_status == "finished"
-    assert result.closing_facts.result_excerpt.startswith("INTENDED")
-    client = stack.factory.last
-    assert client.interrupts == 1 and len(client.sent) == 2
-    assert "Use release/2.3." in client.sent[1][1]
-    execution = stack.frames._executions[identity.harness_execution_id]
-    results = [
-        json.loads(frame.body_excerpt)
-        for frame in execution.frames.values()
-        if frame.kind is FrameKind.RUN_RESULT
-    ]
-    assert [body["terminal_reason"] for body in results] == ["aborted_tools", "completed"]
-    assert result.native.turn_ref == client.sent[1][0]
-    report = (await control.status(receipt)).receipts[-1].delivery_report
-    assert report is not None and report.delivered_semantics == "cancel_and_replace"
-
-
 class _RecordingProjector:
     """Stands in for the `FrameFactProjector`: records what each projection was given."""
 

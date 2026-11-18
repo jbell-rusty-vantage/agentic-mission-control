@@ -10,8 +10,7 @@ from `list_cost`, and end as interrupt, archive, then deletion ordered after ret
 from __future__ import annotations
 
 import asyncio
-import json
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -21,19 +20,12 @@ from mission_control.adapters.anthropic_managed.harness import (
     ClaudeManagedHarness,
     ManagedSessionDeleter,
 )
-from mission_control.adapters.deep_agents.harness import DeepAgentsHarness
-from mission_control.adapters.operations.conformance import ConformanceRuntime
 from mission_control.application.agentic_components.placement import LaneProjectionError
 from mission_control.application.environments.preparation import (
     EnvironmentPreparationService,
     InMemoryEnvironmentPreparationRepository,
 )
 from mission_control.application.execution.harness.dispatch import DispatchRecord
-from mission_control.application.execution.harness.lane_turns import (
-    LaneTurnService,
-)
-from mission_control.application.execution.harness.sessions import WorkerSessionManager
-from mission_control.application.resolution.registries import LaneRegistry
 from mission_control.domain.execution.contracts import (
     OperationExecutionRequest,
     OperationExecutionResult,
@@ -41,15 +33,13 @@ from mission_control.domain.execution.contracts import (
 from mission_control.domain.execution.environment_preparation import ReadinessLevel
 from mission_control.domain.execution.lane_turns import LaneSegmentBounds, LaneTurnRequest
 from mission_control.domain.execution.lanes import (
-    CancelTurnRequest,
     EndSessionRequest,
     PrepareRequest,
     StatusRequest,
     TurnHandle,
     UsageRequest,
 )
-from mission_control.domain.frames.contracts import FrameKind
-from tests.fixtures.lane_turns import LaneStack, RecordingSignals, SimulatedWorkerLoss, lane_stack
+from tests.fixtures.lane_turns import LaneStack, RecordingSignals, lane_stack
 from tests.support.providers.managed_agents import (
     MAX_LIST_COST,
     MODEL_USAGE,
@@ -87,13 +77,6 @@ def _settled(result: Any) -> OperationExecutionResult:
 
 def _lanes(stack: ManagedStack, **changes: Any) -> LaneStack:
     return lane_stack(stack.harness, operation=stack.operation, **changes)
-
-
-async def _frames(lanes: LaneStack, operation: OperationExecutionRequest) -> tuple[Any, ...]:
-    identity = _identity(operation)
-    return await lanes.frames.frames_for_execution(
-        identity.request_scope, identity.harness_execution_id, 1, limit=1_000
-    )
 
 
 # --- prepare and the launch readiness gate (MO-16) ---------------------------------------------
@@ -217,59 +200,6 @@ async def test_drill_labels_are_stamped_on_the_session(tmp_path: Path) -> None:
     )
 
 
-async def test_a_turn_runs_settles_from_its_closing_idle_and_ends_after_custody(
-    tmp_path: Path,
-) -> None:
-    stack = managed_stack(tmp_path)
-    lanes = _lanes(stack)
-    identity = _identity(stack.operation)
-    result = await lanes.service.turn(
-        _turn_request(stack.operation),
-        RecordingSignals(lanes.frames, identity.harness_execution_id),
-    )
-    assert result.done and _settled(result).status == "completed"
-    facts = result.closing_facts
-    assert facts is not None and facts.native_status == "finished"
-    assert facts.result_excerpt == "Done: report.md"
-    assert (facts.usage.disposition, facts.usage.total_tokens) == ("settled", TURN_TOKENS)
-    assert facts.usage.cost_micros_usd == TURN_LIST_COST * 10_000
-    assert facts.cost_disposition == "settled"
-    (sent,) = stack.api.messages()
-    assert sent[1] == "Summarize the release notes.", "inputs only: no packet files in the sandbox"
-    frames = await _frames(lanes, stack.operation)
-    keys = [frame.provider_key for frame in frames]
-    assert len(keys) == len(set(keys))
-    kinds = [frame.kind for frame in frames]
-    assert kinds.count(FrameKind.RUN_RESULT) == 1 and kinds[-1] == FrameKind.RUN_RESULT
-    assert FrameKind.MESSAGE in kinds and FrameKind.USAGE in kinds
-    assert FrameKind.UNKNOWN not in kinds
-    assert "session.status_running" not in {frame.raw_kind for frame in frames}, (
-        "events before the turn's message was processed are not this turn's"
-    )
-    # End: archived, the manifest in custody, deletion ordered after the retention interval.
-    (session_id,) = stack.api.sessions
-    assert stack.api.archived() == [session_id]
-    (order,) = stack.deletions.orders.values()
-    assert order.session_ref == session_id and order.lane_profile == PROFILE
-    (manifest,) = stack.artifacts.staged.values()
-    captured = json.loads(manifest)
-    assert captured["provenance"]["provider_session_ref"] == session_id
-    assert set(captured["turns"].values().__iter__().__next__()) >= {"status", "usage"}
-
-
-async def test_usage_unreported_by_the_provider_stays_unknown(tmp_path: Path) -> None:
-    stack = managed_stack(tmp_path, scripts=("no_usage",))
-    lanes = _lanes(stack)
-    identity = _identity(stack.operation)
-    result = await lanes.service.turn(
-        _turn_request(stack.operation),
-        RecordingSignals(lanes.frames, identity.harness_execution_id),
-    )
-    facts = result.closing_facts
-    assert facts is not None and facts.native_status == "finished"
-    assert facts.usage.disposition == "unknown" and facts.cost_disposition == "unknown"
-
-
 async def test_a_second_turn_costs_only_what_it_added(tmp_path: Path) -> None:
     stack = managed_stack(tmp_path, scripts=("full", "full"))
     _heid, session = await _started(stack)
@@ -291,67 +221,7 @@ def _observe(stack: ManagedStack, turn: TurnHandle, key: str, after: str | None 
     return ObserveRequest(**_fields(stack.operation, key), turn=turn, after=after)
 
 
-async def test_a_message_is_not_sent_while_a_turn_runs(tmp_path: Path) -> None:
-    """Q-M1: a message sent while running would steer the current turn, so it waits."""
-
-    stack = managed_stack(tmp_path, scripts=("held", "full"))
-    _heid, session = await _started(stack)
-    first = await _sent(stack, session)
-    assert first.status == "accepted"
-    busy = await _sent(stack, session, 2)
-    assert busy.status == "busy" and busy.native_turn_ref is None
-    assert len(stack.api.messages()) == 1
-    stack.api.release()
-    assert (await _sent(stack, session, 2)).status == "accepted"
-
-
 # --- reattach after a lost worker --------------------------------------------------------------
-
-
-async def test_a_reattach_after_the_worker_died_stores_no_frame_twice(tmp_path: Path) -> None:
-    """The worker dies between a persisted frame and its heartbeat; another worker (a fresh
-    harness process, no in-process state) takes the expired session over, resumes from the
-    persisted frames' position and settles the turn: one session, one message, each event
-    stored once."""
-
-    stack = managed_stack(tmp_path)
-    lanes = _lanes(stack)
-    identity = _identity(stack.operation)
-    dying = RecordingSignals(lanes.frames, identity.harness_execution_id, fail_on=4)
-    with pytest.raises(SimulatedWorkerLoss):
-        await lanes.service.turn(_turn_request(stack.operation), dying)
-    stored = len(await _frames(lanes, stack.operation))
-    assert stored > 0
-
-    successor = managed_harness(stack.api, stack.pack, deletions=stack.deletions)
-    later = datetime.now(UTC) + timedelta(minutes=5)
-    service = LaneTurnService(
-        lanes=LaneRegistry(
-            [DeepAgentsHarness(ConformanceRuntime()), successor], allow_unqualified=True
-        ),
-        boundary=lanes.boundary,
-        frames=lanes.frames,
-        states=lanes.states,
-        sessions=WorkerSessionManager(owner_ref="worker-b"),
-        clock=lambda: later,
-    )
-    result = await service.turn(
-        _turn_request(stack.operation, phase="resume"),
-        RecordingSignals(lanes.frames, identity.harness_execution_id),
-    )
-    assert result.done and _settled(result).status == "completed"
-    assert len(stack.api.sessions) == 1 and len(stack.api.messages()) == 1
-    frames = await _frames(lanes, stack.operation)
-    keys = [frame.provider_key for frame in frames]
-    assert len(keys) == len(set(keys)), "the resumed segment stored no frame twice"
-    assert [frame.kind for frame in frames].count(FrameKind.RUN_RESULT) == 1
-    events = [frame.raw_kind for frame in frames if frame.raw_kind != "status"]
-    turn_events = [
-        event["type"]
-        for event in stack.api.events[next(iter(stack.api.sessions))]
-        if event["type"] != "session.status_running"
-    ]
-    assert events == turn_events, "every event of the turn stored once, in order"
 
 
 # --- dispatch reconciliation --------------------------------------------------------------------
@@ -395,32 +265,6 @@ async def test_a_lost_first_send_is_the_sessions_only_message(tmp_path: Path) ->
 
 
 # --- cancel, status and the budget gate ---------------------------------------------------------
-
-
-async def test_cancel_interrupts_and_the_turn_closes_cancelled(tmp_path: Path) -> None:
-    stack = managed_stack(tmp_path, scripts=("held",))
-    _heid, session = await _started(stack)
-    turn = await _sent(stack, session)
-    receipt = await stack.harness.cancel_turn(
-        CancelTurnRequest(**_fields(stack.operation, "cancel"), turn=turn, reason="operator")
-    )
-    assert receipt.acknowledged and not receipt.already_terminal
-    assert receipt.native_status == "idle" and stack.api.interrupts() == 1
-    status = await stack.harness.status(
-        StatusRequest(**_fields(stack.operation, "status"), session=session, turn=turn)
-    )
-    assert status.terminal and status.status == "end_turn"
-    closing = [
-        frame
-        async for frame in stack.harness.observe(_observe(stack, turn, "observe"))
-        if frame.terminal
-    ]
-    facts = stack.harness.closing_facts(turn, closing[-1])
-    assert facts.native_status == "cancelled"
-    again = await stack.harness.cancel_turn(
-        CancelTurnRequest(**_fields(stack.operation, "cancel"), turn=turn, reason="operator")
-    )
-    assert again.already_terminal and stack.api.interrupts() == 1, "a closed turn is not resent"
 
 
 async def test_the_budget_gate_pauses_before_the_next_model_request_and_resumes(

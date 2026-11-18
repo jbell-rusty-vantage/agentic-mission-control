@@ -30,23 +30,15 @@ from mission_control.application.context.lane_support import (
 )
 from mission_control.application.execution.harness.controls import SessionHandoverLane
 from mission_control.application.execution.harness.lane_turns import LaneExecutionIdentity
-from mission_control.domain.context import checkpoint
 from mission_control.domain.context.checkpoint import (
-    CheckpointIdentities,
     ContinuationUnsupported,
     continuation_delivery,
 )
 from mission_control.domain.execution.bindings import ProviderExecutionBinding
-from mission_control.domain.execution.contracts import OperationExecutionResult
 from mission_control.domain.execution.lane_turns import LaneSegmentBounds, LaneTurnRequest
-from mission_control.domain.frames.contracts import FrameKind
 from tests.fixtures.continuation import (
     CONT_SCOPE,
     FakeStaging,
-    build_service,
-    facts,
-    seal_target,
-    trigger,
 )
 from tests.fixtures.lane_turns import RecordingSignals
 from tests.support.providers.claude import (
@@ -90,11 +82,6 @@ def _turn(stack: ClaudeStack) -> LaneTurnRequest:
     return LaneTurnRequest(
         operation=stack.operation, lane_profile=PROFILE, generation=1, segment=SEGMENT
     )
-
-
-def _frames(stack: ClaudeStack) -> list[Any]:
-    execution = stack.frames._executions[_identity(stack).harness_execution_id]
-    return sorted(execution.frames.values(), key=lambda frame: frame.arrival_ordinal)
 
 
 # --- context occupancy -------------------------------------------------------------------------
@@ -183,39 +170,6 @@ async def test_a_failing_control_request_reports_unknown_with_the_reason(tmp_pat
 # --- continuation: seal from the live lease, hydrate a fresh session ---------------------------
 
 
-async def _seal_and_transfer(
-    stack: ClaudeStack, staging: FakeStaging
-) -> tuple[dict[str, Any], Any, ClaudeSessionHydrator]:
-    snapshots = ClaudeWorkspaceSnapshots(stack.harness, staging)
-    hydrator = ClaudeSessionHydrator(stack.harness, staging)
-    wired = build_service(snapshots=snapshots, staging=staging)
-    service = wired["service"]
-    transfer = await service.request(
-        trigger(),
-        request_scope=CONT_SCOPE,
-        run_key="run-continuation-1",
-        activation_key="unit-collect-1",
-        logical_execution_id="logical-collect-1",
-        lane_profile=PROFILE,
-        source_session_ref=SESSION_ID,
-    )
-    base = facts()
-    sealed = await service.seal(
-        transfer.transfer_id,
-        facts(
-            lane_profile=PROFILE,
-            identities=CheckpointIdentities(
-                **{**base.identities.model_dump(), "source_agent_session_ref": SESSION_ID}
-            ),
-        ),
-        seal_target(),
-        request_scope=CONT_SCOPE,
-    )
-    assert sealed.checkpoint is not None, sealed.transfer
-    outcome = await service.transfer(transfer.transfer_id, hydrator, request_scope=CONT_SCOPE)
-    return wired, outcome, hydrator
-
-
 def test_the_continuation_service_admits_this_lane_at_a_turn_boundary() -> None:
     """Integrated 2026-10-09: `domain/context/checkpoint._DELIVERY_BY_LANE` declares the
     lane's handover at the finished source turn's boundary; hosted Claude stays refused."""
@@ -223,79 +177,6 @@ def test_the_continuation_service_admits_this_lane_at_a_turn_boundary() -> None:
     assert continuation_delivery(PROFILE) == "turn_boundary_guaranteed"
     with pytest.raises(ContinuationUnsupported):
         continuation_delivery("claude_cloud")
-
-
-@pytest.fixture
-def claude_delivery_row(monkeypatch: pytest.MonkeyPatch) -> None:
-    """The lane's declared queue semantics (now in the integrator-owned table, kept explicit
-    here): `turn_boundary_guaranteed` (the handover sends at the finished source turn's
-    boundary)."""
-
-    monkeypatch.setitem(checkpoint._DELIVERY_BY_LANE, PROFILE, "turn_boundary_guaranteed")
-
-
-@pytest.mark.usefixtures("claude_delivery_row")
-async def test_a_sealed_continuation_hydrates_a_fresh_session_that_runs_the_next_turn(
-    tmp_path: Path,
-) -> None:
-    from mission_control.application.context.continuation import TransferStatus
-
-    stack = claude_stack(tmp_path, script="continuation_source")
-    stack.factory.fresh_scripts.append(FixtureScript.load("continuation_target"))
-    identity = _identity(stack)
-    signals = RecordingSignals(stack.frames, identity.harness_execution_id)
-    running = asyncio.create_task(_live_turn(stack, signals))
-    source_client = await stack.factory.connected()
-    await asyncio.wait_for(source_client.held.wait(), timeout=10)
-    root = Path(stack.harness.lease_path(str(identity.harness_execution_id)))
-    (root / "outputs").mkdir(exist_ok=True)
-    (root / "outputs" / "draft.md").write_text("draft from the source session\n", encoding="utf-8")
-
-    staging = FakeStaging()
-    wired, outcome, hydrator = await _seal_and_transfer(stack, staging)
-    assert outcome.transfer.status == TransferStatus.TRANSFERRED, outcome.transfer
-    assert outcome.receipt is not None
-    receipt = outcome.receipt
-    assert receipt.target_session_ref == TARGET_SESSION and hydrator.hydrated == [TARGET_SESSION]
-    assert receipt.native_identity["conversation"] == "fresh"
-    assert receipt.native_identity["source_session_id"] == SESSION_ID
-    assert "/.mission/context.md" in receipt.restored and "/outputs/draft.md" in receipt.restored
-    # The snapshot never carries the lane's state root (mirror, ledger, config dir).
-    assert (root / ".mission" / "state" / "claude").is_dir()
-    frozen = await wired["snapshots"].snapshot(
-        request_scope=CONT_SCOPE, run_key="run-continuation-1", session_ref=SESSION_ID, roots=()
-    )
-    assert "/outputs/draft.md" in frozen.manifest
-    assert not any(path.startswith("/.mission/state") for path in frozen.manifest)
-    assert wired["events"].actions[-1].event == "transferred"
-    # The target is a *fresh* SDK session: no resume, no conversation fork.
-    target_client = stack.factory.clients[1]
-    assert target_client.options.resume is None and target_client.options.fork_session is False
-    assert target_client.options.cwd == source_client.options.cwd, "same lease"
-    assert target_client.sent == [], "nothing is sent before the handover turn"
-
-    # The source turn finishes; the next turn of the same segment runs on the target.
-    source_client.release.set()
-    result = await asyncio.wait_for(running, timeout=30)
-    assert result.done
-    settled = OperationExecutionResult.model_validate(result.operation_result)
-    assert settled.status == "completed"
-    assert result.closing_facts is not None
-    assert result.closing_facts.result_excerpt.startswith("CONTINUED:")
-    assert len(source_client.sent) == 1 and len(target_client.sent) == 1
-    sent_text = target_client.sent[0][1]
-    assert "# Mission context packet" in sent_text and "- purpose: continuation" in sent_text
-    assert source_client.disconnected, "the superseded source connection is closed"
-    state = await stack.lanes.states.load(identity.request_scope, identity.harness_execution_id)
-    assert state is not None and state.native_session_ref == TARGET_SESSION
-    inits = [
-        frame
-        for frame in _frames(stack)
-        if frame.kind is FrameKind.SESSION_INIT and frame.native_session_ref == TARGET_SESSION
-    ]
-    assert inits, "the target session's session_init frame confirms the hydration"
-    execution = stack.harness.execution_view(str(identity.harness_execution_id))
-    assert execution is None or execution.pending is None
 
 
 def _harness_fields(stack: ClaudeStack, key: str) -> dict[str, Any]:

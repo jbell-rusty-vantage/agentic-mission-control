@@ -44,6 +44,7 @@ Residuals after R3 (for the provider sweep):
 | fork emulation | `test_session_controls.py` | `snapshot`, `fork` implemented, `fork` not `unsupported` |
 | continuation hand-over | `test_session_controls.py` | `continuation` implemented, `request_continuation` not `unsupported` |
 | unknown usage stays unknown | `test_session_turns.py` | `usage` implemented |
+| mission layer at `prepare` (MO-12) | `test_mission_layer.py` | outside SPEC-06: every worker-hosted lane that runs Environment Kits (`claude_agent_sdk`, `codex`, `cursor_local`) |
 
 "Implemented" means `native` or `emulated` (`contract.CLAIMS`). The lane does not choose its
 scenarios; its declared matrix in its lane package's `describe.py` does (aggregated by

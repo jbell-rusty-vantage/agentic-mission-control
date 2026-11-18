@@ -8,7 +8,6 @@ declared matrices (and their digests) are untouched.
 from __future__ import annotations
 
 import json
-from pathlib import Path
 
 import pytest
 
@@ -27,13 +26,9 @@ from mission_control.adapters.cursor.qualification import (
     proposed_describe,
 )
 from mission_control.application.execution.harness.describe import declared_matrix
-from mission_control.application.execution.harness.protocol import implements
 from mission_control.domain.execution.lanes import (
     APPROVAL_MODES,
-    LANE_FEATURES,
-    LaneDescribe,
 )
-from tests.support.providers.cursor import cloud_stack, local_stack
 
 
 @pytest.mark.parametrize("profile", CURSOR_PROFILES)
@@ -73,53 +68,6 @@ def test_local_kernel_hooks_are_implemented_but_unqualified_and_cloud_mcp_has_no
         cell = cloud.cell("governed_effect", effect)  # type: ignore[arg-type]
         assert not cell.implemented and cell.coverage == "unqualified"
         assert "loopback" in cell.mechanism or "VM" in cell.mechanism
-
-
-@pytest.mark.parametrize("profile", CURSOR_PROFILES)
-async def test_the_proposed_v2_describe_is_honest_and_every_declared_control_is_implemented(
-    tmp_path: Path, profile: str
-) -> None:
-    proposed = proposed_describe(profile)
-    assert proposed.is_v2
-    assert LaneDescribe.model_validate_json(proposed.model_dump_json()) == proposed
-    declared = declared_matrix(profile)
-    assert proposed.controls == declared.controls, "controls are unchanged from v1"
-    assert proposed.delivery_semantics == declared.delivery_semantics
-    assert proposed.qualified is False
-    assert proposed.approval_modes == ("workflow_gate",)
-    assert proposed.compaction_control == "unsupported", "preCompact is observe-only"
-    assert proposed.subordinate_visibility == "unqualified"
-    assert set(proposed.features) == set(LANE_FEATURES)
-    for name, cell in proposed.features.items():
-        assert not cell.qualified and cell.account_enabled == "unknown", name
-        # Implemented cells state how (native/emulated); the rest are unqualified/unsupported.
-        expected = {"native", "emulated"} if cell.implemented else {"unqualified", "unsupported"}
-        assert cell.status in expected, name
-        assert cell.sdk_version == "1.0.37" and cell.evidence_ref, name
-    stack = local_stack(tmp_path) if profile == "cursor_local" else cloud_stack(tmp_path)
-    for control, support in proposed.controls.items():
-        if control in {"pause", "fork"}:
-            continue
-        assert implements(stack.harness, control) is (support in {"native", "emulated"}), control
-    if profile == "cursor_cloud":
-        assert proposed.features["approval_suspension"].status == "unsupported"
-        assert proposed.enforcement_coverage["mcp"] == "unsupported"
-        assert not proposed.features["subordinate_lineage"].implemented
-    else:
-        assert proposed.features["approval_suspension"].status == "unqualified"
-        assert not proposed.features["approval_suspension"].implemented
-        assert proposed.enforcement_coverage == {
-            "shell": "unqualified",
-            "file": "unqualified",
-            "mcp": "unqualified",
-        }
-        assert proposed.features["subordinate_lineage"].implemented
-    stub = proposed.unqualified()
-    assert all(value == "unqualified" for value in stub.controls.values())
-    assert (
-        stub.features["approval_suspension"].status
-        == proposed.features["approval_suspension"].status
-    )
 
 
 def test_the_declared_cursor_matrices_are_the_mp09_v2_proposal() -> None:

@@ -18,7 +18,6 @@ from mission_control.adapters.codex.usage import observed_usage
 from mission_control.domain.frames.body import frame_body_object
 from mission_control.domain.frames.contracts import FrameKind
 from mission_control.domain.policies.mailbox import MailboxState
-from tests.conformance.lanes.adapters.codex import CodexConformance
 from tests.conformance.lanes.contract import LaneAdapter, Scenario, Script
 from tests.conformance.lanes.drive import (
     SEGMENT,
@@ -142,36 +141,6 @@ async def test_cancel_reaches_the_provider_and_settles_cancelled_once(
     again = await fake.control.service.cancel(cancel_request(fake))
     assert again.settled and again.operation_result == outcome.operation_result
     assert fake.cancels() == cancels, "a settled cancel is idempotent"
-
-
-async def test_codex_interrupted_without_counters_retains_reconciliation(tmp_path: Path) -> None:
-    fake = await CodexConformance(held_usage=False).open(tmp_path, Script.HELD_TURN)
-    task = await held_turn(fake, cancel=True)
-    outcome = await cancel_held(fake, task)
-    result = settled(outcome)
-    assert fake.cancels() >= 1
-    assert not outcome.settled
-    assert (result.status, result.failure_code) == (
-        "in_doubt",
-        "codex_usage_requires_reconciliation",
-    )
-    assert "tokens.total" not in result.usage.amounts
-    reports = observed_usage(fake.frames())
-    assert reports and all(report.disposition == "unknown" for report in reports.values())
-    assert all(report.total_tokens == 0 for report in reports.values())
-    assert any(frame.kind == FrameKind.RUN_RESULT for frame in fake.frames())
-    assert not fake.control.lanes.budget.settlements
-    assert await fake.control.lanes.boundary.lane_settlement(fake.operation) is None
-    sends = fake.sends()
-    again = await fake.control.service.cancel(cancel_request(fake))
-    assert not again.settled
-    # Cleanup can leave no fresh provider observation on a later control. The
-    # durable operation stays unsettled; an absent result never means free usage.
-    assert again.operation_result is None
-    assert await fake.control.lanes.boundary.lane_settlement(fake.operation) is None
-    assert fake.sends() == sends
-    assert observed_usage(fake.frames()) == reports
-    assert not fake.control.lanes.budget.settlements
 
 
 @pytest.mark.parametrize("lane", lanes_for(Scenario.INTERRUPT_AND_INJECT))

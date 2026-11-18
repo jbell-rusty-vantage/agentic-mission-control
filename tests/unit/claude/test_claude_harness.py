@@ -14,7 +14,6 @@ from uuid import UUID
 
 import pytest
 
-from mission_control.adapters.claude.describe import CLAUDE_AGENT_SDK_DESCRIBE
 from mission_control.adapters.claude.harness import turn_reference
 from mission_control.adapters.claude.workspace import (
     DispatchLedger,
@@ -23,7 +22,6 @@ from mission_control.adapters.claude.workspace import (
 )
 from mission_control.application.environments.discovery import DISCOVERY_RAW_KIND
 from mission_control.application.execution.harness.dispatch import (
-    DispatchReconcilingLane,
     DispatchRecord,
     ProviderCapacityLimited,
 )
@@ -31,23 +29,17 @@ from mission_control.application.execution.harness.lane_turns import (
     LaneTurnService,
 )
 from mission_control.application.execution.harness.protocol import (
-    HARNESS_PROTOCOL_METHODS,
     NativeTurnLost,
-    SessionLane,
-    implements,
 )
 from mission_control.application.execution.harness.sessions import WorkerSessionManager
 from mission_control.application.execution.harness.state import LaneExecutionUpdate
 from mission_control.application.frames.kinds import UnknownKindCounter
 from mission_control.domain.execution.contracts import OperationExecutionResult
 from mission_control.domain.execution.lane_turns import (
-    LANE_COMMAND_SEMANTICS,
-    LANE_PAUSE_SEMANTICS,
-    LANE_RESUME_SEMANTICS,
     LaneCancelRequest,
     LaneStatusRequest,
 )
-from mission_control.domain.execution.lanes import HARNESS_OPERATIONS, ReattachRequest
+from mission_control.domain.execution.lanes import ReattachRequest
 from mission_control.domain.frames.contracts import FrameKind
 from tests.fixtures.lane_turns import RecordingSignals, SimulatedWorkerLoss
 from tests.support.providers.claude import PROFILE, SESSION_ID, claude_stack, fixture_admission
@@ -59,44 +51,6 @@ def _settled(result: Any) -> OperationExecutionResult:
 
 
 # --- describe -------------------------------------------------------------------------------
-
-
-def test_the_proposed_describe_is_honest_and_unqualified(tmp_path: Path) -> None:
-    stack = claude_stack(tmp_path)
-    harness = stack.harness
-    describe = harness.describe()
-    assert describe is CLAUDE_AGENT_SDK_DESCRIBE and describe.is_v2
-    assert describe.qualified is False
-    assert all(not cell.qualified for cell in describe.features.values())
-    for operation in HARNESS_OPERATIONS:
-        support = describe.control(operation)
-        assert support in {"native", "emulated"}, operation
-        assert implements(harness, operation), operation
-    for operation in HARNESS_PROTOCOL_METHODS:
-        assert callable(getattr(harness, operation))
-    # Cross-provider control: `fork` is emulated by `time_travel.seed_fork`, never a harness op.
-    assert describe.controls["pause"] == "unqualified" and describe.controls["fork"] == "emulated"
-    assert describe.time_travel is not None and describe.time_travel.read == "R3"
-    assert callable(harness.turn_points) and callable(harness.transcript_entries)
-    assert not hasattr(harness, "pause") and not hasattr(harness, "fork")
-    # The frozen workflow tables and the MP-01 stub agree on every delivery semantic.
-    assert describe.delivery_semantics == CLAUDE_AGENT_SDK_DESCRIBE.delivery_semantics
-    assert LANE_PAUSE_SEMANTICS[PROFILE] == describe.delivery_semantics["pause"]
-    assert LANE_RESUME_SEMANTICS[PROFILE] == describe.delivery_semantics["resume"]
-    assert LANE_COMMAND_SEMANTICS["cancel"][PROFILE] == describe.delivery_semantics["cancel"]
-    assert (
-        LANE_COMMAND_SEMANTICS["interrupt_and_inject"][PROFILE]
-        == describe.delivery_semantics["interrupt_and_inject"]
-    )
-    assert describe.versions["claude_agent_sdk"] == "0.2.165"
-    assert describe.identity.session_ref == "session_id"
-    assert describe.identity.turn_ref == "user_message_uuid"
-    assert describe.identity.effect_ref == "tool_use_id"
-    assert describe.usage.cost == "estimated"
-    assert describe.compaction_control == "unqualified"
-    assert describe.approval_modes == ("workflow_gate", "provider_permission", "governed_effect")
-    assert isinstance(harness, SessionLane) and isinstance(harness, DispatchReconcilingLane)
-    assert callable(harness.stage_turn)
 
 
 # --- start / observe / end --------------------------------------------------------------------
