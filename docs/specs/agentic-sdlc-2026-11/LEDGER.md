@@ -68,6 +68,7 @@ Status words: `planned` · `draft` · `open` (waiting for an owner decision) · 
 | --- | --- | --- | --- | --- |
 | SP-01 | [SPEC-01 Agentic SDLC](SPEC-01-AGENTIC-SDLC.md) | accepted | OVE-205 | Written 2026-11-01 from AS-D1..D20, PR-01 and DOC-01: principle, architecture, stack, every env var and infrastructure location, git-event table, provider adapter, Linear, slices S0..S8 with acceptance, the ten open items of the navigation-quality session (§12). Linear ids added at conversion. |
 | SP-02 | [SPEC-02 Provenance chain v1](SPEC-02-PROVENANCE-CHAIN.md) | active | OVE-225 | Accepted 2026-11-17 (AS-S3, AS-D40..AS-D46): record formats, trailer grammar, Completion comment, `docs/tools/trace.py`, warn-only hook and CI step. Mission Control only; moves upstream when KS adopts it. |
+| SP-03 | [SPEC-03 The repository kit](SPEC-03-REPO-KIT.md) | active | OVE-243 | Accepted 2026-11-18 (AS-S9, AS-D65, AS-D67..AS-D69): seven parts K1-K7 every repository carries; Mission Control holds the canonical copy. K3 (`config/planes.toml`, `./dev planes`, `./dev db`) and K4 (60-line AGENTS.md, generated code map) built 2026-11-18; K5 waits (AS-D66). |
 
 ## Issues
 
@@ -104,6 +105,7 @@ Status words: `planned` · `draft` · `open` (waiting for an owner decision) · 
 | IA-06 | [AGENTIC-SDLC sitting VI: answers](answers/AGENTIC-SDLC-SITTING-VI-2026-11-17-ANSWERS.md) | done | OVE-239 | AS-S6: dollar budgets held with no placeholder enforcement (AS-D60, OVE-229 rescoped); context-window optimization first (AS-D61, OVE-239); next Knowledge Services, then the AI Engineer service, real missions on one provider (AS-D62). |
 | IA-07 | [AGENTIC-SDLC sitting VII: answers](answers/AGENTIC-SDLC-SITTING-VII-2026-11-17-ANSWERS.md) | done | OVE-240 | AS-S7: complete MC feature maps and `./dev` runners, test them, and make the evaluation a feedback loop (AS-D63); the eleven operability questions (AS-D64); `agentic-sdlc` deleted (AS-D65). |
 | IA-08 | [AGENTIC-SDLC sitting VIII: answers](answers/AGENTIC-SDLC-SITTING-VIII-2026-11-17-ANSWERS.md) | done | OVE-240 | AS-S8: finish and fully migrate the AI Engineer schema first (AS-D66); SE-02 and OVE-240 deferred. |
+| IA-09 | [AGENTIC-SDLC sitting IX: answers](answers/AGENTIC-SDLC-SITTING-IX-2026-11-18-ANSWERS.md) | done | OVE-243 | AS-S9: the same tenets apply to every codebase (AS-D67), in the order set up, AI Engineer schema, real missions, MC web (AS-D68); converted into SPEC-03. |
 
 ## Sessions
 

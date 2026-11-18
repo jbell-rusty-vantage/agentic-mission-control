@@ -7,11 +7,14 @@ AGENTS.md is mostly hand-written; three marked blocks are generated from
 grammar is DOC-02 of the Agentic SDLC program with the accepted edits G1-G16:
 
   <!-- BEGIN:sdlc-infra -->      infrastructure pointer and the most used commands
-  <!-- BEGIN:sdlc v= src= -->    repository guide, knowledge by category, code map, skills, verify
+  <!-- BEGIN:sdlc v= src= -->    repository guide, one pointer line, skills, verify
   <!-- BEGIN:sdlc-programs -->   active programs: ledger link, next step, optional record link
 
-The root `## Code map` is one line per `.sdlc/modules.json` entry: `<path> - <first sentence of
-purpose>` (G4, the target is implied), ordered by `pin_first` then path.
+AGENTS.md stays at most 60 lines (SPEC-03 K4): the knowledge index and the code map live in their
+own generated files, linked once from the pointer line. `docs/CODE-MAP.md` is one line per
+`.sdlc/modules.json` entry: a link to `<path>/AGENTS.md` and the first sentence of its purpose
+(G4), ordered by `pin_first` then path. Entrypoints and sizes count only files git tracks, so
+ignored local trees never change a generated file.
 
 Every `modules.json` entry also gets `<path>/AGENTS.md` with one generated block (G5, G6):
 
@@ -28,14 +31,15 @@ text in a module file should stay within 2 KiB (a warning, not a failure). Link 
 or import belongs to the registered module with the longest path prefix, so unregistered
 sub-packages belong to the nearest registered parent.
 
-`docs/knowledge/index.md` is generated whole: one section per category (anchor `#<category>`),
+`docs/knowledge/index.md` and `docs/CODE-MAP.md` are generated whole; the index has one
+section per category (anchor `#<category>`),
 one line per concept. The tool refuses to build while a concept lacks `category` or `questions`,
 while a nested module guide is not registered in `.sdlc/modules.json`, while a registered path or
 test path is missing, or while an active program ledger is missing from the programs block.
 
 Usage:
-  python docs/tools/agents_docs_index.py          # rewrite blocks, module guides, knowledge index
-  python docs/tools/agents_docs_index.py --check  # exit 1 when a block, index or budget is off
+  python docs/tools/agents_docs_index.py          # rewrite blocks, module guides, index, map
+  python docs/tools/agents_docs_index.py --check  # exit 1 when a block, index, map or budget is off
   python docs/tools/agents_docs_index.py --print  # print the generated AGENTS.md
   python docs/tools/agents_docs_index.py --print-module <id>  # print one module block
 """
@@ -48,6 +52,7 @@ import hashlib
 import json
 import os
 import re
+import subprocess
 import sys
 import tomllib
 from collections import Counter
@@ -62,7 +67,8 @@ KNOWLEDGE_INDEX = KNOWLEDGE / "index.md"
 SPECS = REPO_ROOT / "docs" / "specs"
 ADR_DIR = REPO_ROOT / "docs" / "adr"
 MODULES_JSON = REPO_ROOT / ".sdlc" / "modules.json"
-VERSION = "0.2.0"
+CODE_MAP = REPO_ROOT / "docs" / "CODE-MAP.md"
+VERSION = "0.3.0"
 CATEGORIES = (
     "boundaries",
     "surfaces",
@@ -76,11 +82,12 @@ CATEGORIES = (
 )
 RESERVED = {"index", "log"}
 BUDGETS = {
-    "whole": 14336,
+    "lines": 60,
+    "whole": 10240,
     "sdlc": 8192,
     "infra": 400,
     "programs": 1024,
-    "handwritten": 4096,
+    "handwritten": 5120,
     "module": 2048,
     "module_handwritten": 2048,
 }
@@ -107,7 +114,10 @@ LISTED_SUFFIXES = {".py", ".toml", ".json", ".env", ".yml", ".yaml"}
 def configure(root: Path) -> None:
     """Point every path at another repository root (tests build a small tree under tmp_path)."""
     global REPO_ROOT, AGENTS_MD, CONFIG, KNOWLEDGE, KNOWLEDGE_INDEX, SPECS, ADR_DIR, MODULES_JSON
+    global CODE_MAP, _TRACKED
     REPO_ROOT = root
+    CODE_MAP = root / "docs" / "CODE-MAP.md"
+    _TRACKED = None
     AGENTS_MD = root / "AGENTS.md"
     CONFIG = root / "docs" / "agents" / "index-notes.toml"
     KNOWLEDGE = root / "docs" / "knowledge"
@@ -216,25 +226,6 @@ def render_infra(cfg: dict) -> str:
     return "\n".join([INFRA_BEGIN, _line(infra["pointer"]), _line(infra["commands"]), INFRA_END])
 
 
-def _knowledge_lines(concepts: list[Concept], cfg: dict, collapsed: set[str]) -> list[str]:
-    pins: dict[str, list[str]] = cfg.get("pins", {})
-    lines: list[str] = []
-    for category in CATEGORIES:
-        members = [c for c in concepts if c.category == category]
-        order = {slug: i for i, slug in enumerate(pins.get(category, []))}
-        members.sort(key=lambda c: (order.get(c.slug, len(order)), c.slug))
-        lines.append(f"{category}:")
-        if category in collapsed:
-            pinned = [c for c in members if c.slug in order]
-            rest = [c for c in members if c.slug not in order]
-            lines.extend(f"- {c.slug} — {c.question}" for c in pinned)
-            names = ", ".join(c.slug for c in rest)
-            lines.append(f"- more (questions in docs/knowledge/index.md#{category}): {names}")
-        else:
-            lines.extend(f"- {c.slug} — {c.question}" for c in members)
-    return lines
-
-
 def render_sdlc(cfg: dict, concepts: list[Concept], modules: list[Module]) -> str:
     registered = {m.path for m in modules}
     missing = [d for d in module_dirs() if d not in registered]
@@ -248,31 +239,11 @@ def render_sdlc(cfg: dict, concepts: list[Concept], modules: list[Module]) -> st
         + "".join(f"{c.slug}|{c.category}|{c.question}\n" for c in concepts)
     )
     src = hashlib.sha256(digest_input.encode("utf-8")).hexdigest()[:12]
-    header = f"<!-- BEGIN:sdlc v={VERSION} src={src} -->"
-
-    def build(collapsed: set[str]) -> str:
-        out = [header, "## Repository guide", _line(cfg["repository"]["guide"]), ""]
-        out += [f"## Knowledge (docs/knowledge, {len(CATEGORIES)} categories)"]
-        out += _knowledge_lines(concepts, cfg, collapsed)
-        out += [
-            _line(cfg["repository"]["search"]),
-            "",
-            "## Code map (read the closest guide before editing)",
-        ]
-        out += code_map_lines(modules)
-        out += ["", "## Skills", _line(cfg["skills"]["line"]), _line(cfg["skills"]["tracker"]), ""]
-        out += ["## Verify", _line(cfg["verify"]["code"]), _line(cfg["verify"]["docs"]), SDLC_END]
-        return "\n".join(out)
-
-    collapsed: set[str] = set()
-    block = build(collapsed)
-    sizes = {c: sum(1 for k in concepts if k.category == c) for c in CATEGORIES}
-    for category in sorted(CATEGORIES, key=lambda c: -sizes[c]):
-        if len(block.encode("utf-8")) <= BUDGETS["sdlc"]:
-            break
-        collapsed.add(category)
-        block = build(collapsed)
-    return block
+    out = [f"<!-- BEGIN:sdlc v={VERSION} src={src} -->", "## Repository guide"]
+    out += [_line(cfg["repository"]["guide"]), _line(cfg["repository"]["pointers"]), ""]
+    out += ["## Skills", _line(cfg["skills"]["line"]), _line(cfg["skills"]["tracker"]), ""]
+    out += ["## Verify", _line(cfg["verify"]["code"]), _line(cfg["verify"]["docs"]), SDLC_END]
+    return "\n".join(out)
 
 
 def ledger_programs() -> list[str]:
@@ -320,6 +291,23 @@ def render_knowledge_index(cfg: dict, concepts: list[Concept]) -> str:
     return "\n".join(out)
 
 
+def render_code_map(modules: list[Module]) -> str:
+    """docs/CODE-MAP.md: one linked line per registered module, pinned first, then by path."""
+    out = [
+        "# Code map",
+        "",
+        "Read the closest module guide before editing there. Generated by",
+        "`docs/tools/agents_docs_index.py` from `.sdlc/modules.json`; edit that, not this file.",
+        "",
+    ]
+    out += [
+        f"- [{m.path}](../{m.path}/AGENTS.md) — {first_sentence(m.purpose)}"
+        for m in sorted_modules(modules)
+    ]
+    out.append("")
+    return "\n".join(out)
+
+
 def _replace_between(text: str, begin: str | re.Pattern[str], end: str, block: str) -> str:
     if isinstance(begin, str):
         start = text.find(begin)
@@ -351,6 +339,9 @@ def budget_report(text: str) -> list[str]:
         "sdlc": size(SDLC_BEGIN, SDLC_END),
         "programs": size(PROGRAMS_BEGIN, PROGRAMS_END),
     }
+    lines = len(text.rstrip("\n").split("\n"))
+    if lines > BUDGETS["lines"]:
+        problems.append(f"AGENTS.md is {lines} lines, budget {BUDGETS['lines']}")
     total = len(text.encode("utf-8"))
     hand = total - sum(parts.values())
     for name, value in parts.items():
@@ -459,10 +450,6 @@ def sorted_modules(modules: list[Module]) -> list[Module]:
     return sorted(
         modules, key=lambda m: (m.pin_first if m.pin_first is not None else 10**6, m.path)
     )
-
-
-def code_map_lines(modules: list[Module]) -> list[str]:
-    return [f"{m.path} — {first_sentence(m.purpose)}" for m in sorted_modules(modules)]
 
 
 def _under(path: str, base: str) -> bool:
@@ -634,10 +621,40 @@ def _module_doc(path: Path) -> str:
     return text
 
 
+_TRACKED: frozenset[str] | None = None
+
+
+def tracked() -> frozenset[str] | None:
+    """Every path git tracks under REPO_ROOT, or None outside a git checkout (test trees)."""
+    global _TRACKED
+    if _TRACKED is None:
+        if not (REPO_ROOT / ".git").exists():
+            return None
+        done = subprocess.run(
+            ["git", "ls-files", "-z"], cwd=REPO_ROOT, capture_output=True, check=False
+        )
+        if done.returncode != 0:
+            return None
+        _TRACKED = frozenset(p for p in done.stdout.decode("utf-8").split("\0") if p)
+    return _TRACKED
+
+
+def _is_tracked(path: Path) -> bool:
+    known = tracked()
+    if known is None:
+        return True
+    rel = path.relative_to(REPO_ROOT).as_posix()
+    return rel in known or any(p.startswith(rel + "/") for p in known)
+
+
 def _tree_size(path: Path) -> int:
     if path.is_file():
         return path.stat().st_size
-    return sum(f.stat().st_size for f in path.rglob("*.py") if "__pycache__" not in f.parts)
+    return sum(
+        f.stat().st_size
+        for f in path.rglob("*.py")
+        if "__pycache__" not in f.parts and _is_tracked(f)
+    )
 
 
 def entrypoints(module: Module, ctx: Context) -> list[tuple[str, str]]:
@@ -648,6 +665,8 @@ def entrypoints(module: Module, ctx: Context) -> list[tuple[str, str]]:
     for child in sorted(base.iterdir(), key=lambda p: p.name):
         name = child.name
         if name.startswith(".") or name in SKIP_DIRS or name.endswith(".egg-info"):
+            continue
+        if not _is_tracked(child):
             continue
         if child.is_dir():
             label = name + "/"
@@ -818,6 +837,7 @@ def main() -> int:
     current = AGENTS_MD.read_text(encoding="utf-8").replace("\r\n", "\n")
     updated = build_agents(current, cfg, concepts, modules)
     index = render_knowledge_index(cfg, concepts)
+    code_map = render_code_map(modules)
     module_texts = {m.id: render_module_file(m, ctx, read_module_file(m)) for m in modules}
     if args.print_module:
         wanted = [m for m in modules if m.id == args.print_module]
@@ -848,6 +868,11 @@ def main() -> int:
         )
         if existing != index:
             stale.append("docs/knowledge/index.md")
+        current_map = (
+            CODE_MAP.read_text(encoding="utf-8").replace("\r\n", "\n") if CODE_MAP.is_file() else ""
+        )
+        if current_map != code_map:
+            stale.append("docs/CODE-MAP.md")
         stale += [
             f"{m.path}/AGENTS.md" for m in modules if read_module_file(m) != module_texts[m.id]
         ]
@@ -864,13 +889,14 @@ def main() -> int:
         if stale or failures:
             return 1
         print(
-            f"AGENTS.md blocks, {len(modules)} module guides and docs/knowledge/index.md "
-            "are current, within budget"
+            f"AGENTS.md blocks, {len(modules)} module guides, docs/knowledge/index.md and "
+            "docs/CODE-MAP.md are current, within budget"
         )
         return 0
 
     AGENTS_MD.write_text(updated, encoding="utf-8", newline="\n")
     KNOWLEDGE_INDEX.write_text(index, encoding="utf-8", newline="\n")
+    CODE_MAP.write_text(code_map, encoding="utf-8", newline="\n")
     created = changed = 0
     for module in modules:
         before = read_module_file(module)
@@ -882,7 +908,8 @@ def main() -> int:
         else:
             changed += 1
     print(
-        f"AGENTS.md updated ({len(updated.encode('utf-8'))} bytes); knowledge index rewritten; "
+        f"AGENTS.md updated ({len(updated.encode('utf-8'))} bytes); index and code map "
+        "rewritten; "
         f"module guides: {created} created, {changed} updated, "
         f"{len(modules) - created - changed} unchanged"
     )

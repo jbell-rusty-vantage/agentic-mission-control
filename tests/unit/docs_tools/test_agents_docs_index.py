@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import subprocess
 import sys
 from collections.abc import Iterator
 from dataclasses import replace
@@ -189,13 +190,38 @@ def test_depth_and_map_line_rules(repo) -> None:
     assert any("long" in p and "first purpose sentence" in p for p in problems)
 
 
-def test_code_map_is_pinned_then_by_path_without_repeating_the_target(repo) -> None:
+def test_code_map_file_links_each_guide_pinned_then_by_path(repo) -> None:
     tool, _root = repo
     modules, _ = build(tool)
-    lines = tool.code_map_lines(modules)
+    lines = [line for line in tool.render_code_map(modules).splitlines() if line.startswith("- ")]
     assert lines == [
-        "src/mission_control/adapters/foo — Does one thing",
-        "src/mission_control/domain — Does one thing",
+        "- [src/mission_control/adapters/foo](../src/mission_control/adapters/foo/AGENTS.md)"
+        " — Does one thing",
+        "- [src/mission_control/domain](../src/mission_control/domain/AGENTS.md) — Does one thing",
     ]
     assert tool.first_sentence("A b (c). D e.") == "A b (c)"
     assert tool.first_sentence("mc.v1 stays whole. Next.") == "mc.v1 stays whole"
+
+
+def test_agents_md_over_sixty_lines_is_a_budget_failure(repo) -> None:
+    tool, _root = repo
+    assert not any("lines" in p for p in tool.budget_report("# T\n" + "x\n" * 59))
+    problems = tool.budget_report("# T\n" + "x\n" * 60)
+    assert any("61 lines, budget 60" in p for p in problems)
+
+
+def test_untracked_local_trees_are_not_entrypoints(repo) -> None:
+    tool, root = repo
+    write(root / "src/mission_control/domain/local_only/__init__.py", '"""Ignored."""\n')
+    subprocess.run(["git", "init", "-q"], cwd=root, check=True)
+    subprocess.run(["git", "add", "src", ".sdlc", "docs", "tests"], cwd=root, check=True)
+    subprocess.run(
+        ["git", "rm", "-q", "--cached", "-r", "src/mission_control/domain/local_only"],
+        cwd=root,
+        check=True,
+    )
+    tool.configure(root)
+    modules, ctx = build(tool)
+    names = [name for name, _ in tool.entrypoints(by_id(modules, "domain"), ctx)]
+    assert "rules.py" in names
+    assert "local_only/" not in names

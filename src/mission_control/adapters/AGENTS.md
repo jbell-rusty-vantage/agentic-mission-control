@@ -30,8 +30,8 @@ Entrypoints:
 - realtime/
 - capabilities/
 - remote_session/ — Remote Session Lane base: shared machinery for provider session APIs
-- openai_agents/ — The codex_agents lane: the OpenAI Agents API running the Codex harness
-Also: agent_server/, knowledge/, anthropic_managed/, auth/, workspaces/, provider_auth/, prerequisites/, supabase_storage/, storage/, github/, outputs/, operations/, secrets/, subscriptions/, langsmith/, agents/, document_models/
+- agent_server/ — Import-safe BellLabs Agent Server package exports
+Also: openai_agents/, knowledge/, anthropic_managed/, auth/, workspaces/, provider_auth/, prerequisites/, supabase_storage/, storage/, github/, outputs/, operations/, secrets/, subscriptions/, langsmith/, agents/, document_models/
 Tests: tests/unit, tests/integration, tests/conformance/lanes
 Invariants:
 - Adapters implement application ports; they cannot invent completion semantics, privileged grants or cross-application routing.

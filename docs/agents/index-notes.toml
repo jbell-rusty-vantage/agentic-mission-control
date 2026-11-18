@@ -1,7 +1,8 @@
 # Config of docs/tools/agents_docs_index.py. It renders three marked blocks of the root AGENTS.md and the
-# whole of docs/knowledge/index.md from this file, the concept frontmatter (category, title, questions[0]),
+# whole of docs/knowledge/index.md and docs/CODE-MAP.md from this file, the concept frontmatter (category, title, questions[0]),
 # the program ledgers and .sdlc/modules.json (the code map and every module AGENTS.md block). AGENTS.md loads on every turn, so every line here earns its bytes:
-# budgets are the whole file 14 KiB, the sdlc block 8 KiB, programs 1 KiB, infra 400 B, hand-written 4 KiB.
+# budgets are 60 lines (SPEC-03 K4), the whole file 10 KiB, the sdlc block 8 KiB, programs 1 KiB, infra 400 B, hand-written 5 KiB
+# (the hand-written invariants name the check that enforces each).
 # Edit this file or the concept frontmatter, then run `python docs/tools/agents_docs_index.py`.
 
 [infra]
@@ -10,7 +11,7 @@ commands = "`make dev` (compose up, healthy) · `make check` (fast gate) · `mak
 
 [repository]
 guide = "General Mission Control runtime and the common database component. Provider consolidation, one provider at a time; Deep Agents is the primary lane and the reference adapter shape (ADR-0005). Not here: application knowledge (`integrations/biotech`, never imported by the kernel), AI Engineer or Biotech schema authority, Knowledge Services internals."
-search = 'Search: `python docs/tools/okf_search.py "<terms>"` (`--programs` adds active program documents) · retrieval fixtures: `.sdlc/fixtures/retrieval/`'
+pointers = 'Knowledge: [index](docs/knowledge/index.md) (one question per concept, 9 categories) · code map: [CODE-MAP](docs/CODE-MAP.md) · search: `python docs/tools/okf_search.py "<terms>"` (`--programs` adds program documents) · retrieval fixtures: `.sdlc/fixtures/retrieval/`'
 
 # Concepts named first inside their category (all other concepts follow alphabetically).
 [pins]

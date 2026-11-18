@@ -7,8 +7,8 @@ Entrypoints:
 - fork_seed.py — Seed a forked Run's first Context Packet
 - fork_outputs.py — Carry a reused unit's accepted named outputs into the fork-derived run
 - terminal_evidence_adoption.py — Fenced adoption of an existing FINISHED Cursor run; no native harness dependency
-- runtime_recovery.py
 - runtime_run_plan.py
+- runtime_recovery.py
 - closed_workflow.py — Reducer-governed cancellation recovery after the exact Temporal family closed
 - runtime_execution_bindings.py
 - runtime_reconciliation.py
