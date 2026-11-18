@@ -266,28 +266,12 @@ async def test_shared_session_reuse_is_ordered_and_same_unit_never_reappends_pro
 
 
 @pytest.mark.asyncio
-async def test_invocation_is_root_namespaced_pinned_sync_durable_and_fully_stamped(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    """REQ-CP-DA-016/017: exact thread, root `checkpoint_ns`, source pin, stamps, sync."""
+async def test_invocation_is_root_namespaced_pinned_sync_durable_and_fully_stamped() -> None:
+    """REQ-CP-DA-016/017: exact thread, root `checkpoint_ns`, source pin, stamps, sync.
 
-    import mission_control.adapters.deep_agents.adapter as adapter_module
+    Read from what the checkpointer holds: the thread and namespace each invocation wrote, the
+    checkpoint the second resumed from, and a checkpoint per step (not only at exit)."""
 
-    invoke_kwargs: list[dict[str, Any]] = []
-    real_create = adapter_module.create_deep_agent
-
-    def recording_create(*args: Any, **kwargs: Any) -> Any:
-        agent = real_create(*args, **kwargs)
-        real_ainvoke = agent.ainvoke
-
-        async def ainvoke(state: Any, **invoke: Any) -> Any:
-            invoke_kwargs.append(invoke)
-            return await real_ainvoke(state, **invoke)
-
-        object.__setattr__(agent, "ainvoke", ainvoke)
-        return agent
-
-    monkeypatch.setattr(adapter_module, "create_deep_agent", recording_create)
     binding, _profile, bundle = exact_fixture()
     saver = InMemorySaver()
     exact_registry = registry(binding, bundle, session_probe_model())
@@ -313,17 +297,28 @@ async def test_invocation_is_root_namespaced_pinned_sync_durable_and_fully_stamp
 
     namespace = first_transition.namespace
     assert namespace == "belllabs/goal/run-operation/epoch/1/session/1/role/executor"
-    assert [call["config"]["configurable"] for call in invoke_kwargs] == [
-        {"thread_id": namespace, "checkpoint_ns": ""},
-        {
-            "thread_id": namespace,
-            "checkpoint_ns": "",
-            "checkpoint_id": first_transition.result_key.checkpoint_id,
-        },
-    ]
-    assert [call["durability"] for call in invoke_kwargs] == ["sync", "sync"]
+    # Every checkpoint either invocation wrote is on the exact thread, in the root namespace.
+    every = [item async for item in saver.alist(None)]
+    assert {
+        (item.config["configurable"]["thread_id"], item.config["configurable"]["checkpoint_ns"])
+        for item in every
+    } == {(namespace, "")}
     thread = {"configurable": {"thread_id": namespace, "checkpoint_ns": ""}}
     root = [item async for item in saver.alist(thread)]
+    # The second invocation is pinned to the first one's result: its earliest checkpoint's
+    # parent is that checkpoint, not merely the thread's latest.
+    by_invocation: dict[str, list[Any]] = {}
+    for item in root:
+        by_invocation.setdefault(item.metadata[STAMP_INVOCATION_ID], []).append(item)
+    first_written = by_invocation[first_transition.invocation_id]
+    second_written = by_invocation[second_transition.invocation_id]
+    assert first_written[-1].parent_config is None
+    assert second_written[-1].parent_config is not None
+    assert second_written[-1].parent_config["configurable"]["checkpoint_id"] == (
+        first_transition.result_key.checkpoint_id
+    )
+    # Durable per step: each invocation persisted more than its exit checkpoint.
+    assert len(first_written) > 1 and len(second_written) > 1
     plans = {plan.invocation_id: plan for plan in (first.checkpoint_plan, second.checkpoint_plan)}
     stamped_per_invocation: dict[str, int] = {}
     for item in root:

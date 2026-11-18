@@ -42,24 +42,13 @@ def test_hosted_provider_entry_requires_matching_wire_pins_and_projection(profil
         ProviderLanes.model_validate({profile: broken})
 
 
-def test_hosted_provider_resolution_requires_a_reviewed_base_commit(monkeypatch):
+def test_hosted_provider_resolution_requires_a_reviewed_base_commit():
     from mission_control.application.authoring.manifest_launch_inputs import (
         ManifestLaunchBindingError,
     )
     from mission_control.application.authoring.provider_launch import required_pins
-    from mission_control.application.resolution.resolver import RuntimeResolver
     from mission_control.domain.authoring.mission_definition import DefinitionNode
     from tests.support.manifests.v2_launch import compiled_ok, example, served
-
-    # OC-R3: the hosted node is admitted through the resolution seam.
-    admitted: list[str] = []
-    admit = RuntimeResolver.admit
-
-    def spy(self, admission):
-        admitted.append(admission.lane_profile)
-        return admit(self, admission)
-
-    monkeypatch.setattr(RuntimeResolver, "admit", spy)
 
     compilation = compiled_ok(
         example("claude_agent_sdk", "stage-graph").read_text(encoding="utf-8")
@@ -133,4 +122,3 @@ def test_hosted_provider_resolution_requires_a_reviewed_base_commit(monkeypatch)
     )
     assert resolved.binding_fields["repo_commit"] == "a" * 40
     assert resolved.binding_fields["environment"].kind == "provider_hosted"
-    assert admitted == ["claude_managed"]

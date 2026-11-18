@@ -1,14 +1,18 @@
 """Catalog plugins expand identically to their constituents on every lane (MO-32)."""
 
-from types import SimpleNamespace
-from unittest.mock import AsyncMock
+from datetime import UTC, datetime
 
 import pytest
 
 from mission_control.application.capabilities import catalog
 from mission_control.bootstrap.host_projection import HOST_PROJECTORS
-from mission_control.domain.authoring.contracts import PluginDefinition
+from mission_control.domain.authoring.contracts import (
+    ExactDefinitionRef,
+    PluginDefinition,
+    PublishedDefinition,
+)
 from mission_control.domain.capabilities.host_support import LaneProfile
+from mission_control.domain.capabilities.pins import CapabilityPin
 from tests.fixtures.projections.rows import INSTRUCTION, fixture_rows, plugin_row
 
 
@@ -31,9 +35,34 @@ def test_plugin_and_explicit_constituents_render_the_same_cognition(lane: LanePr
     assert not any("plugin" in path.path for path in expanded.files)
 
 
-async def test_catalog_rejects_a_cycle_before_recursing_forever(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
+class SelfReferencingCatalog:
+    """A catalog whose row for the plugin's pin names that same pin as a member.
+
+    Content-addressed pins cannot form such a cycle; a corrupted or hand-edited catalog can,
+    and the resolver must refuse it rather than recurse without bound.
+    """
+
+    def __init__(self, definition: PluginDefinition, pin: CapabilityPin) -> None:
+        self._row = PublishedDefinition(
+            ref=ExactDefinitionRef(
+                kind=definition.kind,
+                logical_id=pin.capability_id,
+                revision=1,
+                digest=pin.digest,
+            ),
+            definition=definition,
+            published_at=datetime(2026, 11, 1, tzinfo=UTC),
+            published_by="fixture",
+        )
+        self._pin = pin
+
+    async def find_by_pin(self, capability_id: str, digest: str) -> PublishedDefinition | None:
+        if (capability_id, digest) == (self._pin.capability_id, self._pin.digest):
+            return self._row
+        return None
+
+
+async def test_catalog_rejects_a_cycle_before_recursing_forever() -> None:
     row = plugin_row()
     definition = PluginDefinition.model_validate(
         {
@@ -41,8 +70,10 @@ async def test_catalog_rejects_a_cycle_before_recursing_forever(
             "manifest": {"members": [{"pin": row.pin.render(), "role": "skill"}]},
         }
     )
-    lookup = AsyncMock(return_value=SimpleNamespace(definition=definition))
-    monkeypatch.setattr(catalog, "find_published_by_pin", lookup)
-    with pytest.raises(catalog.CapabilityNotFound, match="plugin dependency cycle"):
-        await catalog.resolved_capability(object(), row.pin, bundles=None)
-    assert lookup.await_count == 2
+    pin = row.pin.render()
+    with pytest.raises(catalog.CapabilityNotFound) as refused:
+        await catalog.resolved_capability(
+            SelfReferencingCatalog(definition, row.pin), row.pin, bundles=None
+        )
+    # Refused at the first revisit: the plugin, then itself as its own member.
+    assert str(refused.value) == f"plugin dependency cycle: {pin} > {pin}"
