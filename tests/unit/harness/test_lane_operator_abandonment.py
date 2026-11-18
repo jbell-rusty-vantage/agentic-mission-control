@@ -12,7 +12,7 @@ from mission_control.application.execution.harness.lane_turns import (
 )
 from mission_control.application.execution.harness.sessions import WorkerSessionManager
 from mission_control.domain.execution.lane_turns import LaneCancelRequest, LaneCleanupRequest
-from tests.support.unit.harness.lane_operator_abandonment import lane_recovery, no_adapter_selection
+from tests.support.unit.harness.lane_operator_abandonment import lane_recovery
 from tests.support.unit.operations.lane_reconciliation import NativeRecovery
 
 
@@ -22,9 +22,8 @@ def cancel_request(recovery: NativeRecovery):
     )
 
 
-async def test_ambiguous_create_records_real_incident_before_any_adapter_selection(monkeypatch):
-    recovery, service, local, lane, identity = await lane_recovery()
-    monkeypatch.setattr(service, "_session_lane", no_adapter_selection)
+async def test_ambiguous_create_records_real_incident_before_any_adapter_selection():
+    recovery, service, local, lane, identity = await lane_recovery(adapter_selection=False)
     result = await service.cancel(
         cancel_request(recovery), attempt=recovery.harness.attempt(recovery.request)
     )
@@ -43,11 +42,10 @@ async def test_ambiguous_create_records_real_incident_before_any_adapter_selecti
     assert state.native_session_ref is None and state.native_turn_ref is None
 
 
-async def test_abandon_and_repeated_cancel_preserve_honest_unknown_native_receipt(monkeypatch):
-    recovery, service, local, lane, identity = await lane_recovery()
+async def test_abandon_and_repeated_cancel_preserve_honest_unknown_native_receipt():
+    recovery, service, local, lane, identity = await lane_recovery(adapter_selection=False)
     await recovery.reconcile(reason="create_dispatch_ambiguous")
     await recovery.abandon()
-    monkeypatch.setattr(service, "_session_lane", no_adapter_selection)
     first = await service.cancel(
         cancel_request(recovery), attempt=recovery.harness.attempt(recovery.request)
     )
@@ -107,20 +105,18 @@ async def test_foreign_live_session_owner_cannot_produce_or_apply_operator_decis
     assert not recovery.harness.journal.settlements and not lane.calls
 
 
-async def test_no_activity_attempt_keeps_legacy_ambiguity_without_fabricated_incident(monkeypatch):
-    recovery, service, _local, lane, _identity = await lane_recovery()
-    monkeypatch.setattr(service, "_session_lane", no_adapter_selection)
+async def test_no_activity_attempt_keeps_legacy_ambiguity_without_fabricated_incident():
+    recovery, service, _local, lane, _identity = await lane_recovery(adapter_selection=False)
     result = await service.cancel(cancel_request(recovery))
     assert not result.settled and result.receipt.native_status == "unknown"
     assert await recovery.incident() is None
     assert not recovery.harness.journal.settlements and not lane.calls
 
 
-async def test_control_only_cancel_does_not_apply_accepted_abandonment_or_settle(monkeypatch):
-    recovery, service, _local, lane, _identity = await lane_recovery()
+async def test_control_only_cancel_does_not_apply_accepted_abandonment_or_settle():
+    recovery, service, _local, lane, _identity = await lane_recovery(adapter_selection=False)
     await recovery.reconcile(reason="create_dispatch_ambiguous")
     await recovery.abandon()
-    monkeypatch.setattr(service, "_session_lane", no_adapter_selection)
     result = await service.cancel(
         cancel_request(recovery).model_copy(update={"settle": False}),
         attempt=recovery.harness.attempt(recovery.request),

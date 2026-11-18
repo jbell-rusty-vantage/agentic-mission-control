@@ -12,12 +12,11 @@ from mission_control.adapters.temporal.workflow_sandbox import coordinator_workf
 from mission_control.adapters.temporal.workflows.operation import OperationWorkflow
 from mission_control.domain.execution.contracts import OperationWorkflowRequest
 from tests.support.temporal import workflow_environment
-from tests.support.unit.harness.lane_operator_abandonment import lane_recovery, no_adapter_selection
+from tests.support.unit.harness.lane_operator_abandonment import lane_recovery
 
 
-async def test_real_lane_cancel_parks_then_normal_abandon_hint_settles_and_replays(monkeypatch):
-    recovery, service, local, lane, identity = await lane_recovery()
-    monkeypatch.setattr(service, "_session_lane", no_adapter_selection)
+async def test_real_lane_cancel_parks_then_normal_abandon_hint_settles_and_replays():
+    recovery, service, local, lane, identity = await lane_recovery(adapter_selection=False)
     activities = OperationExecutionActivities(
         recovery.harness.service, worker_identity="operator-reconciliation", lane_turns=service
     )

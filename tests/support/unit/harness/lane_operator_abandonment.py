@@ -12,18 +12,35 @@ from mission_control.application.execution.harness.lane_turns import (
     LaneExecutionIdentity,
     LaneTurnService,
 )
+from mission_control.application.execution.harness.protocol import AgentHarness
 from mission_control.application.execution.harness.sessions import WorkerSessionManager
+from mission_control.application.resolution.registries import LaneRegistry
 from tests.fixtures.lane_turns import lane_stack
 from tests.support.unit.harness.lane_cleanup import CleaningLane
 from tests.support.unit.operations.lane_reconciliation import native_recovery
 
 
-async def lane_recovery(owner="worker:operator-recovery"):
+class AdapterSelectionForbidden(LaneRegistry):
+    """A lane registry whose admission fails the test: operator recovery must precede every
+    adapter selection. Profile lookup (`for_profile`, `describe`) still answers."""
+
+    def admit(self, lane_profile: str) -> AgentHarness:
+        raise AssertionError("operator recovery must precede every adapter selection/call")
+
+
+async def lane_recovery(owner="worker:operator-recovery", *, adapter_selection=True):
+    """`adapter_selection=False` composes the turn service over `AdapterSelectionForbidden`."""
+
     recovery = await native_recovery()
     lane = CleaningLane(describe_matrix=recovery.lane.describe_matrix)
     local = lane_stack(lane, operation=recovery.request)
+    lanes = (
+        local.service._lanes
+        if adapter_selection
+        else AdapterSelectionForbidden([lane], allow_unqualified=True)
+    )
     service = LaneTurnService(
-        lanes=local.service._lanes,
+        lanes=lanes,
         boundary=recovery.harness.service,
         frames=local.frames,
         states=local.states,
@@ -62,7 +79,3 @@ async def lane_recovery(owner="worker:operator-recovery"):
         reason="create_dispatch_ambiguous",
     )
     return recovery, service, local, lane, identity
-
-
-def no_adapter_selection(*args, **kwargs):
-    raise AssertionError("operator recovery must precede every adapter selection/call")

@@ -67,13 +67,13 @@ from tests.support.providers.claude import claude_operation
 from tests.support.run_control import actor, command, reconciler_command
 from tests.support.run_control import service as run_control_service
 from tests.support.unit.harness.lane_cleanup import CleaningLane
-from tests.support.unit.harness.lane_operator_abandonment import no_adapter_selection
+from tests.support.unit.harness.lane_operator_abandonment import AdapterSelectionForbidden
 
 pytestmark = pytest.mark.common_db
 
 
 async def test_persisted_protocol_incident_normal_abandonment_and_unknown_settlement(
-    common_db: CommonDatabase, monkeypatch
+    common_db: CommonDatabase,
 ):
     pool = await common_db.pool("mission_control_runtime")
     try:
@@ -124,15 +124,15 @@ async def test_persisted_protocol_incident_normal_abandonment_and_unknown_settle
         assert accepted.status == CommandStatus.ACCEPTED
         frames = PostgresFrameRepository(pool)
         states = PostgresLaneExecutionStateStore(pool)
+        # Operator recovery must precede every adapter selection on this service.
         service = LaneTurnService(
-            lanes=registry,
+            lanes=AdapterSelectionForbidden([lane], allow_unqualified=True),
             boundary=harness.service,
             frames=frames,
             states=states,
             sessions=WorkerSessionManager(owner_ref="pg-native-owner"),
             clock=harness.clock,
         )
-        monkeypatch.setattr(service, "_session_lane", no_adapter_selection)
         identity = LaneExecutionIdentity.of(request, "claude_agent_sdk", 1)
         # Match production's pre-native frame identity; this is not a provider receipt.
         await frames.open_execution(
