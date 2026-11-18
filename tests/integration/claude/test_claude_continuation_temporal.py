@@ -76,12 +76,13 @@ from mission_control.domain.execution.contracts import (
     OperationWorkflowRequest,
 )
 from mission_control.domain.execution.lanes import LaneSegmentBounds
-from tests.fixtures.continuation import FakeStaging, NoArtifacts, StepClock, trigger
+from tests.fixtures.continuation import NoArtifacts, StepClock, trigger
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.fixtures.mp12_lanes import Crashes
 from tests.fixtures.temporal_history import patch_ids
 from tests.support.db_builders import admit_unit_attempt
 from tests.support.integration.postgres.continuation_postgres import continuation_actor
+from tests.support.knowledge.stores import InMemoryStaging
 from tests.support.providers.claude import SESSION_ID, FixtureScript, claude_operation, claude_stack
 
 pytestmark = pytest.mark.common_db
@@ -171,7 +172,7 @@ async def test_a_claude_unit_continues_into_a_fresh_session_on_real_services(
         harness = stack.harness
         frames = PostgresFrameRepository(pool)
         states = PostgresLaneExecutionStateStore(pool)
-        staging = FakeStaging()
+        staging = InMemoryStaging()
         selections = PostgresContextSelectionRepository(pool)
         transfers = PostgresContinuationRepository(pool)
         checkpoints = PostgresCheckpointRepository(pool)

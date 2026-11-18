@@ -37,6 +37,7 @@ from tests.support.integration.temporal.wp_bp_010_temporal import (
     _blueprint,
     _operation,
 )
+from tests.support.knowledge.stores import InMemoryStaging
 
 RUN_ID = "run-ft-b2"
 SCOPE = "mc/0192a4f0-0000-7000-8000-00000000b10e/biotech/6f1e2d3c-0000-5000-8000-000000000001"
@@ -88,26 +89,12 @@ class FakeSelections:
         return next((p for p, _ in self.rows.values() if p.packet_id == packet_id), None)
 
 
-class FakeStaging:
-    def __init__(self) -> None:
-        self.objects: dict[str, bytes] = {}
-
-    async def stage(self, *, request_scope: str, name: str, content: bytes, media_type: str) -> str:
-        digest = "sha256:" + hashlib.sha256(content).hexdigest()
-        object_ref = f"file-artifact://{digest.removeprefix('sha256:')}"
-        self.objects[object_ref] = content
-        return durable_input_locator(object_ref, digest, len(content))
-
-    async def retrieve(self, durable_ref: str) -> bytes:
-        return self.objects[durable_ref.partition("#")[0]]
-
-
 def _service(
     contents: dict[str, ArtifactContent] | None = None,
     profile: ModelBudgetProfile | None = None,
-) -> tuple[ContextPackService, FakeSelections, FakeStaging]:
+) -> tuple[ContextPackService, FakeSelections, InMemoryStaging]:
     selections = FakeSelections()
-    staging = FakeStaging()
+    staging = InMemoryStaging()
     service = ContextPackService(
         artifacts=FakeArtifacts(
             contents

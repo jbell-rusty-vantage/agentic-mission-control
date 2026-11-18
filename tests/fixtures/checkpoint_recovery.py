@@ -31,6 +31,7 @@ from langgraph.store.memory import InMemoryStore
 from pydantic import PrivateAttr
 from tests.fixtures.checkpoint_lineage import bind_unit, stage_unit
 from tests.fixtures.lane_bindings import lane_fields
+from tests.support.journal import MemoryOperationJournal
 from tests.support.operations import MCP_DIGEST, SKILL_DIGEST, operation_request
 from tests.support.run_control import actor, command, reconciler_command
 from tests.support.run_control import request as run_request
@@ -70,7 +71,6 @@ from mission_control.application.execution.operations.operation_execution import
     RuntimePort,
 )
 from mission_control.application.execution.operations.operation_journal import (
-    OperationJournalMutation,
     OperationJournalService,
 )
 from mission_control.application.execution.operations.unit_reconciliation import (
@@ -98,11 +98,6 @@ from mission_control.domain.execution.contracts import (
     WorkspaceOwnerKind,
     WorkspaceSlotBinding,
 )
-from mission_control.domain.execution.journal import (
-    OperationClaimResult,
-    OperationEffectClaim,
-    OperationJournalSettlement,
-)
 from mission_control.domain.graph_runtime.identities import RuntimeUnitIdentity
 from mission_control.domain.policies.contracts import (
     CommandResult,
@@ -113,7 +108,6 @@ from mission_control.domain.policies.contracts import (
     ReserveBudgetAction,
     StartAction,
 )
-from mission_control.domain.policies.errors import IdempotencyConflict
 
 RESULT_MARKER = "RRM004-OK"
 TOKENS_PER_CALL = 5
@@ -377,53 +371,6 @@ class CrashableRunControl:
 
     def __getattr__(self, name: str) -> Any:
         return getattr(self._inner, name)
-
-
-class MemoryOperationJournal:
-    """Atomic journal repository for unit tests: one claim and one settlement per effect."""
-
-    async def record_reconciliation_applied(self, binding, decision) -> None:  # type: ignore[no-untyped-def]
-        """RRM-007 receipt seam: the in-memory journal keeps no receipt ledger."""
-        return
-
-    def __init__(self) -> None:
-        self.claims: dict[str, OperationEffectClaim] = {}
-        self.settlements: dict[str, OperationJournalSettlement] = {}
-        self.technical_attempts: dict[str, list[int]] = {}
-
-    async def commit(self, mutation: OperationJournalMutation) -> OperationClaimResult:
-        claim_id = mutation.claim.effect_claim_id
-        prior = self.claims.get(claim_id)
-        if mutation.settlement is not None:
-            existing = self.settlements.get(claim_id)
-            if (
-                existing is not None
-                and existing.settlement_revision == mutation.settlement.settlement_revision
-                and existing.settlement_digest != mutation.settlement.settlement_digest
-            ):
-                raise IdempotencyConflict("operation settlement replay conflicts")
-            self.settlements[claim_id] = mutation.settlement
-            if mutation.attempt is not None:
-                self.technical_attempts.setdefault(claim_id, []).append(
-                    mutation.attempt.technical_attempt
-                )
-            return OperationClaimResult(
-                status="existing", claim=prior or mutation.claim, reason="settled"
-            )
-        if prior is not None:
-            return OperationClaimResult(status="existing", claim=prior, reason="claim exists")
-        self.claims[claim_id] = mutation.claim
-        return OperationClaimResult(status="acquired", claim=mutation.claim, reason="acquired")
-
-    async def get_claim(self, request_scope: str, effect_claim_id: str) -> OperationEffectClaim:
-        del request_scope
-        return self.claims[effect_claim_id]
-
-    async def get_settlement(
-        self, request_scope: str, effect_claim_id: str
-    ) -> OperationJournalSettlement | None:
-        del request_scope
-        return self.settlements.get(effect_claim_id)
 
 
 class MutableClock:

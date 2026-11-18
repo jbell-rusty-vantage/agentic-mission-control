@@ -37,9 +37,7 @@ from tests.fixtures.goal_directed_journaled import (
     SCOPE,
     goal_blueprint,
 )
-from tests.support.unit.operations.ft_b2_stage_handoff import (
-    FakeSelections,
-)
+from tests.support.unit.operations.ft_b2_stage_handoff import FakeSelections
 from tests.support.unit.orchestration.ft_b3_goal_iteration_packet import (
     _composition,
     _executor_result,

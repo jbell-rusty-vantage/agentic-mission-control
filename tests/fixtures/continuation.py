@@ -7,6 +7,8 @@ from collections.abc import Mapping, Sequence
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
+from tests.support.knowledge.stores import InMemoryStaging
+
 from mission_control.application.context.continuation import (
     ContinuationService,
     InMemoryCheckpoints,
@@ -40,7 +42,6 @@ from mission_control.domain.context.packet import (
     ModelBudgetProfile,
     PacketScope,
 )
-from mission_control.domain.context.refs import durable_input_locator
 from mission_control.domain.context.render import ContextSelectionRecord
 
 CONT_SCOPE = "mc/0192a4f0-0000-7000-8000-00000000b10e/biotech/1b0e1c4e-6d0f-5c6b-9a4e-0d6d6f1c2a01"
@@ -93,29 +94,10 @@ class FakeSelections:
         return self.packets.get(packet_id)
 
 
-class FakeStaging:
-    """Content-addressed staging plus retrieval (the durable input path)."""
-
-    def __init__(self) -> None:
-        self.objects: dict[str, bytes] = {}
-
-    async def stage(self, *, request_scope: str, name: str, content: bytes, media_type: str) -> str:
-        value = digest(content)
-        object_ref = f"file-artifact://{value.removeprefix('sha256:')}"
-        self.objects[object_ref] = content
-        return durable_input_locator(object_ref, value, len(content))
-
-    async def retrieve(self, durable_ref: str) -> bytes:
-        try:
-            return self.objects[durable_ref.partition("#")[0]]
-        except KeyError as error:
-            raise LookupError(durable_ref) from error
-
-
 class MemorySnapshots:
     """A WorkspaceSnapshotPort over in-memory session files (path -> text)."""
 
-    def __init__(self, staging: FakeStaging, files: dict[str, dict[str, str]]) -> None:
+    def __init__(self, staging: InMemoryStaging, files: dict[str, dict[str, str]]) -> None:
         self.staging = staging
         self.files = files
         self.snapshots: dict[str, WorkspaceSnapshot] = {}
@@ -234,12 +216,12 @@ def build_service(
     failure_policy: CompactionFailurePolicy | None = None,
     governors: ContinuationGovernorPolicy | None = None,
     confirmation: Any = None,
-    staging: FakeStaging | None = None,
+    staging: InMemoryStaging | None = None,
     snapshots: Any = None,
 ) -> dict[str, Any]:
     store = InMemoryContinuationStore()
     selections = FakeSelections()
-    staging = staging or FakeStaging()
+    staging = staging or InMemoryStaging()
     snapshot_port = snapshots or MemorySnapshots(
         staging,
         {key: dict(value) for key, value in (session_files or {}).items()},

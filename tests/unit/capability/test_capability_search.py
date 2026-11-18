@@ -35,11 +35,6 @@ def _request(query: str, **values: Any) -> CapabilitySearchRequest:
     return CapabilitySearchRequest(query=query, tenant_scope=SCOPE, **values)
 
 
-class FailingEmbeddings(DeterministicEmbeddings):
-    async def embed_many(self, texts: tuple[str, ...]) -> Any:
-        raise RuntimeError("provider unavailable")
-
-
 def test_fusion_defaults_follow_adr_0025() -> None:
     assert RRF_K == 60
     assert DEFAULT_TRIGRAM_WEIGHT == 0.5
@@ -75,7 +70,7 @@ async def test_failed_query_embedding_degrades_to_lexical() -> None:
     service = CapabilitySearchService(
         search=search,
         definitions=definitions,
-        embeddings=FailingEmbeddings(),
+        embeddings=DeterministicEmbeddings(failing=True),
         embedding_model_id=MODEL_ID,
         embedding_dimensions=DIMENSIONS,
     )

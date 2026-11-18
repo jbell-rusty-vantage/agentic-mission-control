@@ -32,7 +32,7 @@ from mission_control.domain.programs.goal_directed_runtime import (
     GoalOperationReconciliationRequest,
 )
 from tests.fixtures.checkpoint_lineage import activity_attempt
-from tests.fixtures.checkpoint_recovery import AcceptingAuthority, MemoryOperationJournal
+from tests.fixtures.checkpoint_recovery import AcceptingAuthority
 from tests.fixtures.goal_directed_journaled import (
     SCOPE,
     GoalComposition,
@@ -44,6 +44,7 @@ from tests.fixtures.goal_directed_journaled import (
     goal_run_input,
     goal_start_action,
 )
+from tests.support.journal import MemoryOperationJournal
 from tests.support.run_control import command
 
 

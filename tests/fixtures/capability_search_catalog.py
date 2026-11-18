@@ -12,10 +12,10 @@ import hashlib
 import json
 import math
 import re
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 from mission_control.application.authoring.control_plane_repository import (
     InMemoryDefinitionRepository,
@@ -72,14 +72,42 @@ def seeded_published(
 
 
 class DeterministicEmbeddings:
-    """Offline embedder: hashed bag of words into ``DIMENSIONS`` slots, L2-normalized."""
+    """The one offline embedder: no provider is called.
 
-    def __init__(self, dimensions: int = DIMENSIONS, model_id: str = MODEL_ID) -> None:
+    By default a hashed bag of words into ``DIMENSIONS`` slots, L2-normalized. Options cover the
+    embedding behaviours tests need: ``vector`` replaces the text-to-vector rule, ``batch=False``
+    is an embedder without a batch endpoint (callers fall back to one ``embed`` per text),
+    ``wrong_digest`` answers a digest that is not the input's (``"every"`` embedding, or the
+    ``"last"`` of each batch), and ``failing`` refuses every batch as an unavailable provider.
+    ``calls`` records every request, ``single_calls`` the ``embed`` texts and ``batch_calls``
+    the ``embed_many`` batches.
+    """
+
+    def __init__(
+        self,
+        dimensions: int = DIMENSIONS,
+        model_id: str = MODEL_ID,
+        *,
+        vector: Callable[[str], tuple[float, ...]] | None = None,
+        batch: bool = True,
+        wrong_digest: Literal["every", "last"] | None = None,
+        failing: bool = False,
+    ) -> None:
         self.dimensions = dimensions
         self.model_id = model_id
         self.calls: list[tuple[str, ...]] = []
+        self.single_calls: list[str] = []
+        self.batch_calls: list[tuple[str, ...]] = []
+        self._vector = vector
+        self._wrong_digest = wrong_digest
+        self._failing = failing
+        if not batch:
+            # An embedder with no batch endpoint: `getattr(embedder, "embed_many", None)` is None.
+            self.embed_many = None  # type: ignore[assignment]
 
     def vector(self, text: str) -> tuple[float, ...]:
+        if self._vector is not None:
+            return self._vector(text)
         values = [0.0] * self.dimensions
         for word in _WORD.findall(text.casefold()):
             slot = int(hashlib.sha256(word.encode()).hexdigest()[:8], 16) % self.dimensions
@@ -88,19 +116,35 @@ class DeterministicEmbeddings:
         return tuple(value / norm for value in values)
 
     async def embed(self, text: str) -> CapabilityEmbedding:
-        return (await self.embed_many((text,)))[0]
+        self.single_calls.append(text)
+        return self._embeddings((text,), single=True)[0]
 
     async def embed_many(self, texts: tuple[str, ...]) -> tuple[CapabilityEmbedding, ...]:
+        self.batch_calls.append(texts)
+        return self._embeddings(texts, single=False)
+
+    def _embeddings(
+        self, texts: tuple[str, ...], *, single: bool
+    ) -> tuple[CapabilityEmbedding, ...]:
         self.calls.append(texts)
+        if self._failing:
+            raise RuntimeError("provider unavailable")
         return tuple(
             CapabilityEmbedding(
                 vector=self.vector(text),
                 model_id=self.model_id,
                 dimensions=self.dimensions,
-                input_digest="sha256:" + hashlib.sha256(text.encode()).hexdigest(),
+                input_digest=self._digest(text, last=not single and index == len(texts) - 1),
             )
-            for text in texts
+            for index, text in enumerate(texts)
         )
+
+    def _digest(self, text: str, *, last: bool) -> str:
+        if self._wrong_digest == "every":
+            return "sha256:" + "f" * 64
+        if self._wrong_digest == "last" and last:
+            return "sha256:" + "0" * 64
+        return "sha256:" + hashlib.sha256(text.encode()).hexdigest()
 
 
 async def build_catalog(

@@ -18,12 +18,12 @@ from mission_control.domain.context.snapshot_evidence import (
 )
 from mission_control.domain.policies.forks import RunSnapshotManifest
 from tests.fixtures.run_forks import technical_snapshot
-from tests.support.unit.operations.ft_b2_stage_handoff import FakeStaging
+from tests.support.knowledge.stores import InMemoryStaging
 
 
 async def custody(
     *, value: object = "Source decision and unfinished work"
-) -> tuple[RunSnapshotManifest, FakeStaging, bytes]:
+) -> tuple[RunSnapshotManifest, InMemoryStaging, bytes]:
     origin = ConversationOrigin(
         request_scope="tenant-1",
         run_id="source",
@@ -42,7 +42,7 @@ async def custody(
         ),
         origin=origin,
     )
-    files = FakeStaging()
+    files = InMemoryStaging()
     ref = await files.stage(
         request_scope=origin.request_scope,
         name="conversation",

@@ -65,7 +65,6 @@ from mission_control.domain.programs.goal_directed_runtime import (
     GoalOperationReconciliationRequest,
     GoalOperationReconciliationResult,
 )
-from tests.fixtures.checkpoint_recovery import MemoryOperationJournal
 from tests.fixtures.goal_directed_journaled import (
     SCOPE,
     TOKENS_PER_OPERATION,
@@ -90,6 +89,7 @@ from tests.support.integration.temporal.rrm_007_boundary_interventions import (
 )
 from tests.support.integration.temporal.wp_bp_020_temporal import FakeGoalDirectedActivities
 from tests.support.integration.temporal.wp_bp_020_temporal import _run_input as fake_goal_input
+from tests.support.journal import MemoryOperationJournal
 from tests.support.run_control import command
 
 QUEUE = "rrm016-goal-directed"

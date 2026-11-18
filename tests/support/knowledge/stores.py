@@ -554,7 +554,11 @@ class InMemoryRetainedReadStore:
 
 
 class InMemoryStaging:
-    """``MissionFileStagingPort`` + durable reader over a dict (content addressed)."""
+    """The one staging fake: ``MissionFileStagingPort`` + durable reader over a dict.
+
+    It replaces the content-addressed ``FakeStaging`` copies of ``tests/fixtures/continuation``
+    and the stage-handoff support module. ``objects`` holds the staged bytes by locator.
+    """
 
     def __init__(self) -> None:
         self.objects: dict[str, bytes] = {}
@@ -583,6 +587,11 @@ class InMemoryStaging:
         if self.unreadable_next:
             self.unreadable_next -= 1
             raise OSError("object store unavailable")
+        # A durable reader resolves the object part of the locator; a test that replaces or
+        # drops the bytes under that object ref is what the reader then sees.
+        base = durable_ref.partition("#")[0]
+        if base in self.objects:
+            return self.objects[base]
         return self.objects[durable_ref]
 
 

@@ -74,11 +74,7 @@ from mission_control.interfaces.mcp.coordinator_server import (
     create_coordinator_server,
 )
 from mission_control.interfaces.mcp.run_control_tools import RUN_FORK_TOOL, ScopedRunControl
-from tests.fixtures.checkpoint_recovery import (
-    MemoryOperationJournal,
-    recovery_harness,
-    stage_recovery_unit,
-)
+from tests.fixtures.checkpoint_recovery import recovery_harness, stage_recovery_unit
 from tests.fixtures.goal_directed_journaled import (
     SCOPE as GOAL_SCOPE,
 )
@@ -97,15 +93,13 @@ from tests.fixtures.run_forks import (
     stage_policy,
     stagegraph_head,
 )
+from tests.support.journal import MemoryOperationJournal
+from tests.support.knowledge.stores import InMemoryStaging
 from tests.support.run_control import WORKFLOW_DIGEST, actor
 from tests.support.run_control import command as lifecycle
 from tests.support.run_control import request as run_request
 from tests.support.unit.coordinator.coordinator_mcp_read_surface import FakeFacade
-from tests.support.unit.operations.ft_b2_stage_handoff import (
-    FakeArtifacts,
-    FakeSelections,
-    FakeStaging,
-)
+from tests.support.unit.operations.ft_b2_stage_handoff import FakeArtifacts, FakeSelections
 from tests.support.unit.orchestration.rrm_016_goal_directed_settlement import _run_iteration_one
 
 SCOPE = "mc/00000000-0000-7000-8000-0000000000aa/biotech/00000000-0000-7000-8000-0000000000bb"
@@ -168,7 +162,7 @@ async def test_cloud_capture_flows_through_lease_snapshot_fork_seed_and_mandator
     packs = ContextPackService(
         artifacts=FakeArtifacts({}, scope=None),
         selections=FakeSelections(),
-        staging=FakeStaging(),
+        staging=InMemoryStaging(),
         fork_contexts=ForkContextReader(world.forks.snapshot_store, stack.artifacts),
     )
     candidates = await packs.queued_candidates(entries, request_scope=world.scope)
@@ -417,7 +411,7 @@ async def test_the_forked_runs_first_packet_restores_the_snapshot_and_carries_th
 
     repository = InMemoryRunControlRepository()
     run_control = goal_run_control(repository)
-    selections, staging = FakeSelections(), FakeStaging()
+    selections, staging = FakeSelections(), InMemoryStaging()
     packs = ContextPackService(
         artifacts=FakeArtifacts({}, scope=None), selections=selections, staging=staging
     )

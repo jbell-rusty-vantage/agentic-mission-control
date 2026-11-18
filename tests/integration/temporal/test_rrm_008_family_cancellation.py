@@ -83,7 +83,6 @@ from mission_control.domain.programs.goal_directed_runtime import (
     GoalOperationReconciliationRequest,
     GoalOperationReconciliationResult,
 )
-from tests.fixtures.checkpoint_recovery import MemoryOperationJournal
 from tests.fixtures.goal_directed_journaled import (
     SCOPE,
     ExactLifecycleBinding,
@@ -122,6 +121,7 @@ from tests.support.integration.temporal.wp_bp_010_temporal import QUEUE, _bluepr
 from tests.support.integration.temporal.wp_bp_010_temporal import _run_input as stage_input
 from tests.support.integration.temporal.wp_bp_020_temporal import _run_input as goal_input
 from tests.support.integration.temporal.wp_bp_020_temporal import fake_settlement
+from tests.support.journal import MemoryOperationJournal
 
 GOAL_COMPOSITION_QUEUE = "rrm008-goal-directed"
 

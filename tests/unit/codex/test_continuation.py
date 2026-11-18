@@ -37,10 +37,8 @@ from mission_control.application.context.hydrators import LaneHydratorRegistry
 from mission_control.application.execution.harness.controls import SessionHandoverLane
 from mission_control.domain.context.checkpoint import continuation_delivery
 from mission_control.domain.execution.lanes import LaneSegmentBounds
-from tests.fixtures.continuation import (
-    CONT_SCOPE,
-    FakeStaging,
-)
+from tests.fixtures.continuation import CONT_SCOPE
+from tests.support.knowledge.stores import InMemoryStaging
 from tests.support.providers.codex import codex_stack
 
 SOURCE = "thr-0001"
@@ -53,7 +51,7 @@ BOUNDS = LaneSegmentBounds(max_frames=200, max_duration_s=20, heartbeat_timeout_
 def test_the_registration_resolves_this_lane_only_and_stays_unqualified(tmp_path: Path) -> None:
     stack = codex_stack(tmp_path, approvals=False)
     registry = LaneHydratorRegistry()
-    registry.register(codex_continuation_registration(stack.harness, FakeStaging()))
+    registry.register(codex_continuation_registration(stack.harness, InMemoryStaging()))
     assert registry.profiles() == ("codex",)
     assert isinstance(registry.hydrator("codex", CONT_SCOPE), CodexSessionHydrator)
     assert isinstance(registry.snapshots("codex", CONT_SCOPE), CodexWorkspaceSnapshots)
@@ -68,7 +66,7 @@ def test_the_registration_resolves_this_lane_only_and_stays_unqualified(tmp_path
 
 async def test_snapshots_refuse_a_thread_this_worker_does_not_hold(tmp_path: Path) -> None:
     stack = codex_stack(tmp_path, approvals=False)
-    snapshots = CodexWorkspaceSnapshots(stack.harness, FakeStaging())
+    snapshots = CodexWorkspaceSnapshots(stack.harness, InMemoryStaging())
     with pytest.raises(ContinuationRejected) as rejected:
         await snapshots.snapshot(
             request_scope=CONT_SCOPE, run_key="run-1", session_ref="thr-elsewhere", roots=()

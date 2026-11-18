@@ -48,7 +48,6 @@ from mission_control.contracts.contracts import MissionCommandRequest
 from mission_control.domain.context.packet import ContextSourceKind
 from mission_control.domain.policies.contracts import ActorContext, RunOutcome
 from mission_control.domain.policies.mailbox import MailboxState
-from tests.fixtures.checkpoint_recovery import MemoryOperationJournal
 from tests.fixtures.goal_directed_journaled import (
     SCOPE,
     GoalScriptedModel,
@@ -58,12 +57,10 @@ from tests.fixtures.goal_directed_journaled import (
     goal_run_control,
     goal_run_input,
 )
+from tests.support.journal import MemoryOperationJournal
+from tests.support.knowledge.stores import InMemoryStaging
 from tests.support.run_control import actor as control_actor
-from tests.support.unit.operations.ft_b2_stage_handoff import (
-    FakeArtifacts,
-    FakeSelections,
-    FakeStaging,
-)
+from tests.support.unit.operations.ft_b2_stage_handoff import FakeArtifacts, FakeSelections
 
 QUEUE = "ft-f1-command-mailbox"
 INSTRUCTION = "Also cite the 2024 meta-analysis in the record."
@@ -98,7 +95,7 @@ async def test_queued_instruction_is_consumed_once_across_a_worker_restart() -> 
     async with environment:
         repository = InMemoryRunControlRepository()
         run_control = goal_run_control(repository)
-        selections, staging = FakeSelections(), FakeStaging()
+        selections, staging = FakeSelections(), InMemoryStaging()
         packs = ContextPackService(
             artifacts=FakeArtifacts({}, scope=None), selections=selections, staging=staging
         )

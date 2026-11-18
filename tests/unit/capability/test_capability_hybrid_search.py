@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime
-from hashlib import sha256
 
 import pytest
 
@@ -16,7 +15,6 @@ from mission_control.application.capabilities.capability_search import (
     weighted_rrf,
 )
 from mission_control.application.capabilities.capability_search_repository import (
-    CapabilityEmbedding,
     InMemoryCatalogSearchRepository,
     RankedCapabilityDocument,
 )
@@ -40,6 +38,7 @@ from mission_control.domain.coordinator.contracts import (
     CatalogAssetStatus,
     SearchDocumentMetadata,
 )
+from tests.fixtures.capability_search_catalog import DeterministicEmbeddings
 
 NOW = datetime(2026, 7, 25, 17, 0, tzinfo=UTC)
 DIGEST = "sha256:" + "a" * 64
@@ -64,35 +63,6 @@ def test_generation_join_qualifies_search_filter_columns() -> None:
     assert "$6 = ANY(documents.compatible_runtimes)" in query
     assert "$7 = ANY(documents.operation_classes)" in query
     assert "documents.workflow_type_refs @>" in query
-
-
-class FakeEmbeddings:
-    def __init__(self, *, wrong_digest: bool = False) -> None:
-        self.calls: list[str] = []
-        self.wrong_digest = wrong_digest
-
-    async def embed(self, text: str) -> CapabilityEmbedding:
-        self.calls.append(text)
-        normalized = text.casefold()
-        if (
-            text == "up-to-date internet investigation"
-            or "firecrawl_search" in normalized
-            or "firecrawl search" in normalized
-        ):
-            vector = (1.0, 0.0, 0.0)
-        elif "tavily_search" in normalized or "tavily search" in normalized:
-            vector = (0.8, 0.2, 0.0)
-        else:
-            vector = (0.0, 1.0, 0.0)
-        digest = f"sha256:{sha256(text.encode()).hexdigest()}"
-        if self.wrong_digest:
-            digest = "sha256:" + "f" * 64
-        return CapabilityEmbedding(
-            vector=vector,
-            model_id="text-embedding-3-small",
-            dimensions=3,
-            input_digest=digest,
-        )
 
 
 def server_definition() -> MCPServerDefinition:
@@ -188,12 +158,37 @@ async def publish_catalog(
     return server, firecrawl, tavily
 
 
+def _search_vector(text: str) -> tuple[float, ...]:
+    normalized = text.casefold()
+    if (
+        text == "up-to-date internet investigation"
+        or "firecrawl_search" in normalized
+        or "firecrawl search" in normalized
+    ):
+        return (1.0, 0.0, 0.0)
+    if "tavily_search" in normalized or "tavily search" in normalized:
+        return (0.8, 0.2, 0.0)
+    return (0.0, 1.0, 0.0)
+
+
+def keyword_embeddings(*, wrong_digest: bool = False) -> DeterministicEmbeddings:
+    """A three-dimensional keyword embedder with no batch endpoint."""
+
+    return DeterministicEmbeddings(
+        3,
+        "text-embedding-3-small",
+        vector=_search_vector,
+        batch=False,
+        wrong_digest="every" if wrong_digest else None,
+    )
+
+
 @pytest.mark.asyncio
 async def test_projector_is_idempotent_and_checks_embedding_claims() -> None:
     definitions = InMemoryDefinitionRepository()
     _server, firecrawl, _tavily = await publish_catalog(definitions)
     search = InMemoryCatalogSearchRepository()
-    embeddings = FakeEmbeddings()
+    embeddings = keyword_embeddings()
     projector = CatalogProjector(
         definitions=definitions,
         search=search,
@@ -223,7 +218,7 @@ async def test_projector_is_idempotent_and_checks_embedding_claims() -> None:
     bad_projector = CatalogProjector(
         definitions=definitions,
         search=InMemoryCatalogSearchRepository(),
-        embeddings=FakeEmbeddings(wrong_digest=True),
+        embeddings=keyword_embeddings(wrong_digest=True),
         embedding_model_id="text-embedding-3-small",
         embedding_dimensions=3,
         projection_generation="test-generation-1",
@@ -237,7 +232,7 @@ async def test_hybrid_search_uses_weighted_rrf_and_groups_exact_tool_parent() ->
     definitions = InMemoryDefinitionRepository()
     server, firecrawl, tavily = await publish_catalog(definitions)
     search = InMemoryCatalogSearchRepository()
-    embeddings = FakeEmbeddings()
+    embeddings = keyword_embeddings()
     projector = CatalogProjector(
         definitions=definitions,
         search=search,
@@ -287,7 +282,7 @@ async def test_exact_rehydration_rejects_stale_digest_and_retirement() -> None:
     definitions = InMemoryDefinitionRepository()
     _server, firecrawl, _tavily = await publish_catalog(definitions)
     search = InMemoryCatalogSearchRepository()
-    embeddings = FakeEmbeddings()
+    embeddings = keyword_embeddings()
     projector = CatalogProjector(
         definitions=definitions,
         search=search,
@@ -333,7 +328,7 @@ async def test_rrf_uses_rank_not_branch_score_with_k_50() -> None:
     projector = CatalogProjector(
         definitions=definitions,
         search=search,
-        embeddings=FakeEmbeddings(),
+        embeddings=keyword_embeddings(),
         embedding_model_id="text-embedding-3-small",
         embedding_dimensions=3,
         projection_generation="test-generation-1",

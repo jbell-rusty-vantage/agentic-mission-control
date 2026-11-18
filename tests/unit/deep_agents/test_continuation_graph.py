@@ -35,7 +35,6 @@ from mission_control.domain.frames.facts import CompactionObservedFact
 from tests.fixtures.continuation import (
     CONT_SCOPE,
     RUN_KEY,
-    FakeStaging,
     build_service,
     facts,
     seal_target,
@@ -43,6 +42,7 @@ from tests.fixtures.continuation import (
 )
 from tests.fixtures.continuation_graph import TASK, compaction_agent, stream_turn
 from tests.fixtures.provider_frames import harness_start, in_memory_store, opened_writer
+from tests.support.knowledge.stores import InMemoryStaging
 
 SOURCE_THREAD = "thread-collect-1"
 MANIFEST = '{"records": 180, "source": "pubmed"}'
@@ -131,7 +131,7 @@ async def test_forced_summarization_seals_a_checkpoint_and_hydrates_a_fresh_thre
     assert registrar.registered[0]["content"].startswith(b"## Summarized at")
 
     # 4. A provider compaction trigger seals a valid checkpoint from the thread's files.
-    staging = FakeStaging()
+    staging = InMemoryStaging()
 
     async def thread_values(thread: str) -> dict[str, Any]:
         state = await agent.aget_state({"configurable": {"thread_id": thread}})

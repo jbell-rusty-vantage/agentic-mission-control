@@ -10,7 +10,7 @@ from dataclasses import dataclass, field
 from datetime import timedelta
 from typing import Any
 
-from tests.fixtures.checkpoint_recovery import MemoryOperationJournal
+from tests.support.journal import MemoryOperationJournal
 from tests.support.run_control import ALL_PERMISSIONS, NOW, WORKFLOW_DIGEST
 
 from mission_control.application.execution.inspection import InMemoryInspectionReadRepository

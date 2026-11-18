@@ -21,12 +21,9 @@ from mission_control.domain.context.snapshot_evidence import (
 )
 from mission_control.domain.policies.forks import RunSnapshotManifest
 from mission_control.domain.policies.mailbox import MailboxEntry
+from tests.support.knowledge.stores import InMemoryStaging
 from tests.support.unit.context.fork_conversation_custody import custody
-from tests.support.unit.operations.ft_b2_stage_handoff import (
-    FakeArtifacts,
-    FakeSelections,
-    FakeStaging,
-)
+from tests.support.unit.operations.ft_b2_stage_handoff import FakeArtifacts, FakeSelections
 from tests.unit.context.packets import SEALED_AT
 
 
@@ -80,7 +77,7 @@ def entries(snapshot: RunSnapshotManifest) -> tuple[MailboxEntry, MailboxEntry]:
 
 
 def packs(
-    snapshot: RunSnapshotManifest, files: FakeStaging, *, composed: bool = True
+    snapshot: RunSnapshotManifest, files: InMemoryStaging, *, composed: bool = True
 ) -> ContextPackService:
     return ContextPackService(
         artifacts=FakeArtifacts({}, scope=None),

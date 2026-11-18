@@ -48,10 +48,7 @@ from mission_control.domain.execution.contracts import (
 from mission_control.domain.execution.invocation_settlement import (
     SettlementState,
 )
-from tests.fixtures.checkpoint_recovery import (
-    recovery_harness,
-    stage_recovery_unit,
-)
+from tests.fixtures.checkpoint_recovery import recovery_harness, stage_recovery_unit
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.fixtures.saved_settlement import DurableEffectDouble
 from tests.fixtures.temporal_history import patch_ids

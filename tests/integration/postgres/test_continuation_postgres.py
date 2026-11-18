@@ -43,7 +43,6 @@ from mission_control.domain.context.checkpoint import CheckpointIdentities
 from mission_control.domain.context.packet import PacketScope
 from mission_control.domain.policies.errors import IdempotencyConflict
 from tests.fixtures.continuation import (
-    FakeStaging,
     MemorySnapshots,
     NoArtifacts,
     StepClock,
@@ -56,6 +55,7 @@ from tests.fixtures.provider_frames import StepClock as FrameClock
 from tests.fixtures.provider_frames import turn_observations
 from tests.support.db_builders import admit_unit_attempt, owner_rows
 from tests.support.integration.postgres.continuation_postgres import continuation_actor
+from tests.support.knowledge.stores import InMemoryStaging
 
 pytestmark = pytest.mark.common_db
 
@@ -99,7 +99,7 @@ async def test_seal_and_transfer_persist_checkpoints_transfers_and_session_event
         handle = await frames.open_execution(admitted.start())
         await FrameWriter(frames, handle, clock=FrameClock()).write(turn_observations())
 
-        staging = FakeStaging()
+        staging = InMemoryStaging()
         transfers = PostgresContinuationRepository(pool)
         checkpoints = PostgresCheckpointRepository(pool)
         selections = PostgresContextSelectionRepository(pool)

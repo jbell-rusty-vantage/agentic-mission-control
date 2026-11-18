@@ -31,11 +31,8 @@ from mission_control.domain.context.packet import (
     RetrievalInstruction,
     RetrievalKind,
 )
-from tests.support.unit.operations.ft_b2_stage_handoff import (
-    FakeArtifacts,
-    FakeSelections,
-    FakeStaging,
-)
+from tests.support.knowledge.stores import InMemoryStaging
+from tests.support.unit.operations.ft_b2_stage_handoff import FakeArtifacts, FakeSelections
 from tests.support.unit.orchestration.ft_b3_goal_iteration_packet import _executor_result
 from tests.support.unit.orchestration.rrm_016_goal_directed_settlement import _claim, _preparation
 
@@ -58,7 +55,7 @@ class FakeChainSupplies:
         return self.supply
 
 
-async def _supply(staging: FakeStaging) -> ChainSupply:
+async def _supply(staging: InMemoryStaging) -> ChainSupply:
     locator = await staging.stage(
         request_scope="scope", name="evidence_map.txt", content=MAP, media_type="text/plain"
     )
@@ -118,7 +115,7 @@ async def _supply(staging: FakeStaging) -> ChainSupply:
 
 
 async def _service() -> tuple[ContextPackService, FakeChainSupplies]:
-    staging = FakeStaging()
+    staging = InMemoryStaging()
     supplies = FakeChainSupplies(await _supply(staging))
     service = ContextPackService(
         artifacts=FakeArtifacts({}, scope=None),

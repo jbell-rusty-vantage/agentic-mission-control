@@ -30,8 +30,8 @@ from tests.conformance.lanes.contract import (
     Script,
 )
 from tests.conformance.lanes.drive import REVIEWER
-from tests.fixtures.continuation import FakeStaging
 from tests.fixtures.cursor_controls import FAST, admitted_unit, compose_control_stack
+from tests.support.knowledge.stores import InMemoryStaging
 from tests.support.providers.claude import (
     PROFILE,
     FixtureScript,
@@ -163,7 +163,7 @@ class ClaudeAgentSdkConformance(LaneAdapter):
 
     def continuation_ports(self, fake: LaneFake) -> ContinuationPorts:
         harness = fake.control.local.harness
-        staging = FakeStaging()
+        staging = InMemoryStaging()
         return ContinuationPorts(
             snapshots=ClaudeWorkspaceSnapshots(harness, staging),
             hydrator=ClaudeSessionHydrator(harness, staging),

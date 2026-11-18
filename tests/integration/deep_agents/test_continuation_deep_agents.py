@@ -17,11 +17,12 @@ import pytest
 from deepagents.backends.utils import create_file_data
 from langchain_core.messages import HumanMessage, ToolMessage
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
-from tests.fixtures.continuation import FakeStaging, NoArtifacts, StepClock, facts, seal_target
+from tests.fixtures.continuation import NoArtifacts, StepClock, facts, seal_target
 from tests.fixtures.continuation_graph import TASK, compaction_agent, stream_turn
 from tests.fixtures.mission_control_common_db import CommonDatabase, provision_runtime
 from tests.fixtures.provider_frames import StepClock as FrameClock
 from tests.support.db_builders import admit_unit_attempt, owner_rows
+from tests.support.knowledge.stores import InMemoryStaging
 from tests.support.run_control import ALL_PERMISSIONS, actor
 
 from mission_control.adapters.deep_agents.compaction import (
@@ -115,7 +116,7 @@ async def test_continuation_on_the_local_stack(common_db: CommonDatabase) -> Non
             assert FrameKind.BEFORE_COMPACTION in kinds and FrameKind.AFTER_COMPACTION in kinds
             assert middleware.observations
 
-            staging = FakeStaging()
+            staging = InMemoryStaging()
             selections = PostgresContextSelectionRepository(pool)
             transfers = PostgresContinuationRepository(pool)
 

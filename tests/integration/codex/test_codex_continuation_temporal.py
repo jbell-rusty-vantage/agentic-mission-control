@@ -73,13 +73,14 @@ from mission_control.domain.execution.contracts import (
     OperationWorkflowRequest,
 )
 from mission_control.domain.execution.lanes import LaneSegmentBounds
-from tests.fixtures.continuation import FakeStaging, NoArtifacts, StepClock, trigger
+from tests.fixtures.continuation import NoArtifacts, StepClock, trigger
 from tests.fixtures.lane_turns import lane_stack
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.fixtures.mp12_lanes import Crashes
 from tests.fixtures.temporal_history import patch_ids
 from tests.support.db_builders import admit_unit_attempt
 from tests.support.integration.postgres.continuation_postgres import continuation_actor
+from tests.support.knowledge.stores import InMemoryStaging
 from tests.support.providers.codex import (
     FixtureLauncher,
     build_harness,
@@ -152,7 +153,7 @@ async def test_a_codex_unit_continues_into_a_fresh_thread_on_real_services(
         stack = lane_stack(harness, operation=operation)
         frames = PostgresFrameRepository(pool)
         states = PostgresLaneExecutionStateStore(pool)
-        staging = FakeStaging()
+        staging = InMemoryStaging()
         snapshots = CodexWorkspaceSnapshots(harness, staging)
         selections = PostgresContextSelectionRepository(pool)
         transfers = PostgresContinuationRepository(pool)

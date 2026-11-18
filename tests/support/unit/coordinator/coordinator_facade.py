@@ -6,7 +6,6 @@ Moved from tests/unit/coordinator/test_coordinator_facade.py.
 from __future__ import annotations
 
 from datetime import UTC, datetime
-from hashlib import sha256
 
 from biotech_mission_adapters.domain.coordinator.web_capability_fixtures import (
     web_capability_definitions,
@@ -16,7 +15,6 @@ from mission_control.application.authoring.control_plane_repository import (
 )
 from mission_control.application.capabilities.capability_search import CapabilitySearchService
 from mission_control.application.capabilities.capability_search_repository import (
-    CapabilityEmbedding,
     InMemoryCatalogSearchRepository,
 )
 from mission_control.application.capabilities.catalog_projection import CatalogProjector
@@ -38,25 +36,19 @@ from mission_control.domain.authoring.contracts import (
     SourceProvenance,
 )
 from mission_control.domain.coordinator.launch import BlueprintFamily
+from tests.fixtures.capability_search_catalog import DeterministicEmbeddings
 
 NOW = datetime(2026, 7, 25, 20, 0, tzinfo=UTC)
 DIGEST = f"sha256:{'a' * 64}"
 
 
-class DeterministicEmbeddings:
-    async def embed(self, text: str) -> CapabilityEmbedding:
-        normalized = text.casefold()
-        vector = (
-            1.0 if "web" in normalized else 0.0,
-            1.0 if "research" in normalized else 0.0,
-            1.0 if "browser" in normalized else 0.0,
-        )
-        return CapabilityEmbedding(
-            vector=vector,
-            model_id="text-embedding-3-small",
-            dimensions=3,
-            input_digest=f"sha256:{sha256(text.encode()).hexdigest()}",
-        )
+def _keyword_vector(text: str) -> tuple[float, ...]:
+    normalized = text.casefold()
+    return (
+        1.0 if "web" in normalized else 0.0,
+        1.0 if "research" in normalized else 0.0,
+        1.0 if "browser" in normalized else 0.0,
+    )
 
 
 class ReadyRuntimes:
@@ -133,7 +125,7 @@ async def concrete_facade() -> tuple[
 ]:
     definitions = InMemoryDefinitionRepository()
     search_index = InMemoryCatalogSearchRepository()
-    embeddings = DeterministicEmbeddings()
+    embeddings = DeterministicEmbeddings(3, "text-embedding-3-small", vector=_keyword_vector)
     projector = CatalogProjector(
         definitions=definitions,
         search=search_index,

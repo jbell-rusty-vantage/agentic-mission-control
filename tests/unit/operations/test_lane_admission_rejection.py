@@ -42,15 +42,15 @@ from mission_control.domain.policies.contracts import (
 from mission_control.domain.policies.errors import IdempotencyConflict
 from tests.fixtures.checkpoint_recovery import FixtureControlPlane, governed_workspace
 from tests.fixtures.lane_turns import SCOPE, RecordingSignals, cursor_operation, lane_stack
+from tests.support.journal import MemoryOperationJournal
 from tests.support.run_control import actor, command, request, service
-from tests.support.unit.operations.lane_admission_rejection import RejectionJournal
 
 
 @dataclass
 class RejectionStack:
     lane: Any
     run_control: Any
-    journal: RejectionJournal
+    journal: MemoryOperationJournal
     coordinator: JournaledOperationExecutionCoordinator
     operation: Any
     binding: Any
@@ -88,7 +88,7 @@ async def rejection_stack() -> RejectionStack:
     lane = lane_stack(operation=operation)
     binding = bind_operation_execution_request(operation)
     await lane.bindings.create_binding(binding)
-    journal = RejectionJournal()
+    journal = MemoryOperationJournal()
     coordinator = JournaledOperationExecutionCoordinator(
         journal=journal,  # type: ignore[arg-type]
         run_control=run_control,

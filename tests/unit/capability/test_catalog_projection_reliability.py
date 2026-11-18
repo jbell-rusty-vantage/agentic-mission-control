@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import asyncio
 from datetime import UTC, datetime, timedelta
-from hashlib import sha256
 
 import pytest
 
@@ -10,7 +9,6 @@ from mission_control.application.authoring.control_plane_repository import (
     InMemoryDefinitionRepository,
 )
 from mission_control.application.capabilities.capability_search_repository import (
-    CapabilityEmbedding,
     InMemoryCatalogSearchRepository,
 )
 from mission_control.application.capabilities.catalog_projection import (
@@ -38,43 +36,21 @@ from mission_control.domain.authoring.contracts import (
     ExactDefinitionRef,
     PromptDefinition,
 )
+from tests.fixtures.capability_search_catalog import DeterministicEmbeddings
 
 NOW = datetime(2026, 7, 25, 20, 0, tzinfo=UTC)
 ZERO_DIGEST = "sha256:" + "0" * 64
 
 
-class BatchEmbeddings:
-    def __init__(self, *, wrong_last_digest: bool = False) -> None:
-        self.batch_calls: list[tuple[str, ...]] = []
-        self.single_calls: list[str] = []
-        self.wrong_last_digest = wrong_last_digest
+def constant_embeddings(*, wrong_last_digest: bool = False) -> DeterministicEmbeddings:
+    """A constant three-dimensional embedder with a batch endpoint."""
 
-    async def embed(self, text: str) -> CapabilityEmbedding:
-        self.single_calls.append(text)
-        return self._embedding(text, wrong=False)
-
-    async def embed_many(
-        self,
-        texts: tuple[str, ...],
-    ) -> tuple[CapabilityEmbedding, ...]:
-        self.batch_calls.append(texts)
-        return tuple(
-            self._embedding(
-                text,
-                wrong=self.wrong_last_digest and index == len(texts) - 1,
-            )
-            for index, text in enumerate(texts)
-        )
-
-    @staticmethod
-    def _embedding(text: str, *, wrong: bool) -> CapabilityEmbedding:
-        digest = ZERO_DIGEST if wrong else f"sha256:{sha256(text.encode()).hexdigest()}"
-        return CapabilityEmbedding(
-            vector=(1.0, 0.0, 0.0),
-            model_id="text-embedding-3-small",
-            dimensions=3,
-            input_digest=digest,
-        )
+    return DeterministicEmbeddings(
+        3,
+        "text-embedding-3-small",
+        vector=lambda _text: (1.0, 0.0, 0.0),
+        wrong_digest="last" if wrong_last_digest else None,
+    )
 
 
 class EventCompletions:
@@ -121,7 +97,7 @@ async def _publish_prompts(
 def _projector(
     definitions: InMemoryDefinitionRepository,
     search: InMemoryCatalogSearchRepository,
-    embeddings: BatchEmbeddings,
+    embeddings: DeterministicEmbeddings,
     generation: str,
 ) -> CatalogProjector:
     return CatalogProjector(
@@ -156,7 +132,7 @@ async def test_projector_batches_embeddings_and_persists_nothing_on_bad_claim() 
     definitions = InMemoryDefinitionRepository()
     refs = await _publish_prompts(definitions, 3)
     search = InMemoryCatalogSearchRepository()
-    embeddings = BatchEmbeddings()
+    embeddings = constant_embeddings()
     projector = _projector(definitions, search, embeddings, "generation-batch")
 
     results = await projector.project_many(tuple(CatalogProjectionInput(ref=ref) for ref in refs))
@@ -167,7 +143,7 @@ async def test_projector_batches_embeddings_and_persists_nothing_on_bad_claim() 
     assert embeddings.single_calls == []
 
     rejected_search = InMemoryCatalogSearchRepository()
-    rejected_embeddings = BatchEmbeddings(wrong_last_digest=True)
+    rejected_embeddings = constant_embeddings(wrong_last_digest=True)
     rejected = _projector(
         definitions,
         rejected_search,
@@ -185,7 +161,7 @@ async def test_generation_is_invisible_until_verified_atomic_activation() -> Non
     refs = await _publish_prompts(definitions, 2)
     search = InMemoryCatalogSearchRepository()
     generations = InMemoryProjectionGenerationRepository(search)
-    embeddings = BatchEmbeddings()
+    embeddings = constant_embeddings()
 
     old_spec = _spec("generation-old", refs)
     await generations.begin(old_spec, created_at=NOW)
@@ -244,7 +220,7 @@ async def test_rebuild_verifies_digests_before_activation_and_is_idempotent() ->
     projector = _projector(
         definitions,
         search,
-        BatchEmbeddings(),
+        constant_embeddings(),
         "generation-rebuild",
     )
 
@@ -466,7 +442,7 @@ async def test_event_processor_completes_after_idempotent_projection_commit() ->
         }
     )
     events = InMemoryProjectionEventRepository((event,))
-    embeddings = BatchEmbeddings()
+    embeddings = constant_embeddings()
     processor = CatalogProjectionEventProcessor(
         events=events,
         generations=generations,

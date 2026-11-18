@@ -53,7 +53,6 @@ from mission_control.contracts.contracts import MissionCommandRequest
 from mission_control.domain.context.packet import ContextPurpose, ContextSourceKind
 from mission_control.domain.policies.contracts import ActorContext, RunOutcome
 from mission_control.domain.policies.mailbox import MailboxState
-from tests.fixtures.checkpoint_recovery import MemoryOperationJournal
 from tests.fixtures.goal_directed_journaled import (
     _ROLE,
     SCOPE,
@@ -64,12 +63,10 @@ from tests.fixtures.goal_directed_journaled import (
     goal_run_control,
     goal_run_input,
 )
+from tests.support.journal import MemoryOperationJournal
+from tests.support.knowledge.stores import InMemoryStaging
 from tests.support.run_control import actor as control_actor
-from tests.support.unit.operations.ft_b2_stage_handoff import (
-    FakeArtifacts,
-    FakeSelections,
-    FakeStaging,
-)
+from tests.support.unit.operations.ft_b2_stage_handoff import FakeArtifacts, FakeSelections
 
 QUEUE = "ft-f2-inject"
 INJECTED = "Redirect: cite the 2024 meta-analysis first."
@@ -110,7 +107,7 @@ async def test_interrupt_and_inject_replaces_the_running_executor_turn_on_tempor
     async with environment:
         repository = InMemoryRunControlRepository()
         run_control = goal_run_control(repository)
-        selections, staging = FakeSelections(), FakeStaging()
+        selections, staging = FakeSelections(), InMemoryStaging()
         packs = ContextPackService(
             artifacts=FakeArtifacts({}, scope=None), selections=selections, staging=staging
         )

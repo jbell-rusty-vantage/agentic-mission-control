@@ -36,11 +36,9 @@ from mission_control.domain.context.checkpoint import (
 )
 from mission_control.domain.execution.bindings import ProviderExecutionBinding
 from mission_control.domain.execution.lane_turns import LaneSegmentBounds, LaneTurnRequest
-from tests.fixtures.continuation import (
-    CONT_SCOPE,
-    FakeStaging,
-)
+from tests.fixtures.continuation import CONT_SCOPE
 from tests.fixtures.lane_turns import RecordingSignals
+from tests.support.knowledge.stores import InMemoryStaging
 from tests.support.providers.claude import (
     PROFILE,
     SESSION_ID,
@@ -273,7 +271,7 @@ async def test_reattaching_the_activated_target_adopts_it_without_a_resume(
 
 async def test_hydration_refuses_a_session_this_worker_does_not_hold(tmp_path: Path) -> None:
     stack = claude_stack(tmp_path)
-    staging = FakeStaging()
+    staging = InMemoryStaging()
     snapshots = ClaudeWorkspaceSnapshots(stack.harness, staging)
     with pytest.raises(ContinuationRejected) as rejected:
         await snapshots.snapshot(
@@ -292,7 +290,7 @@ async def test_hydration_refuses_a_session_this_worker_does_not_hold(tmp_path: P
 def test_the_registration_resolves_this_lane_only_and_stays_unqualified(tmp_path: Path) -> None:
     harness = claude_stack(tmp_path).harness
     registry = LaneHydratorRegistry()
-    registry.register(claude_continuation_registration(harness, FakeStaging()))
+    registry.register(claude_continuation_registration(harness, InMemoryStaging()))
     assert registry.profiles() == (PROFILE,)
     assert isinstance(registry.hydrator(PROFILE, CONT_SCOPE), ClaudeSessionHydrator)
     assert isinstance(registry.snapshots(PROFILE, CONT_SCOPE), ClaudeWorkspaceSnapshots)

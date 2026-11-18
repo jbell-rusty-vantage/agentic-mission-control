@@ -12,7 +12,6 @@ from __future__ import annotations
 import json
 from datetime import UTC, datetime
 from typing import Any
-from uuid import UUID
 
 import pytest
 from fastapi import FastAPI
@@ -39,6 +38,7 @@ from mission_control.application.frames.replay import (
     ReplayService,
     ReplayUnavailable,
 )
+from mission_control.application.frames.sink import InMemoryFrameStore
 from mission_control.application.installations.registry import (
     ApplicationBinding,
     ApplicationRegistry,
@@ -74,6 +74,7 @@ from tests.fixtures.provider_frames import (
     TENANT,
     provider_frame,
 )
+from tests.support.frames import store_holding
 
 RUN = str(FIXTURE_RUN)
 NOW = datetime(2026, 10, 21, 12, 0, tzinfo=UTC)
@@ -121,46 +122,6 @@ def stage_unit() -> RuntimeUnitIdentity:
             operation_slot_id="main",
         ),
     )
-
-
-class FakeFrames:
-    """A frame reader over a tuple, scoped like the Postgres repository."""
-
-    def __init__(self, frames: tuple[ProviderFrame, ...]) -> None:
-        self.frames = frames
-
-    async def frames_for_execution(
-        self,
-        request_scope: str,
-        harness_execution_id: UUID,
-        generation: int,
-        *,
-        after_ordinal: int = 0,
-        closing_only: bool = False,
-        limit: int = 1_000,
-    ) -> tuple[ProviderFrame, ...]:
-        assert request_scope == SCOPE
-        rows = sorted(
-            (
-                frame
-                for frame in self.frames
-                if frame.harness_execution_id == harness_execution_id
-                and frame.generation == generation
-                and frame.arrival_ordinal > after_ordinal
-                and (frame.closing or not closing_only)
-            ),
-            key=lambda frame: frame.arrival_ordinal,
-        )
-        return tuple(rows[:limit])
-
-    async def frames_for_run(
-        self, request_scope: str, run_id: UUID, *, closing_only: bool = False, limit: int = 10_000
-    ) -> tuple[ProviderFrame, ...]:
-        assert request_scope == SCOPE
-        return tuple(frame for frame in self.frames if frame.run_id == run_id)
-
-    async def current_generation(self, request_scope: str, harness_execution_id: UUID) -> int:
-        return 1
 
 
 class NoMetadata:
@@ -219,7 +180,7 @@ class World:
         self.points = InMemoryCognitionPointRepository()
         self.reader = GrantedArtifactBodyReader(NoMetadata(), self.payloads, request_scope=SCOPE)
         self.requests = requests
-        self.frames: FakeFrames | None = None
+        self.frames: InMemoryFrameStore | None = None
         self.point_id = ""
 
     async def build(self) -> World:
@@ -244,7 +205,7 @@ class World:
                 provider_frame(ordinal, FrameKind.MODEL_REQUEST, request, raw_kind="model.request")
             )
             ordinal = 5 if ordinal == 2 else ordinal + 1
-        self.frames = FakeFrames(tuple(rows))
+        self.frames = await store_holding(rows)
         unit = stage_unit()
         thread = cognitive_session_namespace(unit, 1)
         keys = tuple(frame.provider_key for frame in rows if 2 <= frame.arrival_ordinal <= 6)

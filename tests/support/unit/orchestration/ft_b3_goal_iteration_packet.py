@@ -23,7 +23,6 @@ from mission_control.application.execution.operations.operation_execution import
 )
 from mission_control.domain.context.packet import ModelBudgetProfile
 from mission_control.domain.policies.contracts import CommandStatus
-from tests.fixtures.checkpoint_recovery import MemoryOperationJournal
 from tests.fixtures.goal_directed_journaled import (
     GoalComposition,
     GoalScriptedModel,
@@ -33,12 +32,10 @@ from tests.fixtures.goal_directed_journaled import (
     goal_run_control,
     goal_start_action,
 )
+from tests.support.journal import MemoryOperationJournal
+from tests.support.knowledge.stores import InMemoryStaging
 from tests.support.run_control import command
-from tests.support.unit.operations.ft_b2_stage_handoff import (
-    FakeArtifacts,
-    FakeSelections,
-    FakeStaging,
-)
+from tests.support.unit.operations.ft_b2_stage_handoff import FakeArtifacts, FakeSelections
 
 
 async def _composition(
@@ -46,7 +43,7 @@ async def _composition(
 ) -> tuple[GoalComposition, str, FakeSelections]:
     run_control = goal_run_control()
     selections = FakeSelections()
-    staging = FakeStaging()
+    staging = InMemoryStaging()
     packs = ContextPackService(
         artifacts=FakeArtifacts({}, scope=None),
         selections=selections,

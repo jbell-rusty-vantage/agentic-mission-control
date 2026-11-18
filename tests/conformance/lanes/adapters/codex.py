@@ -29,8 +29,8 @@ from tests.conformance.lanes.contract import (
     Scenario,
     Script,
 )
-from tests.fixtures.continuation import FakeStaging
 from tests.fixtures.cursor_controls import FAST, admitted_unit, compose_control_stack
+from tests.support.knowledge.stores import InMemoryStaging
 from tests.support.providers.codex import (
     PROFILE,
     FixtureLauncher,
@@ -179,7 +179,7 @@ class CodexConformance(LaneAdapter):
 
     def continuation_ports(self, fake: LaneFake) -> ContinuationPorts:
         harness = fake.control.local.harness
-        staging = FakeStaging()
+        staging = InMemoryStaging()
         return ContinuationPorts(
             snapshots=CodexWorkspaceSnapshots(harness, staging),
             hydrator=CodexSessionHydrator(harness, staging),

@@ -97,13 +97,7 @@ from mission_control.domain.programs.goal_directed_runtime import (
     GoalOperationDispatch,
     GoalOperationPreparationRequest,
 )
-from tests.fixtures.continuation import (
-    FakeStaging,
-    MemorySnapshots,
-    NoArtifacts,
-    StepClock,
-    trigger,
-)
+from tests.fixtures.continuation import MemorySnapshots, NoArtifacts, StepClock, trigger
 from tests.fixtures.lane_turns import (
     LaneStack,
     cursor_binding,
@@ -118,6 +112,7 @@ from tests.support.db_builders import admit_unit_attempt
 from tests.support.integration.postgres.continuation_postgres import continuation_actor
 from tests.support.integration.temporal.wp_bp_020_temporal import FakeGoalDirectedActivities
 from tests.support.integration.temporal.wp_bp_020_temporal import _run_input as goal_input
+from tests.support.knowledge.stores import InMemoryStaging
 
 pytestmark = pytest.mark.common_db
 
@@ -189,7 +184,7 @@ class Composition:
         crashes: Crashes | None = None,
     ) -> None:
         self.scope = scope
-        self.staging = FakeStaging()
+        self.staging = InMemoryStaging()
         self.snapshots = MemorySnapshots(
             self.staging, {key: dict(value) for key, value in FILES.items()}
         )

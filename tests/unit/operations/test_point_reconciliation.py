@@ -29,6 +29,7 @@ from mission_control.application.execution.operations.point_reconciliation impor
     PointReconciliationDenied,
     PointsReconciliation,
 )
+from mission_control.application.frames.sink import InMemoryFrameStore
 from mission_control.domain.execution.checkpoint_lineage import (
     CheckpointLineageInDoubt,
     cognitive_session_namespace,
@@ -58,6 +59,7 @@ from tests.fixtures.checkpoint_lineage import (
     transition,
     unit_result,
 )
+from tests.support.frames import hold_frames
 
 SCOPE = "mc/0192a4f0-0000-7000-8000-00000000b10e/biotech/9287e246-224b-5814-bc00-44bb5396e0c5"
 RUN = "84341b2b-8825-57b0-9b05-c0a4497e3ae4"
@@ -153,23 +155,6 @@ class FakeLane:
         return self.scripted[result_locator]
 
 
-class FakeFrames:
-    def __init__(self, frames: tuple[ProviderFrame, ...] = ()) -> None:
-        self.frames = frames
-
-    async def frames_for_run(
-        self, request_scope: str, run_id: UUID, *, closing_only: bool = False, limit: int = 10_000
-    ) -> tuple[ProviderFrame, ...]:
-        assert request_scope == SCOPE and run_id == RUN_UUID
-        return self.frames
-
-    async def frames_for_execution(self, *args: Any, **kwargs: Any) -> tuple[ProviderFrame, ...]:
-        raise NotImplementedError
-
-    async def current_generation(self, *args: Any, **kwargs: Any) -> int | None:
-        raise NotImplementedError
-
-
 class FakeRuns:
     async def run_identity(self, request_scope: str, run_key: str) -> UUID | None:
         return RUN_UUID if run_key == RUN else None
@@ -216,7 +201,7 @@ class World:
         self.points = InMemoryCognitionPointRepository()
         self.lineage = InMemoryCheckpointLineageRepository(points=self.points)
         self.lane = FakeLane()
-        self.frames = FakeFrames()
+        self.frames = InMemoryFrameStore()
         self.reconciler = PointReconciler(
             lineage=self.lineage,
             points=self.points,
@@ -294,12 +279,15 @@ async def test_missing_points_are_rederived_with_frame_ranges_and_written_by_rec
     await world.settle(draft, "d", with_points=False)
     thread = cognitive_session_namespace(draft, 1)
     turn = submission_invocation_id(draft.unit_key, 1)
-    world.frames.frames = (
-        frame(thread, 1, step=0, turn=turn),
-        frame(thread, 2, step=0, turn=turn),
-        frame(thread, 3, step=1, turn=turn),
-        frame(thread, 4, step=None, checkpoint_id="d-b", kind=FrameKind.RUN_RESULT, turn=turn),
-        frame("another-thread", 5, step=1, turn=turn),
+    await hold_frames(
+        world.frames,
+        (
+            frame(thread, 1, step=0, turn=turn),
+            frame(thread, 2, step=0, turn=turn),
+            frame(thread, 3, step=1, turn=turn),
+            frame(thread, 4, step=None, checkpoint_id="d-b", kind=FrameKind.RUN_RESULT, turn=turn),
+            frame("another-thread", 5, step=1, turn=turn),
+        ),
     )
     assert await world.rows(draft) == []
 
@@ -368,7 +356,9 @@ async def test_frame_ranges_of_existing_rows_are_filled_and_parents_recomputed()
     assert root.parent_coordinate is None and root.frames is None
     thread = cognitive_session_namespace(second, 1)
     turn = submission_invocation_id(second.unit_key, 1)
-    world.frames.frames = (frame(thread, 7, step=1, turn=turn), frame(thread, 8, step=1, turn=turn))
+    await hold_frames(
+        world.frames, (frame(thread, 7, step=1, turn=turn), frame(thread, 8, step=1, turn=turn))
+    )
 
     outcome = await world.reconcile(unit_key=second.unit_key)
 
@@ -519,9 +509,12 @@ async def test_a_bounded_walk_over_nested_subagent_frames_stays_incomplete() -> 
     thread = cognitive_session_namespace(draft, 1)
     turn = submission_invocation_id(draft.unit_key, 1)
     nested = frame(thread, 9, step=2, turn=turn)
-    world.frames.frames = (
-        nested.model_copy(
-            update={"provider_key": f"{thread}:tools:task-1:child-cp:2:item-9:message_delta"}
+    await hold_frames(
+        world.frames,
+        (
+            nested.model_copy(
+                update={"provider_key": f"{thread}:tools:task-1:child-cp:2:item-9:message_delta"}
+            ),
         ),
     )
 
