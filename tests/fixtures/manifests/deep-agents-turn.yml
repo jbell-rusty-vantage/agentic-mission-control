@@ -1,0 +1,44 @@
+# yaml-language-server: $schema=../../../src/mission_control/contracts/schemas/mc.mission_manifest.v2.json
+# One Deep Agents node, authored to be run end to end below Temporal by
+# tests/unit/deep_agents/test_manifest_to_turn.py (OVE-238 G1): an MCP server, a Skill,
+# a model profile, an exact network allowlist, an authored instruction and a run budget.
+manifest: mission/v2
+mission:
+  key: turn-proof
+  title: Deep Agents turn proof
+  application: biotech
+  brief:
+    purpose: system
+    request: "TURN-PROOF-REQUEST: prove one Deep Agents turn receives what was authored."
+    done_means: "The scripted turn saw the card, the instruction and the bound capabilities."
+  goals:
+    - key: evidence_map
+      description: Map the evidence
+      objectives:
+        - { key: find_trials, description: Find the trials }
+      criteria:
+        - key: coverage
+          description: Every study has a claim
+          evidence: [claims]
+          acceptance: { schema: claim_table@1 }
+  environment:
+    lane: deep_agents
+    model: { profile: frontier.default, settings: { temperature: 0.2 } }
+    sandbox: { profile: research.standard }
+    network: { mode: allowlist, allow: [eutils.ncbi.nlm.nih.gov], include_kit: false }
+    capabilities:
+      - { search: "pubmed literature retrieval", kind: mcp_server, as: pubmed }
+      - { search: "biotech literature review procedure", kind: skill_bundle, as: lit_review }
+    budget: { usd: 5, tokens: 200000, tool_calls: 7 }
+    governors: { depth: 1, fan_out: 1, iterations: 1, patience: 1 }
+    side_effects: [read_only]
+  program:
+    key: root
+    behavior: stage_graph
+    objectives: [evidence_map]
+    nodes:
+      - key: survey
+        behavior: agent_executor
+        objectives: [evidence_map]
+        instruction: "TURN-PROOF-INSTRUCTION: cite every claim with its PubMed id."
+        outputs: [ { name: claims, schema: claim_table@1 } ]

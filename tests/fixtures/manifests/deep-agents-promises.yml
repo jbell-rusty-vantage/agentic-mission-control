@@ -1,0 +1,42 @@
+# yaml-language-server: $schema=../../../src/mission_control/contracts/schemas/mc.mission_manifest.v2.json
+# One Deep Agents stage that owes one named, structured output promise and submits it with the
+# pinned `submit_output` tool. Driven in memory from compile to fulfillment by
+# tests/unit/outputs/test_promises_end_to_end.py (OVE-238 G2).
+manifest: mission/v2
+mission:
+  key: promise-proof
+  title: Deep Agents output promise proof
+  application: biotech
+  brief:
+    purpose: system
+    request: "PROMISE-PROOF: submit the claim table once."
+    done_means: "The claims promise is fulfilled by the submitted value."
+  goals:
+    - key: evidence_map
+      description: Map the evidence
+      objectives:
+        - { key: find_trials, description: Find the trials }
+      criteria:
+        - key: coverage
+          description: Every study has a claim
+          evidence: [claims]
+          acceptance: { schema: claim_table@1 }
+  environment:
+    lane: deep_agents
+    model: { profile: frontier.default }
+    sandbox: { profile: research.standard }
+    capabilities:
+      - { pin: "tool.knowledge-submit-output@2#sha256:f1fa75f1e3fa49e9061746cbe89f53a828e502fb93e142d3b34d8a854a2a64dd", kind: tool, as: submit_output }
+    budget: { usd: 1, tokens: 100000, tool_calls: 4 }
+    governors: { depth: 1, fan_out: 1, iterations: 1, patience: 1 }
+    side_effects: [read_only]
+  program:
+    key: root
+    behavior: stage_graph
+    objectives: [evidence_map]
+    nodes:
+      - key: survey
+        behavior: agent_executor
+        objectives: [evidence_map]
+        instruction: "PROMISE-PROOF-INSTRUCTION: submit survey.claims once."
+        outputs: [ { name: claims, form: structured, enforcement: required, schema: claim_table@1 } ]
