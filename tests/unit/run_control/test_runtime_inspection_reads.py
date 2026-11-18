@@ -86,12 +86,12 @@ from tests.fixtures.runtime_inspection import (
     READ_AT,
     SECRET_TEXT,
     TOOL_ARGUMENT,
-    MutableClock,
     put_checkpoint,
     seed_inspection_world,
     sensitive_state,
     stamps_for,
 )
+from tests.support.clock import Clock
 from tests.support.run_control import request, service
 
 # --- Fixture world -----------------------------------------------------------------------
@@ -103,7 +103,7 @@ class World:
     runs: InMemoryRunControlRepository
     lineage: InMemoryCheckpointLineageRepository
     saver: InMemorySaver
-    clock: MutableClock
+    clock: Clock
     active_run: str
     terminal_run: str
     other_scope_run: str
@@ -154,7 +154,7 @@ async def build_world() -> World:
         runs=runs,
         lineage=lineage,
         saver=saver,
-        clock=MutableClock(READ_AT),
+        clock=Clock(READ_AT),
         active_run=seeded.active_run,
         terminal_run=seeded.terminal_run,
         other_scope_run=seeded.other_scope_run,

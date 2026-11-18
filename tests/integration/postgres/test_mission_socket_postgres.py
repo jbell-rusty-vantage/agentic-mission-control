@@ -40,7 +40,8 @@ from mission_control.application.streams.ports import StreamHint
 from mission_control.application.streams.pump import PumpSettings
 from mission_control.interfaces.socketio.server import MissionSocketLimits
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.fixtures.provider_frames import StepClock, turn_observations
+from tests.fixtures.provider_frames import FRAME_NOW, turn_observations
+from tests.support.clock import SECOND, Clock
 from tests.support.db_builders import owner_rows
 from tests.support.integration.postgres.mission_socket_postgres import (
     FAST,
@@ -145,7 +146,9 @@ async def test_forged_expired_and_foreign_requests_cannot_leak_or_apply_commands
     async with stack(common_db, tmp_path, monkeypatch) as s:
         repository = PostgresFrameRepository(s.pool)
         handle = await repository.open_execution(s.admitted.start())
-        await FrameWriter(repository, handle, clock=StepClock()).write(turn_observations())
+        await FrameWriter(repository, handle, clock=Clock(FRAME_NOW, step=SECOND)).write(
+            turn_observations()
+        )
         execution = str(handle.harness_execution_id)
         await s.record_usage(2)
         before = await s.last_seq()

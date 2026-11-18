@@ -16,6 +16,7 @@ from typing import Any
 
 import pytest
 from tests.fixtures.checkpoint_lineage import activity_attempt
+from tests.support.clock import Clock
 from tests.support.deep_agents import registry
 from tests.support.integration.deep_agents.wi02_transfer_plan_lane import (
     PlanReadingModel,
@@ -27,9 +28,9 @@ from tests.support.knowledge.content import report_package
 from tests.support.knowledge.credentials import (
     AUDIENCE,
     BINDING,
+    KNOWLEDGE_NOW,
     Issuer,
     RecordingMinter,
-    SteppingClock,
     knowledge_port,
 )
 from tests.support.knowledge.gateway import TENANT, origin
@@ -73,7 +74,7 @@ class _ReceiverAccess:
     """The lane's knowledge support as the materializer sees it: a fresh host access for the
     receiving attempt (the receiver itself has no knowledge tools)."""
 
-    def __init__(self, clock: SteppingClock) -> None:
+    def __init__(self, clock: Clock) -> None:
         self._clock = clock
 
     def uses_knowledge(self, invocation: Any) -> bool:
@@ -93,7 +94,7 @@ class _ReceiverAccess:
 
 
 def _stack() -> tuple[Any, ...]:
-    clock = SteppingClock(step=timedelta(milliseconds=1))
+    clock = Clock(KNOWLEDGE_NOW, step=timedelta(milliseconds=1))
     issuer = Issuer(clock=clock)
     fake = FakeKnowledgeBinding(verifier=issuer.verifier(), clock=clock)
     fake.operation_statuses["knowledge.read"] = deque(["succeeded"] * 32)

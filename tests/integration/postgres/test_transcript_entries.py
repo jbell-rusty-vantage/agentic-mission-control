@@ -63,7 +63,8 @@ from mission_control.application.frames.writer import FrameWriter
 from mission_control.domain.frames.contracts import FrameKind
 from mission_control.domain.policies.contracts import ActorContext
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.fixtures.provider_frames import FRAME_NOW, StepClock, observation, turn_observations
+from tests.fixtures.provider_frames import FRAME_NOW, observation, turn_observations
+from tests.support.clock import SECOND, Clock
 from tests.support.db_builders import admit_unit_attempt, owner_rows
 from tests.support.run_control import ALL_PERMISSIONS, actor
 
@@ -98,7 +99,9 @@ async def test_projection_replaces_by_run_tracks_the_sources_and_is_tenant_scope
         admitted = await admit_unit_attempt(pool, common_db)
         frames = PostgresFrameRepository(pool)
         handle = await frames.open_execution(admitted.start())
-        await FrameWriter(frames, handle, clock=StepClock()).write(turn_observations())
+        await FrameWriter(frames, handle, clock=Clock(FRAME_NOW, step=SECOND)).write(
+            turn_observations()
+        )
         facts = FrameFactProjector(
             frames,
             admitted.run_control,
@@ -200,7 +203,9 @@ async def test_projection_replaces_by_run_tracks_the_sources_and_is_tenant_scope
         assert await store.current_entries(scope, admitted.run_key) == entries
 
         # A new frame leaves the projection behind: the reader falls back to the view.
-        later = FrameWriter(frames, handle, clock=StepClock(FRAME_NOW + timedelta(minutes=5)))
+        later = FrameWriter(
+            frames, handle, clock=Clock(FRAME_NOW + timedelta(minutes=5), step=SECOND)
+        )
         await later.write(
             [
                 observation(
@@ -332,7 +337,9 @@ async def test_retention_classes_delete_deltas_by_retain_days_and_steps_only_for
         admitted = await admit_unit_attempt(pool, common_db)
         frames = PostgresFrameRepository(pool)
         handle = await frames.open_execution(admitted.start())
-        await FrameWriter(frames, handle, clock=StepClock(FRAME_NOW)).write(turn_observations())
+        await FrameWriter(frames, handle, clock=Clock(FRAME_NOW, step=SECOND)).write(
+            turn_observations()
+        )
         written = await frames.frames_for_run(scope, handle.run_id)
         deltas = [frame for frame in written if frame.kind is FrameKind.MESSAGE_DELTA]
         assert len(written) == 9 and len(deltas) == 1
@@ -460,7 +467,11 @@ async def test_a_frame_body_digest_is_bound_to_the_runs_that_reference_it(
         handle = await frames.open_execution(admitted.start())
         promoter = PayloadStoreFrameBodyPromoter(InMemoryArtifactPayloadStore())
         writer = FrameWriter(
-            frames, handle, clock=StepClock(), excerpt_cap_bytes=256, promoter=promoter
+            frames,
+            handle,
+            clock=Clock(FRAME_NOW, step=SECOND),
+            excerpt_cap_bytes=256,
+            promoter=promoter,
         )
         message = "sha256:" + sha256(b"message").hexdigest()
         message_ref = frame_body_ref(digest=message, size_bytes=7, media_type="text/plain")

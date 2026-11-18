@@ -17,7 +17,7 @@ import asyncio
 import json
 from collections.abc import Awaitable, Callable, Sequence
 from dataclasses import dataclass, field
-from datetime import UTC, datetime, timedelta
+from datetime import timedelta
 from types import SimpleNamespace
 from typing import Any
 
@@ -31,6 +31,7 @@ from langgraph.store.memory import InMemoryStore
 from pydantic import PrivateAttr
 from tests.fixtures.checkpoint_lineage import bind_unit, stage_unit
 from tests.fixtures.lane_bindings import lane_fields
+from tests.support.clock import Clock
 from tests.support.deep_agents_runtime import (
     ConformanceAssetVerifier,
     ConformanceBudgetAuthority,
@@ -373,17 +374,6 @@ class CrashableRunControl:
         return getattr(self._inner, name)
 
 
-class MutableClock:
-    def __init__(self) -> None:
-        self.now = datetime.now(UTC)
-
-    def __call__(self) -> datetime:
-        return self.now
-
-    def advance(self, delta: timedelta) -> None:
-        self.now += delta
-
-
 # --- REAL run-control operation authority (review fix 2) ---------------------------------
 
 GOVERNED_WORKSPACE_CONTRACT = WorkflowWorkspaceContract(
@@ -472,7 +462,7 @@ class RecoveryHarness:
     journal: MemoryOperationJournal
     coordinator: JournaledOperationExecutionCoordinator
     lineage: InMemoryCheckpointLineageRepository
-    clock: MutableClock
+    clock: Clock
     saver: CrashingSaver
     model: ScriptedRecoveryModel
     runtime: InjectingRuntime
@@ -645,7 +635,7 @@ async def recovery_harness(
         results=results,
         actor=actor(),
     )
-    clock = MutableClock()
+    clock = Clock.from_wall_time()
     lineage = InMemoryCheckpointLineageRepository()
     mailbox: Any = None
     injections: Any = None

@@ -33,7 +33,8 @@ from mission_control.domain.frames.contracts import FrameKind, FrameObservation,
 from mission_control.domain.policies.contracts import CommandStatus, StartAction
 from mission_control.interfaces.socketio.server import MissionSocketLimits
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.fixtures.provider_frames import StepClock, turn_observations
+from tests.fixtures.provider_frames import FRAME_NOW, turn_observations
+from tests.support.clock import SECOND, Clock
 from tests.support.db_builders import owner_rows, scoped_command, scoped_request
 from tests.support.integration.postgres.mission_socket_postgres import auth, stack, subscribe
 from tests.support.integration.postgres.realtime_acceptance_postgres import (
@@ -73,9 +74,13 @@ async def test_run_targets_stream_frames_of_every_execution_in_separate_cursor_d
     async with stack(common_db, tmp_path, monkeypatch) as s:
         repository = PostgresFrameRepository(s.pool)
         first = await repository.open_execution(s.admitted.start(lane=LaneProfile.DEEP_AGENTS))
-        await FrameWriter(repository, first, clock=StepClock()).write(turn_observations())
+        await FrameWriter(repository, first, clock=Clock(FRAME_NOW, step=SECOND)).write(
+            turn_observations()
+        )
         second = await repository.open_execution(s.admitted.start(lane=LaneProfile.CODEX))
-        await FrameWriter(repository, second, clock=StepClock()).write(turn_observations("t-2"))
+        await FrameWriter(repository, second, clock=Clock(FRAME_NOW, step=SECOND)).write(
+            turn_observations("t-2")
+        )
         a, b = str(first.harness_execution_id), str(second.harness_execution_id)
         viewer = RealtimeClient()
         await viewer.connect(s.url, auth(s.token("viewer")))
@@ -111,7 +116,9 @@ async def test_run_targets_stream_frames_of_every_execution_in_separate_cursor_d
         assert set(ack["acked"]) == {f"provider_frames:{a}", f"provider_frames:{b}"}
         # A third execution of the same run starts later: discovered and streamed from 1.
         third = await repository.open_execution(s.admitted.start(lane=LaneProfile.CLAUDE_AGENT_SDK))
-        await FrameWriter(repository, third, clock=StepClock()).write(turn_observations("t-3"))
+        await FrameWriter(repository, third, clock=Clock(FRAME_NOW, step=SECOND)).write(
+            turn_observations("t-3")
+        )
         c = str(third.harness_execution_id)
         await viewer.wait_for(
             lambda: len(by_execution(viewer).get(c, [])) == len(turn_observations("t-3")),
@@ -288,10 +295,10 @@ async def test_frame_retention_expiry_is_cursor_expired_with_a_snapshot_and_a_li
         repository = PostgresFrameRepository(s.pool)
         handle = await repository.open_execution(s.admitted.start())
         long_ago = datetime.now(UTC) - timedelta(days=40)
-        writer = FrameWriter(repository, handle, clock=StepClock(long_ago))
+        writer = FrameWriter(repository, handle, clock=Clock(long_ago, step=SECOND))
         await writer.write(old_messages(120))
         # Recent closing frames after them (always retained).
-        await FrameWriter(repository, handle, clock=StepClock(datetime.now(UTC))).write(
+        await FrameWriter(repository, handle, clock=Clock(datetime.now(UTC), step=SECOND)).write(
             turn_observations()
         )
         execution = str(handle.harness_execution_id)

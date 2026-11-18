@@ -45,8 +45,9 @@ from mission_control.bootstrap.composition import (
 )
 from mission_control.domain.execution.contracts import DeepAgentExecutionBinding
 from tests.fixtures.isolated_settings import isolated_settings
+from tests.support.clock import Clock
 from tests.support.knowledge.binding import FakeKnowledgeBinding
-from tests.support.knowledge.credentials import SteppingClock
+from tests.support.knowledge.credentials import KNOWLEDGE_NOW
 from tests.support.manifests.launch_inputs import admitted, compile_programs, resolver
 from tests.support.unit.knowledge.knowledge_manifest import MANIFEST, SCOPE
 from tests.unit.authoring.manifest_launch_fixture import fixture_bindings, fixture_served
@@ -209,7 +210,7 @@ async def test_api_relay_and_worker_serve_the_same_knowledge_tools(
     settings, active = knowledge_settings(tmp_path, path)
     api = served_by_production_author(monkeypatch, settings)
     relay = served_by_production_author(monkeypatch, settings)
-    clock = SteppingClock()
+    clock = Clock(KNOWLEDGE_NOW)
     fake = FakeKnowledgeBinding(
         verifier=CredentialVerifier(
             issuer="mission-control.ai-engineer",
@@ -236,7 +237,7 @@ async def test_api_relay_and_worker_serve_the_same_knowledge_tools(
     assert json.dumps(sorted(api.tools))  # digests only, no live toolset state
 
 
-def _fake(clock: SteppingClock, active: Any) -> FakeKnowledgeBinding:
+def _fake(clock: Clock, active: Any) -> FakeKnowledgeBinding:
     return FakeKnowledgeBinding(
         verifier=CredentialVerifier(
             issuer="mission-control.ai-engineer",
@@ -259,7 +260,7 @@ async def test_bound_read_intent_needs_a_binding_that_serves_it(
     path, bindings = bindings_file(tmp_path, compiled)
     assert "tool.knowledge-read-intent" in bindings.capabilities
     settings, active = knowledge_settings(tmp_path, path)
-    clock = SteppingClock()
+    clock = Clock(KNOWLEDGE_NOW)
     fake = _fake(clock, active)
     fake.serves_read_intent = False
     with pytest.raises(KnowledgeConfigurationError, match="knowledge.read_intent"):

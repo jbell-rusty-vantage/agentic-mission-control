@@ -18,7 +18,7 @@ FIXTURE executors and probe; no provider or external system is called.
 from __future__ import annotations
 
 import asyncio
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime
 from typing import Any
 
 import asyncpg
@@ -52,12 +52,13 @@ from mission_control.interfaces.mcp.governed_gateway import (
     register_governed_tools,
 )
 from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.clock import Clock
 from tests.support.db_builders import owner_rows
 from tests.support.integration.postgres.mp11_approvals_postgres import (
     admitted_run,
     mp11_db,  # noqa: F401
 )
-from tests.unit.approvals.fixtures import POLICY, REVIEWER, Clock, RecordingExecutor, answer
+from tests.unit.approvals.fixtures import POLICY, REVIEWER, RecordingExecutor, answer
 
 pytestmark = pytest.mark.common_db
 
@@ -280,7 +281,7 @@ async def test_fence_after_approval_and_crashed_claims(
         executor.recorded[crashed.intent_id] = GovernedEffectResult(
             outcome="applied", output={"published": True}, external_ref="fixture:crash"
         )
-        clock.at = clock.at + timedelta(seconds=600)
+        clock.advance(600)
         reconciled = await gateway.service.execute(crashed.intent_id, AGENT)
         assert reconciled.status == "executed" and reconciled.receipt is not None
         assert reconciled.receipt.external_ref == "fixture:crash"

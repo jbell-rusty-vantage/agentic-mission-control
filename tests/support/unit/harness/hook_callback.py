@@ -5,7 +5,6 @@ Moved from tests/unit/harness/test_hook_callback.py.
 
 from __future__ import annotations
 
-from datetime import UTC, datetime
 from typing import Any
 from uuid import UUID
 
@@ -25,6 +24,7 @@ from mission_control.application.frames.sink import InMemoryFrameStore
 from mission_control.domain.capabilities.hooks import HookEvent
 from mission_control.domain.frames.contracts import HarnessExecutionStart, LaneProfile
 from tests.fixtures.lane_turns import ACTIVATION_UUID, RUN_UUID
+from tests.support.clock import Clock
 from tests.support.ids import INSTALLATION, SCOPE, TENANT
 
 HEID = UUID("55555555-5555-4555-8555-555555555555")
@@ -34,14 +34,6 @@ SCOPE_BLOCK = {
     "application_id": "biotech",
     "tenant_id": str(TENANT),
 }
-
-
-class Clock:
-    def __init__(self) -> None:
-        self.now = datetime(2026, 10, 8, 12, tzinfo=UTC)
-
-    def __call__(self) -> datetime:
-        return self.now
 
 
 def _context(generation: int = 1, **changes: Any) -> HookTokenContext:

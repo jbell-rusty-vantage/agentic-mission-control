@@ -24,6 +24,7 @@ from mission_control.application.secrets.minting import (
     MintPurpose,
     token_digest,
 )
+from tests.support.clock import Clock
 
 BINDING = CredentialBinding(
     request_scope="mc/installation/biotech/tenant", run_id="run-1", unit_id="unit-a", generation=1
@@ -31,17 +32,9 @@ BINDING = CredentialBinding(
 START = datetime(2026, 10, 13, 12, 0, tzinfo=UTC)
 
 
-class Clock:
-    def __init__(self) -> None:
-        self.now = START
-
-    def __call__(self) -> datetime:
-        return self.now
-
-
 def minter() -> tuple[CredentialMinter, InMemoryMintedCredentialStore, Clock]:
     store = InMemoryMintedCredentialStore()
-    clock = Clock()
+    clock = Clock(START)
     return CredentialMinter(store, clock=clock), store, clock
 
 

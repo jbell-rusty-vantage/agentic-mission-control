@@ -46,13 +46,14 @@ from mission_control.domain.context.transfer import ReceiverAttempt, ReceiverRef
 from mission_control.domain.knowledge.effects import EffectConflict, JournalState
 from mission_control.domain.outputs.contracts import ExactOutput, OutputForm
 from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.clock import Clock
 from tests.support.db_builders import owner_rows
 from tests.support.integration.postgres.knowledge_gateway_postgres import (
     pool,  # noqa: F401
     stack,
 )
 from tests.support.knowledge.content import model_report, report_package
-from tests.support.knowledge.credentials import BINDING, SteppingClock
+from tests.support.knowledge.credentials import BINDING, KNOWLEDGE_NOW
 from tests.support.knowledge.gateway import call, origin
 from tests.support.knowledge.stores import InMemoryStaging
 
@@ -72,7 +73,7 @@ def access_for(db: CommonDatabase, tenant: str = "tenant-1", **updates: object) 
         ),
         subject="mission-control-runtime",
         invocation_id="inv-0001",
-        authenticated_at=SteppingClock().now,
+        authenticated_at=Clock(KNOWLEDGE_NOW).now,
     )
 
 
@@ -86,7 +87,7 @@ def recovery_for(access: InvocationAccess) -> RecoveryAccess:
         subject="mission-control-reconciler",
         authority_ref="recovery-grant-7",
         invocation_id="inv-0009",
-        authenticated_at=SteppingClock().now,
+        authenticated_at=Clock(KNOWLEDGE_NOW).now,
     )
 
 
@@ -639,7 +640,7 @@ async def test_registration_reuse_is_atomic_under_concurrent_writers(
     store = PostgresContentLineageStore(pool)
     first = access_for(common_db, operation_id="register-first")
     second = access_for(common_db, operation_id="register-second")
-    clock = SteppingClock()
+    clock = Clock(KNOWLEDGE_NOW)
     handles = [
         "kh:fixture/artifact/shared-a@artifact.v1",
         "kh:fixture/artifact/shared-b@artifact.v1",
@@ -695,7 +696,7 @@ async def test_registration_subject_mismatch_rolls_back_without_weakening_strict
     store = PostgresContentLineageStore(pool)
     first = access_for(common_db, operation_id="register-first")
     second = access_for(common_db, operation_id="register-second")
-    clock = SteppingClock()
+    clock = Clock(KNOWLEDGE_NOW)
     handle = "kh:fixture/artifact/immutable@artifact.v1"
     entries = registration_entries(first.origin, handle, "sha256:" + "a" * 64, "receipt-1")
     await store.record_registration(first.scope, entries, actor_ref="test", at=clock.now)

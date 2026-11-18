@@ -29,9 +29,10 @@ from mission_control.bootstrap.composition import (
 )
 from mission_control.contracts.knowledge_protocol import digest_canonical
 from tests.fixtures.isolated_settings import isolated_settings
+from tests.support.clock import Clock
 from tests.support.knowledge.binding import FakeKnowledgeBinding
 from tests.support.knowledge.content import describe_document
-from tests.support.knowledge.credentials import SteppingClock
+from tests.support.knowledge.credentials import KNOWLEDGE_NOW
 
 INSTALLATION = "00000000-0000-7000-8000-000000000001"
 
@@ -81,7 +82,7 @@ def test_nothing_configured_composes_nothing_and_partial_fails_closed(tmp_path: 
 
 async def test_describe_preflight_records_the_descriptor_digest(tmp_path: Path) -> None:
     settings, active, retiring = configured(tmp_path)
-    clock = SteppingClock()
+    clock = Clock(KNOWLEDGE_NOW)
     fake = FakeKnowledgeBinding(
         verifier=CredentialVerifier(
             issuer="mission-control",
@@ -134,7 +135,7 @@ async def test_describe_preflight_records_the_descriptor_digest(tmp_path: Path) 
 
 async def test_a_descriptor_for_another_binding_or_issuer_fails_closed(tmp_path: Path) -> None:
     settings, active, retiring = configured(tmp_path)
-    clock = SteppingClock()
+    clock = Clock(KNOWLEDGE_NOW)
     fake = FakeKnowledgeBinding(
         verifier=CredentialVerifier(
             issuer="mission-control",
@@ -187,7 +188,7 @@ async def test_a_scripted_census_auditor_is_refused_outside_a_disposable_install
         settings, active, retiring = configured(
             tmp_path, knowledge_disposable_installation=disposable
         )
-        clock = SteppingClock()
+        clock = Clock(KNOWLEDGE_NOW)
         fake = FakeKnowledgeBinding(
             verifier=CredentialVerifier(
                 issuer="mission-control",
@@ -221,7 +222,7 @@ async def test_a_scripted_census_auditor_is_refused_outside_a_disposable_install
 COMPONENT = "00000000-0000-7000-8000-00000000c0de"
 
 
-def _component_fake(active: Any, retiring: Any, clock: SteppingClock) -> FakeKnowledgeBinding:
+def _component_fake(active: Any, retiring: Any, clock: Clock) -> FakeKnowledgeBinding:
     """A binding that, like the KS executor, installs the component installation only."""
 
     return FakeKnowledgeBinding(
@@ -246,7 +247,7 @@ async def test_origins_name_the_component_installation_while_the_scope_keeps_mc(
     the Mission Control installation."""
 
     settings, active, retiring = configured(tmp_path, knowledge_component_installation_id=COMPONENT)
-    clock = SteppingClock()
+    clock = Clock(KNOWLEDGE_NOW)
     fake = _component_fake(active, retiring, clock)
     lane = await compose_knowledge_lane(
         settings,
@@ -295,7 +296,7 @@ async def test_an_origin_naming_another_installation_is_refused_at_startup(
     for component in (None, "00000000-0000-7000-8000-0000000000ff"):
         overrides = {} if component is None else {"knowledge_component_installation_id": component}
         settings, active, retiring = configured(tmp_path, **overrides)
-        clock = SteppingClock()
+        clock = Clock(KNOWLEDGE_NOW)
         with pytest.raises(
             KnowledgeConfigurationError, match="SCOPE_DENIED.*COMPONENT_INSTALLATION"
         ):
@@ -377,7 +378,7 @@ async def test_the_uncomposed_guard_is_wired_only_without_a_trusted_settlement(
 
     def lane_for(**keys: Any) -> Any:
         settings, active, retiring = configured(tmp_path, **keys)
-        clock = SteppingClock()
+        clock = Clock(KNOWLEDGE_NOW)
         fake = FakeKnowledgeBinding(
             verifier=CredentialVerifier(
                 issuer="mission-control",

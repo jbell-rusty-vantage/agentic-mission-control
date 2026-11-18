@@ -60,20 +60,10 @@ from tests.fixtures.mp06_lanes import (
     NeverAcceptedLane,
     ReconcilingLossyLane,
 )
+from tests.support.clock import Clock
 from tests.support.unit.harness.mp06_dispatch_recovery import BOUNDS, turn_request
 
 T0 = datetime(2026, 10, 8, 12, 0, tzinfo=UTC)
-
-
-@dataclass
-class Clock:
-    now: datetime = T0
-
-    def __call__(self) -> datetime:
-        return self.now
-
-    def advance(self, seconds: float) -> None:
-        self.now += timedelta(seconds=seconds)
 
 
 def service(
@@ -236,7 +226,7 @@ async def test_an_authoritative_not_received_allows_exactly_one_more_send() -> N
 
 
 async def test_a_takeover_fences_the_old_owner_out_of_journal_writes_and_settlement() -> None:
-    clock = Clock()
+    clock = Clock(T0)
     lane = ScriptedSessionLane(frames=scripted_frames())
     stack = lane_stack(lane)
     a = service(stack, "worker-a", clock=clock)

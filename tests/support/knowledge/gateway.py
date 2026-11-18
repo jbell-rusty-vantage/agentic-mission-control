@@ -34,13 +34,14 @@ from mission_control.application.ports.knowledge import RecordedUseDecision
 from mission_control.contracts.knowledge_protocol import Governors, digest_bytes
 from mission_control.domain.knowledge.origin import InvocationOrigin
 from tests.fixtures.lane_bindings import lane_fields
+from tests.support.clock import Clock
 from tests.support.knowledge.binding import FakeKnowledgeBinding, http_client_over
 from tests.support.knowledge.credentials import (
     AUDIENCE,
     BINDING,
+    KNOWLEDGE_NOW,
     Issuer,
     RecordingMinter,
-    SteppingClock,
     knowledge_port,
 )
 
@@ -71,7 +72,7 @@ def origin(attempt: int = 1, **updates: object) -> InvocationOrigin:
 
 @dataclass
 class Harness:
-    clock: SteppingClock
+    clock: Clock
     issuer: Issuer
     minter: RecordingMinter
     client: FakeKnowledgeBinding
@@ -108,7 +109,7 @@ class Harness:
 
 
 def harness(transport: str = "direct", max_polls: int = 3, **drift: object) -> Harness:
-    clock = SteppingClock()
+    clock = Clock(KNOWLEDGE_NOW)
     issuer = Issuer(clock=clock)
     minter = RecordingMinter(issuer.minter(), drift=dict(drift))
     fake = FakeKnowledgeBinding(verifier=issuer.verifier(), clock=clock)
@@ -160,7 +161,7 @@ ACTIVATION = "55555555-5555-4555-8555-555555555555"
 
 @dataclass
 class Lane:
-    clock: SteppingClock
+    clock: Clock
     fake: FakeKnowledgeBinding
     journal: InMemoryKnowledgeJournal
     store: InMemorySubmissionStore
@@ -219,7 +220,7 @@ class Lane:
 
 
 def lane() -> Lane:
-    clock = SteppingClock(step=timedelta(milliseconds=1))
+    clock = Clock(KNOWLEDGE_NOW, step=timedelta(milliseconds=1))
     issuer = Issuer(clock=clock)
     fake = FakeKnowledgeBinding(verifier=issuer.verifier(), clock=clock)
     journal = InMemoryKnowledgeJournal()

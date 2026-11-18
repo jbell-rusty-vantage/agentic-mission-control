@@ -37,13 +37,14 @@ from mission_control.domain.frames.contracts import (
 )
 from mission_control.domain.policies.contracts import ActorContext
 from tests.fixtures.provider_frames import (
-    StepClock,
+    FRAME_NOW,
     harness_start,
     in_memory_store,
     observation,
     opened_writer,
     turn_observations,
 )
+from tests.support.clock import SECOND, Clock
 from tests.support.ids import OTHER_SCOPE, SCOPE
 
 
@@ -82,7 +83,7 @@ async def test_resumed_writer_continues_the_arrival_sequence() -> None:
     await first.write(turn_observations()[:4])
     reopened = await store.open_execution(harness_start())
     assert reopened.last_cursor is not None and reopened.last_cursor.arrival_ordinal == 4
-    resumed = FrameWriter(store, reopened, clock=StepClock())
+    resumed = FrameWriter(store, reopened, clock=Clock(FRAME_NOW, step=SECOND))
     receipt = await resumed.write(turn_observations())
     assert (receipt.new, receipt.duplicate) == (5, 4)
     frames = await store.frames_for_execution(SCOPE, handle.harness_execution_id, 1)
@@ -97,7 +98,7 @@ async def test_frames_of_an_older_generation_are_stale_and_never_stored() -> Non
     store, _run_id = in_memory_store()
     old, _handle = await opened_writer(store, harness_start(generation=1))
     newer = await store.open_execution(harness_start(generation=2))
-    current = FrameWriter(store, newer, clock=StepClock())
+    current = FrameWriter(store, newer, clock=Clock(FRAME_NOW, step=SECOND))
     assert (await current.write(turn_observations()[:2])).new == 2
     stale = await old.write([observation("late", FrameKind.TOOL_CALL_COMPLETED)])
     assert (stale.new, stale.duplicate, stale.stale) == (0, 0, 1)
@@ -142,7 +143,7 @@ async def test_ordinal_collision_reseeds_from_the_store_cursor() -> None:
     store, _run_id = in_memory_store()
     handle = await store.open_execution(harness_start())
     sink: FrameSink = _CollidingSink(store, taken=7)
-    writer = FrameWriter(sink, handle, clock=StepClock())
+    writer = FrameWriter(sink, handle, clock=Clock(FRAME_NOW, step=SECOND))
     await writer.write([observation("k1", FrameKind.MESSAGE)])
     frames = await store.frames_for_execution(SCOPE, handle.harness_execution_id, 1)
     assert [frame.arrival_ordinal for frame in frames] == [8]

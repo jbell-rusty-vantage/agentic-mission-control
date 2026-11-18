@@ -76,10 +76,11 @@ from mission_control.domain.execution.contracts import (
     OperationWorkflowRequest,
 )
 from mission_control.domain.execution.lanes import LaneSegmentBounds
-from tests.fixtures.continuation import NoArtifacts, StepClock, trigger
+from tests.fixtures.continuation import NOW, NoArtifacts, trigger
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.fixtures.mp12_lanes import Crashes
 from tests.fixtures.temporal_history import patch_ids
+from tests.support.clock import SECOND, Clock
 from tests.support.db_builders import admit_unit_attempt
 from tests.support.integration.postgres.continuation_postgres import continuation_actor
 from tests.support.knowledge.stores import InMemoryStaging
@@ -185,10 +186,10 @@ async def test_a_claude_unit_continues_into_a_fresh_session_on_real_services(
             packet_reader=selections,
             snapshots=ClaudeWorkspaceSnapshots(harness, staging),
             events=RunControlContinuationEvents(
-                admitted.run_control, actor=continuation_actor(), clock=StepClock()
+                admitted.run_control, actor=continuation_actor(), clock=Clock(NOW, step=SECOND)
             ),
             mailbox=InMemoryMailbox(),
-            clock=StepClock(),
+            clock=Clock(NOW, step=SECOND),
         )
         registry = LaneHydratorRegistry()
         registry.register(claude_continuation_registration(harness, staging))

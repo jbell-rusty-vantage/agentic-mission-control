@@ -29,11 +29,11 @@ from mission_control.domain.subscriptions.contracts import (
 )
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.support.boundary_commands import TARGET
+from tests.support.clock import Clock
 from tests.support.integration.postgres.subscriptions import (
     READER,
     SECRET_ENV,
     SECRET_VALUE,
-    Clock,
     Receiver,
 )
 from tests.support.run_control import command, request, service
@@ -121,7 +121,7 @@ async def test_webhook_delivery_is_signed_at_least_once_and_gap_free(common_db: 
     try:
         mission_id, _run_id = await admitted_mission(pool, common_db)
         url = await receiver.start()
-        clock = Clock()
+        clock = Clock.from_wall_time()
         store = CrashingStore(pool, common_db.scope(), crash_at=2)
         subscription = await SubscriptionService(store, clock=clock).subscribe(
             subscription_request(mission_id, url), READER
@@ -180,7 +180,7 @@ async def test_dead_letter_after_twelve_failures_emits_a_mission_event(common_db
     try:
         mission_id, _run_id = await admitted_mission(pool, common_db)
         url = await receiver.start()
-        clock = Clock()
+        clock = Clock.from_wall_time()
         store = PostgresSubscriptionStore(pool, common_db.scope())
         service = SubscriptionService(store, clock=clock)
         subscription = await service.subscribe(subscription_request(mission_id, url), READER)

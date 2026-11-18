@@ -26,13 +26,14 @@ from mission_control.application.outputs.submission_service import (
     SelectedItem,
     SubmissionService,
 )
+from tests.support.clock import Clock
 from tests.support.knowledge.binding import FakeKnowledgeBinding
 from tests.support.knowledge.credentials import (
     AUDIENCE,
     BINDING,
+    KNOWLEDGE_NOW,
     Issuer,
     RecordingMinter,
-    SteppingClock,
     knowledge_port,
 )
 from tests.support.knowledge.gateway import origin
@@ -134,7 +135,7 @@ async def test_path_collection_remains_coverage_only() -> None:
 
 @dataclass
 class Handoff:
-    clock: SteppingClock
+    clock: Clock
     fake: FakeKnowledgeBinding
     handles: InMemoryKnowledgeHandleStore
     store: InMemorySubmissionStore
@@ -169,7 +170,7 @@ class Handoff:
 
 
 def handoff() -> Handoff:
-    clock = SteppingClock(step=timedelta(milliseconds=1))
+    clock = Clock(KNOWLEDGE_NOW, step=timedelta(milliseconds=1))
     issuer = Issuer(clock=clock)
     fake = FakeKnowledgeBinding(verifier=issuer.verifier(), clock=clock)
     return Handoff(clock, fake, InMemoryKnowledgeHandleStore(), InMemorySubmissionStore(), issuer)

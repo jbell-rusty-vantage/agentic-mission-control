@@ -31,8 +31,9 @@ from mission_control.domain.frames.render import to_jsonl, to_markdown
 from mission_control.domain.frames.transcript import TranscriptQuery
 from mission_control.domain.policies.contracts import ActorContext
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.fixtures.provider_frames import StepClock, turn_observations
+from tests.fixtures.provider_frames import FRAME_NOW, turn_observations
 from tests.fixtures.transcripts import normalize
+from tests.support.clock import SECOND, Clock
 from tests.support.db_builders import admit_unit_attempt
 from tests.support.run_control import ALL_PERMISSIONS, actor
 
@@ -59,7 +60,9 @@ async def test_transcript_of_a_projected_run_matches_goldens(common_db: CommonDa
         admitted = await admit_unit_attempt(pool, common_db)
         frames = PostgresFrameRepository(pool)
         handle = await frames.open_execution(admitted.start())
-        await FrameWriter(frames, handle, clock=StepClock()).write(turn_observations())
+        await FrameWriter(frames, handle, clock=Clock(FRAME_NOW, step=SECOND)).write(
+            turn_observations()
+        )
         projector = FrameFactProjector(
             frames,
             admitted.run_control,

@@ -37,6 +37,7 @@ from mission_control.domain.subscriptions.event_types import event_type_matches
 from mission_control.interfaces.http import mission_control as http_mc
 from mission_control.interfaces.http import subscriptions as http_subscriptions
 from mission_control.interfaces.http.subscriptions import router
+from tests.support.clock import Clock
 from tests.unit.subscriptions.fakes import (
     MISSION,
     RUN,
@@ -55,14 +56,6 @@ READER = ActorContext(actor_id="actor:reader", permissions=frozenset({"workflow_
 OTHER = ActorContext(actor_id="actor:other", permissions=frozenset({"workflow_run.read"}))
 ADMIN = ActorContext(actor_id="actor:admin", permissions=frozenset({"workflow_run.admin"}))
 NOBODY = ActorContext(actor_id="actor:nobody")
-
-
-class Clock:
-    def __init__(self) -> None:
-        self.now = T0
-
-    def __call__(self):  # type: ignore[no-untyped-def]
-        return self.now
 
 
 def webhook_request(**overrides: Any) -> SubscriptionRequest:
@@ -173,7 +166,7 @@ def test_sse_frames():
 
 async def test_subscribe_requires_read_and_close_requires_owner_or_admin():
     store = InMemoryStore(events=[event(1), event(2)])
-    service = SubscriptionService(store, clock=Clock())
+    service = SubscriptionService(store, clock=Clock(T0))
     with pytest.raises(SubscriptionRejected) as denied:
         await service.subscribe(webhook_request(), NOBODY)
     assert denied.value.code == "unauthorized"
@@ -198,7 +191,7 @@ async def test_relay_delivers_matching_events_in_order_with_signed_bodies():
     store = InMemoryStore(
         events=[event(1, "run.admitted"), event(2, "human_task.opened"), event(3, "run.completed")]
     )
-    clock = Clock()
+    clock = Clock(T0)
     subscription = await SubscriptionService(store, clock=clock).subscribe(
         webhook_request(events=["human_task.*", "run.completed"]), READER
     )
@@ -226,7 +219,7 @@ async def test_relay_delivers_matching_events_in_order_with_signed_bodies():
 
 async def test_at_least_once_after_a_relay_crash_mid_batch():
     store = InMemoryStore(events=[event(seq) for seq in range(1, 6)], crash_on_success=3)
-    clock = Clock()
+    clock = Clock(T0)
     await SubscriptionService(store, clock=clock).subscribe(webhook_request(), READER)
     hook = FakeWebhook()
     with pytest.raises(Crash):
@@ -243,7 +236,7 @@ async def test_at_least_once_after_a_relay_crash_mid_batch():
 
 async def test_failures_back_off_then_dead_letter_after_twelve():
     store = InMemoryStore(events=[event(1), event(2)])
-    clock = Clock()
+    clock = Clock(T0)
     subscription = await SubscriptionService(store, clock=clock).subscribe(
         webhook_request(), READER
     )
@@ -278,7 +271,7 @@ async def test_failures_back_off_then_dead_letter_after_twelve():
 
 async def test_transport_errors_and_missing_secrets_count_as_failures():
     store = InMemoryStore(events=[event(1)])
-    clock = Clock()
+    clock = Clock(T0)
     await SubscriptionService(store, clock=clock).subscribe(webhook_request(), READER)
     await relay(store, FakeWebhook(fail_transport=True), clock).run_once()
     assert store.receipts[-1].error_class == "transport_error"
@@ -308,7 +301,7 @@ async def test_mcp_session_channel_pauses_when_the_session_is_gone():
             return self.connected
 
     store = InMemoryStore(events=[event(1), event(2)])
-    clock = Clock()
+    clock = Clock(T0)
     request = webhook_request(channel={"kind": "mcp_session", "session_ref": "session-1"})
     subscription = await SubscriptionService(store, clock=clock).subscribe(request, READER)
     live = Notifier(True)
@@ -323,7 +316,7 @@ async def test_mcp_session_channel_pauses_when_the_session_is_gone():
 
 async def test_stream_ticket_subscriptions_are_not_pushed():
     store = InMemoryStore(events=[event(1)])
-    clock = Clock()
+    clock = Clock(T0)
     request = webhook_request(channel={"kind": "stream_ticket", "ticket_id": "t-1"})
     subscription = await SubscriptionService(store, clock=clock).subscribe(request, READER)
     assert isinstance(subscription.channel, StreamTicketChannel)
@@ -333,7 +326,7 @@ async def test_stream_ticket_subscriptions_are_not_pushed():
 async def test_run_target_receives_only_its_run():
     other = event(2).model_copy(update={"run_id": UUID(int=5)})
     store = InMemoryStore(events=[event(1), other, event(3)])
-    clock = Clock()
+    clock = Clock(T0)
     await SubscriptionService(store, clock=clock).subscribe(
         webhook_request(target="run", target_id=str(RUN)), READER
     )
@@ -356,7 +349,7 @@ async def test_stream_replays_then_heartbeats_while_idle():
     async def sleep(seconds: float) -> None:
         slept.append(seconds)
 
-    service = SubscriptionService(store, clock=Clock(), sleep=sleep)
+    service = SubscriptionService(store, clock=Clock(T0), sleep=sleep)
     frames = await collect(
         await service.stream(
             MISSION, READER, after_seq=0, heartbeat_seconds=2, poll_seconds=1, idle_polls=3
@@ -375,7 +368,7 @@ async def test_stream_replays_then_heartbeats_while_idle():
 
 async def test_stream_signals_resync_for_an_expired_cursor():
     store = InMemoryStore(events=[event(40), event(41)], oldest=40)
-    service = SubscriptionService(store, clock=Clock())
+    service = SubscriptionService(store, clock=Clock(T0))
     frames = await collect(await service.stream(MISSION, READER, after_seq=10, idle_polls=0))
     assert frames == [
         'event: resync_required\ndata: {"code": "CURSOR_EXPIRED", "oldest_seq": 40}\n\n'
@@ -409,7 +402,7 @@ def http_app(service: SubscriptionService, actor: ActorContext) -> FastAPI:
 async def test_http_subscribe_list_close_and_sse(monkeypatch: pytest.MonkeyPatch):
     monkeypatch.setattr(http_subscriptions, "authorize_application", lambda *_args: None)
     store = InMemoryStore(events=[event(1, "run.admitted"), event(2, "run.completed")])
-    service = SubscriptionService(store, clock=Clock(), live_idle_polls=0)
+    service = SubscriptionService(store, clock=Clock(T0), live_idle_polls=0)
     app = http_app(service, READER)
     async with httpx.AsyncClient(
         transport=httpx.ASGITransport(app=app), base_url="http://test"

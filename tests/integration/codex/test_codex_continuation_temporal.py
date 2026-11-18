@@ -73,11 +73,12 @@ from mission_control.domain.execution.contracts import (
     OperationWorkflowRequest,
 )
 from mission_control.domain.execution.lanes import LaneSegmentBounds
-from tests.fixtures.continuation import NoArtifacts, StepClock, trigger
+from tests.fixtures.continuation import NOW, NoArtifacts, trigger
 from tests.fixtures.lane_turns import lane_stack
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.fixtures.mp12_lanes import Crashes
 from tests.fixtures.temporal_history import patch_ids
+from tests.support.clock import SECOND, Clock
 from tests.support.db_builders import admit_unit_attempt
 from tests.support.integration.postgres.continuation_postgres import continuation_actor
 from tests.support.knowledge.stores import InMemoryStaging
@@ -167,10 +168,10 @@ async def test_a_codex_unit_continues_into_a_fresh_thread_on_real_services(
             packet_reader=selections,
             snapshots=snapshots,
             events=RunControlContinuationEvents(
-                admitted.run_control, actor=continuation_actor(), clock=StepClock()
+                admitted.run_control, actor=continuation_actor(), clock=Clock(NOW, step=SECOND)
             ),
             mailbox=InMemoryMailbox(),
-            clock=StepClock(),
+            clock=Clock(NOW, step=SECOND),
         )
         registry = LaneHydratorRegistry()
         registry.register(codex_continuation_registration(harness, staging))

@@ -38,12 +38,12 @@ from mission_control.domain.policies.errors import IdempotencyConflict
 from tests.fixtures.checkpoint_recovery import (
     RESULT_MARKER,
     TOKENS_PER_CALL,
-    MutableClock,
     RecoveryHarness,
     recovery_harness,
     stage_recovery_unit,
 )
 from tests.fixtures.saved_settlement import REVIEW, DurableEffectDouble
+from tests.support.clock import Clock
 
 ANSWER_TURNS = (2, 4, 6)
 
@@ -434,7 +434,7 @@ async def test_an_effect_wait_past_its_deadline_becomes_an_operator_incident() -
 
 @pytest.mark.asyncio
 async def test_a_review_wait_has_no_deadline_and_records_durable_alarms() -> None:
-    clock = MutableClock()
+    clock = Clock.from_wall_time()
     harness, double, store, request = await _stack(
         review=True,
         acknowledged=True,
@@ -545,7 +545,7 @@ async def test_an_operator_resume_restarts_the_effect_deadline_once() -> None:
     """Re-review 2: after the operator accepts the saved result's checkpoint, the effect wait
     keeps waiting (no resume/incident loop) and escalates only after a fresh full deadline."""
 
-    clock = MutableClock()
+    clock = Clock.from_wall_time()
     harness, double, store, request = await _stack(
         effect_wait_deadline=timedelta(hours=1), settlement_clock=clock
     )
@@ -576,7 +576,7 @@ async def test_an_operator_resume_restarts_the_effect_deadline_once() -> None:
 async def test_a_long_review_then_an_effect_wait_does_not_escalate_at_once() -> None:
     """Re-review 2: the deadline is anchored at the start of the effect wait, not the save."""
 
-    clock = MutableClock()
+    clock = Clock.from_wall_time()
     harness, double, store, request = await _stack(
         review=True,
         acknowledged=True,

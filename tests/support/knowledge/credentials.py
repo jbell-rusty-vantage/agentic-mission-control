@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -52,20 +52,8 @@ def stamp(at: datetime) -> str:
     return at.astimezone(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
-class SteppingClock:
-    """A fixed-start clock that advances by ``step`` on every read."""
-
-    def __init__(self, start: datetime | None = None, step: timedelta = timedelta(0)) -> None:
-        self.now = start or datetime(2026, 10, 24, 20, 0, tzinfo=UTC)
-        self.step = step
-
-    def __call__(self) -> datetime:
-        current = self.now
-        self.now = current + self.step
-        return current
-
-    def advance(self, delta: timedelta) -> None:
-        self.now += delta
+# The start of the knowledge fixtures' clock: `Clock(KNOWLEDGE_NOW)` (tests.support.clock).
+KNOWLEDGE_NOW = datetime(2026, 10, 24, 20, 0, tzinfo=UTC)
 
 
 @dataclass
@@ -126,9 +114,9 @@ __all__ = [
     "BINDING",
     "DEPLOYMENTS",
     "ISSUER",
+    "KNOWLEDGE_NOW",
     "Issuer",
     "RecordingMinter",
-    "SteppingClock",
     "knowledge_port",
     "stamp",
 ]

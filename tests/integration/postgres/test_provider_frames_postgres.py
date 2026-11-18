@@ -34,7 +34,8 @@ from mission_control.domain.frames.contracts import (
     ProviderFrame,
 )
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.fixtures.provider_frames import FRAME_NOW, StepClock, observation, turn_observations
+from tests.fixtures.provider_frames import FRAME_NOW, observation, turn_observations
+from tests.support.clock import SECOND, Clock
 from tests.support.db_builders import admit_unit_attempt, owner_rows
 
 pytestmark = pytest.mark.common_db
@@ -103,7 +104,9 @@ async def test_concurrent_hook_and_lane_writers_allocate_ordinals_under_the_exec
         repository = PostgresFrameRepository(pool)
         handle = await repository.open_execution(admitted.start())
         sink = _SynchronizedWriters(repository, writers=12)
-        writers = [FrameWriter(sink, handle, clock=StepClock()) for _ in range(12)]
+        writers = [
+            FrameWriter(sink, handle, clock=Clock(FRAME_NOW, step=SECOND)) for _ in range(12)
+        ]
         batches = [
             [
                 observation(f"hook:{index}:invoked", FrameKind.HOOK_INVOKED),
@@ -256,7 +259,7 @@ async def test_append_is_idempotent_and_identity_records_land_in_the_frame_trans
         admitted = await admit_unit_attempt(pool, common_db)
         repository = PostgresFrameRepository(pool)
         handle = await repository.open_execution(admitted.start())
-        writer = FrameWriter(repository, handle, clock=StepClock())
+        writer = FrameWriter(repository, handle, clock=Clock(FRAME_NOW, step=SECOND))
         receipt = await writer.write(turn_observations())
         assert (receipt.new, receipt.duplicate, receipt.stale) == (9, 0, 0)
         frames = await repository.frames_for_run(common_db.scope(), handle.run_id)
@@ -317,7 +320,9 @@ async def test_append_is_idempotent_and_identity_records_land_in_the_frame_trans
 
         # Re-running the writer over the same stream (a resumed activity) adds zero rows.
         replay = await FrameWriter(
-            repository, await repository.open_execution(admitted.start()), clock=StepClock()
+            repository,
+            await repository.open_execution(admitted.start()),
+            clock=Clock(FRAME_NOW, step=SECOND),
         ).write(turn_observations())
         assert (replay.new, replay.duplicate, replay.stale) == (0, 9, 0)
         assert len(await repository.frames_for_run(common_db.scope(), handle.run_id)) == 9
@@ -338,13 +343,15 @@ async def test_resume_continues_ordinals_and_older_generations_are_fenced(
         admitted = await admit_unit_attempt(pool, common_db)
         repository = PostgresFrameRepository(pool)
         first = FrameWriter(
-            repository, await repository.open_execution(admitted.start()), clock=StepClock()
+            repository,
+            await repository.open_execution(admitted.start()),
+            clock=Clock(FRAME_NOW, step=SECOND),
         )
         await first.write(turn_observations()[:3])
         resumed_handle = await repository.open_execution(admitted.start())
         assert resumed_handle.last_cursor is not None
         assert resumed_handle.last_cursor.arrival_ordinal == 3
-        resumed = FrameWriter(repository, resumed_handle, clock=StepClock())
+        resumed = FrameWriter(repository, resumed_handle, clock=Clock(FRAME_NOW, step=SECOND))
         receipt = await resumed.write(turn_observations()[2:5])
         assert (receipt.new, receipt.duplicate) == (2, 1)
         frames = await repository.frames_for_execution(
@@ -359,7 +366,7 @@ async def test_resume_continues_ordinals_and_older_generations_are_fenced(
         )
         stale = await first.write([observation("late-tool", FrameKind.TOOL_CALL_COMPLETED)])
         assert (stale.new, stale.duplicate, stale.stale) == (0, 0, 1)
-        fresh = await FrameWriter(repository, newer, clock=StepClock()).write(
+        fresh = await FrameWriter(repository, newer, clock=Clock(FRAME_NOW, step=SECOND)).write(
             [observation("gen2-start", FrameKind.TURN_STARTED, turn="turn-2")]
         )
         assert fresh.new == 1
@@ -381,7 +388,9 @@ async def test_rls_denies_cross_scope_reads_and_restricted_roles_cannot_mutate(
         admitted = await admit_unit_attempt(pool, common_db)
         repository = PostgresFrameRepository(pool)
         handle = await repository.open_execution(admitted.start())
-        await FrameWriter(repository, handle, clock=StepClock()).write(turn_observations())
+        await FrameWriter(repository, handle, clock=Clock(FRAME_NOW, step=SECOND)).write(
+            turn_observations()
+        )
         other_scope = common_db.scope("tenant-2")
         assert await repository.frames_for_run(other_scope, handle.run_id) == ()
         assert (
@@ -420,7 +429,9 @@ async def test_retention_deletes_only_expired_non_closing_frames_unless_configur
         admitted = await admit_unit_attempt(pool, common_db)
         repository = PostgresFrameRepository(pool)
         handle = await repository.open_execution(admitted.start())
-        await FrameWriter(repository, handle, clock=StepClock(FRAME_NOW)).write(turn_observations())
+        await FrameWriter(repository, handle, clock=Clock(FRAME_NOW, step=SECOND)).write(
+            turn_observations()
+        )
         events_before = await owner_rows(
             common_db, "SELECT count(*) AS n FROM mission_control.mission_event"
         )

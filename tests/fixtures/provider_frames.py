@@ -6,6 +6,7 @@ from datetime import UTC, datetime, timedelta
 from typing import Any
 from uuid import UUID, uuid4, uuid5
 
+from tests.support.clock import SECOND, Clock
 from tests.support.ids import INSTALLATION, SCOPE
 
 from mission_control.application.frames.sink import InMemoryFrameStore, harness_execution_id
@@ -20,18 +21,6 @@ from mission_control.domain.frames.contracts import (
 
 FRAME_NOW = datetime(2026, 10, 7, 12, 0, tzinfo=UTC)
 BINDING_DIGEST = "sha256:" + "b" * 64
-
-
-class StepClock:
-    """A deterministic clock advancing one second per reading."""
-
-    def __init__(self, start: datetime = FRAME_NOW) -> None:
-        self._current = start
-
-    def __call__(self) -> datetime:
-        value = self._current
-        self._current = value + timedelta(seconds=1)
-        return value
 
 
 def harness_start(
@@ -87,7 +76,7 @@ async def opened_writer(
     store: Any, start: HarnessExecutionStart | None = None, **kwargs: Any
 ) -> tuple[FrameWriter, HarnessExecutionHandle]:
     handle = await store.open_execution(start or harness_start())
-    return FrameWriter(store, handle, clock=StepClock(), **kwargs), handle
+    return FrameWriter(store, handle, clock=Clock(FRAME_NOW, step=SECOND), **kwargs), handle
 
 
 def observation(

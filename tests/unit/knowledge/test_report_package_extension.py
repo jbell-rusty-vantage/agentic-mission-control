@@ -38,14 +38,15 @@ from mission_control.domain.knowledge.lineage import (
     LineageFact,
     ProvenanceRole,
 )
+from tests.support.clock import Clock
 from tests.support.knowledge.binding import FakeKnowledgeBinding
 from tests.support.knowledge.content import StoredPackage, report_package
 from tests.support.knowledge.credentials import (
     AUDIENCE,
     BINDING,
+    KNOWLEDGE_NOW,
     Issuer,
     RecordingMinter,
-    SteppingClock,
     knowledge_port,
 )
 from tests.support.knowledge.gateway import TENANT, origin
@@ -53,7 +54,7 @@ from tests.support.knowledge.gateway import TENANT, origin
 
 @dataclass
 class Seam:
-    clock: SteppingClock
+    clock: Clock
     fake: FakeKnowledgeBinding
     gateway: KnowledgeGateway
     resolver: ContentResolutionService
@@ -77,7 +78,7 @@ class Seam:
 
 
 def seam() -> Seam:
-    clock = SteppingClock(step=timedelta(milliseconds=1))
+    clock = Clock(KNOWLEDGE_NOW, step=timedelta(milliseconds=1))
     issuer = Issuer(clock=clock)
     fake = FakeKnowledgeBinding(verifier=issuer.verifier(), clock=clock)
     fake.operation_statuses["knowledge.read"] = deque(["succeeded"] * 8)

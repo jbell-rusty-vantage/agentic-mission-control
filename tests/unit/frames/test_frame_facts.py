@@ -50,13 +50,14 @@ from mission_control.domain.policies.reducer import (
 from tests.fixtures.provider_frames import (
     FIXTURE_ACTIVATION,
     FIXTURE_HARNESS,
-    StepClock,
+    FRAME_NOW,
     deep_agents_turn_frames,
     harness_start,
     in_memory_store,
     provider_frame,
     turn_observations,
 )
+from tests.support.clock import SECOND, Clock
 from tests.support.ids import SCOPE
 from tests.support.run_control import ALL_PERMISSIONS, actor, command, request
 from tests.support.run_control import service as run_control_service
@@ -507,7 +508,7 @@ async def test_projector_applies_unapplied_facts_in_ordinal_aligned_batches() ->
     handle = await store.open_execution(harness_start(run_key=run_id))
     from mission_control.application.frames.writer import FrameWriter
 
-    writer = FrameWriter(store, handle, clock=StepClock())
+    writer = FrameWriter(store, handle, clock=Clock(FRAME_NOW, step=SECOND))
     await writer.write(turn_observations())
     control = _RunControl(service)
     permitted = actor().model_copy(
@@ -735,7 +736,7 @@ async def test_projector_passes_the_unit_key_and_the_result_points() -> None:
     )
     store, _ = in_memory_store(run_key=run_id)
     handle = await store.open_execution(harness_start(run_key=run_id))
-    writer = FrameWriter(store, handle, clock=StepClock())
+    writer = FrameWriter(store, handle, clock=Clock(FRAME_NOW, step=SECOND))
     observations = [
         item
         for item in turn_observations()

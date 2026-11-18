@@ -16,7 +16,8 @@ from mission_control.application.frames.provider_mapping import (
 )
 from mission_control.application.frames.writer import FrameWriter
 from mission_control.domain.frames.contracts import FrameObservation, LaneProfile, ProviderFrame
-from tests.fixtures.provider_frames import StepClock, harness_start, in_memory_store
+from tests.fixtures.provider_frames import FRAME_NOW, harness_start, in_memory_store
+from tests.support.clock import SECOND, Clock
 from tests.support.ids import SCOPE
 
 FIXTURES = Path(__file__).resolve().parents[3] / "unit" / "frames" / "fixtures"
@@ -51,7 +52,7 @@ async def persisted(
 
     store, _run_id = in_memory_store()
     handle = await store.open_execution(harness_start(lane=lane, native_session_ref=session))
-    writer = FrameWriter(store, handle, clock=StepClock())
+    writer = FrameWriter(store, handle, clock=Clock(FRAME_NOW, step=SECOND))
     await writer.write(observations)
     frames = await store.frames_for_execution(SCOPE, handle.harness_execution_id, 1)
     return list(frames), store, handle

@@ -17,10 +17,11 @@ import pytest
 from deepagents.backends.utils import create_file_data
 from langchain_core.messages import HumanMessage, ToolMessage
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
-from tests.fixtures.continuation import NoArtifacts, StepClock, facts, seal_target
+from tests.fixtures.continuation import NOW, NoArtifacts, facts, seal_target
 from tests.fixtures.continuation_graph import TASK, compaction_agent, stream_turn
 from tests.fixtures.mission_control_common_db import CommonDatabase, provision_runtime
-from tests.fixtures.provider_frames import StepClock as FrameClock
+from tests.fixtures.provider_frames import FRAME_NOW
+from tests.support.clock import SECOND, Clock
 from tests.support.db_builders import admit_unit_attempt, owner_rows
 from tests.support.knowledge.stores import InMemoryStaging
 from tests.support.run_control import ALL_PERMISSIONS, actor
@@ -64,7 +65,7 @@ MANIFEST = '{"records": 180, "source": "pubmed"}'
 
 async def _turn(frames: Any, admitted: Any, agent: Any, invoke_input: Any, thread: str) -> Any:
     handle = await frames.open_execution(admitted.start(native_session_ref=thread))
-    writer = FrameWriter(frames, handle, clock=FrameClock())
+    writer = FrameWriter(frames, handle, clock=Clock(FRAME_NOW, step=SECOND))
     recorder = DeepAgentFrameRecorder(writer, thread_id=thread, invocation_id=f"turn:{thread}")
     await recorder.begin(body={})
     result = await stream_turn(
@@ -133,7 +134,7 @@ async def test_continuation_on_the_local_stack(common_db: CommonDatabase) -> Non
                 actor=actor().model_copy(
                     update={"permissions": ALL_PERMISSIONS | {"workflow_run.record_continuation"}}
                 ),
-                clock=StepClock(),
+                clock=Clock(NOW, step=SECOND),
             )
             service = ContinuationService(
                 transfers=transfers,
@@ -146,7 +147,7 @@ async def test_continuation_on_the_local_stack(common_db: CommonDatabase) -> Non
                 events=events,
                 mailbox=mailbox,
                 confirmation=FrameHydrationConfirmation(frames, run_ids),
-                clock=StepClock(),
+                clock=Clock(NOW, step=SECOND),
             )
             commands = ContinuationCommands(
                 ContinuationTriggers(transfers),

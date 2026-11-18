@@ -4,9 +4,10 @@ from __future__ import annotations
 
 import hashlib
 from collections.abc import Mapping, Sequence
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime
 from typing import Any
 
+from tests.support.clock import SECOND, Clock
 from tests.support.ids import INSTALLATION, TENANT
 from tests.support.knowledge.stores import InMemoryStaging
 
@@ -57,16 +58,6 @@ NOW = datetime(2026, 10, 8, 9, 0, tzinfo=UTC)
 def digest(text: str | bytes) -> str:
     data = text.encode("utf-8") if isinstance(text, str) else text
     return "sha256:" + hashlib.sha256(data).hexdigest()
-
-
-class StepClock:
-    def __init__(self, start: datetime = NOW) -> None:
-        self._now = start
-
-    def __call__(self) -> datetime:
-        value = self._now
-        self._now = value + timedelta(seconds=1)
-        return value
 
 
 class NoArtifacts:
@@ -241,7 +232,7 @@ def build_service(
         confirmation=confirmation,
         failure_policy=failure_policy,
         governors=governors,
-        clock=StepClock(),
+        clock=Clock(NOW, step=SECOND),
     )
     return {
         "service": service,

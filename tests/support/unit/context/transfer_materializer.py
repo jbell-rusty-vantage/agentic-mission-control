@@ -48,14 +48,15 @@ from mission_control.domain.outputs.contracts import (
     OutputForm,
     OutputObligation,
 )
+from tests.support.clock import Clock
 from tests.support.knowledge.binding import FakeKnowledgeBinding
 from tests.support.knowledge.content import StoredPackage, report_package
 from tests.support.knowledge.credentials import (
     AUDIENCE,
     BINDING,
+    KNOWLEDGE_NOW,
     Issuer,
     RecordingMinter,
-    SteppingClock,
     knowledge_port,
 )
 from tests.support.knowledge.gateway import TENANT, origin
@@ -153,7 +154,7 @@ class FakeArtifacts:
 
 @dataclass
 class Seam:
-    clock: SteppingClock
+    clock: Clock
     fake: FakeKnowledgeBinding
     package: StoredPackage
     outputs: FakeOutputs
@@ -231,7 +232,7 @@ class Seam:
 
 
 def seam(*, selectors: dict[str, object] | None = None) -> Seam:
-    clock = SteppingClock(step=timedelta(milliseconds=1))
+    clock = Clock(KNOWLEDGE_NOW, step=timedelta(milliseconds=1))
     issuer = Issuer(clock=clock)
     fake = FakeKnowledgeBinding(verifier=issuer.verifier(), clock=clock)
     fake.operation_statuses["knowledge.read"] = deque(["succeeded"] * 32)

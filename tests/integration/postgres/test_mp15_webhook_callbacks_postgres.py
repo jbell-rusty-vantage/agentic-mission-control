@@ -67,6 +67,7 @@ from tests.fixtures.mission_control_common_db import (
     common_database,
     migration_paths_with,
 )
+from tests.support.clock import Clock
 from tests.support.integration.postgres.mp15_coordinator_inbox_postgres import (
     COORDINATOR,
     append_fixture_events,
@@ -95,14 +96,6 @@ async def inbox_db() -> AsyncIterator[CommonDatabase]:
 
     async with common_database(paths=migration_paths_with(ATTENTION_MIGRATION)) as database:
         yield database
-
-
-class Clock:
-    def __init__(self) -> None:
-        self.now = datetime.now(UTC)
-
-    def __call__(self) -> datetime:
-        return self.now
 
 
 class ScriptedReceiver(Receiver):
@@ -163,7 +156,7 @@ async def test_callback_retries_never_rerun_agent_work_and_dead_letter_separatel
         scope = inbox_db.scope()
         run_key, _mission, run_uuid = await started_run(pool, inbox_db)
         url = await receiver.start()
-        clock = Clock()
+        clock = Clock.from_wall_time()
         inboxes = CoordinatorInboxService(
             PostgresSubscriptionStore(pool, scope),
             PostgresCoordinatorInboxStore(pool, scope),
@@ -307,7 +300,7 @@ async def test_relay_signatures_and_egress_rejection_on_postgres(inbox_db: Commo
         _run_key, mission_id, run_uuid = await started_run(pool, inbox_db)
         url = await receiver.start()
         store = PostgresSubscriptionStore(pool, scope)
-        clock = Clock()
+        clock = Clock.from_wall_time()
         service = SubscriptionService(store, clock=clock)
 
         def webhook(target_url: str) -> SubscriptionRequest:

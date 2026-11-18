@@ -7,7 +7,7 @@ proof is `tests/integration/agent_server/test_rrm_013_async_subagent_live.py`.
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 import pytest
 
@@ -38,20 +38,13 @@ from mission_control.domain.execution.contracts import (
     AsyncSubagentUsage,
 )
 from tests.fixtures.rrm013_live_stack import reconciler
+from tests.support.clock import Clock
 from tests.support.deep_agents import GRAPH_BINDING_DIGEST, NOW, SERVED, contract, request
 from tests.support.providers.agent_protocol import FakeAgentProtocolClient, install
 from tests.support.run_control import actor
 from tests.support.unit.operations.async_child_parent_budget import admitted_parent, spawn
 
 SECRETS = {"environment:AGENT_SERVER_TOKEN": "offline-token"}
-
-
-class Clock:
-    def __init__(self) -> None:
-        self.now = NOW
-
-    def __call__(self) -> datetime:
-        return self.now
 
 
 def governed(
@@ -67,7 +60,7 @@ def governed(
 ]:
     details = details or InMemoryAsyncSubagentDetailRepository()
     authority = authority or InMemoryAsyncSubagentAuthority()
-    clock = clock or Clock()
+    clock = clock or Clock(NOW)
     service = AsyncSubagentService(
         details,
         authority,
@@ -88,7 +81,7 @@ async def test_crash_before_submission_resumes_the_admitted_child_with_one_provi
 
     client = FakeAgentProtocolClient(served=SERVED)
     install(monkeypatch, client)
-    clock = Clock()
+    clock = Clock(NOW)
     service, details, authority = governed(client, clock=clock)
     client.fail_before_create = ConnectionError("worker lost before the provider accepted")
     with pytest.raises(ConnectionError):
@@ -115,7 +108,7 @@ async def test_crash_after_submission_before_observation_reconnects_to_the_same_
 ) -> None:
     client = FakeAgentProtocolClient(served=SERVED)
     install(monkeypatch, client)
-    clock = Clock()
+    clock = Clock(NOW)
     service, details, authority = governed(client, clock=clock)
     # The provider created the run, then the worker was lost before observing the response:
     # the spawn classifies from durable provider state and binds the single run.
@@ -139,7 +132,7 @@ async def test_live_fence_holder_blocks_a_concurrent_submitter_until_its_lease_e
 ) -> None:
     client = FakeAgentProtocolClient(served=SERVED)
     install(monkeypatch, client)
-    clock = Clock()
+    clock = Clock(NOW)
     details = InMemoryAsyncSubagentDetailRepository()
     authority = InMemoryAsyncSubagentAuthority()
     service, _, _ = governed(client, details=details, authority=authority, clock=clock)

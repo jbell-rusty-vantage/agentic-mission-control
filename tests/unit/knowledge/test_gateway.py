@@ -45,13 +45,14 @@ from mission_control.contracts.knowledge_protocol import (
 from mission_control.contracts.knowledge_protocol_results import CredentialClaims
 from mission_control.domain.knowledge.effects import JournalState
 from mission_control.domain.knowledge.origin import InvocationOrigin
+from tests.support.clock import Clock
 from tests.support.knowledge.binding import FakeKnowledgeBinding
 from tests.support.knowledge.credentials import (
     AUDIENCE,
     BINDING,
+    KNOWLEDGE_NOW,
     Issuer,
     RecordingMinter,
-    SteppingClock,
     knowledge_port,
 )
 from tests.support.knowledge.gateway import TENANT, TRANSPORTS, call, harness, origin
@@ -98,7 +99,7 @@ def test_invocation_access_maps_to_the_golden_wire_origin() -> None:
         ),
         subject=wire["subject"],
         invocation_id=wire["invocationId"],
-        authenticated_at=SteppingClock().now,
+        authenticated_at=Clock(KNOWLEDGE_NOW).now,
     )
     assert mapped == Origin.model_validate(wire)
     assert mapped.digest() == vector["digest"]
@@ -821,7 +822,7 @@ async def test_biotech_apply_of_a_recorded_decision_binds_the_plan_and_supplies_
     from mission_control.adapters.knowledge.decisions import InMemoryUseDecisionStore
     from mission_control.application.ports.knowledge import RecordedUseDecision
 
-    clock = SteppingClock()
+    clock = Clock(KNOWLEDGE_NOW)
     issuer = Issuer(clock=clock)
     fake = FakeKnowledgeBinding(
         verifier=issuer.verifier(), clock=clock, binding="biotech-graph", application="biotech"
@@ -934,7 +935,7 @@ async def test_the_apply_payload_layout_is_the_profiles_data_not_an_application_
     from mission_control.adapters.knowledge.decisions import InMemoryUseDecisionStore
     from mission_control.application.ports.knowledge import RecordedUseDecision
 
-    clock = SteppingClock()
+    clock = Clock(KNOWLEDGE_NOW)
     issuer = Issuer(clock=clock)
     fake = FakeKnowledgeBinding(
         verifier=issuer.verifier(), clock=clock, binding="biotech-graph", application="biotech"

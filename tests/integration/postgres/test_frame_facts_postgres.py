@@ -20,7 +20,8 @@ from mission_control.application.frames.reducer import (
 from mission_control.application.frames.writer import FrameWriter
 from mission_control.domain.frames.contracts import frame_id_from_native_event_ref
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.fixtures.provider_frames import StepClock, turn_observations
+from tests.fixtures.provider_frames import FRAME_NOW, turn_observations
+from tests.support.clock import SECOND, Clock
 from tests.support.db_builders import admit_unit_attempt, owner_rows
 from tests.support.integration.postgres.frame_facts_postgres import projector_actor
 
@@ -45,7 +46,9 @@ async def test_frame_facts_become_mission_events_whose_refs_resolve(
         admitted = await admit_unit_attempt(pool, common_db)
         frames = PostgresFrameRepository(pool)
         handle = await frames.open_execution(admitted.start())
-        await FrameWriter(frames, handle, clock=StepClock()).write(turn_observations())
+        await FrameWriter(frames, handle, clock=Clock(FRAME_NOW, step=SECOND)).write(
+            turn_observations()
+        )
         projector = FrameFactProjector(frames, admitted.run_control, actor=projector_actor())
         target = FrameFactTarget.from_handle(handle, run_key=admitted.run_key)
         completion = CompletionEvidence(
@@ -107,9 +110,11 @@ async def test_a_superseded_generation_produces_no_facts(common_db: CommonDataba
         admitted = await admit_unit_attempt(pool, common_db)
         frames = PostgresFrameRepository(pool)
         old = await frames.open_execution(admitted.start())
-        await FrameWriter(frames, old, clock=StepClock()).write(turn_observations()[:6])
+        await FrameWriter(frames, old, clock=Clock(FRAME_NOW, step=SECOND)).write(
+            turn_observations()[:6]
+        )
         newer = await frames.open_execution(admitted.start(generation=2))
-        await FrameWriter(frames, newer, clock=StepClock()).write(
+        await FrameWriter(frames, newer, clock=Clock(FRAME_NOW, step=SECOND)).write(
             [
                 item.model_copy(update={"provider_key": f"g2:{item.provider_key}"})
                 for item in turn_observations()[:3]

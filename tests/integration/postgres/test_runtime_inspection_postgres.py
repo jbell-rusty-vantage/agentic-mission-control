@@ -44,10 +44,10 @@ from tests.fixtures.runtime_inspection import (
     PROMPT_TEXT,
     READ_AT,
     SECRET_TEXT,
-    MutableClock,
     SeededRuns,
     seed_inspection_world,
 )
+from tests.support.clock import Clock
 from tests.support.deep_agents import request as spawn_request
 from tests.support.run_control import service as run_control_service
 
@@ -136,7 +136,7 @@ async def test_scoped_reads_under_runtime_and_readonly_roles_never_write(
                 assert not await connection.fetchval(
                     "SELECT rolsuper OR rolbypassrls FROM pg_roles WHERE rolname = current_user"
                 )
-            clock = MutableClock(READ_AT)
+            clock = Clock(READ_AT)
             inspection = RuntimeInspectionService(
                 PostgresInspectionReadRepository(pool),
                 cursors=InspectionCursorCodec(b"k" * 32, clock=clock),

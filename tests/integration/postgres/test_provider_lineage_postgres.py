@@ -43,7 +43,8 @@ from mission_control.domain.policies.contracts import (
 )
 from mission_control.domain.subscriptions.contracts import SubscriptionRequest, verify_signature
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.fixtures.provider_frames import StepClock
+from tests.fixtures.provider_frames import FRAME_NOW
+from tests.support.clock import SECOND, Clock
 from tests.support.db_builders import AdmittedUnit, admit_unit_attempt, owner_rows, scoped_command
 from tests.support.integration.postgres.frame_facts_postgres import projector_actor
 from tests.support.integration.postgres.provider_lineage_postgres import identity_rows, tokens
@@ -51,7 +52,6 @@ from tests.support.integration.postgres.subscriptions import (
     READER,
     SECRET_ENV,
     SECRET_VALUE,
-    Clock,
     Receiver,
 )
 from tests.support.run_control import EMPTY_EVIDENCE_DIGEST, NOW, WORKFLOW_DIGEST
@@ -81,7 +81,7 @@ async def run_events(db: CommonDatabase, run_key: str) -> list[Any]:
 
 
 async def write(frames: PostgresFrameRepository, handle: Any, items: list[FrameObservation]):
-    await FrameWriter(frames, handle, clock=StepClock()).write(items)
+    await FrameWriter(frames, handle, clock=Clock(FRAME_NOW, step=SECOND)).write(items)
 
 
 @pytest.mark.asyncio
@@ -106,7 +106,7 @@ async def test_codex_child_thread_never_closes_the_parent_on_postgres(
         assert {FrameKind.TURN_ENDED, FrameKind.RUN_RESULT} <= {
             item.kind for item in before if item.subordinate_ref == "codex:thread:thr_child"
         }
-        writer = FrameWriter(frames, handle, clock=StepClock())
+        writer = FrameWriter(frames, handle, clock=Clock(FRAME_NOW, step=SECOND))
         await writer.write(before)
         midway = await identity_rows(common_db, handle.harness_execution_id)
         assert midway == {"lifecycle": "live", "sessions": ["open"], "turns": []}
@@ -187,7 +187,7 @@ async def test_claude_subagent_usage_is_excluded_and_its_frames_never_close_the_
                 }
             ),
         ]
-        writer = FrameWriter(frames, handle, clock=StepClock())
+        writer = FrameWriter(frames, handle, clock=Clock(FRAME_NOW, step=SECOND))
         await writer.write([*observations[:result_at], *synthetic])
         midway = await identity_rows(common_db, handle.harness_execution_id)
         assert midway["lifecycle"] != "ended" and midway["sessions"] == ["open"]
@@ -304,7 +304,7 @@ async def test_public_aliases_are_delivered_once_with_canonical_receipts(
         assert [row["event_type"] for row in events].count("workflow_run.terminalize") == 1
 
         url = await receiver.start()
-        clock = Clock()
+        clock = Clock.from_wall_time()
         store = PostgresSubscriptionStore(pool, common_db.scope())
         subscription = await SubscriptionService(store, clock=clock).subscribe(
             SubscriptionRequest.model_validate(

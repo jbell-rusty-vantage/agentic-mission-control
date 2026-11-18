@@ -11,7 +11,8 @@ from mission_control.adapters.postgres.frames.repository import PostgresFrameRep
 from mission_control.application.frames.writer import FrameWriter
 from mission_control.domain.frames.contracts import FrameKind, LaneProfile
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.fixtures.provider_frames import FRAME_NOW, StepClock, observation
+from tests.fixtures.provider_frames import FRAME_NOW, observation
+from tests.support.clock import SECOND, Clock
 from tests.support.db_builders import admit_unit_attempt, owner_rows
 
 pytestmark = pytest.mark.common_db
@@ -41,7 +42,7 @@ async def test_reattaching_closed_generation_preserves_lifecycle_until_a_real_ne
         admitted = await admit_unit_attempt(pool, common_db)
         repository = PostgresFrameRepository(pool)
         handle = await repository.open_execution(admitted.start())
-        writer = FrameWriter(repository, handle, clock=StepClock())
+        writer = FrameWriter(repository, handle, clock=Clock(FRAME_NOW, step=SECOND))
         closed = [
             observation("closed-start", FrameKind.TURN_STARTED, turn="closed"),
             observation("closed-end", FrameKind.TURN_ENDED, turn="closed"),
@@ -50,7 +51,9 @@ async def test_reattaching_closed_generation_preserves_lifecycle_until_a_real_ne
         await writer.write(closed)
         for _ in range(2):
             resumed = await repository.open_execution(admitted.start())
-            receipt = await FrameWriter(repository, resumed, clock=StepClock()).write(closed)
+            receipt = await FrameWriter(
+                repository, resumed, clock=Clock(FRAME_NOW, step=SECOND)
+            ).write(closed)
             session, execution, identity = await _state(common_db, handle.harness_execution_id)
             assert receipt.new == 0 and receipt.duplicate == 3
             assert session["state"] == "closed" and execution["lifecycle"] == "ended"
@@ -74,7 +77,7 @@ async def test_new_generation_opens_but_stale_registration_cannot_reopen_its_clo
         second = await repository.open_execution(
             admitted.start().model_copy(update={"generation": 2})
         )
-        await FrameWriter(repository, second, clock=StepClock()).write(
+        await FrameWriter(repository, second, clock=Clock(FRAME_NOW, step=SECOND)).write(
             [
                 observation("g2-start", FrameKind.TURN_STARTED, turn="g2"),
                 observation("g2-end", FrameKind.TURN_ENDED, turn="g2"),
@@ -89,7 +92,9 @@ async def test_new_generation_opens_but_stale_registration_cannot_reopen_its_clo
             await repository.current_generation(common_db.scope(), second.harness_execution_id) == 2
         )
         stale = await FrameWriter(
-            repository, second.model_copy(update={"generation": 1}), clock=StepClock()
+            repository,
+            second.model_copy(update={"generation": 1}),
+            clock=Clock(FRAME_NOW, step=SECOND),
         ).write([observation("stale-start", FrameKind.TURN_STARTED, turn="stale")])
         assert stale.stale == 1
         _, execution, _ = await _state(common_db, second.harness_execution_id)
@@ -106,7 +111,7 @@ async def test_replacement_reopens_session_and_old_results_cannot_close_it(
         admitted = await admit_unit_attempt(pool, common_db)
         repository = PostgresFrameRepository(pool)
         handle = await repository.open_execution(admitted.start())
-        writer = FrameWriter(repository, handle, clock=StepClock())
+        writer = FrameWriter(repository, handle, clock=Clock(FRAME_NOW, step=SECOND))
         await writer.write(
             [
                 observation("old-start", FrameKind.TURN_STARTED, turn="old"),
@@ -147,7 +152,7 @@ async def test_replacement_reopens_session_and_old_results_cannot_close_it(
         session, execution, _ = await _state(common_db, handle.harness_execution_id)
         assert session["state"] == "closed" and execution["lifecycle"] == "ended"
         await writer.write([observation("replayed-closed-new", FrameKind.TURN_STARTED, turn="new")])
-        await FrameWriter(repository, handle, clock=StepClock(FRAME_NOW)).write(
+        await FrameWriter(repository, handle, clock=Clock(FRAME_NOW, step=SECOND)).write(
             [observation("unseen-historical-start", FrameKind.TURN_STARTED, turn="history")]
         )
         session, execution, identity = await _state(common_db, handle.harness_execution_id)
@@ -175,7 +180,7 @@ async def test_delayed_old_end_keeps_replacement_and_attributes_its_own_usage(
         admitted = await admit_unit_attempt(pool, common_db)
         repository = PostgresFrameRepository(pool)
         handle = await repository.open_execution(admitted.start(lane=lane))
-        writer = FrameWriter(repository, handle, clock=StepClock())
+        writer = FrameWriter(repository, handle, clock=Clock(FRAME_NOW, step=SECOND))
 
         def usage(tokens: int) -> dict[str, Any]:
             if lane == LaneProfile.CODEX:
@@ -255,7 +260,7 @@ async def test_unidentified_legacy_session_result_still_closes(common_db: Common
         admitted = await admit_unit_attempt(pool, common_db)
         repository = PostgresFrameRepository(pool)
         handle = await repository.open_execution(admitted.start())
-        await FrameWriter(repository, handle, clock=StepClock()).write(
+        await FrameWriter(repository, handle, clock=Clock(FRAME_NOW, step=SECOND)).write(
             [observation("legacy-result", FrameKind.RUN_RESULT, turn=None)]
         )
         session, execution, _ = await _state(common_db, handle.harness_execution_id)
@@ -272,7 +277,7 @@ async def test_old_end_after_replacement_end_does_not_reassign_latest_turn(
         admitted = await admit_unit_attempt(pool, common_db)
         repository = PostgresFrameRepository(pool)
         handle = await repository.open_execution(admitted.start())
-        writer = FrameWriter(repository, handle, clock=StepClock())
+        writer = FrameWriter(repository, handle, clock=Clock(FRAME_NOW, step=SECOND))
         await writer.write(
             [
                 observation("old-start", FrameKind.TURN_STARTED, turn="old"),
@@ -300,7 +305,7 @@ async def test_unobserved_root_start_does_not_inherit_child_usage(
         admitted = await admit_unit_attempt(pool, common_db)
         repository = PostgresFrameRepository(pool)
         handle = await repository.open_execution(admitted.start())
-        await FrameWriter(repository, handle, clock=StepClock()).write(
+        await FrameWriter(repository, handle, clock=Clock(FRAME_NOW, step=SECOND)).write(
             [
                 observation(
                     "unattributed-child-usage",

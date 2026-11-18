@@ -47,6 +47,7 @@ from mission_control.application.execution.usage_admission import (
     wait_for_limit_reset,
 )
 from mission_control.domain.policies.stop_fence import EffectAdmission, StopFence
+from tests.support.clock import Clock
 
 T0 = datetime(2026, 10, 8, 21, 0, tzinfo=UTC)
 DEADLINE = T0 + timedelta(hours=1)
@@ -235,21 +236,13 @@ def test_warning_continues() -> None:
 # --- Bounded waits with cancellation (FAKE CLOCK) --------------------------------------------
 
 
-class FakeClock:
-    def __init__(self, start: datetime) -> None:
-        self.value = start
-
-    def now(self) -> datetime:
-        return self.value
-
-
 class FakeWait:
     """Fake `workflow.wait_condition`: advances the fake clock by the timeout, or to the
     scheduled cancel instant when that comes first (and runs the cancel handler there)."""
 
     def __init__(
         self,
-        clock: FakeClock,
+        clock: Clock,
         *,
         cancel_after_s: float | None = None,
         on_cancel: Callable[[], None],
@@ -262,41 +255,41 @@ class FakeWait:
     async def __call__(self, predicate: Callable[[], bool], timeout_s: float) -> bool:
         self.timeouts.append(timeout_s)
         if self.cancel_after_s is not None and self.cancel_after_s < timeout_s:
-            self.clock.value += timedelta(seconds=self.cancel_after_s)
+            self.clock.advance(self.cancel_after_s)
             self.on_cancel()
             return predicate()
-        self.clock.value += timedelta(seconds=timeout_s)
+        self.clock.advance(timeout_s)
         return predicate()
 
 
 async def test_fake_clock_wait_elapses_at_reset_and_never_past_deadline() -> None:
-    clock = FakeClock(T0)
+    clock = Clock(T0)
     cancelled = {"value": False}
     wait = FakeWait(clock, on_cancel=lambda: None)
     decision = plan_limit_response(
         _signal(resets_at=T0 + timedelta(minutes=10)), now=T0, deadline=DEADLINE
     )
     outcome = await wait_for_limit_reset(
-        decision, now=clock.now, deadline=DEADLINE, wait=wait, cancelled=lambda: cancelled["value"]
+        decision, now=clock, deadline=DEADLINE, wait=wait, cancelled=lambda: cancelled["value"]
     )
     assert outcome.outcome == "reset_elapsed"
     assert wait.timeouts == [605.0]
-    assert clock.value <= DEADLINE
+    assert clock.now <= DEADLINE
     assert outcome.ledger == LimitWaitLedger(waits_used=1, waited_s=605)
 
 
 async def test_fake_clock_wait_is_clamped_to_a_deadline_that_moved_in() -> None:
-    clock = FakeClock(T0)
+    clock = Clock(T0)
     wait = FakeWait(clock, on_cancel=lambda: None)
     decision = LimitDecision(
         disposition="wait", code=LIMIT_WAIT, message="m", wait_until=T0 + timedelta(minutes=30)
     )
     earlier = T0 + timedelta(minutes=5)
     outcome = await wait_for_limit_reset(
-        decision, now=clock.now, deadline=earlier, wait=wait, cancelled=lambda: False
+        decision, now=clock, deadline=earlier, wait=wait, cancelled=lambda: False
     )
     assert outcome.outcome == "deadline_reached"
-    assert wait.timeouts == [300.0] and clock.value == earlier
+    assert wait.timeouts == [300.0] and clock.now == earlier
 
 
 async def test_fake_clock_cancel_during_wait_reaches_pending_work_through_the_stop_fence() -> None:
@@ -305,7 +298,7 @@ async def test_fake_clock_cancel_during_wait_reaches_pending_work_through_the_st
     provider resend is denied by the fence, so cancellation reaches pending work instead of
     sleeping through it."""
 
-    clock = FakeClock(T0)
+    clock = Clock(T0)
     fences = InMemoryStopFenceRepository()
     state = {"cancelled": False}
 
@@ -317,7 +310,7 @@ async def test_fake_clock_cancel_during_wait_reaches_pending_work_through_the_st
         _signal(resets_at=T0 + timedelta(minutes=10)), now=T0, deadline=DEADLINE
     )
     outcome = await wait_for_limit_reset(
-        decision, now=clock.now, deadline=DEADLINE, wait=wait, cancelled=lambda: state["cancelled"]
+        decision, now=clock, deadline=DEADLINE, wait=wait, cancelled=lambda: state["cancelled"]
     )
     assert outcome.outcome == "cancelled"
     assert outcome.waited_s == 30
@@ -329,7 +322,7 @@ async def test_fake_clock_cancel_during_wait_reaches_pending_work_through_the_st
             generation=1,
             command_id="cmd-cancel",
             reason="operator cancel during capacity wait",
-            requested_at=clock.now(),
+            requested_at=clock(),
         )
     )
     verdict = await fences.admit_effect(
@@ -345,13 +338,13 @@ async def test_fake_clock_cancel_during_wait_reaches_pending_work_through_the_st
 
 
 async def test_cancel_already_requested_skips_the_wait() -> None:
-    clock = FakeClock(T0)
+    clock = Clock(T0)
     wait = FakeWait(clock, on_cancel=lambda: None)
     decision = plan_limit_response(
         _signal(resets_at=T0 + timedelta(minutes=10)), now=T0, deadline=DEADLINE
     )
     outcome = await wait_for_limit_reset(
-        decision, now=clock.now, deadline=DEADLINE, wait=wait, cancelled=lambda: True
+        decision, now=clock, deadline=DEADLINE, wait=wait, cancelled=lambda: True
     )
     assert outcome.outcome == "cancelled" and wait.timeouts == []
 
@@ -387,12 +380,12 @@ async def test_real_event_loop_cancel_wakes_wait_condition_shaped_primitive() ->
 
 
 async def test_only_wait_decisions_can_be_waited() -> None:
-    clock = FakeClock(T0)
+    clock = Clock(T0)
     reject = plan_limit_response(_signal(kind="auth_failed"), now=T0, deadline=DEADLINE)
     with pytest.raises(ValueError):
         await wait_for_limit_reset(
             reject,
-            now=clock.now,
+            now=clock,
             deadline=DEADLINE,
             wait=FakeWait(clock, on_cancel=lambda: None),
             cancelled=lambda: False,

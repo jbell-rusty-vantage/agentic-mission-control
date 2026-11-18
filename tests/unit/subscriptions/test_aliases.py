@@ -21,6 +21,7 @@ from mission_control.domain.subscriptions.contracts import (
     SubscriptionRequest,
     verify_signature,
 )
+from tests.support.clock import Clock
 from tests.unit.subscriptions.fakes import (
     MISSION,
     T0,
@@ -56,14 +57,6 @@ def journal() -> list[Any]:
 
 def filters(*names: str) -> SubscriptionFilters:
     return SubscriptionFilters(event_types=names)
-
-
-class Clock:
-    def __init__(self) -> None:
-        self.now = T0
-
-    def __call__(self):  # type: ignore[no-untyped-def]
-        return self.now
 
 
 def test_each_public_name_comes_from_exactly_one_canonical_type():
@@ -134,7 +127,7 @@ def test_canonical_filters_are_unchanged_and_one_envelope_per_event():
 
 async def test_relay_delivers_derived_notifications_signed_with_canonical_receipts():
     store = InMemoryStore(events=journal())
-    clock = Clock()
+    clock = Clock(T0)
     request = SubscriptionRequest.model_validate(
         {
             "target": "mission",
@@ -182,7 +175,7 @@ async def test_relay_delivers_derived_notifications_signed_with_canonical_receip
 
 async def test_redelivery_after_failure_keeps_the_same_derived_event_id():
     store = InMemoryStore(events=[event(9, "workflow_run.terminalize")])
-    clock = Clock()
+    clock = Clock(T0)
     request = SubscriptionRequest.model_validate(
         {
             "target": "mission",
@@ -215,7 +208,7 @@ async def test_redelivery_after_failure_keeps_the_same_derived_event_id():
 
 async def test_sse_stream_serves_the_public_vocabulary():
     store = InMemoryStore(events=journal())
-    service = SubscriptionService(store, clock=Clock())
+    service = SubscriptionService(store, clock=Clock(T0))
     frames = [
         frame
         async for frame in await service.stream(

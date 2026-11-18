@@ -40,6 +40,7 @@ from mission_control.domain.prerequisites import (
 )
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.fixtures.owner_prerequisites import inputs
+from tests.support.clock import Clock
 from tests.support.db_builders import owner_rows, scoped_count
 from tests.support.integration.postgres.owner_prerequisites import pool  # noqa: F401
 
@@ -65,14 +66,6 @@ OTHER_ROLES = (
     "public",
 )
 PRIVILEGES = ("SELECT", "INSERT", "UPDATE", "DELETE", "TRUNCATE", "REFERENCES", "TRIGGER")
-
-
-class Clock:
-    def __init__(self) -> None:
-        self.now = AT
-
-    def __call__(self) -> datetime:
-        return self.now
 
 
 @pytest_asyncio.fixture
@@ -163,7 +156,7 @@ async def test_the_repository_registers_records_evidence_and_keeps_scopes_apart(
     common_db: CommonDatabase,
     pool: asyncpg.Pool,  # noqa: F811
 ) -> None:
-    clock = Clock()
+    clock = Clock(AT)
     repository = PostgresOwnerPrerequisiteRepository(pool, clock=clock)
     scope = common_db.scope()
     environment, login = generate_owner_prerequisites("claude_cloud", inputs())
@@ -306,7 +299,7 @@ async def test_the_service_flags_an_expiring_login_before_launch_on_postgres(
     common_db: CommonDatabase,
     pool: asyncpg.Pool,  # noqa: F811
 ) -> None:
-    clock = Clock()
+    clock = Clock(AT)
     service = OwnerPrerequisiteService(
         PostgresOwnerPrerequisiteRepository(pool, clock=clock), clock=clock
     )

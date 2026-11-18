@@ -40,7 +40,8 @@ from mission_control.application.knowledge.review import (
 from mission_control.contracts.knowledge_protocol import Ref
 from mission_control.domain.policies.contracts import ActorContext
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.support.knowledge.credentials import SteppingClock
+from tests.support.clock import Clock
+from tests.support.knowledge.credentials import KNOWLEDGE_NOW
 from tests.support.knowledge.gateway import origin
 from tests.support.run_control import request, service
 from tests.support.trusted_knowledge import PRODUCER, ScriptedRunner, evaluators, world
@@ -85,7 +86,7 @@ async def test_the_review_route_resolves_one_run_identifier_on_postgres(
         ),
         subject=PRODUCER.subject,
         invocation_id="inv-producer",
-        authenticated_at=SteppingClock().now,
+        authenticated_at=Clock(KNOWLEDGE_NOW).now,
     )
     store = PostgresOutputContractStore(pool)
     w, subject = await world(app, store=store, access=producer)

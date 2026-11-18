@@ -14,13 +14,14 @@ from mission_control.adapters.postgres.knowledge.handles import PostgresKnowledg
 from mission_control.adapters.postgres.knowledge.operations import PostgresKnowledgeJournal
 from mission_control.application.knowledge.gateway import KnowledgeGateway
 from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.clock import Clock
 from tests.support.knowledge.binding import FakeKnowledgeBinding
 from tests.support.knowledge.credentials import (
     AUDIENCE,
     BINDING,
+    KNOWLEDGE_NOW,
     Issuer,
     RecordingMinter,
-    SteppingClock,
     knowledge_port,
 )
 
@@ -34,8 +35,8 @@ async def pool(common_db: CommonDatabase) -> AsyncIterator[asyncpg.Pool]:
         await created.close()
 
 
-def stack(pool: asyncpg.Pool, clock: SteppingClock | None = None):
-    clock = clock or SteppingClock()
+def stack(pool: asyncpg.Pool, clock: Clock | None = None):
+    clock = clock or Clock(KNOWLEDGE_NOW)
     issuer = Issuer(clock=clock)
     minter = RecordingMinter(issuer.minter())
     client = FakeKnowledgeBinding(verifier=issuer.verifier(), clock=clock)

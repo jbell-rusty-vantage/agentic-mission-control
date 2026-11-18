@@ -27,12 +27,13 @@ from mission_control.application.knowledge.judgment import (
 from mission_control.domain.knowledge.judgment import CognitionIdentity, EvaluatorPin
 from mission_control.domain.outputs.contracts import OutputForm, Requirement
 from mission_control.domain.resolution.resolved import OutputContractProfile
+from tests.support.clock import Clock
 from tests.support.knowledge.binding import FakeKnowledgeBinding
 from tests.support.knowledge.credentials import (
     AUDIENCE,
     BINDING,
+    KNOWLEDGE_NOW,
     Issuer,
-    SteppingClock,
     knowledge_port,
 )
 from tests.support.knowledge.gateway import origin
@@ -84,7 +85,7 @@ class ScriptedRunner:
 
 @dataclass
 class World:
-    clock: SteppingClock
+    clock: Clock
     issuer: Issuer
     ks: TrustedKnowledgeState
     stack: Any
@@ -159,7 +160,7 @@ async def world(  # type: ignore[no-untyped-def]
     store: Any = None,
     access: InvocationAccess | None = None,
 ):
-    clock = SteppingClock()
+    clock = Clock(KNOWLEDGE_NOW)
     store = store if store is not None else InMemoryOutputContractStore()
     access = access or InvocationAccess(
         origin=origin(application_id=application),

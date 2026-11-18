@@ -43,16 +43,16 @@ from mission_control.domain.context.checkpoint import CheckpointIdentities
 from mission_control.domain.context.packet import PacketScope
 from mission_control.domain.policies.errors import IdempotencyConflict
 from tests.fixtures.continuation import (
+    NOW,
     MemorySnapshots,
     NoArtifacts,
-    StepClock,
     facts,
     seal_target,
     trigger,
 )
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.fixtures.provider_frames import StepClock as FrameClock
-from tests.fixtures.provider_frames import turn_observations
+from tests.fixtures.provider_frames import FRAME_NOW, turn_observations
+from tests.support.clock import SECOND, Clock
 from tests.support.db_builders import admit_unit_attempt, owner_rows
 from tests.support.integration.postgres.continuation_postgres import continuation_actor
 from tests.support.knowledge.stores import InMemoryStaging
@@ -97,7 +97,9 @@ async def test_seal_and_transfer_persist_checkpoints_transfers_and_session_event
         session = f"thread:{admitted.unit.unit_key}"
         frames = PostgresFrameRepository(pool)
         handle = await frames.open_execution(admitted.start())
-        await FrameWriter(frames, handle, clock=FrameClock()).write(turn_observations())
+        await FrameWriter(frames, handle, clock=Clock(FRAME_NOW, step=SECOND)).write(
+            turn_observations()
+        )
 
         staging = InMemoryStaging()
         transfers = PostgresContinuationRepository(pool)
@@ -105,7 +107,7 @@ async def test_seal_and_transfer_persist_checkpoints_transfers_and_session_event
         selections = PostgresContextSelectionRepository(pool)
         mailbox = InMemoryMailbox(pending={admitted.run_key: ["cmd-held-1"]})
         events = RunControlContinuationEvents(
-            admitted.run_control, actor=continuation_actor(), clock=StepClock()
+            admitted.run_control, actor=continuation_actor(), clock=Clock(NOW, step=SECOND)
         )
         target_session = f"{session}~continuation~1"
         confirmation = FrameHydrationConfirmation(frames, PostgresRunIds(pool))
@@ -128,7 +130,7 @@ async def test_seal_and_transfer_persist_checkpoints_transfers_and_session_event
             events=events,
             mailbox=mailbox,
             confirmation=confirmation,
-            clock=StepClock(),
+            clock=Clock(NOW, step=SECOND),
         )
 
         # The command path: request_continuation locates the live session from frames.
@@ -179,7 +181,7 @@ async def test_seal_and_transfer_persist_checkpoints_transfers_and_session_event
         target_handle = await frames.open_execution(
             admitted.start(native_session_ref=target_session)
         )
-        await FrameWriter(frames, target_handle, clock=FrameClock()).write(
+        await FrameWriter(frames, target_handle, clock=Clock(FRAME_NOW, step=SECOND)).write(
             turn_observations("turn-2", tool_call="call-2")
         )
         released = await service.release_if_hydrated(planned.transfer_id, request_scope=scope)
@@ -260,7 +262,7 @@ async def test_transfer_rows_are_compare_and_set(common_db: CommonDatabase) -> N
         admitted = await admit_unit_attempt(pool, common_db)
         scope = admitted.unit.request_scope
         transfers = PostgresContinuationRepository(pool)
-        triggers = ContinuationTriggers(transfers, clock=StepClock())
+        triggers = ContinuationTriggers(transfers, clock=Clock(NOW, step=SECOND))
         requested = await triggers.request(
             trigger(),
             request_scope=scope,

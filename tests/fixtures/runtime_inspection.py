@@ -8,7 +8,7 @@ content so that redaction is observable.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import timedelta
 from typing import Any
 
 from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
@@ -67,14 +67,6 @@ READ_AT = LINEAGE_NOW + timedelta(hours=1)
 SECRET_TEXT = "sk-rrm005-secret-value"
 PROMPT_TEXT = "RRM005 confidential prompt body"
 TOOL_ARGUMENT = "rrm005-tool-argument-payload"
-
-
-class MutableClock:
-    def __init__(self, now: datetime) -> None:
-        self.now = now
-
-    def __call__(self) -> datetime:
-        return self.now
 
 
 @dataclass(frozen=True)

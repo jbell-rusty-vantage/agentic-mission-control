@@ -22,6 +22,7 @@ from mission_control.domain.prerequisites import (
     VerificationMethod,
 )
 from tests.fixtures.owner_prerequisites import inputs
+from tests.support.clock import Clock
 
 SCOPE = "installation:fixture"
 AT = datetime(2026, 10, 13, 12, 0, tzinfo=UTC)
@@ -29,16 +30,8 @@ ENVIRONMENT = "claude_cloud.environment.envkit-python-uv-node-1"
 LOGIN = "claude_cloud.host.auth_login"
 
 
-class Clock:
-    def __init__(self) -> None:
-        self.now = AT
-
-    def __call__(self) -> datetime:
-        return self.now
-
-
 def _service() -> tuple[OwnerPrerequisiteService, Clock, InMemoryOwnerPrerequisiteRepository]:
-    clock = Clock()
+    clock = Clock(AT)
     repository = InMemoryOwnerPrerequisiteRepository()
     return OwnerPrerequisiteService(repository, clock=clock), clock, repository
 

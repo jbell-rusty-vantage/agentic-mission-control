@@ -5,7 +5,6 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass
-from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 from uuid import UUID, uuid4
@@ -15,6 +14,7 @@ from mission_control.application.execution.harness.leases import InMemoryWorkspa
 from mission_control.application.workspaces.service import AllocationRequest, WorkspaceAllocator
 from mission_control.domain.execution.bindings import WorkspacePolicyPin
 from tests.support.artifacts import MemoryArtifacts
+from tests.support.clock import Clock
 
 SCOPE = "scope/00000000-0000-0000-0000-000000000001/app/00000000-0000-0000-0000-000000000002"
 IDENTITY = ("-c", "user.name=Fixture", "-c", "user.email=fixture@localhost")
@@ -53,17 +53,6 @@ def make_primary(root: Path) -> Path:
     git("add", "--all", cwd=root)
     commit(root, "base")
     return root
-
-
-class Clock:
-    def __init__(self) -> None:
-        self.now = datetime(2026, 10, 8, 12, tzinfo=UTC)
-
-    def __call__(self) -> datetime:
-        return self.now
-
-    def advance(self, delta: timedelta) -> None:
-        self.now += delta
 
 
 @dataclass
@@ -161,7 +150,6 @@ def within(path: str | Path, root: Path) -> bool:
 __all__ = [
     "IDENTITY",
     "SCOPE",
-    "Clock",
     "Stack",
     "commit",
     "git",

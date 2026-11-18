@@ -37,7 +37,8 @@ from mission_control.domain.frames.contracts import FrameKind
 from mission_control.domain.frames.transcript import TranscriptQuery
 from mission_control.domain.policies.contracts import ActorContext
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.fixtures.provider_frames import StepClock, observation, turn_observations
+from tests.fixtures.provider_frames import FRAME_NOW, observation, turn_observations
+from tests.support.clock import SECOND, Clock
 from tests.support.db_builders import admit_unit_attempt, owner_rows
 from tests.support.run_control import ALL_PERMISSIONS, actor
 
@@ -72,7 +73,7 @@ async def test_projection_rebuilds_idempotently_and_ranks_a_known_phrase_first(
                 tool_call_ref="call-2",
             ),
         ]
-        await FrameWriter(frames, handle, clock=StepClock()).write(observations)
+        await FrameWriter(frames, handle, clock=Clock(FRAME_NOW, step=SECOND)).write(observations)
         await FrameFactProjector(
             frames,
             admitted.run_control,

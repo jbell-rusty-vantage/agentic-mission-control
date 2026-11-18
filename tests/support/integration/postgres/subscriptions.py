@@ -7,7 +7,6 @@ from __future__ import annotations
 
 import asyncio
 from dataclasses import dataclass, field
-from datetime import UTC, datetime
 
 from mission_control.domain.policies.contracts import ActorContext
 
@@ -48,11 +47,3 @@ class Receiver:
             await writer.drain()
         finally:
             writer.close()
-
-
-class Clock:
-    def __init__(self) -> None:
-        self.now = datetime.now(UTC)
-
-    def __call__(self) -> datetime:
-        return self.now

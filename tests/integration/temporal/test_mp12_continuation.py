@@ -96,7 +96,7 @@ from mission_control.domain.programs.goal_directed_runtime import (
     GoalOperationDispatch,
     GoalOperationPreparationRequest,
 )
-from tests.fixtures.continuation import MemorySnapshots, NoArtifacts, StepClock, trigger
+from tests.fixtures.continuation import NOW, MemorySnapshots, NoArtifacts, trigger
 from tests.fixtures.lane_turns import (
     LaneStack,
     cursor_binding,
@@ -107,6 +107,7 @@ from tests.fixtures.lane_turns import (
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.fixtures.mp12_lanes import SOURCE_SESSION, ContinuingLane, Crashes, FakeHydrator
 from tests.fixtures.temporal_history import patch_ids
+from tests.support.clock import SECOND, Clock
 from tests.support.db_builders import admit_unit_attempt
 from tests.support.deep_agents_runtime import ConformanceAuthority
 from tests.support.integration.postgres.continuation_postgres import continuation_actor
@@ -202,10 +203,10 @@ class Composition:
             packet_reader=self.selections,
             snapshots=self.snapshots,
             events=RunControlContinuationEvents(
-                run_control, actor=continuation_actor(), clock=StepClock()
+                run_control, actor=continuation_actor(), clock=Clock(NOW, step=SECOND)
             ),
             mailbox=self.mailbox,
-            clock=StepClock(),
+            clock=Clock(NOW, step=SECOND),
         )
         registry = LaneHydratorRegistry(
             {

@@ -37,6 +37,7 @@ from mission_control.interfaces.http.mission_control import (
     router,
 )
 from mission_control.interfaces.mcp.coordinator_server import CoordinatorPrincipal
+from tests.support.clock import SECOND, Clock
 from tests.support.run_control import actor as control_actor
 from tests.support.run_control import request as run_request
 from tests.support.run_control import service
@@ -60,19 +61,10 @@ def operator() -> ActorContext:
     )
 
 
-class Clock:
-    def __init__(self) -> None:
-        self.now = NOW
-
-    def __call__(self) -> datetime:
-        self.now += timedelta(seconds=1)
-        return self.now
-
-
 class World:
     def __init__(self) -> None:
         self.authority, self.repository = service()
-        self.clock = Clock()
+        self.clock = Clock(NOW + SECOND, step=SECOND)
         self.mailbox = MailboxDeliveryService(
             self.repository.mailbox, self.authority, clock=self.clock
         )

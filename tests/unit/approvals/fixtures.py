@@ -7,7 +7,7 @@ nothing about live provider behaviour.
 
 from __future__ import annotations
 
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime
 from typing import Any
 
 from mission_control.application.execution.approvals import (
@@ -30,19 +30,6 @@ OTHER_POLICY = "sha256:" + "b" * 64
 RUN = "run-1"
 EXECUTION = "harness-exec-1"
 REVIEWER = "owner"
-
-
-class Clock:
-    """A settable FIXTURE clock."""
-
-    def __init__(self, at: datetime = OPENED_AT) -> None:
-        self.at = at
-
-    def __call__(self) -> datetime:
-        return self.at
-
-    def advance(self, seconds: float) -> None:
-        self.at = self.at + timedelta(seconds=seconds)
 
 
 def permission_request(**updates: Any) -> NativeApprovalRequest:

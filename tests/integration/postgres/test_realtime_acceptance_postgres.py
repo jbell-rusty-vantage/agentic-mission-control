@@ -53,9 +53,10 @@ from mission_control.domain.policies.contracts import (
 )
 from mission_control.interfaces.socketio.server import MissionSocketLimits
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.fixtures.provider_frames import StepClock
+from tests.fixtures.provider_frames import FRAME_NOW
 from tests.integration.postgres.realtime_process_app import SPEC_ENV, build
 from tests.support.boundary_commands import TARGET, delivered
+from tests.support.clock import SECOND, Clock
 from tests.support.db_builders import admit_unit_attempt, scoped_command, scoped_request
 from tests.support.integration.postgres.mission_socket_postgres import (
     DSN_ENV,
@@ -129,12 +130,14 @@ async def test_v16_subordinate_lineage_visibility_and_usage_over_the_socket(
             index for index, item in enumerate(observations) if item.kind == FrameKind.TURN_ENDED
         )
         observations.insert(result_at, child_usage(observations[0], "claude:task:toolu_task_01"))
-        await FrameWriter(repository, claude, clock=StepClock()).write(observations)
+        await FrameWriter(repository, claude, clock=Clock(FRAME_NOW, step=SECOND)).write(
+            observations
+        )
         # Codex: a child thread with its own messages and one model call (full coverage).
         codex = await repository.open_execution(
             s.admitted.start(lane=LaneProfile.CODEX, native_session_ref="thr_root")
         )
-        await FrameWriter(repository, codex, clock=StepClock()).write(
+        await FrameWriter(repository, codex, clock=Clock(FRAME_NOW, step=SECOND)).write(
             codex_app_observations(UnknownKindCounter())
         )
 
@@ -396,7 +399,7 @@ async def test_v18_idle_expiry_forged_generation_and_bounded_frame_consumer(
             )
             for index in range(120)
         ]
-        await FrameWriter(repository, handle, clock=StepClock()).write(noisy)
+        await FrameWriter(repository, handle, clock=Clock(FRAME_NOW, step=SECOND)).write(noisy)
         execution = str(handle.harness_execution_id)
         viewer = RealtimeClient()
         await viewer.connect(s.url, auth(s.token("viewer")))
