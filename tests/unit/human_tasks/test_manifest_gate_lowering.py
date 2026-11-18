@@ -70,50 +70,20 @@ def test_a_declared_remediation_needs_a_stage_and_a_cycle_policy(mission_1) -> N
         _human_gates(_run_input(blueprint, (gate,)), blueprint)
 
 
-def test_the_production_launch_author_lowers_the_manifest_gates(mission_1, monkeypatch) -> None:  # type: ignore[no-untyped-def]
-    """The production `LaunchInputPort` (MP-02) carries MP-10 gates into the family input."""
+def test_the_production_launch_author_lowers_the_manifest_gates(mission_1) -> None:  # type: ignore[no-untyped-def]
+    """The production `LaunchInputPort` (MP-02) carries MP-10 gates into the family input:
+    `manifest_human_control` is what it applies to the run's committed definition."""
 
-    import asyncio as _asyncio
-    from types import SimpleNamespace
-    from typing import Any
-
-    from mission_control.application.authoring import manifest_launch_inputs as module
-    from mission_control.domain.programs.human_gate import HumanGateSpec
+    from mission_control.application.authoring.manifest_launch_inputs import (
+        manifest_human_control,
+    )
 
     definition, _program = mission_1
-
-    class Definitions:
-        async def run_subscriptions(self, _scope: str, _run_id: str) -> dict[str, Any]:
-            return {"definition": definition.model_dump(mode="json")}
-
-    author = module.ManifestLaunchInputAuthor(
-        resolver=SimpleNamespace(),  # type: ignore[arg-type]
-        run_control=SimpleNamespace(),  # type: ignore[arg-type]
-        control_plane=SimpleNamespace(),  # type: ignore[arg-type]
-        definitions=Definitions(),
-        stage_templates=SimpleNamespace(),  # type: ignore[arg-type]
-        goal_templates=SimpleNamespace(),  # type: ignore[arg-type]
-    )
-    gates, review = _asyncio.run(author._human_control("tenant-1", "run-1", "StageGraph"))
+    gates, review = manifest_human_control(definition, "StageGraph")
     assert [gate.gate_key for gate in gates] == ["review"] and review is None
     assert gates[0].reviewers == ("owner",)
     # Mission 1 is a Stage Graph: a GoalDirected start derives no review from it.
-    assert _asyncio.run(author._human_control("tenant-1", "run-1", "GoalDirected")) == ((), None)
-
-    # A Goal Loop that requires a human review borrows the manifest's declared reviewers;
-    # the FIXTURE below stands in for such a loop (Mission 1 declares `owner` on its gate).
-    required = HumanGateSpec(gate_key="goal-review", prompt="Review.", reviewers=("owner",))
-
-    def goal_review(_definition: Any, *, reviewers: tuple[str, ...], **_: Any) -> HumanGateSpec:
-        return required.model_copy(update={"reviewers": reviewers})
-
-    monkeypatch.setattr(module, "goal_human_review", goal_review)
-    gates, review = _asyncio.run(author._human_control("tenant-1", "run-1", "GoalDirected"))
-    assert gates == () and review is not None and review.reviewers == ("owner",)
-    # Without any declared reviewer the review is assigned to the `owner` role, never dropped.
-    monkeypatch.setattr(module, "_human_gate_nodes", lambda _definition: [])
-    gates, review = _asyncio.run(author._human_control("tenant-1", "run-1", "GoalDirected"))
-    assert gates == () and review is not None and review.reviewers == ("owner",)
+    assert manifest_human_control(definition, "GoalDirected") == ((), None)
 
 
 def test_mission_2_ingestion_review_is_kept_and_assigned_to_the_owner_role() -> None:
@@ -124,10 +94,9 @@ def test_mission_2_ingestion_review_is_kept_and_assigned_to_the_owner_role() -> 
     the consumer nor drop the review: it lowers one goal review gated on the `owner` role.
     """
 
-    from types import SimpleNamespace
-    from typing import Any
-
-    from mission_control.application.authoring import manifest_launch_inputs as module
+    from mission_control.application.authoring.manifest_launch_inputs import (
+        manifest_human_control,
+    )
     from mission_control.domain.programs.human_gate import is_reviewer
 
     definitions, _programs = asyncio.run(
@@ -135,25 +104,8 @@ def test_mission_2_ingestion_review_is_kept_and_assigned_to_the_owner_role() -> 
     )
     by_key = {definition.mission_key: definition for definition in definitions}
 
-    def author_for(definition: Any) -> Any:
-        class Definitions:
-            async def run_subscriptions(self, _scope: str, _run_id: str) -> dict[str, Any]:
-                return {"definition": definition.model_dump(mode="json")}
-
-        return module.ManifestLaunchInputAuthor(
-            resolver=SimpleNamespace(),  # type: ignore[arg-type]
-            run_control=SimpleNamespace(),  # type: ignore[arg-type]
-            control_plane=SimpleNamespace(),  # type: ignore[arg-type]
-            definitions=Definitions(),
-            stage_templates=SimpleNamespace(),  # type: ignore[arg-type]
-            goal_templates=SimpleNamespace(),  # type: ignore[arg-type]
-        )
-
-    research = asyncio.run(author_for(by_key["research"])._human_control("t", "r", "GoalDirected"))
-    assert research == ((), None)
-    gates, review = asyncio.run(
-        author_for(by_key["ingestion"])._human_control("t", "r", "GoalDirected")
-    )
+    assert manifest_human_control(by_key["research"], "GoalDirected") == ((), None)
+    gates, review = manifest_human_control(by_key["ingestion"], "GoalDirected")
     assert gates == () and review is not None
     assert review.reviewers == ("owner",) and review.remediation_target == "goal/executor"
     assert is_reviewer(review, "owner", frozenset())

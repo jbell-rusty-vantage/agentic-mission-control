@@ -3384,6 +3384,29 @@ def _human_gate_nodes(definition: MissionDefinition) -> list[Any]:
     return [child for child in children if child.behavior is Behavior.HUMAN_GATE]
 
 
+def manifest_human_control(
+    definition: MissionDefinition, family: Literal["StageGraph", "GoalDirected"]
+) -> tuple[tuple[HumanGateSpec, ...], HumanGateSpec | None]:
+    """MP-10 (SPEC-03): the manifest's `human_gate` nodes become Stage Graph gate stages;
+    a Goal Loop whose acceptance requires `human` gets one review activation.
+
+    The manifest schema names reviewers only on `human_gate` tasks, which cannot sit under
+    a Goal Loop root, so a Goal Loop review borrows the reviewers its definition declares
+    on any human gate, else the `owner` reviewer role (`DEFAULT_GOAL_REVIEWERS`). The
+    requirement is never dropped: the review still waits for an attributable resolution
+    by a principal holding that role.
+    """
+
+    if family == "StageGraph":
+        return stagegraph_human_gates(definition), None
+    reviewers = tuple(
+        dict.fromkeys(
+            reviewer for node in _human_gate_nodes(definition) for reviewer in _gate_reviewers(node)
+        )
+    )
+    return (), goal_human_review(definition, reviewers=reviewers or DEFAULT_GOAL_REVIEWERS)
+
+
 # W1 D30: a FALLBACK that duplicates the checked-in application profiles' pin
 # (`deployments/<app>/application.toml` `[outputs] assessment_pin`). The bootstrap passes the
 # installed application's own pin; this value applies only when that profile cannot be read, and
@@ -3649,30 +3672,10 @@ class ManifestLaunchInputAuthor:
     async def _human_control(
         self, request_scope: str, run_id: str, family: Literal["StageGraph", "GoalDirected"]
     ) -> tuple[tuple[HumanGateSpec, ...], HumanGateSpec | None]:
-        """MP-10 (SPEC-03): the manifest's `human_gate` nodes become Stage Graph gate stages;
-        a Goal Loop whose acceptance requires `human` gets one review activation.
-
-        The manifest schema names reviewers only on `human_gate` tasks, which cannot sit under
-        a Goal Loop root, so a Goal Loop review borrows the reviewers its definition declares
-        on any human gate, else the `owner` reviewer role (`DEFAULT_GOAL_REVIEWERS`). The
-        requirement is never dropped: the review still waits for an attributable resolution
-        by a principal holding that role.
-        """
-
         info = await self._definitions.run_subscriptions(request_scope, run_id)
         if info is None:
             return (), None
-        definition = MissionDefinition.model_validate(info["definition"])
-        if family == "StageGraph":
-            return stagegraph_human_gates(definition), None
-        reviewers = tuple(
-            dict.fromkeys(
-                reviewer
-                for node in _human_gate_nodes(definition)
-                for reviewer in _gate_reviewers(node)
-            )
-        )
-        return (), goal_human_review(definition, reviewers=reviewers or DEFAULT_GOAL_REVIEWERS)
+        return manifest_human_control(MissionDefinition.model_validate(info["definition"]), family)
 
     async def bind(
         self,

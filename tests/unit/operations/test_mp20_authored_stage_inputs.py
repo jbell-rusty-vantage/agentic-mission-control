@@ -169,45 +169,58 @@ def test_a_session_lane_goal_packet_is_mounted_at_the_lease_root(runtime: str, r
     assert goal_packet_root(template, "/goal/2/verifier") == root  # type: ignore[arg-type]
 
 
-def test_dependent_stage_inputs_refuse_at_launch_without_a_trusted_settlement(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
+def test_dependent_stage_inputs_refuse_at_launch_without_a_trusted_settlement() -> None:
     """OVE-169 (review B2): dependent inputs are required; with no trusted settlement composed
     nothing can promote, so the launch refuses with a typed code instead of waiting forever."""
 
     import asyncio
 
     from mission_control.application.authoring import manifest_launch_inputs as launch
+    from tests.support.manifests.launch_inputs import MINIMAL, compile_programs
 
-    monkeypatch.setattr(launch, "stagegraph_authored_inputs", lambda _definition: (AUTHORED,))
-    monkeypatch.setattr(launch, "MissionDefinition", SimpleNamespace(model_validate=lambda v: v))
+    # The minimal manifest's `synthesize` stage names `collect.sources` as an authored input
+    # whose output schema is not bound, so it is not a schema-only dependent input.
+    definitions, programs = asyncio.run(compile_programs(MINIMAL.read_text(encoding="utf-8")))
+    definition, configuration = definitions[0], programs[0].configuration
+    blueprint = configuration.selected_blueprint
+    assert stagegraph_authored_inputs(definition)
+
+    class Runs:
+        async def get_run(self, _scope: str, _run_id: str) -> Any:
+            return SimpleNamespace(effective_configuration_digest=configuration.digest)
+
+    class Plane:
+        async def retrieve_for_admission(self, digest: str) -> Any:
+            assert digest == configuration.digest
+            return configuration
 
     class Definitions:
         async def run_subscriptions(self, _scope: str, _run_id: str) -> dict[str, Any]:
-            return {"definition": {}}
+            return {"definition": definition.model_dump(mode="json")}
 
-    def author(admitted: bool) -> Any:
-        value = launch.ManifestLaunchInputAuthor(
-            resolver=None,  # type: ignore[arg-type]
-            run_control=None,  # type: ignore[arg-type]
-            control_plane=None,  # type: ignore[arg-type]
-            definitions=Definitions(),
-            stage_templates=None,  # type: ignore[arg-type]
-            goal_templates=None,  # type: ignore[arg-type]
-            dependent_inputs_admitted=admitted,
-        )
+    class FrozenTemplates:
+        """The run's templates were frozen by an earlier start, so `bind` reuses them."""
 
-        async def bind(*_args: Any, **_kwargs: Any) -> None:
-            return None
+        async def list_templates(self, **_: Any) -> dict[str, Any]:
+            return {
+                launch.template_key(
+                    stage.stage_id, slot.operation_slot_id, variant.operation_variant_id
+                ): None
+                for stage in blueprint.stages
+                for slot in stage.operation_slots
+                for variant in slot.allowed_variants
+            }
 
-        async def human_control(*_args: Any) -> tuple[Any, Any]:
-            return (), None
-
-        value.bind = bind
-        value._human_control = human_control
-        return value
-
-    refused = author(False).family_input(
+    author = launch.ManifestLaunchInputAuthor(
+        resolver=None,  # type: ignore[arg-type]
+        run_control=Runs(),  # type: ignore[arg-type]
+        control_plane=Plane(),  # type: ignore[arg-type]
+        definitions=Definitions(),
+        stage_templates=FrozenTemplates(),  # type: ignore[arg-type]
+        goal_templates=None,  # type: ignore[arg-type]
+        dependent_inputs_admitted=False,
+    )
+    refused = author.family_input(
         request_scope="scope", run_id="run-1", family="StageGraph", initial_goal=None
     )
     with pytest.raises(launch.ManifestDependentInputsUnavailable) as error:

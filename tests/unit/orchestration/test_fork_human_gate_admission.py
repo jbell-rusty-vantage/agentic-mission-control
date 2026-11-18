@@ -5,27 +5,47 @@ family failed `stagegraph_blocked` right after the review was approved."""
 
 from __future__ import annotations
 
+import asyncio
 from dataclasses import dataclass
+from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
 
 import pytest
 
 from mission_control.adapters.temporal.workflows.stagegraph import _noncognitive_gate_keys
-from mission_control.application.programs import control_admission
 from mission_control.application.programs.control_admission import (
     ManifestStageGraphHumanGateProvider,
 )
-from mission_control.domain.authoring.canonical import sha256_digest
+from mission_control.application.programs.human_gates import stagegraph_human_gates
 from mission_control.domain.programs.human_gate import HumanGateSpec
+from tests.support.manifests.launch_inputs import compile_programs
 
 SCOPE = "tenant-1"
 SOURCE, DERIVED, FORK = "run-source", "run-derived", "fork-req-1"
 CONFIG = "sha256:" + "c" * 64
+# A real compiled manifest whose Stage Graph declares one `review` Human Gate.
+MISSION = (
+    Path(__file__).resolve().parents[3]
+    / "tests/fixtures/manifests/fast-track/01-research-ingestion-deep-agents.yml"
+)
 GATE = HumanGateSpec(
     gate_key="review", prompt="Review", reviewers=("owner",), packet_sources=("a.notes",)
 )
-BLUEPRINT = {"stages": ["review"]}
+
+
+@dataclass(frozen=True)
+class Mission:
+    definition: Any
+    selected_blueprint: Any
+    gate: HumanGateSpec
+
+
+@pytest.fixture(scope="module")
+def mission() -> Mission:
+    definitions, programs = asyncio.run(compile_programs(MISSION.read_text(encoding="utf-8")))
+    (gate,) = stagegraph_human_gates(definitions[0])
+    return Mission(definitions[0], programs[0].configuration.selected_blueprint, gate)
 
 
 @dataclass(frozen=True)
@@ -40,13 +60,14 @@ class Forks:
 
 
 class Definitions:
-    def __init__(self) -> None:
+    def __init__(self, mission: Mission) -> None:
         self.read: list[str] = []
+        self._definition = mission.definition
 
     async def run_subscriptions(self, request_scope: str, run_key: str) -> dict[str, Any] | None:
         self.read.append(run_key)
         if run_key == SOURCE:
-            return {"definition": {"kind": "manifest"}}
+            return {"definition": self._definition.model_dump(mode="json")}
         return {"definition": {"contract": "mc.run-request-definition/1"}}
 
 
@@ -56,8 +77,11 @@ class Runs:
 
 
 class Configurations:
+    def __init__(self, mission: Mission) -> None:
+        self._blueprint = mission.selected_blueprint
+
     async def retrieve_for_admission(self, digest: str) -> Any:
-        return SimpleNamespace(digest=CONFIG, selected_blueprint=BLUEPRINT)
+        return SimpleNamespace(digest=CONFIG, selected_blueprint=self._blueprint)
 
 
 class Templates:
@@ -65,39 +89,25 @@ class Templates:
         return SimpleNamespace(request_scope=SCOPE, effective_configuration_digest=CONFIG)
 
 
-def admission(run_id: str, binding_ref: str) -> Any:
+def admission(mission: Mission, run_id: str, binding_ref: str) -> Any:
     return SimpleNamespace(
         run_id=run_id,
         request_scope=SCOPE,
         semantic_input_binding_ref=binding_ref,
         effective_configuration_digest=CONFIG,
-        blueprint=BLUEPRINT,
+        blueprint=mission.selected_blueprint.model_dump(mode="json"),
         proposal=SimpleNamespace(operation_request_key="review"),
         control_gate_keys=("review",),
-        human_gate=GATE,
+        human_gate=mission.gate,
     )
 
 
 @pytest.fixture
-def provider(monkeypatch: pytest.MonkeyPatch) -> tuple[Any, Definitions]:
-    monkeypatch.setattr(
-        control_admission, "MissionDefinition", SimpleNamespace(model_validate=lambda raw: raw)
-    )
-    monkeypatch.setattr(
-        control_admission,
-        "stagegraph_human_gates",
-        lambda definition: (GATE,) if definition == {"kind": "manifest"} else (),
-    )
-    monkeypatch.setattr(
-        control_admission,
-        "StageGraphBlueprint",
-        SimpleNamespace(model_validate=lambda raw: raw),
-    )
-    monkeypatch.setattr(control_admission, "sha256_digest", sha256_digest)
-    definitions = Definitions()
+def provider(mission: Mission) -> tuple[Any, Definitions]:
+    definitions = Definitions(mission)
     return (
         ManifestStageGraphHumanGateProvider(
-            definitions, Configurations(), Runs(), Templates(), fork_sources=Forks()
+            definitions, Configurations(mission), Runs(), Templates(), fork_sources=Forks()
         ),  # type: ignore[arg-type]
         definitions,
     )
@@ -105,21 +115,25 @@ def provider(monkeypatch: pytest.MonkeyPatch) -> tuple[Any, Definitions]:
 
 @pytest.mark.asyncio
 async def test_a_fork_derived_gate_is_verified_against_the_fork_binding_and_source(
-    provider: tuple[Any, Definitions],
+    provider: tuple[Any, Definitions], mission: Mission
 ) -> None:
     gates, definitions = provider
-    assert await gates.verify(admission(DERIVED, f"semantic-input:fork:{FORK}")) == (GATE,)
+    fork = admission(mission, DERIVED, f"semantic-input:fork:{FORK}")
+    assert await gates.verify(fork) == (mission.gate,)
     assert definitions.read == [SOURCE]  # the source's committed definition governs
     with pytest.raises(ValueError, match="admitted semantic configuration"):
-        await gates.verify(admission(DERIVED, f"semantic-input:manifest:{DERIVED}"))
+        await gates.verify(admission(mission, DERIVED, f"semantic-input:manifest:{DERIVED}"))
     with pytest.raises(ValueError, match="admitted semantic configuration"):
-        await gates.verify(admission(DERIVED, "semantic-input:fork:another-fork"))
+        await gates.verify(admission(mission, DERIVED, "semantic-input:fork:another-fork"))
 
 
 @pytest.mark.asyncio
-async def test_a_manifest_run_is_verified_as_before(provider: tuple[Any, Definitions]) -> None:
+async def test_a_manifest_run_is_verified_as_before(
+    provider: tuple[Any, Definitions], mission: Mission
+) -> None:
     gates, definitions = provider
-    assert await gates.verify(admission(SOURCE, f"semantic-input:manifest:{SOURCE}")) == (GATE,)
+    source = admission(mission, SOURCE, f"semantic-input:manifest:{SOURCE}")
+    assert await gates.verify(source) == (mission.gate,)
     assert definitions.read == [SOURCE]
 
 
