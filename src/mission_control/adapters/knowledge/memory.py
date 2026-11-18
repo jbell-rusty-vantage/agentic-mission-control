@@ -46,6 +46,8 @@ from mission_control.domain.knowledge.effects import (
     require_transition,
 )
 
+_OPEN_JOURNAL = frozenset({JournalState.PREPARED, JournalState.DISPATCHED, JournalState.UNCERTAIN})
+
 
 class InMemoryKnowledgeJournal:
     """The journal port with the 1.5.0 legality rules, for unit tests."""
@@ -114,10 +116,19 @@ class InMemoryKnowledgeJournal:
             in {JournalState.PREPARED, JournalState.DISPATCHED, JournalState.UNCERTAIN}
         ]
 
-    def _advance(self, scope: str, effect_key: str, expected: int, **changes: Any) -> JournalRecord:
+    def _advance(
+        self,
+        scope: str,
+        effect_key: str,
+        expected: int,
+        guard: frozenset[JournalState],
+        **changes: Any,
+    ) -> JournalRecord:
+        # As PostgreSQL's guarded UPDATE: an unknown row (or one of another scope), a moved
+        # version and a state the move does not start from are all a lost compare-and-set.
         key = (scope, effect_key)
-        current = self.rows[key]
-        if current.version != expected:
+        current = self.rows.get(key)
+        if current is None or current.version != expected or current.state not in guard:
             raise JournalVersionConflict(effect_key)
         state = changes.get("state", current.state)
         if state != current.state:
@@ -144,6 +155,7 @@ class InMemoryKnowledgeJournal:
             scope,
             effect_key,
             expected_version,
+            frozenset({JournalState.PREPARED, JournalState.UNCERTAIN}),
             state=JournalState.DISPATCHED,
             dispatch_id=dispatch_id,
             envelope_digest=envelope_digest,
@@ -155,7 +167,9 @@ class InMemoryKnowledgeJournal:
     async def record_handle(
         self, scope: str, effect_key: str, *, expected_version: int, operation_id: str, at: datetime
     ) -> JournalRecord:
-        return self._advance(scope, effect_key, expected_version, operation_id=operation_id)
+        return self._advance(
+            scope, effect_key, expected_version, _OPEN_JOURNAL, operation_id=operation_id
+        )
 
     async def settle(
         self,
@@ -170,6 +184,7 @@ class InMemoryKnowledgeJournal:
             scope,
             effect_key,
             expected_version,
+            _OPEN_JOURNAL,
             state=settlement.state,
             terminal_receipt_ref=settlement.terminal_receipt_ref,
             receipt_digest=settlement.receipt_digest,
@@ -180,7 +195,13 @@ class InMemoryKnowledgeJournal:
     async def mark_uncertain(
         self, scope: str, effect_key: str, *, expected_version: int, at: datetime
     ) -> JournalRecord:
-        return self._advance(scope, effect_key, expected_version, state=JournalState.UNCERTAIN)
+        return self._advance(
+            scope,
+            effect_key,
+            expected_version,
+            frozenset({JournalState.DISPATCHED}),
+            state=JournalState.UNCERTAIN,
+        )
 
     async def transitions(
         self, scope: str, effect_key: str
@@ -199,6 +220,14 @@ class InMemoryKnowledgeHandleStore:
         key = (candidate.scope, candidate.binding_id, candidate.handle.operationId)
         if key in self.rows:
             return self.rows[key]
+        for (scope, binding, _operation_id), existing in self.rows.items():
+            # As PostgreSQL: the same request answered with another remote id is the same handle.
+            if (
+                (scope, binding) == (candidate.scope, candidate.binding_id)
+                and existing.operation == candidate.operation
+                and existing.request_id == candidate.request_id
+            ):
+                return existing
         self.runs[key] = candidate.coordinates.run_id
         record = HandleRecord(
             handle_id=str(uuid4()),
@@ -333,9 +362,18 @@ class InMemorySubmissionStore:
             key=lambda row: (row.obligation_id, row.revision),
         )
 
-    def _cas(self, submission_id: str, expected: int, **changes: Any) -> SubmissionRecord:
-        current = self.rows[submission_id]
-        if current.version != expected:
+    def _cas(
+        self, scope: str, submission_id: str, expected: int, state: str, **changes: Any
+    ) -> SubmissionRecord:
+        # As PostgreSQL's guarded UPDATE: another scope's row, a moved version or the wrong
+        # assessment state are all a lost compare-and-set.
+        current = self.rows.get(submission_id)
+        if (
+            current is None
+            or self.scopes.get(submission_id) != scope
+            or current.version != expected
+            or current.assessment_state != state
+        ):
             raise JournalVersionConflict(submission_id)
         record = replace(current, version=current.version + 1, **changes)
         self.rows[submission_id] = record
@@ -352,11 +390,11 @@ class InMemorySubmissionStore:
         actor_ref: str,
         at: datetime,
     ) -> SubmissionRecord:
-        if self.rows[submission_id].assessment_state != "pending":
-            raise ValueError("only a pending submission starts its assessment")
         return self._cas(
+            scope,
             submission_id,
             expected_version,
+            "pending",
             assessment_state="assessing",
             assessment_operation_id=operation_id,
             assessment_binding=binding_id,
@@ -374,11 +412,11 @@ class InMemorySubmissionStore:
         actor_ref: str,
         at: datetime,
     ) -> SubmissionRecord:
-        if self.rows[submission_id].assessment_state != "assessing":
-            raise ValueError("only an assessing submission records its assessment")
         return self._cas(
+            scope,
             submission_id,
             expected_version,
+            "assessing",
             assessment_state=state,
             assessment_ref=assessment_ref,
             assessment_digest=assessment_digest,
@@ -424,7 +462,11 @@ class InMemoryTransferPlanStore:
         )
 
     async def append_receipt(self, scope: str, receipt: DeliveryReceipt) -> DeliveryReceipt:
-        sequence = 1 + sum(1 for s, r in self.receipt_rows if r.plan_id == receipt.plan_id)
+        if await self.get(scope, receipt.plan_id) is None:
+            raise ValueError(f"no sealed transfer plan {receipt.plan_id} in this scope")
+        sequence = 1 + sum(
+            1 for s, r in self.receipt_rows if s == scope and r.plan_id == receipt.plan_id
+        )
         stored = receipt.model_copy(update={"sequence": sequence})
         self.receipt_rows.append((scope, stored))
         return stored
@@ -456,6 +498,7 @@ class InMemoryLineageStore:
     def __init__(self) -> None:
         self.entries: list[tuple[str, LineageEntry]] = []
         self._ids: set[str] = set()
+        self._recorded_at: dict[str, datetime] = {}
 
     async def record(self, scope: str, entries: Any, *, actor_ref: str, at: datetime) -> int:
         from mission_control.adapters.postgres.knowledge.lineage import lineage_id
@@ -473,6 +516,7 @@ class InMemoryLineageStore:
             ):
                 raise ValueError("a subject has at most one producer")
             self._ids.add(key)
+            self._recorded_at[key] = at
             self.entries.append((scope, entry))
             written += 1
         return written
@@ -514,16 +558,21 @@ class InMemoryLineageStore:
             key = lineage_id(entry)
             if key not in self._ids:
                 self._ids.add(key)
+                self._recorded_at[key] = at
                 self.entries.append((scope, entry))
                 written += 1
         return written
 
     async def facts(self, scope: str, subject_handle: str) -> list[Any]:
-        return [
-            entry.fact
+        from mission_control.adapters.postgres.knowledge.lineage import lineage_id
+
+        # As PostgreSQL: ordered by recorded time, then by the deterministic fact identity.
+        mine = [
+            (self._recorded_at[lineage_id(entry)], lineage_id(entry), entry.fact)
             for stored_scope, entry in self.entries
             if stored_scope == scope and entry.fact.subject_handle == subject_handle
         ]
+        return [fact for _at, _id, fact in sorted(mine, key=lambda item: item[:2])]
 
 
 class InMemoryRetainedReadStore:
@@ -549,11 +598,17 @@ class InMemoryRetainedReadStore:
         return written
 
     async def observations(self, scope: str, invocation_ref: str) -> list[RetainedReadObservation]:
-        return [
-            row
-            for (stored, invocation, _), row in self.rows.items()
-            if stored == scope and invocation == invocation_ref
-        ]
+        # Ordered by observed time, as PostgreSQL. Known divergence (OVE-238 G3): PostgreSQL
+        # breaks a time tie by read observation ref, this store by insertion order, which
+        # tests/unit/knowledge/test_read_intent.py still relies on.
+        return sorted(
+            (
+                row
+                for (stored, invocation, _), row in self.rows.items()
+                if stored == scope and invocation == invocation_ref
+            ),
+            key=lambda row: row.observed_at,
+        )
 
 
 __all__ = [
