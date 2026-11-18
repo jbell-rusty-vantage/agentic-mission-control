@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import contextlib
 import sys
 
 from temporalio.api.enums.v1 import IndexedValueType
@@ -51,15 +52,48 @@ async def _ready_client(address: str, namespace: str, within_seconds: float) -> 
                 await asyncio.sleep(2)
 
 
+async def _register(client: Client, namespace: str, within_seconds: float) -> tuple[str, ...]:
+    """Register, retrying while a just-created namespace is not yet visible to the operator
+    service (the server's namespace cache refreshes every few seconds). A type conflict is
+    final and is raised at once."""
+
+    loop = asyncio.get_running_loop()
+    deadline = loop.time() + within_seconds
+    while True:
+        try:
+            return await register_belllabs_search_attributes(client, namespace)
+        except SearchAttributeRegistrationError as error:
+            if "conflicting type" in str(error) or loop.time() >= deadline:
+                raise
+            print(f"registration not accepted yet, retrying: {error}", file=sys.stderr)
+            await asyncio.sleep(2)
+
+
+async def _verified(client: Client, namespace: str, within_seconds: float) -> None:
+    loop = asyncio.get_running_loop()
+    deadline = loop.time() + within_seconds
+    while True:
+        try:
+            await verify_belllabs_search_attributes(client, namespace)
+            return
+        except SearchAttributeRegistrationError:
+            if loop.time() >= deadline:
+                raise
+            await asyncio.sleep(2)
+
+
 async def _main(args: argparse.Namespace) -> int:
     client = await _ready_client(args.address, args.namespace, args.timeout)
     if not args.check_only:
         try:
-            added = await register_belllabs_search_attributes(client, args.namespace)
+            added = await _register(client, args.namespace, args.timeout)
         except SearchAttributeRegistrationError as error:
             print(f"registration failed: {error}", file=sys.stderr)
             return 1
         print(f"registered: {', '.join(added) if added else 'none (all present)'}")
+        # Newly added attributes become visible after the same cache refresh.
+        with contextlib.suppress(SearchAttributeRegistrationError):  # reported below, per attribute
+            await _verified(client, args.namespace, args.timeout)
     response = await client.operator_service.list_search_attributes(
         ListSearchAttributesRequest(namespace=args.namespace)
     )
