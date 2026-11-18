@@ -15,7 +15,7 @@ own evidence.
 
 - **implemented**: `src/mission_control/adapters/cursor/cloud.py`, `cloud_api.py`, `sse.py`,
   `scm.py`, `controls.py` (hydrator), `qualification.py`;
-- **qualified**: offline only. The FIXTURE Cloud Agents API (`tests/fixtures/cursor_cloud.py`,
+- **qualified**: offline only. The FIXTURE Cloud Agents API (`tests/support/providers/cursor.py`,
   `httpx.MockTransport`, a bare git remote) replays hand-authored `synthetic` fixtures
   (`tests/integration/cursor/fixtures/cloud/`) through the real adapter, `lane.turn`, the
   reducer and, for MP-09, the real local Temporal server and a disposable PostgreSQL 17.

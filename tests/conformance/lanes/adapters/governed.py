@@ -12,9 +12,9 @@ from pathlib import Path
 from types import MappingProxyType
 
 from mission_control.adapters.deep_agents.harness import DeepAgentsHarness
-from mission_control.adapters.operations.conformance import ConformanceRuntime
 from mission_control.application.execution.harness.protocol import AgentHarness
 from tests.conformance.lanes.contract import DeclaredException, LaneAdapter, Scenario
+from tests.support.deep_agents_runtime import ConformanceRuntime
 
 _GOVERNED = (
     "deep_agents is a governed lane: the operation boundary runs it through the bounded "

@@ -547,9 +547,9 @@ def test_the_worker_registry_carries_the_real_cursor_local_lane_when_cursor_is_b
     from mission_control.adapters.deep_agents.harness import (
         DeepAgentsHarness,
     )
-    from mission_control.adapters.operations.conformance import ConformanceRuntime
     from mission_control.adapters.temporal.deployment_composition import compose_lane_registry
     from tests.fixtures.isolated_settings import isolated_settings
+    from tests.support.deep_agents_runtime import ConformanceRuntime
 
     stack = local_stack(tmp_path)
     deep_agents = DeepAgentsHarness(ConformanceRuntime())

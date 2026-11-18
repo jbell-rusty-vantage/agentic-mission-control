@@ -17,6 +17,7 @@ from tests.fixtures.lane_bindings import lane_fields
 from tests.fixtures.lane_turns import lane_stack
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.support.db_builders import admit_unit_attempt
+from tests.support.deep_agents_runtime import ConformanceRuntime
 from tests.support.integration.anthropic_managed.managed_segment_loop_real_services import (
     _activity_worker,
     _client,
@@ -33,7 +34,6 @@ from mission_control.adapters.openai_agents.harness import CodexAgentsHarness
 from mission_control.adapters.openai_agents.pack import load_pack
 from mission_control.adapters.openai_agents.prepare import CodexAgentsPreparer
 from mission_control.adapters.openai_agents.tools import AgentsTools
-from mission_control.adapters.operations.conformance import ConformanceRuntime
 from mission_control.adapters.postgres.approvals.tasks import PostgresApprovalTaskRepository
 from mission_control.adapters.postgres.frames.repository import PostgresFrameRepository
 from mission_control.adapters.postgres.human_tasks.repository import PostgresHumanTaskRepository

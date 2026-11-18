@@ -15,7 +15,6 @@ from temporalio.worker import Worker
 
 from mission_control.adapters.anthropic_managed.harness import ClaudeManagedHarness
 from mission_control.adapters.deep_agents.harness import DeepAgentsHarness
-from mission_control.adapters.operations.conformance import ConformanceRuntime
 from mission_control.adapters.postgres.environments.preparation_repository import (
     PostgresEnvironmentPreparationRepository,
 )
@@ -36,6 +35,7 @@ from mission_control.domain.execution.contracts import (
 )
 from mission_control.domain.execution.lanes import LaneSegmentBounds
 from tests.fixtures.lane_turns import lane_stack
+from tests.support.deep_agents_runtime import ConformanceRuntime
 from tests.support.providers.managed_agents import LANE_QUEUE, PROFILE
 
 BOUNDS: Final = LaneSegmentBounds(

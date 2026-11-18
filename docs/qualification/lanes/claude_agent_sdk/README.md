@@ -63,7 +63,7 @@ Nothing above is account-enabled: no login, no `claude -p`, no status probe ran.
 | `tests/unit/claude/test_claude_live_drill.py` | The paid drill refuses without every explicit precondition, its recorder drops control traffic and secrets, and the record it writes is what the qualification gate reads. |
 
 Fixtures: `tests/fixtures/provider_frames/claude/*.jsonl` (first line `recorded: false`,
-labelled FIXTURE) and `tests/unit/claude/fixtures.py` (`FixtureClient`, `FixtureWorkspace`).
+labelled FIXTURE) and `tests/support/providers/claude.py` (`FixtureClient`, `FixtureWorkspace`).
 They prove what the lane does with the pinned SDK's documented shapes, not live behaviour.
 
 ## Real local services (disposable PostgreSQL 17 at 127.0.0.1:55433, Temporal at 127.0.0.1:7233)

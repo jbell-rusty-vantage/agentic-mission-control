@@ -501,15 +501,15 @@ def test_create_deep_agent_has_one_non_experiment_production_call_site() -> None
 async def test_operation_service_pins_records_and_links_the_result_checkpoint() -> None:
     """Production seam: `OperationExecutionService` → adapter → transition → settlement."""
 
-    from tests.support.operations import MCP_DIGEST, SKILL_DIGEST
-
-    from mission_control.adapters.operations.conformance import (
+    from tests.support.deep_agents_runtime import (
         ConformanceAssetVerifier,
         ConformanceBudgetAuthority,
         ConformanceEventSink,
         ConformanceSandbox,
         ConformanceSecretResolver,
     )
+    from tests.support.operations import MCP_DIGEST, SKILL_DIGEST
+
     from mission_control.application.execution.operations.operation_execution import (
         InMemoryOperationBindingRepository,
         OperationExecutionService,

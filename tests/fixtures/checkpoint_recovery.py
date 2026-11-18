@@ -31,6 +31,13 @@ from langgraph.store.memory import InMemoryStore
 from pydantic import PrivateAttr
 from tests.fixtures.checkpoint_lineage import bind_unit, stage_unit
 from tests.fixtures.lane_bindings import lane_fields
+from tests.support.deep_agents_runtime import (
+    ConformanceAssetVerifier,
+    ConformanceBudgetAuthority,
+    ConformanceEventSink,
+    ConformanceSandbox,
+    ConformanceSecretResolver,
+)
 from tests.support.journal import MemoryOperationJournal
 from tests.support.operations import MCP_DIGEST, SKILL_DIGEST, operation_request
 from tests.support.run_control import actor, command, reconciler_command
@@ -49,13 +56,6 @@ from mission_control.adapters.deep_agents.checkpoint_verifier import (
 )
 from mission_control.adapters.deep_agents.describe import DEEP_AGENTS_DESCRIBE
 from mission_control.adapters.deep_agents.harness import DeepAgentsHarness
-from mission_control.adapters.operations.conformance import (
-    ConformanceAssetVerifier,
-    ConformanceBudgetAuthority,
-    ConformanceEventSink,
-    ConformanceSandbox,
-    ConformanceSecretResolver,
-)
 from mission_control.adapters.storage.artifact_payloads import InMemoryArtifactPayloadStore
 from mission_control.application.execution.operations.checkpoint_lineage import (
     CheckpointLineageService,

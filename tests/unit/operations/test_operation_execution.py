@@ -11,15 +11,6 @@ from temporalio.testing import WorkflowEnvironment
 from temporalio.worker import Replayer, Worker
 
 from mission_control.adapters.deep_agents.harness import DeepAgentsHarness
-from mission_control.adapters.operations.conformance import (
-    ConformanceAssetVerifier,
-    ConformanceAuthority,
-    ConformanceBudgetAuthority,
-    ConformanceEventSink,
-    ConformanceRuntime,
-    ConformanceSandbox,
-    ConformanceSecretResolver,
-)
 from mission_control.adapters.temporal.operation_activities import (
     OperationExecutionActivities,
     parse_operation_result,
@@ -89,6 +80,15 @@ from mission_control.domain.policies.contracts import (
 )
 from mission_control.domain.policies.errors import IdempotencyConflict
 from tests.fixtures.lane_bindings import lane_fields
+from tests.support.deep_agents_runtime import (
+    ConformanceAssetVerifier,
+    ConformanceAuthority,
+    ConformanceBudgetAuthority,
+    ConformanceEventSink,
+    ConformanceRuntime,
+    ConformanceSandbox,
+    ConformanceSecretResolver,
+)
 from tests.support.operations import (
     DIGEST,
     MCP_DIGEST,

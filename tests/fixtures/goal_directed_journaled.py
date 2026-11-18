@@ -31,6 +31,13 @@ from langgraph.store.memory import InMemoryStore
 from pydantic import PrivateAttr
 from tests.fixtures.checkpoint_recovery import ScriptedRecoveryModel
 from tests.fixtures.lane_bindings import LANE_REBINDERS, lane_fields
+from tests.support.deep_agents_runtime import (
+    ConformanceAssetVerifier,
+    ConformanceBudgetAuthority,
+    ConformanceEventSink,
+    ConformanceSandbox,
+    ConformanceSecretResolver,
+)
 from tests.support.operations import MCP_DIGEST, SKILL_DIGEST, operation_request
 from tests.support.run_control import ConfigurationVerifier, actor
 from tests.support.run_control import request as run_request
@@ -43,13 +50,6 @@ from mission_control.adapters.deep_agents import (
     StateSandboxFactory,
 )
 from mission_control.adapters.deep_agents.harness import DeepAgentsHarness
-from mission_control.adapters.operations.conformance import (
-    ConformanceAssetVerifier,
-    ConformanceBudgetAuthority,
-    ConformanceEventSink,
-    ConformanceSandbox,
-    ConformanceSecretResolver,
-)
 from mission_control.adapters.temporal.activities.goal_directed import (
     GoalDirectedActivities,
     compose_goal_directed_activities,

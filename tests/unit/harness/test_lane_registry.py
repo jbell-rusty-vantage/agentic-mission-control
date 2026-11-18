@@ -15,7 +15,6 @@ from mission_control.adapters.deep_agents.harness import (
     DeepAgentsHarness,
     HarnessSessionUnknown,
 )
-from mission_control.adapters.operations.conformance import ConformanceRuntime, ConformanceSandbox
 from mission_control.application.execution.harness.protocol import (
     AgentHarness,
     ValidatesOperationRequest,
@@ -46,6 +45,7 @@ from mission_control.domain.execution.lanes import (
     StartRequest,
     UsageRequest,
 )
+from tests.support.deep_agents_runtime import ConformanceRuntime, ConformanceSandbox
 from tests.support.operations import operation_request
 
 DIGEST = "sha256:" + "b" * 64

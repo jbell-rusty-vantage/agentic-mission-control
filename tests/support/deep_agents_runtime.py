@@ -1,3 +1,11 @@
+"""The Deep Agents operation-runtime fakes: authority, sandbox, assets, secrets, budget, runtime.
+
+`ConformanceRuntime` and its companions stand in for the governed operation boundary's runtime
+ports, so `DeepAgentsHarness` and the operation-execution tests run without a model or a sandbox.
+They were `src/mission_control/adapters/operations/conformance.py`, which nothing in `src`
+imported: test-only code shipped in the product.
+"""
+
 from __future__ import annotations
 
 from collections.abc import Mapping

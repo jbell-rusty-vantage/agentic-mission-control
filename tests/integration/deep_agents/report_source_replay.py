@@ -11,6 +11,13 @@ from tests.fixtures.checkpoint_lineage import bind_unit
 from tests.fixtures.lane_bindings import lane_fields
 from tests.fixtures.mission_control_common_db import provision_runtime
 from tests.support.deep_agents import registry
+from tests.support.deep_agents_runtime import (
+    ConformanceAssetVerifier,
+    ConformanceBudgetAuthority,
+    ConformanceEventSink,
+    ConformanceSandbox,
+    ConformanceSecretResolver,
+)
 from tests.support.integration.deep_agents.checkpoint_lineage_postgres_saver import (
     SAVER_SCHEMA,
     AcceptingAuthority,
@@ -26,13 +33,6 @@ from tests.support.run_control import service as run_control_service
 from mission_control.adapters.deep_agents import DeepAgentRuntimeAdapter, ExactDeepAgentMaterializer
 from mission_control.adapters.deep_agents.harness import DeepAgentsHarness
 from mission_control.adapters.deep_agents.persistence import runtime_checkpoint_conninfo
-from mission_control.adapters.operations.conformance import (
-    ConformanceAssetVerifier,
-    ConformanceBudgetAuthority,
-    ConformanceEventSink,
-    ConformanceSandbox,
-    ConformanceSecretResolver,
-)
 from mission_control.adapters.postgres.operations.checkpoint_lineage import (
     PostgresCheckpointLineageRepository,
 )

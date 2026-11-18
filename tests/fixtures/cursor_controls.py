@@ -20,13 +20,13 @@ from uuid import UUID, uuid4
 
 from tests.fixtures.checkpoint_recovery import stage_recovery_unit
 from tests.fixtures.lane_turns import SCOPE, LaneStack, lane_stack
+from tests.support.deep_agents_runtime import ConformanceRuntime
 from tests.support.providers.cursor import LocalStack, local_stack
 from tests.support.run_control import actor as control_actor
 from tests.support.run_control import request as run_request
 from tests.support.run_control import service as run_control_service
 
 from mission_control.adapters.deep_agents.harness import DeepAgentsHarness
-from mission_control.adapters.operations.conformance import ConformanceRuntime
 from mission_control.application.execution.boundary_interventions import BoundaryInterventionService
 from mission_control.application.execution.harness.inject import (
     InjectionSettings,

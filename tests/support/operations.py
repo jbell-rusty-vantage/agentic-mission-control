@@ -8,15 +8,6 @@ from __future__ import annotations
 from datetime import UTC, datetime
 
 from mission_control.adapters.deep_agents.harness import DeepAgentsHarness
-from mission_control.adapters.operations.conformance import (
-    ConformanceAssetVerifier,
-    ConformanceAuthority,
-    ConformanceBudgetAuthority,
-    ConformanceEventSink,
-    ConformanceRuntime,
-    ConformanceSandbox,
-    ConformanceSecretResolver,
-)
 from mission_control.application.execution.operations.checkpoint_lineage import (
     CheckpointLineageService,
 )
@@ -40,6 +31,15 @@ from mission_control.domain.execution.contracts import (
     PromptSegment,
     PromptTrustClass,
     WorkspaceContract,
+)
+from tests.support.deep_agents_runtime import (
+    ConformanceAssetVerifier,
+    ConformanceAuthority,
+    ConformanceBudgetAuthority,
+    ConformanceEventSink,
+    ConformanceRuntime,
+    ConformanceSandbox,
+    ConformanceSecretResolver,
 )
 
 NOW = datetime(2026, 7, 19, 20, 0, tzinfo=UTC)

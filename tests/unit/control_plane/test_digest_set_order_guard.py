@@ -395,13 +395,6 @@ _AUDIT: tuple[tuple[str, str, tuple[str, ...], tuple[str, ...], str], ...] = (
         ),
         NO_SET,
     ),
-    (
-        "src/mission_control/adapters/operations/conformance.py",
-        "ConformanceSandbox.materialize",
-        ("mount.model_dump(mode='json')",),
-        (f"{OE}.contracts.WorkspaceMount",),
-        NO_SET,
-    ),
     # --- audited 2026-11-16 (MC-C): every site the guard had been reporting. The two that
     # reach a set (`BudgetState.usage_ids`/`settlement_ids` and the restored projection sets of
     # a `StageGraphDecisionMutation` in `adapters/postgres/closed_workflow.py`) moved to

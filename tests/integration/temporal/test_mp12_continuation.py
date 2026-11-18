@@ -32,7 +32,6 @@ import pytest
 from temporalio.client import Client, WorkflowHandle
 from temporalio.worker import Replayer, Worker
 
-from mission_control.adapters.operations.conformance import ConformanceAuthority
 from mission_control.adapters.postgres.context.continuation_repository import (
     PostgresCheckpointRepository,
     PostgresContinuationRepository,
@@ -109,6 +108,7 @@ from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.fixtures.mp12_lanes import SOURCE_SESSION, ContinuingLane, Crashes, FakeHydrator
 from tests.fixtures.temporal_history import patch_ids
 from tests.support.db_builders import admit_unit_attempt
+from tests.support.deep_agents_runtime import ConformanceAuthority
 from tests.support.integration.postgres.continuation_postgres import continuation_actor
 from tests.support.integration.temporal.wp_bp_020_temporal import FakeGoalDirectedActivities
 from tests.support.integration.temporal.wp_bp_020_temporal import _run_input as goal_input

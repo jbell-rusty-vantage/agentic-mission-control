@@ -397,9 +397,9 @@ def test_the_worker_registry_carries_both_real_cursor_lanes(tmp_path: Path) -> N
     from mission_control.adapters.deep_agents.harness import (
         DeepAgentsHarness,
     )
-    from mission_control.adapters.operations.conformance import ConformanceRuntime
     from mission_control.adapters.temporal.deployment_composition import compose_lane_registry
     from tests.fixtures.isolated_settings import isolated_settings
+    from tests.support.deep_agents_runtime import ConformanceRuntime
 
     stack = cloud_stack(tmp_path)
     registry = compose_lane_registry(
