@@ -748,6 +748,9 @@ def ks_executor(ctx: Context) -> list[Entry]:
     if app == "biotech":
         binding["tenants"] = list(ctx.tenants)
     entries = [
+        # Knowledge Services is local by default (its SPEC-03 K3): a remote DSN is refused unless
+        # the process names its application, which selects the KS_<PLANE>_DB_* names.
+        constant("KS_APPLICATION", app),
         constant("VERIFY_HOST", "127.0.0.1"),
         constant("VERIFY_PORT", str(ports["ks_executor"])),
         constant("KS_KNOWLEDGE_ISSUER", issuer(app)),

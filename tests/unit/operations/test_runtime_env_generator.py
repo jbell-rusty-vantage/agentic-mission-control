@@ -756,6 +756,7 @@ def test_ai_engineer_has_no_graph_executor(world: dict[str, Path]) -> None:
     assert "KS_BIOTECH_EXECUTOR_TOKEN" not in ks
     assert _env(out / "mission-control.env")["MISSION_CONTROL_APPLICATION"] == "ai-engineer"
     assert ks["VERIFY_PORT"] == "4310"
+    assert ks["KS_APPLICATION"] == "ai-engineer"
 
 
 def test_one_mission_control_root_for_home_deployments_and_pins(world: dict[str, Path]) -> None:
