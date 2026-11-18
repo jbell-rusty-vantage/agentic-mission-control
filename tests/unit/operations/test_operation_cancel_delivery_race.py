@@ -1,4 +1,8 @@
-"""Authority-gated refusal is not a failed child while accepted cancellation is in transit."""
+"""Authority-gated refusal is not a failed child while accepted cancellation is in transit.
+
+The workflow behaviour runs on Temporal in
+tests/integration/temporal/test_operation_cancel_delivery_race.py; this module keeps the
+authority's pending-delivery signal and the one pre-patch case."""
 
 import asyncio
 from types import SimpleNamespace
@@ -33,62 +37,21 @@ def failed_activity(kind):
     return handle
 
 
+# TODO(OVE-238): the pre-patch branch has no recorded history to replay (a history from before
+# `mc-operation-cancel-delivery-race-v1` with a refused, cancel-requested round); until one is
+# captured this patched-workflow case is its only cover. The patched cases run on Temporal in
+# tests/integration/temporal/test_operation_cancel_delivery_race.py.
 @pytest.mark.asyncio
-@pytest.mark.parametrize(
-    ("cancelled", "kind", "patched", "reconcile"),
-    [
-        (True, "operation_execution_rejected", True, True),
-        (True, "operation_execution_rejected", False, False),
-        (False, "operation_execution_rejected", True, False),
-    ],
-)
-async def test_finished_activity_failure_cannot_bypass_delivered_cancel(
-    monkeypatch,
-    cancelled,
-    kind,
-    patched,
-    reconcile,
-):
+async def test_pre_patch_history_keeps_failing_a_refused_round_with_a_cancel(monkeypatch):
     request = _workflow_request()
     instance = module.OperationWorkflow(request)
-    instance._cancel_requested = cancelled
-    handle = failed_activity(kind)
+    instance._cancel_requested = True
+    handle = failed_activity("operation_execution_rejected")
     monkeypatch.setattr(module.workflow, "start_activity", lambda *a, **k: handle)
-    monkeypatch.setattr(module.workflow, "patched", lambda name: patched)
+    monkeypatch.setattr(module.workflow, "patched", lambda name: False)
     monkeypatch.setattr(module.workflow, "wait_condition", AsyncMock())
-    with pytest.raises(module._CancellationRequested if reconcile else ActivityError):
+    with pytest.raises(ActivityError):
         await instance._execute_cancellable(request)
-
-
-@pytest.mark.asyncio
-async def test_accepted_but_undelivered_cancel_waits_durably_then_reconciles(monkeypatch):
-    request = _workflow_request()
-    instance = module.OperationWorkflow(request)
-    handle = failed_activity("operation_cancellation_pending")
-    waiting, delivered = asyncio.Event(), asyncio.Event()
-
-    async def wait_condition(predicate):
-        if not predicate():
-            waiting.set()
-            await delivered.wait()
-            assert predicate()
-
-    monkeypatch.setattr(module.workflow, "start_activity", lambda *a, **k: handle)
-    monkeypatch.setattr(module.workflow, "patched", lambda name: True)
-    monkeypatch.setattr(module.workflow, "wait_condition", wait_condition)
-    task = asyncio.create_task(instance._execute_cancellable(request))
-    try:
-        async with asyncio.timeout(2):
-            await waiting.wait()
-        assert not task.done()
-        instance.request_cancel()
-        delivered.set()
-        with pytest.raises(module._CancellationRequested):
-            await task
-    finally:
-        if not task.done():
-            task.cancel()
-            await asyncio.gather(task, return_exceptions=True)
 
 
 @pytest.mark.asyncio

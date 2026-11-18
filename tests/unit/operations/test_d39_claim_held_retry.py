@@ -107,58 +107,18 @@ def _workflow_clock(monkeypatch: pytest.MonkeyPatch, *, patched: bool) -> list[f
     return waits
 
 
+# TODO(OVE-238): no history recorded before `w1-d39-claim-held-lease-wait` with a refused round
+# exists to replay, so this patched-workflow case stays the only cover of the pre-patch branch.
+# The patched behaviour (the wait, its bound, no deadline, a cancel during the wait) runs on
+# Temporal in tests/integration/temporal/test_d39_claim_held_lease_wait.py.
 @pytest.mark.asyncio
-async def test_a_round_that_ends_refused_waits_for_the_lease_then_continues_the_unit(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
+async def test_a_pre_patch_history_keeps_the_old_failure(monkeypatch: pytest.MonkeyPatch) -> None:
     request = _workflow_request()
     instance = module.OperationWorkflow(request)
-    deadline = NOW + timedelta(seconds=240)
-    handles = _Handles([_held_failure(deadline), {"status": "completed"}])
+    handles = _Handles([_held_failure(NOW + timedelta(seconds=30)), {"status": "completed"}])
     monkeypatch.setattr(module.workflow, "start_activity", handles)
-    waits = _workflow_clock(monkeypatch, patched=True)
-
-    assert await instance._execute_cancellable(request) == {"status": "completed"}
-    assert handles.started == 2
-    assert waits == [240 + CLAIM_HELD_RETRY_MARGIN.total_seconds()]
-
-
-@pytest.mark.asyncio
-async def test_claim_held_rounds_are_bounded(monkeypatch: pytest.MonkeyPatch) -> None:
-    request = _workflow_request()
-    instance = module.OperationWorkflow(request)
-    rounds = module.MAX_CLAIM_HELD_ROUNDS + 1
-    handles = _Handles([_held_failure(NOW + timedelta(seconds=30)) for _ in range(rounds)])
-    monkeypatch.setattr(module.workflow, "start_activity", handles)
-    _workflow_clock(monkeypatch, patched=True)
+    _workflow_clock(monkeypatch, patched=False)
 
     with pytest.raises(ActivityError):
-        await instance._execute_cancellable(request)
-    assert handles.started == rounds
-
-
-@pytest.mark.asyncio
-@pytest.mark.parametrize(
-    ("patched", "deadline", "cancelled"),
-    [
-        (False, NOW + timedelta(seconds=30), False),  # a recorded history replays as before
-        (True, None, False),  # no holder deadline named: nothing to wait for
-        (True, NOW + timedelta(seconds=30), True),  # a requested cancel is never re-run
-    ],
-)
-async def test_the_old_failure_stands_without_patch_deadline_or_with_a_cancel(
-    monkeypatch: pytest.MonkeyPatch,
-    patched: bool,
-    deadline: datetime | None,
-    cancelled: bool,
-) -> None:
-    request = _workflow_request()
-    instance = module.OperationWorkflow(request)
-    instance._cancel_requested = cancelled
-    handles = _Handles([_held_failure(deadline), {"status": "completed"}])
-    monkeypatch.setattr(module.workflow, "start_activity", handles)
-    _workflow_clock(monkeypatch, patched=patched)
-
-    with pytest.raises((ActivityError, module._CancellationRequested)):
         await instance._execute_cancellable(request)
     assert handles.started == 1
