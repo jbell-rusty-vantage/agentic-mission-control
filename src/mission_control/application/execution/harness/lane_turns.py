@@ -471,7 +471,15 @@ class LaneTurnService:
         ]
         | None = None,
         points: CognitionPointRepository | None = None,
+        history_poll_s: float = HISTORY_POLL_SECONDS,
+        history_timeout_s: float = HISTORY_TIMEOUT_SECONDS,
+        max_history_frames: int = MAX_HISTORY_FRAMES,
     ) -> None:
+        # MO75: how often an observing owner polls for a pending history hint, and the bound
+        # (wall time, frames) of one native history replay.
+        self._history_poll_s = history_poll_s
+        self._history_timeout_s = history_timeout_s
+        self._max_history_frames = max_history_frames
         # K1/K2 (cross-provider control, 2026-11-05): the cognition point index, read for
         # the previous generation's result point (the first point's parent) and for the
         # `fork_seed` point a derived unit's first session continues from; the points
@@ -1705,7 +1713,7 @@ class LaneTurnService:
                 and requested.watermark != progress.history_attempted
             ):
                 return requested
-            await asyncio.sleep(HISTORY_POLL_SECONDS)
+            await asyncio.sleep(self._history_poll_s)
 
     async def _replay_history(
         self,
@@ -1732,10 +1740,13 @@ class LaneTurnService:
         terminal: LaneFrame | None = None
         scanned = 0
         try:
-            async with asyncio.timeout(HISTORY_TIMEOUT_SECONDS):
+            async with asyncio.timeout(self._history_timeout_s):
                 stream = harness.reconcile_history(
                     ObserveRequest(
-                        **fields, turn=turn, after=progress.cursor, max_frames=MAX_HISTORY_FRAMES
+                        **fields,
+                        turn=turn,
+                        after=progress.cursor,
+                        max_frames=self._max_history_frames,
                     )
                 )
                 async with aclosing(stream):  # type: ignore[type-var]
@@ -1753,7 +1764,7 @@ class LaneTurnService:
                             # authority expired during the read. Rejection never wakes ingress.
                             return _Pumped(terminal=terminal)
                         scanned += 1
-                        if scanned > MAX_HISTORY_FRAMES:
+                        if scanned > self._max_history_frames:
                             raise HistoryReplayIncomplete("native history frame bound")
                         ended = await self._take(item, identity, writer, signals, turn, progress)
                         if item.terminal:

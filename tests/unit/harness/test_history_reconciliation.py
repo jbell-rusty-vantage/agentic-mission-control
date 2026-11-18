@@ -10,12 +10,19 @@ import pytest
 
 from mission_control.adapters.cursor.describe import CURSOR_CLOUD_DESCRIBE
 from mission_control.application.execution.harness.dispatch import StaleSessionOwner
-from mission_control.application.execution.harness.lane_turns import LaneExecutionIdentity
+from mission_control.application.execution.harness.lane_turns import (
+    LaneExecutionIdentity,
+    LaneTurnService,
+    execution_start,
+)
 from mission_control.application.execution.harness.state import (
     InMemoryLaneExecutionStateStore,
     LaneExecutionState,
     LaneExecutionUpdate,
 )
+from mission_control.application.frames.writer import FrameWriter
+from mission_control.application.resolution.registries import LaneRegistry
+from mission_control.domain.execution.contracts import OperationExecutionRequest
 from mission_control.domain.execution.history_reconciliation import (
     HistoryAcknowledgment,
     HistoryDeferred,
@@ -26,6 +33,7 @@ from mission_control.domain.execution.history_reconciliation import (
     enqueue_history,
 )
 from mission_control.domain.execution.lane_turns import LaneSegmentBounds, LaneTurnRequest
+from tests.fixtures.checkpoint_recovery import stage_recovery_unit
 from tests.fixtures.lane_turns import (
     RecordingSignals,
     ScriptedSessionLane,
@@ -33,6 +41,8 @@ from tests.fixtures.lane_turns import (
     lane_stack,
     scripted_frames,
 )
+from tests.support.deep_agents_runtime import ConformanceSecretResolver
+from tests.support.ids import SCOPE
 
 NOW = datetime(2026, 10, 14, tzinfo=UTC)
 
@@ -54,6 +64,44 @@ def history_request(**changes):
             **changes,
         }
     )
+
+
+def history_service(stack, *, states=None, **settings) -> LaneTurnService:
+    """The stack's turn service composed with explicit history replay settings
+    (`history_poll_s`, `history_timeout_s`, `max_history_frames`), collaborators (`mailbox`,
+    `injections`) and, optionally, its own lane state store."""
+
+    return LaneTurnService(
+        lanes=LaneRegistry([stack.lane], allow_unqualified=True),
+        boundary=stack.boundary,
+        frames=stack.frames,
+        states=states or stack.states,
+        secrets=ConformanceSecretResolver({"environment:OPENAI_API_KEY": "sk-fixture-secret"}),
+        **settings,
+    )
+
+
+async def frame_writer(stack, operation, identity):
+    """The writer the service opens for generation 1 of `identity` (session `session`)."""
+
+    handle = await stack.frames.open_execution(execution_start(operation, identity, 1, "session"))
+    return FrameWriter(stack.frames, handle)
+
+
+def stage_unit_operation(operation: OperationExecutionRequest) -> OperationExecutionRequest:
+    """`operation` bound to one StageGraph unit, so it has a mailbox boundary."""
+
+    unit = stage_recovery_unit(operation.identity.run_id, "implement", request_scope=SCOPE)
+    payload = operation.model_dump(mode="python")
+    payload.update(
+        identity={
+            "run_id": operation.identity.run_id,
+            "operation_id": unit.semantic_operation_id,
+            "operation_attempt": unit.semantic_attempt,
+        },
+        runtime_unit=unit,
+    )
+    return OperationExecutionRequest.model_validate(payload)
 
 
 async def state_for(request):
@@ -193,13 +241,11 @@ class HistoryLane(ScriptedSessionLane):
 
 
 @pytest.mark.parametrize("incomplete", [False, True])
-async def test_idle_sse_owner_drains_history_without_workflow_wake(monkeypatch, incomplete):
-    monkeypatch.setattr(
-        "mission_control.application.execution.harness.lane_turns.HISTORY_POLL_SECONDS", 0.01
-    )
+async def test_idle_sse_owner_drains_history_without_workflow_wake(incomplete):
     lane = HistoryLane(incomplete=incomplete)
     operation = cursor_operation("cursor_cloud")
     stack = lane_stack(lane, operation=operation)
+    service = history_service(stack, history_poll_s=0.01)
     identity = LaneExecutionIdentity.of(operation, "cursor_cloud", 1)
     request = LaneTurnRequest(
         operation=operation,
@@ -208,7 +254,7 @@ async def test_idle_sse_owner_drains_history_without_workflow_wake(monkeypatch, 
         segment=LaneSegmentBounds(max_duration_s=1, start_to_close_s=5, heartbeat_timeout_s=3),
     )
     running = asyncio.create_task(
-        stack.service.turn(request, RecordingSignals(stack.frames, identity.harness_execution_id))
+        service.turn(request, RecordingSignals(stack.frames, identity.harness_execution_id))
     )
     await asyncio.wait_for(lane.held.wait(), 2)
     hint = history_request(
@@ -231,18 +277,14 @@ async def test_idle_sse_owner_drains_history_without_workflow_wake(monkeypatch, 
         )
 
 
-async def test_interrupt_refuses_pending_history_before_delivery_or_provider_effect(monkeypatch):
+async def test_interrupt_refuses_pending_history_before_delivery_or_provider_effect():
     from types import SimpleNamespace
     from unittest.mock import AsyncMock
 
     from mission_control.application.execution.harness.lane_turns import _SegmentProgress
     from mission_control.domain.execution.lanes import SessionHandle, TurnHandle
 
-    monkeypatch.setattr(
-        "mission_control.application.execution.harness.lane_turns.unit_boundary",
-        lambda operation: ("stage_graph", "stage"),
-    )
-    operation = cursor_operation("cursor_cloud")
+    operation = stage_unit_operation(cursor_operation("cursor_cloud"))
     lane = HistoryLane(incomplete=True)
     stack = lane_stack(lane, operation=operation)
     identity = LaneExecutionIdentity.of(operation, "cursor_cloud", 1)
@@ -252,13 +294,13 @@ async def test_interrupt_refuses_pending_history_before_delivery_or_provider_eff
         harness_execution_id=identity.harness_execution_id,
     )
     states, owner = await state_for(hint)
-    stack.service._states = states
     await states.request_history(hint)
     deliver = AsyncMock()
-    stack.service._mailbox = SimpleNamespace(deliver=deliver)
-    stack.service._injections = object()
+    service = history_service(
+        stack, states=states, mailbox=SimpleNamespace(deliver=deliver), injections=object()
+    )
     request = LaneTurnRequest(operation=operation, lane_profile="cursor_cloud", generation=1)
-    fields = stack.service._fields(operation, identity, 1, "observe")
+    fields = service._fields(operation, identity, 1, "observe")
     session = SessionHandle(
         lane_profile="cursor_cloud",
         harness_execution_id=str(identity.harness_execution_id),
@@ -267,7 +309,7 @@ async def test_interrupt_refuses_pending_history_before_delivery_or_provider_eff
     )
     turn = TurnHandle(session=session, turn_no=1, native_turn_ref="turn")
     with pytest.raises(HistoryDeferred):
-        await stack.service._interrupt(
+        await service._interrupt(
             request,
             lane,
             identity,
@@ -282,9 +324,7 @@ async def test_interrupt_refuses_pending_history_before_delivery_or_provider_eff
     assert deliver.await_count == 0 and not lane.sends and not lane.cancels
 
 
-async def test_simultaneous_frame_and_history_watch_persists_the_consumed_frame(monkeypatch):
-    from types import SimpleNamespace
-    from unittest.mock import AsyncMock
+async def test_simultaneous_frame_and_history_watch_persists_the_consumed_frame():
 
     from mission_control.application.execution.harness.lane_turns import _SegmentProgress
     from mission_control.domain.execution.lanes import SessionHandle, TurnHandle
@@ -298,12 +338,12 @@ async def test_simultaneous_frame_and_history_watch_persists_the_consumed_frame(
         run_id=identity.run_key,
         harness_execution_id=identity.harness_execution_id,
     )
-    _, owner = await state_for(hint)
-    monkeypatch.setattr(stack.service, "_watch_history", AsyncMock(return_value=hint))
-    persisted = AsyncMock(return_value=None)
-    monkeypatch.setattr(stack.service, "_take", persisted)
+    # The hint is already pending for this turn: the history watch completes at once.
+    states, owner = await state_for(hint)
+    await states.request_history(hint)
+    service = history_service(stack, states=states)
     request = LaneTurnRequest(operation=operation, lane_profile="cursor_cloud", generation=1)
-    fields = stack.service._fields(operation, identity, 1, "observe")
+    fields = service._fields(operation, identity, 1, "observe")
     session = SessionHandle(
         lane_profile="cursor_cloud",
         harness_execution_id=str(identity.harness_execution_id),
@@ -311,25 +351,25 @@ async def test_simultaneous_frame_and_history_watch_persists_the_consumed_frame(
         native_session_ref="session",
     )
     turn = TurnHandle(session=session, turn_no=1, native_turn_ref="turn")
-    pumped = await stack.service._pump(
+    pumped = await service._pump(
         request,
         lane,
         identity,
         fields,
         turn,
-        SimpleNamespace(),
+        await frame_writer(stack, operation, identity),
         RecordingSignals(stack.frames),
         _SegmentProgress(owner=owner),
     )
     assert pumped.history == hint
-    assert persisted.await_count == 1
-    assert persisted.call_args.args[0].provider_key == "fake:run-fake-1:0"
+    persisted = await stack.frames.frames_for_execution(
+        identity.request_scope, identity.harness_execution_id, 1
+    )
+    assert [frame.provider_key for frame in persisted] == ["fake:run-fake-1:0"]
 
 
 @pytest.mark.parametrize("failure", ["timeout", "overflow"])
-async def test_replay_timeout_and_overflow_keep_the_receipt_pending(monkeypatch, failure):
-    from unittest.mock import AsyncMock
-
+async def test_replay_timeout_and_overflow_keep_the_receipt_pending(failure):
     from mission_control.application.execution.harness.lane_turns import _SegmentProgress
     from mission_control.domain.execution.lanes import SessionHandle, TurnHandle
 
@@ -352,15 +392,8 @@ async def test_replay_timeout_and_overflow_keep_the_receipt_pending(monkeypatch,
         harness_execution_id=identity.harness_execution_id,
     )
     states, owner = await state_for(hint)
-    stack.service._states = states
     await states.request_history(hint)
-    monkeypatch.setattr(
-        "mission_control.application.execution.harness.lane_turns.HISTORY_TIMEOUT_SECONDS", 0.01
-    )
-    monkeypatch.setattr(
-        "mission_control.application.execution.harness.lane_turns.MAX_HISTORY_FRAMES", 1
-    )
-    monkeypatch.setattr(stack.service, "_take", AsyncMock(return_value=None))
+    service = history_service(stack, states=states, history_timeout_s=0.01, max_history_frames=1)
     session = SessionHandle(
         lane_profile="cursor_cloud",
         harness_execution_id=str(identity.harness_execution_id),
@@ -368,12 +401,12 @@ async def test_replay_timeout_and_overflow_keep_the_receipt_pending(monkeypatch,
         native_session_ref="session",
     )
     turn = TurnHandle(session=session, turn_no=1, native_turn_ref="turn")
-    result = await stack.service._replay_history(
+    result = await service._replay_history(
         lane,
         identity,
-        stack.service._fields(operation, identity, 1, "observe"),
+        service._fields(operation, identity, 1, "observe"),
         turn,
-        AsyncMock(),
+        await frame_writer(stack, operation, identity),
         RecordingSignals(stack.frames),
         _SegmentProgress(owner=owner),
         hint,
@@ -419,31 +452,39 @@ async def test_rejected_later_hint_preserves_prior_success_and_allows_supersessi
 
 
 @pytest.mark.parametrize("when", ["before", "during"])
-async def test_rejected_hint_does_not_block_native_operation_completion(monkeypatch, when):
+async def test_rejected_hint_does_not_block_native_operation_completion(when):
     from mission_control.application.execution.harness.state import reject_history_state
 
-    monkeypatch.setattr(
-        "mission_control.application.execution.harness.lane_turns.HISTORY_POLL_SECONDS", 0.01
-    )
+    rejected_event = asyncio.Event()
+
+    class RejectingStates(InMemoryLaneExecutionStateStore):
+        """Rejects the hint at refresh (`before`) or at acknowledgement (`during`)."""
+
+        async def reject(self, request, *, owner, at):
+            state = await self.load(request.request_scope, request.harness_execution_id)
+            journal = reject_history_state(state, request, owner=owner, at=at)
+            self._put(
+                request.request_scope, state.model_copy(update={"history_reconciliation": journal})
+            )
+            rejected_event.set()
+            return journal
+
+        async def refresh_history_authority(self, request, *, owner, at, **kwargs):
+            if when == "before":
+                return await self.reject(request, owner=owner, at=at)
+            return await super().refresh_history_authority(request, owner=owner, at=at, **kwargs)
+
+        async def acknowledge_history(self, request, *, owner, at, **kwargs):
+            if when == "during":
+                return await self.reject(request, owner=owner, at=at)
+            return await super().acknowledge_history(request, owner=owner, at=at, **kwargs)
+
     lane = HistoryLane()
     operation = cursor_operation("cursor_cloud")
     stack = lane_stack(lane, operation=operation)
+    stack.states = RejectingStates()
+    service = history_service(stack, history_poll_s=0.01)
     identity = LaneExecutionIdentity.of(operation, "cursor_cloud", 1)
-    rejected_event = asyncio.Event()
-
-    async def reject(request, *, owner, at, **kwargs):
-        state = await stack.states.load(request.request_scope, request.harness_execution_id)
-        journal = reject_history_state(state, request, owner=owner, at=at)
-        stack.states._put(
-            request.request_scope, state.model_copy(update={"history_reconciliation": journal})
-        )
-        rejected_event.set()
-        return journal
-
-    if when == "before":
-        monkeypatch.setattr(stack.states, "refresh_history_authority", reject)
-    else:
-        monkeypatch.setattr(stack.states, "acknowledge_history", reject)
     request = LaneTurnRequest(
         operation=operation,
         lane_profile="cursor_cloud",
@@ -451,7 +492,7 @@ async def test_rejected_hint_does_not_block_native_operation_completion(monkeypa
         segment=LaneSegmentBounds(max_duration_s=2, start_to_close_s=5, heartbeat_timeout_s=3),
     )
     running = asyncio.create_task(
-        stack.service.turn(request, RecordingSignals(stack.frames, identity.harness_execution_id))
+        service.turn(request, RecordingSignals(stack.frames, identity.harness_execution_id))
     )
     await asyncio.wait_for(lane.held.wait(), 2)
     hint = history_request(
