@@ -29,11 +29,9 @@ from mission_control.bootstrap.composition import (
 )
 from mission_control.contracts.knowledge_protocol import digest_canonical
 from tests.fixtures.isolated_settings import isolated_settings
-from tests.fixtures.knowledge_binding import (
-    FakeKnowledgeBinding,
-    SteppingClock,
-    describe_document,
-)
+from tests.support.knowledge.binding import FakeKnowledgeBinding
+from tests.support.knowledge.content import describe_document
+from tests.support.knowledge.credentials import SteppingClock
 
 INSTALLATION = "00000000-0000-7000-8000-000000000001"
 

@@ -18,7 +18,7 @@ from mission_control.domain.context.transfer import (
     ResourceBounds,
 )
 from mission_control.domain.outputs.current_set import with_current_set_index
-from tests.support.knowledge import origin
+from tests.support.knowledge.gateway import origin
 from tests.unit.outputs.scenario import Stack, text
 
 AT = datetime(2026, 10, 28, 12, tzinfo=UTC)

@@ -6,9 +6,9 @@ Moved from tests/integration/postgres/test_trusted_judgment_postgres.py.
 from __future__ import annotations
 
 from mission_control.application.knowledge.access import InvocationAccess
-from tests.fixtures.knowledge_binding import SteppingClock
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.support.knowledge import origin
+from tests.support.knowledge.credentials import SteppingClock
+from tests.support.knowledge.gateway import origin
 
 
 def access_for(db: CommonDatabase) -> InvocationAccess:

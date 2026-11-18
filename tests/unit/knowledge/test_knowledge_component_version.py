@@ -17,7 +17,7 @@ from mission_control.bootstrap.composition import (
     knowledge_component_supported,
 )
 from mission_control.contracts.knowledge_protocol_results import BindingDescriptor
-from tests.fixtures.knowledge_binding import describe_document
+from tests.support.knowledge.content import describe_document
 
 # Captured from the REAL Knowledge Services executor composition (KS `sprint-oc-wi05`,
 # `createAiEngineerPostgresBackend` over a disposable component 2.5.0 installation, then

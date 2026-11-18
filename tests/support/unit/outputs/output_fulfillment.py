@@ -9,7 +9,7 @@ from datetime import UTC, datetime
 
 from mission_control.application.knowledge.access import InvocationAccess
 from tests.fixtures.output_contracts import InMemoryOutputContractStore
-from tests.support.knowledge import origin
+from tests.support.knowledge.gateway import origin
 from tests.unit.outputs.scenario import Stack, build_stack
 
 AT = datetime(2026, 10, 27, 12, tzinfo=UTC)

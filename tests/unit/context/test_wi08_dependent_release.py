@@ -25,8 +25,8 @@ from mission_control.domain.programs.contracts import (
     StageInputBinding,
     StageReleasedBy,
 )
-from tests.fixtures.knowledge_binding import report_package
-from tests.support.knowledge import TENANT
+from tests.support.knowledge.content import report_package
+from tests.support.knowledge.gateway import TENANT
 from tests.support.unit.context.transfer_materializer import RUN, FakeBackend, dependent, seam
 from tests.unit.outputs.scenario import obligation, promises
 

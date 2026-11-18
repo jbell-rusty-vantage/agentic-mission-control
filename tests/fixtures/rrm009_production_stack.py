@@ -1228,7 +1228,7 @@ class TechnicalModel(_LoggedModel):
             unique = _digest16(f"{self.run_id}/{self.operation_id}")
             template = os.environ.get("MISSION_CONTROL_TECHNICAL_KNOWLEDGE_PAYLOAD", "")
             if template:
-                from tests.fixtures.knowledge_binding import fresh_registration, model_content
+                from tests.support.knowledge.content import fresh_registration, model_content
 
                 # W1 D1: the model submits content; the host binds producer and digests.
                 report = model_content(
@@ -1237,7 +1237,7 @@ class TechnicalModel(_LoggedModel):
                     )
                 )
             else:
-                from tests.fixtures.knowledge_binding import model_report
+                from tests.support.knowledge.content import model_report
 
                 report = model_report(f"report-{unique}")
             call = {"name": "report_register", "args": {"report": report}}

@@ -21,19 +21,21 @@ from mission_control.application.outputs.submission_service import (
     SelectedItem,
     SubmissionService,
 )
-from tests.fixtures.knowledge_binding import (
+from tests.support.knowledge.binding import FakeKnowledgeBinding
+from tests.support.knowledge.credentials import (
     AUDIENCE,
     BINDING,
-    FakeKnowledgeBinding,
-    InMemoryKnowledgeHandleStore,
-    InMemoryKnowledgeJournal,
-    InMemorySubmissionStore,
     Issuer,
     RecordingMinter,
     SteppingClock,
     knowledge_port,
 )
-from tests.support.knowledge import origin
+from tests.support.knowledge.gateway import origin
+from tests.support.knowledge.stores import (
+    InMemoryKnowledgeHandleStore,
+    InMemoryKnowledgeJournal,
+    InMemorySubmissionStore,
+)
 from tests.support.unit.knowledge.submission_assessment import report_selection
 
 

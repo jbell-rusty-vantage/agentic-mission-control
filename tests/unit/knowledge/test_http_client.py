@@ -22,7 +22,7 @@ from mission_control.application.ports.knowledge import (
 )
 from mission_control.contracts.knowledge_protocol import OperationEnvelope, OperationHandle
 from mission_control.contracts.knowledge_protocol_results import protocol_error
-from tests.fixtures.knowledge_binding import describe_document
+from tests.support.knowledge.content import describe_document
 from tests.support.unit.knowledge.http_client import VECTORS
 
 TOKEN = "eyJhbGciOiJFZERTQSJ9.c2VjcmV0LWNsYWltcw.c2lnbmF0dXJl"

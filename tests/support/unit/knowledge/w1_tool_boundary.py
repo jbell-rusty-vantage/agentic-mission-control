@@ -8,7 +8,7 @@ from __future__ import annotations
 from typing import Any
 
 from mission_control.adapters.deep_agents.knowledge_tools import CURRENT_INVOCATION
-from tests.support.knowledge import Lane
+from tests.support.knowledge.gateway import Lane
 
 
 async def _calls(h: Lane, *calls: tuple[str, dict[str, Any], str]) -> list[dict[str, Any]]:

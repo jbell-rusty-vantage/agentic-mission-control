@@ -33,21 +33,22 @@ from mission_control.domain.knowledge.lineage import (
     LineageFact,
     ProvenanceRole,
 )
-from tests.fixtures.knowledge_binding import (
+from tests.support.knowledge.binding import FakeKnowledgeBinding
+from tests.support.knowledge.content import StoredPackage, report_package
+from tests.support.knowledge.credentials import (
     AUDIENCE,
     BINDING,
-    FakeKnowledgeBinding,
-    InMemoryKnowledgeHandleStore,
-    InMemoryKnowledgeJournal,
-    InMemorySubmissionStore,
     Issuer,
     RecordingMinter,
     SteppingClock,
-    StoredPackage,
     knowledge_port,
-    report_package,
 )
-from tests.support.knowledge import TENANT, origin
+from tests.support.knowledge.gateway import TENANT, origin
+from tests.support.knowledge.stores import (
+    InMemoryKnowledgeHandleStore,
+    InMemoryKnowledgeJournal,
+    InMemorySubmissionStore,
+)
 
 
 @dataclass
@@ -205,7 +206,7 @@ async def test_exact_bytes_travel_over_the_executor_artifacts_route() -> None:
     deliver the same exact package as the in-process reader; a wrong digest refuses."""
 
     from mission_control.adapters.knowledge.http_client import HttpExactContentReader
-    from tests.fixtures.knowledge_binding import http_client_over
+    from tests.support.knowledge.binding import http_client_over
 
     s = seam()
     http = http_client_over(s.fake)

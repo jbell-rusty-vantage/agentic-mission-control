@@ -28,8 +28,8 @@ from mission_control.domain.outputs.current_set import (
     CURRENT_SET_FILE,
     with_current_set_index,
 )
-from tests.fixtures.knowledge_binding import InMemoryStaging, InMemoryTransferPlanStore
 from tests.fixtures.output_contracts import InMemoryOutputContractStore
+from tests.support.knowledge.stores import InMemoryStaging, InMemoryTransferPlanStore
 from tests.support.unit.context.wi07_current_set_transfer import (
     AT,
     RUN,

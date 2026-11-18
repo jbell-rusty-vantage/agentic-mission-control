@@ -40,12 +40,12 @@ from mission_control.domain.context.contributions import (
     content_digest,
 )
 from tests.fixtures.hook_contributions import Crash, MemoryWorkspace
-from tests.fixtures.knowledge_binding import InMemoryStaging
 from tests.fixtures.mission_control_common_db import (
     CommonDatabase,
     common_database,
     migration_paths,
 )
+from tests.support.knowledge.stores import InMemoryStaging
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.common_db]
 GRANT = StageGrant(paths=("/prepared/**",))

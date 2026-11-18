@@ -4,7 +4,7 @@ from dataclasses import dataclass, replace
 from typing import Any
 
 from tests.fixtures.output_contracts import InMemoryOutputContractStore
-from tests.support.knowledge import MISSION, lane
+from tests.support.knowledge.gateway import MISSION, lane
 from tests.support.unit.knowledge.native_write import DIGEST, PLAN, RUN_DECISION, Bridge, service
 from tests.support.unit.outputs.w1_d28_d29 import (
     HANDLE,

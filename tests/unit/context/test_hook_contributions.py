@@ -51,8 +51,8 @@ from tests.fixtures.hook_contributions import (
     MemoryWorkspace,
     RecordingOperationRequests,
 )
-from tests.fixtures.knowledge_binding import InMemoryStaging
 from tests.fixtures.output_contracts import InMemoryOutputContractStore
+from tests.support.knowledge.stores import InMemoryStaging
 from tests.support.unit.outputs.output_fulfillment import invocation
 from tests.unit.outputs.scenario import build_stack, codes, obligation
 

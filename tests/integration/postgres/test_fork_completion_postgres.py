@@ -104,12 +104,12 @@ from mission_control.domain.programs.contracts import (
     StageGraphRunInput,
 )
 from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog
-from tests.fixtures.knowledge_binding import InMemoryStaging
 from tests.fixtures.mission_control_common_db import CommonDatabase, catalog_scope
 from tests.fixtures.run_forks import technical_snapshot
 from tests.support.integration.postgres.manifest_submit import MINIMAL, OWNER, RecordingSubmitter
 from tests.support.integration.postgres.manifest_submit import request as submit_request
-from tests.support.knowledge import MISSION, lane
+from tests.support.knowledge.gateway import MISSION, lane
+from tests.support.knowledge.stores import InMemoryStaging
 from tests.support.unit.context.wi07_current_set_transfer import OVERHEAD, SANDBOX, Backend, bounds
 from tests.support.unit.orchestration.stagegraph_v2 import operation_slot
 from tests.unit.outputs.scenario import host_access, obligation, promises, text

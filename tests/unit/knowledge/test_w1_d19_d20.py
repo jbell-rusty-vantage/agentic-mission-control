@@ -22,8 +22,8 @@ from mission_control.application.knowledge.judgment import TrustedJudgmentRefuse
 from mission_control.contracts.knowledge_protocol_results import protocol_error
 from mission_control.domain.execution.invocation_settlement import SettlementOutcome, WaitReason
 from mission_control.domain.knowledge.effects import JournalState
-from tests.fixtures.knowledge_binding import model_report
-from tests.support.knowledge import lane
+from tests.support.knowledge.content import model_report
+from tests.support.knowledge.gateway import lane
 from tests.support.trusted_knowledge import ScriptedRunner, evaluators, world
 from tests.support.unit.knowledge.w1_d19_d20 import census_refusal
 

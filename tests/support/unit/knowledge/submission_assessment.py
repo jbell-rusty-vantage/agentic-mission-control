@@ -6,8 +6,8 @@ Moved from tests/unit/knowledge/test_submission_assessment.py.
 from __future__ import annotations
 
 from mission_control.application.outputs.submission_service import OutputSelection, SelectedItem
-from tests.fixtures.knowledge_binding import report_package
-from tests.support.knowledge import TENANT
+from tests.support.knowledge.content import report_package
+from tests.support.knowledge.gateway import TENANT
 
 
 def report_selection(report_id: str = "report-7") -> OutputSelection:

@@ -17,7 +17,7 @@ from mission_control.adapters.deep_agents.knowledge_tools import (
 from mission_control.application.outputs.fulfillment import OutputSetRef, PromoteOutput
 from mission_control.domain.outputs.contracts import OutputForm
 from tests.fixtures.output_contracts import InMemoryOutputContractStore
-from tests.support.knowledge import lane
+from tests.support.knowledge.gateway import lane
 from tests.unit.outputs.scenario import build_stack, obligation, schema
 
 pytestmark = pytest.mark.asyncio
@@ -172,7 +172,7 @@ async def test_model_cannot_supply_authority_and_legacy_schema_remains_exact():
 
 
 async def test_registered_receipt_is_the_submission_example_and_report_mixing_refuses():
-    from tests.fixtures.knowledge_binding import model_report
+    from tests.support.knowledge.content import model_report
 
     h = lane()
     live = replace(h.live(), position="stage/draft")

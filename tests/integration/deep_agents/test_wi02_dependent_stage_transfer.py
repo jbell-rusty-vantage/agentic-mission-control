@@ -16,27 +16,29 @@ from typing import Any
 
 import pytest
 from tests.fixtures.checkpoint_lineage import activity_attempt
-from tests.fixtures.knowledge_binding import (
-    AUDIENCE,
-    BINDING,
-    FakeKnowledgeBinding,
-    InMemoryKnowledgeHandleStore,
-    InMemoryKnowledgeJournal,
-    InMemoryStaging,
-    InMemoryTransferPlanStore,
-    Issuer,
-    RecordingMinter,
-    SteppingClock,
-    knowledge_port,
-    report_package,
-)
 from tests.support.deep_agents import registry
 from tests.support.integration.deep_agents.wi02_transfer_plan_lane import (
     PlanReadingModel,
     _invocation,
     _selection,
 )
-from tests.support.knowledge import TENANT, origin
+from tests.support.knowledge.binding import FakeKnowledgeBinding
+from tests.support.knowledge.content import report_package
+from tests.support.knowledge.credentials import (
+    AUDIENCE,
+    BINDING,
+    Issuer,
+    RecordingMinter,
+    SteppingClock,
+    knowledge_port,
+)
+from tests.support.knowledge.gateway import TENANT, origin
+from tests.support.knowledge.stores import (
+    InMemoryKnowledgeHandleStore,
+    InMemoryKnowledgeJournal,
+    InMemoryStaging,
+    InMemoryTransferPlanStore,
+)
 from tests.support.unit.context.transfer_materializer import FakeOutputs
 
 from mission_control.adapters.deep_agents.adapter import DeepAgentRuntimeAdapter

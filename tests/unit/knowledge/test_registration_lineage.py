@@ -6,8 +6,9 @@ from types import SimpleNamespace
 import pytest
 
 from mission_control.domain.knowledge.lineage import ProvenanceRole
-from tests.fixtures.knowledge_binding import InMemoryLineageStore, model_report, report_package
-from tests.support.knowledge import lane
+from tests.support.knowledge.content import model_report, report_package
+from tests.support.knowledge.gateway import lane
+from tests.support.knowledge.stores import InMemoryLineageStore
 from tests.support.unit.knowledge.registration_lineage import registration_entries
 from tests.support.unit.knowledge.w1_tool_boundary import _calls
 

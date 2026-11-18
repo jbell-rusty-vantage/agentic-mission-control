@@ -19,7 +19,7 @@ from mission_control.domain.outputs.contracts import (
     OutputForm,
     OutputObligation,
 )
-from tests.support.knowledge import lane
+from tests.support.knowledge.gateway import lane
 from tests.support.unit.context.transfer_materializer import (
     REPORT_INPUT,
     RUN,

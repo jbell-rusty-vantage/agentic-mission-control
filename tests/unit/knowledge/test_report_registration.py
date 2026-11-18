@@ -23,8 +23,9 @@ from mission_control.application.knowledge.report_registration import (
     canonical_registration,
 )
 from mission_control.contracts.knowledge_protocol import Origin, digest_bytes, digest_canonical
-from tests.fixtures.knowledge_binding import BINDING, model_content, model_report
-from tests.support.knowledge import TENANT, lane
+from tests.support.knowledge.content import model_content, model_report
+from tests.support.knowledge.credentials import BINDING
+from tests.support.knowledge.gateway import TENANT, lane
 
 PARITY = json.loads(
     (Path(__file__).resolve().parents[2] / "fixtures" / "knowledge_protocol")

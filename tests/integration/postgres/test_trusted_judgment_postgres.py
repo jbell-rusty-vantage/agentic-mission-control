@@ -21,9 +21,9 @@ from mission_control.adapters.postgres.knowledge.output_contracts import (
 from mission_control.adapters.postgres.knowledge.use_decisions import PostgresUseDecisionStore
 from mission_control.application.ports.knowledge import RecordedUseDecision
 from mission_control.contracts.knowledge_protocol import Ref
-from tests.fixtures.knowledge_binding import BINDING, SteppingClock
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.support.integration.postgres.trusted_judgment_postgres import access_for
+from tests.support.knowledge.credentials import BINDING, SteppingClock
 from tests.support.trusted_knowledge import ScriptedRunner, evaluators, head_of, world
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.common_db]

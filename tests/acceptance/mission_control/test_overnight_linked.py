@@ -197,7 +197,6 @@ async def _run_linked_case(tmp_path: Any, monkeypatch: Any, scenario: str) -> No
     from pathlib import Path
     from uuid import uuid4
 
-    from tests.fixtures.knowledge_binding import model_content
     from tests.fixtures.manifest_runtime import AUTHOR
     from tests.fixtures.mission_control_common_db import canonical_scope
     from tests.fixtures.mission_control_production_stack import open_postgres_production_stack
@@ -214,6 +213,7 @@ async def _run_linked_case(tmp_path: Any, monkeypatch: Any, scenario: str) -> No
         production_lifecycle,
     )
     from tests.support.integration.deep_agents.report_source_real_service import command, response
+    from tests.support.knowledge.content import model_content
     from tests.support.manifest_runtime import host_pins
 
     from mission_control.adapters.postgres.chains.exports import PostgresChainStartGate

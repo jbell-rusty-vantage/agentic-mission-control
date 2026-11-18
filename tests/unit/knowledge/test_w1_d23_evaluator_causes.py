@@ -38,14 +38,9 @@ from mission_control.application.knowledge.trusted_settlement import (
     pending_or_raise,
 )
 from mission_control.domain.execution.invocation_settlement import SettlementOutcome, WaitReason
-from tests.fixtures.knowledge_binding import (
-    AUDIENCE,
-    BINDING,
-    InMemoryKnowledgeHandleStore,
-    InMemoryKnowledgeJournal,
-    knowledge_port,
-)
-from tests.fixtures.trusted_knowledge import TrustedKnowledgeDouble
+from tests.support.knowledge.binding import FakeKnowledgeBinding
+from tests.support.knowledge.credentials import AUDIENCE, BINDING, knowledge_port
+from tests.support.knowledge.stores import InMemoryKnowledgeHandleStore, InMemoryKnowledgeJournal
 from tests.support.trusted_knowledge import JUDGE_PIN, PROFILES, ScriptedRunner, World, world
 from tests.support.trusted_knowledge import evaluators as trusted_evaluators
 from tests.support.unit.knowledge.independent_evaluators import bindings
@@ -368,8 +363,8 @@ class FailingObserveHandles(InMemoryKnowledgeHandleStore):
 
 
 def failing_bridge(w: World, runner: ScriptedRunner) -> TrustedJudgmentBridge:
-    client = TrustedKnowledgeDouble(
-        w.ks, verify=w.issuer.verifier().verify, clock=w.clock, binding=BINDING
+    client = FakeKnowledgeBinding(
+        verifier=w.issuer.verifier(), clock=w.clock, binding=BINDING, trusted=w.ks
     )
     gateway = KnowledgeGateway(
         client=client,

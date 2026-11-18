@@ -6,8 +6,8 @@ from dataclasses import replace
 import pytest
 
 from mission_control.adapters.deep_agents.knowledge_tools import CURRENT_INVOCATION
-from tests.fixtures.knowledge_binding import report_package
-from tests.support.knowledge import TENANT, lane
+from tests.support.knowledge.content import report_package
+from tests.support.knowledge.gateway import TENANT, lane
 
 
 @pytest.mark.parametrize("failure", [None, "digest", "size", "encoding"])

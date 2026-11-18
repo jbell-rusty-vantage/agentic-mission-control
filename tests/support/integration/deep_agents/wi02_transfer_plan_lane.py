@@ -35,9 +35,9 @@ from mission_control.domain.execution.contracts import (
     OperationExecutionRequest,
     RuntimeInvocation,
 )
-from tests.fixtures.knowledge_binding import InMemoryStaging, InMemoryTransferPlanStore
 from tests.fixtures.lane_bindings import lane_fields
 from tests.support.deep_agents import exact_fixture, unit_bound
+from tests.support.knowledge.stores import InMemoryStaging, InMemoryTransferPlanStore
 from tests.support.operations import operation_request
 
 SOURCES = {"records": [{"pmid": "41"}]}

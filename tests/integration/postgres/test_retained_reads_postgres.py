@@ -20,10 +20,11 @@ import pytest_asyncio
 from mission_control.adapters.postgres.knowledge.retained_reads import PostgresRetainedReadStore
 from mission_control.application.knowledge.access import InvocationAccess
 from mission_control.contracts.knowledge_protocol import canonical_json, digest_canonical
-from tests.fixtures.knowledge_binding import BINDING, read_intent_answer
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.support.db_builders import owner_rows
-from tests.support.knowledge import harness, origin
+from tests.support.knowledge.content import read_intent_answer
+from tests.support.knowledge.credentials import BINDING
+from tests.support.knowledge.gateway import harness, origin
 from tests.support.unit.knowledge.read_intent import GOVERNORS, request
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.common_db]

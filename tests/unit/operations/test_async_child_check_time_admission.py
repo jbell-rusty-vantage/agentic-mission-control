@@ -441,7 +441,7 @@ async def test_adopting_the_same_tool_call_twice_submits_once() -> None:
 
     from mission_control.application.knowledge.access import InvocationAccess
     from tests.fixtures.output_contracts import InMemoryOutputContractStore
-    from tests.support.knowledge import origin
+    from tests.support.knowledge.gateway import origin
     from tests.unit.outputs.scenario import build_stack, obligation
 
     service, provider, _run_control, run_id, request = await _governed()

@@ -42,12 +42,10 @@ from mission_control.contracts.knowledge_protocol import (
     canonical_json,
     digest_canonical,
 )
-from tests.fixtures.knowledge_binding import (
-    BINDING,
-    InMemoryRetainedReadStore,
-    read_intent_answer,
-)
-from tests.support.knowledge import RUN, TENANT, TRANSPORTS, harness, lane
+from tests.support.knowledge.content import read_intent_answer
+from tests.support.knowledge.credentials import BINDING
+from tests.support.knowledge.gateway import RUN, TENANT, TRANSPORTS, harness, lane
+from tests.support.knowledge.stores import InMemoryRetainedReadStore
 from tests.support.unit.knowledge.read_intent import GOVERNORS, request
 
 

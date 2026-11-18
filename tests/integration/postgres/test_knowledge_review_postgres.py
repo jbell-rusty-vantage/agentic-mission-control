@@ -39,9 +39,9 @@ from mission_control.application.knowledge.review import (
 )
 from mission_control.contracts.knowledge_protocol import Ref
 from mission_control.domain.policies.contracts import ActorContext
-from tests.fixtures.knowledge_binding import SteppingClock
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.support.knowledge import origin
+from tests.support.knowledge.credentials import SteppingClock
+from tests.support.knowledge.gateway import origin
 from tests.support.run_control import request, service
 from tests.support.trusted_knowledge import PRODUCER, ScriptedRunner, evaluators, world
 

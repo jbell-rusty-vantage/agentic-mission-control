@@ -25,9 +25,9 @@ from mission_control.domain.execution.invocation_settlement import WaitReason
 from mission_control.domain.knowledge.effects import JournalState
 from mission_control.domain.outputs.contracts import OutputForm
 from mission_control.domain.outputs.rules import code_change_digest
-from tests.fixtures.knowledge_binding import model_report
 from tests.fixtures.output_contracts import InMemoryOutputContractStore
-from tests.support.knowledge import RUN, _runtime_invocation, lane
+from tests.support.knowledge.content import model_report
+from tests.support.knowledge.gateway import RUN, _runtime_invocation, lane
 from tests.unit.outputs.scenario import (
     BASE,
     CLAIMS_SCHEMA,

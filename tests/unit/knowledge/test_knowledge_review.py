@@ -1,6 +1,6 @@
 """W1 D2: the authorized operator review route reaches KS review, and the wait settles.
 
-Over the deterministic trusted KS double (``tests/fixtures/trusted_knowledge.py``): an official
+Over the deterministic trusted KS double (``tests/support/knowledge/trusted.py``): an official
 use decision waits ``review_pending``; the operator review (application handler -> the one KS
 review path, ``ReviewRelay``) refuses, typed ``unauthorized_review`` and before anything is sent,
 an actor without ``knowledge.review`` and an actor that is the run's producer or one of its
@@ -47,7 +47,7 @@ from mission_control.interfaces.mcp.knowledge_review_tools import (
     ScopedKnowledgeReviews,
     register_knowledge_review_tools,
 )
-from tests.support.knowledge import INSTALLATION, TENANT
+from tests.support.knowledge.gateway import INSTALLATION, TENANT
 from tests.support.trusted_knowledge import PRODUCER, ScriptedRunner, evaluators, head_of, world
 from tests.support.unit.subscriptions.mo43_wake_channels import missionctl  # noqa: F401
 

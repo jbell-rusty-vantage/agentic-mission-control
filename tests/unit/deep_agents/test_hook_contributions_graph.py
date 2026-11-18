@@ -55,7 +55,7 @@ from mission_control.domain.context.contributions import (
     content_digest,
 )
 from tests.fixtures.hook_contributions import InMemoryInstallStore, RecordingOperationRequests
-from tests.fixtures.knowledge_binding import InMemoryStaging
+from tests.support.knowledge.stores import InMemoryStaging
 
 SCOPE = "mc/11111111-1111-1111-1111-111111111111/biotech/22222222-2222-2222-2222-222222222222"
 BODY = "prepared by hook\n"

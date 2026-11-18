@@ -22,23 +22,18 @@ from mission_control.application.knowledge.judgment import (
 from mission_control.domain.knowledge.judgment import CognitionIdentity, EvaluatorPin
 from mission_control.domain.outputs.contracts import OutputForm, Requirement
 from mission_control.domain.resolution.resolved import OutputContractProfile
-from tests.fixtures.knowledge_binding import (
+from tests.fixtures.output_contracts import InMemoryOutputContractStore
+from tests.support.knowledge.binding import FakeKnowledgeBinding
+from tests.support.knowledge.credentials import (
     AUDIENCE,
     BINDING,
-    InMemoryKnowledgeHandleStore,
-    InMemoryKnowledgeJournal,
     Issuer,
     SteppingClock,
     knowledge_port,
 )
-from tests.fixtures.output_contracts import InMemoryOutputContractStore
-from tests.fixtures.trusted_knowledge import (
-    ReportState,
-    TrustedKnowledgeDouble,
-    TrustedKnowledgeState,
-    ks_ref,
-)
-from tests.support.knowledge import origin
+from tests.support.knowledge.gateway import origin
+from tests.support.knowledge.stores import InMemoryKnowledgeHandleStore, InMemoryKnowledgeJournal
+from tests.support.knowledge.trusted import ReportState, TrustedKnowledgeState, ks_ref
 from tests.unit.outputs.scenario import build_stack, obligation, text
 
 PIN = "knowledge.report.assess@1"
@@ -121,8 +116,8 @@ class World:
     def bridge(self, runner: ScriptedRunner) -> TrustedJudgmentBridge:
         """A fresh MC process: new gateway, handles and bridge over the same KS and MC stores."""
 
-        client = TrustedKnowledgeDouble(
-            self.ks, verify=self.issuer.verifier().verify, clock=self.clock, binding=BINDING
+        client = FakeKnowledgeBinding(
+            verifier=self.issuer.verifier(), clock=self.clock, binding=BINDING, trusted=self.ks
         )
         gateway = KnowledgeGateway(
             client=client,

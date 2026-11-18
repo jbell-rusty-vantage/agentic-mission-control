@@ -3,7 +3,7 @@
 // libraries themselves (research-core `recordRef`, `qualifiersDigest` and strict record schemas;
 // protocol `digestBytes`) and write tests/fixtures/knowledge_protocol/ks-registration-parity.json.
 // tests/unit/knowledge/test_report_registration.py checks that the model-shaped content of each
-// registration (`tests.fixtures.knowledge_binding.model_content`) canonicalizes, in Mission
+// registration (`tests.support.knowledge.content.model_content`) canonicalizes, in Mission
 // Control, to exactly these bytes.
 //
 // Reads only the built `dist` of a Knowledge Services checkout (run `pnpm build` there first);

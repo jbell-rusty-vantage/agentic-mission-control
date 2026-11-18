@@ -9,7 +9,7 @@ from datetime import UTC, datetime
 
 from mission_control.application.knowledge.access import InvocationAccess
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.support.knowledge import origin
+from tests.support.knowledge.gateway import origin
 
 AT = datetime(2026, 10, 28, 12, tzinfo=UTC)
 

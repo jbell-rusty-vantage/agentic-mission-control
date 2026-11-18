@@ -36,11 +36,17 @@ from mission_control.application.knowledge.toolset import (
 from mission_control.contracts.knowledge_protocol import digest_bytes
 from mission_control.domain.knowledge.effects import JournalState
 from mission_control.domain.knowledge.origin import MissionIdentityUnavailable
-from tests.fixtures.knowledge_binding import (
-    BINDING,
-    model_report,
+from tests.support.knowledge.content import model_report
+from tests.support.knowledge.credentials import BINDING
+from tests.support.knowledge.gateway import (
+    ACTIVATION,
+    MISSION,
+    RUN,
+    UNIT,
+    Lane,
+    _runtime_invocation,
+    lane,
 )
-from tests.support.knowledge import ACTIVATION, MISSION, RUN, UNIT, Lane, _runtime_invocation, lane
 
 
 def test_model_facing_schemas_have_no_origin_and_refuse_one() -> None:

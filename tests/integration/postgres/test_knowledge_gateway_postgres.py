@@ -45,20 +45,16 @@ from mission_control.application.ports.knowledge import (
 from mission_control.domain.context.transfer import ReceiverAttempt, ReceiverRef
 from mission_control.domain.knowledge.effects import EffectConflict, JournalState
 from mission_control.domain.outputs.contracts import ExactOutput, OutputForm
-from tests.fixtures.knowledge_binding import (
-    BINDING,
-    InMemoryStaging,
-    SteppingClock,
-    model_report,
-    report_package,
-)
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.support.db_builders import owner_rows
 from tests.support.integration.postgres.knowledge_gateway_postgres import (
     pool,  # noqa: F401
     stack,
 )
-from tests.support.knowledge import call, origin
+from tests.support.knowledge.content import model_report, report_package
+from tests.support.knowledge.credentials import BINDING, SteppingClock
+from tests.support.knowledge.gateway import call, origin
+from tests.support.knowledge.stores import InMemoryStaging
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.common_db]
 

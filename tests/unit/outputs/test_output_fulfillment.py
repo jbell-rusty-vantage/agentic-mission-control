@@ -53,8 +53,8 @@ from mission_control.domain.outputs.successors import (
     classify_successor,
 )
 from tests.fixtures.output_contracts import InMemoryOutputContractStore
-from tests.support.knowledge import call as gateway_call
-from tests.support.knowledge import harness as gateway_harness
+from tests.support.knowledge.gateway import call as gateway_call
+from tests.support.knowledge.gateway import harness as gateway_harness
 from tests.support.unit.outputs.output_fulfillment import invocation, make_stack
 from tests.unit.outputs.scenario import (
     CLAIMS_SCHEMA,

@@ -23,7 +23,7 @@ from mission_control.application.knowledge.judgment import JudgmentSubject, UseS
 from mission_control.contracts.knowledge_protocol import Ref
 from mission_control.domain.knowledge.judgment import CognitionIdentity
 from mission_control.domain.outputs.contracts import ExactOutput
-from tests.support.knowledge import TENANT, origin
+from tests.support.knowledge.gateway import TENANT, origin
 
 NOW = datetime(2026, 10, 28, 12, tzinfo=UTC)
 JUDGE = RolePin("judge.default", "openai", "gpt-5.6-terra", "tool_forced", "responses")

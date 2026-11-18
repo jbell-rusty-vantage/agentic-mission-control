@@ -21,7 +21,7 @@ from mission_control.application.knowledge.trusted_settlement import TrustedPlan
 from mission_control.contracts.knowledge_assessment import DecisionResolution
 from mission_control.contracts.knowledge_protocol import Ref
 from mission_control.domain.knowledge.judgment import CognitionIdentity
-from tests.support.knowledge import TENANT
+from tests.support.knowledge.gateway import TENANT
 from tests.support.unit.outputs.w1_d28_d29 import (
     HANDLE,
     bridge_judges,

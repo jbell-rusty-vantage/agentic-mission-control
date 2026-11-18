@@ -137,7 +137,7 @@ async def test_the_toolset_settlement_raises_the_wait_instead_of_finalizing_unju
     from dataclasses import replace
 
     from mission_control.application.knowledge.trusted_settlement import TrustedSettlementPass
-    from tests.support.knowledge import lane
+    from tests.support.knowledge.gateway import lane
 
     class Guard:
         calls = 0

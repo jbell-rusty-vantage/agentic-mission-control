@@ -41,18 +41,17 @@ from mission_control.contracts.knowledge_protocol import (
 from mission_control.contracts.knowledge_protocol_results import CredentialClaims
 from mission_control.domain.knowledge.effects import JournalState
 from mission_control.domain.knowledge.origin import InvocationOrigin
-from tests.fixtures.knowledge_binding import (
+from tests.support.knowledge.binding import FakeKnowledgeBinding
+from tests.support.knowledge.credentials import (
     AUDIENCE,
     BINDING,
-    FakeKnowledgeBinding,
-    InMemoryKnowledgeHandleStore,
-    InMemoryKnowledgeJournal,
     Issuer,
     RecordingMinter,
     SteppingClock,
     knowledge_port,
 )
-from tests.support.knowledge import TENANT, TRANSPORTS, call, harness, origin
+from tests.support.knowledge.gateway import TENANT, TRANSPORTS, call, harness, origin
+from tests.support.knowledge.stores import InMemoryKnowledgeHandleStore, InMemoryKnowledgeJournal
 
 FIXTURES = Path(__file__).resolve().parents[2] / "fixtures" / "knowledge_protocol"
 GOLDEN = json.loads(

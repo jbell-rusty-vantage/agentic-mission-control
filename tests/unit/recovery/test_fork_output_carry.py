@@ -16,7 +16,7 @@ from typing import Any
 
 import pytest
 from tests.fixtures.output_contracts import InMemoryOutputContractStore
-from tests.support.knowledge import MISSION, lane
+from tests.support.knowledge.gateway import MISSION, lane
 from tests.unit.outputs.scenario import host_access, obligation, promises, text
 
 from mission_control.application.knowledge.toolset import LiveInvocation

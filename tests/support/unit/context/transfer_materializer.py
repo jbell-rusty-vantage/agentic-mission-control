@@ -42,23 +42,24 @@ from mission_control.domain.outputs.contracts import (
     OutputForm,
     OutputObligation,
 )
-from tests.fixtures.knowledge_binding import (
+from tests.support.knowledge.binding import FakeKnowledgeBinding
+from tests.support.knowledge.content import StoredPackage, report_package
+from tests.support.knowledge.credentials import (
     AUDIENCE,
     BINDING,
-    FakeKnowledgeBinding,
+    Issuer,
+    RecordingMinter,
+    SteppingClock,
+    knowledge_port,
+)
+from tests.support.knowledge.gateway import TENANT, origin
+from tests.support.knowledge.stores import (
     InMemoryKnowledgeHandleStore,
     InMemoryKnowledgeJournal,
     InMemoryLineageStore,
     InMemoryStaging,
     InMemoryTransferPlanStore,
-    Issuer,
-    RecordingMinter,
-    SteppingClock,
-    StoredPackage,
-    knowledge_port,
-    report_package,
 )
-from tests.support.knowledge import TENANT, origin
 
 RUN = "22222222-2222-4222-8222-222222222222"
 OVERHEAD = HostOverhead(host_state_tokens=800, tool_schema_tokens=400, skill_tokens=100)

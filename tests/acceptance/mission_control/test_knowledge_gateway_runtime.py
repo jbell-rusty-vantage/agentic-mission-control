@@ -31,12 +31,12 @@ from uuid import uuid4
 
 import pytest
 import uvicorn
-from tests.fixtures.knowledge_binding import (
+from tests.fixtures.scoped_api_stack import ScopedStack, inspect, prepare_run, scoped_stack, until
+from tests.support.knowledge.binding import (
     FakeKnowledgeBinding,
     knowledge_http_app,
     real_binding_configured,
 )
-from tests.fixtures.scoped_api_stack import ScopedStack, inspect, prepare_run, scoped_stack, until
 
 from mission_control.adapters.deep_agents.knowledge_tools import (
     knowledge_tool_components,

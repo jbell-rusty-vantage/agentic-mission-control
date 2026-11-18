@@ -282,7 +282,7 @@ async def test_the_verifier_plan_seals_the_current_set_index_in_the_plan_table(
         TransferMaterializer,
     )
     from mission_control.domain.outputs.current_set import CURRENT_SET_BINDING
-    from tests.fixtures.knowledge_binding import InMemoryStaging
+    from tests.support.knowledge.stores import InMemoryStaging
     from tests.support.unit.context.wi07_current_set_transfer import (
         Backend,
         request,

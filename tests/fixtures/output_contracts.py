@@ -15,7 +15,7 @@ from datetime import datetime
 from typing import Any
 from uuid import uuid4
 
-from tests.fixtures.knowledge_binding import InMemorySubmissionStore
+from tests.support.knowledge.stores import InMemorySubmissionStore
 
 from mission_control.application.ports.knowledge import (
     SubmissionCandidate,

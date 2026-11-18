@@ -1,12 +1,16 @@
-"""A deterministic double of the KS trusted assessment transport (WI-03; never a production path).
+"""The trusted assessment operations of the one KS fake (WI-03; never a production path).
 
-It follows the KS rules MC relies on (``knowledge-services`` ``host/src/knowledge-operation/
-assessment.ts``, proven store-backed by its ``trusted_assessment`` conformance check): the role is
-the credential's ``evaluation`` grant, the producer's subject cannot observe, a sealed run takes no
-observation, a decision follows the seal, an ungrounded disagreement holds, a contradiction with
-evidence rejects, review needs a live grant and exact digests, a superseded decision is stale and
-``decision.resolve`` answers the current successor. :class:`TrustedKnowledgeState` is the durable
-store: a "restart" builds new MC objects over the same state.
+`FakeKnowledgeBinding` built with a `TrustedKnowledgeState` serves `report.observe`,
+`report.seal`, `report.decide`, `report.review` and `decision.resolve` through
+:class:`TrustedAssessments`, which follows the KS rules MC relies on (``knowledge-services``
+``host/src/knowledge-operation/assessment.ts``, proven store-backed by its
+``trusted_assessment`` conformance check): the role is the credential's ``evaluation`` grant, the
+producer's subject cannot observe, a sealed run takes no observation, a decision follows the
+seal, an ungrounded disagreement holds, a contradiction with evidence rejects, review needs a
+live grant and exact digests, a superseded decision is stale and ``decision.resolve`` answers
+the current successor. :class:`TrustedKnowledgeState` is the durable store: a "restart" builds
+new MC objects over the same state. Formerly ``tests/fixtures/trusted_knowledge.py``
+(``TrustedKnowledgeDouble``, a second ``KnowledgeBindingClient``).
 """
 
 from __future__ import annotations
@@ -16,8 +20,6 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any
-
-from tests.fixtures.knowledge_binding import stamp
 
 from mission_control.application.ports.knowledge import (
     KnowledgeProtocolRefusal,
@@ -37,6 +39,7 @@ from mission_control.contracts.knowledge_protocol_results import (
     OperationStatus,
     protocol_error,
 )
+from tests.support.knowledge.credentials import stamp
 
 
 def ks_ref(kind: str, item_id: str, tenant: str, binding: str, version: str) -> Ref:
@@ -80,8 +83,14 @@ class TrustedKnowledgeState:
     revoked: set[str] = field(default_factory=set)
 
 
-class TrustedKnowledgeDouble:
-    """Implements the ``KnowledgeBindingClient`` routes the trusted bridge uses."""
+TRUSTED_OPERATIONS = frozenset(
+    {"report.observe", "report.seal", "report.decide", "report.review", "decision.resolve"}
+)
+
+
+class TrustedAssessments:
+    """The trusted assessment routes `FakeKnowledgeBinding` delegates to (invoke, operation.get
+    and the result bytes)."""
 
     def __init__(
         self,

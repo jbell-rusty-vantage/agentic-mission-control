@@ -26,7 +26,7 @@ from mission_control.domain.outputs.contracts import (
     Requirement,
 )
 from tests.fixtures.output_contracts import InMemoryOutputContractStore
-from tests.support.knowledge import origin
+from tests.support.knowledge.gateway import origin
 from tests.unit.outputs.scenario import Stack, build_stack, digest_of, obligation
 
 AT = datetime(2026, 10, 28, 12, tzinfo=UTC)
