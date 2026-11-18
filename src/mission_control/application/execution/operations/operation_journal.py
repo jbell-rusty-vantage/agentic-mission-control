@@ -34,7 +34,11 @@ from mission_control.domain.policies.contracts import (
     SettleEffectAction,
     SettlePendingUsageAction,
 )
-from mission_control.domain.policies.errors import IdempotencyConflict, RunVersionConflict
+from mission_control.domain.policies.errors import (
+    IdempotencyConflict,
+    RunControlNotFound,
+    RunVersionConflict,
+)
 
 
 @dataclass(frozen=True)
@@ -435,14 +439,22 @@ class OperationJournalService:
 
 
 class InMemoryAtomicOperationJournalRepository:
-    """Atomic behavioral adapter used for crash and idempotency tests."""
+    """Atomic behavioral adapter used for crash and idempotency tests.
 
-    def __init__(self) -> None:
+    Claims, attempts and settlements are keyed by (request scope, claim id), as PostgreSQL keys
+    them by tenant. With ``require_seeded_runs`` a run must be seeded (`seed_run`) before a
+    claim can name it, as a PostgreSQL claim needs the run's row (``RunControlNotFound``
+    otherwise); without it an unseeded run is taken to be at the mutation's expected version,
+    for the older tests that never seed a run (OVE-238 G3).
+    """
+
+    def __init__(self, *, require_seeded_runs: bool = False) -> None:
         self._lock = asyncio.Lock()
-        self._claims: dict[str, OperationEffectClaim] = {}
+        self._require_seeded_runs = require_seeded_runs
+        self._claims: dict[tuple[str, str], OperationEffectClaim] = {}
         self._claim_keys: dict[tuple[str, str, str], str] = {}
-        self._attempts: dict[str, list[OperationTechnicalAttempt]] = {}
-        self._settlements: dict[str, OperationJournalSettlement] = {}
+        self._attempts: dict[tuple[str, str], list[OperationTechnicalAttempt]] = {}
+        self._settlements: dict[tuple[str, str], OperationJournalSettlement] = {}
         self._run_versions: dict[tuple[str, str], int] = {}
         self._budgets: dict[str, BudgetState] = {}
         self._transitions: dict[str, list[LifecycleTransitionRecord]] = {}
@@ -484,6 +496,12 @@ class InMemoryAtomicOperationJournalRepository:
         mutation: OperationJournalMutation,
     ) -> OperationClaimResult:
         mutation.validate()
+        if mutation.claim.claim_mode != "active":
+            # As PostgreSQL: a shadow execution never acquires a consequential claim.
+            return OperationClaimResult(
+                status="shadow_denied",
+                reason="shadow execution cannot acquire a consequential effect claim",
+            )
         if _is_journal_only_authority_mutation(mutation):
             assert mutation.authority_command is not None
             assert mutation.authority_result is not None
@@ -535,7 +553,9 @@ class InMemoryAtomicOperationJournalRepository:
                     raise IdempotencyConflict(
                         "operation journal mutation identity has conflicting intent"
                     )
-                prior_claim = self._claims.get(mutation.claim.effect_claim_id)
+                prior_claim = self._claims.get(
+                    (mutation.request_scope, mutation.claim.effect_claim_id)
+                )
                 return OperationClaimResult(
                     status="existing",
                     claim=deepcopy(prior_claim),
@@ -543,7 +563,7 @@ class InMemoryAtomicOperationJournalRepository:
                 )
             prior_id = self._claim_keys.get(key)
             if prior_id is not None:
-                prior = self._claims[prior_id]
+                prior = self._claims[(mutation.request_scope, prior_id)]
                 if not _same_claim_intent(prior, mutation.claim):
                     raise IdempotencyConflict(
                         "effect claim key was reused with a conflicting request "
@@ -591,11 +611,13 @@ class InMemoryAtomicOperationJournalRepository:
                     raise
                 return OperationClaimResult(
                     status="existing",
-                    claim=deepcopy(self._claims[prior_id]),
+                    claim=deepcopy(self._claims[(mutation.request_scope, prior_id)]),
                     reason="same claim key and digest already exists",
                 )
 
             run_key = (mutation.request_scope, mutation.belllabs_run_id)
+            if self._require_seeded_runs and run_key not in self._run_versions:
+                raise RunControlNotFound(f"workflow run not found: {mutation.belllabs_run_id}")
             current_version = self._run_versions.get(run_key, mutation.expected_run_version)
             journal_only_settlement = _is_journal_only_authority_mutation(mutation)
             if current_version != mutation.expected_run_version and not (
@@ -618,7 +640,9 @@ class InMemoryAtomicOperationJournalRepository:
             outbox = deepcopy(self._outbox)
             mutations = deepcopy(self._mutations)
             try:
-                self._claims[mutation.claim.effect_claim_id] = deepcopy(mutation.claim)
+                self._claims[(mutation.request_scope, mutation.claim.effect_claim_id)] = deepcopy(
+                    mutation.claim
+                )
                 self._claim_keys[key] = mutation.claim.effect_claim_id
                 self._commit_children(mutation, replay=False)
                 self._mutations[mutation_key] = mutation.mutation_digest
@@ -647,7 +671,7 @@ class InMemoryAtomicOperationJournalRepository:
         *,
         replay: bool,
     ) -> None:
-        claim_id = mutation.claim.effect_claim_id
+        claim_id = (mutation.request_scope, mutation.claim.effect_claim_id)
         if mutation.attempt is not None:
             attempts = self._attempts.setdefault(claim_id, [])
             prior = next(
@@ -741,7 +765,7 @@ class InMemoryAtomicOperationJournalRepository:
         request_scope: str,
         effect_claim_id: str,
     ) -> OperationEffectClaim | None:
-        claim = self._claims.get(effect_claim_id)
+        claim = self._claims.get((request_scope, effect_claim_id))
         if claim is None or claim.request_scope != request_scope:
             return None
         return deepcopy(claim)
@@ -751,7 +775,7 @@ class InMemoryAtomicOperationJournalRepository:
         request_scope: str,
         effect_claim_id: str,
     ) -> OperationJournalSettlement | None:
-        settlement = self._settlements.get(effect_claim_id)
+        settlement = self._settlements.get((request_scope, effect_claim_id))
         if settlement is None or settlement.request_scope != request_scope:
             return None
         return deepcopy(settlement)
