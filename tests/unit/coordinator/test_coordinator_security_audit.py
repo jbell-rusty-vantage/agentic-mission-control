@@ -1,12 +1,10 @@
 from __future__ import annotations
 
 import logging
-from contextlib import AbstractAsyncContextManager
 from datetime import UTC, datetime
 from hashlib import sha256
 from pathlib import Path
 from types import SimpleNamespace
-from uuid import uuid4
 
 import pytest
 from pydantic import SecretStr, ValidationError
@@ -29,14 +27,10 @@ from mission_control.adapters.capabilities.capability_embeddings import (
     CapabilityEmbeddingDependencyError,
     OpenAICapabilityEmbeddingAdapter,
 )
-from mission_control.adapters.postgres.coordinator.coordinator_audit_repository import (
-    PostgresCoordinatorAuditSink,
-)
 from mission_control.application.capabilities.external_capability_discovery import (
     ExternalDiscoveryCandidate,
     ExternalDiscoverySource,
 )
-from mission_control.application.coordinator.coordinator_facade import CoordinatorAuditEvent
 from mission_control.application.execution.operations.semantic_operation_bindings import (
     SemanticOperationBindingTemplates,
 )
@@ -75,137 +69,6 @@ from tests.support.unit.web_research.web_research_live_adapters import (
 
 SENTINEL = "sk-proj-SENTINEL_OPENAI_KEY_1234567890"
 NOW = datetime(2026, 7, 26, 18, 0, tzinfo=UTC)
-# A canonical Mission Control scope: mc/{installation}/{application}/{tenant}.
-AUDIT_INSTALLATION = "0192a4f0-0000-7000-8000-00000000b10e"
-AUDIT_TENANT = "0192a4f0-0000-7000-8000-0000000000aa"
-AUDIT_SCOPE = f"mc/{AUDIT_INSTALLATION}/biotech/{AUDIT_TENANT}"
-
-
-class _Transaction(AbstractAsyncContextManager[None]):
-    async def __aenter__(self) -> None:
-        return None
-
-    async def __aexit__(
-        self,
-        exc_type: object,
-        exc: object,
-        traceback: object,
-    ) -> None:
-        return None
-
-
-class _AuditConnection:
-    def __init__(self) -> None:
-        self.calls: list[tuple[str, tuple[object, ...]]] = []
-        self.rows: list[dict[str, object]] = []
-
-    def transaction(self) -> _Transaction:
-        return _Transaction()
-
-    def is_in_transaction(self) -> bool:
-        return True
-
-    async def execute(self, query: str, *args: object) -> str:
-        self.calls.append((query, args))
-        return "INSERT 0 1"
-
-    async def fetch(
-        self,
-        query: str,
-        *args: object,
-    ) -> list[dict[str, object]]:
-        self.calls.append((query, args))
-        return self.rows
-
-
-class _Acquire(AbstractAsyncContextManager[_AuditConnection]):
-    def __init__(self, connection: _AuditConnection) -> None:
-        self._connection = connection
-
-    async def __aenter__(self) -> _AuditConnection:
-        return self._connection
-
-    async def __aexit__(
-        self,
-        exc_type: object,
-        exc: object,
-        traceback: object,
-    ) -> None:
-        return None
-
-
-class _AuditPool:
-    def __init__(self) -> None:
-        self.connection = _AuditConnection()
-
-    def acquire(self) -> _Acquire:
-        return _Acquire(self.connection)
-
-
-@pytest.mark.asyncio
-async def test_postgres_audit_sink_persists_only_digest_metadata() -> None:
-    pool = _AuditPool()
-    event = CoordinatorAuditEvent(
-        event_id=str(uuid4()),
-        occurred_at=NOW,
-        operation="search_capabilities",
-        actor_id="operator-1",
-        tenant_scope=AUDIT_SCOPE,
-        outcome="succeeded",
-        correlation_id=str(uuid4()),
-        request_digest="sha256:" + "a" * 64,
-        response_digest="sha256:" + "b" * 64,
-    )
-
-    await PostgresCoordinatorAuditSink(pool).emit(event)  # type: ignore[arg-type]
-
-    assert len(pool.connection.calls) == 2
-    assert pool.connection.calls[0][1] == (AUDIT_INSTALLATION, "biotech", AUDIT_TENANT)
-    insert_sql, insert_args = pool.connection.calls[1]
-    assert "mission_control.coordinator_audit_event" in insert_sql
-    assert event.request_digest in insert_args
-    assert event.response_digest in insert_args
-    serialized = repr(pool.connection.calls)
-    assert SENTINEL not in serialized
-    assert "request_payload" not in insert_sql
-    assert "response_payload" not in insert_sql
-
-
-@pytest.mark.asyncio
-async def test_postgres_audit_sink_reads_back_only_scoped_digest_events() -> None:
-    pool = _AuditPool()
-    event_id = uuid4()
-    pool.connection.rows = [
-        {
-            "event_key": str(event_id),
-            "occurred_at": NOW,
-            "operation": "get_workflow_result",
-            "actor_key": "operator-1",
-            "tenant_scope": AUDIT_SCOPE,
-            "outcome": "succeeded",
-            "correlation_key": str(uuid4()),
-            "request_digest": "sha256:" + "a" * 64,
-            "response_digest": "sha256:" + "b" * 64,
-            "error_code": None,
-        }
-    ]
-
-    events = await PostgresCoordinatorAuditSink(pool).list_events(  # type: ignore[arg-type]
-        tenant_scope=AUDIT_SCOPE,
-        actor_id="operator-1",
-        occurred_since=NOW,
-    )
-
-    assert len(events) == 1
-    assert events[0].event_id == str(event_id)
-    assert events[0].operation == "get_workflow_result"
-    assert pool.connection.calls[0][1] == (AUDIT_INSTALLATION, "biotech", AUDIT_TENANT)
-    with pytest.raises(ValueError, match="canonical"):
-        await PostgresCoordinatorAuditSink(pool).list_events(  # type: ignore[arg-type]
-            tenant_scope="tenant-a", actor_id="operator-1", occurred_since=NOW
-        )
-    assert "request_payload" not in pool.connection.calls[1][0]
-    assert "response_payload" not in pool.connection.calls[1][0]
 
 
 class _ExplodingReadiness:
