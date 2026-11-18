@@ -18,7 +18,7 @@ import pytest
 from mission_control.adapters.deep_agents.compile import catalog_model_components
 from mission_control.bootstrap.model_profiles import ModelCatalogFile, compose_model_catalog
 from mission_control.domain.resolution.profiles import ModelProfile
-from tests.fixtures.models import DEPLOYMENTS, fixture_model_catalog
+from tests.support.model_catalog import DEPLOYMENTS, fixture_model_catalog
 from tests.unit.authoring.manifest_launch_fixture import fixture_bindings
 
 

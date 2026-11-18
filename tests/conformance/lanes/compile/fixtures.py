@@ -19,7 +19,7 @@ from mission_control.domain.resolution.configuration import (
     ModelPin,
     Vendor,
 )
-from tests.fixtures.models import checked_in_catalog
+from tests.support.model_catalog import checked_in_catalog
 
 _KIT_CONTENT: Final = {"kit": "python-uv", "version": "1.0.0", "tools": ["python3.12", "uv"]}
 KIT_PIN: Final = f"kit.python-uv@1.0.0#{sha256_digest(_KIT_CONTENT)}"

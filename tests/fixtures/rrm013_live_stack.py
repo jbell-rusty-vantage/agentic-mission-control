@@ -21,7 +21,7 @@ from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 from tests.fixtures.checkpoint_lineage import bind_unit, stage_unit
 from tests.fixtures.checkpoint_recovery import governed_workspace
 from tests.fixtures.lane_bindings import lane_fields
-from tests.fixtures.models import checked_in_catalog
+from tests.support.model_catalog import checked_in_catalog
 from tests.support.run_control import actor, command
 from tests.support.run_control import request as run_request
 

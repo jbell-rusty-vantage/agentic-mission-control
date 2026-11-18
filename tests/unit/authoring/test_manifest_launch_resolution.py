@@ -44,7 +44,6 @@ from mission_control.domain.authoring.mission_definition import (
 )
 from mission_control.domain.resolution.resolved import ResolvedRuntime
 from tests.fixtures.applications import installed_applications
-from tests.fixtures.models import bindings_catalog
 from tests.support.manifests.launch_inputs import (
     MINIMAL,
     admitted,
@@ -53,6 +52,7 @@ from tests.support.manifests.launch_inputs import (
     served_with_mcp,
 )
 from tests.support.manifests.v2_launch import compiled_ok, edited, example
+from tests.support.model_catalog import bindings_catalog
 from tests.unit.authoring.manifest_launch_fixture import fixture_bindings, pubmed_bound
 
 ITEMS = {

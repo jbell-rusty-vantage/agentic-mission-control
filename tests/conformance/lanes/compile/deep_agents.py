@@ -52,7 +52,7 @@ from mission_control.domain.resolution.resolved import SealedLaneBinding
 from tests.conformance.lanes.compile.contract import CompileCheck
 from tests.conformance.lanes.compile.fixtures import CANONICAL_ITEMS, VENDOR_PINS
 from tests.conformance.lanes.contract import DeclaredException
-from tests.fixtures.models import checked_in_catalog
+from tests.support.model_catalog import checked_in_catalog
 from tests.unit.authoring.manifest_launch_fixture import fixture_bindings, fixture_served
 
 SANDBOX_PROFILE: Final = "research.standard"

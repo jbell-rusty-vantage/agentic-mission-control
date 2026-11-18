@@ -31,8 +31,8 @@ from mission_control.domain.authoring.extensions import ExtensionRegistry
 from mission_control.domain.authoring.mission_definition import MissionDefinition
 from tests.fixtures.applications import installed_applications
 from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog
-from tests.fixtures.models import bindings_catalog
 from tests.support.ids import canonical_scope
+from tests.support.model_catalog import bindings_catalog
 from tests.unit.authoring.manifest_launch_fixture import (
     deep_agents_chain,
     fixture_bindings,

@@ -61,7 +61,6 @@ from tests.fixtures import mission_control_production_stack as production_stack_
 from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog, publish_output_schemas
 from tests.fixtures.manifest_runtime import ChainModel, ChainScript, GoalScript, promise_submitter
 from tests.fixtures.mission_control_production_stack import open_postgres_production_stack
-from tests.fixtures.models import catalog_for, model_binding
 from tests.fixtures.rrm009_production_harness import ProductionStack
 from tests.fixtures.rrm009_production_stack import (
     AGENT_COGNITIVE_QUEUE,
@@ -77,6 +76,7 @@ from tests.support.integration.temporal.manifest_v2_provider_launch import (
     provider_lane,
 )
 from tests.support.manifest_runtime import host_pins, missions_app
+from tests.support.model_catalog import catalog_for, model_binding
 from tests.support.providers.claude import (
     FIXTURE_ENVIRON,
     FixtureClient,

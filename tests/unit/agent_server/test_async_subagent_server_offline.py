@@ -41,7 +41,7 @@ from mission_control.adapters.deep_agents.materializer import (
     ExactComponentRegistry,
     ExactModelFactory,
 )
-from tests.fixtures.models import checked_in_catalog
+from tests.support.model_catalog import checked_in_catalog
 from tests.support.unit.agent_server.async_subagent_server_offline import ScriptedChildModel
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]

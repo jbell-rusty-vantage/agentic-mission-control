@@ -30,8 +30,8 @@ from mission_control.domain.authoring.mission_environment import KitRequirements
 from mission_control.domain.execution.network_policy import NetworkHosts, ResolvedNetworkPolicy
 from tests.fixtures.applications import installed_applications
 from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog
-from tests.fixtures.models import bindings_catalog
 from tests.support.manifests.v2_launch import SCOPE, bindings, example, served
+from tests.support.model_catalog import bindings_catalog
 
 AT = datetime(2026, 10, 13, tzinfo=UTC)
 REPO = "https://github.com/jbell-rusty-vantage/mission-control-fixtures"

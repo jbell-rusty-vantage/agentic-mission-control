@@ -33,7 +33,6 @@ from tests.fixtures.mission_control_local_agent_server import (
     local_agent_server,
 )
 from tests.fixtures.mission_control_production_stack import open_postgres_production_stack
-from tests.fixtures.models import catalog_for
 from tests.fixtures.rrm009_cancellation import TOKEN_ENV
 from tests.fixtures.rrm009_production_harness import (
     _diagnose,
@@ -60,6 +59,7 @@ from tests.support.manifest_runtime import (
     post,
     submit,
 )
+from tests.support.model_catalog import catalog_for
 
 from mission_control.adapters.postgres.async_subagents.async_subagent_detail_repository import (
     PostgresAsyncSubagentDetailRepository,

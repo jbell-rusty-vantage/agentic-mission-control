@@ -18,7 +18,6 @@ from typing import Any, cast
 
 import pytest
 from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog, publish_output_schemas
-from tests.fixtures.models import catalog_for, model_binding
 from tests.fixtures.qualia_runtime import (
     SpendLedger,
     live_components,
@@ -27,6 +26,7 @@ from tests.fixtures.qualia_runtime import (
 )
 from tests.fixtures.qualia_web_tools import ALLOWED_HOSTS, WebCallBudget, build_qualia_web_tools
 from tests.fixtures.rrm009_production_stack import AGENT_COGNITIVE_QUEUE, technical_binding
+from tests.support.model_catalog import catalog_for, model_binding
 from tests.unit.authoring.manifest_launch_fixture import fixture_bindings
 
 from mission_control.adapters.postgres.run_control.run_control_repository import (

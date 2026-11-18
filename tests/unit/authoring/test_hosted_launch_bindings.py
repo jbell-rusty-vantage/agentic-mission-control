@@ -7,8 +7,8 @@ import pytest
 from mission_control.application.authoring.provider_launch import ProviderLanes, required_pins
 from mission_control.bootstrap.resolution import compose_manifest_launch_resolver
 from tests.fixtures.applications import installed_applications
-from tests.fixtures.models import bindings_catalog
 from tests.support.manifests.v2_launch import bindings
+from tests.support.model_catalog import bindings_catalog
 
 
 @pytest.mark.parametrize(

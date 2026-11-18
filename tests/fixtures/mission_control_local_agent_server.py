@@ -25,9 +25,9 @@ import httpx
 import pytest
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, ToolMessage
 from langchain_core.outputs import ChatGeneration, ChatResult
-from tests.fixtures.models import checked_in_catalog
 from tests.fixtures.rrm009_production_stack import _LoggedModel, call_usage
 from tests.support.ids import SCOPE
+from tests.support.model_catalog import checked_in_catalog
 
 from mission_control.adapters.agent_server.async_subagents.auth import mint_scope_claim
 from mission_control.adapters.agent_server.async_subagents.bindings import (

@@ -11,7 +11,7 @@ from typing import Any
 def install_scripted_trusted(
     lane: Any, pool: Any, application: str, *, producer_vendor: str
 ) -> Any:
-    from tests.fixtures.models import DEPLOYMENTS
+    from tests.support.model_catalog import DEPLOYMENTS
 
     from mission_control.adapters.deep_agents.evaluators import (
         AuditorAnswer,

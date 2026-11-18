@@ -77,7 +77,6 @@ from tests.fixtures.manifest_runtime import (
     promise_submitter,
 )
 from tests.fixtures.mission_control_production_stack import open_postgres_production_stack
-from tests.fixtures.models import catalog_for
 from tests.fixtures.rrm009_production_harness import _diagnose, _run, _until
 from tests.fixtures.rrm009_production_stack import AGENT_COGNITIVE_QUEUE, technical_binding
 from tests.support.ids import SCOPE
@@ -101,6 +100,7 @@ from tests.support.manifest_runtime import (
     submit,
     write_bindings,
 )
+from tests.support.model_catalog import catalog_for
 from tests.unit.authoring.manifest_launch_fixture import (
     deep_agents_chain,
 )

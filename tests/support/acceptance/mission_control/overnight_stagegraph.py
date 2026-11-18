@@ -27,8 +27,8 @@ def overnight_launch_bindings(technical: Any) -> Any:
         knowledge_launch_bindings,
         knowledge_tools,
     )
-    from tests.fixtures.models import model_binding
     from tests.fixtures.rrm009_production_stack import AGENT_COGNITIVE_QUEUE
+    from tests.support.model_catalog import model_binding
     from tests.unit.authoring.manifest_launch_fixture import fixture_bindings
 
     authored = load_manifest_yaml(TEMPLATE.read_text(encoding="utf-8"))
@@ -71,7 +71,7 @@ async def production_lifecycle(
     from mission_control.bootstrap.technical_api import api
     from mission_control.domain.authoring.extensions import ExtensionRegistry
     from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog
-    from tests.fixtures.models import catalog_for
+    from tests.support.model_catalog import catalog_for
 
     run_control = api.state.run_control_service
     register_manifest_admission_policies(api.state.admission_policy_registry)

@@ -360,7 +360,7 @@ async def _run_linked_case(tmp_path: Any, monkeypatch: Any, scenario: str) -> No
         bindings_path = tmp_path / "manifest-launch-bindings.json"
         launch_bindings = goal_launch_bindings(technical)
         if biotech_profile is not None:
-            from tests.fixtures.models import model_binding
+            from tests.support.model_catalog import model_binding
 
             launch_bindings = launch_bindings.model_copy(
                 update={

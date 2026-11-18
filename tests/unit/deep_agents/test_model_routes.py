@@ -56,9 +56,9 @@ from tests.conformance.lanes.compile.deep_agents import (
 )
 from tests.conformance.lanes.compile.fixtures import canonical_agent
 from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog
-from tests.fixtures.models import checked_in_catalog, fixture_model_catalog
 from tests.support.deep_agents import exact_fixture
 from tests.support.manifests.launch_inputs import MINIMAL, SCOPE
+from tests.support.model_catalog import checked_in_catalog, fixture_model_catalog
 from tests.unit.authoring.manifest_launch_fixture import fixture_bindings, fixture_served
 
 PINS = Path(__file__).resolve().parents[3] / "infra/capability-pins/research-capabilities.json"

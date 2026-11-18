@@ -40,7 +40,6 @@ from mission_control.domain.execution.contracts import (
     DeepAgentModelComponent,
 )
 from tests.fixtures.applications import installed_applications
-from tests.fixtures.models import bindings_catalog
 from tests.support.deep_agents import exact_fixture
 from tests.support.ids import canonical_scope
 from tests.support.manifests.launch_inputs import (
@@ -57,6 +56,7 @@ from tests.support.manifests.launch_inputs import (
     resolver,
     served_with_mcp,
 )
+from tests.support.model_catalog import bindings_catalog
 from tests.unit.authoring.manifest_launch_fixture import (
     deep_agents_chain,
     fixture_bindings,
@@ -254,7 +254,7 @@ def test_a_goal_schema_needs_the_model_rows_structured_output_strategy(
     when its model row declares no structured_output strategy (never framework auto-detection,
     which forced tool choice on Claude Sonnet 5.5)."""
 
-    from tests.fixtures.models import fixture_model_catalog, fixture_model_profile
+    from tests.support.model_catalog import fixture_model_catalog, fixture_model_profile
 
     definitions, programs = chain
     research = next(item for item in definitions if item.mission_key == "research")

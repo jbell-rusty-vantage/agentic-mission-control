@@ -39,7 +39,6 @@ from langchain_core.outputs import ChatGeneration, ChatResult
 from langgraph_sdk import get_client
 from langgraph_sdk.errors import NotFoundError
 from temporalio.api.enums.v1 import EventType
-from tests.fixtures.models import checked_in_catalog
 from tests.fixtures.rrm009_production_harness import (
     PRINCIPAL,
     ProductionStack,
@@ -67,6 +66,7 @@ from tests.fixtures.rrm009_production_stack import (
     technical_binding,
 )
 from tests.support.ids import SCOPE
+from tests.support.model_catalog import checked_in_catalog
 
 from mission_control.adapters.agent_server.async_subagents.auth import mint_scope_claim
 from mission_control.adapters.agent_server.async_subagents.bindings import (

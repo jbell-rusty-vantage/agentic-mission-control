@@ -1,8 +1,8 @@
 """FIXTURE deployment launch bindings (``mc.manifest_launch_bindings.v1``) for tests only.
 
 Not production configuration: every model profile the example manifests select maps to the
-WP-CP-040 qualification model (the fixture Model Catalog, `tests/fixtures/models.py`, states its
-vendor and id) (``model.wp-cp-040``, served in tests by deterministic local
+WP-CP-040 qualification model (the fixture Model Catalog, `tests/support/model_catalog.py`,
+states its vendor and id) (``model.wp-cp-040``, served in tests by deterministic local
 cognition) and every sandbox profile to its ``state`` sandbox. The scaffold is the
 qualification's Deep Agent profile with its Skill, MCP server and subagent removed (manifest
 capabilities bind those) and a placement on the test stack's agent-cognitive queue.
@@ -26,8 +26,8 @@ from mission_control.domain.execution.contracts import (
     DeepAgentProfile,
     StructuredOutputBinding,
 )
-from tests.fixtures.models import model_binding
 from tests.support.deep_agents import exact_fixture
+from tests.support.model_catalog import model_binding
 from tests.support.operations import operation_request
 
 FIXTURE_MODEL_PROFILES = ("frontier.default", "frontier.long_context")
