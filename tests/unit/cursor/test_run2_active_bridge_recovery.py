@@ -13,7 +13,7 @@ from mission_control.application.agentic_components.placement import STATE_ROOT
 from mission_control.application.execution.harness.dispatch import DispatchRecord
 from mission_control.application.execution.harness.state import LaneExecutionState
 from mission_control.bootstrap import cursor_bridges
-from tests.unit.cursor.test_run2_released_bridge_sweep import lease
+from tests.support.unit.cursor.run2_released_bridge_sweep import lease
 
 
 def context(root):

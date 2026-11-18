@@ -14,8 +14,8 @@ from typing import Any
 
 import pytest
 from tests.fixtures.checkpoint_lineage import stage_unit
-from tests.unit.recovery.test_seeded_fork_saga import saga
-from tests.unit.runtime.test_runtime_recovery_stage3 import DERIVED_RUN, SOURCE_RUN, fork_request
+from tests.support.unit.recovery.seeded_fork_saga import saga
+from tests.support.unit.runtime.runtime_recovery_stage3 import DERIVED_RUN, SOURCE_RUN, fork_request
 
 from mission_control.application.execution.cognition_points import (
     InMemoryCognitionPointRepository,

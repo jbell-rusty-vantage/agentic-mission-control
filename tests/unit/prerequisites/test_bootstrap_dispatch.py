@@ -15,7 +15,7 @@ from mission_control.bootstrap.settings import Settings
 from mission_control.domain.execution.bindings import ProviderExecutionBinding
 from mission_control.domain.execution.contracts import OperationWorkflowResult
 from mission_control.domain.policies.contracts import CommandStatus, RunPhase
-from tests.unit.prerequisites.test_owner_bootstrap import probe_template
+from tests.support.unit.prerequisites.owner_bootstrap import probe_template
 
 
 async def test_duplicate_dispatch_reuses_result_with_explicit_type_and_current_run_revision(

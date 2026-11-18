@@ -44,17 +44,10 @@ from mission_control.domain.outputs.contracts import OutputForm
 from tests.fixtures.knowledge_binding import BINDING, model_report
 from tests.fixtures.output_contracts import InMemoryOutputContractStore
 from tests.support.knowledge import RUN, Lane, lane
+from tests.support.unit.knowledge.w1_tool_boundary import _calls
 from tests.unit.outputs.scenario import host_access, obligation, promises
 
 pytestmark = pytest.mark.asyncio
-
-
-async def _calls(h: Lane, *calls: tuple[str, dict[str, Any], str]) -> list[dict[str, Any]]:
-    token = CURRENT_INVOCATION.set(h.live())
-    try:
-        return [await h.call(name, args, call_id) for name, args, call_id in calls]
-    finally:
-        CURRENT_INVOCATION.reset(token)
 
 
 # -- D17: object arguments given as JSON strings ------------------------------------------------

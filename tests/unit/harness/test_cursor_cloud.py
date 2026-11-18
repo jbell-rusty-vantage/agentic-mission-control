@@ -26,32 +26,17 @@ from mission_control.adapters.cursor.describe import CURSOR_CLOUD_DESCRIBE
 from mission_control.adapters.cursor.scm import GitBranchPublisher
 from mission_control.adapters.cursor.workspace import git
 from mission_control.adapters.remote_session.sse import parse_sse_text
-from mission_control.application.execution.harness.lane_turns import LaneExecutionIdentity
 from mission_control.application.execution.harness.protocol import NativeTurnLost, SessionLane
 from mission_control.domain.execution.contracts import OperationExecutionResult
 from mission_control.domain.execution.lane_turns import (
     LaneSegmentBounds,
     LaneStatusRequest,
-    LaneTurnRequest,
 )
 from mission_control.domain.execution.lanes import CursorCloudOptions, CursorExecutionBinding
 from mission_control.domain.frames.contracts import FrameKind
 from tests.fixtures.cursor_cloud import CloudStack, cloud_stack
-from tests.fixtures.lane_turns import RecordingSignals, lane_stack
-
-
-def _turn(stack: CloudStack, **changes: Any) -> LaneTurnRequest:
-    return LaneTurnRequest.model_validate(
-        {"operation": stack.operation, "lane_profile": "cursor_cloud", "generation": 1, **changes}
-    )
-
-
-def _identity(stack: CloudStack) -> LaneExecutionIdentity:
-    return LaneExecutionIdentity.of(stack.operation, "cursor_cloud", 1)
-
-
-def _lanes(stack: CloudStack) -> Any:
-    return lane_stack(stack.harness, operation=stack.operation)
+from tests.fixtures.lane_turns import RecordingSignals
+from tests.support.unit.harness.cursor_cloud import _identity, _lanes, _turn
 
 
 def _frames(lanes: Any, stack: CloudStack) -> list[Any]:

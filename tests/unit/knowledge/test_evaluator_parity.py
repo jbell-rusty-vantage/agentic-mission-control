@@ -28,7 +28,7 @@ from mission_control.adapters.deep_agents.evaluators import (
     context_from_document,
 )
 from mission_control.contracts.knowledge_protocol import Ref, digest_canonical
-from tests.unit.knowledge.test_independent_evaluators import (
+from tests.support.unit.knowledge.independent_evaluators import (
     NOW,
     Invoker,
     bindings,
@@ -153,7 +153,7 @@ async def test_mc_evaluator_output_is_the_ks_validated_parity_file() -> None:
 async def test_spans_after_astral_and_accented_characters_are_utf16_exact() -> None:
     """Review S1: an emoji is two UTF-16 code units, an accented letter one; KS slices by them."""
 
-    from tests.unit.knowledge.test_independent_evaluators import context, ref
+    from tests.support.unit.knowledge.independent_evaluators import context, ref
 
     text = "## Findings\n\n🧪 Café note: dosage 5 mg 💊 confirmed in the trial.\n"
     paragraph = (

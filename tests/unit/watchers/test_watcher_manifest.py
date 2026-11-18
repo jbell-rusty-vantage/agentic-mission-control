@@ -3,8 +3,6 @@ and their compilation into watcher descriptors (SPEC-04 §5.1-5.2)."""
 
 from __future__ import annotations
 
-import copy
-from pathlib import Path
 from typing import Any, get_args
 
 import pytest
@@ -14,14 +12,9 @@ from mission_control.contracts.contracts import MissionInspection
 from mission_control.domain.authoring.contracts import StageGraphBlueprint
 from mission_control.domain.authoring.manifest import (
     ManifestRejected,
-    load_manifest_yaml,
 )
 from mission_control.domain.authoring.manifest_lowering import lower_mission
 from mission_control.domain.authoring.manifest_v2 import parse_manifest_any
-from mission_control.domain.authoring.mission_definition import (
-    MissionDefinition,
-    manifest_to_definitions,
-)
 from mission_control.domain.authoring.mission_watchers import compile_mission_watchers
 from mission_control.domain.policies.contracts import RunOutcome, RunPhase
 from mission_control.domain.programs.watchers import (
@@ -37,10 +30,8 @@ from mission_control.domain.programs.watchers import (
     WatcherSpec,
     compile_watcher,
 )
+from tests.support.unit.watchers.watcher_manifest import definition, event_wait_document, v1, v2
 from tests.unit.watchers.fakes import RunView
-
-ROOT = Path(__file__).resolve().parents[3]
-MINIMAL = ROOT / "tests/fixtures/manifests/minimal-stage-graph.yml"
 
 CI_RED_FIX = {
     "id": "ci-red-fix",
@@ -58,22 +49,6 @@ STALLED = {
     "then": [{"notify": {"kind": "blocked", "text": "No progress for 20 minutes"}}, {"probe": {}}],
     "limits": {"max_fires": 2},
 }
-
-
-def v1() -> dict[str, Any]:
-    return load_manifest_yaml(MINIMAL.read_text(encoding="utf-8"))
-
-
-def v2(**controls: Any) -> dict[str, Any]:
-    document = copy.deepcopy(v1())
-    document["manifest"] = "mission/v2"
-    document["mission"]["controls"].update(controls)
-    return document
-
-
-def definition(document: dict[str, Any]) -> MissionDefinition:
-    (item,) = manifest_to_definitions(parse_manifest_any(document), document)
-    return item
 
 
 def issues(document: dict[str, Any]) -> tuple[set[str], set[str]]:
@@ -214,23 +189,6 @@ def test_v1_parses_unchanged_and_compile_warns_about_its_unconsumed_fields() -> 
     assert issues(document) == (set(), {"notifications_unconsumed", "mcp_channel_undelivered"})
     # A definition without watchers keeps its exact digest (the field is additive).
     assert "watchers" not in item.policies.model_dump(mode="json")
-
-
-def event_wait_document(**node: Any) -> dict[str, Any]:
-    document = v2()
-    nodes = document["mission"]["program"]["nodes"]
-    nodes.insert(
-        1,
-        {
-            "key": "await-merge",
-            "behavior": "event_wait",
-            "event_type": "github.pull_request.merged",
-            "match": {"base": "main", "merged": True},
-            **node,
-        },
-    )
-    nodes[2]["depends_on"] = ["collect", "await-merge"]
-    return document
 
 
 def test_an_event_wait_stage_holds_on_a_declared_wait_released_by_its_implied_watcher() -> None:

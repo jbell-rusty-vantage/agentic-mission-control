@@ -18,7 +18,7 @@ from mission_control.domain.execution.contracts import (
     DeepAgentProfile,
 )
 from tests.support.deep_agents import exact_fixture
-from tests.unit.deep_agents.test_lane_adapter import POINTER, _inputs
+from tests.support.unit.deep_agents.lane_adapter import POINTER, _inputs
 
 
 def _anthropic(model: DeepAgentModelComponent) -> DeepAgentModelComponent:

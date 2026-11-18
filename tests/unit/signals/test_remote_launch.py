@@ -9,7 +9,7 @@ from mission_control.application.signals.drainer import DrainRejected
 from mission_control.application.signals.launch import RemoteMissionLauncher, ResolvedLaunch
 from mission_control.domain.authoring.canonical import sha256_digest
 from mission_control.domain.policies.contracts import ActorContext
-from tests.unit.signals.test_drainer import item
+from tests.support.unit.signals.drainer import item
 
 
 class Lifecycle:

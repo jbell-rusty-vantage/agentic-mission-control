@@ -28,9 +28,7 @@ from mission_control.application.execution.harness.dispatch import (
     ProviderCapacityLimited,
 )
 from mission_control.application.execution.harness.lane_turns import (
-    LaneExecutionIdentity,
     LaneTurnService,
-    harness_scope,
 )
 from mission_control.application.execution.harness.protocol import (
     HARNESS_PROTOCOL_METHODS,
@@ -41,75 +39,28 @@ from mission_control.application.execution.harness.protocol import (
 from mission_control.application.execution.harness.sessions import WorkerSessionManager
 from mission_control.application.execution.harness.state import LaneExecutionUpdate
 from mission_control.application.frames.kinds import UnknownKindCounter
-from mission_control.domain.execution.bindings import ProviderExecutionBinding
 from mission_control.domain.execution.contracts import OperationExecutionResult
 from mission_control.domain.execution.lane_turns import (
     LANE_COMMAND_SEMANTICS,
     LANE_PAUSE_SEMANTICS,
     LANE_RESUME_SEMANTICS,
     LaneCancelRequest,
-    LaneSegmentBounds,
     LaneStatusRequest,
-    LaneTurnRequest,
 )
 from mission_control.domain.execution.lanes import HARNESS_OPERATIONS, ReattachRequest
 from mission_control.domain.frames.contracts import FrameKind
 from tests.fixtures.lane_turns import RecordingSignals, SimulatedWorkerLoss
+from tests.support.unit.claude.claude_harness import _fields, _frames, _identity, _turn
 from tests.unit.claude.fixtures import (
     PROFILE,
     SESSION_ID,
-    ClaudeStack,
     claude_stack,
     fixture_admission,
 )
 
-SMALL = LaneSegmentBounds(
-    max_frames=50,
-    max_duration_s=20,
-    start_to_close_s=40,
-    heartbeat_timeout_s=3,
-    status_poll_limit=2,
-    status_poll_interval_s=1,
-    busy_wait_s=10,
-)
-
-
-def _identity(stack: ClaudeStack) -> LaneExecutionIdentity:
-    return LaneExecutionIdentity.of(stack.operation, PROFILE, 1)
-
-
-def _turn(stack: ClaudeStack, **changes: Any) -> LaneTurnRequest:
-    return LaneTurnRequest.model_validate(
-        {
-            "operation": stack.operation,
-            "lane_profile": PROFILE,
-            "generation": 1,
-            "segment": SMALL,
-            **changes,
-        }
-    )
-
-
-def _frames(stack: ClaudeStack) -> list[Any]:
-    execution = stack.frames._executions[_identity(stack).harness_execution_id]
-    return sorted(execution.frames.values(), key=lambda frame: frame.arrival_ordinal)
-
 
 def _settled(result: Any) -> OperationExecutionResult:
     return OperationExecutionResult.model_validate(result.operation_result)
-
-
-def _fields(stack: ClaudeStack, key: str) -> dict[str, Any]:
-    identity = _identity(stack)
-    assert ProviderExecutionBinding.carried_by(stack.operation) is not None
-    return {
-        "scope": harness_scope(identity.request_scope),
-        "lane_profile": PROFILE,
-        "harness_execution_id": str(identity.harness_execution_id),
-        "binding_digest": ProviderExecutionBinding.carried_by(stack.operation).binding_digest,
-        "idempotency_key": f"{identity.harness_execution_id}:1:{key}",
-        "generation": 1,
-    }
 
 
 # --- describe -------------------------------------------------------------------------------

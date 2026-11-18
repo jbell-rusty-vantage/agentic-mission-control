@@ -42,6 +42,11 @@ from mission_control.application.execution.harness.leases import InMemoryWorkspa
 from mission_control.domain.execution.lanes import LaneFrame
 from mission_control.domain.policies.stop_fence import StopFence
 from tests.fixtures.lane_turns import lane_stack
+from tests.support.unit.codex.kernel_hooks import (
+    HookRig,
+    hook_rig,  # noqa: F401
+    kernel_projection,
+)
 from tests.unit.codex.drive import observed, sent, started
 from tests.unit.codex.support import (
     CodexStack,
@@ -52,7 +57,6 @@ from tests.unit.codex.support import (
     codex_operation,
     fixture_settings,
 )
-from tests.unit.codex.test_kernel_hooks import HookRig, hook_rig, kernel_projection  # noqa: F401
 from tests.unit.workspaces.workspace_fixtures import commit, git
 
 pytestmark = pytest.mark.skipif(

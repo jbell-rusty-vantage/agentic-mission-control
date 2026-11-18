@@ -26,8 +26,8 @@ from mission_control.adapters.codex.hook_trust import (
 from mission_control.adapters.codex.launcher import LaunchSpec, SubprocessAppServerLauncher
 from mission_control.adapters.codex.protocol import M_HOOKS_LIST, M_INITIALIZE, M_INITIALIZED
 from mission_control.domain.execution.lanes import PrepareRequest
+from tests.support.unit.codex.kernel_hooks import kernel_projection, kernel_stack, memory_hooks
 from tests.unit.codex.drive import fields
-from tests.unit.codex.test_kernel_hooks import kernel_projection, kernel_stack, memory_hooks
 
 pytestmark = pytest.mark.skipif(
     os.environ.get("MC_CODEX_HOOK_DRILL") != "1",

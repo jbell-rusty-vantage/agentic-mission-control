@@ -127,7 +127,7 @@ async def test_goal_loop_freezes_declared_outputs_and_criteria(output_count):
 
 @pytest.mark.asyncio
 async def test_production_artifact_schema_compiles_and_pins_exact_revision():
-    from tests.unit.capability.test_artifact_schema_seeds import production_record
+    from tests.support.unit.capability.artifact_schema_seeds import production_record
 
     record = production_record()
 
@@ -171,7 +171,7 @@ async def test_production_artifact_schema_compiles_and_pins_exact_revision():
 async def test_artifact_schema_authority_refuses_invalid_catalog_rows(case):
     from unittest.mock import AsyncMock
 
-    from tests.unit.capability.test_artifact_schema_seeds import production_record
+    from tests.support.unit.capability.artifact_schema_seeds import production_record
 
     compiler, _, _ = await service()
     record = production_record()
@@ -210,7 +210,7 @@ async def test_same_schema_reference_from_two_kinds_is_ambiguous_in_both_orders(
     from unittest.mock import AsyncMock
 
     from mission_control.domain.authoring.contracts import DefinitionKind
-    from tests.unit.capability.test_artifact_schema_seeds import production_record
+    from tests.support.unit.capability.artifact_schema_seeds import production_record
 
     compiler, _, _ = await service()
     artifact = production_record()

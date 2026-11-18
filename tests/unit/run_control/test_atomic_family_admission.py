@@ -8,7 +8,7 @@ from types import SimpleNamespace
 
 import pytest
 from fastapi import FastAPI
-from pydantic import Field, ValidationError
+from pydantic import ValidationError
 
 from mission_control.adapters.temporal.worker import compose_worker_run_control_service
 from mission_control.application.execution.run_control_repository import (
@@ -17,7 +17,6 @@ from mission_control.application.execution.run_control_repository import (
     upgrade_legacy_operation_pending_usage,
 )
 from mission_control.application.execution.service import (
-    AdmissionPolicyRegistry,
     FamilyAdmissionRegistry,
     RunControlService,
 )
@@ -25,7 +24,6 @@ from mission_control.domain.authoring.canonical import canonical_json, sha256_di
 from mission_control.domain.execution.journal import OperationJournalSettlement
 from mission_control.domain.policies.contracts import (
     MAX_AUTHORITY_BATCH_IDENTITY_SUMMARY_BYTES,
-    AcceptedObligationEvidence,
     AcceptedOutputEvidence,
     ApplyAuthorityBatchAction,
     BudgetState,
@@ -36,7 +34,6 @@ from mission_control.domain.policies.contracts import (
     EffectLedgerState,
     EffectSettlementOutcome,
     ObserveEffectAction,
-    RecordObligationEvidenceAction,
     RecordOutputEvidenceAction,
     RecordUsageAction,
     ReserveBudgetAction,
@@ -50,7 +47,6 @@ from mission_control.domain.policies.errors import (
     RunControlNotFound,
 )
 from mission_control.domain.policies.family_admission import (
-    AtomicFamilyMutation,
     FamilyAdmissionReceipt,
     FamilyVersionConflict,
 )
@@ -64,152 +60,15 @@ from mission_control.interfaces.http.run_control import (
     configure_family_admission_registry,
 )
 from tests.support.run_control import ConfigurationVerifier, command, request
-
-
-class TestFamilyMutation(AtomicFamilyMutation):
-    __test__ = False
-    candidate_ref: str = Field(min_length=1)
-    cursor: tuple[str, ...] = ()
-
-
-def validate_test_family_batch(
-    mutation: AtomicFamilyMutation,
-    batch: ApplyAuthorityBatchAction,
-) -> str | None:
-    if not isinstance(mutation, TestFamilyMutation):
-        return "unexpected mutation type"
-    output_refs = tuple(
-        action.evidence.output_ref
-        for action in batch.actions
-        if isinstance(action, RecordOutputEvidenceAction)
-    )
-    if output_refs != (mutation.candidate_ref,):
-        return "accepted output evidence does not match the family mutation candidate"
-    return None
-
-
-def registered_family_registry() -> FamilyAdmissionRegistry:
-    families = FamilyAdmissionRegistry()
-    families.register(
-        TestFamilyMutation,
-        family_kind="test_family",
-        mutation_kind="candidate_admitted",
-        required_permission="workflow_run.reserve_budget",
-        allowed_action_kinds=frozenset({"reserve_budget", "apply_authority_batch"}),
-        allowed_batch_action_kinds=frozenset(
-            {
-                "record_usage",
-                "settle_pending_usage",
-                "observe_effect",
-                "settle_effect",
-                "record_obligation_evidence",
-                "record_output_evidence",
-            }
-        ),
-        required_batch_action_kinds=frozenset(
-            {
-                "record_usage",
-                "settle_pending_usage",
-                "observe_effect",
-                "settle_effect",
-                "record_obligation_evidence",
-                "record_output_evidence",
-            }
-        ),
-        batch_binding_validator=validate_test_family_batch,
-    )
-    return families
-
-
-def admission_policies() -> AdmissionPolicyRegistry:
-    policies = AdmissionPolicyRegistry()
-    policies.register("contract:input@1", lambda _request, _configuration: None)
-    policies.register("contract:invariant@1", lambda _request, _configuration: None)
-    return policies
-
-
-def family_service(
-    repository: InMemoryRunControlRepository | None = None,
-    *,
-    register: bool = True,
-) -> tuple[RunControlService, InMemoryRunControlRepository]:
-    repository = repository or InMemoryRunControlRepository()
-    policies = admission_policies()
-    families = registered_family_registry() if register else FamilyAdmissionRegistry()
-    return (
-        RunControlService(repository, ConfigurationVerifier(), policies, families),
-        repository,
-    )
-
-
-def family_mutation(
-    run_id: str,
-    *,
-    mutation_id: str = "family-mutation-1",
-    expected_family_version: int = 0,
-    candidate_ref: str = "output:accepted",
-    request_scope: str = "tenant-1",
-) -> TestFamilyMutation:
-    return TestFamilyMutation(
-        family_kind="test_family",
-        mutation_kind="candidate_admitted",
-        mutation_id=mutation_id,
-        request_scope=request_scope,
-        run_id=run_id,
-        expected_family_version=expected_family_version,
-        exact_operation_request_ref="operation-request:sha256-test",
-        decided_at=request().requested_at,
-        candidate_ref=candidate_ref,
-        cursor=("group:a", "candidate:a"),
-    )
-
-
-def authority_batch() -> ApplyAuthorityBatchAction:
-    return ApplyAuthorityBatchAction(
-        actions=(
-            RecordUsageAction(
-                usage_id="accepted-usage",
-                authority_ref="operation:1",
-                reservation_id="effect-reservation",
-                actual_amounts={"tokens.total": 3},
-                pending_external_amounts={"tokens.total": 5},
-                release_amounts={"tokens.total": 2},
-            ),
-            SettlePendingUsageAction(
-                settlement_id="accepted-usage-settlement",
-                usage_id="accepted-usage",
-                actual_amounts={"tokens.total": 5},
-            ),
-            ObserveEffectAction(
-                effect_id="effect-1",
-                observation_id="effect-observation-1",
-                disposition=EffectDisposition.SUCCEEDED,
-                evidence_refs=("evidence:effect-observed",),
-            ),
-            SettleEffectAction(
-                effect_id="effect-1",
-                settlement_id="effect-settlement-1",
-                observation_id="effect-observation-1",
-                outcome=EffectSettlementOutcome.SUCCEEDED,
-                usage_settlement_ref="accepted-usage-settlement",
-                evidence_refs=("evidence:effect-settled",),
-            ),
-            RecordObligationEvidenceAction(
-                evidence=AcceptedObligationEvidence(
-                    obligation_ref="obligation:required",
-                    evidence_digest="sha256:" + "d" * 64,
-                    accepted_by_authority_ref="authority:lifecycle",
-                )
-            ),
-            RecordOutputEvidenceAction(
-                evidence=AcceptedOutputEvidence(
-                    output_ref="output:accepted",
-                    evidence_digest="sha256:" + "e" * 64,
-                    accepted_by_authority_ref="authority:lifecycle",
-                )
-            ),
-        )
-    )
+from tests.support.unit.run_control.atomic_family_admission import (
+    FixtureFamilyMutation,
+    admission_policies,
+    authority_batch,
+    family_mutation,
+    family_service,
+    registered_family_registry,
+    validate_test_family_batch,
+)
 
 
 async def admitted_family_run(
@@ -283,7 +142,7 @@ async def test_success_reservation_family_state_replay_and_outbox_order() -> Non
         "tokens.total": 10
     }
     assert (
-        await repository.get_family_head("tenant-1", run_id, "test_family", TestFamilyMutation)
+        await repository.get_family_head("tenant-1", run_id, "test_family", FixtureFamilyMutation)
         == mutation
     )
     outbox = await run_service.pending_outbox("tenant-1")
@@ -876,7 +735,12 @@ async def test_family_reads_hide_missing_and_cross_scope_runs_consistently() -> 
                 scope, target_run, "operator", "missing-command"
             )
         with pytest.raises(RunControlNotFound):
-            await repository.get_family_head(scope, target_run, "test_family", TestFamilyMutation)
+            await repository.get_family_head(
+                scope,
+                target_run,
+                "test_family",
+                FixtureFamilyMutation,
+            )
     assert (
         await repository.get_family_admission_receipt(
             "tenant-1", run_id, "operator", "missing-command"
@@ -924,28 +788,28 @@ async def test_failure_boundaries_roll_back_every_store(boundary: str) -> None:
 
 def test_family_mutations_inherit_payload_and_sensitive_data_bounds() -> None:
     with pytest.raises(ValidationError, match="raw secrets"):
-        TestFamilyMutation.model_validate(
+        FixtureFamilyMutation.model_validate(
             {
                 **family_mutation("run").model_dump(),
                 "api_key": "secret-value",
             }
         )
     with pytest.raises(ValidationError, match="8192"):
-        TestFamilyMutation.model_validate(
+        FixtureFamilyMutation.model_validate(
             {
                 **family_mutation("run").model_dump(),
                 "candidate_ref": "x" * 8193,
             }
         )
     with pytest.raises(ValidationError, match="serialized bytes"):
-        TestFamilyMutation.model_validate(
+        FixtureFamilyMutation.model_validate(
             {
                 **family_mutation("run").model_dump(),
                 "cursor": tuple("x" * 7000 for _ in range(10)),
             }
         )
     with pytest.raises(ValidationError, match="string_pattern_mismatch"):
-        TestFamilyMutation.model_validate(
+        FixtureFamilyMutation.model_validate(
             {
                 **family_mutation("run").model_dump(),
                 "exact_operation_request_ref": "https://example.test/private/material",
@@ -1177,7 +1041,7 @@ async def test_authority_batch_rejection_rolls_back_and_replays_without_family_a
     assert await run_service.get_effects("tenant-1", run_id) == before_effects
     assert len(await repository.list_transitions("tenant-1", run_id)) == 3
     assert (
-        await repository.get_family_head("tenant-1", run_id, "test_family", TestFamilyMutation)
+        await repository.get_family_head("tenant-1", run_id, "test_family", FixtureFamilyMutation)
         is None
     )
 
@@ -1342,7 +1206,7 @@ async def test_malformed_copied_batches_and_unknown_permissions_fail_closed() ->
 
 @pytest.mark.asyncio
 async def test_family_mutation_is_strictly_revalidated_before_policy_and_persistence() -> None:
-    class OtherFamilyMutation(TestFamilyMutation):
+    class OtherFamilyMutation(FixtureFamilyMutation):
         pass
 
     run_service, repository, run_id = await admitted_family_run()
@@ -1381,7 +1245,7 @@ def test_batch_family_policy_requires_nested_constraints_and_reference_binding()
     with pytest.raises(ValueError, match="must bind nested actions and references"):
         families = FamilyAdmissionRegistry()
         families.register(
-            TestFamilyMutation,
+            FixtureFamilyMutation,
             family_kind="test_family",
             mutation_kind="candidate_admitted",
             required_permission="workflow_run.reserve_budget",
@@ -1390,7 +1254,7 @@ def test_batch_family_policy_requires_nested_constraints_and_reference_binding()
     with pytest.raises(ValueError, match="subset"):
         families = FamilyAdmissionRegistry()
         families.register(
-            TestFamilyMutation,
+            FixtureFamilyMutation,
             family_kind="test_family",
             mutation_kind="candidate_admitted",
             required_permission="workflow_run.reserve_budget",
@@ -1442,7 +1306,7 @@ async def test_effect_settlement_rejects_spoofed_usage_settlement_reference() ->
     assert (await run_service.get_budget("tenant-1", run_id)).settlement_ids == frozenset()
     assert (await run_service.get_effects("tenant-1", run_id)).claims["effect-1"].settlement is None
     assert (
-        await repository.get_family_head("tenant-1", run_id, "test_family", TestFamilyMutation)
+        await repository.get_family_head("tenant-1", run_id, "test_family", FixtureFamilyMutation)
         is None
     )
 

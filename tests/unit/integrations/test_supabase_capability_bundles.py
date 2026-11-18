@@ -10,7 +10,7 @@ from storage3.exceptions import StorageApiError
 from mission_control.adapters.capabilities.capability_bundles import BundleError
 from mission_control.adapters.supabase_storage.bundles import SupabaseCapabilityBundleStore
 from mission_control.bootstrap.settings import Settings
-from tests.unit.integrations.test_capability_directory_bundles import source
+from tests.support.unit.integrations.capability_directory_bundles import source
 
 
 def test_sdk_stages_without_upsert_and_verifies_every_download(tmp_path: Path) -> None:

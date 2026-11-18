@@ -24,9 +24,9 @@ from mission_control.application.programs.service import (
 from mission_control.domain.authoring.canonical import sha256_digest
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.support.run_control import ConfigurationVerifier
-from tests.unit.orchestration.test_artifact_schema_validation import Custody, captured
-from tests.unit.orchestration.test_completion_validation_service import OUTPUT, prepared
-from tests.unit.run_control.test_atomic_family_admission import admission_policies
+from tests.support.unit.orchestration.artifact_schema_validation import Custody, captured
+from tests.support.unit.orchestration.completion_validation_service import OUTPUT, prepared
+from tests.support.unit.run_control.atomic_family_admission import admission_policies
 
 pytestmark = pytest.mark.common_db
 

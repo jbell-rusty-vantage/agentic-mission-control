@@ -67,7 +67,7 @@ from tests.integration.postgres.test_operation_journal_stage1 import (
     claim,
     settlement,
 )
-from tests.unit.frames.test_transcript_interfaces import transcript_service
+from tests.support.unit.frames.transcript_interfaces import transcript_service
 
 NOW = datetime(2026, 10, 21, 12, 0, tzinfo=UTC)
 READER = ActorContext(actor_id="reader", permissions=frozenset({"workflow_run.read"}))

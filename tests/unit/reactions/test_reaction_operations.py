@@ -31,7 +31,7 @@ from mission_control.domain.execution.data_class import DataClassPolicy
 from mission_control.domain.reactions.contracts import ReactionActivation
 from tests.support.operations import operation_request
 from tests.support.run_control import command, request, service
-from tests.unit.reactions.test_reaction_planning import (
+from tests.support.unit.reactions.reaction_planning import (
     AT,
     RUN,
     SCOPE,

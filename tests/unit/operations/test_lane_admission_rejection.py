@@ -27,7 +27,6 @@ from mission_control.application.execution.operations.operation_execution import
 from mission_control.application.resolution.registries import LaneNotQualified, LaneRegistry
 from mission_control.domain.execution.checkpoint_lineage import OperationActivityAttempt
 from mission_control.domain.execution.contracts import OperationExecutionResult
-from mission_control.domain.execution.journal import OperationClaimResult
 from mission_control.domain.execution.lane_turns import LaneTurnRequest
 from mission_control.domain.graph_runtime.identities import (
     RuntimeUnitIdentity,
@@ -44,37 +43,7 @@ from mission_control.domain.policies.errors import IdempotencyConflict
 from tests.fixtures.checkpoint_recovery import FixtureControlPlane, governed_workspace
 from tests.fixtures.lane_turns import SCOPE, RecordingSignals, cursor_operation, lane_stack
 from tests.support.run_control import actor, command, request, service
-
-
-class RejectionJournal:
-    def __init__(self) -> None:
-        self.claims: dict[str, Any] = {}
-        self.settlements: dict[str, Any] = {}
-        self.crash_claim = False
-        self.crash_settlement = False
-
-    async def commit(self, mutation: Any) -> OperationClaimResult:
-        if mutation.settlement is None and self.crash_claim:
-            self.crash_claim = False
-            raise RuntimeError("lost claim journal write")
-        if mutation.settlement is not None and self.crash_settlement:
-            self.crash_settlement = False
-            raise RuntimeError("lost settlement journal write")
-        claim = mutation.claim
-        prior = self.claims.get(claim.effect_claim_id)
-        if mutation.settlement is not None:
-            previous = self.settlements.get(claim.effect_claim_id)
-            if previous is not None and previous != mutation.settlement:
-                raise IdempotencyConflict("rejection settlement changed on replay")
-            self.settlements[claim.effect_claim_id] = mutation.settlement
-        self.claims[claim.effect_claim_id] = prior or claim
-        return OperationClaimResult(
-            status="existing" if prior else "acquired", claim=prior or claim, reason="recorded"
-        )
-
-    async def get_settlement(self, request_scope: str, effect_claim_id: str) -> Any:
-        del request_scope
-        return self.settlements.get(effect_claim_id)
+from tests.support.unit.operations.lane_admission_rejection import RejectionJournal
 
 
 @dataclass

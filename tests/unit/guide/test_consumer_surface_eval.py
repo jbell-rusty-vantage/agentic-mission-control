@@ -51,6 +51,7 @@ from tests.conformance.resolution.fixtures import APPLICATIONS, MODELS
 from tests.fixtures.capability_search_catalog import seeded_published
 from tests.fixtures.catalog.fast_track_catalog import NOW, fast_track_catalog
 from tests.fixtures.catalog_http import INSTALLATION, TENANT, catalog_harness
+from tests.support.unit.selection.selection_workspace import NARROW_WORKFLOW, OPEN_WORKFLOW
 from tests.unit.guide.support import (
     OPERATOR_REGISTRIES,
     SANDBOX_DETAILS,
@@ -58,7 +59,6 @@ from tests.unit.guide.support import (
     lowered_rows,
     workspace_entries,
 )
-from tests.unit.selection.test_selection_workspace import NARROW_WORKFLOW, OPEN_WORKFLOW
 
 ROOT = Path(__file__).resolve().parents[3]
 BOUND_LANES = ("deep_agents", "cursor_local", "claude_agent_sdk")

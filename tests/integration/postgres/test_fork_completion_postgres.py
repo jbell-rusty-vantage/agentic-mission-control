@@ -114,8 +114,8 @@ from tests.integration.postgres.test_manifest_submit import (
 )
 from tests.integration.postgres.test_manifest_submit import request as submit_request
 from tests.support.knowledge import MISSION, lane
-from tests.unit.context.test_wi07_current_set_transfer import OVERHEAD, SANDBOX, Backend, bounds
-from tests.unit.orchestration.test_stagegraph_v2 import operation_slot
+from tests.support.unit.context.wi07_current_set_transfer import OVERHEAD, SANDBOX, Backend, bounds
+from tests.support.unit.orchestration.stagegraph_v2 import operation_slot
 from tests.unit.outputs.scenario import host_access, obligation, promises, text
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.common_db]

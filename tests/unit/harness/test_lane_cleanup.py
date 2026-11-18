@@ -7,8 +7,6 @@ workspace has none to clean, and a lane's refusal keeps the worktree and names w
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-
 from mission_control.application.execution.harness.lane_turns import (
     UNIT_NOT_SETTLED,
     LaneExecutionIdentity,
@@ -16,7 +14,6 @@ from mission_control.application.execution.harness.lane_turns import (
 from mission_control.application.execution.harness.protocol import WorkspaceLeasingLane
 from mission_control.application.workspaces.errors import WORKSPACE_CUSTODY_STALE, WorkspaceError
 from mission_control.domain.execution.lane_turns import (
-    CleanupOutcome,
     LaneCleanupRequest,
     LaneCleanupResult,
     LaneTurnRequest,
@@ -24,27 +21,11 @@ from mission_control.domain.execution.lane_turns import (
 from tests.fixtures.lane_turns import (
     LaneStack,
     RecordingSignals,
-    ScriptedSessionLane,
     cursor_operation,
     lane_stack,
     scripted_frames,
 )
-
-
-@dataclass
-class CleaningLane(ScriptedSessionLane):
-    """The scripted lane, leasing its workspaces: records each cleanup it is asked for."""
-
-    refusal: WorkspaceError | None = None
-    cleanups: list[tuple[str, str, int]] = field(default_factory=list)
-
-    async def cleanup_workspace(
-        self, *, request_scope: str, harness_execution_id: str, generation: int
-    ) -> CleanupOutcome:
-        self.cleanups.append((request_scope, harness_execution_id, generation))
-        if self.refusal is not None:
-            raise self.refusal
-        return "removed"
+from tests.support.unit.harness.lane_cleanup import CleaningLane
 
 
 def _cleanup() -> LaneCleanupRequest:

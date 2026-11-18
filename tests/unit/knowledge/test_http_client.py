@@ -11,7 +11,6 @@ from __future__ import annotations
 
 import json
 from collections.abc import Callable
-from pathlib import Path
 
 import httpx
 import pytest
@@ -24,12 +23,8 @@ from mission_control.application.ports.knowledge import (
 from mission_control.contracts.knowledge_protocol import OperationEnvelope, OperationHandle
 from mission_control.contracts.knowledge_protocol_results import protocol_error
 from tests.fixtures.knowledge_binding import describe_document
+from tests.support.unit.knowledge.http_client import VECTORS
 
-FIXTURES = Path(__file__).resolve().parents[2] / "fixtures" / "knowledge_protocol"
-GOLDEN = json.loads(
-    (FIXTURES / "knowledge-operation-protocol.v2.golden.json").read_text(encoding="utf-8")
-)
-VECTORS = {vector["id"]: vector for vector in GOLDEN["vectors"]}
 TOKEN = "eyJhbGciOiJFZERTQSJ9.c2VjcmV0LWNsYWltcw.c2lnbmF0dXJl"
 HANDLE = OperationHandle(
     protocolVersion="ks.knowledge_operation.v2",

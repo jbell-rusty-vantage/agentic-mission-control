@@ -14,175 +14,38 @@ import asyncio
 import json
 import subprocess
 import sys
-from collections.abc import AsyncIterator
-from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
-import uvicorn
 
 from mission_control.adapters.codex.harness import CODEX_HOME_DIR
-from mission_control.adapters.codex.hooks_callback import CodexHookMapper
-from mission_control.adapters.cursor.hooks_callback import CursorHookMapper, kernel_hook_script
-from mission_control.application.agentic_components.materialization import projection_digest
+from mission_control.adapters.cursor.hooks_callback import kernel_hook_script
 from mission_control.application.agentic_components.placement import LaneProjectionError
-from mission_control.application.execution.harness.hook_callbacks import (
-    HookCallbackService,
-    InMemoryHookIntentLedger,
-    InMemoryHookTokenStore,
-)
-from mission_control.application.execution.stop_fence import (
-    InMemoryStopFenceRepository,
-    KernelHookFenceGate,
-)
-from mission_control.bootstrap.host_projection import HOST_PROJECTORS
-from mission_control.domain.agentic_components.projection import HostProjection
 from mission_control.domain.capabilities.hooks import HOOK_EVENT_MAPPING
 from mission_control.domain.capabilities.host_support import LaneProfile
-from mission_control.domain.execution.contracts import OperationExecutionRequest
 from mission_control.domain.execution.lanes import (
     EndSessionRequest,
     PrepareRequest,
-    SessionHandle,
     StartRequest,
 )
 from mission_control.domain.policies.stop_fence import StopFence
-from mission_control.interfaces.http.hook_callback import create_hook_callback_app
-from tests.fixtures.lane_turns import lane_stack
-from tests.unit.codex.drive import fields, observed, sent, started
-from tests.unit.codex.fixture_app_server import FixtureLauncher, load_script
-from tests.unit.codex.support import (
-    CodexStack,
-    StaticProjectionSource,
-    build_harness,
-    codex_binding,
-    codex_operation,
-    fixture_settings,
+from tests.support.unit.codex.kernel_hooks import (
+    HookRig,
+    command_statuses,
+    hook_rig,  # noqa: F401
+    kernel_stack,
+    memory_hooks,
+    run_turn,
 )
+from tests.unit.codex.drive import fields, started
 
 KERNEL_FILES = (".mission/hooks/kernel.py", ".mission/hooks/context.json", ".mission/bin/.token")
 
 
-def kernel_projection() -> HostProjection:
-    """The real codex Host Projection of no capability rows: the four Kernel Hooks only."""
-
-    return HOST_PROJECTORS.render([], "codex", "Run the mission; never deploy.")
-
-
-def kernel_operation(projection: HostProjection) -> OperationExecutionRequest:
-    return codex_operation(codex_binding(materialization_digest=projection_digest(projection)))
-
-
-@dataclass
-class HookRig:
-    service: HookCallbackService
-    tokens: InMemoryHookTokenStore
-    intents: InMemoryHookIntentLedger
-    fences: InMemoryStopFenceRepository
-    url: str
-
-
-def memory_hooks() -> tuple[
-    HookCallbackService,
-    InMemoryHookTokenStore,
-    InMemoryHookIntentLedger,
-    InMemoryStopFenceRepository,
-]:
-    """The worker's hook callback service (both command-hook lanes) over in-memory stores."""
-
-    tokens, intents = InMemoryHookTokenStore(), InMemoryHookIntentLedger()
-    fences = InMemoryStopFenceRepository()
-    service = HookCallbackService(
-        tokens=tokens,
-        intents=intents,
-        mapper=CursorHookMapper(),
-        lane_mappers={"codex": CodexHookMapper()},
-        fences=KernelHookFenceGate(fences),
-    )
-    return service, tokens, intents, fences
-
-
-@pytest.fixture
-async def hook_rig() -> AsyncIterator[HookRig]:
-    """The worker's hook callback service on a real loopback listener (port chosen by the OS)."""
-
-    service, tokens, intents, fences = memory_hooks()
-    server = uvicorn.Server(
-        uvicorn.Config(
-            create_hook_callback_app(service), host="127.0.0.1", port=0, log_level="warning"
-        )
-    )
-    serving = asyncio.create_task(server.serve())
-    try:
-        for _ in range(200):
-            if server.started:
-                break
-            await asyncio.sleep(0.05)
-        assert server.started
-        port = server.servers[0].sockets[0].getsockname()[1]
-        yield HookRig(service, tokens, intents, fences, f"http://127.0.0.1:{port}")
-    finally:
-        server.should_exit = True
-        await serving
-
-
-def kernel_stack(
-    tmp_path: Path,
-    *scripts: str,
-    hooks: HookCallbackService | None = None,
-    callback_url: str = "http://127.0.0.1:9",
-    codex_home_mode: str = "isolated",
-) -> CodexStack:
-    projection = kernel_projection()
-    operation = kernel_operation(projection)
-    launcher = FixtureLauncher(scripts=[load_script(name) for name in scripts])
-    settings = fixture_settings(
-        tmp_path,
-        codex_home_mode=codex_home_mode,
-        owner_codex_home=tmp_path / "owner-home",
-        hook_callback_base_url=callback_url,
-    )
-    harness, leaser, artifacts, auth = build_harness(
-        tmp_path,
-        launcher,
-        settings=settings,
-        projections=StaticProjectionSource(projection),
-        hooks=hooks,
-    )
-    return CodexStack(
-        harness=harness,
-        launcher=launcher,
-        leaser=leaser,
-        artifacts=artifacts,
-        auth=auth,
-        rig=None,
-        operation=operation,
-        lanes=lane_stack(harness, operation=operation),
-    )
-
-
-async def run_turn(stack: CodexStack, session: SessionHandle, turn_no: int) -> None:
-    turn = await sent(stack, session, key=f"turn:{turn_no}", turn_no=turn_no)
-    frames = await observed(stack, turn)
-    assert frames and frames[-1].terminal
-
-
-def command_statuses(stack: CodexStack) -> list[object]:
-    """The status of every shell call the FIXTURE app-server ran, in turn order."""
-
-    threads = stack.launcher.disk.threads.values()
-    turns = [turn for thread in threads for turn in thread["turns"]]
-    return [
-        item["status"]
-        for turn in turns
-        for item in turn["items"]
-        if item["type"] == "commandExecution"
-    ]
-
-
 async def test_the_lane_writes_kernel_files_and_trust_before_any_thread(
-    tmp_path: Path, hook_rig: HookRig
+    tmp_path: Path,
+    hook_rig: HookRig,  # noqa: F811
 ) -> None:
     stack = kernel_stack(tmp_path, hooks=hook_rig.service, callback_url=hook_rig.url)
     session = await started(stack)
@@ -229,7 +92,8 @@ async def test_the_lane_writes_kernel_files_and_trust_before_any_thread(
 
 
 async def test_kernel_before_tool_denies_a_fenced_shell_call_end_to_end(
-    tmp_path: Path, hook_rig: HookRig
+    tmp_path: Path,
+    hook_rig: HookRig,  # noqa: F811
 ) -> None:
     stack = kernel_stack(
         tmp_path,
@@ -279,7 +143,8 @@ async def test_kernel_before_tool_denies_a_fenced_shell_call_end_to_end(
 
 
 async def test_end_session_revokes_the_token_and_keeps_kernel_files_out_of_the_patch(
-    tmp_path: Path, hook_rig: HookRig
+    tmp_path: Path,
+    hook_rig: HookRig,  # noqa: F811
 ) -> None:
     stack = kernel_stack(tmp_path, hooks=hook_rig.service, callback_url=hook_rig.url)
     session = await started(stack)
@@ -308,7 +173,7 @@ async def test_end_session_revokes_the_token_and_keeps_kernel_files_out_of_the_p
     assert "callback failed" in late["permissionDecisionReason"]
 
 
-async def test_codex_untrusted_hooks_refuse_the_start(tmp_path: Path, hook_rig: HookRig) -> None:
+async def test_codex_untrusted_hooks_refuse_the_start(tmp_path: Path, hook_rig: HookRig) -> None:  # noqa: F811
     stack = kernel_stack(tmp_path, hooks=hook_rig.service, callback_url=hook_rig.url)
     harness = stack.harness
     harness.stage(stack.heid, stack.operation)

@@ -32,9 +32,9 @@ from tests.fixtures.knowledge_binding import (
     RecordingMinter,
     SteppingClock,
     knowledge_port,
-    report_package,
 )
-from tests.support.knowledge import TENANT, origin
+from tests.support.knowledge import origin
+from tests.support.unit.knowledge.submission_assessment import report_selection
 
 
 @pytest.mark.parametrize(
@@ -171,20 +171,6 @@ def handoff() -> Handoff:
     issuer = Issuer(clock=clock)
     fake = FakeKnowledgeBinding(verifier=issuer.verifier(), clock=clock)
     return Handoff(clock, fake, InMemoryKnowledgeHandleStore(), InMemorySubmissionStore(), issuer)
-
-
-def report_selection(report_id: str = "report-7") -> OutputSelection:
-    package = report_package(report_id, "1", tenant=TENANT)
-    report = package.report
-    return OutputSelection(
-        items=(
-            SelectedItem(
-                kind="handle",
-                ref=f"kh:{report.binding}/report/{report.id}@{report.version}",
-                digest=report.digest,
-            ),
-        )
-    )
 
 
 async def test_final_submission_triggers_the_independent_assessment() -> None:

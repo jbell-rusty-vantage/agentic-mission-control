@@ -1,23 +1,13 @@
 """The committed production bundle supplies S0 schema authority."""
 
 import importlib.util
-import json
-from pathlib import Path
 
 from jsonschema import Draft202012Validator
 
 from mission_control.application.programs.artifact_validation import supported_schema
 from mission_control.domain.authoring.canonical import sha256_digest
-from mission_control.domain.authoring.contracts import ArtifactSchemaDefinition, PublishedDefinition
-
-ROOT = Path(__file__).resolve().parents[3]
-SEEDS = ROOT / "packages/mission-control-db-contract/seeds"
-
-
-def production_record():
-    bundle = json.loads((SEEDS / "common/mc.catalog.artifact-schemas-1.0.0.json").read_text())
-    asset = next(row for row in bundle["records"] if row["kind"] == "asset_version")
-    return PublishedDefinition.model_validate(asset["fields"]["manifest"])
+from mission_control.domain.authoring.contracts import ArtifactSchemaDefinition
+from tests.support.unit.capability.artifact_schema_seeds import SEEDS, production_record
 
 
 def test_production_schema_seed_has_exact_authority_and_deterministic_generation():

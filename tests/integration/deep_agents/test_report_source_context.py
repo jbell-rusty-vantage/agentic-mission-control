@@ -20,7 +20,7 @@ from tests.integration.deep_agents.test_wi02_transfer_plan_lane import (
     activity_attempt,
     registry,
 )
-from tests.unit.test_report_source_context import context
+from tests.support.unit.report_source_context import context
 
 from mission_control.adapters.deep_agents.adapter import DeepAgentRuntimeAdapter
 from mission_control.adapters.deep_agents.materializer import ExactDeepAgentMaterializer

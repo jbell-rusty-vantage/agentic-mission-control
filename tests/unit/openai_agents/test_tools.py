@@ -41,9 +41,9 @@ from mission_control.domain.policies.contracts import ActorContext
 from mission_control.domain.policies.stop_fence import StopFence
 from tests.fixtures.agents_lane import agents_stack
 from tests.fixtures.lane_bindings import lane_fields
+from tests.support.unit.approvals.approval_broker import OWNER, _compose
+from tests.support.unit.effects.hosted_bundle_publication import NoCredential, repository
 from tests.unit.approvals.fixtures import answer
-from tests.unit.approvals.test_approval_broker import OWNER, _compose
-from tests.unit.effects.test_hosted_bundle_publication import NoCredential, repository
 
 
 class PendingClient:

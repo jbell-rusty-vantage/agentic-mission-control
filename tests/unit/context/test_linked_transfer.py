@@ -1,27 +1,23 @@
 """Independent receiver access to a durable exact cross-run export, including redelivery."""
 
 from dataclasses import replace
-from types import SimpleNamespace
 
 import pytest
 from pydantic import ValidationError
 
 from mission_control.application.context.linked_transfer import (
     LinkedExportAccess,
-    LinkedExportResolver,
 )
 from mission_control.application.context.materialization import ContextDeliveryBlocked
-from mission_control.domain.context.transfer import InputSource, LinkedExport, LinkedOutputRef
+from mission_control.domain.context.transfer import InputSource, LinkedExport
 from mission_control.domain.context.transfer_builders import linked_mission
-from tests.unit.context.test_transfer_materializer import (
+from tests.support.unit.context.linked_transfer import SOURCE, setup
+from tests.support.unit.context.transfer_materializer import (
     RUN,
     FakeBackend,
     _trusted,
     dependent,
-    seam,
 )
-
-SOURCE = "33333333-3333-4333-8333-333333333333"
 
 
 async def test_current_use_unavailable_cannot_redeliver_a_sealed_ready_plan(monkeypatch):
@@ -39,99 +35,6 @@ async def test_current_use_unavailable_cannot_redeliver_a_sealed_ready_plan(monk
         await h.s.materializer.materialize(h.s.request(h.selection, attempt=2), FakeBackend())
     assert "LINK_CURRENT_USE_UNAVAILABLE" in str(refused.value)
     assert not h.s.outputs.assessments  # no semantic rejection invented by unavailability
-
-
-class Exports:
-    def __init__(self, export):
-        self.export = export
-        self.reads = []
-
-    async def get_export(self, scope, export_id):
-        self.reads.append((scope, export_id))
-        return self.export
-
-    async def released_for(self, scope, receiver_run_id, receiver_position):
-        return (self.export,)
-
-
-def setup(monkeypatch, *, repair=False):
-    s = seam()
-    s.accept_report()
-    revision = s.outputs.accepted[0].model_copy(update={"run_id": SOURCE})
-    rows = {revision.revision_id: revision}
-    s.outputs.accepted = []  # delivery must not guess from current accepted heads
-    export = LinkedExport(
-        export_id="export-one",
-        request_scope=s.access().scope,
-        chain_id="chain",
-        link_id="link",
-        release_event_ref="mission-event:release",
-        caller_ref="chain-actor",
-        source_mission_id="mission-a",
-        source_run_id=SOURCE,
-        receiver_mission_id="mission-b",
-        receiver_run_id=RUN,
-        receiver_position="review",
-        input_name="selected-report",
-        purpose="repair" if repair else "dependent_input",
-        admission="subject" if repair else "accepted",
-        release_gate="execution_complete" if repair else "goal_accepted",
-        source_goal=None if repair else "research",
-        gate_ref="mission-event:goal-disposition",
-        outputs=(
-            LinkedOutputRef(
-                obligation_key="draft.report",
-                obligation_revision=1,
-                owner_position="draft",
-                revision_id=revision.revision_id,
-                content_digest=revision.content_digest,
-                acceptance_ref=None if repair else "mc-output-acceptance:pinned",
-            ),
-        ),
-    )
-    exports = Exports(export)
-    reads = []
-    checks = []
-
-    async def output(scope, revision_id):
-        reads.append((scope, revision_id))
-        return rows.get(revision_id)
-
-    async def obligation(scope, run_id, key, revision_no):
-        assert run_id == SOURCE
-        return next(
-            (
-                item
-                for item in s.outputs.obligations
-                if item.key == key and item.revision == revision_no
-            ),
-            None,
-        )
-
-    async def recheck(access, revision):
-        checks.append((access.origin.run_id, revision.run_id, revision.revision_id))
-
-    monkeypatch.setattr(s.outputs, "output_revision", output, raising=False)
-    monkeypatch.setattr(s.outputs, "obligation_revision", obligation, raising=False)
-    resolver = LinkedExportResolver(
-        exports, s.outputs, s.materializer._resolvers["produced_output"], recheck=recheck
-    )
-    s.materializer._resolvers["linked_export"] = resolver
-    s.materializer._access["linked_export"] = LinkedExportAccess(
-        resolver, s.materializer._access["produced_output"]
-    )
-    selection = linked_mission(dependent(), (export,))
-    return SimpleNamespace(
-        s=s,
-        export=export,
-        exports=exports,
-        revision=revision,
-        rows=rows,
-        reads=reads,
-        checks=checks,
-        selection=selection,
-        resolver=resolver,
-    )
 
 
 async def test_exact_export_delivers_and_redelivers_original_after_newer_source_head(monkeypatch):

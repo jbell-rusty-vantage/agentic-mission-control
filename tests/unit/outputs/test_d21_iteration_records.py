@@ -17,15 +17,14 @@ import pytest
 
 from mission_control.application.knowledge.access import InvocationAccess
 from mission_control.domain.outputs.contracts import (
-    Enforcement,
     EvaluationScope,
-    OutputForm,
     OutputObligation,
     Requirement,
 )
 from tests.fixtures.output_contracts import InMemoryOutputContractStore
 from tests.support.knowledge import origin
-from tests.unit.outputs.scenario import Stack, build_stack, codes, fulfillment, obligation, text
+from tests.support.unit.outputs.d21_iteration_records import note, promises
+from tests.unit.outputs.scenario import Stack, build_stack, codes, fulfillment, text
 
 pytestmark = pytest.mark.asyncio
 AT = datetime(2026, 10, 28, 12, tzinfo=UTC)
@@ -38,25 +37,6 @@ def invocation(operation: str = EXECUTOR) -> InvocationAccess:
         subject="mission-control-runtime",
         invocation_id="inv-" + operation.replace("/", "-"),
         authenticated_at=AT,
-    )
-
-
-def note(scope: EvaluationScope = EvaluationScope.ITERATION, **extra: object) -> OutputObligation:
-    return obligation("root.progress_note", OutputForm.TEXT, position="root", **extra).model_copy(
-        update={"evaluation_scope": scope}
-    )
-
-
-def promises() -> tuple[OutputObligation, ...]:
-    return (
-        obligation("root.summary", OutputForm.TEXT, position="root"),
-        note(),
-        obligation(
-            "root.appendix", OutputForm.TEXT, position="root", enforcement=Enforcement.EXPECTED
-        ),
-        obligation(
-            "root.caveats", OutputForm.TEXT, position="root", enforcement=Enforcement.OPTIONAL
-        ),
     )
 
 

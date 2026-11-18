@@ -9,7 +9,7 @@ import pytest
 from tests.fixtures.checkpoint_recovery import FixtureControlPlane
 from tests.fixtures.lane_turns import SCOPE, cursor_operation, lane_stack
 from tests.support.run_control import ConfigurationVerifier, actor, command, request, service
-from tests.unit.operations.test_lane_admission_rejection import RejectionJournal
+from tests.support.unit.operations.lane_admission_rejection import RejectionJournal
 
 from mission_control.adapters.storage.artifact_payloads import InMemoryArtifactPayloadStore
 from mission_control.application.execution.operations.journaled_operation_execution import (

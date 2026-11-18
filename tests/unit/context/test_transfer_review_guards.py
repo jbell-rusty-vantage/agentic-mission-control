@@ -20,7 +20,7 @@ from mission_control.domain.outputs.contracts import (
     OutputObligation,
 )
 from tests.support.knowledge import lane
-from tests.unit.context.test_transfer_materializer import (
+from tests.support.unit.context.transfer_materializer import (
     REPORT_INPUT,
     RUN,
     FakeBackend,

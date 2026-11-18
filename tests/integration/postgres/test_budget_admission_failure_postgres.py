@@ -14,7 +14,7 @@ from mission_control.domain.programs.contracts import (
 )
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.support.db_builders import scoped_command, scoped_request
-from tests.unit.orchestration.test_budget_admission_failure import prepared
+from tests.support.unit.orchestration.budget_admission_failure import prepared
 
 pytestmark = pytest.mark.common_db
 

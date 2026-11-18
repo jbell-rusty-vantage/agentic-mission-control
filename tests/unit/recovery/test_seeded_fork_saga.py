@@ -9,14 +9,11 @@ recorded namespace rather than a conflict.
 
 from __future__ import annotations
 
-from typing import Any
-
 import pytest
 from tests.fixtures.checkpoint_lineage import namespace_claim, stage_unit
-from tests.unit.runtime.test_runtime_recovery_stage3 import (
+from tests.support.unit.recovery.seeded_fork_saga import saga
+from tests.support.unit.runtime.runtime_recovery_stage3 import (
     DIGEST,
-    ForkAuthority,
-    ForkMaterializer,
     fork_request,
 )
 
@@ -29,11 +26,6 @@ from mission_control.application.execution.run_launch import (
     RunLaunchService,
 )
 from mission_control.application.recovery.run_forks import ForkOfRun
-from mission_control.application.recovery.runtime_recovery import (
-    ForkMaterializationObservation,
-    InMemoryForkRepository,
-    RuntimeForkService,
-)
 from mission_control.domain.execution.checkpoint_lineage import CheckpointLineageConflict
 from mission_control.domain.graph_runtime.identities import QualifiedCheckpointKey
 from mission_control.domain.policies.forks import (
@@ -63,21 +55,6 @@ def seeded_request() -> RunForkRequest:
     return request.model_copy(update={"patch": patch})
 
 
-class ReconcilingMaterializer(ForkMaterializer):
-    """A materializer whose recorded lineage a replay reconciles."""
-
-    def __init__(self) -> None:
-        super().__init__()
-        self.recorded: Any = None
-
-    async def materialize(self, request, admission):  # type: ignore[no-untyped-def]
-        self.recorded = await super().materialize(request, admission)
-        return self.recorded
-
-    async def reconcile_materialization(self, _request, _admission):  # type: ignore[no-untyped-def]
-        return ForkMaterializationObservation(status="materialized", materialization=self.recorded)
-
-
 class Seeds:
     def __init__(self, *, refuse: int = 0) -> None:
         self.calls: list[str] = []
@@ -88,18 +65,6 @@ class Seeds:
         if self.refuse:
             self.refuse -= 1
             raise ForkRejected("cognitive_seed_unavailable", "the saver did not answer")
-
-
-def saga() -> tuple[RuntimeForkService, InMemoryForkRepository]:
-    repository = InMemoryForkRepository()
-    return (
-        RuntimeForkService(
-            repository=repository,
-            authority=ForkAuthority(),  # type: ignore[arg-type]
-            materializer=ReconcilingMaterializer(),  # type: ignore[arg-type]
-        ),
-        repository,
-    )
 
 
 @pytest.mark.asyncio
@@ -189,7 +154,7 @@ def test_the_fork_seed_point_records_the_head_count_the_lane_read() -> None:
     """Tracing Stage 3 (R2-1): the `fork_seed` point's message count is the one the lane read
     at the seed head, never the source's count plus one."""
 
-    from tests.unit.temporal.test_fork_seed_runner import request as seed_request
+    from tests.support.unit.temporal.fork_seed_runner import request as seed_request
 
     from mission_control.application.execution.harness.time_travel import ForkSeedReceipt
     from mission_control.application.recovery.cognitive_seed import _head_message_count

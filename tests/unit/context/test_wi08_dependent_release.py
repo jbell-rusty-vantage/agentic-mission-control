@@ -27,12 +27,7 @@ from mission_control.domain.programs.contracts import (
 )
 from tests.fixtures.knowledge_binding import report_package
 from tests.support.knowledge import TENANT
-from tests.unit.context.test_transfer_materializer import (
-    RUN,
-    FakeBackend,
-    dependent,
-    seam,
-)
+from tests.support.unit.context.transfer_materializer import RUN, FakeBackend, dependent, seam
 from tests.unit.outputs.scenario import obligation, promises
 
 
@@ -345,7 +340,7 @@ def test_an_authored_expansion_tier_becomes_the_inputs_placement(expand, placeme
     `/inputs/<binding>/<revision>/` with the index pointing at it, never inline bytes."""
 
     from mission_control.domain.context.transfer import render_index
-    from tests.unit.context.test_transfer_plan import member, seal
+    from tests.support.unit.context.transfer_plan import member, seal
 
     request = SimpleNamespace(
         proposal=SimpleNamespace(

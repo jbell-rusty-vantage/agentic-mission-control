@@ -18,9 +18,9 @@ from mission_control.domain.execution.bindings import ProviderExecutionBinding
 from mission_control.domain.policies.stop_fence import StopFence
 from tests.fixtures.lane_bindings import lane_fields
 from tests.fixtures.managed_lane import managed_stack
-from tests.unit.anthropic_managed.test_harness import _started
+from tests.support.unit.anthropic_managed.harness import _started
+from tests.support.unit.approvals.approval_broker import OWNER, _compose
 from tests.unit.approvals.fixtures import answer
-from tests.unit.approvals.test_approval_broker import OWNER, _compose
 
 
 def gate(stack, *, wait=1.0):

@@ -54,7 +54,7 @@ from tests.integration.postgres.test_subscriptions import (
 )
 from tests.support.db_builders import AdmittedUnit, admit_unit_attempt, owner_rows, scoped_command
 from tests.support.run_control import EMPTY_EVIDENCE_DIGEST, NOW, WORKFLOW_DIGEST
-from tests.unit.frames.test_provider_lanes import claude_observations, codex_app_observations
+from tests.support.unit.frames.provider_lanes import claude_observations, codex_app_observations
 
 pytestmark = pytest.mark.common_db
 

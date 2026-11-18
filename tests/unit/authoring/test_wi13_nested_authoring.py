@@ -9,7 +9,6 @@ unknown exports and unsupported bodies refuse typed and pointed.
 from __future__ import annotations
 
 import copy
-from pathlib import Path
 from typing import Any
 
 import pytest
@@ -17,37 +16,14 @@ import pytest
 from mission_control.domain.authoring.contracts import GoalDirectedBlueprint, StageGraphBlueprint
 from mission_control.domain.authoring.manifest import (
     ManifestRejected,
-    load_manifest_yaml,
     parse_manifest,
     resolve_environments,
 )
 from mission_control.domain.authoring.manifest_lowering import lower_mission, output_promises
-from mission_control.domain.authoring.mission_definition import (
-    MissionDefinition,
-    manifest_to_definitions,
-)
 from mission_control.domain.authoring.nested_bodies import NestedBodyError
 from mission_control.domain.authoring.nested_lowering import nested_definition
 from mission_control.domain.programs.stagegraph_bounds import stagegraph_payload_problems
-
-ROOT = Path(__file__).resolve().parents[3]
-W5 = ROOT / "tests/fixtures/manifests/sprint-oc-w5"
-PLACEHOLDERS = {"__PACK__": '{"task":"frozen"}', "__MODEL__": "frontier.default"}
-
-
-def document(name: str) -> dict[str, Any]:
-    text = (W5 / name).read_text(encoding="utf-8")
-    for key, value in PLACEHOLDERS.items():
-        text = text.replace(key, value)
-    return load_manifest_yaml(text)
-
-
-def definition(doc: dict[str, Any]) -> MissionDefinition:
-    manifest = parse_manifest(doc)
-    structure = resolve_environments(manifest, doc)
-    assert not getattr(structure, "blockers", ())
-    (only,) = manifest_to_definitions(manifest, doc)
-    return only
+from tests.support.unit.authoring.wi13_nested_authoring import W5, definition, document
 
 
 def issues(doc: dict[str, Any]) -> list[tuple[str, str]]:

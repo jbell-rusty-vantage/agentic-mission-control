@@ -15,22 +15,11 @@ from dataclasses import replace
 from typing import Any
 
 import pytest
-from langgraph.checkpoint.memory import InMemorySaver
 
-from mission_control.adapters.storage.artifact_payloads import InMemoryArtifactPayloadStore
 from mission_control.application.context.pack_service import (
     ContextPackRejected,
-    ContextPackService,
-    StaticModelBudgetProfiles,
     context_packet_ref,
     goal_handoff_reference,
-)
-from mission_control.application.execution.operations.checkpoint_lineage import (
-    CheckpointLineageService,
-    InMemoryCheckpointLineageRepository,
-)
-from mission_control.application.execution.operations.operation_execution import (
-    InMemoryOperationBindingRepository,
 )
 from mission_control.application.programs.goal_directed import _bind_handoff
 from mission_control.domain.context.packet import (
@@ -42,65 +31,26 @@ from mission_control.domain.context.packet import (
 )
 from mission_control.domain.context.render import is_context_input_slot
 from mission_control.domain.execution.contracts import PromptTrustClass
-from mission_control.domain.policies.contracts import CommandStatus
 from mission_control.domain.programs.contracts import GoalHandoff
 from mission_control.domain.programs.goal_directed_runtime import GoalHandoffDraft
-from tests.fixtures.checkpoint_recovery import MemoryOperationJournal
 from tests.fixtures.goal_directed_journaled import (
     SCOPE,
-    GoalComposition,
-    GoalScriptedModel,
-    admit_goal_run,
-    compose_goal_directed,
     goal_blueprint,
-    goal_run_control,
-    goal_start_action,
 )
-from tests.support.run_control import command
-from tests.unit.operations.test_ft_b2_stage_handoff import (
-    FakeArtifacts,
+from tests.support.unit.operations.ft_b2_stage_handoff import (
     FakeSelections,
-    FakeStaging,
 )
-from tests.unit.orchestration.test_rrm_016_goal_directed_settlement import (
+from tests.support.unit.orchestration.ft_b3_goal_iteration_packet import (
+    _composition,
+    _executor_result,
+)
+from tests.support.unit.orchestration.rrm_016_goal_directed_settlement import (
     _claim,
     _preparation,
     _run_iteration_one,
 )
 
 DRAFT_SECRET = "PRIVATE-EXECUTOR-REASONING: try the hidden tactic first"
-
-
-async def _composition(
-    profile: ModelBudgetProfile | None = None,
-) -> tuple[GoalComposition, str, FakeSelections]:
-    run_control = goal_run_control()
-    selections = FakeSelections()
-    staging = FakeStaging()
-    packs = ContextPackService(
-        artifacts=FakeArtifacts({}, scope=None),
-        selections=selections,
-        staging=staging,
-        profiles=StaticModelBudgetProfiles(default=profile) if profile else None,
-    )
-    composition = await compose_goal_directed(
-        run_control=run_control,
-        journal=MemoryOperationJournal(),
-        lineage=CheckpointLineageService(InMemoryCheckpointLineageRepository()),
-        results=InMemoryArtifactPayloadStore(),
-        bindings=InMemoryOperationBindingRepository(),
-        saver=InMemorySaver(),
-        model=GoalScriptedModel(),
-        blueprint=goal_blueprint(),
-        context_packs=packs,
-        context_inputs=staging,
-    )
-    run_id = await admit_goal_run(run_control, "ft-b3-goal-packet")
-    started = await run_control.execute(
-        command(run_id, 1, "ft-b3-start", goal_start_action(run_id))
-    )
-    assert started.status == CommandStatus.ACCEPTED
-    return composition, run_id, selections
 
 
 def _packet(selections: FakeSelections, role: str, iteration: int) -> ContextPacket:
@@ -304,18 +254,3 @@ def test_handoff_records_its_packet_and_writes_the_goal_handoff_reference():
     assert reference.artifact_ref == f"context-packet://sha256:{'a' * 64}"
     assert reference.checkpoint.goal_iteration == handoff.source_iteration.goal_iteration
     assert reference.checkpoint.belllabs_run_id == handoff.run_id
-
-
-def _executor_result(claim: Any, run_id: str) -> Any:
-    from mission_control.domain.programs.contracts import GoalExecutionResult
-
-    return GoalExecutionResult(
-        identity=claim.identity,
-        disposition="completed",
-        operation_identity=f"{claim.identity.semantic_key}:executor",
-        operation_binding_ref="binding:executor",
-        session_id=claim.session_id,
-        workspace_id=claim.workspace_namespace,
-        writable_paths=("/goal/1/executor/work",),
-        output_refs=("artifact:rrm016:record",),
-    )

@@ -18,7 +18,7 @@ from mission_control.adapters.postgres.capability_bundles import PostgresCapabil
 from mission_control.adapters.postgres.scope import apply_catalog_scope_string
 from mission_control.adapters.supabase_storage.bundles import SupabaseCapabilityBundleStore
 from tests.support.db_builders import AI_ENGINEER_CATALOG, BIOTECH_CATALOG
-from tests.unit.integrations.test_capability_directory_bundles import source
+from tests.support.unit.integrations.capability_directory_bundles import source
 
 pytestmark = pytest.mark.common_db
 ROOT = Path(__file__).resolve().parents[3]

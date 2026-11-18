@@ -360,7 +360,7 @@ async def test_no_run_wide_report_loading_survives_in_the_knowledge_lane() -> No
 
 async def test_report_collection_tool_refusal_is_structured_and_advertised() -> None:
     from mission_control.application.knowledge.toolset import TOOL_ARGUMENTS, TOOL_DESCRIPTIONS
-    from tests.unit.knowledge.test_submission_assessment import report_selection
+    from tests.support.unit.knowledge.submission_assessment import report_selection
 
     h = lane()
     item = report_selection().items[0].model_dump()

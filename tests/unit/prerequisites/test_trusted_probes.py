@@ -9,7 +9,6 @@ import pytest
 
 from mission_control.adapters.prerequisites.probes import ProviderOwnerProbeExecutor
 from mission_control.adapters.secrets.sources import WorkerEnvironmentSource
-from mission_control.application.prerequisites.catalog import account_prerequisites
 from mission_control.application.prerequisites.probes import (
     ConfiguredOwnerProbes,
     OwnerProbeBinding,
@@ -18,15 +17,8 @@ from mission_control.application.prerequisites.probes import (
 )
 from mission_control.application.prerequisites.setup import ProbeUnavailable
 from mission_control.application.secrets.broker import SecretBroker
-from mission_control.domain.capabilities.host_support import LaneProfile
 from mission_control.domain.prerequisites import OwnerPrerequisiteRecord
-
-
-def record_for(profile: str, code: str) -> OwnerPrerequisiteRecord:
-    prerequisite = next(
-        item for item in account_prerequisites(LaneProfile(profile)) if item.id.endswith("." + code)
-    )
-    return OwnerPrerequisiteRecord.of(prerequisite)
+from tests.support.unit.prerequisites.trusted_probes import record_for
 
 
 def configured(record: OwnerPrerequisiteRecord, operation: str, handler: object):

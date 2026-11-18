@@ -29,11 +29,8 @@ from mission_control.domain.policies.errors import (
 from mission_control.domain.policies.family_admission import FamilyAdmissionReceipt
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.support.db_builders import owner_rows, scoped_command, scoped_request
-from tests.unit.run_control.test_atomic_family_admission import (
-    authority_batch,
-    family_service,
-)
-from tests.unit.run_control.test_atomic_family_admission import (
+from tests.support.unit.run_control.atomic_family_admission import authority_batch, family_service
+from tests.support.unit.run_control.atomic_family_admission import (
     family_mutation as unit_family_mutation,
 )
 

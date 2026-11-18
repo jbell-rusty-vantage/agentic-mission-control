@@ -21,7 +21,7 @@ from mission_control.interfaces.mcp.subscriptions import (
     McpSubscriptionBridge,
     notification_for,
 )
-from tests.unit.coordinator.test_coordinator_mcp_read_surface import FakeFacade
+from tests.support.unit.coordinator.coordinator_mcp_read_surface import FakeFacade
 from tests.unit.subscriptions.fakes import (
     MISSION,
     SCOPE,

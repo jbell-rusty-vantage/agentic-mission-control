@@ -53,7 +53,7 @@ from mission_control.domain.policies.errors import IdempotencyConflict
 from tests.fixtures.lane_bindings import LANE_REBINDERS
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.integration.temporal.test_wp_bp_010_temporal import RecordingOperationBindings
-from tests.unit.operations.test_ft_b2_stage_handoff import (
+from tests.support.unit.operations.ft_b2_stage_handoff import (
     _compiled_template,
     _downstream_request,
 )

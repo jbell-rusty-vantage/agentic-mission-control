@@ -19,8 +19,8 @@ from mission_control.domain.programs.nested import (
     executor_result,
     project_exports,
 )
-from tests.unit.orchestration.test_rrm_016_goal_directed_settlement import _reconciliation
-from tests.unit.orchestration.test_w1_goal_failure_paths import _executor_dispatch
+from tests.support.unit.orchestration.rrm_016_goal_directed_settlement import _reconciliation
+from tests.support.unit.orchestration.w1_goal_failure_paths import _executor_dispatch
 
 DIGEST = "sha256:" + "c" * 64
 BODY = NestedBody(

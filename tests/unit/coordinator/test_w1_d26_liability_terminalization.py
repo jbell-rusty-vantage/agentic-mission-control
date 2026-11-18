@@ -22,7 +22,6 @@ from mission_control.application.execution.family_failure import (
     FamilyFailureTerminalization,
     _proposal,
 )
-from mission_control.application.programs.service import orchestration_lifecycle_actor
 from mission_control.application.subscriptions.coordinator import NotificationKind
 from mission_control.domain.policies.contracts import (
     ClaimEffectAction,
@@ -43,26 +42,9 @@ from mission_control.domain.programs.family_failure import (
 )
 from tests.fixtures.goal_directed_journaled import SCOPE
 from tests.support.run_control import command
-from tests.unit.coordinator.test_w1_family_failure_terminalization import _request
-from tests.unit.orchestration.test_rrm_016_goal_directed_settlement import (
-    _claim,
-    _composition,
-    _preparation,
-)
-from tests.unit.subscriptions.test_mp15_coordinator import classify_type
-
-
-async def _stuck_unit() -> tuple[Any, str, FamilyFailureTerminalization]:
-    """A started run whose executor unit is admitted (reservation held) and never settles."""
-
-    composition, run_id = await _composition()
-    claim = await _claim(run_id)
-    run = await composition.run_control.get_run(SCOPE, run_id)
-    await composition.family.execute_iteration(
-        _preparation(run_id, claim, "executor", run.version, 0)
-    )
-    service = FamilyFailureTerminalization(composition.run_control, orchestration_lifecycle_actor())
-    return composition, run_id, service
+from tests.support.unit.coordinator.w1_d26_liability_terminalization import _stuck_unit
+from tests.support.unit.coordinator.w1_family_failure_terminalization import _request
+from tests.support.unit.subscriptions.mp15_coordinator import classify_type
 
 
 async def _closed(composition: Any, run_id: str, service: FamilyFailureTerminalization) -> Any:

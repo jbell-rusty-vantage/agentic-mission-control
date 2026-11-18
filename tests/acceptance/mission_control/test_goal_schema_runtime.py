@@ -22,7 +22,11 @@ from tests.acceptance.mission_control.test_authenticated_scoped_runtime import (
 )
 from tests.fixtures import rrm009_production_stack as technical
 from tests.fixtures.rrm009_production_harness import canonical_evidence
-from tests.unit.orchestration.test_goal_schema_completion import OUTPUT, SUMMARY, multi_goal_request
+from tests.support.unit.orchestration.goal_schema_completion import (
+    OUTPUT,
+    SUMMARY,
+    multi_goal_request,
+)
 
 from mission_control.adapters.operations.runtime_ports import FilesystemArtifactPayloadStore
 from mission_control.adapters.postgres.context.artifact_bytes import PostgresArtifactBytes

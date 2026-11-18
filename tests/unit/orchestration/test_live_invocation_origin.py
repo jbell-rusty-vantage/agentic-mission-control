@@ -51,12 +51,12 @@ from tests.support.manifests.launch_inputs import (
     resolver,
     served_with_mcp,
 )
+from tests.support.unit.operations.ft_b2_stage_handoff import _downstream_request
 from tests.unit.authoring.manifest_launch_fixture import (
     deep_agents_chain,
     fixture_bindings,
     pubmed_bound,
 )
-from tests.unit.operations.test_ft_b2_stage_handoff import _downstream_request
 
 TEMPLATE_PREFIX = "manifest-template/"
 

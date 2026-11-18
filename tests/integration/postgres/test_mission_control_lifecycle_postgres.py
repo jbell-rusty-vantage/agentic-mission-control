@@ -41,7 +41,7 @@ from mission_control.interfaces.http.mission_control import (
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.support.boundary_commands import TARGET, pause
 from tests.support.run_control import actor, command, request, service
-from tests.unit.run_control.test_mission_control_facade import pause_request
+from tests.support.unit.run_control.mission_control_facade import pause_request
 
 pytestmark = pytest.mark.common_db
 

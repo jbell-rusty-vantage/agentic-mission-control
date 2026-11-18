@@ -7,15 +7,15 @@ from mission_control.application.knowledge.toolset import InlineItem, _candidate
 from mission_control.application.programs.goal_directed import bind_fulfillment
 from mission_control.domain.outputs.contracts import Enforcement, OutputForm
 from tests.support.knowledge import call, harness
-from tests.unit.orchestration.test_wp_bp_020_goal_directed import (
+from tests.support.unit.orchestration.wp_bp_020_goal_directed import (
     _blueprint,
     _claim,
     _execution,
     _verification,
 )
+from tests.support.unit.outputs.output_fulfillment import make_stack
+from tests.support.unit.outputs.w1_convergence_fulfillment import _observation
 from tests.unit.outputs.scenario import obligation, text
-from tests.unit.outputs.test_output_fulfillment import make_stack
-from tests.unit.outputs.test_w1_convergence_fulfillment import _observation
 
 
 @pytest.mark.asyncio

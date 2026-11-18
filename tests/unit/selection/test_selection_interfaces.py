@@ -30,7 +30,7 @@ from mission_control.interfaces.mcp.selection_tools import (
     register_selection_tools,
 )
 from tests.fixtures.catalog_http import INSTALLATION, TENANT, CatalogHarness, catalog_harness
-from tests.unit.selection.test_selection_workspace import (
+from tests.support.unit.selection.selection_workspace import (
     NARROW_WORKFLOW,
     RESEARCH,
     REVIEW,

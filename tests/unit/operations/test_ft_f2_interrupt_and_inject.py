@@ -17,13 +17,10 @@ from typing import Any
 from uuid import uuid4
 
 import pytest
-from langchain_core.messages import BaseMessage
 
 from mission_control.adapters.deep_agents.describe import DEEP_AGENTS_DESCRIBE
-from mission_control.application.execution.boundary_interventions import BoundaryInterventionService
 from mission_control.application.execution.harness.inject import (
     InjectionParked,
-    InjectionSettings,
     InterruptAndInjectService,
     TurnRecord,
     cancel_and_replace_turn,
@@ -31,7 +28,6 @@ from mission_control.application.execution.harness.inject import (
 from mission_control.application.execution.operations.operation_execution import (
     bind_operation_execution_request,
 )
-from mission_control.application.missions.service import MissionControlService
 from mission_control.contracts.contracts import MissionCommandRequest
 from mission_control.domain.execution.contracts import (
     PromptSegment,
@@ -57,39 +53,21 @@ from mission_control.domain.policies.contracts import (
 from mission_control.domain.policies.mailbox import MailboxState
 from tests.fixtures.checkpoint_recovery import (
     RecoveryHarness,
-    ScriptedRecoveryModel,
     recovery_harness,
     stage_recovery_unit,
 )
-from tests.support.run_control import actor, command
+from tests.support.run_control import command
+from tests.support.unit.operations.ft_f2_interrupt_and_inject import (
+    FAST,
+    RecordingModel,
+    facade,
+    harness_with_injections,
+    operator,
+    states,
+    status_of,
+)
 
-FAST = InjectionSettings(poll_seconds=0.01, settle_grace_seconds=0.3, settle_poll_seconds=0.01)
 INJECTED = "Redirect: use release/2.3, not main."
-
-
-class RecordingModel(ScriptedRecoveryModel):
-    """The RRM-004 script, plus the text of every human message each call saw."""
-
-    def _observe(self, messages: list[BaseMessage]) -> tuple[int, int]:
-        self.__dict__.setdefault("humans", []).append(
-            [str(item.content) for item in messages if item.type == "human"]
-        )
-        return super()._observe(messages)
-
-    @property
-    def humans(self) -> list[list[str]]:
-        return self.__dict__.get("humans", [])
-
-
-def operator() -> ActorContext:
-    source = actor()
-    return source.model_copy(
-        update={"permissions": source.permissions | {"workflow_run.read", "workflow_run.control"}}
-    )
-
-
-async def harness_with_injections() -> RecoveryHarness:
-    return await recovery_harness(model=RecordingModel(), injection_settings=FAST)
 
 
 async def cancel_and_replace_harness() -> RecoveryHarness:
@@ -98,15 +76,6 @@ async def cancel_and_replace_harness() -> RecoveryHarness:
 
     return await recovery_harness(
         model=RecordingModel(), injection_settings=FAST, interrupt_semantics="cancel_and_replace"
-    )
-
-
-def facade(harness: RecoveryHarness) -> MissionControlService:
-    return MissionControlService(
-        harness.run_control,
-        BoundaryInterventionService(harness.run_control),
-        request_scope="tenant-1",
-        mailbox=harness.mailbox,
     )
 
 
@@ -127,19 +96,6 @@ async def inject(harness: RecoveryHarness, request_id: str | None = None) -> Any
         ),
         operator(),
     )
-
-
-async def status_of(harness: RecoveryHarness, receipt: Any) -> Any:
-    return await harness.run_control.get_boundary_command(
-        "tenant-1",
-        harness.run_id,
-        receipt.delivery.command.idempotency_issuer,
-        str(receipt.request_id),
-    )
-
-
-def states(status: Any) -> list[str]:
-    return [item.state.value for item in status.receipts]
 
 
 @pytest.mark.asyncio
@@ -505,7 +461,7 @@ async def test_protocol_cancel_and_replace_settles_then_sends_the_replacement_tu
 async def test_http_accepts_interrupt_and_inject_with_202_and_a_command_record() -> None:
     from fastapi.testclient import TestClient
 
-    from tests.unit.run_control.test_ft_f1_command_mailbox import World, _app
+    from tests.support.unit.run_control.ft_f1_command_mailbox import World, _app
 
     world = await World().start()
     app, _scope = _app(world)
@@ -536,7 +492,7 @@ async def test_cli_command_inject_sends_interrupt_and_inject_without_a_boundary(
     from fastapi.testclient import TestClient
 
     from mission_control.interfaces.cli.main import main
-    from tests.unit.run_control.test_ft_f1_command_mailbox import World, _app
+    from tests.support.unit.run_control.ft_f1_command_mailbox import World, _app
 
     world = await World().start()
     app, _scope = _app(world)
@@ -592,9 +548,9 @@ async def test_mcp_mission_command_send_admits_interrupt_and_inject_like_http() 
         COMMAND_SEND_TOOL,
         ScopedRunControl,
     )
-    from tests.unit.coordinator.test_coordinator_mcp_read_surface import FakeFacade
-    from tests.unit.run_control.test_ft_f1_command_mailbox import SCOPE, Resolver, World, _app
-    from tests.unit.run_control.test_ft_f1_command_mailbox import operator as f1_operator
+    from tests.support.unit.coordinator.coordinator_mcp_read_surface import FakeFacade
+    from tests.support.unit.run_control.ft_f1_command_mailbox import SCOPE, Resolver, World, _app
+    from tests.support.unit.run_control.ft_f1_command_mailbox import operator as f1_operator
 
     world = await World().start()
     grants = f1_operator().permissions

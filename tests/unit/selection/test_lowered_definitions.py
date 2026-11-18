@@ -41,14 +41,7 @@ from mission_control.domain.coordinator.contracts import CapabilitySearchRequest
 from mission_control.domain.execution.contracts import DeepAgentSandboxComponent
 from tests.conformance.lanes.compile.stub import STUB_DECLARATION
 from tests.conformance.resolution.fixtures import APPLICATIONS, MODELS
-from tests.unit.guide.support import (
-    SANDBOX_DETAILS,
-    SANDBOXES,
-    lowered_rows,
-    stub_guide,
-    workspace_entries,
-)
-from tests.unit.selection.test_selection_workspace import (
+from tests.support.unit.selection.selection_workspace import (
     CATALOG_SCOPE,
     NARROW_WORKFLOW,
     OPEN_WORKFLOW,
@@ -59,6 +52,13 @@ from tests.unit.selection.test_selection_workspace import (
     _hit,
     _pin,
     _registration,
+)
+from tests.unit.guide.support import (
+    SANDBOX_DETAILS,
+    SANDBOXES,
+    lowered_rows,
+    stub_guide,
+    workspace_entries,
 )
 
 LOWERED = lowered_rows()

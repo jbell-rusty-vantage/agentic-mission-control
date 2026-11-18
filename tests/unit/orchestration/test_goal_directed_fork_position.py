@@ -23,7 +23,7 @@ from mission_control.domain.programs.goal_directed import (
     GoalDirectedExecutionError,
     GoalDirectedInterpreter,
 )
-from tests.unit.orchestration.test_wp_bp_020_goal_directed import (
+from tests.support.unit.orchestration.wp_bp_020_goal_directed import (
     _blueprint,
     _execution,
     _revision,

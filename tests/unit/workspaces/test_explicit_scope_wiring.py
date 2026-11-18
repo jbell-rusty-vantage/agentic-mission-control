@@ -17,8 +17,8 @@ from mission_control.application.artifacts.workspace_materialization import (
 )
 from mission_control.domain.execution.contracts import CapturedWorkspaceCandidate
 from mission_control.domain.execution.errors import UndeclaredWorkspacePath, WorkspaceDigestMismatch
-from tests.unit.workspaces.test_artifact_promotion import CONTENT, promotion_fixture
-from tests.unit.workspaces.test_workspace_materialization import RecordingProvisioner
+from tests.support.unit.workspaces.artifact_promotion import CONTENT, promotion_fixture
+from tests.support.unit.workspaces.workspace_materialization import RecordingProvisioner
 
 
 async def test_binding_scope_routes_materialization_and_candidate_access_without_ambient_state():

@@ -340,7 +340,11 @@ async def test_transfer_input_reads_verify_the_sealed_plan_digest() -> None:
 
 
 def _declaring(declared: str, *, bound: bool) -> Any:
-    from tests.unit.deep_agents.test_hook_middleware import _binding, _bound_binding, _hook_bundles
+    from tests.support.unit.deep_agents.hook_middleware import (
+        _binding,
+        _bound_binding,
+        _hook_bundles,
+    )
 
     bundles, (component,) = _hook_bundles((0, "hook.a"))
     update = (

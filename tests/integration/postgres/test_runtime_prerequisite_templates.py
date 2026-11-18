@@ -22,7 +22,7 @@ from mission_control.domain.programs.contracts import StageGraphRunInput
 from tests.fixtures.managed_lane import managed_binding, managed_operation
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.support.db_builders import admit_unit_attempt
-from tests.unit.run_control.test_run_launch import _input
+from tests.support.unit.run_control.run_launch import _input
 
 pytestmark = pytest.mark.common_db
 

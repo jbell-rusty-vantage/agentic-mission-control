@@ -9,7 +9,7 @@ from mission_control.application.authoring.service import ControlPlaneService
 from mission_control.domain.authoring.canonical import stable_json_dump
 from mission_control.domain.authoring.contracts import ArtifactSchemaDefinition, Definition
 from mission_control.domain.authoring.errors import CompilationRejected
-from tests.unit.capability.test_artifact_schema_seeds import production_record
+from tests.support.unit.capability.artifact_schema_seeds import production_record
 
 
 def test_definition_union_roundtrip_and_non_executable_kind():

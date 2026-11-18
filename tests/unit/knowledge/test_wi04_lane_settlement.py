@@ -235,7 +235,7 @@ async def test_fenced_native_settlement_preserves_last_durable_receipt_snapshot(
     from datetime import timedelta
     from types import SimpleNamespace
 
-    from tests.unit.operations.test_native_receipt_evidence import AT, RECEIPT, REFERENCES, saved
+    from tests.support.unit.operations.native_receipt_evidence import AT, RECEIPT, REFERENCES, saved
 
     h = lane()
     calls = []

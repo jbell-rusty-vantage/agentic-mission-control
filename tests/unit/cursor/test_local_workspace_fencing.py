@@ -20,8 +20,8 @@ from mission_control.domain.execution.lanes import (
 )
 from tests.fixtures.cursor_controls import harness_fields, started_session
 from tests.fixtures.cursor_local import LocalStack, local_stack
+from tests.support.unit.cursor.local_reconcile_and_rehydration import _fresh
 from tests.unit.cursor.support import send_request
-from tests.unit.cursor.test_local_reconcile_and_rehydration import _fresh
 
 
 async def _replace_holder(stack: LocalStack, heid: str) -> WorkspaceLease:

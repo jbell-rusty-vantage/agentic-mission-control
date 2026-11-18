@@ -18,7 +18,7 @@ from mission_control.application.execution.harness.hook_callbacks import (
     InMemoryHookTokenStore,
 )
 from mission_control.domain.capabilities.hooks import HookDecision, HookEvent
-from tests.unit.harness.test_hook_callback import Stack, _context
+from tests.support.unit.harness.hook_callback import Stack, _context
 
 PRE_TOOL: dict[str, Any] = {
     "session_id": "thr-1",

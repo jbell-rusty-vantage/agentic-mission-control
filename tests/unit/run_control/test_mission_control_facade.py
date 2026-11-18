@@ -13,35 +13,14 @@ from mission_control.contracts.contracts import (
     InstructionPayload,
     MissionCommandRequest,
     MissionControlRejected,
-    PausePayload,
     ResumePayload,
     WaitPayload,
 )
 from mission_control.domain.policies.contracts import ActorContext, RunPhase, SetWaitAction
 from mission_control.domain.policies.errors import IdempotencyConflict, RunControlNotFound
-from tests.support.boundary_commands import TARGET, declared_wait, pause, resume, started
-from tests.support.run_control import actor as control_actor
+from tests.support.boundary_commands import TARGET, declared_wait, resume, started
 from tests.support.run_control import command, service
-
-
-def actor() -> ActorContext:
-    source = control_actor()
-    return source.model_copy(update={"permissions": source.permissions | {"workflow_run.read"}})
-
-
-def pause_request(run_id: str, version: int = 2) -> MissionCommandRequest:
-    action = pause()
-    return MissionCommandRequest(
-        request_id=uuid4(),
-        expected_version=version,
-        expected_generation=1,
-        target=CommandTarget(id=run_id),
-        kind="pause",
-        payload=PausePayload(
-            decision=action.decision, runnable_work_remains=action.runnable_work_remains
-        ),
-        reason="operator hold",
-    )
+from tests.support.unit.run_control.mission_control_facade import actor, pause_request
 
 
 @pytest.mark.asyncio

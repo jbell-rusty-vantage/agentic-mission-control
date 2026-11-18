@@ -1,26 +1,9 @@
 from contextlib import asynccontextmanager
-from datetime import UTC, datetime
-from uuid import uuid4
 
 import pytest
 
-from mission_control.application.signals.drainer import DrainItem, DrainRejected, IngressDrainer
-
-
-def item(attempts=0):
-    return DrainItem(
-        uuid4(),
-        "scope",
-        uuid4(),
-        "ai-engineer",
-        "signal.test",
-        "credential",
-        "delivery",
-        {},
-        datetime.now(UTC),
-        generation=1,
-        attempts=attempts,
-    )
+from mission_control.application.signals.drainer import DrainRejected, IngressDrainer
+from tests.support.unit.signals.drainer import item
 
 
 class Store:

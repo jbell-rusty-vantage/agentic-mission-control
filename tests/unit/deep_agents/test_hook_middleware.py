@@ -5,7 +5,7 @@
 from __future__ import annotations
 
 import json
-from collections.abc import Callable, Sequence
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
 from types import SimpleNamespace
@@ -16,7 +16,6 @@ from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
 from pydantic import ValidationError
 
 import mission_control.adapters.deep_agents.hooks as hooks_module
-from mission_control.adapters.capabilities.capability_bundles import bundle_digest
 from mission_control.adapters.deep_agents.hooks import (
     HookContext,
     HookDispatcher,
@@ -52,11 +51,9 @@ from mission_control.contracts.hooks import (
     merge_results,
     parse_script_output,
 )
-from mission_control.domain.authoring.contracts import DefinitionKind, ExactDefinitionRef
 from mission_control.domain.capabilities.hooks import KERNEL_HOOK_IDS, HookDecision, HookEvent
 from mission_control.domain.capabilities.host_support import LaneProfile
-from mission_control.domain.execution.contracts import DeepAgentHookScriptComponent
-from tests.fixtures.lane_turns import INSTALLATION, TENANT
+from tests.support.unit.deep_agents.hook_middleware import _binding, _bound_binding, _hook_bundles
 
 SECRETS = ("sk-FIXTURE-openai-0001", "tvly-FIXTURE-0002")
 POLICY_ROOT = Path(__file__).resolve().parents[3] / "scripts" / "hooks" / "policy_template"
@@ -515,53 +512,6 @@ def test_summarization_wrapper_keeps_name_and_emits_compaction_events() -> None:
 # --- materializer composition ----------------------------------------------------------------
 
 
-def _component(hook_id: str, order: int, files: tuple[tuple[str, bytes], ...]) -> Any:
-    return DeepAgentHookScriptComponent(
-        ref=ExactDefinitionRef(
-            kind=DefinitionKind.HOOK_SCRIPT,
-            logical_id=hook_id,
-            revision=1,
-            digest="sha256:" + "1" * 64,
-        ),
-        hook_id=hook_id,
-        order=order,
-        events=("before_shell",),
-        interpreter="python",
-        entrypoint="hook.py",
-        manifest_digest=bundle_digest(files, require_skill_md=False),
-    )
-
-
-def _hook_bundles(
-    *specs: tuple[int, str], callback: str = "none"
-) -> tuple[dict[str, ResolvedHookScriptBundle], list[Any]]:
-    bundles: dict[str, ResolvedHookScriptBundle] = {}
-    components = []
-    for order, hook_id in specs:
-        files = (("hook.py", f"# {hook_id}\n".encode()),)
-        component = _component(hook_id, order, files).model_copy(update={"callback": callback})
-        bundles[component.manifest_digest] = ResolvedHookScriptBundle(
-            component.manifest_digest, files
-        )
-        components.append(component)
-    return bundles, components
-
-
-def _binding(components: Sequence[Any], **values: Any) -> Any:
-    defaults: dict[str, Any] = {
-        "hook_scripts": tuple(components),
-        "run_id": "run-1",
-        "operation_id": "op-1",
-        "operation_attempt": 1,
-        "execution_generation": 1,
-        "binding_id": "binding-1",
-        "runtime_unit": None,
-        "cognitive_session_namespace": None,
-    }
-    defaults.update(values)
-    return SimpleNamespace(**defaults)
-
-
 async def test_materializer_composes_kernel_hooks_before_three_catalog_hooks() -> None:
     from contextlib import AsyncExitStack
 
@@ -587,21 +537,6 @@ async def test_materializer_composes_kernel_hooks_before_three_catalog_hooks() -
         await ExactDeepAgentMaterializer(
             ExactComponentRegistry(model_factories={}, hook_scripts=tampered)
         )._hook_dispatcher(binding, AsyncExitStack())
-
-
-def _bound_binding(components: Sequence[Any]) -> Any:
-    unit = SimpleNamespace(
-        request_scope=f"mc/{INSTALLATION}/biotech/{TENANT}",
-        belllabs_run_id="run-1",
-        unit_key="stage:s1:op-1:1",
-    )
-    return _binding(
-        components,
-        runtime_unit=unit,
-        cognitive_session_namespace="belllabs/stage/stage:s1:op-1:1/gen/1",
-        placement="local_in_worker",
-        binding_digest="sha256:" + "d" * 64,
-    )
 
 
 async def test_materializer_fills_the_hook_context_and_mints_the_callback(tmp_path: Path) -> None:

@@ -41,13 +41,14 @@ from tests.fixtures.mission_control_common_db import (
 )
 from tests.support.db_builders import owner_rows
 from tests.support.knowledge import origin
-from tests.unit.knowledge.test_wi07_report_collections import (
+from tests.support.unit.knowledge.wi07_report_collections import (
     PIN,
     CurrentUse,
     ScriptedBridge,
     handle,
     settlement,
 )
+from tests.support.unit.outputs.collections import collection, collection_promise, report
 from tests.unit.outputs.scenario import (
     TRUSTED_VALIDATORS,
     Stack,
@@ -57,7 +58,6 @@ from tests.unit.outputs.scenario import (
     obligation,
     text,
 )
-from tests.unit.outputs.test_collections import collection, collection_promise, report
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.common_db]
 AT = datetime(2026, 10, 28, 12, tzinfo=UTC)
@@ -301,7 +301,7 @@ async def test_the_verifier_plan_seals_the_current_set_index_in_the_plan_table(
     )
     from mission_control.domain.outputs.current_set import CURRENT_SET_BINDING
     from tests.fixtures.knowledge_binding import InMemoryStaging
-    from tests.unit.context.test_wi07_current_set_transfer import (
+    from tests.support.unit.context.wi07_current_set_transfer import (
         Backend,
         request,
         verifier_selection,
@@ -362,7 +362,7 @@ async def test_d21_text_and_progress_note_fulfillment_on_postgres(wi07_db: Commo
     and fulfilled; a per-iteration progress note is fulfilled after a rejected verdict while
     the summary is not; expected shortfall visible; optional silent."""
 
-    from tests.unit.outputs.test_d21_iteration_records import promises
+    from tests.support.unit.outputs.d21_iteration_records import promises
 
     pool = await wi07_db.pool()
     try:
@@ -424,8 +424,8 @@ async def test_trusted_member_decisions_verify_against_recorded_bridge_decisions
     from mission_control.application.outputs.fulfillment import AssessmentInput, HostAccess
     from mission_control.application.ports.knowledge import RecordedUseDecision
     from mission_control.domain.knowledge.judgment import TRUSTED_BRIDGE_ACTOR, decision_evidence
-    from tests.unit.knowledge.test_wi07_report_collections import Lineage
-    from tests.unit.outputs.test_collections import TRUSTED_PIN
+    from tests.support.unit.knowledge.wi07_report_collections import Lineage
+    from tests.support.unit.outputs.collections import TRUSTED_PIN
 
     pool = await wi07_db.pool()
     try:

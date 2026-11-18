@@ -45,7 +45,7 @@ from mission_control.domain.execution.cognition_points import (
     point_id_for,
 )
 from mission_control.domain.graph_runtime.identities import QualifiedCheckpointKey
-from tests.unit.deep_agents.test_cognition_points_collector import (
+from tests.support.unit.deep_agents.cognition_points_collector import (
     THREAD,
     _graph,
     _lineage,

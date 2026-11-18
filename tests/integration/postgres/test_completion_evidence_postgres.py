@@ -13,7 +13,7 @@ from mission_control.contracts.identities import uuid7
 from mission_control.domain.authoring.canonical import sha256_digest
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.support.run_control import request, service
-from tests.unit.mission_control.test_completion_evidence import receipt_row
+from tests.support.unit.mission_control.completion_evidence import receipt_row
 
 pytestmark = pytest.mark.common_db
 

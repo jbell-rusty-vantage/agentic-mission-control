@@ -22,16 +22,16 @@ from mission_control.domain.subscriptions.streams import (
     StreamTarget,
 )
 from tests.fixtures.provider_frames import FIXTURE_HARNESS
-from tests.unit.streams.fakes import MISSION, FakeStreamSource
-from tests.unit.streams.test_stream_lineage import run_pump, stop
-from tests.unit.streams.test_stream_pump import FAST, Recorder, until
-from tests.unit.streams.test_stream_service import (
+from tests.support.unit.streams.stream_lineage import run_pump, stop
+from tests.support.unit.streams.stream_pump import FAST, Recorder, until
+from tests.support.unit.streams.stream_service import (
     READER,
     frames_at,
     mission_at,
     service,
     subscription,
 )
+from tests.unit.streams.fakes import MISSION, FakeStreamSource
 
 K = FrameKind
 SECOND = UUID("7d4f0c1e-1111-4a2b-9c3d-0000000000b2")

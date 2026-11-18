@@ -14,16 +14,7 @@ from mission_control.adapters.capabilities.capability_bundles import (
 from mission_control.adapters.capabilities.capability_pins import PinnedSkill, read_skill_bundle
 from mission_control.adapters.deep_agents.materializer import ResolvedSkillBundle
 from mission_control.domain.execution.errors import DeepAgentRuntimeDrift
-
-
-def source(tmp_path: Path) -> Path:
-    path = tmp_path / "source"
-    path.mkdir()
-    (path / "SKILL.md").write_bytes(b"---\nname: fixture\ndescription: test\n---\n")
-    (path / ".config").write_bytes(b"complete hidden file")
-    (path / "assets").mkdir()
-    (path / "assets" / "image.bin").write_bytes(b"\x00\xff\x01")
-    return path
+from tests.support.unit.integrations.capability_directory_bundles import source
 
 
 def test_complete_binary_directory_is_immutable_and_materializer_compatible(tmp_path: Path) -> None:

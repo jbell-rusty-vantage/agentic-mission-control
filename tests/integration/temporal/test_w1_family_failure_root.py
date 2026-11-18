@@ -42,7 +42,7 @@ from tests.fixtures.temporal_history import patch_ids
 from tests.integration.temporal.test_rrm_005_search_attributes import _start_local
 from tests.integration.temporal.test_wp_bp_010_temporal import _blueprint
 from tests.integration.temporal.test_wp_bp_010_temporal import _run_input as stage_run_input
-from tests.unit.coordinator.test_root_result_materialization import SCOPE
+from tests.support.unit.coordinator.root_result_materialization import SCOPE
 
 QUEUE = "w1-family-failure-root"
 

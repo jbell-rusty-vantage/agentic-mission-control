@@ -41,14 +41,14 @@ from mission_control.domain.execution.lanes import DELIVERY_COMMANDS, LANE_PROFI
 from tests.architecture.test_package_boundaries import APPLICATION_NEEDLES
 from tests.conformance.lanes.compile.stub import NARROW_DECLARATION, STUB_DECLARATION
 from tests.conformance.resolution.fixtures import MODELS
-from tests.unit.guide.support import APPLICATION, full_guide, stub_guide
-from tests.unit.selection.test_selection_workspace import (
+from tests.support.unit.selection.selection_workspace import (
     OPEN_WORKFLOW,
     RESEARCH,
     ROWS,
     _pin,
     _registration,
 )
+from tests.unit.guide.support import APPLICATION, full_guide, stub_guide
 
 # The owner's budgets, in tokens (characters of the rendered page divided by four). The
 # manifest page carries the required fields, the values and the acceptance table.

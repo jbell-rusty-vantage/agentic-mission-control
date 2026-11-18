@@ -4,7 +4,7 @@ import pytest
 
 from mission_control.application.programs.service import producer_effects_settled
 from mission_control.domain.policies.contracts import EffectLedgerState
-from tests.unit.operations.test_rrm_009_cancellation_composition import _claim
+from tests.support.unit.operations.rrm_009_cancellation_composition import _claim
 
 RESERVATION = "reservation:run-1:operation:formulations:attempt:1"
 KEY = "stagegraph:run-1:operation:formulations:attempt:1:generation:1"
@@ -126,11 +126,8 @@ async def test_human_gate_requires_exact_stored_terminal_task(corruption, change
         outcome_for,
         stagegraph_gate_result,
     )
+    from tests.support.unit.orchestration.human_gate_budget_admission import GATE, fixture
     from tests.unit.human_tasks.fixtures import open_task, packet
-    from tests.unit.orchestration.test_human_gate_budget_admission import (
-        GATE,
-        fixture,
-    )
 
     control, repository, candidate = await fixture()
     gate = GATE.model_copy(update={"remediation_target": "work", "max_review_rounds": 2})
@@ -293,8 +290,8 @@ async def test_nested_body_requires_stored_activation_receipt_and_parent_usage(c
     from mission_control.domain.policies.contracts import RecordUsageAction, RunOutcome, RunPhase
     from mission_control.domain.programs.nested import NestedProjection
     from tests.support.run_control import command
-    from tests.unit.orchestration.test_completion_validation_service import prepared
-    from tests.unit.orchestration.test_wi13_nested_runtime import body
+    from tests.support.unit.orchestration.completion_validation_service import prepared
+    from tests.support.unit.orchestration.wi13_nested_runtime import body
 
     fixture = await prepared(release_usage=False)
     candidate = fixture.result
@@ -421,7 +418,7 @@ async def test_never_activated_nested_body_persists_zero_usage_and_removes_empty
     )
     from mission_control.domain.programs.nested import NestedSettlementRequest
     from tests.support.run_control import service
-    from tests.unit.orchestration.test_wi13_nested_runtime import (
+    from tests.support.unit.orchestration.wi13_nested_runtime import (
         NOW,
         SCOPE,
         body,

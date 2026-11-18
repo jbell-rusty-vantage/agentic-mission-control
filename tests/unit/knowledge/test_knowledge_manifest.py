@@ -10,7 +10,6 @@ components into each node's binding, and the Deep Agents lane receipts them as `
 from __future__ import annotations
 
 import json
-from pathlib import Path
 from typing import Any, cast
 
 import pytest
@@ -25,16 +24,13 @@ from mission_control.adapters.deep_agents.knowledge_tools import (
 from mission_control.application.knowledge.toolset import TOOL_NAMES
 from mission_control.domain.authoring.contracts import DefinitionKind
 from mission_control.domain.execution.contracts import DeepAgentExecutionBinding
-from tests.fixtures.mission_control_common_db import canonical_scope
 from tests.support.manifests.launch_inputs import admitted, compile_programs, resolver
+from tests.support.unit.knowledge.knowledge_manifest import MANIFEST, ROOT, SCOPE
 from tests.unit.authoring.manifest_launch_fixture import fixture_bindings, fixture_served
 
-ROOT = Path(__file__).resolve().parents[3]
-MANIFEST = ROOT / "tests/fixtures/manifests/knowledge-tools-stage-graph.yml"
 SEED = (
     ROOT / "packages/mission-control-db-contract/seeds/common/mc.catalog.knowledge-tools-1.2.0.json"
 )
-SCOPE = canonical_scope("tenant-1", "ai-engineer")
 
 
 def test_the_seed_publishes_seven_catalog_tool_rows() -> None:

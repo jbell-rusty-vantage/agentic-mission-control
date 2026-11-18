@@ -11,7 +11,6 @@ the run open (retryable); history recorded before the patch fails at once, as it
 from __future__ import annotations
 
 from dataclasses import replace
-from datetime import UTC, datetime
 from types import SimpleNamespace
 from typing import Any
 from unittest.mock import AsyncMock
@@ -48,32 +47,17 @@ from mission_control.domain.policies.contracts import (
     RunPhase,
 )
 from mission_control.domain.programs.family_failure import (
-    FamilyFailureTerminalizationRequest,
     FamilyFailureTerminalizationResult,
 )
 from tests.fixtures.goal_directed_journaled import SCOPE, goal_start_action
 from tests.support.run_control import command
-from tests.unit.coordinator.test_root_result_materialization import root
-from tests.unit.orchestration.test_rrm_016_goal_directed_settlement import (
+from tests.support.unit.coordinator.root_result_materialization import root
+from tests.support.unit.coordinator.w1_family_failure_terminalization import NOW, _request
+from tests.support.unit.orchestration.rrm_016_goal_directed_settlement import (
     _claim,
     _composition,
     _preparation,
 )
-
-NOW = datetime(2026, 10, 28, tzinfo=UTC)
-
-
-def _request(run_id: str, *, epoch: int = 1, cause: str = "application_error:x") -> Any:
-    return FamilyFailureTerminalizationRequest(
-        request_scope=SCOPE,
-        run_id=run_id,
-        execution_epoch=epoch,
-        family="GoalDirected",
-        family_workflow_id=f"family/{run_id}/1",
-        cause=cause,
-        cause_digest="sha256:" + "1" * 64,
-        occurred_at=NOW,
-    )
 
 
 async def _started_run() -> tuple[Any, str]:

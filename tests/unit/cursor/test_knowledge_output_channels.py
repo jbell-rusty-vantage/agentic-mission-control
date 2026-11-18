@@ -6,8 +6,8 @@ from pathlib import Path
 from mission_control.domain.context.refs import parse_workspace_candidate_ref
 from tests.fixtures.cursor_cloud import cloud_stack
 from tests.fixtures.lane_turns import RecordingSignals
-from tests.unit.harness.test_cursor_cloud import _identity, _lanes, _turn
-from tests.unit.operations.test_lane_outputs import compiled, custody
+from tests.support.unit.harness.cursor_cloud import _identity, _lanes, _turn
+from tests.support.unit.operations.lane_outputs import compiled, custody
 
 
 async def test_branch_channel_collects_exact_head_bytes_as_evidence(tmp_path: Path) -> None:

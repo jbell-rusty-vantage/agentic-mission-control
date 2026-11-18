@@ -20,6 +20,7 @@ from mission_control.domain.agentic_components.contracts import (
     HOST_LANE_PROFILE,
     AgentHost,
     AgenticComponentRelease,
+    Architecture,
     ComponentKind,
     MaterializationRequest,
     OperatingSystem,
@@ -51,7 +52,7 @@ from tests.fixtures.projections.rows import (
     tavily_row,
     verifier_row,
 )
-from tests.unit.agentic_components.test_harness import Architecture, mcp_release
+from tests.support.unit.agentic_components.harness import mcp_release
 
 GOLDEN = Path(regen.__file__).resolve().parent
 

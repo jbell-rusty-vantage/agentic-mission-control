@@ -34,7 +34,7 @@ from mission_control.domain.execution.lanes import LaneSeedHead, PrepareRequest,
 from tests.fixtures.cursor_controls import harness_fields
 from tests.fixtures.cursor_local import local_stack
 from tests.fixtures.lane_turns import SCOPE, cursor_operation
-from tests.unit.cursor.test_cognition_points import settled_points, unit_changes
+from tests.support.unit.cursor.cognition_points import settled_points, unit_changes
 
 
 def _steps(rows: tuple[CognitionPointRecord, ...]) -> list[CognitionPointRecord]:

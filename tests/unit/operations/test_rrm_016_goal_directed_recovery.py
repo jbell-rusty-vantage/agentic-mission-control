@@ -37,19 +37,12 @@ from tests.fixtures.goal_directed_journaled import (
     preparer,
 )
 from tests.support.run_control import command
-from tests.unit.orchestration.test_rrm_016_goal_directed_settlement import (
+from tests.support.unit.operations.rrm_016_goal_directed_recovery import _Templates
+from tests.support.unit.orchestration.rrm_016_goal_directed_settlement import (
     _claim,
     _preparation,
     _reconciliation,
 )
-
-
-class _Templates:
-    def __init__(self, values: dict[str, Any]) -> None:
-        self._values = values
-
-    async def get_template(self, *, operation_role: str, **_: object) -> Any:
-        return self._values[operation_role]
 
 
 async def _goal_unit(window: str) -> tuple[Any, Any, Any, str]:

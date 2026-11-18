@@ -21,7 +21,7 @@ from mission_control.domain.policies.contracts import (
     AdmissionDecision,
     DecisionStatus,
 )
-from tests.unit.coordinator.test_coordinator_launch_preparation import (
+from tests.support.unit.coordinator.coordinator_launch_preparation import (
     NOW,
     SCOPE,
     FixtureSemanticBindingProvider,

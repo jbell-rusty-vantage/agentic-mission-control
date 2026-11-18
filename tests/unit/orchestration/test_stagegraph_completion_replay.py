@@ -13,7 +13,7 @@ from mission_control.domain.programs.contracts import (
     StageGraphCompletionActivityRequest,
     StageGraphDecisionMutation,
 )
-from tests.unit.orchestration.test_budget_admission_failure import prepared
+from tests.support.unit.orchestration.budget_admission_failure import prepared
 
 
 async def completion():

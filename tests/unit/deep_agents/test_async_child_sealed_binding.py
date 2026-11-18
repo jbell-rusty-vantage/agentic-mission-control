@@ -29,8 +29,8 @@ from mission_control.domain.execution.contracts import (
     DeepAgentModelComponent,
     SealedAsyncChildBinding,
 )
-from tests.unit.deep_agents.test_lane_adapter import _inputs, _profile
-from tests.unit.deep_agents.test_lane_adapter_children import (
+from tests.support.unit.deep_agents.lane_adapter import _inputs, _profile
+from tests.support.unit.deep_agents.lane_adapter_children import (
     _graph,
     _seed_server,
     _seed_skill,

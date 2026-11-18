@@ -1,33 +1,18 @@
 """MO46: each published template has a compilable manifest and bounded firing proof."""
 
-import importlib.util
 import runpy
-from pathlib import Path
 
 import pytest
 
 from mission_control.domain.authoring.manifest import load_manifest_yaml
 from mission_control.domain.programs.watchers import compile_watcher, wait_condition_id
+from tests.support.unit.watchers.standard_library import DATA, LIBRARY, ROOT, SPEC
+from tests.support.unit.watchers.watcher_manifest import definition
+from tests.support.unit.watchers.watcher_planner import plan, signal
 from tests.unit.watchers.fakes import T0, at
-from tests.unit.watchers.test_watcher_manifest import definition
-from tests.unit.watchers.test_watcher_planner import plan, signal
 
-ROOT = Path(__file__).resolve().parents[3]
-SPEC = importlib.util.spec_from_file_location(
-    "standard_watchers", ROOT / "packages/mission-control-db-contract/seeds/watcher_library.py"
-)
 assert SPEC is not None and SPEC.loader is not None
-LIBRARY = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(LIBRARY)
-
-DATA = {
-    "result-marker-stop": {"matched": True},
-    "ci-watch": {"conclusion": "failure"},
-    "pr-merged-release-wait": {"merged": True},
-    "artifact-pipeline": {"media_type": "application/pdf", "artifact_ref": "artifact://fixture"},
-    "budget-guard": {"exhausted": True},
-    "heartbeat-progress": {},
-}
 
 
 @pytest.mark.parametrize("entry", LIBRARY.definitions(), ids=lambda entry: entry.logical_id)

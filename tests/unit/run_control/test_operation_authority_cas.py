@@ -7,29 +7,13 @@ import pytest
 
 from mission_control.domain.authoring.canonical import contract_fingerprint
 from mission_control.domain.policies.contracts import (
-    ClaimEffectAction,
     CommandStatus,
     RunPhase,
     StartAction,
 )
 from mission_control.domain.policies.errors import CommandRejected, IdempotencyConflict
-from tests.support.run_control import DIGEST, command, request, service
-
-
-def claim(run_id: str, name: str):  # type: ignore[no-untyped-def]
-    return command(
-        run_id,
-        2,
-        f"claim:{name}",
-        ClaimEffectAction(
-            effect_id=f"effect:{name}",
-            effect_kind="operation.runtime",
-            operation_ref=f"binding:{name}",
-            provider_idempotency_key=f"provider:{name}",
-            reservation_id="baseline",
-            claim_payload_digest=DIGEST,
-        ),
-    ).model_copy(update={"idempotency_issuer": "operation-journal"})
+from tests.support.run_control import command, request, service
+from tests.support.unit.run_control.operation_authority_cas import claim
 
 
 def active(run: Any, budget: Any, effects: Any) -> None:

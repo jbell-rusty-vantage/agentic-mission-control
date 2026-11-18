@@ -34,6 +34,12 @@ from mission_control.domain.outputs.contracts import (
 from mission_control.domain.outputs.current_set import build_current_set_index
 from tests.fixtures.output_contracts import InMemoryOutputContractStore
 from tests.support.knowledge import origin
+from tests.support.unit.outputs.collections import (
+    TRUSTED_PIN,
+    collection,
+    collection_promise,
+    report,
+)
 from tests.unit.outputs.scenario import (
     TRUSTED_VALIDATORS,
     Stack,
@@ -47,9 +53,6 @@ from tests.unit.outputs.scenario import (
 
 pytestmark = pytest.mark.asyncio
 AT = datetime(2026, 10, 28, 12, tzinfo=UTC)
-# A host-checkable member validator; the trusted-judgment pin is proven only by KS (review B2).
-VERIFIED = Requirement(key="verified", validator="mc.check.member-verified@1", subject="member")
-TRUSTED_PIN = "knowledge.report.assess@1"
 
 
 def invocation(attempt: int = 1, **updates: object) -> InvocationAccess:
@@ -59,61 +62,6 @@ def invocation(attempt: int = 1, **updates: object) -> InvocationAccess:
         invocation_id=f"inv-{attempt:04d}-"
         + str(updates.get("operation_id", "op")).replace("/", "-"),
         authenticated_at=AT,
-    )
-
-
-def report(name: str) -> MemberRef:
-    return MemberRef(
-        ref=f"kh:aiengineer-postgres/report/{name}@research_report.v2", digest=digest_of(name)
-    )
-
-
-def collection(
-    deliverable: str = "reports",
-    members: tuple[MemberRef, ...] = (),
-    *,
-    subjects: dict[str, str] | None = None,
-) -> CandidateRef:
-    value: Any = None
-    if subjects is not None:
-        value = {
-            "entries": [
-                {"ref": item.ref, "digest": item.digest, "subject": subjects[item.ref]}
-                for item in members
-                if item.ref in subjects
-            ]
-        }
-    return CandidateRef(
-        deliverable_id=deliverable,
-        form=OutputForm.COLLECTION,
-        kind="inline",
-        value=value if value is not None else {"kind": "report_collection"},
-        members=members,
-        digest=collection_digest(
-            members, value if value is not None else {"kind": "report_collection"}
-        ),
-    )
-
-
-def collection_promise(
-    *,
-    aggregate: dict[str, Any] | None = None,
-    coverage: CoverageContract | None = None,
-    validator: str | None = None,
-    required: bool = True,
-) -> OutputObligation:
-    requirement = VERIFIED.model_copy(
-        update={
-            "parameters": aggregate or {},
-            "validator": validator or VERIFIED.validator,
-            "required": required,
-        }
-    )
-    return obligation(
-        "draft.reports",
-        OutputForm.COLLECTION,
-        requirements=(requirement,),
-        coverage=coverage,
     )
 
 

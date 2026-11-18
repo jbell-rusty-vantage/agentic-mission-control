@@ -41,11 +41,10 @@ from mission_control.domain.execution.lane_turns import (
     ClosingFacts,
     LaneCancelRequest,
     LaneStatusRequest,
-    LaneTurnRequest,
     NativeRefs,
     pause_decision_for,
 )
-from mission_control.domain.execution.lanes import LaneSegmentBounds, TurnHandle
+from mission_control.domain.execution.lanes import TurnHandle
 from mission_control.domain.policies.mailbox import MailboxState
 from mission_control.domain.policies.stop_fence import EffectAdmission, StopFence
 from tests.fixtures.lane_turns import (
@@ -61,9 +60,9 @@ from tests.fixtures.mp06_lanes import (
     NeverAcceptedLane,
     ReconcilingLossyLane,
 )
+from tests.support.unit.harness.mp06_dispatch_recovery import BOUNDS, turn_request
 
 T0 = datetime(2026, 10, 8, 12, 0, tzinfo=UTC)
-BOUNDS = LaneSegmentBounds(max_frames=50, heartbeat_timeout_s=3)
 
 
 @dataclass
@@ -94,18 +93,6 @@ def service(
         sessions=WorkerSessionManager(owner_ref=owner, min_lease=timedelta(seconds=1)),
         fences=fences,
         **extra,
-    )
-
-
-def turn_request(operation: OperationExecutionRequest | None = None, **changes: Any) -> Any:
-    return LaneTurnRequest.model_validate(
-        {
-            "operation": operation or cursor_operation(),
-            "lane_profile": "cursor_local",
-            "generation": 1,
-            "segment": BOUNDS,
-            **changes,
-        }
     )
 
 

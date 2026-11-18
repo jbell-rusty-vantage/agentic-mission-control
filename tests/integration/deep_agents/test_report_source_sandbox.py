@@ -16,7 +16,7 @@ from langchain_core.messages import AIMessage, ToolMessage
 from langchain_core.outputs import ChatGeneration, ChatResult
 from tests.integration.deep_agents.test_wi02_transfer_plan_lane import PlanReadingModel
 from tests.support.deep_agents import exact_fixture, planned_invocation, registry, unit_bound
-from tests.unit.test_report_source_context import context
+from tests.support.unit.report_source_context import context
 
 from mission_control.adapters.capabilities.capability_bundles import bundle_digest, bytes_digest
 from mission_control.adapters.deep_agents.adapter import DeepAgentRuntimeAdapter

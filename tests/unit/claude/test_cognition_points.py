@@ -22,8 +22,8 @@ from mission_control.domain.execution.cognition_points import SessionCursorPoint
 from mission_control.domain.execution.lane_turns import NativeRefs
 from mission_control.domain.frames.contracts import ProviderFrame
 from tests.fixtures.lane_turns import RecordingSignals
+from tests.support.unit.claude.claude_harness import _frames, _identity, _turn
 from tests.unit.claude.fixtures import SESSION_ID, ClaudeStack, claude_stack
-from tests.unit.claude.test_claude_harness import _frames, _identity, _turn
 
 
 async def _settled_turn(tmp_path: Path, script: str = "full_run") -> tuple[ClaudeStack, str]:
@@ -174,7 +174,7 @@ async def test_the_generation_fold_and_the_turn_fold_agree_on_one_turn(tmp_path:
 
 def test_step_refs_are_the_provider_key_tail() -> None:
     from mission_control.domain.frames.contracts import FrameKind
-    from tests.unit.frames.test_frame_boundary_points import frame
+    from tests.support.unit.frames.frame_boundary_points import frame
 
     assistant = frame(
         3, FrameKind.MESSAGE, provider_key="claude:a-9::assistant", raw_kind="assistant"

@@ -12,21 +12,11 @@ from mission_control.domain.outputs.contracts import (
     Requirement,
 )
 from mission_control.domain.programs.completion import OutputSchemaBinding, SchemaCriterion
-from mission_control.domain.programs.contracts import StageCandidateIdentity, StageExecutionIdentity
 from tests.fixtures.output_contracts import InMemoryOutputContractStore
-from tests.unit.orchestration.test_stagegraph_v2 import operation_slot
+from tests.support.unit.orchestration.stage_named_outputs import identity, setup
+from tests.support.unit.orchestration.stagegraph_v2 import operation_slot
+from tests.support.unit.outputs.output_fulfillment import invocation
 from tests.unit.outputs.scenario import build_stack, obligation, schema, structured, text
-from tests.unit.outputs.test_output_fulfillment import invocation
-
-
-def identity(attempt=1, generation=1):
-    return StageExecutionIdentity(
-        invocation().origin.run_id,
-        1,
-        StageCandidateIdentity("draft", 0, "NO_MAPPED_INSTANCE", 0, 0, "execute"),
-        attempt,
-        generation,
-    )
 
 
 def stage():
@@ -38,20 +28,6 @@ def stage():
             StageOutputSlot(output_slot_id="optional", output_contract_ref="text", required=False),
         ),
     )
-
-
-async def setup(*, cardinality=None):
-    store = InMemoryOutputContractStore()
-    current = identity()
-    stack = await build_stack(
-        store,
-        store.submissions,
-        invocation(operation_id=current.operation_id),
-        obligation("draft.summary", OutputForm.TEXT, cardinality=cardinality or Cardinality()),
-        obligation("draft.optional", OutputForm.TEXT, enforcement=Enforcement.OPTIONAL),
-        obligation("later.summary", OutputForm.TEXT, position="later"),
-    )
-    return stack, NamedStageOutputs(store, stack.outputs), current
 
 
 @pytest.mark.parametrize("failed", [False, True])
@@ -117,7 +93,7 @@ async def test_prior_deliverable_cannot_complete_current_attempt_cardinality():
 
 async def test_schema_validation_route_is_not_replaced_by_named_reference_projection():
     from mission_control.application.programs.completion_validation import validate_completion
-    from tests.unit.orchestration.test_goal_schema_completion import multi_goal_request
+    from tests.support.unit.orchestration.goal_schema_completion import multi_goal_request
 
     stack, bridge, current = await setup()
     schema_stage = stage().model_copy(

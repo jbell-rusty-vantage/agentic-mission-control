@@ -11,7 +11,7 @@ from mission_control.domain.policies.contracts import (
     RecordOutputEvidenceAction,
 )
 from tests.support.run_control import DIGEST, command
-from tests.unit.orchestration.test_completion_validation_service import prepared
+from tests.support.unit.orchestration.completion_validation_service import prepared
 
 
 @pytest.mark.asyncio

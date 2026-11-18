@@ -38,7 +38,7 @@ from tests.fixtures.lane_turns import lane_stack
 from tests.fixtures.managed_lane import managed_stack
 from tests.integration.anthropic_managed import test_session_lifecycle_live as lifecycle
 from tests.support.db_builders import admit_unit_attempt, owner_rows
-from tests.unit.prerequisites.test_owner_bootstrap import probe_template
+from tests.support.unit.prerequisites.owner_bootstrap import probe_template
 
 
 @pytest.mark.common_db

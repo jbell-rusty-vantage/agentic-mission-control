@@ -17,10 +17,9 @@ from mission_control.application.streams.pump import (
     envelope_size,
 )
 from mission_control.domain.frames.contracts import FrameKind
-from mission_control.domain.subscriptions.streams import StreamEnvelope, StreamError
 from tests.fixtures.provider_frames import OTHER_SCOPE, SCOPE
-from tests.unit.streams.fakes import MISSION, FakeStreamSource
-from tests.unit.streams.test_stream_service import (
+from tests.support.unit.streams.stream_pump import FAST, Recorder, until
+from tests.support.unit.streams.stream_service import (
     READER,
     execution_subscription,
     frames_at,
@@ -28,36 +27,7 @@ from tests.unit.streams.test_stream_service import (
     service,
     subscription,
 )
-
-FAST = PumpSettings(page_size=2, poll_interval=0.05, slow_consumer_grace=0.3)
-
-
-class Recorder:
-    def __init__(self) -> None:
-        self.envelopes: list[StreamEnvelope] = []
-        self.resyncs: list[dict[str, Any]] = []
-        self.errors: list[StreamError] = []
-        self.lineages: list[dict[str, Any]] = []
-        self.changed = asyncio.Event()
-
-    async def envelope(self, envelope: StreamEnvelope) -> None:
-        self.envelopes.append(envelope)
-        self.changed.set()
-
-    async def resync_required(self, notice: dict[str, Any]) -> None:
-        self.resyncs.append(notice)
-        self.changed.set()
-
-    async def error(self, error: StreamError) -> None:
-        self.errors.append(error)
-        self.changed.set()
-
-    async def lineage(self, notice: dict[str, Any]) -> None:
-        self.lineages.append(notice)
-        self.changed.set()
-
-    def seqs(self) -> list[int]:
-        return [int(e.cursor.position) for e in self.envelopes if e.stream == "mission_events"]
+from tests.unit.streams.fakes import MISSION, FakeStreamSource
 
 
 async def started(
@@ -76,14 +46,6 @@ async def started(
     window = InflightWindow(max_bytes, ConnectionBudget(max_bytes))
     pump = SubscriptionPump(svc, opened, recorder, window, settings, authorized=authorized)
     return pump, recorder, asyncio.create_task(pump.run()), window
-
-
-async def until(recorder: Recorder, predicate: Any, within: float = 3.0) -> None:
-    async with asyncio.timeout(within):
-        while not predicate():
-            recorder.changed.clear()
-            if not predicate():
-                await recorder.changed.wait()
 
 
 async def test_replay_then_live_without_a_hint_is_delivered_by_the_poll() -> None:

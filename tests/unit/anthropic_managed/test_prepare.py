@@ -5,7 +5,6 @@ from __future__ import annotations
 import shutil
 from collections.abc import Mapping
 from pathlib import Path
-from typing import Final
 
 import pytest
 
@@ -21,7 +20,6 @@ from mission_control.adapters.anthropic_managed.prepare import (
     METADATA_INSTALLATION,
     METADATA_PACK,
     METADATA_SCOPE,
-    ClaudeManagedPrepare,
     PackSecretMissing,
     PreparedPack,
     PreparedVault,
@@ -30,10 +28,7 @@ from mission_control.adapters.secrets.sources import WorkerEnvironmentSource
 from mission_control.application.secrets.broker import SecretBroker
 from mission_control.application.secrets.delivery import DeliveryChannel, SecretUse
 from tests.fixtures.managed_agents import FakeManagedAgentsApi
-
-REPO_ROOT: Final = Path(__file__).resolve().parents[3]
-AI_ENGINEER_PACK: Final = REPO_ROOT / "deployments/hosted-packs/ai-engineer/claude_managed"
-FIRECRAWL_VALUE: Final = "fc-test-value-0123456789"
+from tests.support.unit.anthropic_managed.prepare import AI_ENGINEER_PACK, FIRECRAWL_VALUE, prepare
 
 
 @pytest.fixture
@@ -60,23 +55,6 @@ def render(pack_dir: Path, repo: Path, *, ingress: str = "ingress.example.com") 
 def vault_of(result: PreparedPack) -> PreparedVault:
     assert result.vault is not None
     return result.vault
-
-
-def prepare(
-    api: FakeManagedAgentsApi,
-    *,
-    secrets: Mapping[str, str] | None = None,
-    labels: Mapping[str, str] | None = None,
-    installation_id: str = "local",
-    broker: SecretBroker | None = None,
-) -> ClaudeManagedPrepare:
-    environment = {"FIRECRAWL_API_KEY": FIRECRAWL_VALUE} if secrets is None else secrets
-    return ClaudeManagedPrepare(
-        api.client(),
-        broker or SecretBroker(environment=WorkerEnvironmentSource(environment)),
-        installation_id=installation_id,
-        labels=labels,
-    )
 
 
 async def test_a_first_sync_creates_every_resource_once(pack_dir: Path, repo: Path) -> None:

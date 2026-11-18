@@ -27,8 +27,8 @@ from tests.integration.postgres.test_mo44_watchers_postgres import (
 )
 from tests.integration.postgres.test_mp15_coordinator_inbox_postgres import mission_service
 from tests.support.db_builders import admit_unit_attempt
+from tests.support.unit.watchers.watcher_planner import plan, watcher
 from tests.unit.watchers.fakes import T0
-from tests.unit.watchers.test_watcher_planner import plan, watcher
 
 pytestmark = pytest.mark.common_db
 

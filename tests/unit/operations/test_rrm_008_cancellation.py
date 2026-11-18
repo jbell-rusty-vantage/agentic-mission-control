@@ -85,7 +85,7 @@ from tests.fixtures.goal_directed_journaled import (
 )
 from tests.support.deep_agents import DeterministicProvider
 from tests.support.run_control import actor, command
-from tests.unit.operations.test_checkpoint_recovery_classification import (
+from tests.support.unit.operations.checkpoint_recovery_classification import (
     AFTER_TOOL_CHECKPOINT,
     _chain,
     _leaf_id,
@@ -93,8 +93,9 @@ from tests.unit.operations.test_checkpoint_recovery_classification import (
     _root_checkpoints,
     _write_foreign_root_checkpoint,
 )
-from tests.unit.operations.test_rrm_016_goal_directed_recovery import _Templates
-from tests.unit.orchestration.test_rrm_016_goal_directed_settlement import _preparation
+from tests.support.unit.operations.rrm_008_cancellation import _liability, _settlements
+from tests.support.unit.operations.rrm_016_goal_directed_recovery import _Templates
+from tests.support.unit.orchestration.rrm_016_goal_directed_settlement import _preparation
 
 CANCEL_REASON = "operation cancelled by the governed cancellation saga"
 
@@ -149,35 +150,6 @@ async def _cancel_mid_cognition(
     assert gate in done, "the injection window was not reached"
     task.cancel()
     return await task
-
-
-def _settlements(harness: RecoveryHarness, request: OperationExecutionRequest) -> list[Any]:
-    claim_id = _effect_claim_id(bind_operation_execution_request(request))
-    return [item for key, item in harness.journal.settlements.items() if key == claim_id]
-
-
-async def _liability(
-    harness: RecoveryHarness, request: OperationExecutionRequest
-) -> dict[str, Any]:
-    """The unit's run-control liability after settlement: reservation, effect, evidence."""
-
-    binding = bind_operation_execution_request(request)
-    budget = await harness.run_control.get_budget("tenant-1", harness.run_id)
-    effects = await harness.run_control.get_effects("tenant-1", harness.run_id)
-    run = await harness.run_control.get_run("tenant-1", harness.run_id)
-    claim = effects.claims.get(_effect_claim_id(binding))
-    return {
-        "reservation_open": request.budget_reservation_id in budget.reservations,
-        "pending_settlement": dict(budget.pending_settlement),
-        "effect": claim.disposition.value if claim is not None else None,
-        "effect_settled": claim is not None and claim.settlement is not None,
-        "evidence": [
-            item.settlement_id
-            for item in run.accepted_operation_settlement_evidence
-            if item.accepted_by_authority_ref == binding.binding_id
-        ],
-        "consumed": dict(budget.consumed),
-    }
 
 
 async def _assert_cancelled_once(

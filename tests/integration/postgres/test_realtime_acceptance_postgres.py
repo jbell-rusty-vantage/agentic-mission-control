@@ -69,7 +69,7 @@ from tests.integration.postgres.test_mission_socket_postgres import (
 from tests.integration.postgres.test_provider_lineage_postgres import identity_rows, tokens
 from tests.support.boundary_commands import TARGET, delivered
 from tests.support.db_builders import admit_unit_attempt, owner_rows, scoped_command, scoped_request
-from tests.unit.frames.test_provider_lanes import claude_observations, codex_app_observations
+from tests.support.unit.frames.provider_lanes import claude_observations, codex_app_observations
 from tests.unit.socketio.harness import MissionClient, serve
 
 pytestmark = pytest.mark.common_db

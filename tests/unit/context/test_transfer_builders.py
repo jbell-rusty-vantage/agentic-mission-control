@@ -24,8 +24,8 @@ from mission_control.domain.resolution.resolved import (
     REPORT_REVIEW_FILE_BYTES,
     receiver_transfer_base,
 )
+from tests.support.unit.resolution.resolution_types import _runtime
 from tests.unit.outputs.scenario import obligation, promises
-from tests.unit.resolution.test_resolution_types import _runtime
 
 BOUNDS = ResourceBounds(
     window_tokens=200_000,

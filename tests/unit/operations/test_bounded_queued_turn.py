@@ -33,7 +33,7 @@ from tests.fixtures.checkpoint_recovery import (
 )
 from tests.fixtures.lane_bindings import lane_fields
 from tests.support.run_control import command
-from tests.unit.operations.test_ft_f2_interrupt_and_inject import (
+from tests.support.unit.operations.ft_f2_interrupt_and_inject import (
     FAST,
     RecordingModel,
     facade,

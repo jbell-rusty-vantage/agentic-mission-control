@@ -15,7 +15,7 @@ from mission_control.application.prerequisites.service import InMemoryOwnerPrere
 from mission_control.domain.programs.contracts import StageGraphRunInput
 from tests.fixtures.managed_lane import managed_binding, managed_operation
 from tests.support.run_control import request
-from tests.unit.run_control.test_run_launch import _input
+from tests.support.unit.run_control.run_launch import _input
 
 
 def generic_definition():

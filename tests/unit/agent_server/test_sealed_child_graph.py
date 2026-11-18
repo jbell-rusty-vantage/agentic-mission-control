@@ -39,8 +39,8 @@ from mission_control.domain.execution.async_subagent_reconciliation import (
 from mission_control.domain.execution.contracts import AsyncSubagentContract
 from mission_control.domain.execution.errors import DeepAgentMaterializationError
 from tests.support.deep_agents import exact_fixture
-from tests.unit.agent_server.test_async_subagent_server_offline import ScriptedChildModel
-from tests.unit.operations.test_async_child_check_time_admission import _sealed_contract
+from tests.support.unit.agent_server.async_subagent_server_offline import ScriptedChildModel
+from tests.support.unit.operations.async_child_check_time_admission import _sealed_contract
 
 SCOPE = "tenant-1"
 

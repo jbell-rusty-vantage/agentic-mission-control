@@ -39,17 +39,17 @@ from mission_control.interfaces.mcp.subscriptions import (
     McpSubscriptionBridge,
     register_subscription_tools,
 )
-from tests.unit.subscriptions.coordinator_fakes import RUN
-from tests.unit.subscriptions.fakes import SCOPE
-from tests.unit.subscriptions.test_mo43_wake_channels import (  # noqa: F401 (fixture)
+from tests.support.unit.subscriptions.mo43_wake_channels import (
     INSTALLATION,
     KEY,
     TENANT,
     _registry,
-    missionctl,
+    missionctl,  # noqa: F401
 )
-from tests.unit.subscriptions.test_wi19_attention import Outputs, output
-from tests.unit.subscriptions.test_wi19_interfaces import FakeReader
+from tests.support.unit.subscriptions.wi19_attention import Outputs, output
+from tests.support.unit.subscriptions.wi19_interfaces import FakeReader
+from tests.unit.subscriptions.coordinator_fakes import RUN
+from tests.unit.subscriptions.fakes import SCOPE
 
 KEY_NAME = "report.summary"
 TEXT = "A Mission Manifest declares goals. It is compiled, submitted and started. " * 4

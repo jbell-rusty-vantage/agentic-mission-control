@@ -5,12 +5,12 @@ from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
-from tests.unit.control_plane.test_agentic_asset_definitions import (
+from tests.support.unit.control_plane.agentic_asset_definitions import (
     server_definition,
     skill_definition,
     tool_definition,
 )
-from tests.unit.control_plane.test_control_plane import (
+from tests.support.unit.control_plane.control_plane import (
     authority,
     configured_service,
     invocation,

@@ -21,8 +21,8 @@ from mission_control.domain.programs.watchers import (
     action_request_id,
     compile_watcher,
 )
+from tests.support.unit.watchers.watcher_manifest import definition, event_wait_document
 from tests.unit.watchers.fakes import RUN_ID, T0, FakeRunGateway, MemoryWatcherStore, at
-from tests.unit.watchers.test_watcher_manifest import definition, event_wait_document
 
 
 def watcher(watcher_id: str, body: dict[str, Any]) -> WatcherDescriptor:

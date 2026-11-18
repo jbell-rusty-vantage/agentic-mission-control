@@ -37,7 +37,7 @@ from tests.integration.deep_agents.test_wi02_transfer_plan_lane import (
 )
 from tests.support.deep_agents import registry
 from tests.support.knowledge import TENANT, origin
-from tests.unit.context.test_transfer_materializer import FakeOutputs
+from tests.support.unit.context.transfer_materializer import FakeOutputs
 
 from mission_control.adapters.deep_agents.adapter import DeepAgentRuntimeAdapter
 from mission_control.adapters.deep_agents.materializer import ExactDeepAgentMaterializer

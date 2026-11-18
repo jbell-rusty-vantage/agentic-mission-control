@@ -34,7 +34,6 @@ from mission_control.application.frames.artifact_bodies import (
     ArtifactBodyTooLarge,
     GrantedArtifactBodyReader,
 )
-from mission_control.domain.execution.contracts import WorkspaceOwner, WorkspaceSlotBinding
 from mission_control.domain.execution.workspace_closure import (
     WorkspaceClosure,
     closure_body_ref,
@@ -45,6 +44,7 @@ from mission_control.domain.execution.workspace_closure import (
 from mission_control.domain.graph_runtime.identities import QualifiedCheckpointKey
 from mission_control.domain.resolution.profiles import WorkspaceClosureProfile
 from tests.fixtures.workspace_closures import InMemoryWorkspaceClosures
+from tests.support.unit.deep_agents.workspace_closure import _digest, _workspace
 
 RUN = "run-closure-1"
 UNIT = "bl-unit-v1:" + "a" * 64
@@ -55,35 +55,6 @@ KEY = QualifiedCheckpointKey(
     thread_id="thread-1",
     checkpoint_id="1f0-result",
 )
-OWNER = WorkspaceOwner(kind="stage", owner_id="stage-a")
-
-
-def _digest(content: bytes) -> str:
-    return "sha256:" + hashlib.sha256(content).hexdigest()
-
-
-def _workspace(*, sensitive: bool = False) -> Any:
-    slots = (
-        WorkspaceSlotBinding(
-            slot_name="out", logical_path="/out", access="exclusive_write", owner=OWNER
-        ),
-        WorkspaceSlotBinding(
-            slot_name="private",
-            logical_path="/private",
-            access="exclusive_write",
-            owner=OWNER,
-            sensitive=sensitive,
-        ),
-        WorkspaceSlotBinding(
-            slot_name="ctx-input",
-            logical_path="/inputs/brief.md",
-            access="read_only",
-            owner=OWNER,
-            durable_ref="memory://brief",
-            content_digest=_digest(b"brief"),
-        ),
-    )
-    return SimpleNamespace(slot_bindings=slots, exclusive_write_paths=("/out", "/private"))
 
 
 async def _capture(backend: Any, state: dict[str, Any], **overrides: Any) -> Any:

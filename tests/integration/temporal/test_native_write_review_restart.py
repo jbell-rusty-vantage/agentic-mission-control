@@ -45,9 +45,8 @@ from tests.integration.temporal.test_wi04_saved_settlement_restart import (
     _scheduled,
     _Stack,
 )
-from tests.unit.knowledge.test_native_write import (
+from tests.support.unit.knowledge.native_write import (
     DIGEST,
-    HANDLE,
     PLAN,
     Applier,
     Bridge,
@@ -55,6 +54,7 @@ from tests.unit.knowledge.test_native_write import (
     accepted_report,
     service,
 )
+from tests.support.unit.outputs.w1_d28_d29 import HANDLE
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.common_db]
 

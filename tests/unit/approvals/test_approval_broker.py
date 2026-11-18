@@ -16,16 +16,13 @@ from mission_control.application.execution.approvals_memory import (
     StaticApprovalContext,
 )
 from mission_control.application.execution.stop_fence import InMemoryStopFenceRepository
-from mission_control.application.human_tasks.memory import InMemoryHumanTaskRepository
-from mission_control.application.human_tasks.service import HumanTaskService
 from mission_control.domain.execution.approvals import NativeApprovalCorrelation
-from mission_control.domain.policies.contracts import ActorContext
 from mission_control.domain.policies.stop_fence import StopFence
 from tests.fixtures.provider_frames import SCOPE
+from tests.support.unit.approvals.approval_broker import OWNER, _compose
 from tests.unit.approvals.fixtures import (
     OTHER_POLICY,
     POLICY,
-    REVIEWER,
     RUN,
     Clock,
     answer,
@@ -33,33 +30,6 @@ from tests.unit.approvals.fixtures import (
     elicitation_request,
     permission_request,
 )
-
-OWNER = ActorContext(actor_id=REVIEWER)
-
-
-def _compose(
-    connection_ref: str = "worker-a#1",
-    store: InMemoryApprovalStore | None = None,
-    context: StaticApprovalContext | None = None,
-    fences: InMemoryStopFenceRepository | None = None,
-) -> tuple[ApprovalBroker, HumanTaskService, InMemoryApprovalStore, StaticApprovalContext]:
-    store = store or InMemoryApprovalStore()
-    context = context or StaticApprovalContext(1, POLICY)
-    broker = ApprovalBroker(
-        store,
-        store,
-        probe=context,
-        connection_ref=connection_ref,
-        fences=fences,
-        poll_seconds=0.01,
-    )
-    service = HumanTaskService(
-        InMemoryHumanTaskRepository(),
-        request_scope=SCOPE,
-        approvals=store,
-        approval_wake=broker.hub,
-    )
-    return broker, service, store, context
 
 
 async def test_binding_is_persisted_before_the_wait_and_a_resolution_wakes_it() -> None:

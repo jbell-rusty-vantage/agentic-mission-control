@@ -33,7 +33,7 @@ from mission_control.application.execution.harness.time_travel import TimeTravel
 from mission_control.domain.authoring.canonical import sha256_digest
 from mission_control.domain.execution.checkpoint_lineage import CheckpointCapture
 from mission_control.domain.graph_runtime.identities import QualifiedCheckpointKey
-from tests.unit.deep_agents.test_cognition_points_collector import (
+from tests.support.unit.deep_agents.cognition_points_collector import (
     DIGEST,
     THREAD,
     _graph,

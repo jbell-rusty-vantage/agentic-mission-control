@@ -33,17 +33,12 @@ from mission_control.interfaces.socketio.server import MissionNamespace
 from tests.fixtures.provider_frames import FIXTURE_HARNESS
 from tests.support.boundary_commands import TARGET, delivered, pause, started
 from tests.support.run_control import command, service
-from tests.unit.frames.test_lineage_stream import claude_frames
+from tests.support.unit.frames.lineage_stream import claude_frames
+from tests.support.unit.socketio.mission_socket import FixtureResolver, Lifecycle, auth, build
+from tests.support.unit.streams.stream_lineage import rekeyed
 from tests.unit.socketio.harness import SERVER_EVENTS as HARNESS_EVENTS
 from tests.unit.socketio.harness import MissionClient, serve
-from tests.unit.socketio.test_mission_socket import (
-    FixtureResolver,
-    Lifecycle,
-    auth,
-    build,
-)
 from tests.unit.streams.fakes import FakeStreamSource
-from tests.unit.streams.test_stream_lineage import rekeyed
 
 
 class LineageClient(MissionClient):

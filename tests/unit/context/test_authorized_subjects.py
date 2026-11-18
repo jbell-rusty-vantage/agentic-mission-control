@@ -10,14 +10,14 @@ from mission_control.application.context.materialization import (
 )
 from mission_control.domain.context import transfer_builders
 from mission_control.domain.context.transfer import Boundary, ProducerAttempt
-from tests.unit.context.test_transfer_materializer import (
+from tests.support.unit.context.transfer_materializer import (
     REPORT_INPUT,
     FakeBackend,
     _trusted,
     dependent,
     seam,
 )
-from tests.unit.orchestration.test_stage_named_outputs import setup
+from tests.support.unit.orchestration.stage_named_outputs import setup
 from tests.unit.outputs.scenario import text
 
 ATTEMPT = ProducerAttempt(

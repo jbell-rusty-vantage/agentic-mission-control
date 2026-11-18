@@ -20,8 +20,8 @@ from mission_control.interfaces.socketio.commands import (
     parse_human_task_resolution,
     resolution_failure,
 )
+from tests.support.unit.approvals.approval_task_interfaces import BASE, _app, _compose, _principal
 from tests.unit.approvals.fixtures import answer, permission_request
-from tests.unit.approvals.test_approval_task_interfaces import BASE, _app, _compose, _principal
 
 
 def socket_body(task_id: str, request: Any) -> dict[str, Any]:

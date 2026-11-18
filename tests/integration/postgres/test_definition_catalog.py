@@ -34,7 +34,7 @@ from tests.support.db_builders import (
     BIOTECH_CATALOG,
     add_disabled_installation,
 )
-from tests.unit.coordinator.test_coordinator_facade import coordinator_skill, propose_prompt
+from tests.support.unit.coordinator.coordinator_facade import coordinator_skill, propose_prompt
 
 pytestmark = pytest.mark.common_db
 

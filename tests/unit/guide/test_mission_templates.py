@@ -315,8 +315,8 @@ async def test_search_lists_and_ranks_the_templates() -> None:
     from mission_control.application.resolution.registries import LaneRegistry, ModelCatalog
     from tests.conformance.lanes.compile.stub import STUB_DECLARATION
     from tests.conformance.resolution.fixtures import MODELS
+    from tests.support.unit.selection.selection_workspace import _registration
     from tests.unit.guide.support import _workspace
-    from tests.unit.selection.test_selection_workspace import _registration
 
     lanes = LaneRegistry(allow_unqualified=True)
     lanes.register(_registration(STUB_DECLARATION))

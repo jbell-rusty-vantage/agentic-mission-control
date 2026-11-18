@@ -22,6 +22,7 @@ from pydantic import SecretStr
 
 from mission_control.adapters.deep_agents import evaluators
 from mission_control.adapters.deep_agents.evaluators import JudgeAnswer
+from mission_control.application.knowledge.evaluator_plans import JUDGE_CREDENTIAL
 from mission_control.application.knowledge.gateway import KnowledgeGateway
 from mission_control.application.knowledge.judgment import (
     ATTEMPTS_PREFIX,
@@ -47,7 +48,7 @@ from tests.fixtures.knowledge_binding import (
 from tests.fixtures.trusted_knowledge import TrustedKnowledgeDouble
 from tests.support.trusted_knowledge import JUDGE_PIN, PROFILES, ScriptedRunner, World, world
 from tests.support.trusted_knowledge import evaluators as trusted_evaluators
-from tests.unit.knowledge.test_independent_evaluators import JUDGE_CREDENTIAL, bindings
+from tests.support.unit.knowledge.independent_evaluators import bindings
 
 pytestmark = pytest.mark.asyncio
 

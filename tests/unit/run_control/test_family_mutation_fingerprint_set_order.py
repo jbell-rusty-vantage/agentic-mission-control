@@ -39,7 +39,7 @@ from mission_control.domain.programs.contracts import (
     StageGraphDecisionMutation,
 )
 from tests.support.run_control import ConfigurationVerifier, command, request
-from tests.unit.run_control.test_atomic_family_admission import admission_policies
+from tests.support.unit.run_control.atomic_family_admission import admission_policies
 
 
 class DecisionPayloadMutation(AtomicFamilyMutation):

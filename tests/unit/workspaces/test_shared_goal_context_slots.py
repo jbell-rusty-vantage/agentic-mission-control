@@ -29,8 +29,8 @@ from mission_control.domain.execution.contracts import (
     WorkspaceSlotBinding,
 )
 from mission_control.domain.policies.errors import IdempotencyConflict
-from tests.unit.workspaces.test_goal_role_slot_ownership import _goal_request
-from tests.unit.workspaces.test_workspace_materialization import RecordingProvisioner
+from tests.support.unit.workspaces.goal_role_slot_ownership import _goal_request
+from tests.support.unit.workspaces.workspace_materialization import RecordingProvisioner
 
 WORKSPACE = "run/run-1/execution-epoch/1/goal/workspace/1"
 

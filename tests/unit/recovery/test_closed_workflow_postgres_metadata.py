@@ -2,9 +2,9 @@ from datetime import UTC, datetime
 from uuid import uuid4
 
 import pytest
+from tests.support.unit.recovery.closed_workflow_postgres_metadata import record
 
 from mission_control.adapters.postgres.closed_workflow import metadata_digest, validate_dispatches
-from mission_control.application.execution.harness.dispatch import DispatchRecord
 from mission_control.contracts.contracts import MissionControlRejected
 
 
@@ -15,21 +15,6 @@ def test_actual_uuid_and_datetime_metadata_are_canonical_json():
             "session_id": str(value["session_id"]),
             "ended_at": value["ended_at"].isoformat().replace("+00:00", "Z"),
         }
-    )
-
-
-def record():
-    return DispatchRecord(
-        kind="create",
-        idempotency_key="actual-key",
-        expected_generation=1,
-        instruction_digest="sha256:" + "a" * 64,
-        owner_ref="owner",
-        owner_epoch=1,
-        intended_at=datetime.now(UTC),
-        resolved_at=datetime.now(UTC),
-        phase="acknowledged",
-        native_ref="actual-native",
     )
 
 

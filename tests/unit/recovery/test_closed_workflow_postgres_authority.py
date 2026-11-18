@@ -10,9 +10,9 @@ from uuid import uuid4
 import pytest
 from tests.fixtures.checkpoint_recovery import stage_recovery_unit
 from tests.support.run_control import NOW
+from tests.support.unit.recovery.closed_workflow import setup_recovery
+from tests.support.unit.recovery.closed_workflow_postgres_metadata import record
 from tests.unit.claude.fixtures import claude_operation
-from tests.unit.recovery.test_closed_workflow import setup_recovery
-from tests.unit.recovery.test_closed_workflow_postgres_metadata import record
 
 from mission_control.adapters.postgres.closed_workflow import PostgresClosedWorkflowAuthority
 from mission_control.adapters.storage.artifact_payloads import InMemoryArtifactPayloadStore

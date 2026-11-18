@@ -17,7 +17,6 @@ from mission_control.application.subscriptions.coordinator import (
     JournalEvent,
     NotificationKind,
     PlanInput,
-    classify,
     extract_facts,
     notification_id,
     plan,
@@ -30,6 +29,7 @@ from mission_control.application.subscriptions.coordinator_service import (
 )
 from mission_control.contracts.contracts import MissionCommandRequest
 from mission_control.domain.policies.contracts import ActorContext
+from tests.support.unit.subscriptions.mp15_coordinator import classify_type
 from tests.unit.subscriptions.coordinator_fakes import (
     MISSION,
     RUN,
@@ -54,13 +54,6 @@ class Clock:
 
     def __call__(self) -> Any:
         return self.now
-
-
-def classify_type(event_type: str, profile: CoordinatorProfile | None = None, **facts: Any):
-    found = classify(
-        JournalEvent(journal_event(1, event_type), facts), profile or CoordinatorProfile()
-    )
-    return None if found is None else (found.kind, found.actionable, found.public_event_type)
 
 
 def test_default_filter_classifies_the_public_vocabulary_with_deltas_off():

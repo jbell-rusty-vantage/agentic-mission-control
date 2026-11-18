@@ -17,34 +17,14 @@ from mission_control.application.coordinator.coordinator_results import (
 from mission_control.domain.coordinator.workflow_completion import terminal_family_completion
 from mission_control.domain.policies.contracts import RunOutcome, RunPhase
 from mission_control.domain.programs.contracts import (
-    BellLabsRunInput,
     GoalDirectedRunResult,
     StageGraphCompletionProposal,
     StageGraphRunResult,
 )
-from tests.unit.coordinator.test_coordinator_result_completion import AmbiguousFirstSave
+from tests.support.unit.coordinator.coordinator_result_completion import AmbiguousFirstSave
+from tests.support.unit.coordinator.root_result_materialization import SCOPE, root
 
 NOW = datetime(2026, 10, 11, tzinfo=UTC)
-SCOPE = "mc/00000000-0000-0000-0000-000000000001/biotech/00000000-0000-0000-0000-000000000002"
-DIGEST = "sha256:" + "a" * 64
-
-
-def root(family="StageGraph"):
-    return BellLabsRunInput(
-        schema_version="mc.mission_run.v1",
-        run_id="run-1",
-        request_scope=SCOPE,
-        effective_configuration_digest=DIGEST,
-        workflow_type_digest=DIGEST,
-        family=family,
-        family_task_queue="family-queue",
-        family_input={
-            "run_id": "run-1",
-            "request_scope": SCOPE,
-            "effective_configuration_digest": DIGEST,
-            "workflow_type_digest": DIGEST,
-        },
-    )
 
 
 def family_result(family="StageGraph", outcome=RunOutcome.COMPLETED):

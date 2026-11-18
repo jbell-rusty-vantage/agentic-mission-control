@@ -167,7 +167,8 @@ async def test_composed_recovery_callback_uses_the_configured_nondefault_pin():
     from mission_control.bootstrap.trusted_judgment import compose_native_write
     from tests.fixtures.native_receipt_selection import PIN as CUSTOM_PIN
     from tests.fixtures.native_receipt_selection import pending_receipt_case
-    from tests.unit.knowledge.test_native_write import DIGEST, HANDLE, PLAN, Plans
+    from tests.support.unit.knowledge.native_write import DIGEST, PLAN, Plans
+    from tests.support.unit.outputs.w1_d28_d29 import HANDLE
 
     case = await pending_receipt_case()
     await case.select()
@@ -197,7 +198,7 @@ async def test_composed_recovery_callback_uses_the_configured_nondefault_pin():
 
 async def test_stale_successor_never_retargets_the_producers_selected_candidate():
     from tests.fixtures.native_receipt_selection import pending_receipt_case
-    from tests.unit.knowledge.test_native_write_recovery import IntentPreview
+    from tests.support.unit.knowledge.native_write_recovery import IntentPreview
 
     case = await pending_receipt_case()
     case.native._preview = IntentPreview()
@@ -218,7 +219,7 @@ async def test_stale_successor_never_retargets_the_producers_selected_candidate(
 
 async def successor_case():
     from tests.fixtures.native_receipt_selection import pending_receipt_case
-    from tests.unit.knowledge.test_native_write import RUN_DECISION
+    from tests.support.unit.knowledge.native_write import RUN_DECISION
 
     case = await pending_receipt_case()
     await case.select()
@@ -273,7 +274,7 @@ async def test_review_successor_authorizes_original_selected_effect_without_rewr
 async def test_successor_resolution_with_foreign_context_never_dispatches(field):
     case = await successor_case()
     original = case.bridge.resolve
-    from tests.unit.knowledge.test_native_write import RUN_DECISION
+    from tests.support.unit.knowledge.native_write import RUN_DECISION
 
     async def resolve(access, decision, *, attempt, fresh=False):
         answer = await original(access, decision, attempt=attempt, fresh=fresh)

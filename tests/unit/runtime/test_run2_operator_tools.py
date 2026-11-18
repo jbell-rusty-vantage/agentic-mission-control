@@ -10,11 +10,11 @@ from mission_control.adapters.auth.operator_token import mint_operator_token
 from mission_control.bootstrap import preflight
 from mission_control.bootstrap.binding_summary import binding_summary
 from mission_control.interfaces.cli.main import main
-from tests.unit.mission_control.test_authentication import NOW
-from tests.unit.mission_control.test_authentication import (
+from tests.support.unit.mission_control.authentication import NOW
+from tests.support.unit.mission_control.authentication import (
     authenticated_world as authenticated_world,
 )
-from tests.unit.runtime.test_mp22_local_readiness import (
+from tests.support.unit.runtime.mp22_local_readiness import (
     BINDINGS_EXAMPLE,
     owner_selections,
     profile,
@@ -137,7 +137,7 @@ def test_token_cli_errors_never_echo_key_material(tmp_path, capsys):
 
 
 def test_signed_scope_attenuates_existing_operator_grants(authenticated_world):
-    from tests.unit.mission_control.test_authentication import token
+    from tests.support.unit.mission_control.authentication import token
 
     key, _, claims, verifier = authenticated_world
     claims["mc_scope"] = "workflow_run.cancel"

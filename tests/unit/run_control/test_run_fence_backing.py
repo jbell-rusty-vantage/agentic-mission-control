@@ -35,7 +35,7 @@ from mission_control.domain.policies.stop_fence import (
 )
 from tests.support.boundary_commands import TARGET, started
 from tests.support.run_control import service
-from tests.unit.run_control.test_stop_fence import _cancel, admin
+from tests.support.unit.run_control.stop_fence import _cancel, admin
 
 SCOPE = "tenant-1"
 

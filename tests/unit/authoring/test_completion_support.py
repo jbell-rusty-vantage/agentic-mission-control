@@ -2,19 +2,13 @@ import pytest
 from pydantic import ValidationError
 
 from mission_control.application.authoring.completion_support import completion_support_issues
-from mission_control.domain.authoring.manifest import Behavior, parse_manifest
+from mission_control.domain.authoring.manifest import Behavior
 from mission_control.domain.authoring.manifest_lowering import lower_mission
 from mission_control.domain.authoring.mission_definition import (
     AcceptanceExpression,
     DefinitionOutput,
-    manifest_to_definitions,
 )
-from tests.unit.authoring.test_manifest_schema import minimal
-
-
-def definition():
-    document = minimal()
-    return manifest_to_definitions(parse_manifest(document), document)[0]
+from tests.support.unit.authoring.completion_support import definition
 
 
 @pytest.mark.parametrize(

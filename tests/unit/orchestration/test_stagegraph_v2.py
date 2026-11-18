@@ -7,7 +7,6 @@ from pydantic import ValidationError
 
 from mission_control.domain.authoring.canonical import sha256_digest
 from mission_control.domain.authoring.contracts import (
-    AllowedOperationVariant,
     CapacityCeiling,
     CompletionObligationRef,
     DependencyClass,
@@ -22,7 +21,6 @@ from mission_control.domain.authoring.contracts import (
     StageInputSlot,
     StageJoin,
     StageNode,
-    StageOperationSlot,
     StageOutputSlot,
     WorkflowCyclePolicy,
     WorkflowObligationSlot,
@@ -40,20 +38,7 @@ from mission_control.domain.programs.contracts import (
     StageResultObservation,
 )
 from mission_control.domain.programs.interpreter import StageGraphInterpreter
-
-
-def operation_slot(slot_id: str = "execute", *, priority: int = 0) -> StageOperationSlot:
-    return StageOperationSlot(
-        operation_slot_id=slot_id,
-        priority=priority,
-        reservation={"tokens.total": 1},
-        allowed_variants=(
-            AllowedOperationVariant(
-                operation_variant_id="default",
-                operation_contract_ref=f"operation:{slot_id}@1",
-            ),
-        ),
-    )
+from tests.support.unit.orchestration.stagegraph_v2 import operation_slot
 
 
 def slow_policy() -> SlowSiblingPolicy:

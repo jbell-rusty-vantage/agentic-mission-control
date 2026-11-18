@@ -39,9 +39,8 @@ from mission_control.domain.coordinator.attention import (
     notice_digest,
     plan_excerpts,
 )
-from mission_control.domain.outputs.contracts import ExactOutput, OutputForm
-from mission_control.domain.outputs.rules import text_digest, value_digest
 from mission_control.domain.policies.contracts import ActorContext
+from tests.support.unit.subscriptions.wi19_attention import DIGEST, Outputs, output
 from tests.unit.subscriptions.coordinator_fakes import (
     RUN,
     InMemoryAttentionStore,
@@ -55,58 +54,11 @@ READ = "workflow_run.read"
 CONTENT = "workflow.result.read"
 COORDINATOR = ActorContext(actor_id="coordinator-1", permissions=frozenset({READ, CONTENT}))
 NO_CONTENT = ActorContext(actor_id="coordinator-1", permissions=frozenset({READ}))
-DIGEST = "sha256:" + "0" * 64
 FORGED = "f" * 32
 PURPOSE = {"purpose": "coordinator_review"}
 
 
 # ---------------------------------------------------------------- fixtures
-
-
-def output(
-    key: str,
-    text: str | None = None,
-    *,
-    value: Any = None,
-    ref: str | None = None,
-    revision: int = 1,
-    digest: str | None = None,
-) -> ExactOutput:
-    if text is not None:
-        candidate: dict[str, Any] = {"kind": "inline", "text": text}
-        form = OutputForm.TEXT
-        content_digest = digest or text_digest(text)
-    elif value is not None:
-        candidate = {"kind": "inline", "value": value}
-        form = OutputForm.STRUCTURED
-        content_digest = digest or value_digest(value)
-    else:
-        candidate = {"kind": "handle", "ref": ref}
-        form = OutputForm.REFERENCE
-        content_digest = digest or DIGEST
-    candidate.update(
-        {"deliverable_id": f"{key}.main", "form": form.value, "digest": content_digest}
-    )
-    return ExactOutput(
-        revision_id=str(uuid4()),
-        run_id=str(RUN),
-        obligation_key=key,
-        obligation_revision=1,
-        deliverable_id=f"{key}.main",
-        revision=revision,
-        form=form,
-        content_digest=content_digest,
-        candidate=candidate,
-        producer_origin_ref="mission-invocation:producer-1",
-    )
-
-
-class Outputs:
-    def __init__(self, *items: ExactOutput) -> None:
-        self.items = items
-
-    async def accepted_outputs(self, scope: str, run_id: str) -> tuple[ExactOutput, ...]:
-        return self.items
 
 
 class Knowledge:

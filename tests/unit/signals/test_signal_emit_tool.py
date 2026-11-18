@@ -18,7 +18,7 @@ from mission_control.application.signals.contracts import TrustTier
 from mission_control.interfaces.http.ingress import create_ingress_app
 from mission_control.interfaces.mcp.coordinator_http_client import CoordinatorStreamableHttpClient
 from mission_control.interfaces.mcp.signal_tools import SIGNAL_EMIT_TOOL, mount_signal_tools
-from tests.unit.signals.test_ingress_service import TOKEN, FakeStore, service
+from tests.support.unit.signals.ingress_service import TOKEN, FakeStore, service
 
 PATH = "/v1/ingress/biotech/mcp/"
 

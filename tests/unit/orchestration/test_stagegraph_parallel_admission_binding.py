@@ -49,7 +49,7 @@ from mission_control.domain.programs.interpreter import StageGraphInterpreter
 from tests.fixtures.lane_bindings import LANE_REBINDERS
 from tests.support.operations import operation_request
 from tests.support.run_control import ConfigurationVerifier, command, request
-from tests.unit.run_control.test_atomic_family_admission import admission_policies
+from tests.support.unit.run_control.atomic_family_admission import admission_policies
 
 NOW = datetime(2026, 11, 3, 4, 4, 49, tzinfo=UTC)
 SCOPE = "tenant-1"

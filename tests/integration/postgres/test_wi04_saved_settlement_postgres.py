@@ -248,7 +248,7 @@ async def test_native_receipt_reference_snapshot_survives_new_pool_and_store(
 ) -> None:
     import json
 
-    from tests.unit.operations.test_native_receipt_evidence import EFFECT, RECEIPT, REFERENCES
+    from tests.support.unit.operations.native_receipt_evidence import EFFECT, RECEIPT, REFERENCES
 
     await common_db.add_tenants(["tenant-1", "tenant-2"])
     scope = common_db.scope("tenant-1")

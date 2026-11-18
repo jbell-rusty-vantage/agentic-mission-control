@@ -10,28 +10,14 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from mission_control.adapters.cursor.local import CursorLocalHarness
 from mission_control.application.execution.harness.dispatch import DispatchReconcilingLane
 from mission_control.domain.execution.lanes import ReattachRequest
 from tests.fixtures.cursor_controls import harness_fields, started_session
 from tests.fixtures.cursor_local import local_stack
+from tests.support.unit.cursor.local_reconcile_and_rehydration import _fresh
 from tests.unit.cursor.support import dispatch_record, send_key, send_request, session_handle
 
 PROFILE = "cursor_local"
-
-
-def _fresh(stack) -> CursorLocalHarness:  # type: ignore[no-untyped-def]
-    """A harness in a 'new process' over the same launcher, leases, hooks and artifacts."""
-
-    source = stack.harness
-    return CursorLocalHarness(
-        launcher=source._launcher,
-        leaser=source._leaser,
-        projections=source._projections,
-        hooks=source._hooks,
-        artifacts=source._artifacts,
-        settings=source._settings,
-    )
 
 
 async def test_a_send_is_found_in_process_and_unknown_after_a_restart(tmp_path: Path) -> None:

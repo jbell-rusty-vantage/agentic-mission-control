@@ -21,8 +21,8 @@ from mission_control.domain.execution.cognition_points import ThreadItemPoint
 from mission_control.domain.execution.lane_turns import NativeRefs
 from mission_control.domain.frames.contracts import FrameKind, ProviderFrame
 from tests.fixtures.lane_turns import RecordingSignals
+from tests.support.unit.codex.harness import BOUNDS
 from tests.unit.codex.support import CodexStack, codex_stack
-from tests.unit.codex.test_harness import BOUNDS
 
 
 async def _settled_turn(tmp_path: Path, *scripts: str) -> tuple[CodexStack, str, str]:
@@ -162,7 +162,7 @@ def test_usage_skips_the_attributed_companion_frame(tmp_path: Path) -> None:
     counted once."""
 
     del tmp_path
-    from tests.unit.frames.test_frame_boundary_points import frame
+    from tests.support.unit.frames.frame_boundary_points import frame
 
     raw = frame(
         3,

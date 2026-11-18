@@ -25,22 +25,9 @@ from mission_control.domain.knowledge.effects import JournalState
 from tests.fixtures.knowledge_binding import model_report
 from tests.support.knowledge import lane
 from tests.support.trusted_knowledge import ScriptedRunner, evaluators, world
+from tests.support.unit.knowledge.w1_d19_d20 import census_refusal
 
 pytestmark = pytest.mark.asyncio
-
-ISSUES = [
-    f'occurrences.{index}.span.basis: Invalid input: expected "utf16-code-units-v1"'
-    for index in range(30)
-]
-
-
-def census_refusal() -> Any:
-    return protocol_error(
-        "INVALID_ENVELOPE",
-        "the census is not a valid discovery",
-        occurred_at="2026-10-28T22:44:00Z",
-        details={"reason": "observation_invalid", "issues": ISSUES},
-    )
 
 
 async def test_a_record_collision_is_a_typed_actionable_refusal_never_an_effect_wait() -> None:

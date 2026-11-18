@@ -4,9 +4,9 @@ from unittest.mock import AsyncMock
 import pytest
 
 from mission_control.application.prerequisites.preflight import PrerequisitesUnmet
+from mission_control.application.prerequisites.service import InMemoryOwnerPrerequisiteRepository
 from mission_control.domain.execution.lanes import CursorExecutionBinding
 from tests.fixtures.lane_bindings import lane_fields
-from tests.unit.prerequisites.test_preflight import InMemoryOwnerPrerequisiteRepository
 
 
 async def test_actual_manifest_preflight_and_require_match_sealed_cursor_local_identity(

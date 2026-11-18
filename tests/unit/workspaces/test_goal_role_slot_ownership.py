@@ -9,7 +9,7 @@ is now the ownership boundary; every other overlap still conflicts.
 
 from __future__ import annotations
 
-from datetime import UTC, datetime, timedelta
+from datetime import timedelta
 from hashlib import sha256
 from pathlib import Path
 
@@ -21,8 +21,6 @@ from mission_control.application.artifacts.workspace_materialization import (
     InMemoryWorkspaceManifestRepository,
     WorkspaceMaterializationService,
 )
-from mission_control.domain.authoring.canonical import sha256_digest
-from mission_control.domain.authoring.contracts import DefinitionKind, ExactDefinitionRef
 from mission_control.domain.execution.contracts import (
     WorkspaceMaterializationRequest,
     WorkspaceOwner,
@@ -35,11 +33,13 @@ from mission_control.domain.execution.materialization import (
     verify_workspace_manifest,
 )
 from mission_control.domain.policies.errors import IdempotencyConflict
-from mission_control.domain.programs.runtime_units import goal_unit_workspace_root
-from tests.fixtures.checkpoint_lineage import goal_unit
-from tests.unit.workspaces.test_workspace_materialization import RecordingProvisioner
-
-NAMESPACE = "run/run-1"
+from tests.support.unit.workspaces.goal_role_slot_ownership import (
+    NAMESPACE,
+    _goal_request,
+    _rebound,
+    _request,
+)
+from tests.support.unit.workspaces.workspace_materialization import RecordingProvisioner
 
 
 def _service(
@@ -49,56 +49,6 @@ def _service(
         manifests=manifests or InMemoryWorkspaceManifestRepository(),
         provisioner=RecordingProvisioner(),
         durable_inputs=InMemoryDurableWorkspaceInputs({}),
-    )
-
-
-def _goal_request(workspace_id: str, iteration: int, role: str) -> WorkspaceMaterializationRequest:
-    """The request the GoalDirected preparer derives: the compiled `/work` slot rebased
-    under the unit's role root, owned by the iteration's executor or verifier."""
-
-    unit = goal_unit(
-        request_scope="tenant-1",
-        run_id="run-1",
-        operation_id=f"goal-iteration/{iteration}/{role}",
-        goal_iteration=iteration,
-        role=role,  # type: ignore[arg-type]
-    )
-    root = goal_unit_workspace_root(unit)
-    assert root == f"/goal/{iteration}/{role}"
-    return _request(
-        workspace_id,
-        f"{root}/work",
-        WorkspaceOwner(
-            kind=(
-                WorkspaceOwnerKind.ITERATION if role == "executor" else WorkspaceOwnerKind.EVALUATOR
-            ),
-            owner_id=f"goal-iteration/{iteration}/{role}",
-        ),
-    )
-
-
-def _request(
-    workspace_id: str, path: str, owner: WorkspaceOwner
-) -> WorkspaceMaterializationRequest:
-    return WorkspaceMaterializationRequest(
-        namespace_id=NAMESPACE,
-        workspace_id=workspace_id,
-        provider="conformance-filesystem",
-        template_ref=ExactDefinitionRef(
-            kind=DefinitionKind.WORKSPACE_TEMPLATE,
-            logical_id="goal-workspace",
-            revision=1,
-            digest=sha256_digest("goal-workspace@1"),
-        ),
-        workflow_contract_digest=sha256_digest("goal-workspace-contract"),
-        slots=(
-            WorkspaceSlotBinding(
-                slot_name="work", logical_path=path, access="exclusive_write", owner=owner
-            ),
-        ),
-        runtime_digest=sha256_digest("runtime"),
-        image_digest=sha256_digest("image"),
-        created_at=datetime(2026, 10, 2, tzinfo=UTC),
     )
 
 
@@ -446,16 +396,6 @@ async def test_a_non_ascii_iteration_is_the_typed_conflict_not_a_value_error() -
     with pytest.raises(IdempotencyConflict, match="different materialization"):
         await service.materialize(superscript)
     assert (await service.current_manifest(NAMESPACE, workspace_id)).revision == 1
-
-
-def _rebound(
-    request: WorkspaceMaterializationRequest, minutes: int = 5
-) -> WorkspaceMaterializationRequest:
-    """The same materialization under a later operation attempt's binding (`bound_at`)."""
-
-    return request.model_copy(
-        update={"created_at": request.created_at + timedelta(minutes=minutes)}
-    )
 
 
 @pytest.mark.asyncio

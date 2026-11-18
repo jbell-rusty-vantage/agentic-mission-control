@@ -57,6 +57,7 @@ from tests.fixtures.cursor_controls import started_session
 from tests.fixtures.cursor_local import local_stack
 from tests.fixtures.lane_turns import lane_stack
 from tests.fixtures.projections.rows import firecrawl_row, tavily_row
+from tests.support.unit.codex.kernel_hooks import memory_hooks
 from tests.unit.claude.fixtures import (
     claude_binding,
     claude_operation,
@@ -75,7 +76,6 @@ from tests.unit.codex.support import (
     codex_operation,
     fixture_settings,
 )
-from tests.unit.codex.test_kernel_hooks import memory_hooks
 
 SENTINEL = "mo04-sentinel-value"
 WORKER: dict[str, str] = {

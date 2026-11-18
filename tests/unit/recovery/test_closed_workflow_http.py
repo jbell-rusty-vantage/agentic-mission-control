@@ -5,7 +5,7 @@ import httpx
 import pytest
 from fastapi import FastAPI
 from tests.support.run_control import actor
-from tests.unit.recovery.test_closed_workflow import setup_recovery
+from tests.support.unit.recovery.closed_workflow import setup_recovery
 
 from mission_control.application.missions.runtime import MissionControlRuntimeService
 from mission_control.interfaces.http.mission_control import (

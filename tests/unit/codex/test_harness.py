@@ -41,7 +41,6 @@ from mission_control.domain.execution.contracts import OperationExecutionResult
 from mission_control.domain.execution.lane_turns import LANE_COMMAND_SEMANTICS, LaneCancelRequest
 from mission_control.domain.execution.lanes import (
     CancelTurnRequest,
-    LaneSegmentBounds,
     PrepareRequest,
     SendTurnRequest,
     SessionHandle,
@@ -52,6 +51,7 @@ from mission_control.domain.execution.lanes import (
 from mission_control.domain.frames.body import frame_body_object
 from mission_control.domain.frames.contracts import FrameKind
 from tests.fixtures.lane_turns import RecordingSignals
+from tests.support.unit.codex.harness import BOUNDS
 from tests.unit.codex.fixture_app_server import FixtureLauncher, load_script
 from tests.unit.codex.support import (
     FAKE_WORKER_ENV,
@@ -64,8 +64,6 @@ from tests.unit.codex.support import (
     codex_stack,
     fixture_settings,
 )
-
-BOUNDS = LaneSegmentBounds(max_duration_s=20, start_to_close_s=60, heartbeat_timeout_s=3)
 
 
 @pytest.mark.asyncio

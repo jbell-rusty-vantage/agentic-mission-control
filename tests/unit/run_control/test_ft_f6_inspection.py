@@ -40,8 +40,8 @@ from tests.fixtures.transcripts import (
     transcript_events,
     transcript_frames,
 )
-from tests.unit.coordinator.test_coordinator_mcp_read_surface import FakeFacade
-from tests.unit.run_control.test_ft_f1_command_mailbox import (
+from tests.support.unit.coordinator.coordinator_mcp_read_surface import FakeFacade
+from tests.support.unit.run_control.ft_f1_command_mailbox import (
     SCOPE,
     Resolver,
     World,

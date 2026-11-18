@@ -32,8 +32,8 @@ from tests.fixtures.provider_webhooks import (
     delivery_body,
     standard_headers,
 )
+from tests.support.unit.signals.ingress_service import FakeStore
 from tests.unit.remote_session.support import PROFILE, ScriptedRemoteLane, staged_lane
-from tests.unit.signals.test_ingress_service import FakeStore
 
 SECRETS = {"anthropic": ANTHROPIC_TEST_SECRET, "openai": OPENAI_TEST_SECRET}
 

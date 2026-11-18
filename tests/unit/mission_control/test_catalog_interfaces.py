@@ -58,7 +58,7 @@ def test_catalog_cli_routes_preserve_typed_request_body():
 
 
 def test_plugin_search_preserves_trust_and_host_filters_and_does_not_install():
-    from tests.unit.agentic_components.test_harness import mcp_release
+    from tests.support.unit.agentic_components.harness import mcp_release
 
     from mission_control.application.agentic_components.repository import (
         InMemoryAgenticComponentRepository,

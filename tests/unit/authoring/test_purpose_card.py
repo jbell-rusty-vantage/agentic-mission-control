@@ -39,7 +39,7 @@ from mission_control.domain.authoring.mission_definition import (
     manifest_to_definitions,
 )
 from mission_control.domain.execution.contracts import PURPOSE_CARD_HEADER
-from tests.unit.authoring.test_mission_brief import BRIEF, document
+from tests.support.unit.authoring.mission_brief import BRIEF, document
 from tests.unit.guide.support import SANDBOXES
 
 PREFACE = (

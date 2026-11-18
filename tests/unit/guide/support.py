@@ -43,7 +43,7 @@ from mission_control.domain.resolution.profiles import LaneDeclaration
 from mission_control.interfaces.mcp.operator_server import create_operator_server
 from tests.conformance.lanes.compile.stub import NARROW_DECLARATION, STUB_DECLARATION
 from tests.conformance.resolution.fixtures import APPLICATIONS, MODELS
-from tests.unit.selection.test_selection_workspace import (
+from tests.support.unit.selection.selection_workspace import (
     CATALOG_SCOPE,
     FakeDefinitions,
     FakeSearch,

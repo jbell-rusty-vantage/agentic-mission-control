@@ -10,7 +10,6 @@ inline, and a redelivery of the same receiver reads the same index bytes.
 from __future__ import annotations
 
 import json
-from datetime import UTC, datetime
 
 import pytest
 
@@ -18,20 +17,11 @@ from mission_control.application.context.materialization import (
     ApplicationSelectorResolver,
     ContextDeliveryBlocked,
     LiteralResolver,
-    MaterializeRequest,
     ProducedOutputResolver,
     TransferMaterializer,
 )
-from mission_control.application.knowledge.access import InvocationAccess
 from mission_control.application.outputs.current_set import CurrentSetIndexResolver
 from mission_control.domain.context import transfer_builders as builders
-from mission_control.domain.context.transfer import (
-    BackendCapabilities,
-    HostOverhead,
-    ReceiverAttempt,
-    ReceiverRef,
-    ResourceBounds,
-)
 from mission_control.domain.outputs.contracts import Cardinality, OutputForm, Requirement
 from mission_control.domain.outputs.current_set import (
     CURRENT_SET_BINDING,
@@ -40,58 +30,28 @@ from mission_control.domain.outputs.current_set import (
 )
 from tests.fixtures.knowledge_binding import InMemoryStaging, InMemoryTransferPlanStore
 from tests.fixtures.output_contracts import InMemoryOutputContractStore
-from tests.support.knowledge import origin
+from tests.support.unit.context.wi07_current_set_transfer import (
+    AT,
+    RUN,
+    SANDBOX,
+    Backend,
+    bounds,
+    executor,
+    invocation,
+    iteration,
+    judge,
+    request,
+    verifier_selection,
+)
 from tests.unit.outputs.scenario import (
     TRUSTED_VALIDATORS,
     Stack,
     build_stack,
     obligation,
-    text,
 )
 
 pytestmark = pytest.mark.asyncio
-AT = datetime(2026, 10, 28, 12, tzinfo=UTC)
-RUN = "22222222-2222-4222-8222-222222222222"
-SANDBOX = BackendCapabilities(custody_backend="mc-custody", file_capable=True, binary_capable=True)
-OVERHEAD = HostOverhead(host_state_tokens=800, tool_schema_tokens=400, skill_tokens=100)
 ASSESSED = Requirement(key="assessed", validator="knowledge.report.assess@1")
-
-
-def invocation(operation: str, attempt: int = 1) -> InvocationAccess:
-    return InvocationAccess(
-        origin=origin(attempt, operation_id=operation),
-        subject="mission-control-runtime",
-        invocation_id="inv-" + operation.replace("/", "-") + f"-{attempt}",
-        authenticated_at=AT,
-    )
-
-
-def executor(iteration: int) -> str:
-    return f"goal-iteration/{iteration}/executor"
-
-
-class Backend:
-    realized_backend = "fake:sandbox"
-
-    def __init__(self) -> None:
-        self.files: dict[str, bytes] = {}
-
-    async def write(self, files) -> None:  # type: ignore[no-untyped-def]
-        self.files.update(files)
-
-    async def read(self, path: str) -> bytes | None:
-        return self.files.get(path)
-
-
-def bounds() -> ResourceBounds:
-    return ResourceBounds(
-        window_tokens=64_000,
-        generation_reserve_tokens=4_000,
-        tool_result_reserve_tokens=2_000,
-        inline_bytes_ceiling=16_000,
-        file_bytes_ceiling=512_000,
-        file_count_ceiling=16,
-    )
 
 
 async def goal_stack() -> Stack:
@@ -125,52 +85,6 @@ def materializer(stack: Stack, store: InMemoryTransferPlanStore) -> TransferMate
         },
         clock=lambda: AT,
     )
-
-
-def verifier_selection(iteration: int):  # type: ignore[no-untyped-def]
-    base = builders.first_invocation("goal", bounds(), SANDBOX)
-    judge = builders.evaluator(base, [("goal", "goal.reports")])
-    return with_current_set_index(
-        builders.for_producer(judge, executor(iteration)), purpose="evaluation_subject"
-    )
-
-
-def request(stack: Stack, selection, operation: str, attempt: int = 1) -> MaterializeRequest:  # type: ignore[no-untyped-def]
-    access = invocation(operation, attempt)
-    return MaterializeRequest(
-        receiver=ReceiverRef(scope=stack.host.scope, run_id=RUN, operation_id=operation),
-        attempt=ReceiverAttempt(
-            operation_attempt=attempt, execution_generation=1, invocation_ref=f"inv-{attempt}"
-        ),
-        selection=selection,
-        configuration_ref="erc:sha256:" + "0" * 64,
-        host_state_ref="context-packet:p1@sha256:" + "1" * 64,
-        overhead=OVERHEAD,
-        access=access,
-    )
-
-
-async def iteration(stack: Stack, number: int, *items: tuple[str, str]) -> list[str]:
-    """One executor iteration submits its reports and finalizes; returns revision ids."""
-
-    access = invocation(executor(number))
-    worker = await stack.start(access)
-    ids: list[str] = []
-    for deliverable, body in items:
-        ack = await worker.submit(
-            f"{number}-{deliverable}", "goal.reports", text(deliverable, body), position="goal"
-        )
-        assert ack.status == "accepted", ack.error
-        ids.append(ack.revisions[0].revision_id)
-    await stack.submissions.finalize(access.identity(("goal.reports",)))
-    return ids
-
-
-async def judge(stack: Stack, revision_id: str, verdict: str) -> None:
-    revision = await stack.store.output_revision(stack.host.scope, revision_id)
-    assert revision is not None
-    receipt = await stack.judge(revision_id, revision.content_digest, assessed=verdict)
-    assert receipt.status == "recorded", receipt.error
 
 
 async def promote(stack: Stack, revision_id: str) -> None:
@@ -302,7 +216,7 @@ async def test_a_collection_blocked_by_held_or_rejected_members_is_not_a_deliver
     """Review S1: under `all`, a rejected member keeps the manifest out of the verifier's subjects
     (the index labels it); an authored `at_least 1` rule tolerates it, so it is delivered."""
 
-    from tests.unit.outputs.test_collections import VERIFIED, collection, report
+    from tests.support.unit.outputs.collections import VERIFIED, collection, report
 
     store = InMemoryOutputContractStore()
     promise = obligation(

@@ -7,7 +7,7 @@ from uuid import uuid4
 import pytest
 from temporalio.api.history.v1 import HistoryEvent
 from temporalio.client import WorkflowExecutionStatus
-from tests.unit.recovery.test_closed_workflow import setup_recovery
+from tests.support.unit.recovery.closed_workflow import setup_recovery
 
 from mission_control.adapters.temporal.closed_workflow import TemporalClosedWorkflowObserver
 from mission_control.contracts.contracts import MissionControlRejected

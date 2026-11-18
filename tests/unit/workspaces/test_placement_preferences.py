@@ -11,7 +11,7 @@ from mission_control.application.workspaces.preferences import FreshPlacementEli
 from mission_control.domain.authoring.manifest_v2 import EnvironmentV2
 from tests.fixtures.provider_frames import SCOPE
 from tests.support.manifests.compile import minimal, scope, service, text
-from tests.unit.prerequisites.test_preflight import definition
+from tests.support.unit.prerequisites.preflight import definition
 
 
 async def test_rejected_primary_recompiles_valid_secondary_before_sealing():

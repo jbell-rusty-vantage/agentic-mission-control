@@ -33,7 +33,7 @@ from mission_control.domain.programs.contracts import (
 from mission_control.domain.programs.runtime_units import stage_runtime_unit
 from tests.support.operations import operation_request
 from tests.support.run_control import DIGEST, NOW, actor, command, request, service
-from tests.unit.run_control.test_operation_authority_cas import claim as authority_claim
+from tests.support.unit.run_control.operation_authority_cas import claim as authority_claim
 
 
 def admitted_stage():  # type: ignore[no-untyped-def]

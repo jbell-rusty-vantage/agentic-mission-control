@@ -10,20 +10,18 @@ from __future__ import annotations
 import asyncio
 from collections.abc import Mapping
 from datetime import UTC, datetime
-from typing import Annotated, Any, TypedDict
+from typing import Any
 
 import pytest
-from langchain_core.messages import AIMessage, AnyMessage, HumanMessage, ToolMessage
+from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
 from langchain_core.runnables import RunnableConfig
 from langchain_core.tools import tool
 from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.graph import END, START, StateGraph
-from langgraph.graph.message import add_messages
 
 import mission_control.adapters.deep_agents.cognition_points as cognition_points_module
 from mission_control.adapters.deep_agents.adapter import _TaskNamespaceObserver
 from mission_control.adapters.deep_agents.checkpoint_reads import (
-    checkpoint_parent_id,
     root_checkpoint_config,
 )
 from mission_control.adapters.deep_agents.cognition_points import collect_points
@@ -33,7 +31,6 @@ from mission_control.domain.execution.checkpoint_lineage import (
     ROOT_CHECKPOINT_NS,
     CheckpointCapture,
     CheckpointInvocationPlan,
-    submission_invocation_id,
 )
 from mission_control.domain.execution.cognition_points import (
     CheckpointPoint,
@@ -46,74 +43,15 @@ from mission_control.domain.frames.contracts import FrameKind
 from mission_control.domain.graph_runtime.identities import QualifiedCheckpointKey
 from tests.fixtures.provider_frames import SCOPE as FRAME_SCOPE
 from tests.fixtures.provider_frames import in_memory_store, opened_writer
-
-SCOPE = "mc/0192a4f0-0000-7000-8000-00000000b10e/biotech/9287e246-224b-5814-bc00-44bb5396e0c5"
-UNIT_KEY = "bl-unit-v1:" + "cd" * 32
-DIGEST = "sha256:" + "ef" * 32
-THREAD = "belllabs/goal/run/epoch/1/session/1/role/executor"
-
-
-class State(TypedDict):
-    messages: Annotated[list[AnyMessage], add_messages]
-    files: dict[str, Any]
-
-
-def _graph(saver: InMemorySaver) -> Any:
-    calls = {"n": 0}
-
-    def think(state: State) -> dict[str, Any]:
-        calls["n"] += 1
-        return {
-            "messages": [
-                AIMessage(
-                    content=f"answer {calls['n']}",
-                    id=f"ai-{calls['n']}",
-                    usage_metadata={"input_tokens": 8, "output_tokens": 12, "total_tokens": 20},
-                )
-            ]
-        }
-
-    def write(state: State) -> dict[str, Any]:
-        return {"files": {**state.get("files", {}), f"/work/{calls['n']}.md": {"content": "x"}}}
-
-    graph = StateGraph(State)
-    graph.add_node("think", think)
-    graph.add_node("write", write)
-    graph.add_edge(START, "think")
-    graph.add_edge("think", "write")
-    graph.add_edge("write", END)
-    return graph.compile(checkpointer=saver)
-
-
-def _plan(attempt_ref: str) -> CheckpointInvocationPlan:
-    return CheckpointInvocationPlan(
-        request_scope=SCOPE,
-        unit_key=UNIT_KEY,
-        execution_generation=1,
-        claim_fence=1,
-        namespace=THREAD,
-        invocation_id=submission_invocation_id(UNIT_KEY, 1),
-        checkpointer_ref_digest=DIGEST,
-        binding_digest=DIGEST,
-        state_schema_digest=DIGEST,
-        attempt_ref=attempt_ref,
-    )
-
-
-async def _lineage(saver: InMemorySaver) -> list[tuple[str, str | None, int | None]]:
-    items = []
-    async for item in saver.alist(
-        {"configurable": {"thread_id": THREAD, "checkpoint_ns": ROOT_CHECKPOINT_NS}}
-    ):
-        items.append(
-            (
-                str(item.config["configurable"]["checkpoint_id"]),
-                checkpoint_parent_id(item),
-                (item.metadata or {}).get("step"),
-            )
-        )
-    items.reverse()
-    return items
+from tests.support.unit.deep_agents.cognition_points_collector import (
+    DIGEST,
+    THREAD,
+    UNIT_KEY,
+    State,
+    _graph,
+    _lineage,
+    _plan,
+)
 
 
 @pytest.mark.asyncio

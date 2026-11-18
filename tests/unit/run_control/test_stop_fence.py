@@ -17,13 +17,10 @@ from mission_control.application.execution.stop_fence import (
 )
 from mission_control.application.missions.service import MissionControlService
 from mission_control.contracts.contracts import (
-    CancelPayload,
-    CommandTarget,
-    MissionCommandRequest,
     MissionControlRejected,
 )
 from mission_control.domain.authoring.canonical import contract_fingerprint, sha256_digest
-from mission_control.domain.policies.contracts import ActorContext, CancelAction, RunPhase
+from mission_control.domain.policies.contracts import CancelAction, RunPhase
 from mission_control.domain.policies.stop_fence import (
     STOP_FENCED,
     STOP_NOW_NOTE,
@@ -36,7 +33,8 @@ from mission_control.domain.policies.stop_fence import (
 )
 from tests.support.boundary_commands import TARGET, started
 from tests.support.run_control import service
-from tests.unit.run_control.test_mission_control_facade import actor
+from tests.support.unit.run_control.mission_control_facade import actor
+from tests.support.unit.run_control.stop_fence import _cancel, admin
 
 NOW = datetime(2026, 10, 8, 9, 0, tzinfo=UTC)
 
@@ -153,18 +151,6 @@ async def test_in_memory_fence_and_admissions_serialize() -> None:
         assert verdict == verdicts[index]
 
 
-def _cancel(run_id: str, version: int, urgency: str) -> MissionCommandRequest:
-    return MissionCommandRequest(
-        request_id=uuid4(),
-        expected_version=version,
-        expected_generation=1,
-        target=CommandTarget(id=run_id),
-        kind="cancel",
-        payload=CancelPayload(urgency=urgency),  # type: ignore[arg-type]
-        reason="wrong repo",
-    )
-
-
 class FenceObservingInterventions(BoundaryInterventionService):
     """Records whether the fence was already persisted when the cancel was admitted."""
 
@@ -177,11 +163,6 @@ class FenceObservingInterventions(BoundaryInterventionService):
         fence = await self.fences.get(command.request_scope, command.run_id)
         self.fenced_at_admission.append(fence is not None)
         return await super().execute(command)
-
-
-def admin() -> ActorContext:
-    source = actor()
-    return source.model_copy(update={"permissions": source.permissions | {"workflow_run.admin"}})
 
 
 async def test_immediate_cancel_persists_the_fence_before_admission() -> None:

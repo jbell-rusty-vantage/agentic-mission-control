@@ -11,7 +11,7 @@ import pytest
 from mission_control.application.subscriptions.coordinator import NotificationKind, extract_facts
 from mission_control.domain.policies.contracts import SetWaitAction, StartAction, WaitCondition
 from tests.support.run_control import command, request, service
-from tests.unit.subscriptions.test_mp15_coordinator import classify_type
+from tests.support.unit.subscriptions.mp15_coordinator import classify_type
 
 
 @pytest.mark.parametrize("condition", ["route-exhausted:triage_route", "revisit-exhausted:refine"])

@@ -14,7 +14,7 @@ from typing import Any
 from temporalio.testing import ActivityEnvironment
 from tests.fixtures.lane_turns import DIGEST, ScriptedSessionLane, lane_stack
 from tests.fixtures.managed_lane import managed_binding, managed_operation
-from tests.unit.harness.test_managed_budget_controls import NOW, Approvals, Authority, Provider
+from tests.support.unit.harness.managed_budget_controls import NOW, Approvals, Authority, Provider
 
 from mission_control.adapters.anthropic_managed.describe import CLAUDE_MANAGED_DESCRIBE
 from mission_control.adapters.temporal.operation_activities import OperationExecutionActivities

@@ -43,6 +43,12 @@ from mission_control.interfaces.http.hook_callback import create_hook_callback_a
 from tests.fixtures.lane_turns import lane_stack
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.support.db_builders import admit_unit_attempt, owner_rows
+from tests.support.unit.codex.kernel_hooks import (
+    command_statuses,
+    kernel_operation,
+    kernel_projection,
+    run_turn,
+)
 from tests.unit.codex.drive import fields, started
 from tests.unit.codex.fixture_app_server import FixtureLauncher, load_script
 from tests.unit.codex.support import (
@@ -50,12 +56,6 @@ from tests.unit.codex.support import (
     StaticProjectionSource,
     build_harness,
     fixture_settings,
-)
-from tests.unit.codex.test_kernel_hooks import (
-    command_statuses,
-    kernel_operation,
-    kernel_projection,
-    run_turn,
 )
 
 pytestmark = pytest.mark.common_db

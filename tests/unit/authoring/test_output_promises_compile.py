@@ -26,36 +26,14 @@ from mission_control.domain.outputs.contracts import AllOf, Enforcement, OutputF
 from tests.fixtures.output_contracts import InMemoryOutputContractStore
 from tests.support.knowledge import origin
 from tests.support.manifests.compile import minimal, reasons, scope, service, text
+from tests.support.unit.authoring.output_promises_compile import (
+    compiled_configuration,
+    promised_manifest,
+)
 from tests.unit.outputs.scenario import Stack, fulfillment, host_access
 from tests.unit.outputs.scenario import text as text_candidate
 
 pytestmark = pytest.mark.asyncio
-
-
-def promised_manifest() -> dict:  # type: ignore[type-arg]
-    document = minimal()
-    synthesize = document["mission"]["program"]["nodes"][1]
-    synthesize["outputs"] = [
-        {
-            "name": "claims",
-            "schema": "claim_table@1",
-            "coverage": {"subjects": ["nct-1", "nct-2"], "pointer": "/claims", "key": "study"},
-        },
-        {
-            "name": "summary",
-            "form": "text",
-            "enforcement": "expected",
-            "media_type": "text/markdown",
-        },
-        {
-            "name": "patch",
-            "form": "code_change",
-            "enforcement": "optional",
-            "repository": "github.com/overtonbell/mission-control",
-            "requirements": [{"key": "tests", "validator": "mc.check.command@1"}],
-        },
-    ]
-    return document
 
 
 async def test_the_effective_configuration_pins_every_named_promise() -> None:
@@ -173,15 +151,6 @@ def test_dependencies_carry_the_bound_output_and_the_authored_join() -> None:
     ).ordering_only
     joins = {join.consumer_stage_id: join.kind for join in graph.joins}
     assert joins == {"review": JoinKind.ANY, "archive": JoinKind.ALL}
-
-
-async def compiled_configuration():  # type: ignore[no-untyped-def]
-    compiler, _, _ = await service()
-    result = await compiler.compile(text(promised_manifest()), scope())
-    assert result.ok, result.report.blockers
-    configuration = result.programs[0].configuration
-    assert configuration.output_promises is not None
-    return configuration
 
 
 async def test_the_compiled_configuration_registers_and_drives_fulfillment() -> None:

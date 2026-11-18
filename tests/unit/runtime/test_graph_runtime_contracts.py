@@ -19,7 +19,6 @@ from mission_control.domain.graph_runtime.contracts import (
 from mission_control.domain.graph_runtime.definitions import (
     CapabilityManifestDefinition,
     CapabilityMaturityRecord,
-    ContentAddressedRef,
     DelegationModePolicy,
     DelegationPolicyDefinition,
     GraphAssemblyDefinition,
@@ -41,18 +40,9 @@ from mission_control.domain.graph_runtime.identities import (
     SemanticOperationAttemptKey,
 )
 from mission_control.interfaces.http.graph_runtime_schemas import graph_runtime_contract_schemas
+from tests.support.unit.runtime.graph_runtime_contracts import DIGEST, ref
 
-DIGEST = "sha256:" + "a" * 64
 NOW = datetime(2026, 8, 5, 20, 0, tzinfo=UTC)
-
-
-def ref(kind: RuntimeDefinitionKind, name: str, digest: str = DIGEST) -> ContentAddressedRef:
-    return ContentAddressedRef(
-        kind=kind,
-        logical_id=name,
-        schema_version="1",
-        digest=digest,
-    )
 
 
 def test_provider_qualified_identity_grammar_rejects_ambiguous_children() -> None:

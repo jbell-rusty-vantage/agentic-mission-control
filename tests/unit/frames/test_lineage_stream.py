@@ -10,7 +10,6 @@ from typing import Any
 
 import pytest
 
-from mission_control.application.frames.kinds import UnknownKindCounter
 from mission_control.application.frames.lineage import provider_subordinates
 from mission_control.application.frames.lineage_stream import LineageTracker
 from mission_control.application.frames.projections import (
@@ -21,27 +20,9 @@ from mission_control.application.frames.projections import (
 )
 from mission_control.domain.frames.contracts import FrameKind, LaneProfile, ProviderFrame
 from tests.fixtures.provider_frames import provider_frame
-from tests.unit.frames.test_provider_lanes import (
-    claude_observations,
-    codex_app_observations,
-    persisted,
-)
+from tests.support.unit.frames.lineage_stream import claude_frames, codex_frames
 
 K = FrameKind
-
-
-async def claude_frames() -> list[ProviderFrame]:
-    frames, _store, _handle = await persisted(
-        claude_observations(UnknownKindCounter()), LaneProfile.CLAUDE_AGENT_SDK, "sess-fixture-1"
-    )
-    return frames
-
-
-async def codex_frames() -> list[ProviderFrame]:
-    frames, _store, _handle = await persisted(
-        codex_app_observations(UnknownKindCounter()), LaneProfile.CODEX, "thr_root"
-    )
-    return frames
 
 
 def spawn_only_frames() -> list[ProviderFrame]:

@@ -42,8 +42,8 @@ from tests.fixtures.transcripts import (
     transcript_events,
     transcript_frames,
 )
-from tests.unit.frames.test_run_list_and_search import MemoryDocuments
-from tests.unit.frames.test_transcript_interfaces import http_app
+from tests.support.unit.frames.run_list_and_search import MemoryDocuments
+from tests.support.unit.frames.transcript_interfaces import http_app
 
 READ = frozenset({"workflow_run.read"})
 FULL = READ | {"workflow.result.read"}

@@ -420,7 +420,7 @@ async def test_one_sealed_plan_per_receiver_and_appended_attempt_receipts(
     common_db: CommonDatabase,
     pool: asyncpg.Pool,
 ) -> None:
-    from tests.unit.context.test_transfer_materializer import (
+    from tests.support.unit.context.transfer_materializer import (
         OVERHEAD,
         REPORT_INPUT,
         FakeBackend,
@@ -681,7 +681,7 @@ async def test_registration_reuse_is_atomic_under_concurrent_writers(
 ) -> None:
     from mission_control.adapters.postgres.knowledge.lineage import PostgresContentLineageStore
     from mission_control.domain.knowledge.lineage import ProvenanceRole
-    from tests.unit.knowledge.test_registration_lineage import registration_entries
+    from tests.support.unit.knowledge.registration_lineage import registration_entries
 
     store = PostgresContentLineageStore(pool)
     first = access_for(common_db, operation_id="register-first")
@@ -737,7 +737,7 @@ async def test_registration_subject_mismatch_rolls_back_without_weakening_strict
     from dataclasses import replace
 
     from mission_control.adapters.postgres.knowledge.lineage import PostgresContentLineageStore
-    from tests.unit.knowledge.test_registration_lineage import registration_entries
+    from tests.support.unit.knowledge.registration_lineage import registration_entries
 
     store = PostgresContentLineageStore(pool)
     first = access_for(common_db, operation_id="register-first")

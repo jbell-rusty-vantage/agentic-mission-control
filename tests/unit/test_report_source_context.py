@@ -1,17 +1,12 @@
 """Fail-closed fixture context composition without databases or model calls."""
 
-import importlib.util
 import json
-from pathlib import Path
 
 import pytest
 
-SPEC = importlib.util.spec_from_file_location(
-    "report_source_context",
-    Path(__file__).resolve().parents[2] / "scripts/report_source_context.py",
-)
+from tests.support.unit.report_source_context import SPEC, context
+
 assert SPEC and SPEC.loader
-context = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(context)
 
 

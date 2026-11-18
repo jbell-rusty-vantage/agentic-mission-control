@@ -49,7 +49,7 @@ from tests.fixtures.checkpoint_recovery import (
     stage_recovery_unit,
 )
 from tests.fixtures.temporal_history import patch_ids
-from tests.unit.operations.test_checkpoint_recovery_classification import (
+from tests.support.unit.operations.checkpoint_recovery_classification import (
     _namespace,
     _write_foreign_root_checkpoint,
 )

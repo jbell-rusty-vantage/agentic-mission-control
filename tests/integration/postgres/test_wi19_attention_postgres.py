@@ -377,7 +377,7 @@ async def test_transfer_inspection_reads_plans_receipts_and_refusals(
         SealedTransferPlan,
         seal_plan,
     )
-    from tests.unit.context.test_transfer_plan import (
+    from tests.support.unit.context.transfer_plan import (
         OVERHEAD,
         _deliveries,
         report_input,

@@ -5,7 +5,7 @@ from uuid import uuid4
 
 import pytest
 from tests.support.run_control import NOW, actor
-from tests.unit.recovery.test_closed_workflow import setup_recovery
+from tests.support.unit.recovery.closed_workflow import setup_recovery
 
 from mission_control.adapters.postgres.closed_workflow import (
     command_allows_cancelled_terminalization,

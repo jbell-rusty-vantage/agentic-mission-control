@@ -9,11 +9,11 @@ from dataclasses import replace
 import pytest
 
 from mission_control.domain.context.render import is_context_input_slot
-from tests.unit.orchestration.test_ft_b3_goal_iteration_packet import (
+from tests.support.unit.orchestration.ft_b3_goal_iteration_packet import (
     _composition,
     _executor_result,
 )
-from tests.unit.orchestration.test_rrm_016_goal_directed_settlement import _claim, _preparation
+from tests.support.unit.orchestration.rrm_016_goal_directed_settlement import _claim, _preparation
 
 ROLE_ROOT = "/goal/1/verifier"
 

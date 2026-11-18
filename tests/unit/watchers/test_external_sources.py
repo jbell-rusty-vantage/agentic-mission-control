@@ -17,8 +17,8 @@ from mission_control.adapters.temporal.activities.source_watches import (
 )
 from mission_control.application.effects.ports import GitCredential
 from mission_control.application.watchers.sources import cursor_status_signal, github_signal
+from tests.support.unit.watchers.watcher_planner import plan, watcher
 from tests.unit.watchers.fakes import T0
-from tests.unit.watchers.test_watcher_planner import plan, watcher
 
 
 def fires(signal):

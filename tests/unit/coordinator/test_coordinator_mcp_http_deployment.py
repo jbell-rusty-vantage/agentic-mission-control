@@ -17,7 +17,7 @@ from mission_control.interfaces.mcp.coordinator_server import (
     CoordinatorPrincipal,
     StaticPrincipalResolver,
 )
-from tests.unit.coordinator.test_coordinator_mcp_read_surface import FakeFacade
+from tests.support.unit.coordinator.coordinator_mcp_read_surface import FakeFacade
 
 
 @pytest.mark.asyncio

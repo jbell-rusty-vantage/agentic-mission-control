@@ -31,13 +31,13 @@ from mission_control.domain.context.packet import (
     RetrievalInstruction,
     RetrievalKind,
 )
-from tests.unit.operations.test_ft_b2_stage_handoff import (
+from tests.support.unit.operations.ft_b2_stage_handoff import (
     FakeArtifacts,
     FakeSelections,
     FakeStaging,
 )
-from tests.unit.orchestration.test_ft_b3_goal_iteration_packet import _executor_result
-from tests.unit.orchestration.test_rrm_016_goal_directed_settlement import _claim, _preparation
+from tests.support.unit.orchestration.ft_b3_goal_iteration_packet import _executor_result
+from tests.support.unit.orchestration.rrm_016_goal_directed_settlement import _claim, _preparation
 
 MAP = b"| model | quoted size | source id |\n| Mistral 7B | 7-billion-parameter | arxiv |\n"
 BINDING = "e4-evidence.evidence_map"

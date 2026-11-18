@@ -11,15 +11,12 @@ import json
 from contextlib import AsyncExitStack
 from pathlib import Path
 from types import SimpleNamespace
-from typing import Any
 
 import pytest
 import yaml
 from fastapi.testclient import TestClient
 from langchain_anthropic import ChatAnthropic
-from langchain_core.language_models import BaseChatModel
-from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
-from langchain_core.outputs import ChatGeneration, ChatResult
+from langchain_core.messages import HumanMessage
 from langchain_core.tools import BaseTool
 from langgraph_cli.cli import prepare_args_and_stdin
 from langgraph_cli.config import validate_config_file
@@ -45,6 +42,7 @@ from mission_control.adapters.deep_agents.materializer import (
     ExactModelFactory,
 )
 from tests.fixtures.models import checked_in_catalog
+from tests.support.unit.agent_server.async_subagent_server_offline import ScriptedChildModel
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 ROOT_LANGGRAPH = PROJECT_ROOT / "agent_server" / "langgraph.json"
@@ -84,34 +82,6 @@ def test_an_installation_without_an_application_has_no_child_model(
     )
     with pytest.raises(RuntimeError, match="MISSION_CONTROL_APPLICATION"):
         child_bindings.technical_child_model()
-
-
-class ScriptedChildModel(BaseChatModel):
-    calls: int = 0
-
-    @property
-    def _llm_type(self) -> str:
-        return "rrm-013-scripted-child"
-
-    def bind_tools(self, tools: Any, *, tool_choice: Any = None, **kwargs: Any) -> BaseChatModel:
-        del tools, tool_choice, kwargs
-        return self
-
-    def _generate(
-        self, messages: list[BaseMessage], stop: Any = None, run_manager: Any = None, **kwargs: Any
-    ) -> ChatResult:
-        del messages, stop, run_manager, kwargs
-        self.calls += 1
-        return ChatResult(
-            generations=[
-                ChatGeneration(
-                    message=AIMessage(
-                        content="PONG",
-                        usage_metadata={"input_tokens": 1, "output_tokens": 1, "total_tokens": 2},
-                    )
-                )
-            ]
-        )
 
 
 def test_canonical_config_preserves_bounded_graphs_and_uses_one_auth_surface() -> None:

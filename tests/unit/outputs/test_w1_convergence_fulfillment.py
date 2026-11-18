@@ -21,9 +21,9 @@ from mission_control.application.outputs.fulfillment import (
 )
 from mission_control.application.programs.goal_directed import bind_fulfillment
 from mission_control.domain.outputs.contracts import Enforcement, OutputForm, Requirement
-from mission_control.domain.programs.goal_directed_runtime import GoalVerifierObservation
 from tests.fixtures.output_contracts import InMemoryOutputContractStore
 from tests.support.knowledge import origin
+from tests.support.unit.outputs.w1_convergence_fulfillment import _observation
 from tests.unit.outputs.scenario import (
     Stack,
     build_stack,
@@ -154,15 +154,6 @@ async def test_production_refreshes_fulfillment_after_each_head_move() -> None:
     assert len(store.fulfillments) > before  # the promotion itself decided the frontier
     decided = {item.obligation_key: item.disposition for item in store.fulfillments.values()}
     assert decided["report.note"] == "fulfilled"
-
-
-def _observation(decision: str = "accepted") -> GoalVerifierObservation:
-    return GoalVerifierObservation(
-        decision=decision,  # type: ignore[arg-type]
-        progress_made=True,
-        accepted_obligation_refs=("obligation:goal",),
-        output_contract_ref="contract:report",
-    )
 
 
 async def test_the_verdict_stands_only_when_every_required_promise_is_fulfilled() -> None:

@@ -135,7 +135,7 @@ def _budget(**update: object) -> BudgetState:
 
 
 def test_the_in_turn_run_budget_is_the_hard_cap_less_what_others_hold_and_spent() -> None:
-    from tests.unit.harness.test_lane_settlement_usage import _stage_operation
+    from tests.support.unit.harness.lane_settlement_usage import _stage_operation
 
     binding = bind_operation_execution_request(_stage_operation())
     own = binding.budget_reservation_id
@@ -158,7 +158,7 @@ def test_the_in_turn_run_budget_does_not_count_the_units_own_recorded_usage() ->
         operation_settlement_id,
     )
     from mission_control.domain.policies.contracts import UsageRecord
-    from tests.unit.harness.test_lane_settlement_usage import _stage_operation
+    from tests.support.unit.harness.lane_settlement_usage import _stage_operation
 
     binding = bind_operation_execution_request(_stage_operation())
     settlement_id = operation_settlement_id(binding.binding_id)

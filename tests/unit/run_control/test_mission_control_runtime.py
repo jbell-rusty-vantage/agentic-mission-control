@@ -27,7 +27,7 @@ from tests.fixtures.run_forks import (
     stagegraph_head,
 )
 from tests.support.run_control import WORKFLOW_DIGEST, actor
-from tests.unit.operations.test_checkpoint_recovery_classification import (
+from tests.support.unit.operations.checkpoint_recovery_classification import (
     _namespace,
     _write_foreign_root_checkpoint,
 )

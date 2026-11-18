@@ -4,7 +4,6 @@ reflection and control propagation (domain rules and the application service).""
 from __future__ import annotations
 
 from dataclasses import replace
-from datetime import UTC, datetime
 from typing import Any
 
 import pytest
@@ -18,12 +17,11 @@ from mission_control.application.programs.nested_bodies import (
     NestedProgramService,
 )
 from mission_control.domain.authoring.canonical import sha256_digest
-from mission_control.domain.authoring.nested_bodies import NestedBody, NestedExport
+from mission_control.domain.authoring.nested_bodies import NestedBody
 from mission_control.domain.policies.contracts import (
     CancelAction,
     CommandStatus,
     RecordUsageAction,
-    ReserveBudgetAction,
     StartAction,
 )
 from mission_control.domain.programs.contracts import BellLabsRunInput
@@ -43,29 +41,13 @@ from mission_control.domain.programs.nested import (
     uncontained,
 )
 from tests.support.run_control import command, request, service
-
-NOW = datetime(2026, 10, 29, tzinfo=UTC)
-DIGEST = "sha256:" + "a" * 64
-SCOPE = "tenant-1"
-
-
-def body(*, depth: int = 1, timing: str = "final", required: bool = True) -> NestedBody:
-    return NestedBody(
-        host_id="research",
-        node_key="research",
-        position="research",
-        behavior="stage_graph",
-        family="StageGraph",
-        depth=depth,
-        max_depth=2,
-        definition_digest=DIGEST,
-        blueprint_digest=DIGEST,
-        exports=(
-            NestedExport(output="report", source="inner.report"),
-            NestedExport(output="note", source="notes.note", timing=timing, required=required),
-        ),
-    )
-
+from tests.support.unit.orchestration.wi13_nested_runtime import (
+    DIGEST,
+    NOW,
+    SCOPE,
+    body,
+    parent_with_reservation,
+)
 
 # --------------------------------------------------------------------------- domain rules
 
@@ -283,23 +265,6 @@ class Controls:
     async def command(self, request: NestedControlRequest) -> NestedControlReceipt:
         self.requests.append(request)
         return NestedControlReceipt(True, status="delivered")
-
-
-async def parent_with_reservation(control: Any, amount: int = 40) -> str:
-    admitted = await control.admit(request())
-    run_id = admitted.run_id
-    assert run_id
-    await control.execute(command(run_id, 1, "start", StartAction()))
-    reserved = await control.execute(
-        command(
-            run_id,
-            2,
-            "reserve-unit",
-            ReserveBudgetAction(reservation_id="unit-1", amounts={"tokens.total": amount}),
-        )
-    )
-    assert reserved.status == CommandStatus.ACCEPTED
-    return run_id
 
 
 def activation(parent: str, **changes: Any) -> NestedActivationRequest:

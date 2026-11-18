@@ -100,13 +100,13 @@ from tests.fixtures.run_forks import (
 from tests.support.run_control import WORKFLOW_DIGEST, actor
 from tests.support.run_control import command as lifecycle
 from tests.support.run_control import request as run_request
-from tests.unit.coordinator.test_coordinator_mcp_read_surface import FakeFacade
-from tests.unit.operations.test_ft_b2_stage_handoff import (
+from tests.support.unit.coordinator.coordinator_mcp_read_surface import FakeFacade
+from tests.support.unit.operations.ft_b2_stage_handoff import (
     FakeArtifacts,
     FakeSelections,
     FakeStaging,
 )
-from tests.unit.orchestration.test_rrm_016_goal_directed_settlement import _run_iteration_one
+from tests.support.unit.orchestration.rrm_016_goal_directed_settlement import _run_iteration_one
 
 SCOPE = "mc/00000000-0000-7000-8000-0000000000aa/biotech/00000000-0000-7000-8000-0000000000bb"
 GRANTS = {

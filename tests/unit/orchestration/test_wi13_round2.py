@@ -67,11 +67,8 @@ from mission_control.domain.programs.nested import (
     NestedSettlementRequest,
 )
 from tests.support.run_control import command, request, service
-from tests.unit.authoring.test_wi13_nested_authoring import definition, document
-from tests.unit.orchestration.test_wi13_nested_runtime import (
-    body,
-    parent_with_reservation,
-)
+from tests.support.unit.authoring.wi13_nested_authoring import definition, document
+from tests.support.unit.orchestration.wi13_nested_runtime import body, parent_with_reservation
 
 NOW = datetime(2026, 10, 29, tzinfo=UTC)
 SCOPE = "mc/5e8f2a52-7c0e-4f55-9a4e-2f2a3b1c0d11/ai-engineer/7a7d7b1e-1c2d-4e3f-8a9b-0c1d2e3f4a5b"

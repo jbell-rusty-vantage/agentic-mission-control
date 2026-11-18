@@ -34,7 +34,7 @@ from mission_control.domain.capabilities.host_support import LaneProfile
 from mission_control.domain.prerequisites import OwnerPrerequisiteRecord
 from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog
 from tests.fixtures.provider_frames import SCOPE
-from tests.unit.prerequisites.test_preflight import definition
+from tests.support.unit.prerequisites.preflight import definition
 
 
 def oauth_record():

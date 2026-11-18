@@ -17,7 +17,7 @@ from mission_control.domain.resolution.resolved import ResolvedRuntime, SealedLa
 from mission_control.domain.resolution.selection import RuntimeSelection
 from tests.conformance.lanes.compile.fixtures import CANONICAL_ITEMS, canonical_agent
 from tests.conformance.lanes.compile.stub import STUB_DECLARATION, StubLaneAdapter
-from tests.conformance.resolution.fixtures import AI_ENGINEER
+from tests.support.unit.resolution.resolution_types import _runtime, _selection
 
 
 def test_every_item_kind_has_a_receipt_kind() -> None:
@@ -75,17 +75,6 @@ def test_a_lane_declaration_names_every_item_kind_and_family() -> None:
         LaneDeclaration.model_validate({**STUB_DECLARATION.model_dump(), "items": items})
 
 
-def _selection(agent: AgentConfiguration) -> RuntimeSelection:
-    return RuntimeSelection(
-        lane_profile=agent.lane_profile,
-        model_profile=agent.model.profile,
-        family="GoalDirected",
-        node_role="executor",
-        application_id="ai-engineer",
-        agent=agent,
-    )
-
-
 def test_a_selection_names_one_lane_and_one_model() -> None:
     selection = _selection(canonical_agent("deep_agents")).model_dump()
     with pytest.raises(ValidationError, match="different lanes"):
@@ -102,22 +91,6 @@ def test_a_sealed_binding_round_trips_through_json_and_refuses_non_json_bytes() 
         SealedLaneBinding.seal(
             lane_profile="deep_agents", schema_id="s.v1", payload=bytes([255, 0])
         )
-
-
-def _runtime(**overrides: object) -> ResolvedRuntime:
-    agent = canonical_agent("deep_agents")
-    binding, receipt = StubLaneAdapter().compile(agent, {})
-    fields: dict[str, object] = {
-        "selection_digest": _selection(agent).digest(),
-        "agent": agent,
-        "lane_binding": binding,
-        "knowledge": AI_ENGINEER.knowledge,
-        "outputs": AI_ENGINEER.outputs,
-        "transfer": AI_ENGINEER.transfer,
-        "receipt": receipt,
-        "application_revision": AI_ENGINEER.revision,
-    }
-    return ResolvedRuntime.create(**{**fields, **overrides})
 
 
 def test_resolved_runtime_digest_covers_the_application_revision() -> None:

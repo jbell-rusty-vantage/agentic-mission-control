@@ -32,7 +32,7 @@ from tests.fixtures.lane_turns import RecordingSignals, ScriptedSessionLane, scr
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.fixtures.mp06_lanes import LossyReceiptLane, ReconcilingLossyLane
 from tests.support.db_builders import pg_lane_unit
-from tests.unit.harness.test_mp06_dispatch_recovery import turn_request
+from tests.support.unit.harness.mp06_dispatch_recovery import turn_request
 
 pytestmark = pytest.mark.common_db
 LEASE = timedelta(seconds=30)

@@ -58,15 +58,9 @@ from tests.fixtures.lane_turns import (
     lane_stack,
     scripted_frames,
 )
+from tests.support.unit.harness.lane_settlement_usage import STAGE_RESERVATION, _stage_operation
 
-STAGE_RESERVATION = {"operation.attempts": 1, "concurrency.slots": 1}
 RUN_DIMENSIONS = frozenset({"tokens.total", "goal.iterations", "operation.attempts"})
-
-
-def _stage_operation() -> OperationExecutionRequest:
-    """A Stage Graph stage unit: its limits are its reservation (no token dimension)."""
-
-    return cursor_operation().model_copy(update={"budget_limits": dict(STAGE_RESERVATION)})
 
 
 def _turn(operation: OperationExecutionRequest) -> LaneTurnRequest:

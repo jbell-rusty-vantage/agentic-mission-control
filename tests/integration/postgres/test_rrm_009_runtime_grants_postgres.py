@@ -196,7 +196,7 @@ async def test_family_writer_closes_the_ledger_of_a_cancelled_run_only_with_its_
     """StageGraph terminalizes through the family admission, committed as the family writer:
     the terminal receipts of the run's boundary commands are written in that commit."""
 
-    from tests.unit.run_control.test_rrm_009_family_terminal_receipts import (
+    from tests.support.unit.run_control.rrm_009_family_terminal_receipts import (
         assert_ledger_closed,
         cancelled_run,
         terminal_family_service,

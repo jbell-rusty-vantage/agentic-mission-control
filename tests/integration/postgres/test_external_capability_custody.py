@@ -188,7 +188,7 @@ async def test_projection_claim_reclaim_fencing_poison_scope(pool):
 @pytest.mark.asyncio
 async def test_alias_listing_is_scoped_and_tracks_current_exact_target(pool):
     from mission_control.domain.authoring.contracts import AliasRef
-    from tests.unit.control_plane.test_agentic_asset_definitions import skill_definition
+    from tests.support.unit.control_plane.agentic_asset_definitions import skill_definition
 
     scope = BIOTECH_CATALOG
     catalog = PostgresDefinitionRepository(pool, catalog_scope=scope)

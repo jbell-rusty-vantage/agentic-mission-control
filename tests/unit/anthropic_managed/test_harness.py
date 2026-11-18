@@ -30,13 +30,10 @@ from mission_control.application.environments.preparation import (
 )
 from mission_control.application.execution.harness.dispatch import DispatchRecord
 from mission_control.application.execution.harness.lane_turns import (
-    LaneExecutionIdentity,
     LaneTurnService,
-    harness_scope,
 )
 from mission_control.application.execution.harness.sessions import WorkerSessionManager
 from mission_control.application.resolution.registries import LaneRegistry
-from mission_control.domain.execution.bindings import ProviderExecutionBinding
 from mission_control.domain.execution.contracts import (
     OperationExecutionRequest,
     OperationExecutionResult,
@@ -47,9 +44,6 @@ from mission_control.domain.execution.lanes import (
     CancelTurnRequest,
     EndSessionRequest,
     PrepareRequest,
-    SendTurnRequest,
-    SessionHandle,
-    StartRequest,
     StatusRequest,
     TurnHandle,
     UsageRequest,
@@ -64,6 +58,7 @@ from tests.fixtures.managed_lane import (
     managed_harness,
     managed_stack,
 )
+from tests.support.unit.anthropic_managed.harness import _fields, _identity, _sent, _started
 
 BOUNDS = LaneSegmentBounds(
     max_frames=500,
@@ -78,23 +73,6 @@ WITHIN_S = 20.0
 TURN_TOKENS = sum(MODEL_USAGE.values())
 
 
-def _identity(operation: OperationExecutionRequest) -> LaneExecutionIdentity:
-    return LaneExecutionIdentity.of(operation, PROFILE, 1)
-
-
-def _fields(operation: OperationExecutionRequest, key: str) -> dict[str, Any]:
-    identity = _identity(operation)
-    assert ProviderExecutionBinding.carried_by(operation) is not None
-    return {
-        "scope": harness_scope(identity.request_scope),
-        "lane_profile": PROFILE,
-        "harness_execution_id": str(identity.harness_execution_id),
-        "binding_digest": ProviderExecutionBinding.carried_by(operation).binding_digest,
-        "idempotency_key": f"{identity.harness_execution_id}:1:{key}",
-        "generation": 1,
-    }
-
-
 def _turn_request(operation: OperationExecutionRequest, **changes: Any) -> LaneTurnRequest:
     return LaneTurnRequest.model_validate(
         {"operation": operation, "lane_profile": PROFILE, "generation": 1, "segment": BOUNDS}
@@ -104,35 +82,6 @@ def _turn_request(operation: OperationExecutionRequest, **changes: Any) -> LaneT
 
 def _settled(result: Any) -> OperationExecutionResult:
     return OperationExecutionResult.model_validate(result.operation_result)
-
-
-async def _started(stack: ManagedStack) -> tuple[str, SessionHandle]:
-    operation = stack.operation
-    heid = str(_identity(operation).harness_execution_id)
-    stack.harness.stage(heid, operation)
-    prepared = await stack.harness.prepare(
-        PrepareRequest(
-            **_fields(operation, "turn:1"),
-            run_id=operation.identity.run_id,
-            operation_id=operation.identity.operation_id,
-            attempt_no=1,
-        )
-    )
-    session = await stack.harness.start(
-        StartRequest(**_fields(operation, "turn:1"), prepared=prepared)
-    )
-    return heid, session
-
-
-async def _sent(stack: ManagedStack, session: SessionHandle, turn_no: int = 1) -> TurnHandle:
-    return await stack.harness.send_turn(
-        SendTurnRequest(
-            **_fields(stack.operation, f"turn:{turn_no}"),
-            session=session,
-            turn_no=turn_no,
-            instruction_ref=f"operation:test:turn:{turn_no}",
-        )
-    )
 
 
 def _lanes(stack: ManagedStack, **changes: Any) -> LaneStack:

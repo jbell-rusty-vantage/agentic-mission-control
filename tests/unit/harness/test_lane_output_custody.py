@@ -17,7 +17,7 @@ from mission_control.adapters.claude.harness import _output_files
 from mission_control.domain.execution.contracts import OperationExecutionRequest
 from tests.fixtures.cursor_local import local_stack
 from tests.fixtures.lane_turns import RecordingSignals
-from tests.unit.harness.test_cursor_local import _identity, _service, _turn
+from tests.support.unit.harness.cursor_local import _identity, _service, _turn
 
 
 class RecordingCustody:

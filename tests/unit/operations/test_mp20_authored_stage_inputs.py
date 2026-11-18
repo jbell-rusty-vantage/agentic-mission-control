@@ -25,7 +25,7 @@ from tests.integration.temporal.test_wp_bp_010_temporal import (
     RecordingOperationBindings,
     _blueprint,
 )
-from tests.unit.operations.test_ft_b2_stage_handoff import (
+from tests.support.unit.operations.ft_b2_stage_handoff import (
     FAST_REF,
     _compiled_template,
     _downstream_request,

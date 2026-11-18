@@ -32,8 +32,6 @@ from mission_control.adapters.deep_agents.async_subagents import (
     DeepAgentsAsyncSubagentAdapter,
     final_message_text,
 )
-from mission_control.adapters.deep_agents.child_binding import seal_async_child_binding
-from mission_control.adapters.deep_agents.routes import AGENT_FEATURES
 from mission_control.application.execution.operations.checkpoint_lineage import (
     CheckpointLineageService,
     InMemoryCheckpointLineageRepository,
@@ -54,10 +52,8 @@ from mission_control.application.subordinates.service import (
     AsyncSubagentService,
     InMemoryAsyncSubagentAuthority,
     InMemoryAsyncSubagentDetailRepository,
-    ProviderAsyncObservation,
 )
 from mission_control.domain.authoring.canonical import sha256_digest
-from mission_control.domain.capabilities.features import resolve_agent_configuration
 from mission_control.domain.execution.async_child_admission import (
     adoption_ref,
     parse_adoption_ref,
@@ -70,9 +66,7 @@ from mission_control.domain.execution.async_subagent_reconciliation import (
 )
 from mission_control.domain.execution.contracts import (
     AsyncSubagentContract,
-    AsyncSubagentDependencyClass,
     AsyncSubagentLifecycle,
-    CapabilityGrant,
     DeepAgentExecutionBinding,
     OperationExecutionBinding,
 )
@@ -80,37 +74,22 @@ from mission_control.domain.outputs.contracts import OutputForm, SubmissionAck
 from mission_control.domain.outputs.rules import text_digest
 from tests.fixtures.fake_agent_protocol import FakeAgentProtocolClient, install
 from tests.support.deep_agents import (
-    DeterministicProvider,
     exact_fixture,
     planned_invocation,
     unit_bound,
 )
 from tests.support.run_control import actor
-from tests.unit.operations.test_async_child_parent_budget import admitted_parent, spawn
-from tests.unit.operations.test_async_child_parent_completion import Lineage
+from tests.support.unit.operations.async_child_check_time_admission import (
+    TEXT,
+    ExactProvider,
+    _sealed_contract,
+)
+from tests.support.unit.operations.async_child_parent_budget import admitted_parent, spawn
+from tests.support.unit.operations.async_child_parent_completion import Lineage
 
 POLICY = "policy:async-result:v1"
 SECRETS = {"environment:BELLABS_ASYNC_SUBAGENT_SERVER_TOKEN": "offline-signing-secret"}
-TEXT = "canonical child result"
 NOW = datetime(2026, 10, 28, 12, tzinfo=UTC)
-
-
-class ExactProvider(DeterministicProvider):
-    """The deterministic provider with the adapter's exact output address for its text."""
-
-    @staticmethod
-    def _observation(
-        status: str, run_id: str = "provider-run-1", receipt: str | None = None
-    ) -> ProviderAsyncObservation:
-        observation = DeterministicProvider._observation(status, run_id, receipt)
-        if status != "success":
-            return observation
-        return observation.model_copy(
-            update={
-                "output_ref": "ref:async-output:" + sha256_digest(TEXT).removeprefix("sha256:"),
-                "output_text": TEXT,
-            }
-        )
 
 
 def _parent(run_id: str, binding_id: str = "binding-1") -> OperationExecutionBinding:
@@ -216,55 +195,6 @@ async def test_foreign_parents_other_contracts_late_results_and_unknown_policies
     late = await admission.admit(_parent(run_id), contract, completed, current_generation=2)
     assert (late.status, late.reason) == ("refused", "late_result")
     assert (await service.link("tenant-1", child_id)).result_decision is None
-
-
-def _sealed_contract(model: Any, url: str = "http://agent-server.invalid") -> AsyncSubagentContract:
-    configuration, _ = resolve_agent_configuration(
-        AGENT_FEATURES,
-        lane="deep_agents",
-        model_provider=model.provider,
-        sandbox_backend="state",
-        lane_features=None,
-        model_tools=None,
-    )
-    sealed = seal_async_child_binding(
-        name="researcher",
-        shape="seeded",
-        system_prompt="Answer exactly what the objective asks.",
-        model=model,
-        tools=(),
-        skills=(),
-        mcp_servers=(),
-        agent_configuration=configuration,
-        authority_refs=("authority:parent-operation",),
-        budget_limits={"tokens.total": 20},
-    )
-    return AsyncSubagentContract.create(
-        contract_id=f"async-subagent:researcher:{sealed.sealed_digest}",
-        name="researcher",
-        description="Bounded background research",
-        graph_id="belllabs_async_child",
-        graph_revision="sealed-child@1",
-        graph_binding_digest=sealed.sealed_digest,
-        agent_protocol_url=url,
-        deployment_credential_ref="environment:BELLABS_ASYNC_SUBAGENT_SERVER_TOKEN",
-        objective_schema_ref="schema:async-objective@1",
-        result_schema_ref="schema:async-result@1",
-        context_slice_id="context:child",
-        state_slice_id="state:child",
-        capability_ceiling=CapabilityGrant(capabilities=frozenset()),
-        authority_refs=("authority:parent-operation",),
-        budget_limits={"tokens.total": 20},
-        dependency_classes=frozenset(
-            {AsyncSubagentDependencyClass.NONBLOCKING, AsyncSubagentDependencyClass.ADVISORY}
-        ),
-        timeout_seconds=600,
-        cancellation_propagation="required",
-        late_result_policy="quarantine",
-        fallback_policy="degrade",
-        result_admission_policy_ref="policy:async-result:typed-manifest@1",
-        child_binding=sealed,
-    )
 
 
 class RecordingAdopter:

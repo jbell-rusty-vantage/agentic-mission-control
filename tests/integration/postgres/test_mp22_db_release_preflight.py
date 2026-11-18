@@ -42,7 +42,7 @@ from tests.qualification.two_project.release_install import (
     plan_and_apply,
     write_target,
 )
-from tests.unit.runtime.test_mp22_local_readiness import (
+from tests.support.unit.runtime.mp22_local_readiness import (
     AUTH_EXAMPLE,
     BINDINGS_EXAMPLE,
     PROFILE_EXAMPLE,

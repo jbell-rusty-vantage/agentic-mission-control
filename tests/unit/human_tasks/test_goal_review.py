@@ -21,8 +21,8 @@ from mission_control.domain.programs.human_review import apply_goal_review, goal
 from tests.fixtures.goal_directed_journaled import goal_template_workspace
 from tests.fixtures.lane_bindings import LANE_REBINDERS
 from tests.support.operations import operation_request
-from tests.unit.orchestration.test_rrm_016_goal_directed_settlement import _preparation
-from tests.unit.orchestration.test_wp_bp_020_goal_directed import (
+from tests.support.unit.orchestration.rrm_016_goal_directed_settlement import _preparation
+from tests.support.unit.orchestration.wp_bp_020_goal_directed import (
     _blueprint,
     _claim,
     _execution,

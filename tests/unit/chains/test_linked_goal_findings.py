@@ -12,9 +12,9 @@ from mission_control.adapters.postgres.chains.goal_findings import (
 )
 from mission_control.domain.authoring.canonical import sha256_digest
 from mission_control.domain.context.transfer_builders import linked_mission
-from tests.unit.context.test_linked_transfer import setup
-from tests.unit.context.test_transfer_materializer import FakeBackend, dependent
-from tests.unit.orchestration.test_goal_exact_context import fixture
+from tests.support.unit.context.linked_transfer import setup
+from tests.support.unit.context.transfer_materializer import FakeBackend, dependent
+from tests.support.unit.orchestration.goal_exact_context import fixture
 
 
 def document(identity, payload):

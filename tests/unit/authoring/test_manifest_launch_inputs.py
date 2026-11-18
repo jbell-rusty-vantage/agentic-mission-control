@@ -215,7 +215,7 @@ def test_named_goal_templates_require_explicit_served_schema_binding(chain):  # 
     from mission_control.domain.authoring.canonical import sha256_digest
     from mission_control.domain.execution.contracts import StructuredOutputBinding
     from mission_control.domain.programs.goal_directed_runtime import GoalNamedExecutorObservation
-    from tests.unit.orchestration.test_goal_schema_completion import multi_goal_request
+    from tests.support.unit.orchestration.goal_schema_completion import multi_goal_request
 
     definitions, programs = chain
     research = next(item for item in definitions if item.mission_key == "research")

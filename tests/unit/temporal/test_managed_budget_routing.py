@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from tests.unit.harness.test_managed_budget_controls import queue, stack
+from tests.support.unit.harness.managed_budget_controls import queue, stack
 
 from mission_control.adapters.temporal.workflows import budget_controls as routing
 from mission_control.domain.execution.contracts import OperationWorkflowRequest

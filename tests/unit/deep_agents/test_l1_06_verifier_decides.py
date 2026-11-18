@@ -36,7 +36,7 @@ from mission_control.adapters.deep_agents.adapter import (
 )
 from mission_control.adapters.deep_agents.budget import BudgetStopMiddleware
 from mission_control.domain.programs.goal_directed_runtime import GoalVerifierObservation
-from tests.unit.authoring.test_l1_06_goal_verifier_objective import E4, loop_templates, text_of
+from tests.support.unit.authoring.l1_06_goal_verifier_objective import E4, loop_templates, text_of
 
 USAGE = {"input_tokens": 900, "output_tokens": 100, "total_tokens": 1000}
 RUN_DIMENSIONS = ("model.turns", "tokens.total", "tool.calls.total")

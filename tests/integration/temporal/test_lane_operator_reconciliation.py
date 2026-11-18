@@ -12,7 +12,7 @@ from mission_control.adapters.temporal.registration.activities import agent_cogn
 from mission_control.adapters.temporal.workflow_sandbox import coordinator_workflow_runner
 from mission_control.adapters.temporal.workflows.operation import OperationWorkflow
 from mission_control.domain.execution.contracts import OperationWorkflowRequest
-from tests.unit.harness.test_lane_operator_abandonment import lane_recovery, no_adapter_selection
+from tests.support.unit.harness.lane_operator_abandonment import lane_recovery, no_adapter_selection
 
 
 async def test_real_lane_cancel_parks_then_normal_abandon_hint_settles_and_replays(monkeypatch):

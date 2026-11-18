@@ -5,33 +5,11 @@ from types import SimpleNamespace
 
 import pytest
 
-from mission_control.application.ports.knowledge import LineageEntry
-from mission_control.domain.knowledge.lineage import ActorKind, LineageFact, ProvenanceRole
+from mission_control.domain.knowledge.lineage import ProvenanceRole
 from tests.fixtures.knowledge_binding import InMemoryLineageStore, model_report, report_package
 from tests.support.knowledge import lane
-from tests.unit.knowledge.test_w1_tool_boundary import _calls
-
-
-def registration_entries(origin, handle, digest, receipt):
-    common = {"subject_kind": "artifact", "subject_digest": digest}
-    return [
-        LineageEntry(
-            fact=LineageFact(
-                subject_handle=handle,
-                role=role,
-                actor_kind=ActorKind.RECEIPT
-                if role is ProvenanceRole.RECEIPT
-                else ActorKind.ORIGIN,
-                actor_ref=receipt
-                if role is ProvenanceRole.RECEIPT
-                else "mc-inv:" + origin.digest(),
-                actor_origin=None if role is ProvenanceRole.RECEIPT else origin,
-                fact={"receipt": receipt},
-            ),
-            **common,
-        )
-        for role in (ProvenanceRole.PRODUCER, ProvenanceRole.CALLER, ProvenanceRole.RECEIPT)
-    ]
+from tests.support.unit.knowledge.registration_lineage import registration_entries
+from tests.support.unit.knowledge.w1_tool_boundary import _calls
 
 
 async def test_two_registrations_shared_body_keep_original_producer_and_new_report_producer():

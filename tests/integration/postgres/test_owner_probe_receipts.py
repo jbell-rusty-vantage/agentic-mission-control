@@ -23,7 +23,7 @@ from mission_control.domain.execution.environment_preparation import (
 from mission_control.domain.frames.contracts import LaneProfile
 from tests.fixtures.mission_control_common_db import CommonDatabase, tenant_id
 from tests.support.db_builders import admit_unit_attempt
-from tests.unit.prerequisites.test_trusted_probes import record_for
+from tests.support.unit.prerequisites.trusted_probes import record_for
 
 pytestmark = pytest.mark.common_db
 

@@ -48,12 +48,13 @@ from mission_control.domain.programs.goal_directed_runtime import (
 )
 from tests.fixtures.checkpoint_lineage import activity_attempt
 from tests.fixtures.goal_directed_journaled import SCOPE, goal_blueprint, goal_run_input
-from tests.unit.orchestration.test_rrm_016_goal_directed_settlement import (
+from tests.support.unit.orchestration.rrm_016_goal_directed_settlement import (
     _claim,
     _composition,
     _preparation,
     _reconciliation,
 )
+from tests.support.unit.orchestration.w1_goal_failure_paths import _executor_dispatch
 
 # The real W1 dry-run context packet was 8,524 characters (W1-EVIDENCE session 3, dry 2).
 PACKET_CHARS = 8_524
@@ -87,16 +88,6 @@ def _with_long_packet(dispatch: GoalOperationDispatch) -> GoalOperationDispatch:
         resulting_run_version=dispatch.resulting_run_version,
         resulting_family_version=dispatch.resulting_family_version,
     )
-
-
-async def _executor_dispatch() -> tuple[Any, str, Any, GoalOperationDispatch]:
-    composition, run_id = await _composition()
-    claim = await _claim(run_id)
-    run = await composition.run_control.get_run(SCOPE, run_id)
-    dispatch = await composition.family.execute_iteration(
-        _preparation(run_id, claim, "executor", run.version, 0)
-    )
-    return composition, run_id, claim, dispatch
 
 
 @pytest.mark.asyncio

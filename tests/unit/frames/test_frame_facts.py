@@ -60,6 +60,7 @@ from tests.fixtures.provider_frames import (
 )
 from tests.support.run_control import ALL_PERMISSIONS, actor, command, request
 from tests.support.run_control import service as run_control_service
+from tests.support.unit.frames.frame_facts import _RunControl
 
 K = FrameKind
 DA = DeriveContext(lane=LaneProfile.DEEP_AGENTS, current_generation=1)
@@ -491,21 +492,6 @@ def test_action_rejects_facts_of_another_execution_or_out_of_order() -> None:
 
 
 # --- Projector ------------------------------------------------------------------------------
-
-
-class _RunControl:
-    """In-memory run control wrapper granting the projector's permission."""
-
-    def __init__(self, service: Any) -> None:
-        self.service = service
-        self.commands: list[LifecycleCommand] = []
-
-    async def execute(self, lifecycle: LifecycleCommand) -> Any:
-        self.commands.append(lifecycle)
-        return await self.service.execute(lifecycle)
-
-    async def get_run(self, request_scope: str, run_id: str) -> Any:
-        return await self.service.get_run(request_scope, run_id)
 
 
 @pytest.mark.asyncio

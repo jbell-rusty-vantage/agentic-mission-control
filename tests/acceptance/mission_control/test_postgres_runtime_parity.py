@@ -585,10 +585,9 @@ async def _cancel_at_declared_wait(stack: ProductionStack) -> None:
 # --- GoalDirected ------------------------------------------------------------------------------
 
 
-@pytest.mark.asyncio
-async def test_goal_directed_runs_two_iterations_through_the_production_composition(
-    stack: ProductionStack,
-) -> None:
+async def goal_directed_two_iterations_scenario(stack: ProductionStack) -> None:
+    """RRM-009 GoalDirected: two iterations through the production composition."""
+
     catalog = await publish_technical_catalog(
         stack.control_plane, family="GoalDirected", now=datetime.now(UTC)
     )
@@ -651,3 +650,10 @@ async def test_goal_directed_runs_two_iterations_through_the_production_composit
             sort_keys=True,
         ),
     )
+
+
+@pytest.mark.asyncio
+async def test_goal_directed_runs_two_iterations_through_the_production_composition(
+    stack: ProductionStack,
+) -> None:
+    await goal_directed_two_iterations_scenario(stack)

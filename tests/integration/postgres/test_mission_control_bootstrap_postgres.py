@@ -31,7 +31,7 @@ from tests.fixtures.mission_control_common_db import (
     catalog_scope,
     common_database,
 )
-from tests.unit.control_plane.test_agentic_asset_definitions import skill_definition
+from tests.support.unit.control_plane.agentic_asset_definitions import skill_definition
 
 pytestmark = pytest.mark.common_db
 

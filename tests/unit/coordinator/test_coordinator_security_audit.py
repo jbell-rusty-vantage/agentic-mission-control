@@ -63,8 +63,8 @@ from mission_control.domain.coordinator.contracts import (
 from mission_control.domain.coordinator.errors import CoordinatorDomainError
 from mission_control.interfaces.mcp.coordinator_server import CoordinatorPrincipal
 from tests.support.operations import operation_request
-from tests.unit.coordinator.test_coordinator_facade import concrete_facade
-from tests.unit.web_research.test_web_research_live_adapters import (
+from tests.support.unit.coordinator.coordinator_facade import concrete_facade
+from tests.support.unit.web_research.web_research_live_adapters import (
     BROWSER_REF,
     BROWSER_RUNTIME,
     FIRECRAWL_RUNTIME,

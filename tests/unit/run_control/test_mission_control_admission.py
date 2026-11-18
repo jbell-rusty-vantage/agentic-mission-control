@@ -11,7 +11,7 @@ from mission_control.contracts.admission_contracts import (
 )
 from mission_control.contracts.contracts import MissionControlRejected
 from tests.support.run_control import actor, request, service
-from tests.unit.run_control.test_run_launch import RecordingSubmitter, _input
+from tests.support.unit.run_control.run_launch import RecordingSubmitter, _input
 
 
 def admission_request() -> MissionAdmissionRequest:

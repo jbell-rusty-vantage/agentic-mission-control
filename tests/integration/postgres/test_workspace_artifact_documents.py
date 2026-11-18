@@ -26,8 +26,8 @@ from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.integration.postgres.test_artifact_promotion_postgres_integration import (
     admitted_revision,
 )
-from tests.unit.workspaces.test_goal_role_slot_ownership import _goal_request, _rebound
-from tests.unit.workspaces.test_workspace_materialization import RecordingProvisioner
+from tests.support.unit.workspaces.goal_role_slot_ownership import _goal_request, _rebound
+from tests.support.unit.workspaces.workspace_materialization import RecordingProvisioner
 
 pytestmark = pytest.mark.common_db
 

@@ -54,7 +54,7 @@ from tests.fixtures.run_forks import stage_policy, technical_snapshot
 from tests.support.db_builders import owner_rows, scoped_command, scoped_request
 from tests.support.run_control import WORKFLOW_DIGEST, actor
 from tests.support.run_control import service as run_control_service
-from tests.unit.context.test_fork_conversation_custody import custody
+from tests.support.unit.context.fork_conversation_custody import custody
 
 pytestmark = pytest.mark.common_db
 

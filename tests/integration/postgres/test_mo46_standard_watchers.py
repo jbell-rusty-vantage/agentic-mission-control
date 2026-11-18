@@ -19,7 +19,7 @@ from tests.integration.postgres.test_mo44_watchers_postgres import FixedProgram
 from tests.integration.postgres.test_mp15_coordinator_inbox_postgres import mission_service
 from tests.support.boundary_commands import declared_wait
 from tests.support.db_builders import admit_unit_attempt, scoped_command
-from tests.unit.watchers.test_standard_library import DATA, LIBRARY
+from tests.support.unit.watchers.standard_library import DATA, LIBRARY
 
 pytestmark = pytest.mark.common_db
 

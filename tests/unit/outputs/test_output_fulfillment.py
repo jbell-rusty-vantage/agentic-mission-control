@@ -9,12 +9,10 @@ from __future__ import annotations
 
 import asyncio
 import dataclasses
-from datetime import UTC, datetime
 
 import pytest
 from pydantic import ValidationError
 
-from mission_control.application.knowledge.access import InvocationAccess
 from mission_control.application.knowledge.effect_receipts import JournalEffectReceipts
 from mission_control.application.outputs.fulfillment import (
     AssessmentInput,
@@ -57,12 +55,11 @@ from mission_control.domain.outputs.successors import (
 from tests.fixtures.output_contracts import InMemoryOutputContractStore
 from tests.support.knowledge import call as gateway_call
 from tests.support.knowledge import harness as gateway_harness
-from tests.support.knowledge import origin
+from tests.support.unit.outputs.output_fulfillment import invocation, make_stack
 from tests.unit.outputs.scenario import (
     CLAIMS_SCHEMA,
     INDEX_SCHEMA,
     Stack,
-    build_stack,
     code_change,
     codes,
     digest_of,
@@ -77,23 +74,6 @@ from tests.unit.outputs.scenario import (
 )
 
 pytestmark = pytest.mark.asyncio
-AT = datetime(2026, 10, 27, 12, tzinfo=UTC)
-
-
-def invocation(attempt: int = 1, **updates: object) -> InvocationAccess:
-    return InvocationAccess(
-        origin=origin(attempt, **updates),
-        subject="mission-control-runtime",
-        invocation_id=f"inv-{attempt:04d}",
-        authenticated_at=AT,
-    )
-
-
-async def make_stack(*obligations, completion=None, **vocab) -> Stack:  # type: ignore[no-untyped-def]
-    store = InMemoryOutputContractStore()
-    return await build_stack(
-        store, store.submissions, invocation(), *obligations, completion=completion, **vocab
-    )
 
 
 async def judge(stack: Stack, revision_id: str, digest: str, **results: str) -> None:

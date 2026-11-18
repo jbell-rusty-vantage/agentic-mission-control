@@ -13,7 +13,7 @@ from mission_control.bootstrap.ingress_drainer import (
     compose_ingress_drainer,
 )
 from mission_control.contracts.identities import mission_operation_id
-from tests.unit.signals.test_drainer import item
+from tests.support.unit.signals.drainer import item
 
 
 class Connection:

@@ -10,9 +10,8 @@ from mission_control.application.knowledge.native_write import NativePlanDigest
 from mission_control.application.knowledge.operations import KnowledgeRefused, KnowledgeResult
 from mission_control.contracts.knowledge_protocol import digest_canonical
 from mission_control.domain.knowledge.effects import JournalState
-from tests.unit.knowledge.test_native_write import (
+from tests.support.unit.knowledge.native_write import (
     DIGEST,
-    HANDLE,
     PLAN,
     Applier,
     Bridge,
@@ -21,6 +20,8 @@ from tests.unit.knowledge.test_native_write import (
     resolution,
     service,
 )
+from tests.support.unit.knowledge.native_write_recovery import IntentPreview
+from tests.support.unit.outputs.w1_d28_d29 import HANDLE
 from tests.unit.outputs.scenario import digest_of
 
 pytestmark = pytest.mark.asyncio
@@ -194,7 +195,7 @@ async def test_decide_before_record_crash_replays_or_leaves_harmless_lineage(dri
 
 async def test_native_decide_request_identity_excludes_attempt_but_resolve_refreshes():
     from mission_control.application.knowledge.judgment import TrustedJudgmentBridge, UseSpec
-    from tests.unit.knowledge.test_native_write import ref
+    from tests.support.unit.knowledge.native_write import ref
 
     calls = []
     decision = ref("use_decision", "opaque-decision", "research-core.use_decision.v2")
@@ -229,7 +230,7 @@ async def test_native_decide_request_identity_excludes_attempt_but_resolve_refre
 
 async def test_fresh_resolution_under_a_frozen_clock_uses_distinct_request_keys():
     from mission_control.application.knowledge.judgment import TrustedJudgmentBridge
-    from tests.unit.knowledge.test_native_write import ref
+    from tests.support.unit.knowledge.native_write import ref
 
     decision = ref("use_decision", "d", "research-core.use_decision.v2")
     keys = []
@@ -252,8 +253,8 @@ async def test_explicit_effect_candidate_from_settlement_can_fulfill_a_named_pro
     from mission_control.application.knowledge.toolset import InlineItem, _candidate
     from mission_control.domain.outputs.contracts import OutputForm
     from tests.support.knowledge import call, harness
+    from tests.support.unit.outputs.output_fulfillment import make_stack
     from tests.unit.outputs.scenario import fulfillment, obligation
-    from tests.unit.outputs.test_output_fulfillment import make_stack
 
     h = harness()
     stack = await make_stack(obligation("draft.native_receipt", OutputForm.EFFECT_RECEIPT))
@@ -354,17 +355,6 @@ async def test_terminal_or_unknown_effect_never_creates_a_successor_or_redispatc
     )
     assert not apply.handles and len(preview.calls) == 1 and len(bridge.decided) == 1
     assert outcome.decision == first.decision
-
-
-class IntentPreview(Preview):
-    async def preview(self, plan, *, effect_key, access):
-        self.calls.append((dict(plan), effect_key))
-        return NativePlanDigest(
-            digest_of("payload"),
-            digest_canonical(dict(plan)),
-            normalized_values_digest=digest_canonical({}),
-            processed_epoch=1,
-        )
 
 
 async def test_durable_rejection_creates_one_stable_successor_then_replays_its_receipt():

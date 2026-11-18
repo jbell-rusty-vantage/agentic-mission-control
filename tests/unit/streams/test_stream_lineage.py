@@ -19,20 +19,17 @@ from mission_control.application.streams.pump import SubscriptionPump
 from mission_control.domain.frames.contracts import ProviderFrame
 from mission_control.domain.subscriptions.streams import StreamFilters
 from tests.fixtures.provider_frames import FIXTURE_HARNESS
-from tests.unit.frames.test_lineage_stream import claude_frames, codex_frames
-from tests.unit.streams.fakes import MISSION, FakeStreamSource
-from tests.unit.streams.test_stream_pump import FAST, Recorder, until
-from tests.unit.streams.test_stream_service import (
+from tests.support.unit.frames.lineage_stream import claude_frames, codex_frames
+from tests.support.unit.streams.stream_lineage import rekeyed, run_pump, stop
+from tests.support.unit.streams.stream_pump import FAST, Recorder, until
+from tests.support.unit.streams.stream_service import (
     READER,
     frames_at,
     mission_at,
     service,
     subscription,
 )
-
-
-def rekeyed(frames: list[ProviderFrame]) -> list[ProviderFrame]:
-    return [frame.model_copy(update={"harness_execution_id": FIXTURE_HARNESS}) for frame in frames]
+from tests.unit.streams.fakes import MISSION, FakeStreamSource
 
 
 def source_with(frames: list[ProviderFrame]) -> FakeStreamSource:
@@ -50,19 +47,6 @@ def frame_sub(svc: Any, cursor: int | None, **extra: Any) -> Any:
         cursors=(frames_at(cursor),) if cursor is not None else (),
         **extra,
     )
-
-
-async def run_pump(
-    svc: Any, opened: Any, recorder: Recorder, *, max_bytes: int = 1_048_576
-) -> asyncio.Task[str]:
-    window = InflightWindow(max_bytes, ConnectionBudget(max_bytes))
-    pump = SubscriptionPump(svc, opened, recorder, window, FAST, authorized=lambda: True)
-    return asyncio.create_task(pump.run())
-
-
-async def stop(task: asyncio.Task[str]) -> None:
-    task.cancel()
-    await asyncio.gather(task, return_exceptions=True)
 
 
 async def test_replay_from_the_start_reports_lineage_and_normalized_child_facts() -> None:

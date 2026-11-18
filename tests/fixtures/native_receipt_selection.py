@@ -5,16 +5,12 @@ from typing import Any
 
 from tests.fixtures.output_contracts import InMemoryOutputContractStore
 from tests.support.knowledge import MISSION, lane
-from tests.unit.knowledge.test_native_write import (
-    DIGEST,
+from tests.support.unit.knowledge.native_write import DIGEST, PLAN, RUN_DECISION, Bridge, service
+from tests.support.unit.outputs.w1_d28_d29 import (
     HANDLE,
-    PLAN,
-    RUN_DECISION,
-    Bridge,
     bridge_judges,
     report_candidate,
     report_promise,
-    service,
 )
 from tests.unit.outputs.scenario import build_stack, fulfillment, obligation
 

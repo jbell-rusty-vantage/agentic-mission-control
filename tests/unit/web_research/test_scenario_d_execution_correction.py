@@ -30,7 +30,7 @@ from mission_control.domain.authoring.contracts import (
     WorkflowTypeDefinition,
 )
 from mission_control.domain.authoring.extensions import ExtensionRegistry
-from tests.unit.web_research.test_web_research_semantic_handlers import (
+from tests.support.unit.web_research.web_research_semantic_handlers import (
     BROWSER_RUNTIME,
     FIRECRAWL_RUNTIME,
     TAVILY_RUNTIME,

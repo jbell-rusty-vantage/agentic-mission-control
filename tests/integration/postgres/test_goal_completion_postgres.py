@@ -21,8 +21,8 @@ from mission_control.adapters.postgres.workspace_candidate_contents import (
 from mission_control.application.programs.completion_validation import ArtifactPublicationPending
 from mission_control.application.programs.goal_directed import GoalDirectedOperationResultService
 from mission_control.domain.execution.contracts import CapturedWorkspaceCandidate, WorkspaceOwner
-from tests.unit.orchestration.test_artifact_schema_validation import Custody, captured
-from tests.unit.orchestration.test_goal_schema_completion import (
+from tests.support.unit.orchestration.artifact_schema_validation import Custody, captured
+from tests.support.unit.orchestration.goal_schema_completion import (
     OUTPUT,
     SUMMARY,
     ScopedCustody,

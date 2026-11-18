@@ -33,15 +33,10 @@ from mission_control.domain.authoring.mission_definition import (
     manifest_to_definitions,
 )
 from mission_control.interfaces.cli.main import main as missionctl
+from tests.support.unit.authoring.manifest_schema import FIXTURES, ROOT, minimal
 
-ROOT = Path(__file__).resolve().parents[3]
 OWNER_MISSIONS = sorted((ROOT / "tests/fixtures/manifests/fast-track").glob("*.yml"))
-FIXTURES = ROOT / "tests/fixtures/manifests"
 SCHEMA_PATH = ROOT / "src/mission_control/contracts/schemas" / MANIFEST_SCHEMA_FILENAME
-
-
-def minimal() -> dict[str, Any]:
-    return load_manifest_yaml((FIXTURES / "minimal-stage-graph.yml").read_text(encoding="utf-8"))
 
 
 def chain() -> dict[str, Any]:

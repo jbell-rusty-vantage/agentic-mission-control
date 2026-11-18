@@ -23,7 +23,6 @@ from mission_control.application.prerequisites.service import (
 )
 from mission_control.domain.authoring.manifest import (
     Environment,
-    Lane,
     RepositoryWorkspace,
     WorkspaceSelection,
     load_manifest_yaml,
@@ -38,25 +37,9 @@ from mission_control.domain.policies.contracts import ActorContext
 from mission_control.domain.prerequisites import PrerequisiteStanding
 from mission_control.interfaces.mcp.mission_tools import ScopedManifests
 from tests.fixtures.provider_frames import SCOPE
-from tests.support.manifests.compile import MINIMAL, http_app
+from tests.support.manifests.compile import http_app
 from tests.support.manifests.interfaces import FakeLifecycle, manifests, principal
-
-
-def definition(lane="claude_managed"):
-    document = load_manifest_yaml(MINIMAL.read_text(encoding="utf-8"))
-    manifest = parse_manifest_any(document)
-    original = manifest_to_definitions(manifest, document)[0]
-
-    def change(node):
-        return node.model_copy(
-            update={
-                "lane": Lane(lane),
-                "environment": node.environment.model_copy(update={"lane": Lane(lane)}),
-                "nodes": tuple(change(child) for child in node.nodes),
-            }
-        )
-
-    return original.model_copy(update={"program": change(original.program)})
+from tests.support.unit.prerequisites.preflight import definition
 
 
 async def test_fresh_managed_installation_lists_full_owner_steps_and_readiness():

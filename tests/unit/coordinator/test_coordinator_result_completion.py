@@ -15,6 +15,7 @@ from mission_control.domain.coordinator.launch import (
     TerminalWorkflowCompletion,
 )
 from mission_control.domain.policies.contracts import RunOutcome, RunPhase
+from tests.support.unit.coordinator.coordinator_result_completion import AmbiguousFirstSave
 
 NOW = datetime(2026, 7, 28, 20, 0, tzinfo=UTC)
 
@@ -36,22 +37,6 @@ class TerminalRuns:
             phase=self.phase,
             terminal_outcome=self.outcome,
         )
-
-
-class AmbiguousFirstSave:
-    def __init__(self) -> None:
-        self.inner = InMemoryWorkflowResultRepository()
-        self.first = True
-
-    async def save(self, result):
-        persisted = await self.inner.save(result)
-        if self.first:
-            self.first = False
-            raise TimeoutError("database response was ambiguous")
-        return persisted
-
-    async def get(self, tenant_scope: str, request_scope: str, run_id: str):
-        return await self.inner.get(tenant_scope, request_scope, run_id)
 
 
 def completion(

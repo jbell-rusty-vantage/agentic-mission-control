@@ -64,7 +64,7 @@ async def test_submitted_configuration_forks_through_real_admission_contract(
         )
         from tests.fixtures.mission_control_common_db import catalog_scope
         from tests.fixtures.qualia_fork_contract import QualiaForkPrograms
-        from tests.unit.test_qualia_fork_contract import fixture
+        from tests.support.unit.qualia_fork_contract import fixture
 
         definitions, payloads, extensions, _, _, texts = await fixture(tmp_path)
         catalog = PostgresDefinitionRepository(stack.pool, catalog_scope=catalog_scope("biotech"))

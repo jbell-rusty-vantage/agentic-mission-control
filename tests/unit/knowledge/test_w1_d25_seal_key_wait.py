@@ -23,7 +23,7 @@ from mission_control.contracts.knowledge_protocol import OperationEnvelope
 from mission_control.contracts.knowledge_protocol_results import protocol_error
 from mission_control.domain.execution.invocation_settlement import SettlementOutcome, WaitReason
 from tests.support.trusted_knowledge import ScriptedRunner, evaluators, world
-from tests.unit.knowledge.test_http_client import VECTORS
+from tests.support.unit.knowledge.http_client import VECTORS
 
 pytestmark = pytest.mark.asyncio
 

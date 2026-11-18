@@ -38,7 +38,7 @@ from mission_control.domain.frames.body import canonical_bytes
 from mission_control.domain.frames.contracts import FrameKind, HarnessExecutionHandle
 from tests.fixtures.provider_frames import INSTALLATION, SCOPE
 from tests.support.deep_agents import registry
-from tests.unit.frames.test_deep_agents_frames import _planned, _store_for, _unit_binding
+from tests.support.unit.frames.deep_agents_frames import _planned, _store_for, _unit_binding
 
 SKILL_MD = "/skills/exact-binding-proof/SKILL.md"
 

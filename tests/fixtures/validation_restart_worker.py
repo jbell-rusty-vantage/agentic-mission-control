@@ -14,8 +14,8 @@ from temporalio.client import Client
 from temporalio.common import RetryPolicy
 from temporalio.worker import UnsandboxedWorkflowRunner, Worker
 from tests.integration.postgres.test_completion_validation_postgres import recompose
-from tests.unit.orchestration.test_artifact_schema_validation import Custody, captured
-from tests.unit.orchestration.test_completion_validation_service import OUTPUT
+from tests.support.unit.orchestration.artifact_schema_validation import Custody, captured
+from tests.support.unit.orchestration.completion_validation_service import OUTPUT
 
 from mission_control.domain.programs.contracts import StageGraphResultActivityRequest
 

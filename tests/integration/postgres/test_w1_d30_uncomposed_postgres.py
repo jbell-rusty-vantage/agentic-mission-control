@@ -22,7 +22,7 @@ from mission_control.domain.execution.invocation_settlement import SettlementOut
 from mission_control.domain.outputs.contracts import OutputForm, Requirement
 from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.integration.postgres.test_wi07_collections_postgres import access_for
-from tests.unit.knowledge.test_wi07_report_collections import PIN, handle
+from tests.support.unit.knowledge.wi07_report_collections import PIN, handle
 from tests.unit.outputs.scenario import build_stack, obligation
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.common_db]

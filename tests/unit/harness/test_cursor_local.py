@@ -35,7 +35,6 @@ from mission_control.application.agentic_components.placement import (
     LaneProjectionError,
 )
 from mission_control.application.execution.harness.lane_turns import (
-    LaneExecutionIdentity,
     harness_scope,
 )
 from mission_control.application.execution.harness.protocol import (
@@ -48,17 +47,13 @@ from mission_control.domain.execution.contracts import OperationExecutionResult
 from mission_control.domain.execution.lane_turns import (
     LaneCleanupRequest,
     LaneSegmentBounds,
-    LaneTurnRequest,
 )
 from mission_control.domain.execution.lanes import CursorExecutionBinding, PrepareRequest
 from mission_control.domain.frames.contracts import FrameKind, LaneProfile
 from mission_control.domain.frames.facts import CompactionObservedFact, ToolEffectFact
 from tests.fixtures.cursor_local import LocalStack, local_stack
-from tests.fixtures.lane_turns import RecordingSignals, SimulatedWorkerLoss, lane_stack
-
-
-def _identity(stack: LocalStack) -> LaneExecutionIdentity:
-    return LaneExecutionIdentity.of(stack.operation, "cursor_local", 1)
+from tests.fixtures.lane_turns import RecordingSignals, SimulatedWorkerLoss
+from tests.support.unit.harness.cursor_local import _identity, _service, _turn
 
 
 def _prepare_request(stack: LocalStack) -> PrepareRequest:
@@ -76,21 +71,6 @@ def _prepare_request(stack: LocalStack) -> PrepareRequest:
         operation_id=operation.identity.operation_id,
         attempt_no=1,
     )
-
-
-def _turn(stack: LocalStack, **changes: Any) -> LaneTurnRequest:
-    return LaneTurnRequest.model_validate(
-        {
-            "operation": stack.operation,
-            "lane_profile": "cursor_local",
-            "generation": 1,
-            **changes,
-        }
-    )
-
-
-def _service(stack: LocalStack) -> Any:
-    return lane_stack(stack.harness, frames=stack.frames, operation=stack.operation)
 
 
 async def _prepared(stack: LocalStack) -> Path:

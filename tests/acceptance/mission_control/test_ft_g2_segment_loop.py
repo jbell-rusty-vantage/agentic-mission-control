@@ -14,7 +14,7 @@ from pathlib import Path
 import pytest
 from temporalio.worker import Replayer
 from tests.acceptance.mission_control.test_postgres_runtime_parity import (
-    test_goal_directed_runs_two_iterations_through_the_production_composition as goal_scenario,
+    goal_directed_two_iterations_scenario as goal_scenario,
 )
 from tests.fixtures.mission_control_production_stack import open_postgres_production_stack
 from tests.fixtures.rrm009_production_harness import ProductionStack

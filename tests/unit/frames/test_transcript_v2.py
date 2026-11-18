@@ -66,7 +66,7 @@ from tests.fixtures.transcripts import (
     transcript_events,
     transcript_frames,
 )
-from tests.unit.frames.test_transcript_interfaces import _cli_transport, http_app
+from tests.support.unit.frames.transcript_interfaces import _cli_transport, http_app
 
 UNIT = "bl-unit-v1:" + "7c" * 32
 OTHER_UNIT = "bl-unit-v1:" + "0f" * 32

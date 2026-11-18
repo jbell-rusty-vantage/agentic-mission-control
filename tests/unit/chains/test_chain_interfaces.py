@@ -35,7 +35,7 @@ from mission_control.interfaces.mcp.mission_tools import (
     register_chain_tools,
 )
 from tests.fixtures.provider_frames import INSTALLATION, SCOPE, TENANT
-from tests.unit.chains.test_chain_reducer import accepted, apply, build, document, reduce
+from tests.support.unit.chains.chain_reducer import accepted, apply, build, document, reduce
 
 
 def inspection(*, completed: bool = False) -> ChainInspection:

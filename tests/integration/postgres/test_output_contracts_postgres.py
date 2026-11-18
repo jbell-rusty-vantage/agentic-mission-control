@@ -341,7 +341,7 @@ async def test_association_steps_are_taken_once_each(common_db, pool):
 
 
 async def test_a_compiled_configuration_registers_through_the_real_service(common_db, pool):
-    from tests.unit.authoring.test_output_promises_compile import compiled_configuration
+    from tests.support.unit.authoring.output_promises_compile import compiled_configuration
 
     configuration = await compiled_configuration()
     promises = configuration.output_promises

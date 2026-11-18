@@ -17,7 +17,7 @@ from mission_control.domain.execution.contracts import (
 from mission_control.domain.policies.errors import IdempotencyConflict, RunControlNotFound
 from tests.fixtures.mission_control_common_db import CommonDatabase, canonical_scope
 from tests.support.db_builders import insert_fixture_run
-from tests.unit.workspaces.test_artifact_promotion import CONTENT_DIGEST, NOW, OWNER
+from tests.support.unit.workspaces.artifact_promotion import CONTENT_DIGEST, NOW, OWNER
 
 pytestmark = pytest.mark.common_db
 

@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import hashlib
-from dataclasses import replace
 from typing import Any
 
 import pytest
@@ -15,42 +13,13 @@ from mission_control.application.programs.artifact_validation import (
 )
 from mission_control.domain.authoring.canonical import sha256_digest
 from mission_control.domain.programs.completion import ArtifactValidationCheck
-
-SCOPE = "mc/install/app/tenant"
-REF = f"artifact://{SCOPE}/run/report"
-SCHEMA: dict[str, Any] = {
-    "type": "object",
-    "required": ["count"],
-    "properties": {"count": {"type": "integer", "minimum": 1}},
-    "additionalProperties": False,
-}
-
-
-def captured(raw_text: str = '{"count": 1}', **changes: Any) -> ArtifactContent:
-    raw = raw_text.encode("utf-8")
-    return replace(
-        ArtifactContent(
-            source_ref=REF,
-            durable_ref="object://report",
-            content_digest="sha256:" + hashlib.sha256(raw).hexdigest(),
-            size_bytes=len(raw),
-            media_type="application/json",
-            text=raw_text,
-        ),
-        **changes,
-    )
-
-
-class Custody:
-    def __init__(self, content: ArtifactContent | None) -> None:
-        self.content = content
-        self.calls: list[tuple[str, str, int]] = []
-
-    async def capture(
-        self, source_ref: str, *, request_scope: str, max_text_bytes: int
-    ) -> ArtifactContent | None:
-        self.calls.append((source_ref, request_scope, max_text_bytes))
-        return self.content
+from tests.support.unit.orchestration.artifact_schema_validation import (
+    REF,
+    SCHEMA,
+    SCOPE,
+    Custody,
+    captured,
+)
 
 
 async def check(custody: Custody, **changes: Any) -> ArtifactValidationCheck:

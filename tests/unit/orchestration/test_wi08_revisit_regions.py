@@ -30,7 +30,7 @@ from mission_control.domain.authoring.stagegraph_builder import (
     StageInputBindingSpec,
     build_stagegraph_v2,
 )
-from tests.unit.orchestration.test_wi08_graph_routes import Driver
+from tests.support.unit.orchestration.wi08_graph_routes import Driver
 
 FACTS = (
     StageFact(fact_id="approved", output_slot_id="out", pointer="/approved", value_type="boolean"),

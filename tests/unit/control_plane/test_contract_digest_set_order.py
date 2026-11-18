@@ -186,7 +186,7 @@ def test_launch_proposal_digest_is_independent_of_set_iteration_order() -> None:
 
     import asyncio
 
-    from tests.unit.coordinator.test_coordinator_launch_preparation import launch_fixture
+    from tests.support.unit.coordinator.coordinator_launch_preparation import launch_fixture
 
     _preparation, _tickets, proposal, _context = asyncio.run(launch_fixture("StageGraph"))
     first, second = with_different_set_orders(proposal)
@@ -209,7 +209,7 @@ def test_structural_compiler_requirement_digest_is_independent_of_set_iteration_
         RuntimeDefinitionKind,
         StageExecutionBinding,
     )
-    from tests.unit.runtime.test_graph_runtime_contracts import ref
+    from tests.support.unit.runtime.graph_runtime_contracts import ref
 
     implementation_ref = ref(RuntimeDefinitionKind.GRAPH_ASSEMBLY, "operation.collect")
     manifest_ref = ref(RuntimeDefinitionKind.CAPABILITY_MANIFEST, "disabled.manifest")
@@ -372,7 +372,7 @@ async def test_graph_admission_and_reconciliation_ids_are_independent_of_set_ite
     from biotech_mission_adapters.application.schema.supporting_graph_reconciliation import (
         _reconciliation_request_digest,
     )
-    from tests.unit.schema.test_schema_grounding_services import _reconciliation_fixture
+    from tests.support.unit.schema.schema_grounding_services import _reconciliation_fixture
 
     request, _records, _factory = await _reconciliation_fixture()
     first_request, second_request = with_different_set_orders(request)
@@ -391,7 +391,7 @@ async def test_graph_admission_and_reconciliation_ids_are_independent_of_set_ite
 async def test_sandbox_snapshot_identities_are_independent_of_set_iteration_order() -> None:
     """Snapshot creation identity and clone request fingerprint replay exactly."""
 
-    from tests.unit.workspaces.test_sandbox_snapshots import (
+    from tests.support.unit.workspaces.sandbox_snapshots import (
         clone_request,
         create_request,
         service,
@@ -417,7 +417,7 @@ async def _prepared_exact_refs(provider: object, family: str, initial_goal: str 
     from mission_control.application.coordinator.coordinator_semantic_bindings import (
         WorkflowSemanticBindingProviderRouter,
     )
-    from tests.unit.coordinator.test_coordinator_launch_preparation import launch_fixture
+    from tests.support.unit.coordinator.coordinator_launch_preparation import launch_fixture
 
     captured: list[object] = []
 
@@ -448,7 +448,7 @@ async def test_semantic_binding_operation_template_refs_are_independent_of_set_o
     from mission_control.application.execution.operations.operation_execution import (
         InMemoryOperationBindingRepository,
     )
-    from tests.unit.coordinator.test_coordinator_semantic_binding_integration import (
+    from tests.support.unit.coordinator.coordinator_semantic_binding_integration import (
         _schema_context_provider,
         _supporting_graph_provider,
     )
@@ -486,7 +486,7 @@ async def test_web_research_record_digests_are_independent_of_set_iteration_orde
         _append,
     )
     from biotech_mission_adapters.domain.coordinator.web_research_runtime import PublicGoalAdmission
-    from tests.unit.web_research.test_web_research_semantic_handlers import (
+    from tests.support.unit.web_research.web_research_semantic_handlers import (
         request as stage_request,
     )
 
@@ -521,7 +521,7 @@ async def test_effective_run_configuration_persistence_is_independent_of_set_ord
     )
     from mission_control.application.authoring.service import ControlPlaneService
     from mission_control.domain.authoring.extensions import ExtensionRegistry
-    from tests.unit.control_plane.test_control_plane import configured_service, invocation
+    from tests.support.unit.control_plane.control_plane import configured_service, invocation
 
     compiler, _repository, records = await configured_service()
     erc = await compiler.compile(invocation(records))

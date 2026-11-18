@@ -47,8 +47,8 @@ from mission_control.domain.execution.contracts import DeepAgentExecutionBinding
 from tests.fixtures.isolated_settings import isolated_settings
 from tests.fixtures.knowledge_binding import FakeKnowledgeBinding, SteppingClock
 from tests.support.manifests.launch_inputs import admitted, compile_programs, resolver
+from tests.support.unit.knowledge.knowledge_manifest import MANIFEST, SCOPE
 from tests.unit.authoring.manifest_launch_fixture import fixture_bindings, fixture_served
-from tests.unit.knowledge.test_knowledge_manifest import MANIFEST, SCOPE
 
 APP = "ai-engineer"
 CATALOG = "mc/00000000-0000-7000-8000-000000000001/ai-engineer/catalog"

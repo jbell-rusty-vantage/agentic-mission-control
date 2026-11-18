@@ -53,8 +53,8 @@ from tests.fixtures.hook_contributions import (
 )
 from tests.fixtures.knowledge_binding import InMemoryStaging
 from tests.fixtures.output_contracts import InMemoryOutputContractStore
+from tests.support.unit.outputs.output_fulfillment import invocation
 from tests.unit.outputs.scenario import build_stack, codes, obligation
-from tests.unit.outputs.test_output_fulfillment import invocation
 
 SCOPE = "mc/11111111-1111-1111-1111-111111111111/biotech/22222222-2222-2222-2222-222222222222"
 TARGET = ContributionTarget(scope=SCOPE, run_id="run-1", operation_ref="op-1", generation=1)

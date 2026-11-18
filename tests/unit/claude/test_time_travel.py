@@ -69,8 +69,8 @@ from mission_control.domain.execution.lanes import (
     TurnHandle,
 )
 from tests.fixtures.lane_turns import SCOPE
+from tests.support.unit.claude.claude_harness import _fields, _identity
 from tests.unit.claude.fixtures import SESSION_ID, ClaudeStack, claude_operation, claude_stack
-from tests.unit.claude.test_claude_harness import _fields, _identity
 from tests.unit.codex.support import MemoryArtifacts
 
 UNIT_KEY = "bl-unit-v1:" + "a" * 64

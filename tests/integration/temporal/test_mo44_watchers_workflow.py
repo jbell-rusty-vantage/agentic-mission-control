@@ -62,8 +62,8 @@ from tests.integration.temporal.test_chain_start_idempotent import (
 )
 from tests.integration.temporal.test_chain_start_idempotent import SCOPE as CHAIN_SCOPE
 from tests.support.run_control import request, service
+from tests.support.unit.watchers.watcher_manifest import definition, event_wait_document
 from tests.unit.watchers.fakes import RUN_ID, FakeRunGateway, MemoryWatcherStore
-from tests.unit.watchers.test_watcher_manifest import definition, event_wait_document
 
 SCOPE = "mc/00000000-0000-4000-8000-000000000001/biotech/00000000-0000-4000-8000-000000000002"
 MINUTE = 60
