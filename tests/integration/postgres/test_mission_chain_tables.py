@@ -1,6 +1,10 @@
-"""FT-D1: migration 0028 (mission_chain, chain_link, authoring_provenance, relationship kinds)
-on a disposable PostgreSQL 17: forced RLS, grants, forward-only guards and the chain contract
-round trip through real restricted roles."""
+"""FT-D1: the migration 0028 chain tables through real restricted roles on a disposable
+PostgreSQL 17: the chain contract round trip is tenant scoped, links move forward only, and the
+chain lifecycle is forward only with a final completion.
+
+Their catalog shape (forced RLS, least-privilege grants, relationship kinds) is proved by
+`packages/mission-control-db-contract/tests/test_schema_guards.py`.
+"""
 
 from __future__ import annotations
 
@@ -20,16 +24,9 @@ from mission_control.domain.composition.chain import (
     compile_chain,
 )
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.support.integration.postgres.mission_chain_tables import (
-    FIXTURE,
-    NOW,
-    insert_chain,
-    insert_mission,
-)
+from tests.support.db_builders import CHAIN_MANIFEST, CHAIN_NOW, insert_chain, insert_mission
 
 pytestmark = pytest.mark.common_db
-
-TABLES = ("mission_chain", "chain_link", "authoring_provenance")
 
 
 async def seed_chain(pool: asyncpg.Pool, db: CommonDatabase) -> MissionChain:
@@ -40,7 +37,7 @@ async def seed_chain(pool: asyncpg.Pool, db: CommonDatabase) -> MissionChain:
         tenant_id=request_scope.tenant_id,
     )
     compilation = compile_chain(
-        parse_manifest(load_manifest_yaml(FIXTURE.read_text(encoding="utf-8")))
+        parse_manifest(load_manifest_yaml(CHAIN_MANIFEST.read_text(encoding="utf-8")))
     )
     assert compilation.resolution is not None
     async with pool.acquire() as connection, connection.transaction():
@@ -57,7 +54,7 @@ async def seed_chain(pool: asyncpg.Pool, db: CommonDatabase) -> MissionChain:
             title="Research then ingestion",
             manifest_digest="sha256:" + "c" * 64,
             members=members,
-            created_at=NOW,
+            created_at=CHAIN_NOW,
             created_by_actor_ref="actor:owner",
         )
         await insert_chain(connection, chain)
@@ -69,60 +66,6 @@ async def scoped(pool: asyncpg.Pool, scope: str | None, query: str, *args: objec
         if scope is not None:
             await apply_scope(connection, scope)
         return await connection.fetchval(query, *args)
-
-
-async def test_tables_force_rls_and_grant_least_privilege(common_db: CommonDatabase):
-    owner = await asyncpg.connect(common_db.owner_dsn)
-    try:
-        rows = await owner.fetch(
-            "SELECT relname, relrowsecurity, relforcerowsecurity FROM pg_class "
-            "WHERE relnamespace = 'mission_control'::regnamespace AND relname = ANY($1)",
-            list(TABLES),
-        )
-        flags = {row["relname"]: (row[1], row[2]) for row in rows}
-        assert flags == dict.fromkeys(TABLES, (True, True))
-        privileges = {
-            (role, table): await owner.fetchval(
-                "SELECT array_agg(p ORDER BY p) FROM unnest(ARRAY['SELECT','INSERT','UPDATE',"
-                "'DELETE']) p WHERE has_table_privilege($1, 'mission_control.' || $2, p)",
-                role,
-                table,
-            )
-            for role in ("mission_control_runtime", "mission_control_readonly")
-            for table in TABLES
-        }
-        assert privileges[("mission_control_readonly", "mission_chain")] == ["SELECT"]
-        assert privileges[("mission_control_runtime", "authoring_provenance")] == [
-            "INSERT",
-            "SELECT",
-        ]
-        # Column-limited UPDATE: identity columns are not updatable by the runtime.
-        assert await owner.fetchval(
-            "SELECT has_column_privilege('mission_control_runtime', "
-            "'mission_control.chain_link', 'state', 'UPDATE')"
-        )
-        assert not await owner.fetchval(
-            "SELECT has_column_privilege('mission_control_runtime', "
-            "'mission_control.chain_link', 'bindings', 'UPDATE')"
-        )
-        kinds = await owner.fetchval(
-            "SELECT pg_get_constraintdef(oid) FROM pg_constraint "
-            "WHERE conname = 'mission_relationship_kind_check'"
-        )
-        for kind in (
-            "composition",
-            "fork",
-            "dependency",
-            "supplies",
-            "depends_on",
-            "parent_of",
-            "adopted_from",
-            "successor_of",
-            "forked_from",
-        ):
-            assert f"'{kind}'" in kinds
-    finally:
-        await owner.close()
 
 
 async def test_chain_round_trip_is_scoped(common_db: CommonDatabase):
@@ -181,7 +124,7 @@ async def test_links_move_forward_only(common_db: CommonDatabase):
             "UPDATE mission_control.chain_link SET state = 'released', released_at = $2, "
             "packet_digest = $3, version = version + 1, updated_at = $2 WHERE link_id = $1",
             supplies.link_id,
-            NOW,
+            CHAIN_NOW,
             "sha256:" + "d" * 64,
         )
         # released -> armed, a stale version, and rewriting release facts are refused.

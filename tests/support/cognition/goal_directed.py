@@ -14,13 +14,13 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from langchain_core.messages import AIMessage, BaseMessage, ToolMessage
-from tests.fixtures.overnight_stagegraph_model import _document
-from tests.fixtures.rrm009_production_stack import Cognition, call_usage
 
 from mission_control.domain.programs.goal_directed_runtime import (
     GoalNamedExecutorObservation,
     GoalVerifierObservation,
 )
+from tests.fixtures.rrm009_production_stack import Cognition, call_usage
+from tests.support.cognition.stagegraph import tool_document
 
 
 def goal_context(content: str) -> tuple[str, int] | None:
@@ -177,7 +177,7 @@ class GoalCognition(Cognition):
                 "executor",
                 0,
             )
-        registered = _document(tools[0])
+        registered = tool_document(tools[0])
         assert registered.get("ok"), registered
         affected = registered["result"]["affected"]
         reports = [row for row in affected if "/report/" in row["handle"]]
@@ -201,7 +201,7 @@ class GoalCognition(Cognition):
                 "executor",
                 1,
             )
-        assert _document(tools[-1]).get("ok"), tools[-1].content
+        assert tool_document(tools[-1]).get("ok"), tools[-1].content
         if len(tools) == 2:
             return self._call(
                 "submit_output",
@@ -253,7 +253,7 @@ class GoalCognition(Cognition):
                 "verifier",
                 len(tools),
             )
-        reads = [_document(message) for message in tools[1:]]
+        reads = [tool_document(message) for message in tools[1:]]
         assert all(read.get("ok") for read in reads), reads
         self.script.reads.append(
             {

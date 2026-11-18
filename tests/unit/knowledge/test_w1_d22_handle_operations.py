@@ -5,7 +5,8 @@ Release 1.6.0 (0055) allowed only six operations, so the trusted path's KS-accep
 ``knowledge_operation_handle_operation_check``. Release 1.9.0's 0067 replaces the check; this test
 binds its SQL to the code that writes the table (``application/knowledge/gateway.py``) and, when
 the Knowledge Services checkout is beside this one, to the K01 protocol's handle operations. The
-PostgreSQL proof is ``tests/integration/postgres/test_sprint_oc_release_190.py``.
+PostgreSQL proof is
+``packages/mission-control-db-contract/tests/test_release_190_handle_operations.py``.
 """
 
 from __future__ import annotations

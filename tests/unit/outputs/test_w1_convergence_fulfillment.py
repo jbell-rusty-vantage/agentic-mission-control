@@ -21,8 +21,15 @@ from mission_control.application.outputs.fulfillment import (
     PromoteOutput,
 )
 from mission_control.application.programs.goal_directed import bind_fulfillment
-from mission_control.domain.outputs.contracts import Enforcement, OutputForm, Requirement
+from mission_control.domain.outputs.contracts import (
+    Enforcement,
+    EvaluationScope,
+    OutputForm,
+    OutputObligation,
+    Requirement,
+)
 from tests.support.knowledge.gateway import origin
+from tests.support.unit.outputs.d21_iteration_records import note, promises
 from tests.support.unit.outputs.w1_convergence_fulfillment import _observation
 from tests.unit.outputs.scenario import (
     Stack,
@@ -269,3 +276,88 @@ async def test_a_failed_refresh_never_fails_the_committed_promotion() -> None:
         ),
     )
     assert promoted.status == "promoted"
+
+
+# W1 D21: requirement-free text promises of a GoalDirected executor (OUTPUT-CONTRACTS §2, §7).
+# A promise authored as a per-iteration record (`evaluation_scope: iteration`, no requirement)
+# is satisfied by its iteration's own submission whatever the verdict, since a rejected verdict
+# still hands off; every other promise keeps fix D (a rejected iteration's output never becomes
+# an accepted head).
+
+EXECUTOR = "goal-iteration/1/executor"
+
+
+async def _executor_stack(*items: OutputObligation) -> Stack:
+    store = InMemoryOutputContractStore()
+    access = InvocationAccess(
+        origin=origin(1, operation_id=EXECUTOR),
+        subject="mission-control-runtime",
+        invocation_id="inv-" + EXECUTOR.replace("/", "-"),
+        authenticated_at=AT,
+    )
+    return await build_stack(store, store.submissions, access, *items)
+
+
+async def _submit_and_finalize(stack: Stack, **bodies: str) -> None:
+    for key, body in bodies.items():
+        ack = await stack.submit(
+            f"s-{key}", f"root.{key}", text(key.replace("_", "-"), body), position="root"
+        )
+        assert ack.status == "accepted", ack.error
+    await stack.submissions.finalize(stack.access.identity(tuple(f"root.{k}" for k in bodies)))
+
+
+async def _converge_executor(stack: Stack, *, promote: bool):  # type: ignore[no-untyped-def]
+    return await stack.outputs.converge(
+        stack.host, stack.run_id, operation_ref=EXECUTOR, generation=1, promote=promote
+    )
+
+
+async def test_requirement_free_text_of_an_accepted_iteration_is_promoted_and_fulfilled() -> None:
+    stack = await _executor_stack(*promises())
+    await _submit_and_finalize(stack, summary="three models", progress_note="did A; next B")
+    result = await _converge_executor(stack, promote=True)
+    assert fulfillment(result, "root.summary").disposition == "fulfilled"
+    assert fulfillment(result, "root.progress_note").disposition == "fulfilled"
+    assert result.shortfalls == ("root.appendix",)  # expected shortfall stays visible
+    assert "root.caveats" not in result.shortfalls  # optional absence is silent
+    assert result.completion == "satisfied"
+
+
+async def test_a_rejected_iteration_still_records_its_progress_note_but_nothing_else() -> None:
+    stack = await _executor_stack(*promises())
+    await _submit_and_finalize(stack, summary="three models", progress_note="did A; next B")
+    result = await _converge_executor(stack, promote=False)
+    assert fulfillment(result, "root.progress_note").disposition == "fulfilled"
+    assert codes(result, "root.summary") == [
+        "SUBMITTED_NOT_ACCEPTED"
+    ]  # fix D: no accepted head from rejection
+    assert result.blocking == ("root.summary",) and result.completion == "waiting"
+
+
+async def test_an_invocation_scoped_note_keeps_the_verdict_gate() -> None:
+    stack = await _executor_stack(note(EvaluationScope.INVOCATION))
+    await _submit_and_finalize(stack, progress_note="did A")
+    assert codes(await _converge_executor(stack, promote=False), "root.progress_note") == [
+        "SUBMITTED_NOT_ACCEPTED"
+    ]
+    accepted = await _converge_executor(stack, promote=True)
+    assert fulfillment(accepted, "root.progress_note").disposition == "fulfilled"
+
+
+async def test_a_note_with_a_declared_requirement_belongs_to_the_assessment_path() -> None:
+    checked = note(requirements=(Requirement(key="cited", validator="mc.check.cited@1"),))
+    stack = await _executor_stack(checked)
+    await _submit_and_finalize(stack, progress_note="did A")
+    for verdict in (False, True):
+        assert codes(await _converge_executor(stack, promote=verdict), "root.progress_note") == [
+            "SUBMITTED_NOT_ACCEPTED"
+        ]
+
+
+async def test_a_missing_progress_note_is_never_fabricated() -> None:
+    stack = await _executor_stack(*promises())
+    await _submit_and_finalize(stack, summary="three models")
+    result = await _converge_executor(stack, promote=False)
+    assert codes(result, "root.progress_note") == ["MISSING"]
+    assert "root.progress_note" in result.blocking

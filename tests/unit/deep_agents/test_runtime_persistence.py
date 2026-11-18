@@ -1,7 +1,9 @@
-"""Offline proofs for the private runtime saver/store binding and its pinned descriptor."""
+"""Offline proofs for the Deep Agents runtime persistence: the private saver/store binding, the
+one persistence lifespan and its pinned migration descriptor."""
 
 from __future__ import annotations
 
+import asyncio
 import hashlib
 import importlib.util
 import json
@@ -16,6 +18,7 @@ from pydantic import SecretStr, ValidationError
 from mission_control.adapters.deep_agents.persistence import (
     RUNTIME_SCHEMA,
     RuntimeConninfoError,
+    StandalonePersistence,
     StandalonePersistenceLifespan,
     conninfo_search_path_schema,
     runtime_checkpoint_conninfo,
@@ -153,19 +156,32 @@ def test_vendor_setup_is_never_accepted_for_runtime_schema_or_production() -> No
 
 
 class _Resource:
-    def __init__(self) -> None:
+    """A LangGraph saver or store: records when it is entered, set up and exited."""
+
+    def __init__(self, kind: str, events: list[str]) -> None:
+        self.kind = kind
+        self.events = events
         self.setup_calls = 0
 
     async def setup(self) -> None:
         self.setup_calls += 1
+        self.events.append(f"setup:{self.kind}")
 
 
-def _factory(created: list[_Resource]):  # type: ignore[no-untyped-def]
+def _factory(  # type: ignore[no-untyped-def]
+    created: list[_Resource], kind: str = "resource", events: list[str] | None = None
+):
+    log = events if events is not None else []
+
     @asynccontextmanager
     async def context(_conninfo):  # type: ignore[no-untyped-def]
-        resource = _Resource()
+        resource = _Resource(kind, log)
         created.append(resource)
-        yield resource
+        log.append(f"enter:{kind}")
+        try:
+            yield resource
+        finally:
+            log.append(f"exit:{kind}")
 
     return context
 
@@ -192,6 +208,64 @@ async def test_production_lifespan_never_calls_vendor_setup() -> None:
 def test_test_only_setup_refuses_runtime_public_or_implicit_schema(conninfo: str) -> None:
     with pytest.raises(RuntimeConninfoError, match="test-only vendor setup"):
         StandalonePersistenceLifespan(conninfo, run_setup=True)
+
+
+@pytest.mark.asyncio
+async def test_standalone_persistence_is_one_lifespan_and_setup_is_explicit() -> None:
+    events: list[str] = []
+    lifespan = StandalonePersistenceLifespan(
+        # Test-only vendor setup requires an explicit disposable search_path schema.
+        "postgresql://disposable?options=-c%20search_path%3Dstage3_disposable",
+        run_setup=True,
+        saver_factory=_factory([], "saver", events),
+        store_factory=_factory([], "store", events),
+    )
+
+    async with lifespan as persistence:
+        assert persistence.saver.setup_calls == 1  # type: ignore[attr-defined]
+        assert persistence.store.setup_calls == 1  # type: ignore[attr-defined]
+        assert StandalonePersistence.namespace("tenant-1", "procedural") == (
+            "tenant-1",
+            "procedural",
+        )
+
+    assert events == [
+        "enter:saver",
+        "enter:store",
+        "setup:saver",
+        "setup:store",
+        "exit:store",
+        "exit:saver",
+    ]
+    with pytest.raises(RuntimeError, match="cannot be entered twice"):
+        async with lifespan:
+            pass
+
+
+@pytest.mark.asyncio
+async def test_cancellation_closes_store_and_saver_cleanly() -> None:
+    events: list[str] = []
+    lifespan = StandalonePersistenceLifespan(
+        "postgresql://disposable",
+        saver_factory=_factory([], "saver", events),
+        store_factory=_factory([], "store", events),
+    )
+
+    async def cancelled_scope() -> None:
+        async with lifespan:
+            raise asyncio.CancelledError
+
+    with pytest.raises(asyncio.CancelledError):
+        await cancelled_scope()
+
+    assert events[-2:] == ["exit:store", "exit:saver"]
+
+
+def test_store_namespace_is_tenant_and_purpose_scoped() -> None:
+    with pytest.raises(ValueError, match="request scope and purpose"):
+        StandalonePersistence.namespace("", "procedural")
+    with pytest.raises(ValueError, match="request scope and purpose"):
+        StandalonePersistence.namespace("tenant-1", "")
 
 
 # ------------------------------------------------------------------ descriptor

@@ -119,5 +119,5 @@ are a goal tied to [deployment](deployment.md).
   [provenance report](../specs/archive/provider-consolidation-2026-10/sprint-oc/provenance-2026-10-31/REPORT.md),
   `BellLabs/docs/navigation/DATA-PLANES-AND-CREDENTIALS.md`.
 - Tests: [release 1.12.0](../../tests/integration/postgres/test_sprint_oc_release_1120.py),
-  [release 1.9.0](../../tests/integration/postgres/test_sprint_oc_release_190.py),
+  [release 1.9.0](../../packages/mission-control-db-contract/tests/test_release_190_handle_operations.py),
   [two-project parity](../../tests/qualification/two_project/test_release_parity.py).

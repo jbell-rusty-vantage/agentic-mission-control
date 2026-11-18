@@ -47,13 +47,15 @@ from mission_control.domain.frames.contracts import FrameKind
 from mission_control.domain.policies.stop_fence import StopFence
 from tests.fixtures.continuation import build_service, trigger
 from tests.fixtures.lane_turns import (
+    CompactingFixtureLane,
+    ContinuingLane,
+    FakeHydrator,
     RecordingSignals,
     ScriptedSessionLane,
     cursor_operation,
     lane_stack,
     scripted_frames,
 )
-from tests.fixtures.mp12_lanes import CompactingFixtureLane, ContinuingLane, FakeHydrator
 from tests.support.ids import SCOPE
 
 BOUNDS = LaneSegmentBounds(max_frames=50, max_duration_s=5, heartbeat_timeout_s=3)

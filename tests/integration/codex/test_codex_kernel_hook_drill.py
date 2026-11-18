@@ -1,7 +1,7 @@
 """MO-03 drill: the real `codex app-server` enforces Mission Control's kernel `before_tool` deny.
 
-Opt-in (`MC_CODEX_HOOK_DRILL=1`, `MC_CODEX_BINARY` = a codex CLI; the R21 pin 0.162.1, so the
-0.162.0 schema pin is overridden explicitly). No provider is called and nothing is paid: the
+Opt-in (`MC_CODEX_HOOK_DRILL=1`, `MC_CODEX_BINARY` = a codex CLI at the adapter's pinned
+version; on Windows name the `codex.cmd` shim). No provider is called and nothing is paid: the
 model is a LOCAL mock of the Responses API (`model_providers.mc_mock` in the isolated
 `CODEX_HOME`) that asks for one `exec_command` per turn. Everything else is production code:
 the codex harness over a git worktree lease, `SubprocessAppServerLauncher`, the projected
@@ -11,7 +11,9 @@ loopback listener. Codex itself runs the kernel hooks.
 
 Turn 1: the shell call is allowed and its Operation Intent recorded. Then a Stop Fence is
 persisted; turn 2: Codex blocks the shell call with the kernel's reason ("Command blocked by
-PreToolUse hook: run is stop-fenced ..."). A live-model drill remains the owner's S0 item.
+PreToolUse hook: run is stop-fenced ..."). Last, an edited trust record makes a fresh
+app-server's `hooks/list` report the hooks untrusted, so the trust check refuses (Q-X2). A
+live-model drill remains the owner's S0 item.
 """
 
 from __future__ import annotations
@@ -28,11 +30,26 @@ from typing import Any
 
 import pytest
 
-from mission_control.adapters.codex.harness import CodexLocalHarness
+from mission_control.adapters.codex.harness import (
+    CODEX_HOME_DIR,
+    CodexLocalHarness,
+    projected_hooks,
+)
+from mission_control.adapters.codex.hook_trust import (
+    HOOKS_FILE,
+    HookTrustUnverified,
+    verify_listed_trust,
+)
 from mission_control.adapters.codex.launcher import (
     LaunchedAppServer,
     LaunchSpec,
     SubprocessAppServerLauncher,
+)
+from mission_control.adapters.codex.protocol import (
+    M_HOOKS_LIST,
+    M_INITIALIZE,
+    M_INITIALIZED,
+    PINNED_CODEX_CLI_VERSION,
 )
 from mission_control.adapters.cursor.workspace import GitWorktreeLeaser
 from mission_control.application.agentic_components.materialization import projection_digest
@@ -47,6 +64,7 @@ from tests.support.providers.codex import (
     CodexStack,
     StaticAuth,
     StaticProjectionSource,
+    admission,
     codex_binding,
     codex_operation,
     fixture_settings,
@@ -64,6 +82,7 @@ pytestmark = pytest.mark.skipif(
     reason="opt-in: set MC_CODEX_HOOK_DRILL=1 and MC_CODEX_BINARY (a local codex CLI)",
 )
 SHELL_COMMAND = "echo mission-control-drill"
+DRILL_KEY_NAME = "MC_CODEX_DRILL_API_KEY"
 _USAGE = {
     "input_tokens": 1,
     "output_tokens": 1,
@@ -159,14 +178,16 @@ def drill_environment(
 
 class MockModelLauncher(SubprocessAppServerLauncher):
     """The production launcher, with the isolated home pointed at the local mock model (the
-    provider's top-level key precedes the trust tables the lane wrote)."""
+    provider's top-level key precedes the trust tables the lane wrote). The provider requires
+    OpenAI auth so the app-server reports the admitted API-key account the harness checks;
+    the placeholder key only ever reaches the local mock."""
 
     def __init__(self, binary: str, base_url: str) -> None:
         super().__init__(binary, allow_version_mismatch=True)
         self._provider = (
             'model_provider = "mc_mock"\n'
             f'[model_providers.mc_mock]\nname = "mc_mock"\nbase_url = "{base_url}"\n'
-            'wire_api = "responses"\nrequires_openai_auth = false\n\n'
+            'wire_api = "responses"\nrequires_openai_auth = true\n\n'
         )
 
     async def launch(self, spec: LaunchSpec) -> LaunchedAppServer:
@@ -175,6 +196,40 @@ class MockModelLauncher(SubprocessAppServerLauncher):
         if not text.startswith(self._provider):
             config.write_text(self._provider + text, encoding="utf-8")
         return await super().launch(spec)
+
+
+LIST_ENV_NAMES = (
+    "PATH",
+    "SYSTEMROOT",
+    "SystemRoot",
+    "TEMP",
+    "TMP",
+    "HOME",
+    "USERPROFILE",
+    "APPDATA",
+)
+
+
+async def listed_hooks(root: Path, home: Path) -> dict[str, object]:
+    """`hooks/list` from a fresh production-launched app-server in `home` (no thread)."""
+
+    launcher = SubprocessAppServerLauncher(
+        os.environ.get("MC_CODEX_BINARY", "codex"), allow_version_mismatch=True
+    )
+    env = {name: os.environ[name] for name in LIST_ENV_NAMES if name in os.environ}
+    launched = await launcher.launch(
+        LaunchSpec(cwd=root, env={**env, "CODEX_HOME": str(home)}, codex_home=home)
+    )
+    try:
+        connection = launched.connection
+        await connection.request(
+            M_INITIALIZE,
+            {"clientInfo": {"name": "mission_control_probe", "version": "0"}, "capabilities": {}},
+        )
+        await connection.notify(M_INITIALIZED)
+        return await connection.request(M_HOOKS_LIST, {"cwds": [str(root)]}) or {}
+    finally:
+        await launched.terminate()
 
 
 def hook_statuses(frames: list[LaneFrame]) -> set[str]:
@@ -202,11 +257,16 @@ async def test_real_codex_enforces_the_kernel_before_tool_deny(
                 "provider": "codex_app_server",
                 "approval_policy": "never",
                 "sandbox_mode": "danger-full-access",
-                "app_server_schema_version": "v2@0.162.0",
+                "app_server_schema_version": f"v2@{PINNED_CODEX_CLI_VERSION}",
             },
         )
     )
     artifacts = MemoryArtifacts()
+    # The isolated CODEX_HOME never carries an owner login: the API-key route, as the shared
+    # codex stack admits for isolated homes, with a placeholder key that only the local mock
+    # model ever sees (never the worker's real key).
+    auth = StaticAuth(admission("api_key", credential_ref=f"env:{DRILL_KEY_NAME}"))
+    worker_environ = {**os.environ, DRILL_KEY_NAME: "sk-mission-control-local-drill"}
     harness = CodexLocalHarness(
         launcher=MockModelLauncher(os.environ.get("MC_CODEX_BINARY", "codex"), base_url),
         leaser=GitWorktreeLeaser(
@@ -214,9 +274,9 @@ async def test_real_codex_enforces_the_kernel_before_tool_deny(
         ),
         projections=StaticProjectionSource(projection),
         artifacts=artifacts,
-        auth=StaticAuth(),
+        auth=auth,
         settings=fixture_settings(
-            tmp_path, worker_environ=os.environ, hook_callback_base_url=hook_rig.url
+            tmp_path, worker_environ=worker_environ, hook_callback_base_url=hook_rig.url
         ),
         child_environment=drill_environment,
         hooks=hook_rig.service,
@@ -227,7 +287,7 @@ async def test_real_codex_enforces_the_kernel_before_tool_deny(
         launcher=None,  # type: ignore[arg-type]
         leaser=None,  # type: ignore[arg-type]
         artifacts=artifacts,
-        auth=StaticAuth(),
+        auth=auth,
         rig=None,
         operation=operation,
         lanes=lane_stack(harness, operation=operation),
@@ -260,3 +320,17 @@ async def test_real_codex_enforces_the_kernel_before_tool_deny(
     assert "run is stop-fenced by immediate cancel cancel-mo-03-drill" in blocked
     assert "mission-control-drill\n" not in blocked
     assert [intent.effect_ref for intent in hook_rig.intents.intents()] == ["tool_use:call_drill_1"]
+
+    # An edited trust record: Codex itself must report the hooks untrusted, and the check
+    # the harness runs before any thread must refuse.
+    root = Path(harness.lease_path(stack.heid))
+    home = root / CODEX_HOME_DIR
+    records, kernel = projected_hooks(projection, root)
+    assert kernel and records
+    config = home / "config.toml"
+    config.write_text(
+        config.read_text(encoding="utf-8").replace("trusted_hash", "stale_hash", 1),
+        encoding="utf-8",
+    )
+    with pytest.raises(HookTrustUnverified, match="untrusted"):
+        verify_listed_trust(await listed_hooks(root, home), records, root / HOOKS_FILE)

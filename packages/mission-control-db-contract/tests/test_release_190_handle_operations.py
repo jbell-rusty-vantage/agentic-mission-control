@@ -40,6 +40,12 @@ CHECK = (
     "SELECT pg_get_constraintdef(oid) FROM pg_constraint "
     "WHERE conname = 'knowledge_operation_handle_operation_check'"
 )
+TABLE = "WHERE oid = 'mission_control.knowledge_operation_handle'::regclass"
+EFFECT_KEY_CHECK = (
+    "SELECT pg_get_constraintdef(oid) FROM pg_constraint "
+    "WHERE conrelid = 'mission_control.knowledge_operation_handle'::regclass AND contype = 'c' "
+    "AND pg_get_constraintdef(oid) LIKE '%effect_key IS NOT NULL%'"
+)
 
 
 @pytest.fixture(scope="module")
@@ -89,6 +95,22 @@ def test_upgrade_from_180_widens_the_handle_check_on_a_supabase_like_cluster(
     assert result["component_version"] == "1.9.0"
     after = run(_admin(db, CHECK))
     assert sorted(set(re.findall(r"'([a-z]+\.[a-z]+)'", after))) == list(HANDLE_OPERATIONS)
+    # Unchanged by the upgrade: only the effectful operations name an effect key (a trusted
+    # assessment handle names none), and the table keeps forced RLS with no DELETE grant.
+    effect_rule = run(_admin(db, EFFECT_KEY_CHECK))
+    assert "effect_key IS NOT NULL" in effect_rule
+    assert set(re.findall(r"'([a-z]+\.[a-z]+)'", effect_rule)) == {
+        "knowledge.apply",
+        "report.register",
+    }
+    assert run(_admin(db, f"SELECT relrowsecurity AND relforcerowsecurity FROM pg_class {TABLE}"))
+    assert not run(
+        _admin(
+            db,
+            "SELECT has_table_privilege('mission_control_runtime', "
+            "'mission_control.knowledge_operation_handle', 'DELETE')",
+        )
+    )
     assert run(verify_release(target, releases["1.9.0"], **VERSIONS))["status"] == "verified"
     again = run(plan_release(target, releases["1.9.0"], **VERSIONS))
     assert again["plan"]["pending_migrations"] == []

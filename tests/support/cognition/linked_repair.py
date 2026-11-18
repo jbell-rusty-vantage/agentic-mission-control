@@ -10,11 +10,11 @@ from dataclasses import dataclass, field, replace
 from typing import Any
 
 from langchain_core.messages import AIMessage, ToolMessage
-from tests.fixtures.overnight_goal_model import GoalCognition, GoalScript
-from tests.fixtures.overnight_linked_model import LinkedScript
-from tests.fixtures.overnight_stagegraph_model import StageGraphCognition, _document
 
 from mission_control.contracts.knowledge_protocol import ResearchReportPackage
+from tests.support.cognition.goal_directed import GoalCognition, GoalScript
+from tests.support.cognition.linked import LinkedScript
+from tests.support.cognition.stagegraph import StageGraphCognition, tool_document
 
 
 @dataclass
@@ -106,7 +106,7 @@ class LinkedRepairConsumerCognition(StageGraphCognition):
         if len(tools) == 1:
             self.script.reads.append({"run_id": self.run_id, "index": str(tools[0].content)})
             return self._call("knowledge_read", {"handle": handle, "digest": digest}, 1)
-        read = _document(tools[1])
+        read = tool_document(tools[1])
         assert read.get("ok"), read
         content = read["result"]["content"]
         package = ResearchReportPackage.model_validate(content["manifest"])
@@ -157,7 +157,7 @@ class LinkedRepairConsumerCognition(StageGraphCognition):
             assert "Model X has 7B parameters." in json.dumps(candidate["report"]["structuredBody"])
             candidate["report"]["supersedes"] = {"handle": handle, "digest": digest}
             return self._call("report_register", {"report": candidate}, 3)
-        registered = _document(tools[3])
+        registered = tool_document(tools[3])
         assert registered.get("ok"), registered
         reports = [
             item for item in registered["result"]["affected"] if "/report/" in item["handle"]
@@ -182,7 +182,7 @@ class LinkedRepairConsumerCognition(StageGraphCognition):
                 },
                 4,
             )
-        assert _document(tools[-1]).get("ok"), tools[-1].content
+        assert tool_document(tools[-1]).get("ok"), tools[-1].content
         progress = (
             f"Read held {handle} ({digest}) and full findings; proposed {successor['handle']}."
         )
@@ -207,7 +207,7 @@ class LinkedRepairConsumerCognition(StageGraphCognition):
             )
         if len(tools) == 7:
             return self._call("knowledge_read", successor, 7)
-        successor_read = _document(tools[7])
+        successor_read = tool_document(tools[7])
         assert successor_read.get("ok"), successor_read
         successor_content = successor_read["result"]["content"]
         successor_package = ResearchReportPackage.model_validate(successor_content["manifest"])

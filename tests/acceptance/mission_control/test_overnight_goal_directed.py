@@ -33,7 +33,7 @@ pytestmark = pytest.mark.psycopg_selector
 
 
 def goal_components(technical: Any, script: Any, log: list[dict[str, Any]]) -> Any:
-    from tests.fixtures.overnight_goal_model import GoalCognition
+    from tests.support.cognition.goal_directed import GoalCognition
 
     base = technical.components(log)
 
@@ -70,8 +70,8 @@ def test_goal_manifest_preserves_independent_review_and_repair_bounds() -> None:
 
 def test_goal_model_factory_accepts_actual_lane_binding() -> None:
     from langchain_core.messages import HumanMessage
-    from tests.fixtures.overnight_goal_model import GoalScript
     from tests.fixtures.rrm009_production_stack import technical_binding
+    from tests.support.cognition.goal_directed import GoalScript
 
     candidates: list[dict[str, Any]] = [
         {
@@ -403,9 +403,9 @@ async def _run_goal_case(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, scenar
     """Real PostgreSQL/Temporal/KS HTTP; only producer/evaluator cognition is scripted."""
     from datetime import UTC, datetime
 
-    from tests.fixtures.overnight_goal_model import GoalScript
     from tests.fixtures.overnight_trusted import install_scripted_trusted
     from tests.fixtures.rrm009_production_stack import technical_binding
+    from tests.support.cognition.goal_directed import GoalScript
     from tests.support.ids import canonical_scope
     from tests.support.integration.deep_agents.report_source_real_service import response
     from tests.support.knowledge.content import model_content

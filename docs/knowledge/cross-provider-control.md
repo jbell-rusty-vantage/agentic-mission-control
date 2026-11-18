@@ -95,4 +95,4 @@ for session lanes and the paid drills are not done; nothing is qualified; the cl
 - Tests: [fold](../../tests/unit/frames/test_frame_boundary_points.py), [lane turn points](../../tests/unit/harness/test_lane_turn_points.py),
   [session lane seed](../../tests/unit/recovery/test_session_lane_seed.py), [points on Temporal](../../tests/integration/temporal/test_lane_turn.py),
   [points on PostgreSQL](../../tests/integration/postgres/test_session_lane_points_postgres.py),
-  [release 1.14.0](../../tests/integration/postgres/test_cross_provider_release_1140.py), [lane contracts](../../tests/unit/harness/test_lane_contracts.py).
+  [release 1.14.0](../../tests/integration/postgres/test_lane_bindings.py), [lane contracts](../../tests/unit/harness/test_lane_contracts.py).

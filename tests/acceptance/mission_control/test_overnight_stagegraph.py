@@ -64,8 +64,8 @@ def test_overnight_manifest_keeps_required_transfer_and_optional_omission() -> N
 
 def test_scripted_model_factory_accepts_the_actual_lane_binding_type() -> None:
     from langchain_core.messages import HumanMessage
-    from tests.fixtures.overnight_stagegraph_model import StageGraphScript, stagegraph_components
     from tests.fixtures.rrm009_production_stack import technical_binding
+    from tests.support.cognition.stagegraph import StageGraphScript, stagegraph_components
 
     technical = technical_binding()
     binding = technical.binding.model_copy(
@@ -83,7 +83,7 @@ def test_scripted_model_factory_accepts_the_actual_lane_binding_type() -> None:
 
 def test_negative_script_preserves_index_digest_after_typed_refusal() -> None:
     from langchain_core.messages import HumanMessage, ToolMessage
-    from tests.fixtures.overnight_stagegraph_model import StageGraphCognition, StageGraphScript
+    from tests.support.cognition.stagegraph import StageGraphCognition, StageGraphScript
 
     digest = "sha256:" + "a" * 64
     handle = "kh:aiengineer-postgres/report/exact@research-report.v2"
@@ -115,8 +115,8 @@ def test_negative_script_preserves_index_digest_after_typed_refusal() -> None:
 
 def test_isolation_registration_uses_exact_returned_predecessor_receipt() -> None:
     from langchain_core.messages import HumanMessage, ToolMessage
-    from tests.fixtures.overnight_stagegraph_model import StageGraphScript, stagegraph_components
     from tests.fixtures.rrm009_production_stack import technical_binding
+    from tests.support.cognition.stagegraph import StageGraphScript, stagegraph_components
 
     technical = technical_binding()
     binding = technical.binding.model_copy(
@@ -168,10 +168,10 @@ async def _run_stagegraph_case(
     """Real PostgreSQL/Temporal/KS HTTP; only producer/evaluator cognition is scripted."""
     from datetime import UTC, datetime
 
-    from tests.fixtures.overnight_stagegraph_model import StageGraphScript, stagegraph_components
     from tests.fixtures.overnight_stagegraph_recovery import SavedConsumerRestart
     from tests.fixtures.overnight_trusted import install_scripted_trusted
     from tests.fixtures.rrm009_production_stack import technical_binding
+    from tests.support.cognition.stagegraph import StageGraphScript, stagegraph_components
     from tests.support.ids import canonical_scope
     from tests.support.integration.deep_agents.report_source_real_service import response
     from tests.support.knowledge.content import model_content

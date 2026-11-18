@@ -4,7 +4,7 @@ The bounding tests use a FAKE CLOCK and a fake wait primitive (labelled per test
 the decision and waiting logic, not provider behaviour. Limit payloads are SYNTHETIC
 FIXTURES shaped after the documented Claude SDK `RateLimitInfo` and Codex
 `RateLimitSnapshot` fields. The real-timer proof is
-`tests/integration/temporal/test_mp05_limit_wait.py` (local Temporal).
+`tests/integration/temporal/test_mp06_dispatch_recovery.py` (local Temporal).
 """
 
 from __future__ import annotations

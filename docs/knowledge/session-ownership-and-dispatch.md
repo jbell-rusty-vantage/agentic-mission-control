@@ -19,7 +19,7 @@ These rules sit inside `LaneTurnService` (`application/execution/harness/lane_tu
 apply to every lane that runs through `lane.turn` ([lanes and harness](lanes-and-harness.md)).
 Built by MP-06 and composed in production by the integrator on 2026-10-09
 (`adapters/temporal/deployment_composition.py`). The rules are proven with labelled fixture
-lanes (`tests/fixtures/mp06_lanes.py`) on real PostgreSQL 17 and Temporal; the Run 2 live Claude and Codex
+lanes (`tests/fixtures/lane_turns.py`) on real PostgreSQL 17 and Temporal; the Run 2 live Claude and Codex
 Stage Graph missions ran under them ([provider lanes](provider-lanes.md)), but no drill targets the ownership, journal or
 capacity rules themselves.
 
@@ -135,10 +135,10 @@ Run 2 ran the Claude and Codex lanes live with a profiles document supplied thro
 - Tests: [dispatch recovery](../../tests/unit/harness/test_mp06_dispatch_recovery.py),
   [journal in PostgreSQL](../../tests/integration/postgres/test_mp06_dispatch_journal_postgres.py),
   [takeover and fence race on Temporal](../../tests/integration/temporal/test_mp06_dispatch_recovery.py),
-  [limit wait on Temporal](../../tests/integration/temporal/test_mp05_limit_wait.py),
+  [limit wait on Temporal](../../tests/integration/temporal/test_mp06_dispatch_recovery.py),
   [auth admission](../../tests/unit/provider_auth/test_auth_admission.py),
   [usage admission](../../tests/unit/provider_auth/test_usage_admission.py),
   [auth composition](../../tests/unit/mission_control/test_provider_auth_composition.py),
-  [fixture lanes](../../tests/fixtures/mp06_lanes.py),
+  [fixture lanes](../../tests/fixtures/lane_turns.py),
   [Session Lane routing](../../tests/unit/operations/test_session_lane_routing.py),
   [lane task queue workers](../../tests/unit/runtime/test_lane_task_queue_workers.py).

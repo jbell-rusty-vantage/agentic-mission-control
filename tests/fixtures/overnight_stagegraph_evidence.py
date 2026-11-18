@@ -11,7 +11,7 @@ from urllib.parse import quote
 
 import httpx
 from scripts.overnight_evidence import export_run, observe_mission_event, redact
-from tests.fixtures.overnight_read_api import overnight_read_api
+from tests.support.stack import signed_read_api
 
 from mission_control.adapters.operations.runtime_ports import FilesystemArtifactPayloadStore
 from mission_control.adapters.postgres.context.transfer_plans import PostgresTransferPlanStore
@@ -425,7 +425,7 @@ async def export_stagegraph(
 
     materialization_reads: list[dict[str, Any]] = []
     materialization_gaps: list[str] = []
-    async with overnight_read_api(stack) as public_http:
+    async with signed_read_api(stack) as public_http:
         frame_readbacks = await recover_tool_call_frame_bodies(frame_documents, public_http, run_id)
         (evidence / "provider-frame-body-readbacks.json").write_text(
             json.dumps(frame_readbacks, indent=2), encoding="utf-8"

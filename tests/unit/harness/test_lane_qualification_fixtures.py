@@ -36,6 +36,7 @@ from mission_control.domain.execution.lane_turns import LaneCancelRequest, LaneT
 from mission_control.domain.execution.lanes import CancelTurnRequest, SendTurnRequest, TurnHandle
 from mission_control.domain.frames.contracts import LaneProfile
 from mission_control.domain.frames.facts import (
+    CompactionObservedFact,
     ExecutionOutcomeFact,
     ToolEffectFact,
     TurnCompletedFact,
@@ -156,11 +157,58 @@ async def test_cursor_local_fixture_replays_through_lane_turn(tmp_path: Path, ca
     assert ToolEffectFact in kinds
     if case in {"error", "cancelled", "expired"}:
         assert ExecutionOutcomeFact in kinds
+    # Every kernel hook decision is the one the fixture recorded.
+    for _event, expected, decision in stack.launcher.hook_results:
+        assert decision.decision.value == expected
     if case == "hook_deny":
         refused = {(event, item.decision.value) for event, _x, item in stack.launcher.hook_results}
         assert ("preToolUse", "deny") in refused
         assert stack.intents.intents() == ()
     assert len(stack.launcher.sends) == 1
+    # Replaying the first segment again stores nothing new and sends nothing.
+    again = await lanes.service.turn(
+        _request(stack.operation, "cursor_local"), RecordingSignals(lanes.frames)
+    )
+    assert again.done and len(stack.launcher.sends) == 1
+    assert len(_frames(lanes, stack.operation, "cursor_local")) == len(frames)
+
+
+async def _precompact_run(tmp_path: Path) -> tuple[Any, Any, Any]:
+    stack = local_stack(tmp_path, "precompact")
+    lanes = lane_stack(stack.harness, frames=stack.frames, operation=stack.operation)
+    result = await _until_done(lanes, stack.operation, "cursor_local")
+    return stack, lanes, result
+
+
+async def test_cursor_local_precompact_run_records_the_compaction(tmp_path: Path) -> None:
+    stack, lanes, result = await _precompact_run(tmp_path)
+
+    assert result.closing_facts is not None
+    assert result.closing_facts.native_status == "finished"
+    frames = _common_assertions(lanes, stack.operation, "cursor_local")
+    facts = derive(
+        [frame for frame in frames if frame.closing],
+        DeriveContext(lane=LaneProfile.CURSOR_LOCAL, current_generation=1),
+    )
+    assert {CompactionObservedFact, TurnCompletedFact} <= {type(fact) for fact in facts}
+    assert len(stack.launcher.sends) == 1
+
+
+@pytest.mark.xfail(
+    strict=True,
+    reason=(
+        "open defect: the precompact fixture runs past the operation's token budget, yet the "
+        "unit settles `completed` (the lane logs an incomplete usage aggregate). The deleted "
+        "integration copy, tests/integration/cursor/test_cursor_local_fixtures.py[precompact], "
+        "failed the same way."
+    ),
+)
+async def test_cursor_local_precompact_run_past_its_token_budget_fails_budget_exceeded(
+    tmp_path: Path,
+) -> None:
+    _stack, _lanes, result = await _precompact_run(tmp_path)
+    settled = OperationExecutionResult.model_validate(result.operation_result)
+    assert (settled.status, settled.failure_code) == ("failed", "budget_exceeded")
 
 
 async def test_cursor_local_busy_waits_then_sends_once(tmp_path: Path) -> None:
@@ -226,8 +274,13 @@ async def test_cursor_cloud_fixture_replays_through_lane_turn(tmp_path: Path, ca
         DeriveContext(lane=LaneProfile.CURSOR_CLOUD, current_generation=1),
     )
     kinds = {type(fact) for fact in facts}
+    # The Cloud API key (`cursor-test-key-not-real`) never reaches a stored frame.
+    assert all("cursor-test-key" not in frame.body_excerpt for frame in frames)
     if case != "cancelled":
         assert ToolEffectFact in kinds or TurnCompletedFact in kinds
+    if case == "full":
+        tools = {fact.tool_call_ref for fact in facts if isinstance(fact, ToolEffectFact)}
+        assert tools == {"call-c1", "call-c2"} and TurnCompletedFact in kinds
     if case == "expired_stream":
         # Resumed with the run-scoped Last-Event-ID, then the run record after `410`.
         assert stack.api.stream_requests == [None, "4"]

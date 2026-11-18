@@ -1,6 +1,7 @@
-"""Builders, constants and fakes that other test files import.
+"""The scripted full-context reader (the LLM boundary) of the Deep Agents delivery tests.
 
-Moved from tests/integration/deep_agents/test_report_source_context.py.
+`FULL_CONTEXT_READER` reads one delivered file whole in 150-line pages; the WI-02 lane test and
+the report-source real-service and replay tests configure it and read back what it saw.
 """
 
 from __future__ import annotations

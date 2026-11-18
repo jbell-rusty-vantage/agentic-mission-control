@@ -18,11 +18,7 @@ from mission_control.domain.composition.chain import (
     compile_chain,
 )
 from mission_control_db_contract.deployment import plan_release, verify_release
-from tests.support.integration.postgres.mission_chain_tables import (
-    FIXTURE,
-    insert_chain,
-    insert_mission,
-)
+from tests.support.db_builders import CHAIN_MANIFEST, insert_chain, insert_mission
 from tests.support.integration.postgres.run2_release_141 import (
     CONTRACTS,
     PACKAGE,
@@ -53,7 +49,7 @@ async def seed_links(
         application_id=target["application_id"],
         tenant_id=tenant,
     )
-    doc = load_manifest_yaml(FIXTURE.read_text(encoding="utf-8"))
+    doc = load_manifest_yaml(CHAIN_MANIFEST.read_text(encoding="utf-8"))
     doc["links"][0]["on_upstream_cancel"] = "cancel_downstream"
     doc["links"][1]["on_upstream_cancel"] = "detach"
     compiled = compile_chain(parse_manifest(doc))

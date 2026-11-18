@@ -49,6 +49,41 @@ async def command(stack: ScopedStack, run_id: str, kind: str, payload: dict[str,
     return request_id
 
 
+async def receipt_ledger(stack: ScopedStack, run_id: str) -> list[tuple[str, int, str, str]]:
+    """The run's boundary command receipts as PostgreSQL holds them, in command order.
+
+    Each command's initial receipt (``command.payload.initial_receipt``) and its later
+    ``delivery_report`` rows, read through the owner pool (it bypasses RLS):
+    ``(command_id, target_sequence, state, recorded_by)``.
+    """
+
+    async with stack.owner_pool.acquire() as connection:
+        rows = await connection.fetch(
+            """
+            SELECT receipt->>'command_id' AS command_id, c.target_sequence,
+                   receipt->>'state' AS state, receipt->>'recorded_by' AS recorded_by
+            FROM mission_control.command c
+            JOIN mission_control.mission_run m
+              ON (m.installation_id, m.application_id, m.tenant_id, m.run_id)
+               = (c.installation_id, c.application_id, c.tenant_id, c.run_id)
+            CROSS JOIN LATERAL (
+                SELECT c.payload->'initial_receipt' AS receipt
+                UNION ALL
+                SELECT d.detail FROM mission_control.delivery_report d
+                WHERE (d.installation_id, d.application_id, d.tenant_id, d.command_id)
+                    = (c.installation_id, c.application_id, c.tenant_id, c.command_id)
+            ) receipts
+            WHERE m.run_key = $1 AND c.payload ? 'initial_receipt'
+            ORDER BY c.target_sequence, (receipt->>'ordinal')::int
+            """,
+            run_id,
+        )
+    return [
+        (row["command_id"], row["target_sequence"], row["state"], row["recorded_by"])
+        for row in rows
+    ]
+
+
 async def assert_persisted_run_evidence(
     stack: ScopedStack, run_id: str, terminal_outcome: str
 ) -> None:

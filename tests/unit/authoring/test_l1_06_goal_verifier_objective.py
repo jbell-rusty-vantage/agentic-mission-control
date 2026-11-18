@@ -118,14 +118,23 @@ async def test_e4_consumer_verifier_names_the_chain_input_it_receives() -> None:
         "- evidence_map: chain supply from e4-evidence.evidence_map, delivered to you read-only"
         in verifier
     )
-    assert "binding subject-root-brief" in verifier
+    # The subject binding names where its files arrive, so one read reaches the subject.
+    assert "binding subject-root-brief, files under inputs/subject-root-brief/" in verifier
     criterion = definition.criteria[0]
     assert f"criterion {criterion.key}: {criterion.description}" in verifier
     assert "Evidence: brief, progress_note" in verifier
     assert 'accepted_obligation_refs: on accepted exactly ["brief"]' in verifier
     assert "output_contract_ref: exactly one of output:brief, output:progress_note" in verifier
+    # The verdict's default contract is one the reconciler admits (`GoalDirectedService._parsed`
+    # admits only the frozen required output contracts).
+    assert "(the first unmet one, else output:brief)" in verifier
+    assert "output:brief" in blueprint.required_output_contracts
     assert "tool.calls.total 16" in verifier
+    # The turn is held to the run's in-turn budget the prompt states.
+    limits = templates["verifier"].budget_limits
+    assert (limits["tool.calls.total"], limits["tokens.total"]) == (16, 200000)
     for line in procedure_lines(definition):
         assert line not in verifier, line
     assert "submit_output" not in verifier
+    # Accepting exactly the named obligations is a verified completion (every required one).
     assert sorted(blueprint.required_obligation_refs) == ["brief"]

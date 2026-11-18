@@ -289,7 +289,7 @@ container: schema fingerprint
 `docs/specs/provider-consolidation-2026-10/sprint-oc/release/locks-190/<app>/release.lock.json`
 (ai-engineer file sha256 `b3ecf3f8…2885`, biotech `7d00afb2…97c0`; the 1.8.0 locks stay under
 `locks-180/`); `deployments/<app>/release.lock.json` is unchanged. Proof:
-`tests/integration/postgres/test_sprint_oc_release_190.py` (fresh and upgrade from 1.8.0, exactly
+`packages/mission-control-db-contract/tests/test_release_190_handle_operations.py` (fresh and upgrade from 1.8.0, exactly
 0066/0067, the 1.8.0 refusal of `report.observe`, every recorded operation under the runtime role,
 control operations refused, verify, idempotent re-apply, runtime security), the package's
 `tests/test_release_190_handle_operations.py` (non-superuser installer upgrade from 1.8.0 and the
@@ -383,7 +383,7 @@ refresh of the six session-lane profiles (`cursor_local`, `cursor_cloud`, `claud
 `claude_managed`, `codex_agents`), each UPDATE conditional on the exact 1.13.0 literal, rendered from the
 declared matrices by `scripts/prepare_release_1140.py` (`lane_describe_refresh.render_successor_section`).
 Data only: the schema fingerprint stays `sha256:f6ef74ac98bd2500e9d155a51fb34b6c8094e09c700b2645b83f8c23f5328ea4`.
-Built 2026-11-05 on the disposable PostgreSQL 17. Proof: `tests/integration/postgres/test_cross_provider_release_1140.py`
+Built 2026-11-05 on the disposable PostgreSQL 17. Proof: `tests/integration/postgres/test_lane_bindings.py`
 (fresh and upgrade from 1.13.0 planning exactly 0073 with earlier receipts kept, every persisted describe equal to
 the declared matrix, verify, replay) and `tests/unit/harness/test_lane_contracts.py` (0073 is the exact generated
 successor). No deployment lock and no remote install yet.

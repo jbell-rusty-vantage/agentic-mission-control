@@ -8,8 +8,9 @@ from dataclasses import dataclass, field, replace
 from typing import Any
 
 from langchain_core.messages import AIMessage, ToolMessage
-from tests.fixtures.overnight_goal_model import GoalCognition, GoalScript
-from tests.fixtures.overnight_stagegraph_model import StageGraphCognition, StageGraphScript
+
+from tests.support.cognition.goal_directed import HANDLE, GoalCognition, GoalScript
+from tests.support.cognition.stagegraph import StageGraphCognition, StageGraphScript
 
 
 @dataclass
@@ -65,8 +66,6 @@ class LinkedConsumerCognition(StageGraphCognition):
 
     def _consumer(self, tools: list[ToolMessage]) -> AIMessage:
         if tools:
-            from tests.fixtures.overnight_goal_model import HANDLE
-
             exact = self.linked.source.registered.get(1)
             assert exact is not None, "consumer cannot precede observed source registration"
             selected = list(dict.fromkeys(HANDLE.findall(str(tools[0].content))))

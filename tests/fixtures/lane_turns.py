@@ -4,6 +4,18 @@
 monotonic offset cursor, can hold the stream open (a long tool call), report `busy`, lose a
 turn, and records every native call so tests can prove a resume never sends twice and a
 cancel reaches the provider only when it was requested.
+
+Modes of the scripted lane, each a labelled fixture that proves Mission Control's logic and no
+live provider's behaviour:
+
+- dispatch recovery and cancel races: `FakeProviderLedger` stands for the provider side (what it
+  accepted, by idempotency key); `LossyReceiptLane`, `ReconcilingLossyLane`,
+  `NeverAcceptedLane` and `CapacityLimitedLane` lose a receipt, reconcile by key, drop before
+  accept, or hit a provider rate limit;
+- continuation: `ContinuingLane` and `CompactingFixtureLane` expose a context occupancy and an
+  explicit compaction and leave declared outputs missing when work continues; `FakeHydrator`
+  provisions a fresh fake session per hydration; `Crashes` raises once after a chosen phase was
+  persisted (a worker lost right there).
 """
 
 from __future__ import annotations
@@ -11,7 +23,8 @@ from __future__ import annotations
 import asyncio
 from collections.abc import AsyncIterator
 from dataclasses import dataclass, field
-from typing import Any
+from datetime import UTC, datetime, timedelta
+from typing import Any, Literal
 from uuid import UUID
 
 from tests.fixtures.lane_bindings import lane_fields
@@ -29,7 +42,21 @@ from tests.support.operations import MCP_DIGEST, SKILL_DIGEST
 
 from mission_control.adapters.cursor.describe import CURSOR_LOCAL_DESCRIBE
 from mission_control.adapters.deep_agents.harness import DeepAgentsHarness
+from mission_control.application.context.continuation import (
+    ContinuationTransfer,
+    HydrationReceipt,
+    HydrationRequest,
+)
+from mission_control.application.context.lane_support import (
+    CompactionReceipt,
+    CompactionRequest,
+)
 from mission_control.application.environments.preparation import EnvironmentPreparationService
+from mission_control.application.execution.harness.dispatch import (
+    DispatchLookup,
+    DispatchRecord,
+    ProviderCapacityLimited,
+)
 from mission_control.application.execution.harness.lane_turns import LaneTurnService
 from mission_control.application.execution.harness.protocol import NativeTurnLost
 from mission_control.application.execution.harness.state import InMemoryLaneExecutionStateStore
@@ -37,10 +64,13 @@ from mission_control.application.execution.operations.operation_execution import
     InMemoryOperationBindingRepository,
     OperationExecutionService,
 )
+from mission_control.application.execution.usage_admission import ProviderLimitSignal
 from mission_control.application.frames.sink import InMemoryFrameStore
 from mission_control.application.resolution.registries import LaneRegistry
 from mission_control.application.secrets.redaction import SecretValueRegistry
 from mission_control.domain.authoring.canonical import sha256_digest
+from mission_control.domain.context.phases import ContinuationPhase
+from mission_control.domain.context.pressure import ContextOccupancy
 from mission_control.domain.execution.contracts import OperationExecutionRequest
 from mission_control.domain.execution.lane_turns import ClosingFacts
 from mission_control.domain.execution.lanes import (
@@ -408,3 +438,188 @@ def lane_stack(
         points=points,
     )
     return LaneStack(service, boundary, bindings, frames, states, lane, budget)
+
+
+# Dispatch recovery and cancel races.
+
+LossMode = Literal["none", "raise", "hang"]
+
+
+@dataclass
+class FakeProviderLedger:
+    """FIXTURE: the provider side. A send it accepted is real work, receipt or not."""
+
+    accepted: dict[str, str] = field(default_factory=dict)
+
+    def accept(self, idempotency_key: str, turn_ref: str) -> str:
+        return self.accepted.setdefault(idempotency_key, turn_ref)
+
+
+@dataclass
+class LossyReceiptLane(ScriptedSessionLane):
+    """FIXTURE: the provider accepts the send, then the local receipt is lost once.
+
+    `raise`: the response never arrives (a reset connection after accept). `hang`: the
+    worker process stops making progress after the provider accepted (the test kills it).
+    """
+
+    ledger: FakeProviderLedger = field(default_factory=FakeProviderLedger)
+    loss: LossMode = "raise"
+    accepted_event: asyncio.Event = field(default_factory=asyncio.Event)
+    hang_release: asyncio.Event = field(default_factory=asyncio.Event)
+    native_sends: list[str] = field(default_factory=list)
+
+    async def send_turn(self, request: SendTurnRequest) -> TurnHandle:
+        self.calls.append("send_turn")
+        self.native_sends.append(request.idempotency_key)
+        self.sends.append(request.idempotency_key)
+        turn_ref = self.ledger.accept(request.idempotency_key, "run-fake-1")
+        loss, self.loss = self.loss, "none"
+        self.accepted_event.set()
+        if loss == "raise":
+            raise ConnectionError("connection reset after the provider accepted the turn")
+        if loss == "hang":
+            await self.hang_release.wait()
+        return TurnHandle(
+            session=request.session, turn_no=request.turn_no, native_turn_ref=turn_ref
+        )
+
+
+@dataclass
+class ReconcilingLossyLane(LossyReceiptLane):
+    """FIXTURE: a lane that can ask the provider by idempotency key (`DispatchReconcilingLane`).
+
+    `authoritative=False` answers `unknown` for an absent key (the lane cannot be sure)."""
+
+    authoritative: bool = True
+    lookups: list[str] = field(default_factory=list)
+
+    async def reconcile_dispatch(
+        self, record: DispatchRecord, *, session: SessionHandle | None
+    ) -> DispatchLookup:
+        self.lookups.append(record.key)
+        if record.kind == "create":
+            return DispatchLookup(outcome="found", native_ref="agent-fake-1")
+        found = self.ledger.accepted.get(record.idempotency_key)
+        if found is not None:
+            return DispatchLookup(outcome="found", native_ref=found)
+        return DispatchLookup(outcome="not_received" if self.authoritative else "unknown")
+
+
+@dataclass
+class NeverAcceptedLane(ReconcilingLossyLane):
+    """FIXTURE: the connection drops *before* the provider accepts (nothing was sent)."""
+
+    async def send_turn(self, request: SendTurnRequest) -> TurnHandle:
+        if self.loss == "raise":
+            self.loss = "none"
+            self.calls.append("send_turn")
+            raise ConnectionError("connection refused before the provider accepted anything")
+        return await super().send_turn(request)
+
+
+@dataclass
+class CapacityLimitedLane(ScriptedSessionLane):
+    """FIXTURE: the first `limited` sends are refused by a provider rate limit (nothing
+    accepted), with a reset `reset_in_s` seconds after the refusal."""
+
+    limited: int = 1
+    reset_in_s: float = 2.0
+    refusals: int = 0
+
+    async def send_turn(self, request: SendTurnRequest) -> TurnHandle:
+        if self.limited > 0:
+            self.limited -= 1
+            self.refusals += 1
+            raise ProviderCapacityLimited(
+                ProviderLimitSignal(
+                    lane_profile="cursor_local",
+                    kind="rate_limited",
+                    resets_at=datetime.now(UTC) + timedelta(seconds=self.reset_in_s),
+                    source="fixture:rate_limit",
+                    fixture=True,
+                )
+            )
+        return await super().send_turn(request)
+
+
+# Continuation.
+
+SOURCE_SESSION = "agent-fake-1"
+
+
+@dataclass
+class ContinuingLane(ScriptedSessionLane):
+    """FIXTURE `cursor_local` lane whose turns leave declared outputs missing (work
+    continues), optionally exposing a context occupancy and staging turn text."""
+
+    missing: tuple[str, ...] = ("/outputs/report.md",)
+    occupancy: ContextOccupancy | None = None
+    occupancy_after: ContextOccupancy | None = None
+    compactions: list[CompactionRequest] = field(default_factory=list)
+    compact_fails: bool = False
+    staged_text: dict[str, str] = field(default_factory=dict)
+    session_refs: list[str] = field(default_factory=list)
+
+    def closing_facts(self, turn: TurnHandle, frame: LaneFrame) -> ClosingFacts:
+        facts = super().closing_facts(turn, frame)
+        return facts.model_copy(update={"missing_outputs": self.missing})
+
+    async def context_occupancy(
+        self, harness_execution_id: str, session: SessionHandle, turn: TurnHandle | None
+    ) -> ContextOccupancy | None:
+        return self.occupancy
+
+    def stage_turn(self, harness_execution_id: str, instruction_ref: str, text: str) -> None:
+        self.staged_text[instruction_ref] = text
+
+
+class CompactingFixtureLane(ContinuingLane):
+    """FIXTURE: the explicit compaction operation a qualified lane (Codex) would expose."""
+
+    async def compact(self, request: CompactionRequest) -> CompactionReceipt:
+        self.compactions.append(request)
+        if self.compact_fails:
+            raise RuntimeError("compaction endpoint refused")
+        return CompactionReceipt(
+            completed=True,
+            native_ref=f"compaction-{request.epoch}",
+            summary_digest="sha256:" + "1" * 64,
+            occupancy_after=self.occupancy_after,
+        )
+
+
+@dataclass
+class FakeHydrator:
+    """FIXTURE hydrator: a fresh session id per hydration; `corrupt` changes one digest."""
+
+    corrupt: bool = False
+    fail_first: bool = False
+    requests: list[HydrationRequest] = field(default_factory=list)
+
+    async def hydrate(self, request: HydrationRequest) -> HydrationReceipt:
+        self.requests.append(request)
+        if self.fail_first and len(self.requests) == 1:
+            raise ConnectionError("the hydration receipt was lost")
+        restored = dict(request.snapshot.manifest)
+        if self.corrupt:
+            key = next(iter(sorted(restored)), None)
+            if key is not None:
+                restored[key] = "sha256:" + "f" * 64
+        return HydrationReceipt(
+            target_session_ref=f"agent-fake-{1 + len(self.requests)}", restored=restored
+        )
+
+
+@dataclass
+class Crashes:
+    """FIXTURE: raise once after a given phase is persisted (a worker lost right there)."""
+
+    at: set[ContinuationPhase] = field(default_factory=set)
+    seen: list[ContinuationPhase] = field(default_factory=list)
+
+    async def __call__(self, phase: ContinuationPhase, transfer: ContinuationTransfer) -> None:
+        self.seen.append(phase)
+        if phase in self.at:
+            self.at.discard(phase)
+            raise RuntimeError(f"worker lost after {phase.value} was persisted")

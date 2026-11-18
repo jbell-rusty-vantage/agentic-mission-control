@@ -1,9 +1,12 @@
 from __future__ import annotations
 
 import inspect
-from typing import Any
+import re
+from dataclasses import dataclass, field, replace
+from typing import Any, cast
 
 import pytest
+from langchain_core.messages import AIMessage, BaseMessage, ToolMessage
 from langgraph.checkpoint.memory import InMemorySaver
 from pydantic import ValidationError
 from tests.fixtures.checkpoint_lineage import (
@@ -22,14 +25,17 @@ from tests.support.deep_agents import (
     skill_reading_model,
     unit_bound,
 )
+from tests.support.models import ScriptedChatModel
 from tests.support.operations import operation_request
 
+from mission_control.adapters.capabilities.capability_bundles import bundle_digest, bytes_digest
 from mission_control.adapters.deep_agents import (
     DeepAgentRuntimeAdapter,
     ExactComponentRegistry,
     ExactDeepAgentMaterializer,
 )
 from mission_control.adapters.deep_agents.harness import DeepAgentsHarness
+from mission_control.adapters.deep_agents.materializer import ResolvedSkillBundle
 from mission_control.application.execution.operations.checkpoint_lineage import (
     CheckpointLineageService,
     InMemoryCheckpointLineageRepository,
@@ -210,6 +216,117 @@ async def test_actual_deep_agent_progressively_loads_skill_md_into_messages() ->
     assert "SKILL-MD-IN-MESSAGES-040" in (inspection["skill_instruction_messages"][0]["content"])
     assert inspection["skill_instruction_messages"][0]["path"].endswith("SKILL.md")
     assert len(model.calls) == 2
+
+
+@dataclass
+class SkillFileReader:
+    """Reads every expected Skill file whole, then records the text it saw (`observed_text`)."""
+
+    expected: dict[str, str]
+    observed_text: dict[str, str] = field(default_factory=dict)
+
+    def __call__(self, messages: list[BaseMessage], call: int) -> AIMessage:
+        del call
+        results = [item for item in messages if isinstance(item, ToolMessage)]
+        if not results:
+            return AIMessage(
+                content="",
+                tool_calls=[
+                    {
+                        "name": "read_file",
+                        "args": {
+                            "file_path": path,
+                            "offset": 0,
+                            "limit": len(text.splitlines()) + 1,
+                        },
+                        "id": path,
+                        "type": "tool_call",
+                    }
+                    for path, text in self.expected.items()
+                ],
+            )
+        for item in results:
+            lines: dict[int, str] = {}
+            for row in str(item.content).split("\n"):
+                match = re.match(r"^\s*(\d+)(?:\.(\d+))?  (.*)$", row)
+                if match:
+                    number = int(match[1])
+                    lines[number] = lines.get(number, "") + match[3]
+            self.observed_text[str(item.tool_call_id)] = "\n".join(lines[n] for n in sorted(lines))
+        return AIMessage(content="all skill files read")
+
+
+def _skill_files(name: str) -> tuple[tuple[str, bytes], ...]:
+    skill = f"---\nname: {name}\ndescription: Use for the {name} procedure.\n---\n\n"
+    skill += f"Read references/START_HERE.md before acting on {name}.\n"
+    references = {
+        "references/START_HERE.md": f"# {name}\n\nStart with the schema route.\n",
+        "references/context/shared/records/report.ts": "".join(
+            f"export const field{n} = {n}; // {name} référence\n" for n in range(1, 90)
+        ),
+    }
+    return (
+        ("SKILL.md", skill.encode()),
+        *((path, text.encode()) for path, text in references.items()),
+    )
+
+
+@pytest.mark.asyncio
+async def test_actual_deep_agent_discovers_several_skills_and_reads_their_references_whole() -> (
+    None
+):
+    """Several attached Skill bundles are discovered, and their SKILL.md and nested bundled
+    references are readable by the agent byte for byte (no MCP or CLI execution)."""
+
+    binding, _, original = exact_fixture()
+    bundles = {}
+    components = []
+    expected = {}
+    for name in ("report-source-procedure", "source-discovery"):
+        files = _skill_files(name)
+        bundle = ResolvedSkillBundle(bundle_digest(files), files, digest_format="bytes_v1")
+        bundles[bundle.bundle_digest] = bundle
+        skill = dict(files)["SKILL.md"]
+        mount = f"/skills/{name}"
+        components.append(
+            binding.skills[0].model_copy(
+                update={
+                    "ref": binding.skills[0].ref.model_copy(
+                        update={"logical_id": f"skill.{name}", "digest": bytes_digest(skill)}
+                    ),
+                    "skill_name": name,
+                    "bundle_digest": bundle.bundle_digest,
+                    "skill_md_digest": bytes_digest(skill),
+                    "mount_root": mount,
+                }
+            )
+        )
+        for path, content in files:
+            expected[f"{mount}/{path}"] = content.decode().rstrip("\n")
+    binding = unit_bound(
+        DeepAgentExecutionBinding.create(
+            **{**binding.model_dump(exclude={"binding_digest"}), "skills": tuple(components)}
+        )
+    )
+    reader = SkillFileReader(expected=expected)
+    model = ScriptedChatModel(script=reader, label="wp-cp-040-skill-files", usage=None)
+    components_registry = replace(registry(binding, original, model), skill_bundles=bundles)
+    adapter = DeepAgentRuntimeAdapter(ExactDeepAgentMaterializer(components_registry))
+    lineage = CheckpointLineageService(InMemoryCheckpointLineageRepository())
+    result = await adapter.execute(await planned_invocation(binding, lineage), {})
+
+    assert result.output_text == "all skill files read"
+    assert reader.observed_text == expected
+    assert len(model.calls) == 2
+    inspection = result.event_payloads[0]
+    skills_metadata = cast(list[dict[str, Any]], inspection["skills_metadata"])
+    instructions = cast(list[dict[str, Any]], inspection["skill_instruction_messages"])
+    assert {row["name"] for row in skills_metadata} == {
+        component.skill_name for component in components
+    }
+    assert {row["path"] for row in instructions} == {
+        path for path in expected if path.endswith("/SKILL.md")
+    }
 
 
 @pytest.mark.asyncio

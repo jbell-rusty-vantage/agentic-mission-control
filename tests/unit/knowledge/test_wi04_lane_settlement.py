@@ -4,7 +4,8 @@
   declares the promises that position owns, so the finalization iterates them.
 * ``submit_output`` serves inline text, structured values and code changes for a named promise
   (the host computes the digest; a given wrong digest refuses); a run without promises refuses
-  inline candidates.
+  inline candidates; with registered promises a selected report enters through it only, with
+  typed refusals and adopter lineage.
 * ``KnowledgeLaneSupport.settle`` consumes the finalization outcome as a typed settlement: an
   unresolved effect is an effect wait (nothing recorded), an assessment without a verdict a
   review wait, a late verdict settles; a fenced (cancelled) pass starts no assessment.
@@ -27,6 +28,7 @@ from mission_control.domain.knowledge.effects import JournalState
 from mission_control.domain.outputs.contracts import OutputForm
 from mission_control.domain.outputs.rules import code_change_digest
 from tests.support.knowledge.content import model_report
+from tests.support.knowledge.credentials import BINDING
 from tests.support.knowledge.gateway import RUN, _runtime_invocation, lane
 from tests.unit.outputs.scenario import (
     BASE,
@@ -140,6 +142,53 @@ async def test_a_run_without_promises_refuses_inline_candidates() -> None:
     )
     assert refused["refusal"]["code"] == "SCHEMA_UNSUPPORTED"
     assert not h.store.rows
+
+
+async def test_with_registered_promises_the_lane_tool_enters_submit_output_only() -> None:
+    """WI-01 gap (b): a selected report enters through ``submit_output`` only; undeclared
+    promises and an unbound position refuse with typed codes, no legacy selection row is
+    written, and the report keeps adopter lineage."""
+
+    h = lane()
+    contracts = InMemoryOutputContractStore()
+    submissions = SubmissionService(contracts.submissions, contracts=contracts, clock=h.clock)
+    toolset = replace(h.toolset, submissions=submissions)
+    live = replace(h.live(), position=POSITION)
+    access = toolset.access(live)
+    registered = await OutputFulfillmentService(contracts, submissions).register_promises(
+        host_access(access.scope),
+        RUN,
+        promises(obligation("stage.report", OutputForm.REFERENCE, position=POSITION)),
+    )
+    assert isinstance(registered, tuple)
+    live = await toolset.begin(live)  # invocation start pins the promise revisions
+    item = {
+        "kind": "handle",
+        "ref": f"kh:{BINDING}/report/report-7@research-report.v2",
+        "digest": "sha256:" + "a" * 64,
+    }
+    accepted = await toolset.dispatch(
+        "submit_output", {"obligation": "stage.report", "items": [item]}, live, tool_call_id="c-1"
+    )
+    assert accepted["ok"], accepted
+    assert accepted["result"]["revisions"][0]["deliverable_id"] == "report"
+    undeclared = await toolset.dispatch(
+        "submit_output", {"obligation": "report", "items": [item]}, live, tool_call_id="c-2"
+    )
+    assert undeclared["refusal"]["code"] == "OBLIGATION_UNDECLARED"
+    unbound = await toolset.dispatch(
+        "submit_output",
+        {"obligation": "stage.report", "items": [item]},
+        replace(live, position=None),
+        tool_call_id="c-3",
+    )
+    assert unbound["refusal"]["code"] == "POSITION_UNBOUND"
+    # One writer: only the submit_output act wrote a submission row.
+    assert len(contracts.submissions.rows) == 1
+    # The adopted report keeps its adopter lineage on the named path too.
+    assert toolset.lineage is not None
+    facts = await toolset.lineage.facts(access.scope, item["ref"])
+    assert [fact.role.value for fact in facts] == ["adopter"]
 
 
 async def test_settlement_consumes_an_unresolved_effect_as_an_effect_wait() -> None:

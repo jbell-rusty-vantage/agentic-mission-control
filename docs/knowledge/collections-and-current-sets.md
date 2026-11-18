@@ -128,7 +128,7 @@ are not built or not run; qualified: no.
 ## Citations
 
 - Unit: `tests/unit/outputs/test_collections.py`, `tests/unit/knowledge/test_wi07_report_collections.py`,
-  `tests/unit/context/test_wi07_current_set_transfer.py`, `tests/unit/authoring/test_sprint_oc_w3_fixtures.py`.
+  `tests/unit/context/test_wi07_current_set_transfer.py`, `tests/unit/authoring/test_output_promises_compile.py`.
 - PostgreSQL: `tests/integration/postgres/test_wi07_collections_postgres.py` (1.8.0 refuses, 0066 admits).
 - Fixtures: `tests/fixtures/manifests/sprint-oc-w3/`.
 - [Submission and fulfillment decision](../adr/0058-composable-output-obligations-and-one-submission-act.md);

@@ -9,21 +9,32 @@ and the authored join, and a nested Goal Loop keeps its own position.
 
 from __future__ import annotations
 
+import json
 from datetime import UTC, datetime
+from pathlib import Path
 
 import pytest
 
 from mission_control.adapters.outputs.memory import InMemoryOutputContractStore
+from mission_control.application.chains.service import ManifestStructureService
 from mission_control.application.knowledge.access import InvocationAccess
 from mission_control.application.outputs.fulfillment import OutputFulfillmentService
 from mission_control.application.outputs.submission_service import SubmissionService
 from mission_control.domain.authoring.contracts import JoinKind
+from mission_control.domain.authoring.manifest_lowering import output_promises
+from mission_control.domain.authoring.manifest_v2 import parse_manifest_yaml_versioned
+from mission_control.domain.authoring.mission_definition import manifest_to_definition
 from mission_control.domain.authoring.stagegraph_builder import (
     StageGraphStageSpec,
     StageInputBindingSpec,
     build_stagegraph_v2,
 )
-from mission_control.domain.outputs.contracts import AllOf, Enforcement, OutputForm
+from mission_control.domain.outputs.contracts import (
+    AllOf,
+    Enforcement,
+    EvaluationScope,
+    OutputForm,
+)
 from tests.support.knowledge.gateway import origin
 from tests.support.manifests.compile import minimal, reasons, scope, service, text
 from tests.support.unit.authoring.output_promises_compile import (
@@ -197,3 +208,48 @@ async def test_a_duplicate_output_name_is_a_manifest_issue() -> None:
     compiler, _, _ = await service()
     result = await compiler.compile(text(document), scope())
     assert ("/mission/program/nodes/1/outputs", "duplicate_output") in reasons(result)
+
+
+REPORT_COLLECTIONS = Path(__file__).resolve().parents[2] / "fixtures/manifests/sprint-oc-w3"
+REPORT_PACK = {
+    "reports": [
+        {"reportId": f"w3-{name}", "task": {}, "fragments": [{"id": f"frag-{name}"}]}
+        for name in ("a", "b", "c")
+    ]
+}
+
+
+@pytest.mark.parametrize(
+    "name", ["ai-engineer.report-collection.mission.yml", "biotech.report-collection.mission.yml"]
+)
+async def test_a_report_collection_lowers_to_a_goal_scoped_collection_promise(name: str) -> None:
+    """Each app's report-collection manifest (frozen pack and producer profile substituted as
+    the driver does) lowers to a goal-scoped required ``reports`` promise of exactly three
+    report references, judged per exact revision, plus an iteration-scoped progress note,
+    under a Goal Loop with at least three iterations (WI-07 / OVE-170)."""
+
+    manifest_text = (
+        (REPORT_COLLECTIONS / name)
+        .read_text(encoding="utf-8")
+        .replace("__PACK__", json.dumps(REPORT_PACK))
+        .replace("__PRODUCER__", "producer.default")
+    )
+    report = ManifestStructureService().compile(manifest_text)
+    assert report.ok, report.blockers
+    manifest, _document = parse_manifest_yaml_versioned(manifest_text)
+    ((pointer, block),) = tuple(manifest.mission_blocks())
+    definition = manifest_to_definition(block, pointer=pointer, digest=report.manifest_digest)
+    promises = output_promises(definition)
+    assert promises is not None
+    reports = promises.obligation("root.reports")
+    note = promises.obligation("root.progress_note")
+    assert reports is not None and note is not None
+    assert reports.contract.form is OutputForm.REFERENCE
+    assert reports.enforcement is Enforcement.REQUIRED
+    assert reports.evaluation_scope is EvaluationScope.GOAL
+    assert (reports.cardinality.min, reports.cardinality.max) == (3, 3)
+    assert [item.validator for item in reports.contract.requirements] == [
+        "knowledge.report.assess@1"
+    ]
+    assert note.evaluation_scope is EvaluationScope.ITERATION
+    assert block.environment.governors.iterations >= 3  # type: ignore[union-attr]

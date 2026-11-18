@@ -19,6 +19,7 @@ from tests.support.acceptance.mission_control.authenticated_scoped_runtime impor
     assert_persisted_run_evidence,
     command,
     condition,
+    receipt_ledger,
 )
 from tests.support.stack import (
     ScopedStack,
@@ -71,7 +72,7 @@ async def test_signed_scoped_stagegraph_goal_and_lifecycle_reach_mc_operations(
         stage_run, stage_root = await admit_and_launch(stack, "StageGraph")
         await until(lambda: at_wait(stack, stage_run))
         pause_decision = str(uuid4())
-        await command(
+        pause_id = await command(
             stack,
             stage_run,
             "pause",
@@ -86,7 +87,7 @@ async def test_signed_scoped_stagegraph_goal_and_lifecycle_reach_mc_operations(
             },
         )
         assert (await inspect(stack, stage_run))["lifecycle"] == "paused"
-        await command(
+        resume_id = await command(
             stack,
             stage_run,
             "resume",
@@ -102,7 +103,7 @@ async def test_signed_scoped_stagegraph_goal_and_lifecycle_reach_mc_operations(
         )
         state = await inspect(stack, stage_run)
         wait = state["projection"]["active_waits"][0]
-        await command(
+        release_id = await command(
             stack,
             stage_run,
             "satisfy_wait",
@@ -123,6 +124,28 @@ async def test_signed_scoped_stagegraph_goal_and_lifecycle_reach_mc_operations(
         )
         assert len(stage_terminal["projection"]["accepted_output_evidence"]) == 2
         await assert_persisted_run_evidence(stack, stage_run, "completed")
+        # RRM-007 receipt ledger: each boundary command is accepted by run control, delivered,
+        # then applied at the family boundary, in command order; PostgreSQL holds exactly the
+        # receipts the public command listing serves.
+        boundary = [pause_id, resume_id, release_id]
+        receipt_states = ("accepted", "delivered", "applied")
+        ledger = [row for row in await receipt_ledger(stack, stage_run) if row[0] in boundary]
+        assert [(row[0], row[2]) for row in ledger] == [
+            (command_id, receipt) for command_id in boundary for receipt in receipt_states
+        ], ledger
+        sequences = [row[1] for row in ledger]
+        assert sequences == sorted(sequences) and len(set(sequences)) == 3, ledger
+        assert {row[3] for row in ledger if row[2] == "accepted"} == {"run_control"}, ledger
+        assert "run_control" not in {row[3] for row in ledger if row[2] == "applied"}, ledger
+        listed = await stack.http.get(f"/v1/applications/biotech/runs/{stage_run}/commands")
+        assert listed.status_code == 200, listed.text
+        served = {
+            item["command"]["command_id"]: [receipt["state"] for receipt in item["receipts"]]
+            for item in listed.json()["commands"]
+        }
+        assert {command_id: served[command_id] for command_id in boundary} == {
+            command_id: list(receipt_states) for command_id in boundary
+        }, served
 
         goal_run, goal_root = await admit_and_launch(stack, "GoalDirected")
         await until(lambda: condition(stack, goal_run, "lifecycle", "completed"), seconds=300)

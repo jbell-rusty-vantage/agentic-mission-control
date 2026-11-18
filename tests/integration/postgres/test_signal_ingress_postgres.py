@@ -15,7 +15,7 @@ import json
 import time
 from datetime import UTC, datetime, timedelta
 from typing import Any
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 import asyncpg
 import httpx
@@ -880,6 +880,150 @@ async def test_mission_requests_need_a_launch_credential_and_dedupe_on_idempoten
         )
     refused = await ingress.service.mission_request_status(refused_id, headers)
     assert (refused.state, refused.reason) == ("refused", "spawn_grant_missing")
+
+
+MISSION_REQUEST_FUNCTION = (
+    "mission_control.ingress_mission_request(uuid,text,text,uuid,text,text,text,jsonb)"
+)
+
+
+def mission_request(key: str, *, manifest: str = "fixture:first", value: str = "original") -> bytes:
+    return json.dumps(
+        {"idempotency_key": key, "manifest_ref": manifest, "inputs": {"topic": value}}
+    ).encode()
+
+
+async def launch_credential(ingress: Ingress, *, scope: str | None = None) -> Any:  # noqa: F811
+    scope = scope or ingress.scope
+    return await CredentialMinter(PostgresMintedCredentialStore(ingress.runtime, scope)).mint(
+        "mission_request",
+        LaunchBinding(scope),
+        context={"manifest_refs": ["fixture:first", "fixture:second"]},
+    )
+
+
+async def test_a_mission_request_key_binds_its_body_digest_tenant_and_application(
+    ingress: Ingress,  # noqa: F811
+) -> None:
+    """0044: the idempotency key replays only the same body; the definer recomputes nothing a
+    direct caller supplies, and a key never crosses its tenant or application."""
+
+    (function,) = await ingress.owner(
+        "SELECT prosecdef, proconfig FROM pg_proc WHERE oid = $1::regprocedure",
+        MISSION_REQUEST_FUNCTION,
+    )
+    assert function["prosecdef"] and "search_path=pg_catalog" in function["proconfig"]
+    token = await launch_credential(ingress)
+    headers = bearer(token.value)
+    request = mission_request("bound-key")
+    original_id = await ingress.service.request_mission(request, headers)
+    original = dict((await ingress.inbox("mission_request"))[0])
+    assert await ingress.service.request_mission(request, headers) == original_id
+    for conflicting in (
+        mission_request("bound-key", manifest="fixture:second"),
+        mission_request("bound-key", value="changed"),
+    ):
+        with pytest.raises(IngressRejected) as failure:
+            await ingress.service.request_mission(conflicting, headers)
+        assert (failure.value.status_code, failure.value.code) == (409, "dedupe_conflict")
+    # A direct SQL caller supplying the original digest with a different payload is refused.
+    changed_payload = json.loads(original["payload"])
+    changed_payload["inputs"]["topic"] = "forged-digest"
+    async with ingress.edge.acquire() as connection:
+        forged = await connection.fetchrow(
+            "SELECT * FROM mission_control.ingress_mission_request($1,$2,$3,$4,$5,$6,$7,$8::jsonb)",
+            ingress.db.installation_id,
+            ingress.db.application_id,
+            token.record.digest,
+            uuid4(),
+            "bound-key",
+            "fixture:first",
+            original["body_sha256"],
+            json.dumps(changed_payload),
+        )
+    assert dict(forged) == {"outcome": "dedupe_conflict", "request_id": None}
+    assert dict((await ingress.inbox("mission_request"))[0]) == original
+    assert (await ingress.service.mission_request_status(original_id, headers)).state == "queued"
+    # Credentials bind their own tenant: the same key cannot expose or mutate its sibling.
+    other = await launch_credential(ingress, scope=ingress.db.scope("tenant-2"))
+    other_id = await ingress.service.request_mission(request, bearer(other.value))
+    assert other_id != original_id
+    assert (
+        await rejected(ingress.service.mission_request_status(original_id, bearer(other.value)))
+        == "not_found"
+    )
+    wrong_application = SignalIngressService(
+        PostgresIngressStore(
+            ingress.edge, installation_id=ingress.db.installation_id, application_id="ai-engineer"
+        ),
+        keys=ingress.service._keys,
+    )
+    with pytest.raises(IngressRejected) as wrong_scope:
+        await wrong_application.request_mission(request, headers)
+    assert wrong_scope.value.status_code == 401
+
+
+@pytest.mark.parametrize("conflicting", [False, True])
+async def test_concurrent_mission_requests_check_the_winning_digest(
+    ingress: Ingress,  # noqa: F811
+    conflicting: bool,
+) -> None:
+    """Two requests with one key pass the absent-row lookup together and meet the INSERT
+    conflict branch: the loser replays the winner, or is refused when its body differs."""
+
+    token = await launch_credential(ingress)
+    headers = bearer(token.value)
+    first = mission_request("simultaneous")
+    second = mission_request("simultaneous", value="changed") if conflicting else first
+    owner = await asyncpg.connect(ingress.db.owner_dsn)
+    tasks: list[asyncio.Task[Any]] = []
+    try:
+        async with owner.transaction():
+            # Both calls pass the initial absent-row lookup, then block in ingress_take_rate.
+            # Releasing this existing credential lock forces the INSERT conflict branch.
+            await owner.fetchval(
+                "SELECT credential_id FROM mission_control.ingress_credential "
+                "WHERE credential_id=$1::uuid FOR UPDATE",
+                UUID(token.record.credential_id),
+            )
+            tasks = [
+                asyncio.create_task(ingress.service.request_mission(payload, headers))
+                for payload in (first, second)
+            ]
+            async with asyncio.timeout(5):
+                while True:
+                    # Statistics snapshots are cached for this barrier transaction.
+                    await owner.execute("SELECT pg_stat_clear_snapshot()")
+                    waiting = await owner.fetchval(
+                        "SELECT count(*) FROM pg_stat_activity WHERE datname=current_database() "
+                        "AND wait_event_type='Lock' AND pid<>pg_backend_pid() "
+                        "AND query LIKE '%ingress_mission_request(%'",
+                    )
+                    if waiting == 2:
+                        break
+                    await asyncio.sleep(0.02)
+        results = await asyncio.wait_for(asyncio.gather(*tasks, return_exceptions=True), 5)
+    finally:
+        for task in tasks:
+            if not task.done():
+                task.cancel()
+        await asyncio.gather(*tasks, return_exceptions=True)
+        await owner.close()
+    rows = await ingress.inbox("mission_request")
+    assert len(rows) == 1
+    winner = rows[0]
+    successes = [result for result in results if not isinstance(result, BaseException)]
+    failures = [result for result in results if isinstance(result, BaseException)]
+    if conflicting:
+        assert successes == [winner["ingress_id"]]
+        assert len(failures) == 1 and isinstance(failures[0], IngressRejected)
+        assert (failures[0].status_code, failures[0].code) == (409, "dedupe_conflict")
+    else:
+        assert successes == [winner["ingress_id"], winner["ingress_id"]] and not failures
+    winner_body = json.loads(winner["payload"])
+    matching = mission_request("simultaneous", value=winner_body["inputs"]["topic"])
+    assert await ingress.service.request_mission(matching, headers) == winner["ingress_id"]
+    assert dict((await ingress.inbox("mission_request"))[0]) == dict(winner)
 
 
 async def test_least_privilege_and_the_drainer_row_contract(ingress: Ingress) -> None:  # noqa: F811

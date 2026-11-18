@@ -113,4 +113,4 @@ released gate; W1 to W5, every other lane's qualification, and the real coordina
   [lane replay histories](../../tests/integration/temporal/test_lane_replay_histories.py),
   [lane conformance](../../tests/conformance/lanes/README.md),
   [describe honesty](../../tests/unit/harness/test_describe_honesty.py),
-  [Sprint OC release 1.9.0](../../tests/integration/postgres/test_sprint_oc_release_190.py).
+  [release 1.9.0](../../packages/mission-control-db-contract/tests/test_release_190_handle_operations.py).

@@ -7,7 +7,13 @@ under the `required` policy with its ledger mission. The family now upserts ``mc
 root carries ``mc_mission_id`` and ``mc_run_id``; operations carry ``mc_lane`` and
 ``mc_phase``. :class:`RunListService` over :class:`TemporalRunVisibility` lists the run for
 ``lane``, ``phase``, ``mission_id`` and ``status`` filters, enriched from the ledger, and
-another application's scope lists nothing. The new histories replay.
+another application's scope lists nothing.
+
+FT-G7 in the same server start: each operation writes ``mc_run_id``, ``mc_lane`` and
+``mc_phase`` at its segment boundaries only (start ``executing``, close ``completed``, behind
+``ft-g7-mc-visibility``), so the raw Visibility queries count the run's workflows by phase; a
+fork submitted with ``parent_run_id`` starts its root with ``ForkedFromRunId``. The new
+histories replay.
 """
 
 from __future__ import annotations
@@ -20,12 +26,14 @@ from uuid import UUID
 
 import pytest
 from temporalio import activity
+from temporalio.client import Client, WorkflowHistory
 from temporalio.common import SearchAttributeKey
 from temporalio.worker import Replayer, Worker
 
 from mission_control.adapters.temporal.search_attributes import (
     BELLLABS_SEARCH_ATTRIBUTE_KEYS,
     FAMILY_PHASE_PATCH,
+    MC_VISIBILITY_PATCH,
 )
 from mission_control.adapters.temporal.submission import TemporalWorkflowSubmitter
 from mission_control.adapters.temporal.visibility import TemporalRunVisibility
@@ -44,7 +52,6 @@ from mission_control.domain.coordinator.launch import (
     WorkflowResultRecord,
 )
 from mission_control.domain.policies.contracts import ActorContext, RunOutcome, RunPhase
-from tests.support.integration.temporal.ft_g7_visibility import _mc_upserts
 from tests.support.integration.temporal.rrm_005_search_attributes import (
     UnitBoundStageGraphActivities,
     _start_local,
@@ -63,6 +70,33 @@ READER = ActorContext(actor_id="reader", permissions=frozenset({"workflow_run.re
 
 def _key(name: str) -> SearchAttributeKey[Any]:
     return next(key for key in BELLLABS_SEARCH_ATTRIBUTE_KEYS if key.name == name)
+
+
+def _mc_upserts(history: WorkflowHistory) -> list[dict[str, str]]:
+    """The fast-track upserts of a history, decoded as `{name: raw json}`."""
+
+    upserts: list[dict[str, str]] = []
+    for event in history.events:
+        if not event.HasField("upsert_workflow_search_attributes_event_attributes"):
+            continue
+        fields = event.upsert_workflow_search_attributes_event_attributes.search_attributes
+        mc = {
+            name: payload.data.decode("utf-8")
+            for name, payload in fields.indexed_fields.items()
+            if name.startswith("mc_")
+        }
+        if mc:
+            upserts.append(mc)
+    return upserts
+
+
+async def _count(client: Client, query: str, expected: int) -> int:
+    async with asyncio.timeout(30):
+        while True:
+            count = (await client.count_workflows(query)).count
+            if count == expected:
+                return count
+            await asyncio.sleep(0.25)
 
 
 class _Ledger:
@@ -126,8 +160,9 @@ async def _eventually(service: RunListService, query: str, expected: set[str]) -
 async def test_run_list_queries_typed_search_attributes_and_family_phase() -> None:
     authority, _runs = run_control_service()
     admitted = await authority.admit(run_request(request_id="ft-c4-run-list"))
-    assert admitted.run_id is not None
-    run_id = admitted.run_id
+    fork = await authority.admit(run_request(request_id="ft-c4-run-list-fork"))
+    assert admitted.run_id is not None and fork.run_id is not None
+    run_id, fork_id = admitted.run_id, fork.run_id
     activities = _RunListActivities()
     activities.slow_release.set()
     env = await _start_local()
@@ -194,6 +229,45 @@ async def test_run_list_queries_typed_search_attributes_and_family_phase() -> No
         assert (await other.list(None, actor=READER)).rows == ()
 
         histories = [await root.fetch_history(), family_history]
+        # Root, family and three operations; the family and the operations close `completed`.
+        assert await _count(client, f"mc_run_id = '{run_id}'", 5) == 5
+        listed_run = [item.id async for item in client.list_workflows(f"mc_run_id = '{run_id}'")]
+        operation_ids = sorted(set(listed_run) - {submission.workflow_id, family_id})
+        assert len(operation_ids) == 3
+        # FT-G7: segment-boundary upserts only, never a re-upsert of an unchanged key.
+        for operation_id in operation_ids:
+            history = await client.get_workflow_handle(operation_id).fetch_history()
+            assert MC_VISIBILITY_PATCH in patch_ids(history)
+            upserts = _mc_upserts(history)
+            assert [item.get("mc_phase") for item in upserts] == ['"executing"', '"completed"']
+            assert '"mc_run_id"' not in str(upserts[1:]), "unchanged keys are not re-upserted"
+            histories.append(history)
+        assert await _count(client, f"mc_run_id = '{run_id}' AND mc_phase = 'completed'", 4) == 4
+        assert await _count(client, f"mc_run_id = '{run_id}' AND mc_phase = 'executing'", 0) == 0
+        # Root and family carry the mission; operations carry lane and phase instead.
+        assert await _count(client, "mc_mission_id = 'mission-ft-c4'", 2) == 2
+
+        # A fork of the run starts its root with `ForkedFromRunId`.
+        async with Worker(
+            client,
+            task_queue=QUEUE,
+            workflows=[MissionRunWorkflow, StageGraphWorkflow, MissionOperationWorkflow],
+            workflow_runner=coordinator_workflow_runner(),
+            activities=activities.functions,
+        ):
+            forked = await submitter.submit(
+                replace(stage_run_input(_blueprint()), run_id=fork_id, request_scope=SCOPE),
+                workflow_id="ignored",
+                blueprint_family=BlueprintFamily.STAGE_GRAPH,
+                parent_run_id=run_id,
+                mission_id="mission-ft-c4",
+            )
+            await asyncio.wait_for(client.get_workflow_handle(forked.workflow_id).result(), 120)
+        assert await _count(client, f"ForkedFromRunId = '{run_id}'", 1) == 1
+        listed = [item async for item in client.list_workflows(f"ForkedFromRunId = '{run_id}'")]
+        assert [item.id for item in listed] == [forked.workflow_id]
+        assert listed[0].typed_search_attributes.get(_key("ForkedFromRunId")) == [run_id]
+        assert listed[0].typed_search_attributes.get(_key("mc_run_id")) == [fork_id]
     replayer = Replayer(
         workflows=[MissionRunWorkflow, StageGraphWorkflow, MissionOperationWorkflow],
         workflow_runner=coordinator_workflow_runner(),

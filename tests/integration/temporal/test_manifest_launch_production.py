@@ -24,10 +24,22 @@ launch refuses one it cannot, ``completion_support``).
    has exactly one root workflow.
 3. A manifest whose node selects an unbound model profile is refused before any dispatch with
    409 ``start_unavailable`` naming the manifest pointer; the run stays pending.
+
+Acceptance 1 and 2 also run from the committed deployment example (MP-22), so the example file
+stays guarded: ``deployments/examples/manifest-launch-bindings.deep-agents.example.json`` read
+from disk and completed with ``compose_launch_bindings`` (the ``preflight compose-bindings``
+path an owner uses). Every value the example leaves to the owner is a FIXTURE selection taken
+from the test stack's WP-CP-040 technical binding (model name, prompt, context-assembly,
+backend and tracing refs, policy refs, workspace provision, the agent-cognitive queue, and
+``mcp.pubmed`` on the qualification MCP server). The model, sandbox, checkpointer and store stay
+the example's pinned components, and the readiness check of the composed file must report
+nothing unresolved before anything starts.
 """
 
 from __future__ import annotations
 
+import asyncio
+import json
 from collections.abc import AsyncIterator
 from pathlib import Path
 from typing import Any, cast
@@ -35,6 +47,7 @@ from typing import Any, cast
 import pytest
 from temporalio.service import RPCError
 
+from mission_control.adapters.capabilities.capability_pins import CapabilityPins
 from mission_control.adapters.postgres.chains.store import HOOK_NAME, ChainReleaseHook
 from mission_control.adapters.postgres.control_plane.definition_repository import (
     PostgresDefinitionRepository,
@@ -46,6 +59,7 @@ from mission_control.adapters.postgres.run_control.canonical import register_pos
 from mission_control.adapters.postgres.subscriptions.store import PostgresSubscriptionStore
 from mission_control.adapters.storage.control_plane_payloads import InMemoryPayloadStore
 from mission_control.application.authoring.manifest_launch_inputs import (
+    CapabilityComponentBinding,
     binding_ref,
 )
 from mission_control.application.authoring.manifest_service import (
@@ -63,11 +77,11 @@ from mission_control.application.execution.service import (
     RunControlService,
 )
 from mission_control.application.subscriptions.service import SubscriptionService
-from mission_control.bootstrap.manifests import (
-    compose_manifest_launch_inputs,
-)
+from mission_control.bootstrap.manifests import compose_manifest_launch_inputs, served_components
+from mission_control.bootstrap.preflight import check_bindings, compose_launch_bindings
 from mission_control.bootstrap.technical_api import api
 from mission_control.domain.authoring.extensions import ExtensionRegistry
+from mission_control.domain.authoring.manifest import canonical_manifest_bytes, load_manifest_yaml
 from mission_control.domain.execution.contracts import DeepAgentExecutionBinding
 from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog, publish_output_schemas
 from tests.fixtures.manifest_runtime import (
@@ -76,7 +90,12 @@ from tests.fixtures.manifest_runtime import (
     chain_components,
     promise_submitter,
 )
-from tests.fixtures.rrm009_production_stack import AGENT_COGNITIVE_QUEUE, technical_binding
+from tests.fixtures.rrm009_production_stack import (
+    AGENT_COGNITIVE_QUEUE,
+    TechnicalBinding,
+    technical_binding,
+)
+from tests.support.deep_agents import exact_fixture
 from tests.support.ids import SCOPE
 from tests.support.manifest_runtime import (
     MISSION_2,
@@ -92,6 +111,7 @@ from tests.support.manifest_runtime import (
     host_pins,
     missions_app,
     post,
+    pubmed_digest,
     pumping,
     relay_pump,
     root_executions,
@@ -100,25 +120,100 @@ from tests.support.manifest_runtime import (
 )
 from tests.support.model_catalog import catalog_for
 from tests.support.stack import _diagnose, _run, _until, open_stack
-from tests.unit.authoring.manifest_launch_fixture import (
-    deep_agents_chain,
-)
+from tests.unit.authoring.manifest_launch_fixture import deep_agents_chain, fixture_bindings
 
 pytestmark = pytest.mark.common_db
 
 MINIMAL = ROOT / "tests/fixtures/manifests/minimal-stage-graph.yml"
+EXAMPLE = ROOT / "deployments/examples/manifest-launch-bindings.deep-agents.example.json"
+# The model profile a launched node selects under each bindings source.
+MODEL_PROFILE = {"fixture": "frontier.default", "example": "producer.default"}
+# The Goal Loop executor-observation schema each bindings source configures.
+EXECUTOR_SCHEMA = {
+    "fixture": "goal-executor-observation",
+    "example": "belllabs.goal-executor-observation.v1",
+}
+
+
+def selecting(manifest_yaml: str, profile: str) -> str:
+    """Every node and Goal Loop verifier of a Mission 2 transform selects `profile`."""
+
+    document = load_manifest_yaml(manifest_yaml)
+    for mission in document["missions"]:
+        verifier = mission["program"].get("verifier")
+        if verifier is not None and "model" in verifier.get("environment", {}):
+            verifier["environment"]["model"] = {"profile": profile}
+    return canonical_manifest_bytes(document).decode("utf-8")
+
+
+def _json(value: Any) -> Any:
+    return json.loads(value.model_dump_json())
+
+
+async def example_selections(technical: TechnicalBinding) -> dict[str, object]:
+    """FIXTURE owner selections: the technical stack's values for every example placeholder."""
+
+    _binding, qualification, _bundle = exact_fixture()
+    scaffold = fixture_bindings().deep_agents
+    (server,) = technical.binding.mcp_servers
+    return {
+        "/deep_agents/profile/model/model_name": technical.binding.model.model_name,
+        "/deep_agents/profile/prompt_refs": [_json(ref) for ref in qualification.prompt_refs],
+        "/deep_agents/profile/context_assembly_ref": _json(qualification.context_assembly_ref),
+        "/deep_agents/profile/backend_ref": _json(qualification.backend_ref),
+        "/deep_agents/profile/tracing_policy_ref": _json(qualification.tracing_policy_ref),
+        "/deep_agents/placement/task_queue": AGENT_COGNITIVE_QUEUE,
+        "/deep_agents/authority_refs": list(scaffold.authority_refs),
+        "/deep_agents/redaction_policy_ref": scaffold.redaction_policy_ref,
+        "/deep_agents/tracing_policy_ref": scaffold.tracing_policy_ref,
+        "/deep_agents/sensitive_data_policy_ref": scaffold.sensitive_data_policy_ref,
+        "/deep_agents/snapshot_policy_ref": scaffold.snapshot_policy_ref,
+        "/deep_agents/agent_profile_ref": _json(scaffold.agent_profile_ref),
+        "/deep_agents/workspace": _json(scaffold.workspace),
+        "/capabilities/mcp.pubmed": _json(
+            CapabilityComponentBinding(
+                catalog_digest=await pubmed_digest(), kind="mcp_server", mcp_server=server
+            )
+        ),
+    }
+
+
+@pytest.fixture
+def bindings_source() -> str:
+    """`fixture` (the test deployment bindings) unless a test parametrizes `example`."""
+
+    return "fixture"
 
 
 @pytest.fixture
 async def launch_stack(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, bindings_source: str
 ) -> AsyncIterator[LaunchStack]:
     script = ChainScript(request_scope=SCOPE)
     model_log: list[dict[str, Any]] = []
     technical = technical_binding()
     components = chain_components(technical, script, model_log)
     bindings_path = tmp_path / "manifest-launch-bindings.json"
-    await write_bindings(bindings_path, technical)
+    if bindings_source == "example":
+        base = json.loads(EXAMPLE.read_text(encoding="utf-8"))
+        composed = compose_launch_bindings(base, await example_selections(technical))
+        await asyncio.to_thread(
+            bindings_path.write_text, composed.model_dump_json(indent=2), encoding="utf-8"
+        )
+        # OC-R6/R7: the example binds Model Catalog profile names; `producer.default` is served
+        # by the WP-CP-040 slot, so this catalog states the fixture model under those names.
+        models = catalog_for(
+            {
+                "producer.default": technical.binding.model,
+                "producer.fallback": technical.binding.model.model_copy(
+                    update={"provider": "anthropic", "model_name": "claude-haiku-5-5"}
+                ),
+            }
+        )
+    else:
+        await write_bindings(bindings_path, technical)
+        models = catalog_for({"frontier.default": technical.binding.model})
+    pins_path = host_pins(tmp_path / "capability-pins.json")
     async with open_stack(
         fixture_owner_prerequisites=True,
         root=tmp_path,
@@ -128,9 +223,18 @@ async def launch_stack(
         model_log=model_log,
         extra_environment={
             "MANIFEST_LAUNCH_BINDINGS_PATH": str(bindings_path),
-            "CAPABILITY_PINS_PATH": str(host_pins(tmp_path / "capability-pins.json")),
+            "CAPABILITY_PINS_PATH": str(pins_path),
         },
     ) as production:
+        if bindings_source == "example":
+            # The readiness gate sees nothing unresolved in the composed file before any start.
+            pins = CapabilityPins.load(pins_path)
+            served = served_components(pins, production.settings, components)
+            loaded, issues = check_bindings(
+                bindings_path, served, pins, production.settings, models=models
+            )
+            assert loaded is not None and issues == [], issues
+            assert loaded.model_profiles["producer.default"].ref == technical.binding.model.ref
         unregister = register_post_append_hook(HOOK_NAME, ChainReleaseHook())
         # W1 (OVE-169): the scripted executors submit their declared required promises.
         script.submit = promise_submitter(production.worker_pool, SCOPE)
@@ -147,7 +251,7 @@ async def launch_stack(
                 run_control=run_control,
                 control_plane=production.control_plane,
                 additional=components,
-                models=catalog_for({"frontier.default": technical.binding.model}),
+                models=models,
             )
             assert author is not None
             definitions, search = await fast_track_catalog()
@@ -185,11 +289,16 @@ async def launch_stack(
 
 
 @pytest.mark.asyncio
+@pytest.mark.parametrize("bindings_source", ["fixture", "example"])
 async def test_a_chain_starts_over_http_and_its_consumer_starts_once_under_redelivery(
-    launch_stack: LaunchStack,
+    launch_stack: LaunchStack, bindings_source: str
 ) -> None:
     stack, script, app = launch_stack.stack, launch_stack.script, launch_stack.app
-    receipt = await submit(app, evaluable(deep_agents_chain(MISSION_2.read_text(encoding="utf-8"))))
+    profile = MODEL_PROFILE[bindings_source]
+    manifest = selecting(
+        deep_agents_chain(MISSION_2.read_text(encoding="utf-8"), model_profile=profile), profile
+    )
+    receipt = await submit(app, evaluable(manifest))
     members = {item["mission_key"]: item for item in receipt["missions"]}
     research, ingestion = members["research"], members["ingestion"]
     assert research["run_id"] is not None and ingestion["run_id"] is None
@@ -218,6 +327,8 @@ async def test_a_chain_starts_over_http_and_its_consumer_starts_once_under_redel
         item.server_name for item in DeepAgentExecutionBinding.carried_by(executor).mcp_servers
     ] == [stack.technical.binding.mcp_servers[0].server_name]
     assert executor.secret_refs[0].key == "OPENAI_API_KEY"
+    assert executor.output_schema is not None
+    assert executor.output_schema.schema_id == EXECUTOR_SCHEMA[bindings_source]
 
     author = CountingAuthor(launch_stack.author)
     pump = relay_pump(stack, author)

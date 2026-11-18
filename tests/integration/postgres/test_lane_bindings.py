@@ -6,49 +6,28 @@ from __future__ import annotations
 
 import json
 import uuid
-from collections.abc import AsyncIterator
 from datetime import UTC, datetime
-from pathlib import Path
 
 import asyncpg
 import pytest
-import pytest_asyncio
 
 from mission_control.application.execution.harness.describe import DECLARED_LANE_MATRICES
-from tests.fixtures.mission_control_common_db import (
-    CommonDatabase,
-    create_common_database,
-    drop_common_database,
-)
+from tests.fixtures.mission_control_common_db import CommonDatabase
 
 pytestmark = pytest.mark.common_db
 
 DIGEST = "sha256:" + "d" * 64
 # The nine Lane Profiles the registry seeds (0030 three, 0031 four and 0036 two v2 stubs).
 SEEDED_PROFILES = sorted(DECLARED_LANE_MATRICES)
-SUCCESSOR_COMPONENT = (
-    Path(__file__).resolve().parents[3]
-    / "packages/mission-control-db-contract/releases/1.4.1/component"
-)
-
-
-@pytest_asyncio.fixture
-async def successor_db() -> AsyncIterator[CommonDatabase]:
-    """Current describes use explicit 1.4.1 SQL; other historical tests retain 1.4.0."""
-    database = await create_common_database(
-        paths=sorted((SUCCESSOR_COMPONENT / "migrations").glob("*.sql")),
-        component_version="1.4.1",
-    )
-    try:
-        yield database
-    finally:
-        await drop_common_database(database)
 
 
 async def test_lane_profiles_are_seeded_with_their_declared_describes(
-    successor_db: CommonDatabase,
+    common_db: CommonDatabase,
 ) -> None:
-    owner = await asyncpg.connect(successor_db.owner_dsn)
+    """On the newest built release the database describes equal the code's declared matrices,
+    each with its `time_travel` cells exactly when declared, and only deep_agents is qualified."""
+
+    owner = await asyncpg.connect(common_db.owner_dsn)
     try:
         rows = await owner.fetch(
             "SELECT lane_profile, lane, placement, describe, qualified, qualification_ref "
@@ -60,10 +39,14 @@ async def test_lane_profiles_are_seeded_with_their_declared_describes(
     assert len(rows) == 9
     for row in rows:
         declared = DECLARED_LANE_MATRICES[row["lane_profile"]]
-        assert json.loads(row["describe"]) == declared.model_dump(mode="json")
         assert row["lane"] == declared.lane and row["placement"] == declared.placement
         assert row["qualified"] is declared.qualified
         assert (row["qualification_ref"] is not None) is declared.qualified
+        document = json.loads(row["describe"])
+        declared_document = declared.model_dump(mode="json")
+        assert document == declared_document
+        assert ("time_travel" in document) is (declared_document.get("time_travel") is not None)
+    assert {row["lane_profile"] for row in rows if row["qualified"]} == {"deep_agents"}
 
 
 async def test_runtime_reads_but_never_writes_lane_profiles(

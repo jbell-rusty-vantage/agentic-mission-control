@@ -126,7 +126,7 @@ cloud or production deployment is a proposal ([deployment](deployment.md)).
   [cluster refusal](../../tests/unit/run_control/test_run_launch.py),
   [outage drill](../../tests/integration/temporal/test_mp22_outage_drill.py),
   [release preflight](../../tests/integration/postgres/test_mp22_db_release_preflight.py),
-  [local profile start](../../tests/integration/temporal/test_mp22_local_profile_start.py),
+  [local profile start](../../tests/integration/temporal/test_manifest_launch_production.py),
   [0032 cluster binding](../../tests/integration/postgres/test_release_0032_cluster_binding_and_stream_hints.py),
   [worker startup](../../tests/integration/postgres/test_mission_worker_startup.py).
 - History: [VALIDATION](../specs/archive/multi-provider-2026-10/VALIDATION.md) (local Temporal fallback);

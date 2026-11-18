@@ -7,8 +7,13 @@ from mission_control.application.execution.harness.lane_turns import LaneTurnSer
 from mission_control.application.execution.harness.sessions import WorkerSessionManager
 from mission_control.application.workspaces.placement import PlacementAdmission
 from mission_control.domain.execution.placement import PlacementLimit
-from tests.fixtures.lane_turns import cursor_binding, cursor_operation, lane_stack, scripted_frames
-from tests.fixtures.mp06_lanes import CapacityLimitedLane
+from tests.fixtures.lane_turns import (
+    CapacityLimitedLane,
+    cursor_binding,
+    cursor_operation,
+    lane_stack,
+    scripted_frames,
+)
 from tests.support.integration.temporal.mp06_dispatch_recovery import (
     _activity_worker,
     _client,

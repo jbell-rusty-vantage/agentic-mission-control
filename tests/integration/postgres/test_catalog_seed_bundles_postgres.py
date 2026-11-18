@@ -41,6 +41,17 @@ def _catalog_only(bundles: list[dict]) -> list[dict]:
     ]
 
 
+def _assert_first_apply(bundles: list[dict], stats: list[dict[str, int]]) -> None:
+    """Every bundle creates rows; only a successor version (its seed key already applied)
+    reuses the unchanged records its predecessor admitted."""
+    seen: set[str] = set()
+    for bundle, applied in zip(bundles, stats, strict=True):
+        assert applied["created"] > 0, (bundle["seed_key"], bundle["seed_version"])
+        if bundle["seed_key"] not in seen:
+            assert applied["reused"] == 0, (bundle["seed_key"], bundle["seed_version"])
+        seen.add(bundle["seed_key"])
+
+
 async def _apply(database: CommonDatabase, bundle: dict) -> dict[str, int]:
     target = {
         "installation_id": str(database.installation_id),
@@ -67,7 +78,7 @@ async def test_seeded_catalog_is_readable_replayable_and_conflicts_on_change(
         )
     )
     first = [await _apply(catalog_db, bundle) for bundle in bundles]
-    assert all(stats["reused"] == 0 and stats["created"] > 0 for stats in first)
+    _assert_first_apply(bundles, first)
     replay = [await _apply(catalog_db, bundle) for bundle in bundles]
     assert all(stats["created"] == 0 and stats["reused"] > 0 for stats in replay)
 
@@ -150,7 +161,11 @@ async def test_ai_engineer_seeds_admit_edgartools_only_there() -> None:
             order_bundles(load_bundles([SEEDS / "common", SEEDS / "ai-engineer"]), set())
         )
         first = [await _apply(database, bundle) for bundle in bundles]
-        assert all(stats["created"] > 0 for stats in first)
+        _assert_first_apply(bundles, first)
+        # WI-08: the graph-variant artifact-schema seed 1.0.1 applies after 1.0.0, additively.
+        order = [(bundle["seed_key"], bundle["seed_version"]) for bundle in bundles]
+        schemas = "mc.catalog.artifact-schemas"
+        assert order.index((schemas, "1.0.0")) < order.index((schemas, "1.0.1"))
         replay = [await _apply(database, bundle) for bundle in bundles]
         assert all(stats["created"] == 0 for stats in replay)
         connection = await asyncpg.connect(database.owner_dsn)
@@ -173,10 +188,18 @@ async def test_ai_engineer_seeds_admit_edgartools_only_there() -> None:
                 "SELECT host_support, secret_refs FROM mission_control.asset_version "
                 "WHERE asset_id = 'definition:mcp_server:mcp.knowledge-capture'"
             )
+            artifact_schemas = {
+                row["asset_id"]
+                for row in await connection.fetch(
+                    "SELECT asset_id FROM mission_control.asset_version "
+                    "WHERE asset_id LIKE 'definition:artifact_schema:%'"
+                )
+            }
+            # One MCP Tool asset per allowlisted tool (successor seeds add versions of it).
             tools = {
                 name: await connection.fetchval(
-                    "SELECT count(*) FROM mission_control.asset_version WHERE kind = 'mcp_tool' "
-                    "AND asset_id LIKE $1",
+                    "SELECT count(DISTINCT asset_id) FROM mission_control.asset_version "
+                    "WHERE kind = 'mcp_tool' AND asset_id LIKE $1",
                     f"definition:mcp_tool:{name}.tool.%",
                 )
                 for name in ("mcp.github", "mcp.context7", "mcp.knowledge-capture")
@@ -205,6 +228,16 @@ async def test_ai_engineer_seeds_admit_edgartools_only_there() -> None:
             statuses["deep_agents"] == "unqualified" and statuses["cursor_cloud"] == "unsupported"
         )
         assert list(capture["secret_refs"]) == ["VERIFY_EXECUTOR_TOKEN"]
-        assert tools == {"mcp.github": 22, "mcp.context7": 2, "mcp.knowledge-capture": 19}
+        # agent-capabilities 1.3.0 widened the knowledge-capture allowlist from 19 to 23.
+        assert tools == {"mcp.github": 22, "mcp.context7": 2, "mcp.knowledge-capture": 23}
+        assert {
+            f"definition:artifact_schema:{name}"
+            for name in (
+                "schema.s0-probe-report",
+                "schema.w2-triage-verdict",
+                "schema.w2-scan-flag",
+                "schema.w2-critique-verdict",
+            )
+        } <= artifact_schemas
     finally:
         await drop_common_database(database)

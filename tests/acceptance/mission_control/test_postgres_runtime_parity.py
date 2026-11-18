@@ -16,6 +16,7 @@ from typing import cast
 
 import asyncpg
 import pytest
+from temporalio.worker import Replayer
 from tests.fixtures.mission_control_common_db import legacy_poison_intact
 from tests.fixtures.rrm009_production_stack import (
     AGENT_COGNITIVE_QUEUE,
@@ -23,9 +24,9 @@ from tests.fixtures.rrm009_production_stack import (
     stage_input,
     stage_templates,
 )
-from tests.fixtures.run_authority_digest import run_authority_digest
 from tests.support.acceptance.mission_control.postgres_runtime_parity import (
     goal_directed_two_iterations_scenario,
+    run_authority_digest,
 )
 from tests.support.ids import SCOPE
 from tests.support.stack import (
@@ -56,9 +57,15 @@ from tests.support.stack import (
 from tests.support.stack import (
     start_local as _start_local,
 )
+from tests.support.temporal import patch_ids
 
 from mission_control.adapters.postgres.orchestration.stagegraph_repository import (
     PostgresStageGraphOperationTemplateRepository,
+)
+from mission_control.adapters.temporal.workflow_sandbox import coordinator_workflow_runner
+from mission_control.adapters.temporal.workflows.operation import (
+    SEGMENT_LOOP_PATCH,
+    OperationWorkflow,
 )
 from mission_control.application.execution.run_launch import fork_semantic_input_binding_ref
 from mission_control.application.recovery.run_forks import ForkPatchPolicyRegistry
@@ -579,7 +586,41 @@ async def _cancel_at_declared_wait(stack: ProductionStack) -> None:
 
 
 @pytest.mark.asyncio
+@pytest.mark.parametrize("segment_loop", [False, True], ids=["operation-execute", "segment-loop"])
 async def test_goal_directed_runs_two_iterations_through_the_production_composition(
-    stack: ProductionStack,
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, segment_loop: bool
 ) -> None:
-    await goal_directed_two_iterations_scenario(stack)
+    """RRM-009 GoalDirected; FT-G2: with ``MISSION_CONTROL_LANE_SEGMENT_LOOP=true`` the same
+    scenario runs unchanged, and every operation workflow schedules `lane.turn` instead of
+    `operation.execute`, carries the segment-loop patch and replays."""
+
+    environment = {"MISSION_CONTROL_LANE_SEGMENT_LOOP": "true"} if segment_loop else {}
+    async with open_stack(
+        root=tmp_path, monkeypatch=monkeypatch, extra_environment=environment
+    ) as stack:
+        await goal_directed_two_iterations_scenario(stack)
+        if segment_loop:
+            await _assert_every_operation_ran_lane_turn(stack)
+
+
+async def _assert_every_operation_ran_lane_turn(stack: ProductionStack) -> None:
+    operations = [
+        item
+        async for item in stack.client.list_workflows(
+            "WorkflowType = 'belllabs.operation.v2' OR WorkflowType = 'mc.operation.v1'"
+        )
+    ]
+    assert len(operations) == 4, [item.id for item in operations]
+    replayer = Replayer(
+        workflows=[OperationWorkflow], workflow_runner=coordinator_workflow_runner()
+    )
+    for item in operations:
+        history = await stack.client.get_workflow_handle(item.id).fetch_history()
+        scheduled = [
+            event.activity_task_scheduled_event_attributes.activity_type.name
+            for event in history.events
+            if event.HasField("activity_task_scheduled_event_attributes")
+        ]
+        assert scheduled == ["lane.turn"], (item.id, scheduled)
+        assert SEGMENT_LOOP_PATCH in patch_ids(history)
+        await replayer.replay_workflow(history)

@@ -3,7 +3,7 @@
 The real `OperationWorkflow` drives the real `lane.*` and `continuation.*` activities; the
 continuation ledger (transfer rows, sealed checkpoints, the continuation packet) and, in
 the crash drill, the lane state and frames live in PostgreSQL under the runtime role.
-Providers are labelled fixtures (`tests/fixtures/mp12_lanes.py`); nothing here proves live
+Providers are labelled fixtures (`tests/fixtures/lane_turns.py`); nothing here proves live
 provider behaviour.
 
 - V13: a worker is lost after *every* persisted continuation phase (two drills covering the
@@ -98,6 +98,10 @@ from mission_control.domain.programs.goal_directed_runtime import (
 )
 from tests.fixtures.continuation import NOW, MemorySnapshots, NoArtifacts, trigger
 from tests.fixtures.lane_turns import (
+    SOURCE_SESSION,
+    ContinuingLane,
+    Crashes,
+    FakeHydrator,
     LaneStack,
     cursor_binding,
     cursor_operation,
@@ -105,7 +109,6 @@ from tests.fixtures.lane_turns import (
     scripted_frames,
 )
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.fixtures.mp12_lanes import SOURCE_SESSION, ContinuingLane, Crashes, FakeHydrator
 from tests.support.clock import SECOND, Clock
 from tests.support.db_builders import admit_unit_attempt
 from tests.support.deep_agents_runtime import ConformanceAuthority

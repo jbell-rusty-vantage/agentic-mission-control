@@ -6,7 +6,9 @@ executor of iteration 2 receives the prior Progress Review inline (as untrusted 
 sealed handoff as a mandatory journal reference, Loop State and blockers as mandatory inline
 items and the handoff snapshot files under its role root; the verifier receives an
 independent packet with only the executor's registered outputs; the handoff records the
-packet it was produced from and ``GoalHandoffReference`` is written from it.
+packet it was produced from and ``GoalHandoffReference`` is written from it. A packet keeps
+its slots under the unit's role root (MP-20) and, on a Session Lane, names its files relative
+to the lease root the lane maps that role root to.
 """
 
 from __future__ import annotations
@@ -252,3 +254,42 @@ def test_handoff_records_its_packet_and_writes_the_goal_handoff_reference():
     assert reference.artifact_ref == f"context-packet://sha256:{'a' * 64}"
     assert reference.checkpoint.goal_iteration == handoff.source_iteration.goal_iteration
     assert reference.checkpoint.belllabs_run_id == handoff.run_id
+
+
+ROLE_ROOT = "/goal/1/verifier"
+
+
+@pytest.mark.parametrize(
+    ("runtime", "pointer"),
+    [
+        ("deep_agent", f"This index: {ROLE_ROOT}/.mission/context.md"),
+        ("claude", "This index: .mission/context.md."),
+        ("codex", "This index: .mission/context.md."),
+        ("cursor", "This index: .mission/context.md."),
+    ],
+)
+async def test_goal_packet_slots_stay_role_rooted_and_session_lanes_read_the_lease_root(
+    runtime: str, pointer: str
+) -> None:
+    composition, run_id, _selections = await _composition()
+    claim = await _claim(run_id)
+    service = composition.family._operations._context_packs
+    assert service is not None
+    result = replace(_executor_result(claim, run_id), workspace_id=claim.workspace_namespace)
+    request = _preparation(run_id, claim, "verifier", 3, 1, result)
+    template = composition.templates["verifier"].model_copy(update={"execution_runtime": runtime})
+
+    sealed = await service.pack_for_iteration(request, template, role_root=ROLE_ROOT)
+
+    paths = {slot.logical_path for slot in sealed.slot_bindings}
+    assert all(is_context_input_slot(slot) for slot in sealed.slot_bindings)
+    assert all(path.startswith(f"{ROLE_ROOT}/") for path in paths), paths
+    assert {f"{ROLE_ROOT}/.mission/context.md", f"{ROLE_ROOT}/.mission/inputs.json"} <= paths
+    assert pointer in sealed.prompt_segment.content
+    if runtime != "deep_agent":
+        assert f"{ROLE_ROOT}/.mission" not in sealed.prompt_segment.content
+        # P5c: the lease-relative locations, never absolute paths the lease does not have.
+        assert "Read-only inputs: inputs/ (see .mission/inputs.json)." in (
+            sealed.prompt_segment.content
+        )
+        assert " /.mission/" not in sealed.prompt_segment.content

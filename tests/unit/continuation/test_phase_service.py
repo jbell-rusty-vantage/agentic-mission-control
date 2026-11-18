@@ -48,8 +48,7 @@ from mission_control.domain.policies.mailbox import (
     inline_content_ref,
 )
 from tests.fixtures.continuation import build_service, trigger
-from tests.fixtures.lane_turns import cursor_operation
-from tests.fixtures.mp12_lanes import Crashes, FakeHydrator
+from tests.fixtures.lane_turns import Crashes, FakeHydrator, cursor_operation
 from tests.support.ids import SCOPE
 
 SOURCE = "agent-fake-1"

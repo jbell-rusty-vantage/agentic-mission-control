@@ -1,7 +1,7 @@
 """MP-06 (OVE-69): fenced session ownership, the native dispatch journal and interventions.
 
 In-memory stores with the production transition rules (`dispatch.py`) and scripted fake
-lanes (`tests/fixtures/mp06_lanes.py`, labelled fixtures). The PostgreSQL store and the
+lanes (`tests/fixtures/lane_turns.py`, labelled fixtures). The PostgreSQL store and the
 real-Temporal crash/race scenarios are in `tests/integration/{postgres,temporal}`.
 """
 
@@ -49,16 +49,14 @@ from mission_control.domain.policies.mailbox import MailboxState
 from mission_control.domain.policies.stop_fence import EffectAdmission, StopFence
 from tests.fixtures.lane_turns import (
     LaneStack,
+    LossyReceiptLane,
+    NeverAcceptedLane,
+    ReconcilingLossyLane,
     RecordingSignals,
     ScriptedSessionLane,
     cursor_operation,
     lane_stack,
     scripted_frames,
-)
-from tests.fixtures.mp06_lanes import (
-    LossyReceiptLane,
-    NeverAcceptedLane,
-    ReconcilingLossyLane,
 )
 from tests.support.clock import Clock
 from tests.support.unit.harness.mp06_dispatch_recovery import BOUNDS, turn_request

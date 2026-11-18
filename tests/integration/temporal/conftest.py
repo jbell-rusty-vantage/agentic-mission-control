@@ -15,7 +15,6 @@ _PSYCOPG_SELECTOR_MODULES = frozenset(
     {
         "test_manifest_launch_production.py",
         "test_remote_mission_admission.py",
-        "test_mp22_local_profile_start.py",
         "test_manifest_v2_provider_launch.py",
         "test_mp20_workflow_parity.py",
         "test_environment_readiness_production.py",

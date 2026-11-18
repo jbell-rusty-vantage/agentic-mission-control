@@ -1,30 +1,19 @@
-"""Migration 0033 (component 1.2.0) on a real disposable PostgreSQL 17.
+"""Migration 0033 guards on a real disposable PostgreSQL 17 (newest built release).
 
-Runs against MISSION_CONTROL_TEST_ADMIN_DSN (loopback disposable server only).
+Runs against MISSION_CONTROL_TEST_ADMIN_DSN (loopback disposable server only). The guards refuse
+what they should: a closed MP-11 correlation and a settled intent never move (including a
+settled intent's receipt digest), bound columns never change, nothing is deleted, and MP-15
+causation is immutable and must name an existing inbox.
 
-- MP-11 `approval_correlation`/`governed_effect_intent` and MP-15 `coordinator_inbox`,
-  `coordinator_notification`, `coordinator_causation`: tenant scoped, forced RLS with one
-  three-column scope policy, a tenant FK, REVOKE PUBLIC, runtime SELECT/INSERT plus the declared
-  column-limited UPDATE grants, readonly SELECT, nothing for any other capability role.
-- The guards refuse what they should: a closed correlation and a settled intent never move
-  (including a settled intent's receipt digest), bound columns never change, nothing is deleted,
-  causation is immutable and must name an existing inbox.
-- Historical lane describes equal the hash-verified frozen 1.4.0 migration snapshot,
-  still unqualified, and `lane_profile_immutable` plus FORCE RLS are restored.
-- A NON-superuser CREATEROLE migration principal (the Supabase-like installer, package cluster
-  B pattern) applies the frozen 1.4.0 chain and ends in the same lane/trigger/RLS state.
+The catalog shape of the 0033 tables (scope, forced RLS, grants) and the lane profile registry's
+immutability are proved by `packages/mission-control-db-contract/tests/test_schema_guards.py`;
+the live lane describes by `tests/integration/postgres/test_lane_bindings.py`.
 """
 
 from __future__ import annotations
 
-import hashlib
-import json
-import re
-import secrets
 from collections.abc import AsyncIterator
 from datetime import UTC, datetime
-from pathlib import Path
-from typing import Any
 from uuid import UUID, uuid4
 
 import asyncpg
@@ -34,14 +23,7 @@ import pytest_asyncio
 from mission_control.adapters.postgres.run_control.run_control_repository import (
     PostgresRunControlRepository,
 )
-from tests.fixtures.mission_control_common_db import (
-    COMPONENT_VERSION,
-    CommonDatabase,
-    _with_database,
-    admin_dsn,
-    install_component,
-    migration_paths,
-)
+from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.support.db_builders import owner_rows, scoped_count
 from tests.support.run_control import request, service
 
@@ -49,226 +31,6 @@ pytestmark = pytest.mark.common_db
 
 DIGEST = "sha256:" + "d" * 64
 ACTOR = "test:release-0033"
-TENANT_TABLES = (
-    "approval_correlation",
-    "governed_effect_intent",
-    "coordinator_inbox",
-    "coordinator_notification",
-    "coordinator_causation",
-)
-RUNTIME_UPDATE_COLUMNS: dict[str, frozenset[str]] = {
-    "approval_correlation": frozenset(
-        {"state", "reply", "reply_digest", "close_reason", "replayed_from", "closed_at", "version"}
-    ),
-    "governed_effect_intent": frozenset(
-        {
-            "state",
-            "reason",
-            "claimant_ref",
-            "claimed_at",
-            "receipt",
-            "receipt_digest",
-            "version",
-            "updated_at",
-        }
-    ),
-    "coordinator_inbox": frozenset({"next_inbox_seq", "acked_inbox_seq", "version", "updated_at"}),
-    "coordinator_notification": frozenset(
-        {
-            "inbox_seq",
-            "state",
-            "actionable",
-            "seq_from",
-            "seq_to",
-            "event_count",
-            "anchor_event_id",
-            "depth",
-            "suppressed_reason",
-            "body",
-            "sealed_at",
-            "acknowledged_at",
-            "acknowledged_by_actor_ref",
-            "prompt_request_id",
-            "prompt_state",
-            "prompt_request",
-            "prompt_detail",
-            "prompted_at",
-            "version",
-            "updated_at",
-        }
-    ),
-    "coordinator_causation": frozenset(),
-}
-OTHER_ROLES = (
-    "mission_control_family_writer",
-    "mission_control_catalog_writer",
-    "mission_control_outbox_worker",
-    "public",
-)
-TABLE_PRIVILEGES = ("SELECT", "INSERT", "UPDATE", "DELETE", "TRUNCATE", "REFERENCES", "TRIGGER")
-
-
-def _frozen_describes() -> dict[str, Any]:
-    """Historical SQL is the authority here; current runtime matrices use 1.4.1 tests."""
-    component = (
-        Path(__file__).resolve().parents[3] / "packages/mission-control-db-contract/component"
-    )
-    payload = (component / "manifest.json").read_bytes()
-    assert hashlib.sha256(payload).hexdigest() == (
-        "7ba8ec65917f99e8d16feb5c93835fe2495d82dee942327d06c33ee23b3b84d1"
-    )
-    documents = {}
-    for migration in json.loads(payload)["ordered_migrations"]:
-        sql_bytes = (component / migration["path"]).read_bytes()
-        assert hashlib.sha256(sql_bytes).hexdigest() == migration["sha256"]
-        sql = sql_bytes.decode("utf-8")
-        for profile, document in re.findall(
-            r"\('([a-z_]+)', '[a-z_]+', '[a-z_]+',\s*'(\{.*?\})'::jsonb", sql
-        ):
-            parsed = json.loads(document.replace("''", "'"))
-            if parsed.get("schema_version", "").startswith("mc.lane_describe."):
-                documents[profile] = parsed
-        for document, profile in re.findall(
-            r"UPDATE mission_control\.lane_profile\s+SET describe = '((?:[^']|'')*)'::jsonb\s+"
-            r"WHERE lane_profile = '([a-z_]+)' AND NOT qualified;",
-            sql,
-        ):
-            documents[profile] = json.loads(document.replace("''", "'"))
-    assert len(documents) == 9
-    assert documents["codex"]["versions"]["codex_cli"] == "0.162.0"
-    return documents
-
-
-async def _lane_state(connection: asyncpg.Connection) -> dict[str, Any]:
-    rows = await connection.fetch(
-        "SELECT lane_profile, describe::text AS describe, qualified, qualified_at, "
-        "qualification_ref FROM mission_control.lane_profile"
-    )
-    table = await connection.fetchrow(
-        "SELECT c.relrowsecurity, c.relforcerowsecurity, pg_get_userbyid(c.relowner) AS owner, "
-        "(SELECT t.tgenabled::text FROM pg_trigger t WHERE t.tgrelid = c.oid "
-        " AND t.tgname = 'lane_profile_immutable') AS trigger_enabled, "
-        "(SELECT array_agg(p.polname || ':' || p.polcmd::text) FROM pg_policy p "
-        " WHERE p.polrelid = c.oid) AS policies "
-        "FROM pg_class c WHERE c.oid = 'mission_control.lane_profile'::regclass"
-    )
-    return {"rows": {row["lane_profile"]: row for row in rows}, "table": dict(table)}
-
-
-def _assert_lane_profiles_declared(state: dict[str, Any]) -> None:
-    declared = _frozen_describes()
-    assert set(state["rows"]) == set(declared)
-    for profile, row in state["rows"].items():
-        assert json.loads(row["describe"]) == declared[profile], profile
-        expected_qualified = profile == "deep_agents"
-        assert row["qualified"] is expected_qualified, profile
-        if not expected_qualified:
-            assert (row["qualified_at"], row["qualification_ref"]) == (None, None), profile
-    table = state["table"]
-    assert (table["relrowsecurity"], table["relforcerowsecurity"]) == (True, True)
-    # 'O' = enabled in origin and local mode, exactly how CREATE TRIGGER left it in 0030.
-    assert table["trigger_enabled"] == "O"
-    assert table["policies"] == ["lane_profile_read:r"]
-
-
-# --------------------------------------------------------------------------- catalog shape
-
-
-async def test_0033_tables_are_scoped_forced_rls_with_declared_grants(
-    common_db: CommonDatabase,
-) -> None:
-    rows = await owner_rows(
-        common_db,
-        """
-        SELECT c.relname, c.relrowsecurity, c.relforcerowsecurity,
-               (SELECT array_agg(pg_get_expr(p.polqual, p.polrelid) || ' / '
-                                 || pg_get_expr(p.polwithcheck, p.polrelid))
-                FROM pg_policy p WHERE p.polrelid = c.oid) AS policies,
-               EXISTS (SELECT 1 FROM pg_constraint k WHERE k.conrelid = c.oid
-                       AND k.contype = 'f'
-                       AND k.confrelid = 'mission_control.tenant'::regclass) AS tenant_fk,
-               (SELECT array_agg(a.attname ORDER BY a.attnum) FROM pg_attribute a
-                WHERE a.attrelid = c.oid AND a.attnum IN (1, 2, 3)) AS scope_columns,
-               (SELECT count(*) FROM aclexplode(c.relacl) x WHERE x.grantee = 0) AS public_acl
-        FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
-        WHERE n.nspname = 'mission_control' AND c.relname = ANY($1::text[])
-        """,
-        list(TENANT_TABLES),
-    )
-    assert {row["relname"] for row in rows} == set(TENANT_TABLES)
-    for row in rows:
-        name = row["relname"]
-        assert (row["relrowsecurity"], row["relforcerowsecurity"]) == (True, True), name
-        assert row["tenant_fk"], name
-        assert row["scope_columns"] == ["installation_id", "application_id", "tenant_id"], name
-        assert row["public_acl"] == 0, name
-        (policy,) = row["policies"]
-        for function in ("ctx_installation_id", "ctx_application_id", "ctx_tenant_id"):
-            assert policy.count(function) == 2, (name, policy)  # USING and WITH CHECK
-    for table, update_columns in RUNTIME_UPDATE_COLUMNS.items():
-        assert await _table_privileges(common_db, "mission_control_runtime", table) == {
-            "SELECT",
-            "INSERT",
-        }, table
-        assert await _update_columns(common_db, "mission_control_runtime", table) == (
-            update_columns
-        ), table
-        assert await _table_privileges(common_db, "mission_control_readonly", table) == {
-            "SELECT"
-        }, table
-        assert await _update_columns(common_db, "mission_control_readonly", table) == set(), table
-        for role in OTHER_ROLES:
-            assert await _table_privileges(common_db, role, table) == set(), (role, table)
-            assert await _update_columns(common_db, role, table) == set(), (role, table)
-    # Every new foreign key is covered by an index whose leading columns are the FK columns.
-    uncovered = await owner_rows(
-        common_db,
-        """
-        SELECT k.conrelid::regclass::text AS relation, k.conname
-        FROM pg_constraint k
-        WHERE k.contype = 'f' AND k.conrelid = ANY(
-            SELECT ('mission_control.' || t)::regclass FROM unnest($1::text[]) AS t)
-          AND NOT EXISTS (
-              SELECT 1 FROM pg_index i
-              WHERE i.indrelid = k.conrelid
-                AND (i.indkey::int2[])[0:cardinality(k.conkey) - 1] = k.conkey)
-        """,
-        list(TENANT_TABLES),
-    )
-    assert [dict(row) for row in uncovered] == []
-    # The guard functions are not executable by PUBLIC.
-    for function in ("governed_effect_intent_guard", "approval_correlation_guard"):
-        assert not (
-            await owner_rows(
-                common_db,
-                "SELECT has_function_privilege('public', $1, 'EXECUTE') AS allowed",
-                f"mission_control.{function}()",
-            )
-        )[0]["allowed"], function
-
-
-async def _table_privileges(db: CommonDatabase, role: str, table: str) -> set[str]:
-    rows = await owner_rows(
-        db,
-        "SELECT privilege FROM unnest($3::text[]) AS privilege "
-        "WHERE has_table_privilege($1, 'mission_control.' || $2, privilege)",
-        role,
-        table,
-        list(TABLE_PRIVILEGES),
-    )
-    return {row["privilege"] for row in rows}
-
-
-async def _update_columns(db: CommonDatabase, role: str, table: str) -> set[str]:
-    rows = await owner_rows(
-        db,
-        "SELECT a.attname FROM pg_attribute a "
-        "WHERE a.attrelid = ('mission_control.' || $2)::regclass AND a.attnum > 0 "
-        "AND NOT a.attisdropped AND has_column_privilege($1, a.attrelid, a.attnum, 'UPDATE')",
-        role,
-        table,
-    )
-    return {row["attname"] for row in rows}
 
 
 # --------------------------------------------------------------------------- guards
@@ -494,94 +256,3 @@ async def test_mp15_guards_keep_causation_immutable_and_nothing_deleted(
             assert await scoped_count(pool, common_db.scope("tenant-2"), table) == 0, table
     finally:
         await pool.close()
-
-
-# --------------------------------------------------------------------------- lane profiles
-
-
-async def test_lane_profiles_equal_frozen_describes_with_trigger_and_rls_restored(
-    common_db: CommonDatabase,
-    owner: asyncpg.Connection,
-) -> None:
-    _assert_lane_profiles_declared(await _lane_state(owner))
-    # The immutability trigger is live again: even the owner cannot revise a row.
-    with pytest.raises(asyncpg.RestrictViolationError, match="immutable"):
-        await owner.execute(
-            "UPDATE mission_control.lane_profile SET describe = describe "
-            "WHERE lane_profile = 'cursor_local'"
-        )
-    receipts = await owner_rows(
-        common_db,
-        "SELECT component_version, migration_key FROM mission_control.component_release "
-        "WHERE migration_key LIKE '0033_%'",
-    )
-    # The fixture records the release being built (`release-spec.json`), not 0033's own 1.2.0.
-    assert [tuple(row) for row in receipts] == [
-        (COMPONENT_VERSION, "0033_approvals_coordinator_inbox_lane_describes")
-    ]
-    runtime = await asyncpg.connect(common_db.dsn())
-    try:
-        # Reference data: readable without tenant scope, never writable by the runtime role.
-        assert await runtime.fetchval("SELECT count(*) FROM mission_control.lane_profile") == len(
-            _frozen_describes()
-        )
-        with pytest.raises(asyncpg.InsufficientPrivilegeError):
-            await runtime.execute(
-                "UPDATE mission_control.lane_profile SET qualified = qualified "
-                "WHERE lane_profile = 'codex'"
-            )
-    finally:
-        await runtime.close()
-
-
-async def test_non_superuser_migration_principal_applies_0001_to_0033() -> None:
-    server = admin_dsn()
-    suffix = secrets.token_hex(5)
-    database, migrator, password = f"mct_{suffix}", f"mct_{suffix}_migrator", secrets.token_hex(16)
-    admin = await asyncpg.connect(server)
-    try:
-        await admin.execute(f'CREATE DATABASE "{database}"')
-        await admin.execute(
-            f'CREATE ROLE "{migrator}" LOGIN CREATEROLE NOSUPERUSER NOBYPASSRLS NOCREATEDB '
-            f"PASSWORD '{password}'"
-        )
-        await admin.execute(f'GRANT CONNECT, CREATE ON DATABASE "{database}" TO "{migrator}"')
-    finally:
-        await admin.close()
-    try:
-        superuser = await asyncpg.connect(_with_database(server, database))
-        try:
-            await superuser.execute("CREATE SCHEMA extensions")
-            for extension in ("vector", "pgcrypto", "pg_trgm"):
-                await superuser.execute(f"CREATE EXTENSION {extension} SCHEMA extensions")
-            await superuser.execute("GRANT USAGE ON SCHEMA extensions TO PUBLIC")
-        finally:
-            await superuser.close()
-        connection = await asyncpg.connect(
-            _with_database(server, database, user=migrator, password=password)
-        )
-        try:
-            assert not await connection.fetchval(
-                "SELECT rolsuper OR rolbypassrls FROM pg_roles WHERE rolname = current_user"
-            )
-            applied = await install_component(connection)
-            assert applied == [path.stem for path in migration_paths()]
-            assert "0033_approvals_coordinator_inbox_lane_describes" in applied
-            state = await _lane_state(connection)
-            _assert_lane_profiles_declared(state)
-            assert state["table"]["owner"] == migrator
-            owners = await connection.fetchval(
-                "SELECT array_agg(DISTINCT pg_get_userbyid(c.relowner)) FROM pg_class c "
-                "WHERE c.oid = ANY($1::regclass[])",
-                [f"mission_control.{table}" for table in TENANT_TABLES],
-            )
-            assert owners == [migrator]
-        finally:
-            await connection.close()
-    finally:
-        admin = await asyncpg.connect(server)
-        try:
-            await admin.execute(f'DROP DATABASE IF EXISTS "{database}" WITH (FORCE)')
-            await admin.execute(f'DROP ROLE IF EXISTS "{migrator}"')
-        finally:
-            await admin.close()

@@ -113,4 +113,4 @@ on PostgreSQL (`tests/integration/postgres/test_w1_d30_uncomposed_postgres.py`);
   reset, recovery), `tests/unit/knowledge/test_ks_operation_id_parity.py`,
   `tests/unit/knowledge/test_w1_d22_handle_operations.py`, `tests/unit/knowledge/test_knowledge_review.py`,
   `tests/integration/postgres/test_w1_fixg_evaluator_ledger_postgres.py`,
-  `tests/integration/postgres/test_sprint_oc_release_190.py`.
+  `packages/mission-control-db-contract/tests/test_release_190_handle_operations.py`.

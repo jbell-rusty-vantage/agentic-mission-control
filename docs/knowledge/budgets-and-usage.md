@@ -149,11 +149,11 @@ human and driver rule, not a runtime gate.
   [RRM-008 cancellation settlement](../../tests/unit/operations/test_rrm_008_cancellation.py),
   [atomic family admission](../../tests/unit/run_control/test_atomic_family_admission.py),
   [lane settlement usage](../../tests/unit/harness/test_lane_settlement_usage.py),
-  [budget stop](../../tests/unit/deep_agents/test_budget_stop.py),
+  [budget stop](../../tests/unit/deep_agents/test_in_turn_run_budget.py),
   [in-turn run budget](../../tests/unit/deep_agents/test_in_turn_run_budget.py),
   [run budget through the boundary](../../tests/unit/operations/test_in_turn_run_budget.py),
   [turn stops and resumed spend](../../tests/unit/deep_agents/test_turn_stops.py),
   [exactly at the limit exhausts nothing](../../tests/unit/operations/test_fenced_turn.py),
   [disconnect keeps usage and points](../../tests/acceptance/mission_control/test_tracing_stream.py),
   [inspection sections](../../tests/unit/run_control/test_ft_f6_inspection.py),
-  [capacity wait on Temporal](../../tests/integration/temporal/test_mp05_limit_wait.py).
+  [capacity wait on Temporal](../../tests/integration/temporal/test_mp06_dispatch_recovery.py).

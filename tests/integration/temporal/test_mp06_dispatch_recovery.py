@@ -2,7 +2,7 @@
 
 The real `OperationWorkflow` drives the real `lane.*` activities on isolated task queues;
 every history is replayed with `Replayer`. Providers are labelled fixtures
-(`tests/fixtures/mp06_lanes.py`); nothing here proves live provider behaviour.
+(`tests/fixtures/lane_turns.py`); nothing here proves live provider behaviour.
 
 - V07: the worker dies after the provider accepted the send and before the local receipt.
   Another worker takes the session over once the lease expires (higher epoch), reconciles
@@ -12,7 +12,8 @@ every history is replayed with `Replayer`. Providers are labelled fixtures
   turn: the replacement is never sent, the pre-fence effect keeps its disposition, a
   post-fence effect is denied, and the four cancel timestamps are recorded independently.
 - MP-05 wiring: a provider limit refusal waits for the reset on a Temporal timer (patched
-  `mp05-capacity-wait`) and the turn is sent once after it.
+  `mp05-capacity-wait`) and the turn is sent once after it; a cancel during a long reset wait
+  wakes it at once and nothing is sent.
 """
 
 from __future__ import annotations
@@ -52,6 +53,8 @@ from mission_control.domain.execution.lanes import (
 )
 from mission_control.domain.policies.stop_fence import EffectAdmission, StopFence
 from tests.fixtures.lane_turns import (
+    CapacityLimitedLane,
+    ReconcilingLossyLane,
     ScriptedSessionLane,
     cursor_binding,
     cursor_operation,
@@ -59,7 +62,6 @@ from tests.fixtures.lane_turns import (
     scripted_frames,
 )
 from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.fixtures.mp06_lanes import CapacityLimitedLane, ReconcilingLossyLane
 from tests.support.db_builders import pg_lane_unit
 from tests.support.integration.temporal.mp06_dispatch_recovery import (
     _activity_worker,
@@ -290,3 +292,46 @@ async def test_a_provider_limit_waits_on_a_temporal_timer_then_sends_once() -> N
     timers = [event for event in history.events if event.HasField("timer_started_event_attributes")]
     assert timers, "the reset was waited out on a Temporal timer"
     assert _scheduled(history) == ["lane.turn", "lane.turn", "lane.cleanup"]
+
+
+async def _timer_started(handle: Any) -> None:
+    async with asyncio.timeout(60):
+        while True:
+            history = await handle.fetch_history()
+            if any(event.HasField("timer_started_event_attributes") for event in history.events):
+                return
+            await asyncio.sleep(0.1)
+
+
+async def test_a_cancel_wakes_a_long_provider_limit_wait_and_nothing_is_sent() -> None:
+    """A cancel during a ten-minute reset wait wakes it at once on real Temporal timers, so
+    the cancel path reaches the pending turn: nothing is sent and the unit settles cancelled."""
+
+    client = await _client()
+    lane_queue, workflow_queue = f"mp06-lane-{uuid4().hex[:8]}", f"mp06-wf-{uuid4().hex[:8]}"
+    operation = cursor_operation(binding=cursor_binding(task_queue=lane_queue))
+    lane = CapacityLimitedLane(frames=scripted_frames(), limited=1, reset_in_s=600)
+    stack = lane_stack(lane, operation=operation)
+    service = LaneTurnService(
+        lanes=stack.service._lanes,
+        boundary=stack.boundary,
+        frames=stack.frames,
+        states=stack.states,
+        sessions=WorkerSessionManager(owner_ref="worker-a"),
+    )
+    began = asyncio.get_running_loop().time()
+    async with (
+        _workflow_worker(client, workflow_queue),
+        _activity_worker(client, lane_queue, stack.boundary, service),
+    ):
+        handle = await _start(client, _request(operation), workflow_queue, "mp06-capacity-cancel")
+        await _timer_started(handle)
+        await handle.execute_update("cancel_command", args=["cancel-during-wait", "normal"])
+        result = await asyncio.wait_for(handle.result(), timeout=60)
+        history = await _replayed(handle)
+
+    assert asyncio.get_running_loop().time() - began < 60, "the wait never ran to its reset"
+    assert result.disposition == "cancelled"
+    assert lane.refusals == 1 and lane.sends == []
+    assert CAPACITY_WAIT_PATCH in patch_ids(history)
+    assert _scheduled(history).count("lane.turn") == 1

@@ -13,6 +13,7 @@ from dataclasses import dataclass, field, replace
 from typing import Any
 
 from langchain_core.messages import AIMessage, BaseMessage, ToolMessage
+
 from tests.fixtures.rrm009_production_stack import Cognition, call_usage
 from tests.support.models import ScriptedChatModel
 
@@ -28,7 +29,7 @@ class StageGraphScript:
     calls: list[dict[str, Any]] = field(default_factory=list)
 
 
-def _document(message: ToolMessage) -> dict[str, Any]:
+def tool_document(message: ToolMessage) -> dict[str, Any]:
     content = message.content
     if isinstance(content, list):
         content = "".join(str(item.get("text", "")) for item in content if isinstance(item, dict))
@@ -58,7 +59,7 @@ class StageGraphCognition(Cognition):
             return self._isolation_producer(tools)
         if not tools:
             return self._call("report_register", {"report": self.script.report}, 0)
-        registered = _document(tools[0])
+        registered = tool_document(tools[0])
         assert registered.get("ok"), registered
         result = registered["result"]
         report = next(item for item in result["affected"] if "/report/" in item["handle"])
@@ -73,7 +74,7 @@ class StageGraphCognition(Cognition):
                 },
                 1,
             )
-        assert _document(tools[-1]).get("ok"), tools[-1].content
+        assert tool_document(tools[-1]).get("ok"), tools[-1].content
         if len(tools) == 2:
             return self._call(
                 "submit_output",
@@ -106,7 +107,7 @@ class StageGraphCognition(Cognition):
 
     def _isolation_producer(self, tools: list[ToolMessage]) -> AIMessage:
         def report_at(index: int, name: str) -> dict[str, str]:
-            answer = _document(tools[index])
+            answer = tool_document(tools[index])
             assert answer.get("ok"), answer
             exact = next(
                 item for item in answer["result"]["affected"] if "/report/" in item["handle"]
@@ -136,7 +137,7 @@ class StageGraphCognition(Cognition):
                 },
                 3,
             )
-        assert _document(tools[-1]).get("ok"), tools[-1].content
+        assert tool_document(tools[-1]).get("ok"), tools[-1].content
         if len(tools) == 4:
             return self._call(
                 "submit_output",
@@ -182,7 +183,7 @@ class StageGraphCognition(Cognition):
                 digest = digest[:-1] + ("0" if digest[-1] != "0" else "1")
             return self._call("knowledge_read", {"handle": handle, "digest": digest}, 1)
         if self.script.wrong_digest_probe and len(tools) == 2:
-            refused = _document(tools[1])
+            refused = tool_document(tools[1])
             assert not refused.get("ok"), refused
             assert "content" not in (refused.get("result") or {}), refused
             self.script.reads.append({"run_id": self.run_id, "wrong_digest_refusal": refused})
@@ -192,7 +193,7 @@ class StageGraphCognition(Cognition):
             return self._call("knowledge_read", {"handle": handle, "digest": digest}, 2)
         offset = int(self.script.wrong_digest_probe)
         if len(tools) == 2 + offset:
-            read = _document(tools[1 + offset])
+            read = tool_document(tools[1 + offset])
             assert read.get("ok"), read
             self.script.reads.append({"run_id": self.run_id, "read": read})
             text = json.dumps(read["result"], sort_keys=True)
@@ -212,7 +213,7 @@ class StageGraphCognition(Cognition):
                 },
                 2 + offset,
             )
-        assert _document(tools[-1]).get("ok"), tools[-1].content
+        assert tool_document(tools[-1]).get("ok"), tools[-1].content
         return self._final()
 
     def _call(self, name: str, args: dict[str, Any], ordinal: int) -> AIMessage:

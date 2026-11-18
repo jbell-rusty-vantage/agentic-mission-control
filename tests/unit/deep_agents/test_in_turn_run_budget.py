@@ -30,6 +30,7 @@ from mission_control.adapters.deep_agents.adapter import (
 from mission_control.adapters.deep_agents.budget import (
     BUDGET_STOP,
     BudgetStopMiddleware,
+    is_turn_stop,
     turn_stop_marker,
 )
 from tests.support.models import ScriptedChatModel
@@ -128,6 +129,7 @@ async def test_a_turn_stops_past_the_runs_remaining_tokens() -> None:
     )
 
     assert len(model.calls) == 3  # 50, 100, 150 > 120
+    assert is_turn_stop(result["messages"][-1])
     assert _budget_stop_of(result["messages"]) == {"tokens.total": {"limit": 120, "spent": 150}}
 
 
@@ -169,3 +171,20 @@ def test_usage_is_reported_on_the_runs_dimensions_beyond_the_reservation() -> No
     unbudgeted = _invocation({"goal.iterations": 1}, dimensions=())
     assert _usage(unbudgeted, messages).amounts == {}
     assert _budget_stop_of(messages) == {}
+
+
+def test_the_stop_names_the_exceeded_dimension_only_past_the_cap() -> None:
+    spent = {"tokens.total": 0, "model.turns": 0}
+    middleware = BudgetStopMiddleware({"tokens.total": 100, "model.turns": 9}, lambda: spent)
+    assert middleware.stop_message() is None
+    spent["tokens.total"] = 100  # reaching the limit is within budget
+    assert middleware.stop_message() is None
+    spent["tokens.total"] = 101
+    message = middleware.stop_message()
+    assert message is not None and is_turn_stop(message) and not message.tool_calls
+    assert message.additional_kwargs[BUDGET_STOP] == {"tokens.total": {"limit": 100, "spent": 101}}
+
+
+def test_an_unbounded_operation_never_stops() -> None:
+    middleware = BudgetStopMiddleware({}, lambda: {"tokens.total": 10**9})
+    assert middleware.stop_message() is None

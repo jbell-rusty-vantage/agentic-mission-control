@@ -184,9 +184,9 @@ def biotech_components(technical: Any, script: Any, log: list[dict[str, Any]], t
     from dataclasses import replace
 
     from langchain_core.messages import ToolMessage
-    from tests.fixtures.overnight_linked_model import LinkedSourceCognition
-    from tests.fixtures.overnight_linked_repair_model import file_text
-    from tests.fixtures.overnight_stagegraph_model import StageGraphCognition, _document
+    from tests.support.cognition.linked import LinkedSourceCognition
+    from tests.support.cognition.linked_repair import file_text
+    from tests.support.cognition.stagegraph import StageGraphCognition, tool_document
 
     @dataclass(kw_only=True)
     class BiotechConsumer(StageGraphCognition):
@@ -210,7 +210,7 @@ def biotech_components(technical: Any, script: Any, log: list[dict[str, Any]], t
                 self.script.reads.append({"run_id": self.run_id, "index": str(tools[0].content)})
                 return self._call("knowledge_read", {"handle": handle, "digest": digest}, 1)
             if len(tools) == 2:
-                read = _document(tools[1])
+                read = tool_document(tools[1])
                 summary = biotech_summary_from_read(
                     read, report_handle=handle, report_digest=digest, tenant=tenant
                 )
@@ -224,7 +224,7 @@ def biotech_components(technical: Any, script: Any, log: list[dict[str, Any]], t
                     },
                     2,
                 )
-            assert _document(tools[-1]).get("ok")
+            assert tool_document(tools[-1]).get("ok")
             return self._final()
 
     base = technical.components(log)
