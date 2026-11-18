@@ -19,13 +19,17 @@ from __future__ import annotations
 
 import json
 import re
+from collections.abc import Mapping
 from dataclasses import asdict, dataclass, field, replace
 from datetime import UTC, datetime
 from hashlib import sha256
 from typing import Any, cast
 
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, ToolMessage
-from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog
+from tests.fixtures.catalog.fast_track_catalog import (
+    fast_track_catalog,
+    publish_output_schemas,
+)
 from tests.fixtures.rrm009_production_stack import (
     Cognition,
     TechnicalBinding,
@@ -219,20 +223,32 @@ def goal_templates(
 
 
 async def compose_lifecycle(
-    stack: ProductionStack, request_scope: str
-) -> tuple[ManifestSubmitService, StagedLaunchInputs]:
-    """The manifest lifecycle over the stack's API services and installation catalog."""
+    stack: ProductionStack,
+    request_scope: str,
+    *,
+    output_schemas: Mapping[str, dict[str, Any]] | None = None,
+    launch_inputs: Any = None,
+) -> tuple[ManifestSubmitService, Any]:
+    """The manifest lifecycle over the stack's API services and installation catalog.
+
+    ``output_schemas`` (``name@1`` -> JSON Schema) are published into the catalog first, so
+    the manifest's declared outputs bind a schema and can be fulfilled. ``launch_inputs``
+    is the launch input author (the production ``compose_manifest_launch_inputs``);
+    without one, the test author ``StagedLaunchInputs`` binds the run.
+    """
 
     run_control = cast(RunControlService, api.state.run_control_service)
     policies = cast(AdmissionPolicyRegistry, api.state.admission_policy_registry)
     register_manifest_admission_policies(policies)
     launches = cast(RunLaunchService, api.state.run_launch_service)
     definitions, search = await fast_track_catalog()
+    if output_schemas:
+        await publish_output_schemas(definitions, output_schemas)
     catalog = PostgresDefinitionRepository(
         stack.worker_pool, catalog_scope=stack.settings.mission_control_catalog_scope or ""
     )
     programs = ManifestProgramCompiler(catalog, ExtensionRegistry(), InMemoryPayloadStore())
-    inputs = StagedLaunchInputs(stack, run_control)
+    inputs = launch_inputs or StagedLaunchInputs(stack, run_control)
     service = ManifestSubmitService(
         compiler=ManifestCompileService(definitions=definitions, search=search, programs=programs),
         programs=programs,
