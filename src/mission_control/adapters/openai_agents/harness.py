@@ -134,6 +134,7 @@ class CodexAgentsHarness(RemoteSessionLane[_AgentsSession], UnsupportedHarnessOp
         tools: AgentsTools | None = None,
         poll_interval_s: float = 0.25,
         poll_limit: int = 120,
+        max_history_frames: int = MAX_HISTORY_FRAMES,
     ) -> None:
         super().__init__(describe=CODEX_AGENTS_DESCRIBE)
         self._client, self._preparer, self._pack = client, preparer, pack
@@ -144,6 +145,8 @@ class CodexAgentsHarness(RemoteSessionLane[_AgentsSession], UnsupportedHarnessOp
         if {"mc_dispatch", "mc_generation", "mc_unit"} & self._labels.keys():
             raise ValueError("labels cannot replace dispatch identity")
         self._poll_interval_s, self._poll_limit = poll_interval_s, poll_limit
+        # MO75: the item bound of one finite history replay (and its terminal rescan).
+        self._max_history_frames = max_history_frames
 
     def _new_session(self, operation: OperationExecutionRequest) -> _AgentsSession:
         binding = ProviderExecutionBinding.carried_by(operation)
@@ -554,7 +557,7 @@ class CodexAgentsHarness(RemoteSessionLane[_AgentsSession], UnsupportedHarnessOp
         scanned = 0
         async for item in self._client.items(session_ref, turn_id=turn_ref):
             scanned += 1
-            if scanned > MAX_HISTORY_FRAMES:
+            if scanned > self._max_history_frames:
                 raise HistoryReplayIncomplete("native history frame bound")
             item_id = str(item["id"])
             session.items[item_id] = item
@@ -632,7 +635,7 @@ class CodexAgentsHarness(RemoteSessionLane[_AgentsSession], UnsupportedHarnessOp
         scanned = 0
         async for item in self._client.items(session_ref, turn_id=turn_ref):
             scanned += 1
-            if scanned > MAX_HISTORY_FRAMES:
+            if scanned > self._max_history_frames:
                 raise HistoryReplayIncomplete("native terminal history frame bound")
             items[str(item["id"])] = item
         await self._annotate_terminal(session_ref, turn_ref, body, items)
