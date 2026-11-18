@@ -151,6 +151,15 @@ class InMemoryFrameStore:
         if run is None or start.activation_key not in run.activations:
             raise HarnessExecutionNotFound("run or activation is not recorded")
         existing = self._executions.get(start.harness_execution_id)
+        if existing is not None and (
+            existing.handle.run_id != run.run_id
+            or existing.handle.activation_id != run.activations[start.activation_key]
+            or existing.handle.attempt_no != start.attempt_no
+            or existing.handle.lane_profile != start.lane_profile
+            or existing.start is None
+            or existing.start.intended_binding_digest != start.intended_binding_digest
+        ):
+            raise ValueError("harness execution identity is reused with a different binding")
         generation = max(start.generation, existing.generation if existing else 0)
         handle = HarnessExecutionHandle(
             harness_execution_id=start.harness_execution_id,
@@ -174,31 +183,72 @@ class InMemoryFrameStore:
         return handle.model_copy(update={"last_cursor": cursor})
 
     async def append(self, frames: Sequence[ProviderFrame]) -> AppendReceipt:
-        new = duplicate = stale = 0
-        new_ids: list[UUID] = []
-        for frame in frames:
-            execution = self._executions.get(frame.harness_execution_id)
-            if execution is None:
+        """Append one batch atomically, with the PostgreSQL rules (OVE-238 G3): one scope per
+        batch; a frame names an execution of that scope; frames of a generation older than the
+        execution's current one are stale; each generation's proposed ordinal range is shifted
+        past its persisted cursor; a provider key already stored is a duplicate; a repeated
+        ordinal raises `FrameOrdinalConflict` and stores nothing."""
+
+        if not frames:
+            return AppendReceipt(new=0, duplicate=0, stale=0)
+        if len({frame.scope for frame in frames}) != 1:
+            raise ValueError("one append batch carries exactly one scope")
+        groups: dict[UUID, list[ProviderFrame]] = {}
+        for frame in sorted(frames, key=lambda item: item.arrival_ordinal):
+            groups.setdefault(frame.harness_execution_id, []).append(frame)
+        plans: list[tuple[_Execution, int, list[ProviderFrame]]] = []
+        duplicate = stale = 0
+        for harness_execution_id, batch in groups.items():
+            execution = self._executions.get(harness_execution_id)
+            if execution is None or batch[0].scope != execution.handle.scope:
                 raise HarnessExecutionNotFound("frame names an unopened harness execution")
-            if frame.scope != execution.handle.scope:
-                raise PermissionError("frame scope differs from its harness execution")
-            if frame.generation < execution.generation:
-                stale += 1
+            current = execution.generation
+            fresh = [frame for frame in batch if frame.generation >= current]
+            stale += len(batch) - len(fresh)
+            if not fresh:
                 continue
-            execution.generation = max(execution.generation, frame.generation)
-            key = (frame.generation, frame.provider_key)
-            if key in execution.frames:
-                duplicate += 1
-                continue
-            if (frame.generation, frame.arrival_ordinal) in execution.ordinals:
-                raise FrameOrdinalConflict("arrival ordinal already used")
-            execution.frames[key] = frame
-            execution.ordinals.add((frame.generation, frame.arrival_ordinal))
-            new += 1
-            new_ids.append(frame.frame_id)
-            self._identity(execution, frame)
+            if any(frame.run_id != execution.handle.run_id for frame in fresh):
+                raise ValueError("frame run identity differs from its harness execution")
+            shifts: dict[int, int] = {}
+            for generation in {frame.generation for frame in fresh}:
+                persisted = [
+                    stored.arrival_ordinal
+                    for (gen, _key), stored in execution.frames.items()
+                    if gen == generation
+                ]
+                proposed = min(
+                    item.arrival_ordinal for item in fresh if item.generation == generation
+                )
+                shifts[generation] = max(0, max(persisted, default=0) + 1 - proposed)
+            stored: list[ProviderFrame] = []
+            keys: set[tuple[int, str]] = set()
+            ordinals: set[tuple[int, int]] = set()
+            for frame in fresh:
+                if shifts[frame.generation]:
+                    frame = frame.model_copy(
+                        update={"arrival_ordinal": frame.arrival_ordinal + shifts[frame.generation]}
+                    )
+                key = (frame.generation, frame.provider_key)
+                if key in execution.frames or key in keys:
+                    duplicate += 1
+                    continue
+                ordinal = (frame.generation, frame.arrival_ordinal)
+                if ordinal in execution.ordinals or ordinal in ordinals:
+                    raise FrameOrdinalConflict("arrival ordinal already claimed")
+                keys.add(key)
+                ordinals.add(ordinal)
+                stored.append(frame)
+            plans.append((execution, max(frame.generation for frame in fresh), stored))
+        new_ids: list[UUID] = []
+        for execution, newest, stored in plans:
+            execution.generation = max(execution.generation, newest)
+            for frame in stored:
+                execution.frames[(frame.generation, frame.provider_key)] = frame
+                execution.ordinals.add((frame.generation, frame.arrival_ordinal))
+                new_ids.append(frame.frame_id)
+                self._identity(execution, frame)
         return AppendReceipt(
-            new=new, duplicate=duplicate, stale=stale, new_frame_ids=tuple(new_ids)
+            new=len(new_ids), duplicate=duplicate, stale=stale, new_frame_ids=tuple(new_ids)
         )
 
     def _identity(self, execution: _Execution, frame: ProviderFrame) -> None:
@@ -288,7 +338,14 @@ class InMemoryFrameStore:
             for frame in execution.frames.values()
             if frame.closing or not closing_only
         ]
-        frames.sort(key=lambda frame: (frame.observed_at, frame.arrival_ordinal))
+        frames.sort(
+            key=lambda frame: (
+                frame.observed_at,
+                frame.harness_execution_id,
+                frame.generation,
+                frame.arrival_ordinal,
+            )
+        )
         return tuple(frames[:limit])
 
     async def frames_for_semantic_attempt(
