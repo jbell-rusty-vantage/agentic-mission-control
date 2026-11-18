@@ -19,7 +19,6 @@ from mission_control.adapters.postgres.cursor_costs import (
 )
 from mission_control.domain.execution.cursor_costs import (
     COST_DIMENSION,
-    CostReadResult,
     CostRequest,
     NativeBillingRun,
 )
@@ -159,26 +158,6 @@ async def test_scope_refusal_before_provider_read():
             CostRequest(request_scope="other", binding_id="binding", activity_task_queue="lane"), 0
         )
     reader.assert_not_called()
-
-
-@pytest.mark.asyncio
-async def test_workflow_only_two_bounded_timers_and_unknown_liability(monkeypatch):
-    from mission_control.adapters.temporal.workflows import cursor_costs
-
-    result = CostReadResult(
-        state="unknown", pending_micros=100, recorded_at="2026-10-14T00:00:00+00:00"
-    )
-    execute, sleep = AsyncMock(return_value=result), AsyncMock()
-    monkeypatch.setattr(cursor_costs.workflow, "execute_activity", execute)
-    monkeypatch.setattr(cursor_costs.workflow, "sleep", sleep)
-    assert (
-        await cursor_costs.CursorCostsWorkflow().run(
-            CostRequest(request_scope="scope", binding_id="binding", activity_task_queue="lane")
-        )
-        == result
-    )
-    assert execute.await_count == 3
-    assert [call.args[0].total_seconds() for call in sleep.call_args_list] == [300, 900]
 
 
 @pytest.mark.asyncio

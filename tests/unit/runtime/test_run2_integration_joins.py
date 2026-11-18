@@ -1,4 +1,6 @@
-"""Run 2 worker, auth, workflow and accounting boundaries; no live service calls."""
+"""Run 2 worker, auth and accounting boundaries; no live service calls. The delayed cost
+child of the operation workflow runs on Temporal in
+tests/integration/temporal/test_cursor_costs_workflow.py."""
 
 import asyncio
 from types import SimpleNamespace
@@ -8,7 +10,6 @@ import pytest
 
 from mission_control.adapters.provider_auth.preflight import SubprocessStatusRunner
 from mission_control.adapters.temporal import worker
-from mission_control.adapters.temporal.workflows import operation as workflow_module
 from mission_control.application.execution.operations.operation_execution import (
     _lane_settlement,
     bind_operation_execution_request,
@@ -85,34 +86,6 @@ def test_unknown_cursor_currency_retains_reservation_and_explicit_zero_settles(c
     else:
         assert result.usage.pending_external_amounts == {}
         assert result.usage.amounts == {"currency.estimated_micros": cost}
-
-
-@pytest.mark.parametrize("patched", [True, False])
-async def test_delayed_cost_child_uses_base_workflow_queue_and_exact_lane_activity(
-    patched, monkeypatch
-):
-    start = AsyncMock()
-    monkeypatch.setattr(workflow_module.workflow, "start_child_workflow", start)
-    monkeypatch.setattr(workflow_module.workflow, "patched", lambda _: patched)
-    monkeypatch.setattr(
-        workflow_module.workflow, "info", lambda: SimpleNamespace(task_queue="family")
-    )
-    operation = cursor_operation()
-    request = SimpleNamespace(operation=operation, activity_task_queue="lane")
-    result = {
-        "binding_id": "bound",
-        "usage": {"pending_external_amounts": {"currency.estimated_micros": 100}},
-    }
-    flow = object.__new__(workflow_module.OperationWorkflow)
-    assert await flow._settled_lane_result(request, result) is result
-    if patched:
-        args, kwargs = start.call_args
-        assert args[1].request_scope == operation.request_scope
-        assert args[1].activity_task_queue == "lane"
-        assert kwargs["task_queue"] == "family"
-        assert kwargs["parent_close_policy"] == workflow_module.workflow.ParentClosePolicy.ABANDON
-    else:
-        start.assert_not_called()
 
 
 async def test_background_failure_fails_worker_and_no_tasks_waits_for_stop():
