@@ -109,6 +109,7 @@ from mission_control.adapters.deep_agents.materializer import (
     SandboxFactory,
 )
 from mission_control.adapters.deep_agents.persistence import (
+    PersistenceFactory,
     StandalonePersistence,
     StandalonePersistenceLifespan,
 )
@@ -353,6 +354,7 @@ from mission_control.application.subordinates.parent_completion import (
     ASYNC_RESULT_POLICIES,
     AdmissionRule,
     AsyncChildCompletion,
+    ChildLineage,
 )
 from mission_control.application.subordinates.parent_effects import RunControlAsyncChildEffects
 from mission_control.application.subordinates.service import AsyncSubagentService
@@ -1175,10 +1177,13 @@ class DeploymentOperationRuntime:
         policies: Mapping[str, AdmissionRule],
         wait_seconds: float,
         launch_verifier: PinnedCapabilityAssetVerifier | None = None,
+        lineage: ChildLineage | None = None,
     ) -> None:
         self._runtime = runtime
         self._children = children
         self._pool = pool
+        # The children's lineage authority; the deployment's PostgreSQL rows by default.
+        self._lineage = lineage
         self._policies = dict(policies)
         self._wait_seconds = wait_seconds
         self._launch_verifier = launch_verifier
@@ -1204,7 +1209,9 @@ class DeploymentOperationRuntime:
         service, _adapter = self._children.service(invocation.binding, resolved_secrets)
         records = await AsyncChildCompletion(
             service,
-            PostgresAsyncSubagentAuthority(self._pool),
+            self._lineage
+            if self._lineage is not None
+            else PostgresAsyncSubagentAuthority(self._pool),
             policies=self._policies,
             wait_seconds=self._wait_seconds,
         ).complete(invocation.binding, execution_generation=dispatch.execution_generation)
@@ -1261,8 +1268,13 @@ class ProductionWorkerActivityCompositionFactory:
         claim_lease: timedelta | None = None,
         async_result_policies: Mapping[str, AdmissionRule] | None = None,
         knowledge_lane: KnowledgeLaneFactory | None = None,
+        checkpoint_saver_factory: PersistenceFactory | None = None,
+        checkpoint_store_factory: PersistenceFactory | None = None,
     ) -> None:
         self._client = client
+        # The LangGraph saver/Store openers; the vendor PostgreSQL ones by default.
+        self._saver_factory = checkpoint_saver_factory
+        self._store_factory = checkpoint_store_factory
         self.hosted_signal_ingress: SignalIngressService | None = None
         self.installation_id: str | None = None
         # Sprint V SV-16: the application this worker serves (set by bootstrap like the
@@ -1350,6 +1362,8 @@ class ProductionWorkerActivityCompositionFactory:
                 StandalonePersistenceLifespan(
                     settings.langgraph_checkpoint_dsn,
                     run_setup=settings.langgraph_checkpoint_setup,
+                    saver_factory=self._saver_factory,
+                    store_factory=self._store_factory,
                     locator_address=settings.langgraph_checkpoint_locator,
                 )
             )

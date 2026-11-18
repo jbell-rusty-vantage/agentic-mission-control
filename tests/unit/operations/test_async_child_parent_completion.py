@@ -148,14 +148,17 @@ def test_completion_bounds_are_validated() -> None:
 
 
 @pytest.mark.asyncio
-async def test_deployment_runtime_completes_children_after_cognition_and_delegates_the_rest(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
+async def test_deployment_runtime_completes_children_after_cognition_and_delegates_the_rest() -> (
+    None
+):
     import mission_control.adapters.temporal.deployment_composition as composition
     from mission_control.adapters.deep_agents.browser_tool import GRANTED_NETWORK_HOSTS
     from mission_control.domain.execution.contracts import RuntimeResult
 
     calls: list[str] = []
+    run_control, run_id = await admitted_parent()
+    children, provider, child_id = await _spawned(run_id, run_control)
+    provider.next_status = "success"
 
     class Inner:
         async def execute(self, invocation: Any, secrets: Any) -> RuntimeResult:
@@ -173,30 +176,24 @@ async def test_deployment_runtime_completes_children_after_cognition_and_delegat
     class Children:
         def service(self, binding: Any, secrets: Any) -> tuple[Any, Any]:
             calls.append(f"service:{binding.binding_id}:{sorted(secrets)}")
-            return object(), object()
+            return children, provider
 
-    class Completion:
-        def __init__(self, service: Any, lineage: Any, **kwargs: Any) -> None:
-            assert kwargs["wait_seconds"] == 5 and set(kwargs["policies"]) == {POLICY}
-
-        async def complete(self, binding: Any, *, execution_generation: int) -> tuple[Any, ...]:
-            calls.append(f"complete:{execution_generation}")
-            return (SimpleNamespace(as_payload=lambda: {"child_execution_id": "child-1"}),)
-
-    monkeypatch.setattr(composition, "AsyncChildCompletion", Completion)
-    monkeypatch.setattr(composition, "PostgresAsyncSubagentAuthority", lambda pool: pool)
     runtime = composition.DeploymentOperationRuntime(
         cast(Any, Inner()),
         cast(Any, Children()),
         pool=cast(Any, "pool"),
         policies={POLICY: admit_typed_manifest},
         wait_seconds=5,
+        lineage=Lineage(child_id),
     )
     with_children = SimpleNamespace(
         binding=SimpleNamespace(
             binding_id="binding-1",
+            request_scope="tenant-1",
+            run_id=run_id,
             capability_grant=SimpleNamespace(network_hosts=frozenset({"example.com"})),
-            **lane_fields(SimpleNamespace(async_subagents=("contract",), execution_generation=2)),
+            # The spawning attempt's generation: a different one is refused as superseded.
+            **lane_fields(SimpleNamespace(async_subagents=("contract",), execution_generation=1)),
         )
     )
     result = await runtime.execute(cast(Any, with_children), {"environment:TOKEN": "x"})
@@ -204,7 +201,6 @@ async def test_deployment_runtime_completes_children_after_cognition_and_delegat
     assert calls == [
         "cognition:['example.com']",
         "service:binding-1:['environment:TOKEN']",
-        "complete:2",
     ]
     assert GRANTED_NETWORK_HOSTS.get() is None
     assert result.event_payloads == (
@@ -212,9 +208,22 @@ async def test_deployment_runtime_completes_children_after_cognition_and_delegat
         {
             "kind": composition.ASYNC_CHILD_COMPLETION_KIND,
             "binding_id": "binding-1",
-            "children": [{"child_execution_id": "child-1"}],
+            # The deployment's registered policy admitted the completed blocking child and
+            # settled it against the parent budget.
+            "children": [
+                {
+                    "child_execution_id": child_id,
+                    "lifecycle": "completed",
+                    "dependency_class": "required_blocking",
+                    "result_decision": "admit",
+                    "usage_disposition": "settled",
+                    "reason": None,
+                }
+            ],
         },
     )
+    link = await children.link("tenant-1", child_id)
+    assert link.result_decision == "admit" and link.settlement_revision == 1
     calls.clear()
     without_children = SimpleNamespace(
         binding=SimpleNamespace(

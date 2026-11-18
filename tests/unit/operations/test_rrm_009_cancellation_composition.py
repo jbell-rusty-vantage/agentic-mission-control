@@ -196,6 +196,8 @@ def _invocation(*contracts: str) -> Any:
     return SimpleNamespace(
         binding=SimpleNamespace(
             binding_id="binding-1",
+            request_scope="tenant-1",
+            run_id="run-1",
             capability_grant=SimpleNamespace(network_hosts=frozenset({"example.com"})),
             **lane_fields(SimpleNamespace(async_subagents=contracts, execution_generation=1)),
         )
@@ -203,9 +205,9 @@ def _invocation(*contracts: str) -> Any:
 
 
 @pytest.mark.asyncio
-async def test_deployment_runtime_never_swallows_a_cancel_during_cognition_or_the_child_wait(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
+async def test_deployment_runtime_never_swallows_a_cancel_during_cognition_or_the_child_wait() -> (
+    None
+):
     import mission_control.adapters.temporal.deployment_composition as composition
     from mission_control.adapters.deep_agents.browser_tool import GRANTED_NETWORK_HOSTS
     from mission_control.domain.execution.contracts import RuntimeResult
@@ -225,23 +227,22 @@ async def test_deployment_runtime_never_swallows_a_cancel_during_cognition_or_th
         def service(self, binding: Any, secrets: Any) -> tuple[Any, Any]:
             return object(), object()
 
-    class Completion:
-        def __init__(self, service: Any, lineage: Any, **kwargs: Any) -> None:
-            pass
+    class HeldLineage:
+        """The children's completion wait, held open: the child is still running."""
 
-        async def complete(self, binding: Any, *, execution_generation: int) -> tuple[Any, ...]:
+        async def list_children(self, request_scope: str, parent_run_id: str) -> tuple[Any, ...]:
+            del request_scope, parent_run_id
             entered.set()
-            await asyncio.Event().wait()  # the child is still running
+            await asyncio.Event().wait()
             raise AssertionError("unreachable")
 
-    monkeypatch.setattr(composition, "AsyncChildCompletion", Completion)
-    monkeypatch.setattr(composition, "PostgresAsyncSubagentAuthority", lambda pool: pool)
     runtime = composition.DeploymentOperationRuntime(
         cast(Any, Inner()),
         cast(Any, Children()),
         pool=cast(Any, "pool"),
         policies={},
         wait_seconds=5,
+        lineage=HeldLineage(),
     )
     for cognition_blocks in (True, False):
         stage["cognition_blocks"] = cognition_blocks
@@ -257,9 +258,9 @@ async def test_deployment_runtime_never_swallows_a_cancel_during_cognition_or_th
 
 
 @pytest.mark.asyncio
-async def test_deployment_runtime_observes_the_latest_checkpoint_inside_the_granted_egress(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
+async def test_deployment_runtime_observes_the_latest_checkpoint_inside_the_granted_egress() -> (
+    None
+):
     import mission_control.adapters.temporal.deployment_composition as composition
     from mission_control.adapters.deep_agents.browser_tool import GRANTED_NETWORK_HOSTS
     from mission_control.domain.execution.contracts import RuntimeResult
@@ -494,13 +495,13 @@ async def test_deployment_runtime_verifies_the_mcp_launch_before_any_materializa
 
 @pytest.mark.asyncio
 async def test_composition_resources_are_closed_when_build_or_worker_start_fails(
-    tmp_path: Any, monkeypatch: pytest.MonkeyPatch
+    tmp_path: Any,
 ) -> None:
     """RRM-009 review: a factory build that fails partway (here: the pin file is absent and
     production composition fails closed) closes the saver/store it opened; a worker set that
     refuses to start closes the composition's resources."""
 
-    from contextlib import AsyncExitStack
+    from contextlib import AsyncExitStack, asynccontextmanager
 
     import mission_control.adapters.temporal.deployment_composition as composition
     from mission_control.adapters.capabilities.capability_pins import CapabilityPinError
@@ -511,18 +512,15 @@ async def test_composition_resources_are_closed_when_build_or_worker_start_fails
 
     events: list[str] = []
 
-    class Lifespan:
-        def __init__(self, *args: Any, **kwargs: Any) -> None:
-            pass
-
-        async def __aenter__(self) -> Any:
-            events.append("opened")
-            return SimpleNamespace(saver=object(), store=object())
-
-        async def __aexit__(self, *exc: object) -> None:
+    @asynccontextmanager
+    async def opened(conn_string: str) -> Any:
+        del conn_string
+        events.append("opened")
+        try:
+            yield object()
+        finally:
             events.append("closed")
 
-    monkeypatch.setattr(composition, "StandalonePersistenceLifespan", Lifespan)
     settings = isolated_settings(
         mission_control_worker_role="base",
         langgraph_checkpoint_dsn="postgresql://unused",
@@ -530,7 +528,9 @@ async def test_composition_resources_are_closed_when_build_or_worker_start_fails
         mc_local_db_runtime_dsn="postgresql://unused",
         capability_pins_path=tmp_path / "absent.json",
     )
-    factory = composition.ProductionWorkerActivityCompositionFactory(cast(Any, object()))
+    factory = composition.ProductionWorkerActivityCompositionFactory(
+        cast(Any, object()), checkpoint_saver_factory=opened, checkpoint_store_factory=opened
+    )
     with pytest.raises(CapabilityPinError, match="required but absent"):
         await factory.build(
             settings=cast(Any, settings),
@@ -538,7 +538,8 @@ async def test_composition_resources_are_closed_when_build_or_worker_start_fails
             run_control=cast(Any, object()),
             postgres_pool=cast(Any, object()),
         )
-    assert events == ["opened", "closed"]
+    # The saver and the Store it opened are both closed.
+    assert events == ["opened", "opened", "closed", "closed"]
 
     events.clear()
     resources = AsyncExitStack()
