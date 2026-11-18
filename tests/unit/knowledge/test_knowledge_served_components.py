@@ -8,9 +8,10 @@ tools. Now one shared definition (``served_knowledge_tools``) serves them wherev
 binding is configured, and nowhere else.
 
 The launch author is composed here exactly as the API and the chain relay compose it (settings,
-the real pin file, the bindings file, no ``additional``); the served set it hands the resolver is
-recorded. Admission then runs the knowledge-tools manifest against that served tool set (the
-fixture's own model/sandbox components stand in for the worker's qualification models).
+the real pin file, the bindings file, no ``additional``); the served set its launches are
+admitted against is read from the composed author. Admission then runs the knowledge-tools
+manifest against that served tool set (the fixture's own model/sandbox components stand in for
+the worker's qualification models).
 """
 
 from __future__ import annotations
@@ -101,19 +102,9 @@ def bindings_file(tmp_path: Path, compiled: tuple[Any, Any]) -> tuple[Path, Any]
     return path, bindings
 
 
-def served_by_production_author(
-    monkeypatch: pytest.MonkeyPatch, settings: Any, application_id: str = APP
-) -> ServedComponents:
+def served_by_production_author(settings: Any, application_id: str = APP) -> ServedComponents:
     """Compose the launch author as the API and the chain relay do; return what it serves."""
 
-    recorded: list[ServedComponents] = []
-    real = manifests.compose_manifest_launch_resolver
-
-    def record(bindings: Any, served: ServedComponents, **kwargs: Any) -> Any:
-        recorded.append(served)
-        return real(bindings, served, **kwargs)
-
-    monkeypatch.setattr(manifests, "compose_manifest_launch_resolver", record)
     author = manifests.compose_manifest_launch_inputs(
         cast(Any, object()),
         settings=settings,
@@ -122,16 +113,17 @@ def served_by_production_author(
         control_plane=cast(Any, object()),
     )
     assert author is not None
-    (served,) = recorded
+    served = author.served_components
+    assert served is not None
     return served
 
 
 def test_the_production_author_admits_a_manifest_selecting_report_register(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, compiled: tuple[Any, Any]
+    tmp_path: Path, compiled: tuple[Any, Any]
 ) -> None:
     path, bindings = bindings_file(tmp_path, compiled)
     settings, _active = knowledge_settings(tmp_path, path)
-    served = served_by_production_author(monkeypatch, settings)
+    served = served_by_production_author(settings)
     definitions = served_knowledge_tools()
     knowledge = set(definitions)
     current = {
@@ -166,7 +158,7 @@ def test_the_production_author_admits_a_manifest_selecting_report_register(
 
 
 def test_without_a_knowledge_binding_only_output_submission_is_served(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, compiled: tuple[Any, Any]
+    tmp_path: Path, compiled: tuple[Any, Any]
 ) -> None:
     """Output submission is Mission Control's own act: `submit_output` is served on every
     installation; the other knowledge tools only where a knowledge binding is configured."""
@@ -180,7 +172,7 @@ def test_without_a_knowledge_binding_only_output_submission_is_served(
     settings = isolated_settings(
         manifest_launch_bindings_path=path, mission_control_catalog_scope=CATALOG
     )
-    served = served_by_production_author(monkeypatch, settings)
+    served = served_by_production_author(settings)
     knowledge_only = set(served_knowledge_tools()) - set(served_output_tools())
     assert not knowledge_only & served.tools
     assert set(served_output_tools()) <= served.tools
@@ -196,11 +188,11 @@ def test_without_a_knowledge_binding_only_output_submission_is_served(
         knowledge_gateway_required=True,
     )
     with pytest.raises(KnowledgeConfigurationError, match="KNOWLEDGE_BINDING_URL"):
-        served_by_production_author(monkeypatch, required)
+        served_by_production_author(required)
 
 
 async def test_api_relay_and_worker_serve_the_same_knowledge_tools(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, compiled: tuple[Any, Any]
+    tmp_path: Path, compiled: tuple[Any, Any]
 ) -> None:
     """Parity: the API launch author, the worker's chain-relay author (both
     `compose_manifest_launch_inputs`) and the worker's exact registry (`compose_knowledge_lane`
@@ -208,8 +200,8 @@ async def test_api_relay_and_worker_serve_the_same_knowledge_tools(
 
     path, _bindings = bindings_file(tmp_path, compiled)
     settings, active = knowledge_settings(tmp_path, path)
-    api = served_by_production_author(monkeypatch, settings)
-    relay = served_by_production_author(monkeypatch, settings)
+    api = served_by_production_author(settings)
+    relay = served_by_production_author(settings)
     clock = Clock(KNOWLEDGE_NOW)
     fake = FakeKnowledgeBinding(
         verifier=CredentialVerifier(

@@ -735,6 +735,7 @@ class ManifestLaunchResolver:
         hosted_digest: Any = None,
         resolution: LaunchResolution | None = None,
         projectors: HostProjectors | None = None,
+        served: ServedComponents | None = None,
     ) -> None:
         unresolved = sorted(
             name for name, item in bindings.capabilities.items() if not item.resolved
@@ -753,6 +754,9 @@ class ManifestLaunchResolver:
         # The Host Projection port the provider and Cursor templates pin their projection
         # digests through (OC-R3; bootstrap composes it from the lane packages).
         self._projectors = projectors
+        # The components the deployment serves, which the seam admits node selections against
+        # (read-only; `None` when the composition did not state them).
+        self.served = served
 
     def _projection_port(self) -> HostProjectors:
         if self._projectors is None:
@@ -3471,6 +3475,12 @@ class ManifestLaunchInputAuthor:
             run_control=run_control,
             control_plane=control_plane,
         )
+
+    @property
+    def served_components(self) -> ServedComponents | None:
+        """The components this author's launches are admitted against (W1 D9)."""
+
+        return self._resolver.served
 
     async def family_input(
         self,

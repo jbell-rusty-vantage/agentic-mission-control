@@ -97,6 +97,7 @@ def compose_manifest_launch_resolver(
         network_hosts=network_hosts,
         hosted_digest=hosted_digest,
         projectors=HOST_PROJECTORS,
+        served=served,
         resolution=compose_launch_resolution(
             bindings,
             served,
