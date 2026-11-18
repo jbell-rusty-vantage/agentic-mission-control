@@ -64,6 +64,42 @@ jobs:
           fi
           python3 -X utf8 docs/tools/trace.py check --range "$range"
 
+  deep-agents-end-to-end:
+    # Test-suite review G5 (OVE-238): the two canonical end-to-end proofs of the Deep Agents
+    # path (manifest -> compile -> sealed binding -> GoalDirected/StageGraph on Temporal ->
+    # settlement and chain release) on real PostgreSQL 17 and a Temporal dev server the tests
+    # start themselves, with a scripted model (no provider spend).
+    name: Deep Agents end to end (real PostgreSQL and Temporal)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    services:
+      postgres:
+        image: pgvector/pgvector:pg17
+        env:
+          POSTGRES_DB: belllabs
+          POSTGRES_USER: belllabs
+          POSTGRES_PASSWORD: belllabs-local
+        ports:
+          - 127.0.0.1:55434:5432
+        options: >-
+          --health-cmd "pg_isready -U belllabs -d belllabs"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 30
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Install uv
+        run: pipx install "uv==${UV_VERSION}"
+      - name: Install the locked environment (runtime, dev, dbcontract, biotech)
+        run: make install
+      - name: Manifest to chain completion, and the signed scoped runtime with history replay
+        env:
+          MISSION_CONTROL_TEST_ADMIN_DSN: postgresql://belllabs:belllabs-local@127.0.0.1:55434/belllabs
+        run: >-
+          uv run --no-sync pytest -q
+          "tests/acceptance/mission_control/test_chain_two_goal_loops.py::test_research_acceptance_releases_ingestion_with_its_packet_and_completes_the_chain"
+          tests/acceptance/mission_control/test_authenticated_scoped_runtime.py
+
   local-stack:
     name: Local stack (install, up, consumer evaluation)
     runs-on: ubuntu-24.04
