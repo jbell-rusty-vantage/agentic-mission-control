@@ -1,4 +1,4 @@
-"""`tests/fixtures/tcp_proxy.py` (FX-TR-REMOTE's saver proxy) against an asyncio echo server:
+"""`tests/support/tcp_proxy.py` (FX-TR-REMOTE's saver proxy) against an asyncio echo server:
 bytes pass through unchanged, `delay_seconds` is applied to each client chunk, and
 `set_closed(True)` severs open pairs and refuses new ones until `set_closed(False)`."""
 
@@ -12,7 +12,7 @@ from contextlib import asynccontextmanager
 
 import pytest
 
-from tests.fixtures.tcp_proxy import SaverProxy
+from tests.support.tcp_proxy import SaverProxy
 
 
 async def _echo(reader: asyncio.StreamReader, writer: asyncio.StreamWriter) -> None:

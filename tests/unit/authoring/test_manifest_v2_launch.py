@@ -90,10 +90,10 @@ from mission_control.domain.execution.contracts import (
     OperationWorkflowRequest,
 )
 from mission_control.domain.execution.lane_requirements import RequirementSet, admit_requirements
-from tests.fixtures.applications import installed_applications
-from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog
-from tests.fixtures.environment_kits import StaticDefinitions
+from tests.support.applications import installed_applications
+from tests.support.environment_kits import StaticDefinitions
 from tests.support.ids import canonical_scope
+from tests.support.manifests.seeded_catalog import fast_track_catalog
 from tests.support.manifests.v2_launch import (
     AT,
     BINDINGS,
@@ -874,7 +874,7 @@ def test_projected_capabilities_are_pinned_and_rendered_like_the_lane_renders_th
     same projection digest (`RenderedProjectionSource`, as the claude/codex harnesses use)."""
 
     from mission_control.application.agentic_components.placement import RenderedProjectionSource
-    from tests.fixtures.projections.rows import skill_row
+    from tests.support.projection_rows import skill_row
 
     def with_skill(document: dict[str, Any]) -> None:
         document["mission"]["environment"]["workspace"]["skills"] = [

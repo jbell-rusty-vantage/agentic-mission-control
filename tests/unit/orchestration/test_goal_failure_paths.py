@@ -46,8 +46,8 @@ from mission_control.domain.programs.goal_directed_runtime import (
     GoalOperationReconciliationResult,
     reconciliation_payload_bytes,
 )
-from tests.fixtures.checkpoint_lineage import activity_attempt
-from tests.fixtures.goal_directed_journaled import SCOPE, goal_blueprint, goal_run_input
+from tests.support.checkpoint_lineage import activity_attempt
+from tests.support.journaled_goal_loop import SCOPE, goal_blueprint, goal_run_input
 from tests.support.unit.orchestration.rrm_016_goal_directed_settlement import (
     _claim,
     _composition,

@@ -38,7 +38,7 @@ from mission_control.domain.coordinator.contracts import (
     CatalogAssetStatus,
     SearchDocumentMetadata,
 )
-from tests.fixtures.capability_search_catalog import DeterministicEmbeddings
+from tests.support.capability_search import DeterministicEmbeddings
 
 NOW = datetime(2026, 7, 25, 17, 0, tzinfo=UTC)
 DIGEST = "sha256:" + "a" * 64

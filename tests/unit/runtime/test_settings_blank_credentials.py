@@ -18,7 +18,7 @@ from mission_control.adapters.temporal.client import (
 from mission_control.bootstrap.bundle_custody import compose_bundle_materializer
 from mission_control.bootstrap.lanes import settings_bound_lanes
 from mission_control.bootstrap.settings import configured
-from tests.fixtures.isolated_settings import isolated_settings
+from tests.support.settings import isolated_settings
 
 DSN = "postgresql://runtime@db.example.invalid:5432/postgres"
 BLANK = SecretStr("")

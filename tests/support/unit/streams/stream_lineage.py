@@ -11,7 +11,7 @@ from typing import Any
 from mission_control.application.streams.flow import ConnectionBudget, InflightWindow
 from mission_control.application.streams.pump import SubscriptionPump
 from mission_control.domain.frames.contracts import ProviderFrame
-from tests.fixtures.provider_frames import FIXTURE_HARNESS
+from tests.support.provider_frames import FIXTURE_HARNESS
 from tests.support.unit.streams.stream_pump import FAST, Recorder
 
 

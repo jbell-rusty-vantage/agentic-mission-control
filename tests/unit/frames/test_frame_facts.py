@@ -47,7 +47,9 @@ from mission_control.domain.policies.reducer import (
     reduce_lifecycle,
     required_action_permissions,
 )
-from tests.fixtures.provider_frames import (
+from tests.support.clock import SECOND, Clock
+from tests.support.ids import SCOPE
+from tests.support.provider_frames import (
     FIXTURE_ACTIVATION,
     FIXTURE_HARNESS,
     FRAME_NOW,
@@ -57,8 +59,6 @@ from tests.fixtures.provider_frames import (
     provider_frame,
     turn_observations,
 )
-from tests.support.clock import SECOND, Clock
-from tests.support.ids import SCOPE
 from tests.support.run_control import ALL_PERMISSIONS, actor, command, request
 from tests.support.run_control import service as run_control_service
 from tests.support.unit.frames.frame_facts import _RunControl
@@ -725,7 +725,7 @@ async def test_reducer_stamps_unit_activation_and_point_on_frame_fact_events() -
 async def test_projector_passes_the_unit_key_and_the_result_points() -> None:
     from mission_control.application.frames.writer import FrameWriter
     from mission_control.domain.frames.facts import FRAME_EVENT_TYPES
-    from tests.fixtures.provider_frames import observation
+    from tests.support.provider_frames import observation
 
     service, _repository = run_control_service()
     admitted = await service.admit(request(request_scope=SCOPE, request_id="projector-points"))

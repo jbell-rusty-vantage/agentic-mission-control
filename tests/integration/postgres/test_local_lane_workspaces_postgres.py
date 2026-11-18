@@ -25,9 +25,9 @@ from mission_control.application.workspaces.errors import (
     WorkspaceError,
 )
 from mission_control.application.workspaces.service import AllocationRequest
-from tests.fixtures.local_lane_workspaces import SHARED, WITHIN_RUN
-from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.support.artifacts import MemoryArtifacts
+from tests.support.db import CommonDatabase
+from tests.support.local_lane_workspaces import SHARED, WITHIN_RUN
 from tests.unit.workspaces.workspace_fixtures import make_primary, present
 
 pytestmark = pytest.mark.common_db

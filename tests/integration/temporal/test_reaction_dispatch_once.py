@@ -58,13 +58,13 @@ from mission_control.domain.reactions.contracts import (
     ReactionDeclaration,
     TransitionKind,
 )
-from tests.fixtures.checkpoint_recovery import recovery_harness, stage_recovery_unit
-from tests.fixtures.lane_bindings import LANE_REBINDERS
-from tests.fixtures.mission_control_common_db import (
+from tests.support.checkpoint_recovery import recovery_harness, stage_recovery_unit
+from tests.support.db import (
     CommonDatabase,
     common_database,
     migration_paths_with,
 )
+from tests.support.lane_bindings import LANE_REBINDERS
 from tests.support.temporal import start_workflow_env
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.common_db]

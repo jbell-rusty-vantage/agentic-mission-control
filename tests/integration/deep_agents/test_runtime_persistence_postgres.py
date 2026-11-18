@@ -25,20 +25,20 @@ from langgraph.checkpoint.base import empty_checkpoint
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 from langgraph.store.postgres.aio import AsyncPostgresStore
 from pydantic import SecretStr
-from tests.fixtures.isolated_settings import isolated_settings
-from tests.fixtures.mission_control_common_db import (
+from tests.support.db import (
     RUNTIME_DESCRIPTOR as DESCRIPTOR,
 )
-from tests.fixtures.mission_control_common_db import (
+from tests.support.db import (
     CommonDatabase,
     StepHold,
     apply_descriptor,
     create_common_database,
     drop_common_database,
 )
-from tests.fixtures.mission_control_common_db import (
+from tests.support.db import (
     checkpointer_login as _checkpointer_login,
 )
+from tests.support.settings import isolated_settings
 
 from mission_control.adapters.deep_agents.persistence import (
     StandalonePersistenceLifespan,

@@ -11,7 +11,7 @@ from mission_control.adapters.storage.frame_body_promoter import PayloadStoreFra
 from mission_control.application.frames.body_refs import parse_frame_body_ref
 from mission_control.domain.execution.errors import WorkspaceDigestMismatch
 from mission_control.domain.frames.contracts import FrameKind
-from tests.fixtures.provider_frames import harness_start, in_memory_store
+from tests.support.provider_frames import harness_start, in_memory_store
 
 BODY = b'{"content": "a tool result", "status": "success"}'
 DIGEST = "sha256:" + sha256(BODY).hexdigest()

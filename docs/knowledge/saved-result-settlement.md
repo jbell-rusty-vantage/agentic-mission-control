@@ -85,7 +85,7 @@ structured values and code changes (see [output contracts](output-contracts.md))
 
 ## Limits
 
-The proofs of this section use generic durable waits (`tests/fixtures/saved_settlement.py`); the real KS review waits are WI-03, shipped ([trusted judgment](trusted-judgment.md)).
+The proofs of this section use generic durable waits (`tests/support/saved_settlement.py`); the real KS review waits are WI-03, shipped ([trusted judgment](trusted-judgment.md)).
 WI-05 bridges native receipt reconciliation into the effect wait. A refused dispatch carries
 `details.dispatch` (KS 2.5.0): a first dispatch is rejected for `not_journaled`, and for a
 fenced (`details.fenced`) `journaled_uncommitted` only once `receipt.get` proves no commit; `committed`, `unknown`, a retry's

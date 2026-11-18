@@ -40,9 +40,9 @@ from mission_control.domain.execution.lanes import EndSessionRequest
 from mission_control.domain.frames.contracts import FrameKind
 from mission_control.domain.policies.stop_fence import StopFence
 from mission_control.interfaces.http.hook_callback import create_hook_callback_app
-from tests.fixtures.lane_turns import lane_stack
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import admit_unit_attempt, owner_rows
+from tests.support.lanes import lane_stack
 from tests.support.providers.codex import (
     CodexStack,
     FixtureLauncher,

@@ -17,7 +17,7 @@ import pytest
 
 from mission_control.adapters.temporal import worker as module
 from mission_control.bootstrap.payload_custody import MARKER, verify_payload_custody
-from tests.fixtures.isolated_settings import isolated_settings
+from tests.support.settings import isolated_settings
 
 
 def _record(monkeypatch: pytest.MonkeyPatch) -> list[str]:

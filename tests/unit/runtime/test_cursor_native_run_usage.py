@@ -91,7 +91,7 @@ async def test_missing_output_followup_uses_one_durable_dispatch_and_sums_both_r
     from mission_control.domain.authoring.canonical import sha256_digest
     from mission_control.domain.execution.lane_turns import LaneTurnRequest
     from mission_control.domain.execution.lanes import LaneFrame, TurnHandle
-    from tests.fixtures.lane_turns import (
+    from tests.support.lanes import (
         RecordingSignals,
         ScriptedSessionLane,
         cursor_operation,
@@ -179,8 +179,8 @@ async def test_production_reader_union_accounts_two_generations_and_excludes_oth
     from mission_control.domain.execution.lane_turns import ClosingFacts
     from mission_control.domain.execution.lanes import SessionHandle, TurnHandle
     from mission_control.domain.frames.contracts import FrameObservation
-    from tests.fixtures.cursor_controls import harness_fields
-    from tests.fixtures.lane_turns import cursor_operation, lane_stack
+    from tests.support.cursor_lane_controls import harness_fields
+    from tests.support.lanes import cursor_operation, lane_stack
 
     operation = cursor_operation("cursor_cloud")
     stack = lane_stack(operation=operation)
@@ -383,8 +383,8 @@ async def test_cancelled_run_observation_and_authoritative_read_policy(
     from mission_control.domain.execution.lane_turns import ClosingFacts
     from mission_control.domain.execution.lanes import SessionHandle, TurnHandle
     from mission_control.domain.frames.contracts import FrameObservation
-    from tests.fixtures.cursor_controls import harness_fields
-    from tests.fixtures.lane_turns import cursor_operation, lane_stack
+    from tests.support.cursor_lane_controls import harness_fields
+    from tests.support.lanes import cursor_operation, lane_stack
 
     operation = cursor_operation("cursor_cloud")
     stack = lane_stack(operation=operation)

@@ -36,9 +36,9 @@ from mission_control.domain.execution.lanes import (
 )
 from mission_control.domain.policies.contracts import ActorContext
 from tests.conformance.lanes.contract import ContinuationPorts, LaneFake
-from tests.fixtures.continuation import build_service, facts, seal_target, trigger
-from tests.fixtures.lane_turns import RecordingSignals
+from tests.support.continuation import build_service, facts, seal_target, trigger
 from tests.support.ids import SCOPE
+from tests.support.lanes import RecordingSignals
 from tests.unit.approvals.fixtures import answer
 
 # Bounds every scenario segment runs under: short enough to fail fast, long enough for a

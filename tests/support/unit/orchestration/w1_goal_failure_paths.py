@@ -8,7 +8,7 @@ from __future__ import annotations
 from typing import Any
 
 from mission_control.domain.programs.goal_directed_runtime import GoalOperationDispatch
-from tests.fixtures.goal_directed_journaled import SCOPE
+from tests.support.journaled_goal_loop import SCOPE
 from tests.support.unit.orchestration.rrm_016_goal_directed_settlement import (
     _claim,
     _composition,

@@ -6,7 +6,7 @@ import pytest
 from mission_control.application.prerequisites.preflight import PrerequisitesUnmet
 from mission_control.application.prerequisites.service import InMemoryOwnerPrerequisiteRepository
 from mission_control.domain.execution.lanes import CursorExecutionBinding
-from tests.fixtures.lane_bindings import lane_fields
+from tests.support.lane_bindings import lane_fields
 
 
 async def _no_installation_blockers() -> tuple[str, ...]:

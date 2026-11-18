@@ -17,7 +17,7 @@ import pytest
 from mission_control.adapters.postgres.subscriptions.store import PostgresSubscriptionStore
 from mission_control.application.subscriptions.ports import SubscriptionNotFound
 from mission_control.domain.subscriptions.contracts import SubscriptionTarget
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import insert_fixture_run
 
 pytestmark = pytest.mark.common_db

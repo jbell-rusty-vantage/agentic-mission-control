@@ -13,7 +13,7 @@ from mission_control.application.installations.registry import (
 )
 from mission_control.bootstrap.composition import compose_application_services
 from mission_control.domain.authoring.extensions import ExtensionRegistry
-from tests.fixtures.mission_control_common_db import COMPONENT_VERSION, common_database
+from tests.support.db import COMPONENT_VERSION, common_database
 
 pytestmark = pytest.mark.common_db
 

@@ -27,7 +27,7 @@ from mission_control.application.execution.harness.state import (
 from mission_control.application.frames.kinds import classify, cursor_local_key
 from mission_control.application.frames.writer import FrameWriter
 from mission_control.domain.frames.contracts import FrameObservation, LaneProfile
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import admit_unit_attempt
 
 pytestmark = pytest.mark.common_db

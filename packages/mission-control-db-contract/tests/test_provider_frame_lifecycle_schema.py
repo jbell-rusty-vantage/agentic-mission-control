@@ -9,8 +9,8 @@ import asyncpg
 import pytest
 from mission_control.adapters.postgres.frames.repository import PostgresFrameRepository
 from mission_control.adapters.postgres.scope import apply_scope
-from tests.fixtures.mission_control_common_db import common_database, migration_paths
 from tests.integration.postgres.frames_common import admit_unit_attempt
+from tests.support.db import common_database, migration_paths
 
 pytestmark = [pytest.mark.common_db, pytest.mark.asyncio]
 

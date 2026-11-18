@@ -41,7 +41,7 @@ from mission_control.domain.execution.lanes import (
 )
 from mission_control.domain.frames.body import frame_body_object
 from mission_control.domain.frames.contracts import FrameKind
-from tests.fixtures.lane_turns import RecordingSignals
+from tests.support.lanes import RecordingSignals
 from tests.support.providers.codex import (
     FAKE_WORKER_ENV,
     FIXTURE_INSTRUCTIONS,

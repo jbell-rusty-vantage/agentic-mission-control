@@ -11,7 +11,7 @@ from mission_control.application.execution.boundary_interventions import Boundar
 from mission_control.application.execution.harness.inject import InjectionSettings
 from mission_control.application.missions.service import MissionControlService
 from mission_control.domain.policies.contracts import ActorContext
-from tests.fixtures.checkpoint_recovery import (
+from tests.support.checkpoint_recovery import (
     RecoveryHarness,
     recovery_harness,
 )

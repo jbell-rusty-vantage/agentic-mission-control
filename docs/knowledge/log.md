@@ -1194,7 +1194,7 @@ MP-12 ported; MP-15 and MP-20 finished; uncommitted on the local branch
   `mc.provider_wake.v1` wake signals (`application/signals/wake.py`): the event type and resource
   id each provider documents, nothing else from the body. A repeated `webhook-id` records nothing
   and still answers 204; forged and stale deliveries are 401. Added the glossary term Provider
-  Wake. Proof uses signed fixture deliveries only (`tests/fixtures/provider_webhooks.py`).
+  Wake. Proof uses signed fixture deliveries only (`tests/support/provider_webhooks.py`).
 
 ## 2026-10-13 (materialization-observation run 1, MO-20)
 

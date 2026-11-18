@@ -19,7 +19,7 @@ from mission_control.adapters.temporal.workflows.watchers import (
 from mission_control.application.watchers.ports import WatcherCursor
 from mission_control.application.watchers.service import WatcherEvaluationService
 from mission_control.bootstrap.watch_sources import RegisteredWatchSources, SourceWatchRegistration
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import admit_unit_attempt
 from tests.support.integration.postgres.mo44_watchers_postgres import (
     FixedProgram,

@@ -6,7 +6,7 @@ Moved from tests/integration/postgres/test_environment_kits_postgres.py.
 from __future__ import annotations
 
 from mission_control_db_contract.seeds import load_bundles, order_bundles
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import SEEDS, apply_seed_bundle
 
 

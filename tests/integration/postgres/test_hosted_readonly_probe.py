@@ -13,7 +13,7 @@ from mission_control.bootstrap.hosted_readonly import HostedReadonlyVerifier
 from mission_control.bootstrap.settings import Settings
 from mission_control.domain.capabilities.host_support import LaneProfile
 from mission_control.domain.prerequisites import VerificationMethod
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.db import CommonDatabase
 from tests.support.unit.prerequisites.hosted_readonly import readonly_binding, readonly_template
 
 pytestmark = pytest.mark.common_db

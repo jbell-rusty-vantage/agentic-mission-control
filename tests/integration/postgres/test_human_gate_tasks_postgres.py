@@ -30,7 +30,7 @@ from mission_control.domain.programs.human_gate import (
     bind_outcome,
     outcome_for,
 )
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import owner_rows
 from tests.support.run_control import request, service
 from tests.unit.human_tasks.fixtures import activation, later, spec

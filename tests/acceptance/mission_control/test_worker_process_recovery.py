@@ -16,8 +16,8 @@ from uuid import uuid4
 
 import pytest
 from pydantic import TypeAdapter
-from tests.fixtures.owned_process import OwnedProcess
-from tests.fixtures.validation_restart_worker import ValidationRestartWorkflow
+from tests.support.owned_process import OwnedProcess
+from tests.support.restart_worker import ValidationRestartWorkflow
 from tests.support.run_control import command
 from tests.support.stack import start_local
 from tests.support.unit.orchestration.completion_validation_service import prepared
@@ -72,7 +72,7 @@ async def test_forced_worker_loss_replays_commit_and_honors_offline_cancel(commo
         ready = "ready-" + uuid4().hex
         proc = await asyncio.to_thread(
             OwnedProcess,
-            [sys.executable, "-m", "tests.fixtures.validation_restart_worker"],
+            [sys.executable, "-m", "tests.support.restart_worker"],
             cwd=ROOT,
             env={**child_env, "MC_RESTART_BLOCK": str(int(block)), "MC_RESTART_READY": ready},
             stdout=log,

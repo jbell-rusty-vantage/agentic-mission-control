@@ -16,7 +16,7 @@ from mission_control.domain.subscriptions.streams import (
     StreamSubscription,
     StreamTarget,
 )
-from tests.fixtures.provider_frames import FIXTURE_HARNESS
+from tests.support.provider_frames import FIXTURE_HARNESS
 from tests.unit.streams.fakes import RUN_KEY, FakeStreamSource
 
 READER = ActorContext(actor_id="viewer", permissions=frozenset({"workflow_run.read"}))

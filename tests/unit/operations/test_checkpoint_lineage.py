@@ -7,7 +7,7 @@ import pytest
 from mission_control.application.execution.operations.checkpoint_lineage import (
     InMemoryCheckpointLineageRepository,
 )
-from tests.fixtures.checkpoint_lineage import (
+from tests.support.checkpoint_lineage import (
     assert_checkpoint_lineage_repository_contract,
     assert_checkpoint_recovery_repository_contract,
 )

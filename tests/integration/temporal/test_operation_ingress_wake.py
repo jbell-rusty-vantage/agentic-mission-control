@@ -39,7 +39,7 @@ from mission_control.adapters.temporal.workflows.operation import (
 )
 from mission_control.domain.execution.contracts import OperationWorkflowRequest
 from mission_control.domain.execution.lanes import LaneSegmentBounds
-from tests.fixtures.lane_turns import (
+from tests.support.lanes import (
     LANE_QUEUE,
     LaneStack,
     ScriptedSessionLane,

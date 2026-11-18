@@ -12,7 +12,7 @@ from types import SimpleNamespace
 from typing import Any
 
 from temporalio.testing import ActivityEnvironment
-from tests.fixtures.lane_turns import DIGEST, ScriptedSessionLane, lane_stack
+from tests.support.lanes import DIGEST, ScriptedSessionLane, lane_stack
 from tests.support.providers.managed_agents import managed_binding, managed_operation
 from tests.support.unit.harness.managed_budget_controls import NOW, Approvals, Authority, Provider
 

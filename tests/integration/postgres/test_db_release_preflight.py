@@ -28,7 +28,6 @@ from mission_control.bootstrap.preflight import (
 )
 from mission_control.bootstrap.settings import get_settings
 from mission_control.domain.authoring.canonical import sha256_digest
-from tests.fixtures.mission_control_common_db import common_database
 from tests.qualification.two_project.disposable import (
     ADMIN_DSN_ENV,
     create_database,
@@ -42,6 +41,7 @@ from tests.qualification.two_project.release_install import (
     plan_and_apply,
     write_target,
 )
+from tests.support.db import common_database
 from tests.support.unit.runtime.mp22_local_readiness import (
     AUTH_EXAMPLE,
     BINDINGS_EXAMPLE,

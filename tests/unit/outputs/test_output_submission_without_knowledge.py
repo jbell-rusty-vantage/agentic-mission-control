@@ -143,7 +143,7 @@ async def test_the_worker_composes_output_submission_where_no_binding_is_configu
         compose_output_lane,
         knowledge_served_tools,
     )
-    from tests.fixtures.isolated_settings import isolated_settings
+    from tests.support.settings import isolated_settings
 
     settings = isolated_settings()
     served = knowledge_served_tools(settings, application_id="ai-engineer")

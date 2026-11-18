@@ -83,18 +83,6 @@ from mission_control.bootstrap.technical_api import api
 from mission_control.domain.authoring.extensions import ExtensionRegistry
 from mission_control.domain.authoring.manifest import canonical_manifest_bytes, load_manifest_yaml
 from mission_control.domain.execution.contracts import DeepAgentExecutionBinding
-from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog, publish_output_schemas
-from tests.fixtures.manifest_runtime import (
-    ChainScript,
-    GoalScript,
-    chain_components,
-    promise_submitter,
-)
-from tests.fixtures.rrm009_production_stack import (
-    AGENT_COGNITIVE_QUEUE,
-    TechnicalBinding,
-    technical_binding,
-)
 from tests.support.deep_agents import exact_fixture
 from tests.support.ids import SCOPE
 from tests.support.manifest_runtime import (
@@ -118,7 +106,19 @@ from tests.support.manifest_runtime import (
     submit,
     write_bindings,
 )
+from tests.support.manifests.lifecycle import (
+    ChainScript,
+    GoalScript,
+    chain_components,
+    promise_submitter,
+)
+from tests.support.manifests.seeded_catalog import fast_track_catalog, publish_output_schemas
 from tests.support.model_catalog import catalog_for
+from tests.support.production_stack import (
+    AGENT_COGNITIVE_QUEUE,
+    TechnicalBinding,
+    technical_binding,
+)
 from tests.support.stack import _diagnose, _run, _until, open_stack
 from tests.unit.authoring.manifest_launch_fixture import deep_agents_chain, fixture_bindings
 

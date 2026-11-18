@@ -12,12 +12,12 @@ One builder, `open_stack`, for one composition, with two front doors:
   ``saver_proxy=`` routes the LangGraph saver through a TCP proxy.
 
 Both run on a fresh database with the common ``mission_control`` component installed
-(`tests.fixtures.mission_control_common_db`): the API and workers connect as restricted
+(`tests.support.db`): the API and workers connect as restricted
 ``mission_control_runtime`` / ``mission_control_family_writer`` logins under forced row-level
 security, the LangGraph saver/store use the provisioned ``mission_control_runtime`` schema
 through a checkpointer-only login, and every scope is a canonical
 ``mc/{installation}/{application}/{tenant}`` scope. The production workers run deterministic
-Deep Agents cognition (`tests.fixtures.rrm009_production_stack`); no provider is called.
+Deep Agents cognition (`tests.support.production_stack`); no provider is called.
 
 The stack is hermetic (`bind_hermetic_environment`): it never reads the developer ``.env``,
 it drops every `Settings` variable the developer shell exported, and it depends on no sibling
@@ -28,7 +28,7 @@ environment; set ``MISSION_CONTROL_E2E_KEEP_DATABASE=1`` to keep the database fo
 inspection. Temporal starts through the SDK (``MISSION_CONTROL_TEMPORAL_CLI`` or the cached
 SDK CLI). Missing prerequisites fail the proof instead of converting it to a successful skip.
 
-The multi-lane parity stack (`tests.fixtures.mp20_parity.open_parity_stack`) builds on the
+The multi-lane parity stack (`tests.support.lane_parity_stack.open_parity_stack`) builds on the
 inspection mode and adds the provider-lane fakes.
 """
 
@@ -175,19 +175,20 @@ from mission_control.interfaces.http.run_control import (
     close_run_control_resources,
     initialize_run_control_resources,
 )
-from tests.fixtures import rrm009_production_stack as technical
-from tests.fixtures.checkpoint_lineage import bind_unit, stage_unit
-from tests.fixtures.db_env import db_env_name
-from tests.fixtures.lane_bindings import lane_fields
-from tests.fixtures.mission_control_common_db import (
+from tests.support import production_stack as technical
+from tests.support.checkpoint_lineage import bind_unit, stage_unit
+from tests.support.db import (
     COMPONENT_VERSION,
     CommonDatabase,
     create_common_database,
     drop_common_database,
     provision_runtime,
 )
-from tests.fixtures.prerequisite_preflight import bind_disposable_prerequisites
-from tests.fixtures.rrm009_production_stack import (
+from tests.support.db_env import db_env_name
+from tests.support.ids import SCOPE, canonical_scope
+from tests.support.lane_bindings import lane_fields
+from tests.support.prerequisite_inputs import bind_disposable_prerequisites
+from tests.support.production_stack import (
     LANGGRAPH_SCHEMA,
     OPERATOR,
     REPORT_PATH,
@@ -201,8 +202,7 @@ from tests.fixtures.rrm009_production_stack import (
     technical_admission_policies,
     technical_binding,
 )
-from tests.fixtures.tcp_proxy import SaverProxy
-from tests.support.ids import SCOPE, canonical_scope
+from tests.support.tcp_proxy import SaverProxy
 
 # --- Hermetic environment --------------------------------------------------------------------
 

@@ -20,7 +20,7 @@ from mission_control.application.execution.hosted_tools import HostedToolGate
 from mission_control.application.execution.stop_fence import InMemoryStopFenceRepository
 from mission_control.application.frames.sink import InMemoryFrameStore
 from tests.conformance.lanes.contract import LaneAdapter, LaneFake, Script
-from tests.fixtures.cursor_controls import FAST, admitted_unit, compose_control_stack
+from tests.support.cursor_lane_controls import FAST, admitted_unit, compose_control_stack
 from tests.support.providers.managed_agents import (
     PROFILE,
     FakeManagedAgentsApi,

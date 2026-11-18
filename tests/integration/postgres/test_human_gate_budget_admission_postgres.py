@@ -9,7 +9,7 @@ from mission_control.adapters.postgres.run_control.run_control_repository import
 )
 from mission_control.domain.authoring.canonical import sha256_digest
 from mission_control.domain.programs.contracts import StageGraphDecisionMutation
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import scoped_command, scoped_request
 from tests.support.unit.orchestration.human_gate_budget_admission import accept_gate_result, fixture
 

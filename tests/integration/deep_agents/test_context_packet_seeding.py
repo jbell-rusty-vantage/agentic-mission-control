@@ -13,9 +13,9 @@ from typing import Any
 
 import pytest
 from langchain_core.messages import AIMessage, BaseMessage, ToolMessage
-from tests.fixtures.checkpoint_lineage import activity_attempt
-from tests.fixtures.lane_bindings import lane_fields
+from tests.support.checkpoint_lineage import activity_attempt
 from tests.support.deep_agents import exact_fixture, registry, unit_bound
+from tests.support.lane_bindings import lane_fields
 from tests.support.models import ScriptedChatModel
 from tests.support.operations import operation_request
 

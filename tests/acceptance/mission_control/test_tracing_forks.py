@@ -39,7 +39,7 @@ from typing import Any
 from uuid import uuid4
 
 import pytest
-from tests.fixtures import rrm009_production_stack as technical
+from tests.support import production_stack as technical
 from tests.support.acceptance.mission_control.cognition_points import (
     BASE,
     all_points,

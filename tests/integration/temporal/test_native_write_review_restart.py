@@ -36,14 +36,14 @@ from mission_control.domain.execution.invocation_settlement import (
     WaitReason,
 )
 from mission_control.domain.knowledge.effects import JournalState
-from tests.fixtures.checkpoint_recovery import recovery_harness, stage_recovery_unit
-from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.fixtures.saved_settlement import DurableEffectDouble
+from tests.support.checkpoint_recovery import recovery_harness, stage_recovery_unit
+from tests.support.db import CommonDatabase
 from tests.support.integration.temporal.wi04_saved_settlement_restart import (
     _replays,
     _scheduled,
     _Stack,
 )
+from tests.support.saved_settlement import DurableEffectDouble
 from tests.support.temporal import start_workflow_env
 from tests.support.unit.knowledge.native_write import (
     DIGEST,
@@ -258,7 +258,7 @@ async def test_explicit_native_selection_fulfills_after_review_successor_and_sav
 ) -> None:
     """Real MC PG/Temporal boundary; KS transport is doubled with an immutable review successor."""
     from mission_control.adapters.deep_agents.knowledge_tools import live_invocation
-    from tests.fixtures.native_receipt_selection import (
+    from tests.support.native_receipt_selection import (
         approve_review_successor,
         pending_receipt_case,
     )

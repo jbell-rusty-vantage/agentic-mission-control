@@ -22,7 +22,7 @@ from mission_control.adapters.postgres.workspace_closures import (
 )
 from mission_control.domain.graph_runtime.identities import QualifiedCheckpointKey
 from mission_control.domain.resolution.profiles import WorkspaceClosureProfile
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import insert_fixture_run
 from tests.support.unit.deep_agents.workspace_closure import _workspace
 

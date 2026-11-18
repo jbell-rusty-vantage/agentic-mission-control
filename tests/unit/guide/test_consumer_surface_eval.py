@@ -48,9 +48,9 @@ from mission_control.interfaces.mcp.operator_server import (
     create_operator_server,
 )
 from tests.conformance.resolution.fixtures import APPLICATIONS, MODELS
-from tests.fixtures.capability_search_catalog import seeded_published
-from tests.fixtures.catalog.fast_track_catalog import NOW, fast_track_catalog
-from tests.fixtures.catalog_http import INSTALLATION, TENANT, catalog_harness
+from tests.support.capability_search import seeded_published
+from tests.support.catalog_http import INSTALLATION, TENANT, catalog_harness
+from tests.support.manifests.seeded_catalog import NOW, fast_track_catalog
 from tests.support.unit.selection.selection_workspace import NARROW_WORKFLOW, OPEN_WORKFLOW
 from tests.unit.guide.support import (
     OPERATOR_REGISTRIES,

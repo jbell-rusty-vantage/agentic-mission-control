@@ -16,7 +16,7 @@ from mission_control.application.execution.boundary_interventions import Boundar
 from mission_control.application.missions.retrieval import RunEvidenceService
 from mission_control.application.missions.service import MissionControlService
 from mission_control.domain.policies.errors import RunControlNotFound
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.db import CommonDatabase
 from tests.support.run_control import request, service
 from tests.support.unit.mission_control.run_evidence import ACTOR, binding
 

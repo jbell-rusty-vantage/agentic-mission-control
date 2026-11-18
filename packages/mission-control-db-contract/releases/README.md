@@ -73,7 +73,7 @@ Local build and tests do not upgrade live installations or qualify a provider la
 `--component-root packages/mission-control-db-contract/releases/1.4.3/component`. Proof:
 `tests/integration/postgres/test_run2_release_143.py` (fresh install, upgrade from 1.4.2 and
 from 1.3.0, drifted-describe refusal). The repository test fixture
-(`tests/fixtures/mission_control_common_db.py`) and the offline operator stack install the
+(`tests/support/db.py`) and the offline operator stack install the
 newest *built* release here unless `MISSION_CONTROL_TEST_COMPONENT_ROOT` names another.
 
 ## 1.5.0

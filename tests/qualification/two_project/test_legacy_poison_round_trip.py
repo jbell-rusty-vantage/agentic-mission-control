@@ -9,7 +9,7 @@ repositories with restricted pools. Evidence without ``pg_stat_statements`` or
 asyncpg query loggers on the restricted pools; any denied/missing legacy access
 would surface as an exception or a logged legacy statement.
 
-Installation here uses ``tests.fixtures.mission_control_common_db`` (lead-owned
+Installation here uses ``tests.support.db`` (lead-owned
 shared fixture, ``install_component``); see the switch list in the qualification
 report — it must move to the real ``mission-db`` installer with the fixture.
 """
@@ -23,14 +23,14 @@ from uuid import uuid4
 import asyncpg
 import pytest
 
-from tests.fixtures.mission_control_common_db import (
+from tests.qualification.two_project.disposable import require_admin_dsn
+from tests.support.db import (
     LEGACY_SCHEMAS,
     CommonDatabase,
     create_common_database,
     drop_common_database,
     legacy_poison_intact,
 )
-from tests.qualification.two_project.disposable import require_admin_dsn
 
 pytestmark = pytest.mark.common_db
 

@@ -30,7 +30,7 @@ from tests.conformance.lanes.contract import (
     Script,
 )
 from tests.conformance.lanes.drive import REVIEWER
-from tests.fixtures.cursor_controls import FAST, admitted_unit, compose_control_stack
+from tests.support.cursor_lane_controls import FAST, admitted_unit, compose_control_stack
 from tests.support.knowledge.stores import InMemoryStaging
 from tests.support.providers.claude import (
     PROFILE,

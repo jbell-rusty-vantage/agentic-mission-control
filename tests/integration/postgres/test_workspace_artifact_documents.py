@@ -22,7 +22,7 @@ from mission_control.application.artifacts.workspace_materialization import (
 from mission_control.domain.execution.contracts import ArtifactPromotionState
 from mission_control.domain.execution.errors import WorkspaceSlotConflict
 from mission_control.domain.policies.errors import IdempotencyConflict
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.db import CommonDatabase
 from tests.support.integration.postgres.artifact_promotion_postgres_integration import (
     admitted_revision,
 )

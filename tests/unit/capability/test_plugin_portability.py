@@ -13,7 +13,7 @@ from mission_control.domain.authoring.contracts import (
 )
 from mission_control.domain.capabilities.host_support import LaneProfile
 from mission_control.domain.capabilities.pins import CapabilityPin
-from tests.fixtures.projections.rows import INSTRUCTION, fixture_rows, plugin_row
+from tests.support.projection_rows import INSTRUCTION, fixture_rows, plugin_row
 
 
 @pytest.mark.parametrize("lane", list(LaneProfile))

@@ -76,7 +76,7 @@ def test_application_postgres_dsn() -> str:
 # Shared fixtures registered as plugins: Block C live fixtures for persistent Agent Server
 # qualification, the disposable common databases, and the Temporal test server (`workflow_env`).
 pytest_plugins = [
-    "tests.fixtures.agent_server_block_c",
+    "tests.support.agent_server_drills",
     "tests.support.db_plugin",
     "tests.support.temporal",
 ]

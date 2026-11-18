@@ -100,7 +100,7 @@ def test_remote_registry_requires_admitted_reader() -> None:
 def _custody_settings(**update: object) -> Settings:
     from pydantic import SecretStr
 
-    from tests.fixtures.isolated_settings import isolated_settings
+    from tests.support.settings import isolated_settings
 
     base = {
         "mission_control_application": "ai-engineer",

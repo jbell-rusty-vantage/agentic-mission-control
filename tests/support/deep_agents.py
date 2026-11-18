@@ -75,8 +75,8 @@ from mission_control.domain.execution.materialization import (
     compose_cognitive_context_schema,
     compose_cognitive_state_schema,
 )
-from tests.fixtures.checkpoint_lineage import activity_attempt, bind_unit, goal_unit, stage_unit
-from tests.fixtures.lane_bindings import lane_fields
+from tests.support.checkpoint_lineage import activity_attempt, bind_unit, goal_unit, stage_unit
+from tests.support.lane_bindings import lane_fields
 from tests.support.models import ScriptedChatModel, tool_call
 from tests.support.operations import operation_request
 

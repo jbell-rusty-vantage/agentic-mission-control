@@ -8,7 +8,7 @@ import pytest
 
 from mission_control.application.execution.harness.protocol import NativeTurnLost
 from mission_control.domain.execution.lanes import CancelTurnRequest, TurnHandle
-from tests.fixtures.cursor_controls import harness_fields, started_session
+from tests.support.cursor_lane_controls import harness_fields, started_session
 from tests.support.providers.cursor import cloud_stack, local_stack
 from tests.unit.cursor.support import send_request
 

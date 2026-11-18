@@ -41,7 +41,7 @@ from mission_control.domain.capabilities.bundles import (
     build_bundle_manifest,
 )
 from mission_control.domain.capabilities.catalog_entry import capability_pin
-from tests.fixtures.catalog_http import catalog_harness
+from tests.support.catalog_http import catalog_harness
 
 SKILL_FILES = (
     ("SKILL.md", b"---\nname: observe\ndescription: Observe a mission.\n---\n\nBody.\n"),

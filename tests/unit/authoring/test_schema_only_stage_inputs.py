@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass, replace
 from datetime import UTC, datetime
-from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
 
@@ -15,9 +14,9 @@ from mission_control.domain.authoring.canonical import sha256_digest
 from mission_control.domain.authoring.contracts import StageGraphBlueprint
 from mission_control.domain.outputs.contracts import Enforcement, OutputForm, Requirement, SchemaPin
 from mission_control.domain.programs.contracts import StageAuthoredInput
-from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog, publish_output_schemas
 from tests.support.manifests import launch_inputs as fixtures
 from tests.support.manifests.launch_inputs import MINIMAL, compile_programs
+from tests.support.manifests.seeded_catalog import fast_track_catalog, publish_output_schemas
 
 
 @pytest.mark.asyncio
@@ -123,8 +122,7 @@ async def test_only_exact_bound_schema_values_pass_without_trusted_settlement(
         "reference",
     ],
 )
-async def test_full_qualia_graph_optional_plain_text_keeps_narrow_launch_eligibility(
-    tmp_path: Path,
+async def test_optional_plain_text_output_keeps_narrow_launch_eligibility(
     variant: str,
 ) -> None:
     from mission_control.adapters.storage.control_plane_payloads import InMemoryPayloadStore
@@ -135,23 +133,23 @@ async def test_full_qualia_graph_optional_plain_text_keeps_narrow_launch_eligibi
     )
     from mission_control.application.programs.stage_inputs import stagegraph_authored_inputs
     from mission_control.domain.authoring.extensions import ExtensionRegistry
-    from tests.fixtures.qualia_full_manifest import full_manifest
-    from tests.fixtures.qualia_stagegraph import RECORD_SCHEMA
-    from tests.fixtures.qualia_web_tools import build_qualia_web_tools
     from tests.support.ids import canonical_scope
+    from tests.support.manifests.optional_output_graph import (
+        CONSUMERS,
+        MANIFEST,
+        RECORD_REF,
+        RECORD_SCHEMA,
+    )
 
     definitions, search = await fast_track_catalog()
-    web = build_qualia_web_tools(tmp_path / "web", environment={})
-    for definition in web.definitions.values():
-        await definitions.publish(definition, "fixture", datetime.now(UTC), 0)
-    await publish_output_schemas(definitions, {"qualia_record@1": RECORD_SCHEMA})
+    await publish_output_schemas(definitions, {RECORD_REF: RECORD_SCHEMA})
     compiler = ManifestCompileService(
         definitions=definitions,
         search=search,
         programs=ManifestProgramCompiler(definitions, ExtensionRegistry(), InMemoryPayloadStore()),
     )
     compiled = await compiler.compile(
-        full_manifest(web, [], vendor="firecrawl", interventions=False),
+        MANIFEST,
         ManifestScope(request_scope=canonical_scope(), actor_id="owner", at=datetime.now(UTC)),
     )
     assert compiled.ok, compiled.report.blockers
@@ -266,11 +264,4 @@ async def test_full_qualia_graph_optional_plain_text_keeps_narrow_launch_eligibi
     launched = await author.family_input(
         request_scope=canonical_scope(), run_id="run", family="StageGraph", initial_goal=None
     )
-    assert {item["consumer_stage_id"] for item in launched["stage_inputs"]} == {
-        "formulations",
-        "studies",
-        "synthesize",
-        "verify",
-        "ingest",
-        "finalize",
-    }
+    assert {item["consumer_stage_id"] for item in launched["stage_inputs"]} == CONSUMERS

@@ -45,8 +45,8 @@ from mission_control.application.ports.knowledge import (
 from mission_control.domain.context.transfer import ReceiverAttempt, ReceiverRef
 from mission_control.domain.knowledge.effects import EffectConflict, JournalState
 from mission_control.domain.outputs.contracts import ExactOutput, OutputForm
-from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.support.clock import Clock
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import owner_rows
 from tests.support.integration.postgres.knowledge_gateway_postgres import (
     pool,  # noqa: F401

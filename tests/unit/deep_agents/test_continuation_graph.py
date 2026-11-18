@@ -32,11 +32,11 @@ from mission_control.application.frames.reducer import DeriveContext, derive
 from mission_control.domain.context.checkpoint import ContinuationTriggerKind
 from mission_control.domain.frames.contracts import FrameKind, LaneProfile
 from mission_control.domain.frames.facts import CompactionObservedFact
-from tests.fixtures.continuation import RUN_KEY, build_service, facts, seal_target, trigger
-from tests.fixtures.continuation_graph import TASK, compaction_agent, stream_turn
-from tests.fixtures.provider_frames import harness_start, in_memory_store, opened_writer
+from tests.support.continuation import RUN_KEY, build_service, facts, seal_target, trigger
 from tests.support.ids import SCOPE
 from tests.support.knowledge.stores import InMemoryStaging
+from tests.support.provider_frames import harness_start, in_memory_store, opened_writer
+from tests.support.summarizing_graph import TASK, compaction_agent, stream_turn
 
 SOURCE_THREAD = "thread-collect-1"
 MANIFEST = '{"records": 180, "source": "pubmed"}'

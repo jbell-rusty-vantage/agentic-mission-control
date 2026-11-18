@@ -63,7 +63,8 @@ from mission_control.domain.execution.lanes import (
 )
 from mission_control.domain.frames.contracts import FrameKind
 from mission_control.domain.policies.mailbox import MailboxState
-from tests.fixtures.cursor_controls import (
+from tests.support.artifacts import MemoryArtifacts
+from tests.support.cursor_lane_controls import (
     ACTIVATION_UUID,
     RUN_UUID,
     ControlStack,
@@ -74,9 +75,8 @@ from tests.fixtures.cursor_controls import (
     started_session,
     states,
 )
-from tests.fixtures.lane_turns import RecordingSignals
-from tests.support.artifacts import MemoryArtifacts
 from tests.support.ids import SCOPE
+from tests.support.lanes import RecordingSignals
 from tests.support.providers.cursor import local_stack
 
 INJECTED = "Redirect: build on release/2.3, not main."

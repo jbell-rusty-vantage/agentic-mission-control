@@ -27,9 +27,9 @@ from mission_control.domain.subscriptions.contracts import (
     SubscriptionState,
     verify_signature,
 )
-from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.support.boundary_commands import TARGET
 from tests.support.clock import Clock
+from tests.support.db import CommonDatabase
 from tests.support.integration.postgres.subscriptions import (
     READER,
     SECRET_ENV,

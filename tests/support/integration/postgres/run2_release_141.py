@@ -22,8 +22,8 @@ import pytest
 from mission_control_db_contract.deployment import apply_release, plan_release
 from mission_control_db_contract.integrity import load_release
 from mission_control_db_contract.release import write_lock
-from tests.fixtures.mission_control_common_db import admin_dsn
 from tests.qualification.two_project.release_install import write_target
+from tests.support.db import admin_dsn
 
 ROOT = Path(__file__).resolve().parents[4]
 PACKAGE = ROOT / "packages/mission-control-db-contract"

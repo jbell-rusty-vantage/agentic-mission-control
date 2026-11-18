@@ -12,7 +12,7 @@ import asyncpg
 import pytest
 
 from mission_control.application.execution.harness.describe import DECLARED_LANE_MATRICES
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.db import CommonDatabase
 
 pytestmark = pytest.mark.common_db
 

@@ -25,7 +25,7 @@ from mission_control.domain.policies.contracts import (
     CommandStatus,
     ReserveBudgetAction,
 )
-from tests.fixtures.checkpoint_recovery import (
+from tests.support.checkpoint_recovery import (
     TOKENS_PER_CALL,
     recovery_harness,
     stage_recovery_unit,

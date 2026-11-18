@@ -50,8 +50,7 @@ from mission_control.domain.execution.contracts import (
 )
 from mission_control.domain.execution.environment_preparation import ReadinessLevel
 from mission_control.domain.frames.contracts import FrameKind
-from tests.fixtures.lane_turns import LaneStack, lane_stack
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import admit_unit_attempt
 from tests.support.deep_agents_runtime import ConformanceRuntime
 from tests.support.integration.anthropic_managed.managed_segment_loop_real_services import (
@@ -62,6 +61,7 @@ from tests.support.integration.anthropic_managed.managed_segment_loop_real_servi
     _request,
     _workflow_worker,
 )
+from tests.support.lanes import LaneStack, lane_stack
 from tests.support.providers.managed_agents import (
     PROFILE,
     ManagedStack,

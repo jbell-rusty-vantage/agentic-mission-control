@@ -38,7 +38,7 @@ from biotech_mission_adapters.domain.schema_grounding.errors import (
     SchemaGroundingRecordNotFound,
 )
 from mission_control.domain.authoring.canonical import sha256_digest
-from tests.fixtures.mission_control_common_db import (
+from tests.support.db import (
     CAPABILITY_ROLES,
     CommonDatabase,
     common_database,

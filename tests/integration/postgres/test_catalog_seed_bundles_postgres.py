@@ -24,7 +24,7 @@ from mission_control.bootstrap.coordinator_composition import load_coordinator_c
 from mission_control.domain.authoring.errors import DefinitionConflict
 from mission_control_db_contract.errors import ContractError
 from mission_control_db_contract.seeds import _apply_record, load_bundles, order_bundles
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import BIOTECH_CATALOG
 
 pytestmark = pytest.mark.common_db
@@ -150,7 +150,7 @@ async def test_seeded_catalog_is_readable_replayable_and_conflicts_on_change(
 
 @pytest.mark.asyncio
 async def test_ai_engineer_seeds_admit_edgartools_only_there() -> None:
-    from tests.fixtures.mission_control_common_db import (
+    from tests.support.db import (
         create_common_database,
         drop_common_database,
     )

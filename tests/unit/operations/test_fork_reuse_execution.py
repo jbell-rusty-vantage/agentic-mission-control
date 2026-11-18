@@ -31,8 +31,9 @@ from mission_control.domain.execution.checkpoint_lineage import cognitive_sessio
 from mission_control.domain.execution.contracts import OperationSettlement
 from mission_control.domain.policies.contracts import CommandStatus, StartAction
 from mission_control.domain.policies.forks import ForkRejected, derived_unit_identity
-from tests.fixtures.checkpoint_recovery import recovery_harness, stage_recovery_unit
-from tests.fixtures.run_forks import (
+from tests.support.checkpoint_recovery import recovery_harness, stage_recovery_unit
+from tests.support.run_control import WORKFLOW_DIGEST, command
+from tests.support.run_forks import (
     FakeForkSourceReader,
     compose_in_memory_forks,
     fork_command,
@@ -41,7 +42,6 @@ from tests.fixtures.run_forks import (
     stage_policy,
     stagegraph_head,
 )
-from tests.support.run_control import WORKFLOW_DIGEST, command
 
 SCOPE = "tenant-1"
 

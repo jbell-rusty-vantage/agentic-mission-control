@@ -23,9 +23,9 @@ from mission_control.application.secrets.minting import CredentialBinding, Crede
 from mission_control.application.signals.contracts import IngressRejected
 from mission_control.application.signals.ports import OidcIdentity
 from mission_control.application.signals.service import IngressKeys, SignalIngressService
-from tests.fixtures.mission_control_common_db import CommonDatabase, ingress_login
-from tests.fixtures.provider_webhooks import ANTHROPIC_TEST_SECRET, OPENAI_TEST_SECRET
+from tests.support.db import CommonDatabase, ingress_login
 from tests.support.db_builders import admit_unit_attempt
+from tests.support.provider_webhooks import ANTHROPIC_TEST_SECRET, OPENAI_TEST_SECRET
 
 ENV_MASTER = b"environment-key-master-for-disposable-tests"
 CURSOR_MASTER = b"cursor-webhook-master-for-disposable-tests"

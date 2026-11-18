@@ -26,7 +26,7 @@ from mission_control.domain.programs.contracts import (
     StageGraphAcceptedProjection,
     StageGraphDecisionMutation,
 )
-from tests.fixtures import rrm009_production_stack as technical
+from tests.support import production_stack as technical
 from tests.support.manifest_runtime import host_pins
 from tests.support.stack import admit_and_launch, inspect, open_stack, until
 

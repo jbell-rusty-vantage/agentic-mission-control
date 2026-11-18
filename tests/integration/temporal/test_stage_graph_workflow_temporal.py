@@ -22,7 +22,6 @@ from mission_control.domain.programs.contracts import (
     StageGraphAdmissionActivityRequest,
 )
 from mission_control.domain.programs.interpreter import StageGraphInterpreter
-from tests.fixtures.lane_bindings import LANE_REBINDERS, lane_fields
 from tests.support.integration.temporal.wp_bp_010_temporal import (
     DIGEST,
     NOW,
@@ -33,6 +32,7 @@ from tests.support.integration.temporal.wp_bp_010_temporal import (
     _operation,
     _run_input,
 )
+from tests.support.lane_bindings import LANE_REBINDERS, lane_fields
 from tests.support.temporal import start_workflow_env
 
 # A cancelled sibling's heartbeat timeout: the cancel is delivered on the next heartbeat.

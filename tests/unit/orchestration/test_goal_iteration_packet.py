@@ -35,7 +35,7 @@ from mission_control.domain.context.render import is_context_input_slot
 from mission_control.domain.execution.contracts import PromptTrustClass
 from mission_control.domain.programs.contracts import GoalHandoff
 from mission_control.domain.programs.goal_directed_runtime import GoalHandoffDraft
-from tests.fixtures.goal_directed_journaled import (
+from tests.support.journaled_goal_loop import (
     SCOPE,
     goal_blueprint,
 )

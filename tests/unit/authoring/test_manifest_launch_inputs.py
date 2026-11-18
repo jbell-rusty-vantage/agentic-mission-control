@@ -39,7 +39,7 @@ from mission_control.domain.execution.contracts import (
     DeepAgentExecutionBinding,
     DeepAgentModelComponent,
 )
-from tests.fixtures.applications import installed_applications
+from tests.support.applications import installed_applications
 from tests.support.deep_agents import exact_fixture
 from tests.support.ids import canonical_scope
 from tests.support.manifests.launch_inputs import (

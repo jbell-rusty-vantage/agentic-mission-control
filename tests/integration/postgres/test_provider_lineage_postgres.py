@@ -42,9 +42,8 @@ from mission_control.domain.policies.contracts import (
     TerminalizeAction,
 )
 from mission_control.domain.subscriptions.contracts import SubscriptionRequest, verify_signature
-from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.fixtures.provider_frames import FRAME_NOW
 from tests.support.clock import SECOND, Clock
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import AdmittedUnit, admit_unit_attempt, owner_rows, scoped_command
 from tests.support.integration.postgres.frame_facts_postgres import projector_actor
 from tests.support.integration.postgres.provider_lineage_postgres import identity_rows, tokens
@@ -54,6 +53,7 @@ from tests.support.integration.postgres.subscriptions import (
     SECRET_VALUE,
     Receiver,
 )
+from tests.support.provider_frames import FRAME_NOW
 from tests.support.run_control import EMPTY_EVIDENCE_DIGEST, NOW, WORKFLOW_DIGEST
 from tests.support.unit.frames.provider_lanes import claude_observations, codex_app_observations
 

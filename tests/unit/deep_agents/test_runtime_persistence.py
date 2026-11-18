@@ -30,7 +30,7 @@ from mission_control.adapters.deep_agents.runtime_persistence_verifier import (
     PINNED_STORE_VERSIONS,
 )
 from mission_control.bootstrap.settings import RUNTIME_CHECKPOINT_SCHEMA
-from tests.fixtures.isolated_settings import isolated_settings
+from tests.support.settings import isolated_settings
 
 ROOT = Path(__file__).resolve().parents[3]
 RUNTIME_ROOT = ROOT / "packages" / "mission-control-db-contract" / "runtime"

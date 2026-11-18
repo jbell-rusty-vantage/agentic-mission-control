@@ -23,7 +23,7 @@ from mission_control.domain.composition.chain import (
     build_mission_chain,
     compile_chain,
 )
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import CHAIN_MANIFEST, CHAIN_NOW, insert_chain, insert_mission
 
 pytestmark = pytest.mark.common_db

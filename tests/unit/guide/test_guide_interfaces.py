@@ -37,7 +37,7 @@ from mission_control.interfaces.mcp.guide_tools import (
     register_guide_tools,
     server_tool_listing,
 )
-from tests.fixtures.catalog_http import INSTALLATION, TENANT, CatalogHarness, catalog_harness
+from tests.support.catalog_http import INSTALLATION, TENANT, CatalogHarness, catalog_harness
 from tests.support.unit.selection.selection_workspace import RESEARCH, _pin
 from tests.unit.guide.support import stub_guide
 

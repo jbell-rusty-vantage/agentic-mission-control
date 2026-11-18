@@ -23,7 +23,7 @@ from mission_control.domain.authoring.errors import (
     ReferenceMismatch,
     RetiredDefinition,
 )
-from tests.fixtures.mission_control_common_db import CommonDatabase, common_database
+from tests.support.db import CommonDatabase, common_database
 from tests.support.db_builders import (
     AI_ENGINEER_CATALOG,
     BIOTECH_CATALOG,

@@ -38,11 +38,11 @@ from mission_control.domain.prerequisites import (
     PrerequisiteState,
     VerificationMethod,
 )
-from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.fixtures.owner_prerequisites import inputs
 from tests.support.clock import Clock
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import owner_rows, scoped_count
 from tests.support.integration.postgres.owner_prerequisites import pool  # noqa: F401
+from tests.support.owner_prerequisites import inputs
 
 pytestmark = pytest.mark.common_db
 

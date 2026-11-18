@@ -44,7 +44,7 @@ from mission_control.domain.capabilities.bundles import (
 )
 from mission_control.domain.capabilities.catalog_entry import capability_pin
 from mission_control.interfaces.cli.main import MissionClient, publish_bundle
-from tests.fixtures.catalog_http import catalog_harness
+from tests.support.catalog_http import catalog_harness
 
 ROOT = Path(__file__).resolve().parents[3]
 SKILL_FILES = (

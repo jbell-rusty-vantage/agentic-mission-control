@@ -17,8 +17,8 @@ from pathlib import Path
 from uuid import uuid4
 
 import pytest
-from tests.fixtures.manifest_runtime import AUTHOR, compose_lifecycle
 from tests.support.ids import SCOPE
+from tests.support.manifests.lifecycle import AUTHOR, compose_lifecycle
 from tests.support.stack import (
     ProductionStack,
     _command,

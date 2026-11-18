@@ -9,7 +9,7 @@ from datetime import UTC, datetime
 from typing import Any
 
 from mission_control.domain.programs.family_failure import FamilyFailureTerminalizationRequest
-from tests.fixtures.goal_directed_journaled import SCOPE
+from tests.support.journaled_goal_loop import SCOPE
 
 NOW = datetime(2026, 10, 28, tzinfo=UTC)
 

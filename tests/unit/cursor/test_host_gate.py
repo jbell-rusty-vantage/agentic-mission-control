@@ -23,7 +23,7 @@ from mission_control.adapters.cursor.bridge import (
 from mission_control.application.agentic_components.placement import LaneProjectionError
 from mission_control.application.execution.harness.lane_turns import LaneExecutionIdentity
 from mission_control.domain.execution.lanes import PrepareRequest, StartRequest
-from tests.fixtures.cursor_controls import harness_fields
+from tests.support.cursor_lane_controls import harness_fields
 from tests.support.providers.cursor import local_stack
 
 

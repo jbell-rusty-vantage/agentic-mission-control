@@ -131,7 +131,7 @@ async def test_collect_points_re_derives_the_settlement_fold(tmp_path: Path) -> 
 def test_step_refs_fall_back_to_the_kernel_default_for_content_keyed_frames(
     tmp_path: Path,
 ) -> None:
-    from tests.fixtures.provider_frames import provider_frame
+    from tests.support.provider_frames import provider_frame
 
     del tmp_path
 

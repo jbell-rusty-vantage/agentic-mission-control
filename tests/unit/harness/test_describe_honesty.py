@@ -28,7 +28,7 @@ from mission_control.domain.execution.contracts import OperationExecutionResult
 from mission_control.domain.execution.lane_turns import LaneTurnRequest
 from mission_control.domain.execution.lanes import SessionHandle, SnapshotRequest
 from tests.conformance.lanes.records import live_drills
-from tests.fixtures.cursor_controls import (
+from tests.support.cursor_lane_controls import (
     ControlStack,
     cloud_control_stack,
     control_stack,
@@ -37,7 +37,7 @@ from tests.fixtures.cursor_controls import (
     source_agent,
     started_session,
 )
-from tests.fixtures.lane_turns import RecordingSignals, lane_stack
+from tests.support.lanes import RecordingSignals, lane_stack
 from tests.support.providers.cursor import cloud_stack, local_stack
 
 PROFILES = ("cursor_local", "cursor_cloud")

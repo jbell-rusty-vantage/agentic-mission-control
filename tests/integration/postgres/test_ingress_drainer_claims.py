@@ -139,7 +139,7 @@ async def test_webhook_history_receipt_waits_for_owner_and_survives_revoked_bind
         HistoryRequest,
     )
     from mission_control.domain.frames.contracts import FrameKind, FrameObservation, LaneProfile
-    from tests.fixtures.provider_webhooks import (
+    from tests.support.provider_webhooks import (
         ANTHROPIC_SESSION_IDLED,
         ANTHROPIC_TEST_SECRET,
         delivery_body,

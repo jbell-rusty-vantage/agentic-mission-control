@@ -15,7 +15,7 @@ from mission_control.bootstrap.guide import compose_guide
 from mission_control.bootstrap.lanes import SESSION_LANES, describe_only_registry
 from mission_control.domain.execution.lanes import LANE_PROFILES
 from tests.conformance.resolution.fixtures import MODELS
-from tests.fixtures.capability_search_catalog import seeded_published
+from tests.support.capability_search import seeded_published
 from tests.unit.guide.support import SANDBOX_DETAILS, SANDBOXES, _workspace, full_guide
 
 APPLICATION = "ai-engineer"

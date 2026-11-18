@@ -40,7 +40,7 @@ from mission_control.domain.programs.family_failure import (
     BUDGET_UNSETTLED_AT_FAILURE,
     LIABILITY_TERMINALIZATION_ATTEMPT,
 )
-from tests.fixtures.goal_directed_journaled import SCOPE
+from tests.support.journaled_goal_loop import SCOPE
 from tests.support.run_control import command
 from tests.support.unit.coordinator.w1_d26_liability_terminalization import _stuck_unit
 from tests.support.unit.coordinator.w1_family_failure_terminalization import _request

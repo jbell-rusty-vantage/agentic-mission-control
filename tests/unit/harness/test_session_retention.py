@@ -20,7 +20,7 @@ from mission_control.domain.execution.session_retention import (
     SessionDeletion,
     SessionRetentionPolicy,
 )
-from tests.fixtures.session_retention import FakeSessionDeleter, RecordingDeletionScheduler
+from tests.support.session_retention import FakeSessionDeleter, RecordingDeletionScheduler
 
 SCOPE = "mc/00000000-0000-0000-0000-000000000001/ai-engineer/00000000-0000-0000-0000-000000000002"
 CUSTODY = datetime(2026, 10, 13, 12, 0, tzinfo=UTC)

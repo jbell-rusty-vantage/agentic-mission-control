@@ -22,10 +22,10 @@ from mission_control.domain.execution.contracts import (
     OperationExecutionRequest,
     RuntimeInvocation,
 )
-from tests.fixtures.checkpoint_lineage import activity_attempt, bind_unit, stage_unit
-from tests.fixtures.lane_bindings import lane_fields
+from tests.support.checkpoint_lineage import activity_attempt, bind_unit, stage_unit
 from tests.support.deep_agents import exact_fixture
 from tests.support.ids import INSTALLATION, SCOPE
+from tests.support.lane_bindings import lane_fields
 from tests.support.operations import operation_request
 
 

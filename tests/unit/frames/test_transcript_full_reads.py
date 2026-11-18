@@ -28,9 +28,9 @@ from mission_control.application.frames.transcript import (
 )
 from mission_control.domain.frames.contracts import FrameKind
 from mission_control.domain.policies.contracts import ActorContext
-from tests.fixtures.provider_frames import provider_frame
-from tests.fixtures.transcripts import RUN_KEY, InMemoryMissionEvents, StaticFrames
 from tests.support.ids import SCOPE
+from tests.support.provider_frames import provider_frame
+from tests.support.transcripts import RUN_KEY, InMemoryMissionEvents, StaticFrames
 
 FULL = ActorContext(actor_id="reader", permissions=frozenset({"workflow_run.read"}))
 

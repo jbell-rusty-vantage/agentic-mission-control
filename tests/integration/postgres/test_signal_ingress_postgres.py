@@ -52,15 +52,6 @@ from mission_control.application.signals.verification import (
 )
 from mission_control.domain.policies.stop_fence import StopFence
 from mission_control.interfaces.http.ingress import create_ingress_app
-from tests.fixtures.provider_webhooks import (
-    ANTHROPIC_SESSION_IDLED,
-    ANTHROPIC_TEST_SECRET,
-    OPENAI_ACTION_REQUIRED,
-    OPENAI_SESSION_CREATED,
-    OPENAI_TEST_SECRET,
-    delivery_body,
-    standard_headers,
-)
 from tests.support.integration.postgres.signal_ingress_postgres import (
     CURSOR_MASTER,
     ENV_MASTER,
@@ -73,6 +64,15 @@ from tests.support.integration.postgres.signal_ingress_postgres import (
     gate_body,
     ingress,  # noqa: F401
     signal,
+)
+from tests.support.provider_webhooks import (
+    ANTHROPIC_SESSION_IDLED,
+    ANTHROPIC_TEST_SECRET,
+    OPENAI_ACTION_REQUIRED,
+    OPENAI_SESSION_CREATED,
+    OPENAI_TEST_SECRET,
+    delivery_body,
+    standard_headers,
 )
 from tests.support.stack import serve_loopback
 

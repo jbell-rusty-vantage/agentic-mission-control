@@ -41,11 +41,11 @@ from mission_control.domain.execution.heartbeats import (
     operation_heartbeat_class,
 )
 from mission_control.domain.policies.contracts import CancelAction, RunPhase
-from tests.fixtures.isolated_settings import isolated_settings
-from tests.fixtures.lane_bindings import lane_fields
 from tests.support.boundary_commands import FAMILY_WORKFLOW_ID, TARGET, started
+from tests.support.lane_bindings import lane_fields
 from tests.support.operations import operation_request
 from tests.support.run_control import command, service
+from tests.support.settings import isolated_settings
 from tests.support.unit.operations.rrm_009_cancellation_composition import _claim
 
 

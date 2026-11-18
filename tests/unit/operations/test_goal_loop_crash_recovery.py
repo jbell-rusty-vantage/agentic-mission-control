@@ -18,13 +18,13 @@ from mission_control.application.execution.operations.operation_execution import
     operation_settlement_id,
 )
 from mission_control.domain.policies.contracts import CommandStatus, EffectDisposition
-from tests.fixtures.checkpoint_recovery import (
+from tests.support.checkpoint_recovery import (
     SimulatedWorkerCrash,
     governed_workspace,
     recovery_harness,
     result_digest,
 )
-from tests.fixtures.goal_directed_journaled import (
+from tests.support.journaled_goal_loop import (
     SCOPE,
     TOKENS_PER_OPERATION,
     RecordingGoalDocuments,

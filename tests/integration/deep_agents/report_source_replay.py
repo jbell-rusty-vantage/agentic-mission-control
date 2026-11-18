@@ -7,9 +7,8 @@ process restart or durable object custody: result payloads and staged inputs sta
 from dataclasses import replace
 
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
-from tests.fixtures.checkpoint_lineage import bind_unit
-from tests.fixtures.lane_bindings import lane_fields
-from tests.fixtures.mission_control_common_db import provision_runtime
+from tests.support.checkpoint_lineage import bind_unit
+from tests.support.db import provision_runtime
 from tests.support.deep_agents import registry
 from tests.support.deep_agents_runtime import (
     ConformanceAssetVerifier,
@@ -25,6 +24,7 @@ from tests.support.integration.deep_agents.checkpoint_lineage_postgres_saver imp
     root_lineage,
 )
 from tests.support.integration.deep_agents.report_source_context import FULL_CONTEXT_READER
+from tests.support.lane_bindings import lane_fields
 from tests.support.operations import MCP_DIGEST, SKILL_DIGEST, operation_request
 from tests.support.run_control import actor, command
 from tests.support.run_control import request as run_request

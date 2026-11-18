@@ -19,18 +19,18 @@ from mission_control.application.authoring.manifest_launch_inputs import (
 )
 from mission_control.domain.authoring.canonical import sha256_digest
 from mission_control.domain.authoring.manifest import canonical_manifest_bytes, load_manifest_yaml
-from tests.fixtures.catalog.fast_track_catalog import fixture_definitions
-from tests.fixtures.manifest_runtime import ChainCognition, ChainScript
-from tests.fixtures.mission_control_local_agent_server import deterministic_child_definition
-from tests.fixtures.rrm009_cancellation import TOKEN_ENV
-from tests.fixtures.rrm009_production_stack import (
+from tests.support.local_agent_server import deterministic_child_definition
+from tests.support.manifest_runtime import MISSION_2, evaluable, pubmed_digest
+from tests.support.manifests.lifecycle import ChainCognition, ChainScript
+from tests.support.manifests.seeded_catalog import fixture_definitions
+from tests.support.model_catalog import model_binding
+from tests.support.models import ScriptedChatModel
+from tests.support.production_stack import (
     AGENT_COGNITIVE_QUEUE,
     TechnicalBinding,
     call_usage,
 )
-from tests.support.manifest_runtime import MISSION_2, evaluable, pubmed_digest
-from tests.support.model_catalog import model_binding
-from tests.support.models import ScriptedChatModel
+from tests.support.running_cancellation import TOKEN_ENV
 from tests.support.stack import ProductionStack
 from tests.unit.authoring.manifest_launch_fixture import (
     deep_agents_chain,

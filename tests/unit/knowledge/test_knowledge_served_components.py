@@ -45,11 +45,11 @@ from mission_control.bootstrap.composition import (
     compose_knowledge_lane,
 )
 from mission_control.domain.execution.contracts import DeepAgentExecutionBinding
-from tests.fixtures.isolated_settings import isolated_settings
 from tests.support.clock import Clock
 from tests.support.knowledge.binding import FakeKnowledgeBinding
 from tests.support.knowledge.credentials import KNOWLEDGE_NOW
 from tests.support.manifests.launch_inputs import admitted, compile_programs, resolver
+from tests.support.settings import isolated_settings
 from tests.support.unit.knowledge.knowledge_manifest import MANIFEST, SCOPE
 from tests.unit.authoring.manifest_launch_fixture import fixture_bindings, fixture_served
 

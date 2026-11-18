@@ -40,8 +40,8 @@ from mission_control.domain.execution.contracts import (
     OperationWorkflowRequest,
 )
 from mission_control.domain.execution.lanes import LaneSegmentBounds
-from tests.fixtures.checkpoint_recovery import recovery_harness, stage_recovery_unit
-from tests.fixtures.lane_turns import (
+from tests.support.checkpoint_recovery import recovery_harness, stage_recovery_unit
+from tests.support.lanes import (
     LANE_QUEUE,
     LaneStack,
     ScriptedSessionLane,
@@ -552,7 +552,7 @@ def _control_workers(env: WorkflowEnvironment, stack: Any) -> tuple[Worker, Work
 async def test_inject_on_cursor_local_cancels_and_replaces_inside_the_segment_loop(
     tmp_path: Path,
 ) -> None:
-    from tests.fixtures.cursor_controls import control_stack, states
+    from tests.support.cursor_lane_controls import control_stack, states
 
     env = await start_workflow_env()
     async with env:
@@ -585,7 +585,7 @@ async def test_fork_runs_its_first_segment_in_a_fresh_lease_restored_from_the_sn
     tmp_path: Path,
 ) -> None:
     from mission_control.domain.execution.lanes import SnapshotRequest
-    from tests.fixtures.cursor_controls import (
+    from tests.support.cursor_lane_controls import (
         fork_stack_from,
         harness_fields,
         register_run,
@@ -637,7 +637,7 @@ async def test_fork_runs_its_first_segment_in_a_fresh_lease_restored_from_the_sn
 async def test_request_continuation_hands_the_next_turn_to_a_hydrated_agent(
     tmp_path: Path,
 ) -> None:
-    from tests.fixtures.cursor_controls import control_stack, seal_and_transfer
+    from tests.support.cursor_lane_controls import control_stack, seal_and_transfer
 
     env = await start_workflow_env()
     async with env:
@@ -678,8 +678,8 @@ async def test_a_session_lane_settlement_writes_its_cognition_points_through_the
         InMemoryCheckpointLineageRepository,
     )
     from mission_control.domain.execution.cognition_points import CognitionPointFilter
-    from tests.fixtures.lane_turns import ACTIVATION_UUID, RUN_UUID
     from tests.support.ids import SCOPE
+    from tests.support.lanes import ACTIVATION_UUID, RUN_UUID
     from tests.support.unit.harness.lane_turn_points import PointLane, _unit_operation
 
     operation = _unit_operation()

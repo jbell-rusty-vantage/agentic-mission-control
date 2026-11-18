@@ -20,7 +20,7 @@ from mission_control.application.context.continuation import (
     HydrationRequest,
     TransferStatus,
 )
-from tests.fixtures.continuation import RUN_KEY, build_service, facts, seal_target, trigger
+from tests.support.continuation import RUN_KEY, build_service, facts, seal_target, trigger
 from tests.support.ids import SCOPE
 
 

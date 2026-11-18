@@ -14,7 +14,7 @@ import pytest_asyncio
 from mission_control.adapters.postgres.run_control.run_control_repository import (
     PostgresRunControlRepository,
 )
-from tests.fixtures.mission_control_common_db import (
+from tests.support.db import (
     CommonDatabase,
     create_common_database,
     drop_common_database,

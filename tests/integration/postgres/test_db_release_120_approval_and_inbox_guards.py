@@ -23,7 +23,7 @@ import pytest_asyncio
 from mission_control.adapters.postgres.run_control.run_control_repository import (
     PostgresRunControlRepository,
 )
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import owner_rows, scoped_count
 from tests.support.run_control import request, service
 

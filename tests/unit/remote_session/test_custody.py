@@ -15,7 +15,7 @@ from mission_control.adapters.remote_session.custody import (
 from mission_control.application.execution.harness.lane_turns import LaneExecutionIdentity
 from mission_control.application.execution.harness.protocol import NativeTurnLost
 from mission_control.application.workspaces.snapshots import branch_snapshot_ref
-from tests.fixtures.lane_turns import cursor_operation
+from tests.support.lanes import cursor_operation
 from tests.unit.workspaces.workspace_fixtures import policy, stack
 
 PROFILE: Final = "cursor_cloud"

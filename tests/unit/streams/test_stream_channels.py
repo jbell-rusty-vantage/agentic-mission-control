@@ -21,7 +21,7 @@ from mission_control.domain.subscriptions.streams import (
     StreamSubscription,
     StreamTarget,
 )
-from tests.fixtures.provider_frames import FIXTURE_HARNESS
+from tests.support.provider_frames import FIXTURE_HARNESS
 from tests.support.unit.streams.stream_lineage import run_pump, stop
 from tests.support.unit.streams.stream_pump import FAST, Recorder, until
 from tests.support.unit.streams.stream_service import (

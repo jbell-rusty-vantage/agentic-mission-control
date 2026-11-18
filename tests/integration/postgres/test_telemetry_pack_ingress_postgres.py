@@ -25,11 +25,11 @@ from mission_control.domain.capabilities.host_support import LaneProfile
 from mission_control.interfaces.http.ingress import create_ingress_app
 from mission_control.interfaces.mcp.coordinator_http_client import CoordinatorStreamableHttpClient
 from mission_control.interfaces.mcp.signal_tools import SIGNAL_EMIT_TOOL, mount_signal_tools
-from tests.fixtures.projections.rows import INSTRUCTION
 from tests.support.integration.postgres.signal_ingress_postgres import (
     Ingress,
     ingress,  # noqa: F401
 )
+from tests.support.projection_rows import INSTRUCTION
 from tests.support.providers.cursor import cloud_rows, run_cursor_hooks
 from tests.support.stack import serve_loopback
 

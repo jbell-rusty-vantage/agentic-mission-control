@@ -20,7 +20,7 @@ from mission_control.adapters.cursor.cloud_api import (
 from mission_control.domain.execution.contracts import OperationExecutionResult
 from mission_control.domain.execution.lanes import ObserveRequest, SessionHandle, TurnHandle
 from mission_control.domain.frames.contracts import FrameKind
-from tests.fixtures.cursor_controls import harness_fields, started_session
+from tests.support.cursor_lane_controls import harness_fields, started_session
 from tests.support.providers.cursor import cloud_stack
 from tests.unit.cursor.support import frames_of, heid_of, lanes_for, signals, turn
 

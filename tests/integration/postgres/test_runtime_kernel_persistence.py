@@ -68,10 +68,10 @@ from mission_control.domain.policies.forks import (
     admission_request_ref,
     lineage_for,
 )
-from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.fixtures.run_forks import technical_snapshot
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import owner_rows, scoped_request
 from tests.support.run_control import service as run_control_service
+from tests.support.run_forks import technical_snapshot
 
 pytestmark = pytest.mark.common_db
 

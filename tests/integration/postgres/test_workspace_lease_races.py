@@ -17,8 +17,8 @@ from mission_control.application.execution.harness.leases import (
     WorkspaceLeaseHeld,
 )
 from mission_control.application.workspaces.service import WorkspaceAllocator
-from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.support.artifacts import MemoryArtifacts
+from tests.support.db import CommonDatabase
 from tests.unit.workspaces.lease_scenarios import (
     NOW,
     claim,

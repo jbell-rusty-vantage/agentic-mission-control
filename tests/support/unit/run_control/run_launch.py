@@ -11,7 +11,7 @@ from typing import Any
 from mission_control.domain.authoring.canonical import sha256_digest
 from mission_control.domain.coordinator.launch import BlueprintFamily, WorkflowSubmission
 from mission_control.domain.programs.contracts import StageGraphRunInput
-from tests.fixtures.rrm009_production_stack import stage_blueprint
+from tests.support.production_stack import stage_blueprint
 from tests.support.run_control import DIGEST, WORKFLOW_DIGEST
 
 SCOPE = "tenant-1"

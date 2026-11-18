@@ -13,9 +13,7 @@ from uuid import uuid4
 
 import pytest
 from pydantic import SecretStr
-from tests.fixtures.lane_bindings import lane_fields
-from tests.fixtures.lane_turns import lane_stack
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import admit_unit_attempt
 from tests.support.deep_agents_runtime import ConformanceRuntime
 from tests.support.integration.anthropic_managed.managed_segment_loop_real_services import (
@@ -25,6 +23,8 @@ from tests.support.integration.anthropic_managed.managed_segment_loop_real_servi
     _workflow_worker,
 )
 from tests.support.integration.anthropic_managed.session_lifecycle_live import _request
+from tests.support.lane_bindings import lane_fields
+from tests.support.lanes import lane_stack
 from tests.support.providers.openai_agents import agents_stack
 from tests.unit.approvals.fixtures import answer
 

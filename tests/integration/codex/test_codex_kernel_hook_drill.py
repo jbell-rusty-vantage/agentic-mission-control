@@ -58,8 +58,8 @@ from mission_control.application.execution.child_environment import provider_chi
 from mission_control.application.execution.harness.leases import InMemoryWorkspaceLeaseStore
 from mission_control.domain.execution.lanes import LaneFrame
 from mission_control.domain.policies.stop_fence import StopFence
-from tests.fixtures.lane_turns import lane_stack
 from tests.support.artifacts import MemoryArtifacts
+from tests.support.lanes import lane_stack
 from tests.support.providers.codex import (
     CodexStack,
     StaticAuth,

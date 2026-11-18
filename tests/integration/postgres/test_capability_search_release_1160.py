@@ -28,7 +28,7 @@ from mission_control.adapters.postgres.control_plane.definition_repository impor
     PostgresDefinitionRepository,
 )
 from mission_control_db_contract.deployment import plan_release, verify_release
-from tests.fixtures.mission_control_common_db import COMPONENT_ROOT, common_database
+from tests.support.db import COMPONENT_ROOT, common_database
 from tests.support.ids import catalog_scope
 from tests.support.integration.postgres.capability_search_projection_postgres import (
     NOW,

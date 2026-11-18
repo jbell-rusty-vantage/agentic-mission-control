@@ -53,7 +53,7 @@ SPEND_LEDGER = OUTPUT_ROOT / "spend.jsonl"
 CEILING_USD_PER_PROVIDER = 10.0
 PROOF_BUDGET_USD = 1.0
 # USD per 1M tokens: input, cached input, output. Anthropic Haiku 5.5 (prompts under 100K)
-# and the owner's GPT-6 Luna (tests/fixtures/live_models.py).
+# and the owner's GPT-6 Luna (tests/support/live_models.py).
 PRICES: Mapping[str, tuple[float, float, float]] = {
     "claude-haiku-5-5": (0.10, 0.01, 0.50),
     "gpt-6-luna": (0.10, 0.01, 0.50),

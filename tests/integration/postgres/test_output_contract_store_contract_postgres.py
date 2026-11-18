@@ -12,8 +12,8 @@ import pytest
 from mission_control.adapters.postgres.knowledge.output_contracts import (
     PostgresOutputContractStore,
 )
-from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.support.contracts.output_contracts import SCENARIOS, OutputContractSubject, Scenario
+from tests.support.db import CommonDatabase
 
 pytestmark = pytest.mark.common_db
 

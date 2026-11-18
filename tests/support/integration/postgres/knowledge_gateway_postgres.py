@@ -13,8 +13,8 @@ import pytest_asyncio
 from mission_control.adapters.postgres.knowledge.handles import PostgresKnowledgeHandleStore
 from mission_control.adapters.postgres.knowledge.operations import PostgresKnowledgeJournal
 from mission_control.application.knowledge.gateway import KnowledgeGateway
-from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.support.clock import Clock
+from tests.support.db import CommonDatabase
 from tests.support.knowledge.binding import FakeKnowledgeBinding
 from tests.support.knowledge.credentials import (
     AUDIENCE,

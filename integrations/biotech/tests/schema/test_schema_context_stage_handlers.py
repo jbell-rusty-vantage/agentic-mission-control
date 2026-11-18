@@ -6,8 +6,8 @@ from pathlib import Path
 from typing import Any, cast
 
 import pytest
-from tests.fixtures.lane_bindings import LANE_REBINDERS
 from tests.schema_context_helpers import SDL
+from tests.support.lane_bindings import LANE_REBINDERS
 
 from biotech_mission_adapters.adapters.temporal.coordinator_runtime import (
     SchemaGroundingCoordinatorRuntimeDependencies,

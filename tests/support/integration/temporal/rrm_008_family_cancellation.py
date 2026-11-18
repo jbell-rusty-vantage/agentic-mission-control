@@ -26,12 +26,12 @@ from mission_control.domain.programs.contracts import (
     StageGraphCompletionActivityRequest,
     StageGraphCompletionActivityResult,
 )
-from tests.fixtures.goal_directed_journaled import SCOPE
 from tests.support.integration.temporal.rrm_007_boundary_interventions import (
     Authority,
     GovernedStageGraphActivities,
     until,
 )
+from tests.support.journaled_goal_loop import SCOPE
 from tests.support.temporal import cancelled_operation_result, wait_heartbeating
 
 BASELINE = {"tokens.total": 20}

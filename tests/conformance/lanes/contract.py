@@ -26,7 +26,7 @@ from mission_control.application.execution.harness.lane_turns import LaneExecuti
 from mission_control.application.execution.harness.protocol import AgentHarness, SessionLane
 from mission_control.domain.execution.contracts import OperationExecutionRequest
 from mission_control.domain.execution.lanes import LaneDescribe, LaneProfileName, SnapshotManifest
-from tests.fixtures.cursor_controls import ControlStack
+from tests.support.cursor_lane_controls import ControlStack
 
 
 class Scenario(StrEnum):

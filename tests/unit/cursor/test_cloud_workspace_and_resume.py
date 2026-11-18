@@ -25,7 +25,7 @@ from mission_control.domain.execution.lanes import (
     ReattachRequest,
     SnapshotRequest,
 )
-from tests.fixtures.cursor_controls import harness_fields, started_session
+from tests.support.cursor_lane_controls import harness_fields, started_session
 from tests.support.providers.cursor import cloud_stack
 from tests.unit.cursor.support import (
     dispatch_record,

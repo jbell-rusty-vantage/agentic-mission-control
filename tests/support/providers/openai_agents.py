@@ -36,11 +36,11 @@ from mission_control.adapters.secrets.sources import WorkerEnvironmentSource
 from mission_control.application.execution.harness.retention import SessionRetentionService
 from mission_control.domain.execution.bindings import ProviderExecutionBinding
 from mission_control.domain.execution.contracts import OperationExecutionRequest
-from tests.fixtures.lane_bindings import lane_fields
-from tests.fixtures.lane_turns import DIGEST
-from tests.fixtures.session_retention import RecordingDeletionScheduler
 from tests.support.artifacts import MemoryArtifacts
 from tests.support.ids import SCOPE
+from tests.support.lane_bindings import lane_fields
+from tests.support.lanes import DIGEST
+from tests.support.session_retention import RecordingDeletionScheduler
 
 API_KEY = "sk-test-not-a-real-key"
 SHIPPED_PACK = (

@@ -51,7 +51,7 @@ from mission_control.domain.execution.lane_turns import (
 from mission_control.domain.execution.lanes import CursorExecutionBinding, PrepareRequest
 from mission_control.domain.frames.contracts import FrameKind, LaneProfile
 from mission_control.domain.frames.facts import CompactionObservedFact, ToolEffectFact
-from tests.fixtures.lane_turns import RecordingSignals, SimulatedWorkerLoss
+from tests.support.lanes import RecordingSignals, SimulatedWorkerLoss
 from tests.support.providers.cursor import LocalStack, local_stack
 from tests.support.unit.harness.cursor_local import _identity, _service, _turn
 
@@ -548,8 +548,8 @@ def test_the_worker_registry_carries_the_real_cursor_local_lane_when_cursor_is_b
         DeepAgentsHarness,
     )
     from mission_control.adapters.temporal.deployment_composition import compose_lane_registry
-    from tests.fixtures.isolated_settings import isolated_settings
     from tests.support.deep_agents_runtime import ConformanceRuntime
+    from tests.support.settings import isolated_settings
 
     stack = local_stack(tmp_path)
     deep_agents = DeepAgentsHarness(ConformanceRuntime())

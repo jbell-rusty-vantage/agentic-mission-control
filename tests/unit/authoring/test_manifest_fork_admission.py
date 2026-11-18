@@ -142,7 +142,7 @@ async def test_neutral_fork_seals_server_provenance_without_changing_admission_i
         SemanticForkService,
     )
     from mission_control.domain.policies.forks import admission_request_ref
-    from tests.fixtures.run_forks import fork_command, technical_snapshot
+    from tests.support.run_forks import fork_command, technical_snapshot
 
     snapshot = technical_snapshot("source")
     snapshots = InMemoryRunSnapshotRepository()

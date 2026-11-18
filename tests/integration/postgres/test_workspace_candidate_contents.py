@@ -14,7 +14,7 @@ from mission_control.adapters.postgres.workspace_candidate_contents import (
 from mission_control.domain.execution.contracts import CapturedWorkspaceCandidate, WorkspaceOwner
 from mission_control.domain.execution.errors import UndeclaredWorkspacePath, WorkspaceDigestMismatch
 from mission_control.domain.policies.errors import IdempotencyConflict
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.db import CommonDatabase
 
 pytestmark = pytest.mark.common_db
 

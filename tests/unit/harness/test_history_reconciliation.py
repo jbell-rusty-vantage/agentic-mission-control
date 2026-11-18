@@ -33,16 +33,16 @@ from mission_control.domain.execution.history_reconciliation import (
     enqueue_history,
 )
 from mission_control.domain.execution.lane_turns import LaneSegmentBounds, LaneTurnRequest
-from tests.fixtures.checkpoint_recovery import stage_recovery_unit
-from tests.fixtures.lane_turns import (
+from tests.support.checkpoint_recovery import stage_recovery_unit
+from tests.support.deep_agents_runtime import ConformanceSecretResolver
+from tests.support.ids import SCOPE
+from tests.support.lanes import (
     RecordingSignals,
     ScriptedSessionLane,
     cursor_operation,
     lane_stack,
     scripted_frames,
 )
-from tests.support.deep_agents_runtime import ConformanceSecretResolver
-from tests.support.ids import SCOPE
 
 NOW = datetime(2026, 10, 14, tzinfo=UTC)
 

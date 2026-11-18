@@ -10,7 +10,7 @@ from collections.abc import AsyncIterator
 import asyncpg
 import pytest_asyncio
 
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.db import CommonDatabase
 
 
 @pytest_asyncio.fixture

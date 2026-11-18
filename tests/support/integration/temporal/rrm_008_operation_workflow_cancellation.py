@@ -18,7 +18,7 @@ from mission_control.domain.execution.contracts import (
     OperationExecutionRequest,
     OperationWorkflowRequest,
 )
-from tests.fixtures.checkpoint_recovery import RecoveryHarness
+from tests.support.checkpoint_recovery import RecoveryHarness
 
 WORKFLOW_QUEUE = "rrm008-operation-workflows"
 HEARTBEAT_SECONDS = 2

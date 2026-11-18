@@ -33,7 +33,7 @@ from mission_control.bootstrap.manifests import resolve_pinned_capabilities, ser
 from mission_control.bootstrap.settings import PROJECT_ROOT, get_settings
 from mission_control.domain.authoring.contracts import SecretRef
 from mission_control.domain.execution.contracts import DeepAgentMCPToolComponent
-from tests.fixtures.lane_bindings import lane_fields
+from tests.support.lane_bindings import lane_fields
 
 PINS = PROJECT_ROOT / "infra" / "capability-pins" / "research-capabilities.json"
 ENDPOINT = "http://127.0.0.1:4310/mcp"

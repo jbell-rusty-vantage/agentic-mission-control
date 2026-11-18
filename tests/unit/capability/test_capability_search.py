@@ -20,13 +20,13 @@ from mission_control.bootstrap.catalog import compose_catalog_service, configure
 from mission_control.bootstrap.settings import Settings
 from mission_control.domain.authoring.contracts import DefinitionKind
 from mission_control.domain.coordinator.contracts import CapabilitySearchRequest
-from tests.fixtures.capability_search_catalog import (
+from tests.support.capability_search import (
     DIMENSIONS,
     MODEL_ID,
     DeterministicEmbeddings,
     build_catalog,
 )
-from tests.fixtures.catalog_http import catalog_harness
+from tests.support.catalog_http import catalog_harness
 
 SCOPE = "mc/00000000-0000-4000-8000-000000000001/biotech/00000000-0000-4000-8000-000000000002"
 

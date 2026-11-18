@@ -5,15 +5,15 @@ from uuid import uuid4
 import httpx
 import pytest
 from fastapi import FastAPI
-from tests.fixtures.checkpoint_recovery import recovery_harness, stage_recovery_unit
-from tests.fixtures.run_forks import (
+from tests.support.checkpoint_recovery import recovery_harness, stage_recovery_unit
+from tests.support.run_control import WORKFLOW_DIGEST
+from tests.support.run_forks import (
     FakeForkSourceReader,
     compose_in_memory_forks,
     inspection_reads,
     stage_policy,
     stagegraph_head,
 )
-from tests.support.run_control import WORKFLOW_DIGEST
 
 from mission_control.application.missions.runtime import MissionControlRuntimeService
 from mission_control.application.recovery.run_forks import ForkPatchPolicyRegistry

@@ -35,8 +35,8 @@ from mission_control.domain.policies.contracts import (
     RunPhase,
     StartAction,
 )
-from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.support.boundary_commands import TARGET, pause
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import owner_rows, scoped_command, scoped_request
 from tests.support.integration.postgres.operation_journal_stage1 import _SCOPE, claim
 from tests.support.run_control import service

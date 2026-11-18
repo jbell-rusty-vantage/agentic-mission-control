@@ -24,16 +24,6 @@ from pathlib import Path
 from typing import Any, cast
 
 import pytest
-from tests.fixtures.catalog.fast_track_catalog import (
-    fast_track_catalog,
-    publish_output_schemas,
-)
-from tests.fixtures.manifest_runtime import ChainScript, GoalScript, promise_submitter
-from tests.fixtures.mission_control_local_agent_server import (
-    local_agent_server,
-)
-from tests.fixtures.rrm009_cancellation import TOKEN_ENV
-from tests.fixtures.rrm009_production_stack import technical_binding
 from tests.support.acceptance.mission_control.manifest_async_child import (
     ASYNC_CHILD,
     POLICY,
@@ -44,6 +34,9 @@ from tests.support.acceptance.mission_control.manifest_async_child import (
     write_async_bindings,
 )
 from tests.support.ids import SCOPE
+from tests.support.local_agent_server import (
+    local_agent_server,
+)
 from tests.support.manifest_runtime import (
     OUTPUT_SCHEMAS,
     host_pins,
@@ -51,7 +44,14 @@ from tests.support.manifest_runtime import (
     post,
     submit,
 )
+from tests.support.manifests.lifecycle import ChainScript, GoalScript, promise_submitter
+from tests.support.manifests.seeded_catalog import (
+    fast_track_catalog,
+    publish_output_schemas,
+)
 from tests.support.model_catalog import catalog_for
+from tests.support.production_stack import technical_binding
+from tests.support.running_cancellation import TOKEN_ENV
 from tests.support.stack import (
     _diagnose,
     _run,

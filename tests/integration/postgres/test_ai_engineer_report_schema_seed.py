@@ -24,8 +24,8 @@ from mission_control.adapters.postgres.scope import apply_catalog_scope_string
 from mission_control.domain.authoring.contracts import ArtifactSchemaDefinition, PublishedDefinition
 from mission_control_db_contract.errors import ContractError
 from mission_control_db_contract.seeds import load_bundles, seed_plan, validate_bundle
-from tests.fixtures.mission_control_common_db import admin_dsn
 from tests.qualification.two_project.release_install import write_target
+from tests.support.db import admin_dsn
 from tests.support.integration.postgres.ai_engineer_report_schema_seed import (
     RELEASE_142,
     ROOT,

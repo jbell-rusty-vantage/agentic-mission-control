@@ -185,7 +185,7 @@ async def test_stage_graph_fork_from_a_point_continues_the_copied_thread(
 
     from dataclasses import asdict
 
-    from tests.fixtures import rrm009_production_stack as technical
+    from tests.support import production_stack as technical
 
     from mission_control.application.execution.run_launch import fork_semantic_input_binding_ref
 

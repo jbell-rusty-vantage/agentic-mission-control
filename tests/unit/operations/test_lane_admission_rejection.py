@@ -40,10 +40,10 @@ from mission_control.domain.policies.contracts import (
     StartAction,
 )
 from mission_control.domain.policies.errors import IdempotencyConflict
-from tests.fixtures.checkpoint_recovery import FixtureControlPlane, governed_workspace
-from tests.fixtures.lane_turns import RecordingSignals, cursor_operation, lane_stack
+from tests.support.checkpoint_recovery import FixtureControlPlane, governed_workspace
 from tests.support.ids import SCOPE
 from tests.support.journal import MemoryOperationJournal
+from tests.support.lanes import RecordingSignals, cursor_operation, lane_stack
 from tests.support.run_control import actor, command, request, service
 
 

@@ -15,7 +15,7 @@ from datetime import timedelta
 from typing import Any
 
 import pytest
-from tests.fixtures.checkpoint_lineage import activity_attempt
+from tests.support.checkpoint_lineage import activity_attempt
 from tests.support.clock import Clock
 from tests.support.deep_agents import registry
 from tests.support.integration.deep_agents.wi02_transfer_plan_lane import (

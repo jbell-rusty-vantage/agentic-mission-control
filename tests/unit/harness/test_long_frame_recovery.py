@@ -5,9 +5,9 @@ import pytest
 from mission_control.application.execution.harness.lane_turns import LaneExecutionIdentity
 from mission_control.application.frames.writer import FrameWriter
 from mission_control.domain.frames.contracts import FrameKind, LaneProfile
-from tests.fixtures.lane_turns import cursor_operation, lane_stack
-from tests.fixtures.provider_frames import harness_start, observation
 from tests.support.ids import SCOPE
+from tests.support.lanes import cursor_operation, lane_stack
+from tests.support.provider_frames import harness_start, observation
 
 
 @pytest.mark.asyncio

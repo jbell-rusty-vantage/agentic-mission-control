@@ -2,7 +2,7 @@
 
 The real `OperationWorkflow` drives the real `lane.*` activities on isolated task queues;
 every history is replayed with `Replayer`. Providers are labelled fixtures
-(`tests/fixtures/lane_turns.py`); nothing here proves live provider behaviour.
+(`tests/support/lanes.py`); nothing here proves live provider behaviour.
 
 - V07: the worker dies after the provider accepted the send and before the local receipt.
   Another worker takes the session over once the lease expires (higher epoch), reconciles
@@ -52,16 +52,7 @@ from mission_control.domain.execution.lanes import (
     CancelTurnRequest,
 )
 from mission_control.domain.policies.stop_fence import EffectAdmission, StopFence
-from tests.fixtures.lane_turns import (
-    CapacityLimitedLane,
-    ReconcilingLossyLane,
-    ScriptedSessionLane,
-    cursor_binding,
-    cursor_operation,
-    lane_stack,
-    scripted_frames,
-)
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import pg_lane_unit
 from tests.support.integration.temporal.mp06_dispatch_recovery import (
     _activity_worker,
@@ -71,6 +62,15 @@ from tests.support.integration.temporal.mp06_dispatch_recovery import (
     _scheduled,
     _start,
     _workflow_worker,
+)
+from tests.support.lanes import (
+    CapacityLimitedLane,
+    ReconcilingLossyLane,
+    ScriptedSessionLane,
+    cursor_binding,
+    cursor_operation,
+    lane_stack,
+    scripted_frames,
 )
 from tests.support.temporal import patch_ids
 
@@ -167,7 +167,7 @@ class _FencedDuringDrainLane(ScriptedSessionLane):
 
 
 async def test_a_stop_fence_during_cancel_and_replace_blocks_the_replacement() -> None:
-    from tests.fixtures.cursor_controls import FAST, admitted_unit, compose_control_stack
+    from tests.support.cursor_lane_controls import FAST, admitted_unit, compose_control_stack
 
     client = await _client()
     lane_queue, workflow_queue = f"mp06-lane-{uuid4().hex[:8]}", f"mp06-wf-{uuid4().hex[:8]}"

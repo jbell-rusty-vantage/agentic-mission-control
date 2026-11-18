@@ -14,8 +14,8 @@ from typing import Any
 
 from langchain_core.messages import AIMessage, BaseMessage, ToolMessage
 
-from tests.fixtures.rrm009_production_stack import Cognition, call_usage
 from tests.support.models import ScriptedChatModel
+from tests.support.production_stack import Cognition, call_usage
 
 
 @dataclass

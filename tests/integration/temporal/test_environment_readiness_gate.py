@@ -34,7 +34,9 @@ from mission_control.domain.execution.contracts import (
 )
 from mission_control.domain.execution.environment_preparation import ENVIRONMENT_NOT_READY
 from mission_control.domain.execution.lanes import LaneSegmentBounds
-from tests.fixtures.lane_turns import (
+from tests.support.db import CommonDatabase
+from tests.support.db_builders import owner_rows
+from tests.support.lanes import (
     ACTIVATION_UUID,
     LANE_QUEUE,
     RUN_UUID,
@@ -44,8 +46,6 @@ from tests.fixtures.lane_turns import (
     lane_stack,
     scripted_frames,
 )
-from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.support.db_builders import owner_rows
 from tests.support.temporal import start_workflow_env
 
 pytestmark = pytest.mark.common_db

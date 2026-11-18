@@ -62,5 +62,5 @@ object and program-level events are not built ([coordinator surface](coordinator
   [stream service](../../src/mission_control/application/streams/service.py),
   [frame envelopes](../../src/mission_control/application/frames/streams.py).
 - Tests: [stream equals transcript](../../tests/acceptance/mission_control/test_tracing_stream.py),
-  [capture client](../../tests/fixtures/stream_capture.py),
+  [capture client](../../tests/support/stream_capture.py),
   [stream service](../../tests/unit/streams/test_stream_service.py).

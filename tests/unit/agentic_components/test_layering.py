@@ -45,8 +45,8 @@ from mission_control.domain.agentic_components.projection import (
 )
 from mission_control.domain.capabilities.host_support import LaneProfile
 from mission_control.domain.capabilities.layouts import CODEX_INSTRUCTIONS_LIMIT
-from tests.fixtures.layering_repo import REPO_FILES
-from tests.fixtures.projections.rows import (
+from tests.support.layering_repo import REPO_FILES
+from tests.support.projection_rows import (
     INSTRUCTION,
     hook_row,
     skill_row,

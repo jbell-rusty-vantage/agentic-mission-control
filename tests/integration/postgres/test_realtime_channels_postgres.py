@@ -9,7 +9,7 @@ domains.
 - Frame retention expiry (`PostgresFrameRetention.expire`) is reported as `CURSOR_EXPIRED`
   with a snapshot at the high-watermark on subscribe, and as `resync_required` live.
 
-Provider frames are the deterministic fixtures of `tests/fixtures/provider_frames.py` and
+Provider frames are the deterministic fixtures of `tests/support/provider_frames.py` and
 synthetic message frames (not provider recordings).
 """
 
@@ -32,9 +32,8 @@ from mission_control.contracts.realtime import LineageNotice
 from mission_control.domain.frames.contracts import FrameKind, FrameObservation, LaneProfile
 from mission_control.domain.policies.contracts import CommandStatus, StartAction
 from mission_control.interfaces.socketio.server import MissionSocketLimits
-from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.fixtures.provider_frames import FRAME_NOW, turn_observations
 from tests.support.clock import SECOND, Clock
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import owner_rows, scoped_command, scoped_request
 from tests.support.integration.postgres.mission_socket_postgres import auth, stack, subscribe
 from tests.support.integration.postgres.realtime_acceptance_postgres import (
@@ -44,6 +43,7 @@ from tests.support.integration.postgres.realtime_acceptance_postgres import (
     mission_of,
     release_link,
 )
+from tests.support.provider_frames import FRAME_NOW, turn_observations
 
 pytestmark = pytest.mark.common_db
 

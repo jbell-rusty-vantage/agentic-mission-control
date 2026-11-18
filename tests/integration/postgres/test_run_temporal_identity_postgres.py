@@ -20,7 +20,7 @@ from mission_control.adapters.postgres.run_control.run_control_repository import
 from mission_control.application.execution.run_control_repository import (
     TemporalIdentityConflict,
 )
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import insert_fixture_run, owner_rows
 
 pytestmark = pytest.mark.common_db

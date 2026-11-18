@@ -142,7 +142,7 @@ class DryRun:
 
     async def _publish_fixture_rows(self, dsn: str, catalog_scope: str) -> list[str]:
         sys.path.insert(0, str(ROOT))
-        from tests.fixtures.catalog.fast_track_catalog import fixture_definitions
+        from tests.support.manifests.seeded_catalog import fixture_definitions
 
         from mission_control.adapters.postgres.control_plane.definition_repository import (
             PostgresDefinitionRepository,

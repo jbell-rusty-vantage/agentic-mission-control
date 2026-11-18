@@ -37,7 +37,7 @@ from mission_control.domain.execution.contracts import (
 )
 from mission_control.domain.execution.lanes import CursorExecutionBinding
 from mission_control.domain.frames.contracts import FrameKind
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.db import CommonDatabase
 from tests.support.integration.temporal.mp07_claude_lane_turns import (
     WORKER,
     claude_unit,

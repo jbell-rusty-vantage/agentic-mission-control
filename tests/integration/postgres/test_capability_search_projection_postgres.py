@@ -25,7 +25,7 @@ from mission_control.domain.authoring.contracts import (
     DefinitionKind,
 )
 from mission_control.domain.coordinator.contracts import CapabilitySearchRequest, CatalogAssetStatus
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import AI_ENGINEER_CATALOG, BIOTECH_CATALOG
 from tests.support.integration.postgres.capability_search_projection_postgres import (
     NOW,

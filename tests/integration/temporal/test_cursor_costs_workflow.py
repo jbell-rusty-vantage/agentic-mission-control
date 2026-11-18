@@ -40,7 +40,7 @@ from mission_control.adapters.temporal.workflows.operation import (
 from mission_control.domain.execution.contracts import OperationWorkflowRequest
 from mission_control.domain.execution.cursor_costs import CostReadResult, CostRequest
 from mission_control.domain.execution.lane_turns import LaneTurnResult
-from tests.fixtures.lane_turns import cursor_operation
+from tests.support.lanes import cursor_operation
 from tests.support.temporal import patch_ids
 
 WORKFLOW_QUEUE = "cursor-costs-workflows"

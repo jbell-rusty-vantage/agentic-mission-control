@@ -51,7 +51,7 @@ from mission_control.domain.policies.contracts import (
     LifecycleCommand,
     RunPhase,
 )
-from tests.fixtures.lane_turns import (
+from tests.support.lanes import (
     RecordingSignals,
     ScriptedSessionLane,
     cursor_operation,

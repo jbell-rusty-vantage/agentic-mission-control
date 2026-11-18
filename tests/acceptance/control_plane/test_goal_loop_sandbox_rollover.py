@@ -14,16 +14,16 @@ from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.store.memory import InMemoryStore
 from temporalio import activity
 from temporalio.worker import Worker
-from tests.fixtures.checkpoint_lineage import (
+from tests.support.checkpoint_lineage import (
     execute_with_checkpoint_lineage,
     materialized_workspace,
 )
-from tests.fixtures.goal_directed_journaled import (
+from tests.support.deep_agents import exact_fixture
+from tests.support.journaled_goal_loop import (
     FixtureGoalSettlements,
     goal_template_workspace,
 )
-from tests.fixtures.lane_bindings import LANE_REBINDERS, lane_fields
-from tests.support.deep_agents import exact_fixture
+from tests.support.lane_bindings import LANE_REBINDERS, lane_fields
 from tests.support.models import ScriptedChatModel, tool_call
 from tests.support.operations import operation_request
 from tests.support.temporal import cancelled_operation_result, start_workflow_env

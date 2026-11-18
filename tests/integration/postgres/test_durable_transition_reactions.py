@@ -79,7 +79,7 @@ from mission_control.domain.reactions.contracts import (
     ReactionDeclaration,
     TransitionKind,
 )
-from tests.fixtures.mission_control_common_db import (
+from tests.support.db import (
     CommonDatabase,
     common_database,
     migration_paths_with,

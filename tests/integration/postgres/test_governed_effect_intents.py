@@ -51,8 +51,8 @@ from mission_control.interfaces.mcp.governed_gateway import (
     ScopedGovernedEffects,
     register_governed_tools,
 )
-from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.support.clock import Clock
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import owner_rows
 from tests.support.integration.postgres.mp11_approvals_postgres import (
     admitted_run,

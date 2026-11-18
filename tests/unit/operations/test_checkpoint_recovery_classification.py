@@ -3,7 +3,7 @@
 REQ-CP-DA-018 and `CON-CP-CHECKPOINT-LINEAGE-V1` (classification and crash-window tables),
 REQ-CP-EXEC-005/014 (claim lease, fence, generation boundary), REQ-CP-RUN-007 (narrowed
 post-dispatch rule, `in_doubt`, operator reconciliation). A real Deep Agent graph runs
-through the whole operation boundary (see `tests/fixtures/checkpoint_recovery.py`).
+through the whole operation boundary (see `tests/support/checkpoint_recovery.py`).
 """
 
 from __future__ import annotations
@@ -55,7 +55,7 @@ from mission_control.domain.policies.contracts import (
     RunPhase,
     operator_reconciliation_condition_id,
 )
-from tests.fixtures.checkpoint_recovery import (
+from tests.support.checkpoint_recovery import (
     RESULT_MARKER,
     RecoveryHarness,
     SimulatedWorkerCrash,
@@ -92,7 +92,7 @@ async def _final_messages(harness: RecoveryHarness, namespace: str, leaf_id: str
 
     from deepagents import create_deep_agent
 
-    from tests.fixtures.checkpoint_recovery import recovery_model
+    from tests.support.checkpoint_recovery import recovery_model
 
     reader = create_deep_agent(model=recovery_model(), checkpointer=harness.saver)
     state = await reader.aget_state(_root(namespace, leaf_id))

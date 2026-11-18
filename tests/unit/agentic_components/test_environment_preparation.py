@@ -43,7 +43,7 @@ from mission_control.domain.execution.environment_preparation import (
 from mission_control.domain.execution.lanes import CursorExecutionBinding, PreparedSession
 from mission_control.domain.frames.contracts import FrameKind
 from mission_control.domain.policies.contracts import ActorContext
-from tests.fixtures.lane_turns import cursor_binding, cursor_operation
+from tests.support.lanes import cursor_binding, cursor_operation
 from tests.support.manifests.v2_environment import (
     KIT_PIN,
     RESOLVED,

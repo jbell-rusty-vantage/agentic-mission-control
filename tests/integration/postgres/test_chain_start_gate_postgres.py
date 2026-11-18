@@ -18,7 +18,7 @@ import pytest
 
 from mission_control.adapters.postgres.chains.exports import PostgresChainStartGate
 from mission_control.application.chains.relay import ChainIntent
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import insert_fixture_run
 
 pytestmark = pytest.mark.common_db

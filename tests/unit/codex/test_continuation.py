@@ -1,7 +1,7 @@
 """MP-08 x MP-12: the codex continuation (sealed checkpoint -> a fresh thread).
 
 FIXTURES: the FIXTURE app-server (`tests/support/providers/codex.py`) and the MP-12
-in-memory continuation service (`tests/fixtures/continuation.py`). Proves:
+in-memory continuation service (`tests/support/continuation.py`). Proves:
 
 - the snapshot port freezes `inputs/`, `outputs/`, `.mission/` and takes custody of the lease's
   git patch, never the lane's state root or `CODEX_HOME`;

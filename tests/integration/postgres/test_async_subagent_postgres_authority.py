@@ -29,7 +29,7 @@ from mission_control.domain.execution.contracts import (
     AsyncSubagentLifecycle,
     AsyncSubagentUsage,
 )
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import owner_rows
 from tests.support.deep_agents import request as spawn_request
 from tests.support.integration.postgres.checkpoint_lineage_postgres import RUNTIME_ROLE, admit_run

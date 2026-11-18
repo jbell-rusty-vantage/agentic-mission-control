@@ -29,8 +29,8 @@ from mission_control.interfaces.mcp.coordinator_server import (
     CoordinatorPrincipal,
     create_coordinator_server,
 )
-from tests.fixtures.capability_search_catalog import build_catalog, evaluation_cases
-from tests.fixtures.catalog_http import CatalogHarness, catalog_harness
+from tests.support.capability_search import build_catalog, evaluation_cases
+from tests.support.catalog_http import CatalogHarness, catalog_harness
 from tests.support.unit.coordinator.coordinator_facade import ReadyRuntimes
 
 NOW = datetime(2026, 10, 7, tzinfo=UTC)

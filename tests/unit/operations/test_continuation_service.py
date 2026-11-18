@@ -21,7 +21,7 @@ from mission_control.domain.context.checkpoint import (
     ContinuationTriggerKind,
 )
 from mission_control.domain.policies.contracts import RecordContinuationAction
-from tests.fixtures.continuation import RUN_KEY, build_service, facts, seal_target, trigger
+from tests.support.continuation import RUN_KEY, build_service, facts, seal_target, trigger
 from tests.support.ids import SCOPE
 
 SESSION_FILES = {

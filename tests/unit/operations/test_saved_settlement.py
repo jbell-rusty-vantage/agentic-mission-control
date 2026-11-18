@@ -3,7 +3,7 @@
 A real `create_deep_agent` graph (deterministic scripted model, two calls per cognition) runs
 through the whole operation boundary (RRM-004 harness: journaled coordinator, checkpoint
 lineage, in-memory run control) with the saved-result store and a generic durable-wait double
-(`tests/fixtures/saved_settlement.py`): cognition performs one native write per answer turn,
+(`tests/support/saved_settlement.py`): cognition performs one native write per answer turn,
 the write needs a receipt and an independent review may hold the result. Worker loss is a
 `SimulatedWorkerCrash` (no lease release, nothing settled); a fresh worker takes the lease over
 after it expires. Every window converges to one logical result with the model called twice,
@@ -35,15 +35,15 @@ from mission_control.domain.execution.invocation_settlement import (
 )
 from mission_control.domain.policies.contracts import CommandStatus, ReconcileUnitAction
 from mission_control.domain.policies.errors import IdempotencyConflict
-from tests.fixtures.checkpoint_recovery import (
+from tests.support.checkpoint_recovery import (
     RESULT_MARKER,
     TOKENS_PER_CALL,
     RecoveryHarness,
     recovery_harness,
     stage_recovery_unit,
 )
-from tests.fixtures.saved_settlement import REVIEW, DurableEffectDouble
 from tests.support.clock import Clock
+from tests.support.saved_settlement import REVIEW, DurableEffectDouble
 
 ANSWER_TURNS = (2, 4, 6)
 

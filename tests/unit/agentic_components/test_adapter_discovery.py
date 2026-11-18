@@ -5,7 +5,7 @@ additive in that build: the repository's skill and the mission's are both discov
 SessionStart hooks of the merged settings fire, and the repository files are byte-identical
 after the restore.
 
-Re-record with ``uv run --frozen python -m tests.fixtures.projections.discovery.claude_cli``
+Re-record with ``uv run --frozen python -m tests.support.discovery_recorders.claude_cli``
 (no provider call; see that module). The recording is bound to the projection digest, so any
 renderer change that alters the claude_agent_sdk bytes makes this test demand a re-record
 instead of silently trusting stale evidence. It proves local discovery only; it qualifies
@@ -23,7 +23,7 @@ from mission_control.application.environments import BootstrapRoute, route_evide
 from mission_control.application.environments.discovery import discovery_expectation
 from mission_control.domain.capabilities.host_support import LaneProfile
 from mission_control.domain.execution.discovery import DiscoveryItem, discovery_gaps
-from tests.fixtures.projections.discovery import claude_cli
+from tests.support.discovery_recorders import claude_cli
 
 RECORDING = json.loads(claude_cli.RECORDING.read_text(encoding="utf-8"))
 
@@ -47,7 +47,7 @@ def test_recording_matches_the_current_projection() -> None:
     projection = claude_cli.project()
     assert RECORDING["projection_digest"] == projection_digest(projection), (
         "claude_agent_sdk projection changed: re-record "
-        "`uv run --frozen python -m tests.fixtures.projections.discovery.claude_cli`"
+        "`uv run --frozen python -m tests.support.discovery_recorders.claude_cli`"
     )
     assert RECORDING["projected_paths"] == list(projection.paths())
 

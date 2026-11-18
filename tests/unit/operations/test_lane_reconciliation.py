@@ -32,7 +32,7 @@ from mission_control.domain.policies.contracts import (
     ClaimEffectAction,
     CommandStatus,
 )
-from tests.fixtures.checkpoint_recovery import SimulatedWorkerCrash
+from tests.support.checkpoint_recovery import SimulatedWorkerCrash
 from tests.support.run_control import command
 from tests.support.unit.operations.lane_reconciliation import native_recovery
 

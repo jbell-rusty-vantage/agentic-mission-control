@@ -10,7 +10,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
-from tests.fixtures.isolated_settings import isolated_settings
+from tests.support.settings import isolated_settings
 
 from biotech_mission_adapters.application.web_research.web_research_semantic_binding import (
     REQUIRED_SELECTED_IDENTITIES,

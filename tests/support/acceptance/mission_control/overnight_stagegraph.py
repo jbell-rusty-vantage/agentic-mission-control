@@ -15,7 +15,7 @@ from uuid import uuid4
 from mission_control.application.authoring.manifest_submit import SubmitRequest
 from mission_control.contracts.identities import mission_root_id
 from mission_control.domain.authoring.manifest import canonical_manifest_bytes, load_manifest_yaml
-from tests.fixtures.manifest_runtime import AUTHOR
+from tests.support.manifests.lifecycle import AUTHOR
 from tests.support.stack import ProductionStack
 
 ROOT = Path(__file__).resolve().parents[4]
@@ -27,8 +27,8 @@ def overnight_launch_bindings(technical: Any) -> Any:
         knowledge_launch_bindings,
         knowledge_tools,
     )
-    from tests.fixtures.rrm009_production_stack import AGENT_COGNITIVE_QUEUE
     from tests.support.model_catalog import model_binding
+    from tests.support.production_stack import AGENT_COGNITIVE_QUEUE
     from tests.unit.authoring.manifest_launch_fixture import fixture_bindings
 
     authored = load_manifest_yaml(TEMPLATE.read_text(encoding="utf-8"))
@@ -70,7 +70,7 @@ async def production_lifecycle(
     from mission_control.bootstrap.manifests import compose_manifest_launch_inputs
     from mission_control.bootstrap.technical_api import api
     from mission_control.domain.authoring.extensions import ExtensionRegistry
-    from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog
+    from tests.support.manifests.seeded_catalog import fast_track_catalog
     from tests.support.model_catalog import catalog_for
 
     run_control = api.state.run_control_service

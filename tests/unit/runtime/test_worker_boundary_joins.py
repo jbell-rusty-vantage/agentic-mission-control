@@ -18,8 +18,8 @@ from mission_control.bootstrap.provider_auth import selected_auth_environment, w
 from mission_control.bootstrap.worker import wait_worker_background
 from mission_control.domain.execution.lane_turns import ClosingFacts
 from mission_control.domain.execution.lanes import UsageReport
-from tests.fixtures.isolated_settings import isolated_settings
-from tests.fixtures.lane_turns import cursor_operation
+from tests.support.lanes import cursor_operation
+from tests.support.settings import isolated_settings
 
 
 @pytest.mark.parametrize(

@@ -7,9 +7,9 @@ from mission_control.application.frames.reducer import CompletionEvidence, Deriv
 from mission_control.application.frames.writer import FrameWriter
 from mission_control.domain.frames.contracts import FrameKind, LaneProfile
 from mission_control.domain.frames.facts import ExecutionOutcomeFact
-from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.fixtures.provider_frames import observation
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import admit_unit_attempt
+from tests.support.provider_frames import observation
 
 pytestmark = pytest.mark.common_db
 

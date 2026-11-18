@@ -28,8 +28,8 @@ from mission_control.domain.authoring.manifest import canonical_manifest_bytes, 
 from mission_control.domain.authoring.mission_definition import MissionDefinition
 from mission_control.domain.authoring.mission_environment import KitRequirements
 from mission_control.domain.execution.network_policy import NetworkHosts, ResolvedNetworkPolicy
-from tests.fixtures.applications import installed_applications
-from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog
+from tests.support.applications import installed_applications
+from tests.support.manifests.seeded_catalog import fast_track_catalog
 from tests.support.manifests.v2_launch import SCOPE, bindings, example, served
 from tests.support.model_catalog import bindings_catalog
 

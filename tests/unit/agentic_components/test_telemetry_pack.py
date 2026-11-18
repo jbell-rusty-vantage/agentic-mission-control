@@ -33,7 +33,7 @@ from mission_control.domain.agentic_components.projection import (
 from mission_control.domain.authoring.contracts import SkillDefinition
 from mission_control.domain.capabilities.host_support import LaneProfile
 from mission_control.domain.capabilities.pins import CapabilityPin
-from tests.fixtures.projections.rows import INSTRUCTION, fixture_rows, skill_row
+from tests.support.projection_rows import INSTRUCTION, fixture_rows, skill_row
 
 SKILL_BUNDLE = Path(__file__).resolve().parents[3] / "skills" / "mc-signals" / "SKILL.md"
 PACK = (SIGNAL_SCRIPT, SIGNAL_CLI, SIGNAL_POLICY)

@@ -176,7 +176,7 @@ def test_a_lane_credential_alone_does_not_publish_the_api_billed_profiles() -> N
 
 @pytest.mark.parametrize("profile", API_PROFILES)
 def test_the_projection_carries_the_instructions_and_reports_every_row(profile: str) -> None:
-    from tests.fixtures.projections.rows import INSTRUCTION, fixture_rows
+    from tests.support.projection_rows import INSTRUCTION, fixture_rows
 
     rows = fixture_rows()
     projection = HOST_PROJECTORS.render(rows, profile, INSTRUCTION)

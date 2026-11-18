@@ -50,10 +50,10 @@ from mission_control.domain.authoring.environment_kits import (
 from mission_control.domain.capabilities.catalog_entry import capability_pin
 from mission_control.domain.capabilities.host_support import HostSupportStatus
 from mission_control.domain.coordinator.contracts import CapabilitySearchRequest
-from tests.fixtures.capability_search_catalog import DIMENSIONS, MODEL_ID
-from tests.fixtures.environment_kits import BASH, setup_environ
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.capability_search import DIMENSIONS, MODEL_ID
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import BIOTECH_CATALOG
+from tests.support.environment_kits import BASH, setup_environ
 from tests.support.integration.postgres.environment_kits_postgres import _seed
 
 pytestmark = pytest.mark.common_db

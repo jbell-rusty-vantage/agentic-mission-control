@@ -80,7 +80,6 @@ from mission_control.domain.execution.lanes import (
     TurnHandle,
 )
 from mission_control.domain.frames.contracts import FrameKind, LaneProfile
-from tests.fixtures.lane_turns import RecordingSignals, lane_stack
 from tests.integration.codex.live_drill import (
     DrillOutcome,
     RecordingLauncher,
@@ -96,6 +95,7 @@ from tests.integration.codex.live_drill import (
     write_recording,
 )
 from tests.support.artifacts import MemoryArtifacts
+from tests.support.lanes import RecordingSignals, lane_stack
 from tests.support.providers.codex import (
     StaticProjectionSource,
     approval_rig,

@@ -45,8 +45,8 @@ from mission_control.domain.execution.lanes import (
     StartRequest,
 )
 from mission_control.domain.execution.network_policy import ResolvedNetworkPolicy
-from tests.fixtures.cursor_controls import started_session
-from tests.fixtures.lane_bindings import lane_fields
+from tests.support.cursor_lane_controls import started_session
+from tests.support.lane_bindings import lane_fields
 from tests.support.providers.claude import (
     base_operation,
     claude_binding,

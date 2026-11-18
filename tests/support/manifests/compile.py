@@ -38,8 +38,8 @@ from mission_control.domain.coordinator.contracts import CapabilitySearchRequest
 from mission_control.domain.policies.contracts import ActorContext
 from mission_control.interfaces.http.mission_control import MissionPrincipal, get_mission_principal
 from mission_control.interfaces.http.missions import router
-from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog
 from tests.support.ids import INSTALLATION, TENANT, canonical_scope
+from tests.support.manifests.seeded_catalog import fast_track_catalog
 
 ROOT = Path(__file__).resolve().parents[3]
 

@@ -10,7 +10,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from tests.fixtures.qualia_stagegraph import run_pilot
+from experiments.knowledge_loop.qualia_stagegraph import run_pilot
 
 
 def main() -> None:

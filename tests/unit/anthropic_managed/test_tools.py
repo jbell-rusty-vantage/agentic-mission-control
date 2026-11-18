@@ -16,7 +16,7 @@ from mission_control.application.human_tasks.memory import InMemoryHumanTaskRepo
 from mission_control.application.human_tasks.service import HumanTaskService
 from mission_control.domain.execution.bindings import ProviderExecutionBinding
 from mission_control.domain.policies.stop_fence import StopFence
-from tests.fixtures.lane_bindings import lane_fields
+from tests.support.lane_bindings import lane_fields
 from tests.support.providers.managed_agents import managed_stack
 from tests.support.unit.anthropic_managed.harness import _started
 from tests.support.unit.approvals.approval_broker import OWNER, _compose

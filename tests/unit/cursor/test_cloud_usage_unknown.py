@@ -11,7 +11,7 @@ from pathlib import Path
 import pytest
 
 from mission_control.domain.execution.lanes import SessionHandle, TurnHandle, UsageRequest
-from tests.fixtures.cursor_controls import harness_fields
+from tests.support.cursor_lane_controls import harness_fields
 from tests.support.providers.cursor import cloud_stack
 from tests.unit.cursor.support import heid_of, lanes_for, signals, turn
 
@@ -58,7 +58,7 @@ async def test_exact_cloud_usage_uses_cursor_cache_total_policy(shape, expected,
 
     from mission_control.adapters.cursor.cloud import CursorCloudHarness
     from mission_control.adapters.cursor.cloud_api import CloudAgentsClient
-    from tests.fixtures.lane_turns import cursor_operation
+    from tests.support.lanes import cursor_operation
 
     tokens = {"inputTokens": 10, "outputTokens": 5}
     if shape == "cache":

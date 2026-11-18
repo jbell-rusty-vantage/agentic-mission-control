@@ -34,8 +34,8 @@ from mission_control.domain.execution.contracts import OperationExecutionResult
 from mission_control.domain.execution.lanes import LaneSegmentBounds, ReattachRequest
 from mission_control.domain.frames.contracts import FrameKind
 from mission_control.domain.policies.contracts import ActorContext
-from tests.fixtures.lane_turns import RecordingSignals
 from tests.support.ids import SCOPE
+from tests.support.lanes import RecordingSignals
 from tests.support.providers.codex import REVIEWER, CodexStack, approval_rig, codex_stack
 from tests.unit.codex.drive import fields, sent, started
 

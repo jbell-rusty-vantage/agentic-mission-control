@@ -38,9 +38,9 @@ from mission_control.domain.execution.live_invocation import (
 )
 from mission_control.domain.programs.goal_directed import GoalDirectedInterpreter
 from mission_control.domain.programs.goal_directed_runtime import GoalOperationPreparationRequest
-from tests.fixtures.lane_bindings import LANE_REBINDERS, lane_fields
 from tests.support.integration.temporal.wp_bp_010_temporal import RecordingOperationBindings
 from tests.support.integration.temporal.wp_bp_020_temporal import _run_input
+from tests.support.lane_bindings import LANE_REBINDERS, lane_fields
 from tests.support.manifests.launch_inputs import (
     MINIMAL,
     MISSION_2,

@@ -27,7 +27,7 @@ from mission_control.domain.execution.contracts import (
     purpose_card_problem,
     purpose_card_segment,
 )
-from tests.fixtures.goal_directed_journaled import goal_authority
+from tests.support.journaled_goal_loop import goal_authority
 from tests.support.unit.orchestration.rrm_016_goal_directed_settlement import (
     _claim,
     _composition,

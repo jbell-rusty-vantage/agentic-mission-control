@@ -41,7 +41,9 @@ import httpx
 import pytest
 from fastapi import FastAPI
 from temporalio.client import WorkflowExecutionStatus
-from tests.fixtures.manifest_runtime import (
+from tests.support.ids import INSTALLATIONS, SCOPE
+from tests.support.manifest_runtime import OUTPUT_SCHEMAS, evaluable, write_bindings
+from tests.support.manifests.lifecycle import (
     AUTHOR,
     ChainScript,
     GoalScript,
@@ -49,10 +51,8 @@ from tests.fixtures.manifest_runtime import (
     compose_lifecycle,
     promise_submitter,
 )
-from tests.fixtures.rrm009_production_stack import technical_binding
-from tests.support.ids import INSTALLATIONS, SCOPE
-from tests.support.manifest_runtime import OUTPUT_SCHEMAS, evaluable, write_bindings
 from tests.support.model_catalog import catalog_for
+from tests.support.production_stack import technical_binding
 from tests.support.stack import (
     ProductionStack,
     _command,

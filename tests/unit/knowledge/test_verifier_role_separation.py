@@ -33,9 +33,9 @@ from mission_control.application.outputs.fulfillment import OutputFulfillmentSer
 from mission_control.application.outputs.submission_service import SubmissionService
 from mission_control.domain.graph_runtime.identities import GoalDirectedUnitLocation
 from mission_control.domain.outputs.contracts import OutputForm
-from tests.fixtures.lane_bindings import lane_fields
 from tests.support.knowledge.credentials import BINDING
 from tests.support.knowledge.gateway import RUN, lane
+from tests.support.lane_bindings import lane_fields
 from tests.support.manifests.launch_inputs import (
     admitted,
     chain,  # noqa: F401

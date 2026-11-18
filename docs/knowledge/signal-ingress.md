@@ -61,7 +61,7 @@ timestamp within ±300 s. A verified delivery is stored only as `mc.provider_wak
 resource_ref, event_id}`); status, URLs and usage are dropped; a missing type or id is 422 `invalid_body`.
 Deduplication by `webhook-id` returns 204; forged or stale deliveries are 401 and reach no SQL. The worker
 re-reads provider state through `RemoteSessionLane.wake_target`. Signed fixtures:
-`tests/fixtures/provider_webhooks.py`; no provider webhook has been registered.
+`tests/support/provider_webhooks.py`; no provider webhook has been registered.
 
 ## The gate
 

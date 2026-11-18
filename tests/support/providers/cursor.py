@@ -135,9 +135,9 @@ from mission_control.domain.capabilities.gates import SignalGatePolicy
 from mission_control.domain.capabilities.hooks import KERNEL_HOOK_EVENTS, KERNEL_HOOK_IDS, HookEvent
 from mission_control.domain.execution.contracts import OperationExecutionRequest
 from mission_control.domain.execution.lanes import CursorExecutionBinding
-from tests.fixtures.environment_kits import kit_files, published_kit
-from tests.fixtures.lane_turns import cursor_binding, cursor_operation
 from tests.support.artifacts import MemoryArtifacts
+from tests.support.environment_kits import kit_files, published_kit
+from tests.support.lanes import cursor_binding, cursor_operation
 
 LOCAL_FIXTURES = (
     Path(__file__).resolve().parents[2] / "integration" / "cursor" / "fixtures" / "local"
@@ -456,7 +456,7 @@ def service_hook_invoker(service: HookCallbackService) -> HookInvoker:
 
 
 def projection_rows() -> tuple[ResolvedCapability, ...]:
-    from tests.fixtures.projections.rows import hook_row, skill_row, tavily_row, verifier_row
+    from tests.support.projection_rows import hook_row, skill_row, tavily_row, verifier_row
 
     return (skill_row(), tavily_row(), hook_row(), verifier_row())
 
@@ -1017,7 +1017,7 @@ class FakeCloudApi:
 
 
 def cloud_rows() -> tuple[ResolvedCapability, ...]:
-    from tests.fixtures.projections.rows import hook_row, tavily_row, verifier_row
+    from tests.support.projection_rows import hook_row, tavily_row, verifier_row
 
     return (tavily_row(), hook_row(), verifier_row())
 

@@ -10,7 +10,7 @@ caller's scope, Temporal, PostgreSQL and the parent-boundary settlement.
 
 FIXTURE: the deterministic parent (it spawns, then checks the task until the governed check
 admits it, then does its scripted work) and the deterministic model the server substitutes for
-the sealed binding's model (``tests/fixtures/wi23_sealed_child_hosting.py``). Nothing is paid.
+the sealed binding's model (``tests/support/sealed_child_hosting.py``). Nothing is paid.
 """
 
 from __future__ import annotations
@@ -26,15 +26,15 @@ from typing import Any, cast
 
 import pytest
 from langchain_core.messages import AIMessage, BaseMessage, ToolMessage
-from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog, publish_output_schemas
-from tests.fixtures.manifest_runtime import ChainScript, GoalScript, promise_submitter
-from tests.fixtures.mission_control_local_agent_server import local_agent_server
-from tests.fixtures.rrm009_production_stack import call_usage, technical_binding
 from tests.support.acceptance.mission_control import manifest_async_child as base
 from tests.support.ids import SCOPE
+from tests.support.local_agent_server import local_agent_server
 from tests.support.manifest_runtime import OUTPUT_SCHEMAS, host_pins, missions_app, post, submit
+from tests.support.manifests.lifecycle import ChainScript, GoalScript, promise_submitter
+from tests.support.manifests.seeded_catalog import fast_track_catalog, publish_output_schemas
 from tests.support.model_catalog import catalog_for
 from tests.support.models import ScriptedChatModel
+from tests.support.production_stack import call_usage, technical_binding
 from tests.support.stack import _diagnose, _run, _terminal, _wait_for, open_stack
 
 from mission_control.adapters.agent_server.async_subagents.sealed import (
@@ -214,9 +214,7 @@ async def sealed_launch_stack(
         tmp_path / "agent-server",
         monkeypatch,
         extra_environment={
-            "MISSION_CONTROL_SEALED_CHILD_FACTORY": (
-                "tests.fixtures.wi23_sealed_child_hosting:factory"
-            ),
+            "MISSION_CONTROL_SEALED_CHILD_FACTORY": ("tests.support.sealed_child_hosting:factory"),
             "WI23_TEST_CUSTODY_DSN_FILE": str(dsn_file),
         },
     ) as endpoint:

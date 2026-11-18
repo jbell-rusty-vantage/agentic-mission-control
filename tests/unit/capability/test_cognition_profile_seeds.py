@@ -28,7 +28,7 @@ from mission_control.domain.capabilities.host_support import (
 from mission_control.domain.capabilities.pins import CapabilityPin
 from mission_control.domain.coordinator.contracts import CapabilitySearchRequest
 from mission_control_db_contract.seeds import load_bundles, order_bundles
-from tests.fixtures.capability_search_catalog import build_catalog
+from tests.support.capability_search import build_catalog
 
 ROOT = Path(__file__).resolve().parents[3]
 SEEDS = ROOT / "packages/mission-control-db-contract/seeds"

@@ -20,14 +20,14 @@ from mission_control.application.installations.registry import (
 from mission_control.domain.policies.contracts import ActorContext
 from mission_control.interfaces.http.mission_control import MissionPrincipal, get_mission_principal
 from mission_control.interfaces.http.transcript import router
-from tests.fixtures.transcripts import (
+from tests.support.ids import INSTALLATION, SCOPE, TENANT
+from tests.support.transcripts import (
     SECRET_VALUE,
     InMemoryMissionEvents,
     StaticFrames,
     transcript_events,
     transcript_frames,
 )
-from tests.support.ids import INSTALLATION, SCOPE, TENANT
 
 
 def transcript_service() -> TranscriptService:

@@ -52,7 +52,7 @@ from mission_control.application.subscriptions.coordinator_service import (
 from mission_control.domain.coordinator.attention import HostObservation, nonce_digest
 from mission_control.domain.outputs.contracts import Enforcement, OutputForm, Requirement
 from mission_control.domain.policies.contracts import ActorContext
-from tests.fixtures.mission_control_common_db import (
+from tests.support.db import (
     CommonDatabase,
     common_database,
     migration_paths_with,

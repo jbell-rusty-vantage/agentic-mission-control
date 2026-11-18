@@ -40,8 +40,8 @@ from mission_control.bootstrap.settings import Settings
 from mission_control.domain.authoring.contracts import PluginDefinition
 from mission_control.domain.capabilities.catalog_entry import capability_pin
 from mission_control.domain.execution.bindings import ProviderExecutionBinding
-from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog
 from tests.support.manifests.cursor_launch import seeds_publish_module
+from tests.support.manifests.seeded_catalog import fast_track_catalog
 from tests.support.manifests.v2_launch import SCOPE, compiled_ok, edited, example, stub_author
 
 PLUGIN = "plugin.cognition-sdlc"

@@ -22,10 +22,9 @@ from mission_control.application.execution.harness.leases import lease_identity
 from mission_control.application.workspaces.snapshots import branch_snapshot_ref
 from mission_control.domain.execution.lane_turns import LaneTurnRequest
 from mission_control.domain.execution.lanes import CursorExecutionBinding
-from tests.fixtures.isolated_settings import isolated_settings
-from tests.fixtures.lane_turns import ACTIVATION_UUID, RUN_UUID, RecordingSignals, lane_stack
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.db import CommonDatabase
 from tests.support.ids import catalog_scope
+from tests.support.lanes import ACTIVATION_UUID, RUN_UUID, RecordingSignals, lane_stack
 from tests.support.providers.cursor import (
     API_KEY,
     FakeCloudApi,
@@ -33,6 +32,7 @@ from tests.support.providers.cursor import (
     load_cloud_fixture,
     make_remote,
 )
+from tests.support.settings import isolated_settings
 
 pytestmark = pytest.mark.common_db
 

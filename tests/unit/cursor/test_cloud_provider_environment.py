@@ -31,8 +31,8 @@ from mission_control.application.environments.provider_environments import (
 )
 from mission_control.application.secrets.broker import SecretBroker
 from mission_control.domain.authoring.environment_kits import MISSION_SETUP_KIT, MISSION_SETUP_RUN
-from tests.fixtures.cursor_controls import started_session
-from tests.fixtures.environment_kits import StaticDefinitions, kit_document, kit_pin
+from tests.support.cursor_lane_controls import started_session
+from tests.support.environment_kits import StaticDefinitions, kit_document, kit_pin
 from tests.support.providers.cursor import (
     CloudStack,
     FakeEnvironmentsApi,

@@ -49,7 +49,7 @@ from mission_control.interfaces.http.human_tasks import router
 from mission_control.interfaces.http.mission_control import MissionPrincipal, get_mission_principal
 from mission_control.interfaces.socketio.app import MissionSocketConfig, mount_mission_socketio
 from mission_control.interfaces.socketio.auth import SocketAuthRejected, token_expiry
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import owner_rows
 from tests.support.ids import tenant_id
 from tests.support.integration.postgres.mp11_approvals_postgres import (
@@ -526,8 +526,8 @@ async def test_production_context_probe_reads_generation_and_binding_from_harnes
 
     from mission_control.adapters.postgres.approvals.context import PostgresApprovalContextProbe
     from mission_control.application.execution.harness.lane_turns import execution_start
-    from tests.fixtures.lane_turns import ScriptedSessionLane, scripted_frames
     from tests.support.db_builders import pg_lane_unit
+    from tests.support.lanes import ScriptedSessionLane, scripted_frames
 
     pool = await mp11_db.pool(max_size=8)
     try:

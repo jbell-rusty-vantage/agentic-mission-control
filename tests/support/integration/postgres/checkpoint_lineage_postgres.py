@@ -12,7 +12,7 @@ import asyncpg
 from mission_control.adapters.postgres.run_control.run_control_repository import (
     PostgresRunControlRepository,
 )
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import scoped_request
 from tests.support.run_control import service as run_control_service
 

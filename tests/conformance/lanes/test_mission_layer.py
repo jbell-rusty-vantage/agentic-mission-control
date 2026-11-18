@@ -33,8 +33,8 @@ from mission_control.domain.authoring.environment_kits import (
 )
 from mission_control.domain.execution.contracts import OperationExecutionRequest
 from mission_control.domain.execution.lanes import PreparedSession, PrepareRequest
-from tests.fixtures.cursor_controls import started_session
-from tests.fixtures.environment_kits import (
+from tests.support.cursor_lane_controls import started_session
+from tests.support.environment_kits import (
     BASH,
     kit_document,
     kit_pin,

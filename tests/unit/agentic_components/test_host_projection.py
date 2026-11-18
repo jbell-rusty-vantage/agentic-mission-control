@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import json
 import tomllib
-from pathlib import Path
 
 import pytest
 
@@ -40,8 +39,8 @@ from mission_control.domain.authoring.contracts import MCPServerDefinition
 from mission_control.domain.capabilities.hooks import KERNEL_HOOK_IDS, HookEvent
 from mission_control.domain.capabilities.host_support import LaneProfile
 from mission_control.domain.capabilities.layouts import CODEX_INSTRUCTIONS_LIMIT
-from tests.fixtures.projections import regen
-from tests.fixtures.projections.rows import (
+from tests.support import projection_regen as regen
+from tests.support.projection_rows import (
     FIXTURE_SECRET_VALUES,
     INSTRUCTION,
     PACKET_INDEX,
@@ -54,7 +53,7 @@ from tests.fixtures.projections.rows import (
 )
 from tests.support.unit.agentic_components.harness import mcp_release
 
-GOLDEN = Path(regen.__file__).resolve().parent
+GOLDEN = regen.ROOT
 
 
 def _lf(data: bytes) -> bytes:
@@ -72,7 +71,7 @@ def test_projection_matches_golden_files(profile: LaneProfile) -> None:
         if path.is_file() and path.name != regen.REPORT
     }
     assert on_disk == set(projection.paths()), (
-        "regenerate: python -m tests.fixtures.projections.regen"
+        "regenerate: python -m tests.support.projection_regen"
     )
     for item in projection.files:
         assert _lf((root / item.path).read_bytes()) == item.content, item.path

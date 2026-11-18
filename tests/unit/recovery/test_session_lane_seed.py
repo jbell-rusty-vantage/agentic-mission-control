@@ -13,7 +13,7 @@ from datetime import UTC, datetime
 from typing import Any
 
 import pytest
-from tests.fixtures.checkpoint_lineage import stage_unit
+from tests.support.checkpoint_lineage import stage_unit
 from tests.support.unit.recovery.seeded_fork_saga import saga
 from tests.support.unit.runtime.runtime_recovery_stage3 import DERIVED_RUN, SOURCE_RUN, fork_request
 

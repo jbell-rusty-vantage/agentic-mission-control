@@ -31,9 +31,9 @@ from mission_control.domain.authoring.extensions import ExtensionRegistry
 from mission_control.domain.authoring.manifest import canonical_manifest_bytes, load_manifest_yaml
 from mission_control.domain.authoring.mission_definition import MissionDefinition
 from mission_control.domain.execution.data_class import DEFAULT_DATA_CLASS_POLICY, DataClassPolicy
-from tests.fixtures.applications import installed_applications
-from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog
+from tests.support.applications import installed_applications
 from tests.support.ids import canonical_scope
+from tests.support.manifests.seeded_catalog import fast_track_catalog
 from tests.support.model_catalog import bindings_catalog
 
 ROOT = Path(__file__).resolve().parents[3]

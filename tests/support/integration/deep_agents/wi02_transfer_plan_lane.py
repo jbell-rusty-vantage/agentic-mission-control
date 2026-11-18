@@ -33,9 +33,9 @@ from mission_control.domain.execution.contracts import (
     OperationExecutionRequest,
     RuntimeInvocation,
 )
-from tests.fixtures.lane_bindings import lane_fields
 from tests.support.deep_agents import exact_fixture, unit_bound
 from tests.support.knowledge.stores import InMemoryStaging
+from tests.support.lane_bindings import lane_fields
 from tests.support.models import ScriptedChatModel
 from tests.support.operations import operation_request
 

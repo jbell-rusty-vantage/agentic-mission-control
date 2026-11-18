@@ -23,7 +23,6 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-from tests.fixtures.stage2_outputs import write_outputs
 from tests.support.acceptance.mission_control.cognition_points import BASE
 from tests.support.acceptance.mission_control.tracing import db_rows, temporal_diagnostics, terminal
 from tests.support.stack import (
@@ -34,6 +33,7 @@ from tests.support.stack import (
     serve_loopback,
     until,
 )
+from tests.support.tracing_outputs import write_outputs
 
 from mission_control.application.programs.goal_directed import OUTPUT_UNPARSEABLE
 from mission_control.contracts.identities import mission_root_id

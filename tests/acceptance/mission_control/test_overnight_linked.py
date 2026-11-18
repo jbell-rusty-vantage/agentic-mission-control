@@ -42,7 +42,7 @@ async def verify_linked(
     explicit_adoption: bool = False,
     expected_release_gate: str = "mission_accepted",
 ) -> None:
-    from tests.fixtures.overnight_stagegraph_evidence import observed_report_parts
+    from tests.support.scenarios.stage_graph_evidence import observed_report_parts
 
     from mission_control.adapters.postgres.context.transfer_plans import PostgresTransferPlanStore
     from mission_control.adapters.postgres.knowledge.output_contracts import (
@@ -197,11 +197,6 @@ async def _run_linked_case(tmp_path: Any, monkeypatch: Any, scenario: str) -> No
     from pathlib import Path
     from uuid import uuid4
 
-    from tests.fixtures.manifest_runtime import AUTHOR
-    from tests.fixtures.overnight_linked_evidence import export_linked
-    from tests.fixtures.overnight_linked_probes import LinkedProbe
-    from tests.fixtures.overnight_trusted import install_scripted_trusted
-    from tests.fixtures.rrm009_production_stack import technical_binding
     from tests.support.acceptance.mission_control.overnight_goal_directed import (
         goal_launch_bindings,
     )
@@ -214,6 +209,11 @@ async def _run_linked_case(tmp_path: Any, monkeypatch: Any, scenario: str) -> No
     from tests.support.integration.deep_agents.report_source_real_service import command, response
     from tests.support.knowledge.content import model_content
     from tests.support.manifest_runtime import host_pins
+    from tests.support.manifests.lifecycle import AUTHOR
+    from tests.support.production_stack import technical_binding
+    from tests.support.scenarios.linked_probes import LinkedProbe
+    from tests.support.scenarios.linked_transfer_evidence import export_linked
+    from tests.support.scenarios.scripted_trusted_evaluator import install_scripted_trusted
     from tests.support.stack import open_stack
 
     from mission_control.adapters.postgres.chains.exports import PostgresChainStartGate
@@ -256,22 +256,22 @@ async def _run_linked_case(tmp_path: Any, monkeypatch: Any, scenario: str) -> No
     probe = LinkedProbe(scenario if scenario in {"gate", "duplicate", "restart"} else "positive")
     cancellation: Any = None
     if scenario.startswith("cancel-"):
-        from tests.fixtures.overnight_linked_cancellation import LinkedCancellationProbe
+        from tests.support.scenarios.linked_cancellation import LinkedCancellationProbe
 
         cancellation = LinkedCancellationProbe(mode=scenario.removeprefix("cancel-"))
     repair: Any = None
     if scenario == "held-repair":
-        from tests.fixtures.overnight_linked_repair_probe import LinkedRepairProbe
+        from tests.support.scenarios.linked_repair_probe import LinkedRepairProbe
 
         repair = LinkedRepairProbe()
     revocation: Any = None
     adoption: Any = None
     if scenario == "revocation":
-        from tests.fixtures.overnight_linked_revocation import LinkedSourceRevocation
+        from tests.support.scenarios.linked_revocation import LinkedSourceRevocation
 
         revocation = LinkedSourceRevocation()
     if scenario == "adoption":
-        from tests.fixtures.overnight_linked_adoption import LinkedAdoptionProbe
+        from tests.support.scenarios.linked_adoption import LinkedAdoptionProbe
 
         adoption = LinkedAdoptionProbe()
     outcome: dict[str, Any] = {"result": "failed-before-admission", "qualified": False}
@@ -325,7 +325,7 @@ async def _run_linked_case(tmp_path: Any, monkeypatch: Any, scenario: str) -> No
         models: Any = None
         biotech_profile: Any = None
         if scenario == "biotech":
-            from tests.fixtures.overnight_linked_biotech import (
+            from tests.support.scenarios.linked_biotech_report import (
                 biotech_model_profile,
                 biotech_technical_binding,
                 validate_biotech_ready,
@@ -352,7 +352,7 @@ async def _run_linked_case(tmp_path: Any, monkeypatch: Any, scenario: str) -> No
             )
             components = linked_repair_components(technical, script, model_log)
         elif scenario == "biotech":
-            from tests.fixtures.overnight_linked_biotech import biotech_components
+            from tests.support.scenarios.linked_biotech_report import biotech_components
 
             components = biotech_components(technical, script, model_log, tenant)
         else:
@@ -389,7 +389,7 @@ async def _run_linked_case(tmp_path: Any, monkeypatch: Any, scenario: str) -> No
                 composed, pool, application, producer_vendor=technical.binding.model.provider
             )
             if scenario == "biotech":
-                from tests.fixtures.overnight_linked_biotech import BiotechDecisionCapture
+                from tests.support.scenarios.linked_biotech_report import BiotechDecisionCapture
 
                 capture = BiotechDecisionCapture(
                     destination / "06-evidence/native-decision-resolutions.json"
@@ -406,7 +406,7 @@ async def _run_linked_case(tmp_path: Any, monkeypatch: Any, scenario: str) -> No
 
         capability_pins_path = host_pins(tmp_path / "capability-pins.json")
         if biotech_profile is not None:
-            from tests.fixtures.overnight_linked_biotech import biotech_host_pins
+            from tests.support.scenarios.linked_biotech_report import biotech_host_pins
 
             capability_pins_path = biotech_host_pins(capability_pins_path, biotech_profile)
 
@@ -448,7 +448,9 @@ async def _run_linked_case(tmp_path: Any, monkeypatch: Any, scenario: str) -> No
                 }
                 authored = linked_manifest(pack, scenario=scenario)
                 if scenario == "biotech":
-                    from tests.fixtures.overnight_linked_biotech import biotech_linked_manifest
+                    from tests.support.scenarios.linked_biotech_report import (
+                        biotech_linked_manifest,
+                    )
 
                     authored = biotech_linked_manifest(authored, ready, tenant=tenant)
                 (destination / "01-authored-mission.yml").write_text(authored, encoding="utf-8")
@@ -683,7 +685,7 @@ async def _run_linked_case(tmp_path: Any, monkeypatch: Any, scenario: str) -> No
                         await adoption.verify(stack, scope, runs, holder["lane"])
                     assert {record["run_id"] for record in records} == set(runs.values())
                 if scenario == "biotech":
-                    from tests.fixtures.overnight_linked_biotech import verify_biotech
+                    from tests.support.scenarios.linked_biotech_report import verify_biotech
 
                     biotech_proof = await verify_biotech(
                         stack, scope, runs, script, holder["lane"], technical, biotech_profile

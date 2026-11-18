@@ -37,7 +37,7 @@ from mission_control.application.execution.harness.state import (
 )
 from mission_control.domain.capabilities.hooks import HookEvent
 from mission_control.domain.frames.contracts import LaneProfile
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import admit_unit_attempt
 
 pytestmark = pytest.mark.common_db

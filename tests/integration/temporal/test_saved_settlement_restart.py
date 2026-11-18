@@ -4,7 +4,7 @@ The `OperationWorkflow` (time-skipping test server) drives the real operation bo
 harness: a `create_deep_agent` graph with a deterministic two-call model, the journaled
 coordinator, checkpoint lineage, in-memory run control); the saved provider result lives only
 in `mission_control.invocation_settlement` on a disposable PostgreSQL 17 with release 1.7.0
-(restricted runtime role). The generic durable-wait double (`tests/fixtures/saved_settlement.py`)
+(restricted runtime role). The generic durable-wait double (`tests/support/saved_settlement.py`)
 performs one native write per cognition answer turn, holds it until its receipt, and can hold a
 review. Every window converges to one logical result: two model calls, one native write, one
 lane dispatch, one operation settlement; the histories replay.
@@ -48,14 +48,14 @@ from mission_control.domain.execution.contracts import (
 from mission_control.domain.execution.invocation_settlement import (
     SettlementState,
 )
-from tests.fixtures.checkpoint_recovery import recovery_harness, stage_recovery_unit
-from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.fixtures.saved_settlement import DurableEffectDouble
+from tests.support.checkpoint_recovery import recovery_harness, stage_recovery_unit
+from tests.support.db import CommonDatabase
 from tests.support.integration.temporal.wi04_saved_settlement_restart import (
     _replays,
     _scheduled,
     _Stack,
 )
+from tests.support.saved_settlement import DurableEffectDouble
 from tests.support.temporal import patch_ids, start_workflow_env
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.common_db]

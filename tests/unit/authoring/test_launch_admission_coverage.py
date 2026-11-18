@@ -21,7 +21,7 @@ from mission_control.application.execution.harness.describe import DECLARED_LANE
 from mission_control.application.resolution.registries import ApplicationRegistry
 from mission_control.bootstrap.resolution import compose_manifest_launch_resolver
 from mission_control.domain.authoring.mission_definition import DefinitionNode
-from tests.fixtures.applications import installed_applications
+from tests.support.applications import installed_applications
 from tests.support.manifests.v2_launch import (
     EXAMPLES,
     SCOPE,

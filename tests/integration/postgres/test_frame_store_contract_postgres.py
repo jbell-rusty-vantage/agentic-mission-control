@@ -10,8 +10,8 @@ from __future__ import annotations
 import pytest
 
 from mission_control.adapters.postgres.frames.repository import PostgresFrameRepository
-from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.support.contracts.frames import SCENARIOS, FrameStoreSubject, Scenario
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import admit_unit_attempt
 
 pytestmark = pytest.mark.common_db

@@ -16,7 +16,7 @@ from mission_control.domain.execution.contracts import (
     WorkspaceSlotBinding,
 )
 from mission_control.domain.programs.runtime_units import goal_unit_workspace_root
-from tests.fixtures.checkpoint_lineage import goal_unit
+from tests.support.checkpoint_lineage import goal_unit
 
 NAMESPACE = "run/run-1"
 

@@ -30,8 +30,8 @@ from mission_control.domain.capabilities.layouts import (
     DeliveryMode,
     LaneLayout,
 )
-from tests.fixtures.projections import regen
-from tests.fixtures.projections.rows import (
+from tests.support import projection_regen as regen
+from tests.support.projection_rows import (
     INSTRUCTION,
     firecrawl_row,
     fixture_rows,

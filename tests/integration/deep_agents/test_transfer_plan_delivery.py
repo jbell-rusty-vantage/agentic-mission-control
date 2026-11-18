@@ -14,7 +14,7 @@ import hashlib
 import json
 
 import pytest
-from tests.fixtures.checkpoint_lineage import activity_attempt
+from tests.support.checkpoint_lineage import activity_attempt
 from tests.support.deep_agents import registry
 from tests.support.integration.deep_agents.report_source_context import FULL_CONTEXT_READER
 from tests.support.integration.deep_agents.wi02_transfer_plan_lane import (

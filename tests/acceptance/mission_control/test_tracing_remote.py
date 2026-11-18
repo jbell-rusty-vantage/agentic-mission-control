@@ -29,8 +29,6 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-from tests.fixtures.stage2_outputs import write_outputs
-from tests.fixtures.tcp_proxy import SaverProxy
 from tests.support.acceptance.mission_control.cognition_points import (
     BASE,
     all_points,
@@ -53,6 +51,8 @@ from tests.support.stack import (
     serve_loopback,
     until,
 )
+from tests.support.tcp_proxy import SaverProxy
+from tests.support.tracing_outputs import write_outputs
 
 pytestmark = [pytest.mark.psycopg_selector, pytest.mark.common_db]
 

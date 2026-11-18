@@ -43,7 +43,7 @@ from mission_control.domain.authoring.mission_definition import (
     MissionDefinition,
 )
 from mission_control.domain.resolution.resolved import ResolvedRuntime
-from tests.fixtures.applications import installed_applications
+from tests.support.applications import installed_applications
 from tests.support.manifests.launch_inputs import (
     MINIMAL,
     admitted,

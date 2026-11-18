@@ -13,7 +13,6 @@ from typing import Any
 from uuid import uuid4
 
 import pytest
-from tests.fixtures.manifest_runtime import AUTHOR
 from tests.support.acceptance.mission_control.overnight_goal_directed import (
     goal_launch_bindings,
     goal_manifest,
@@ -23,6 +22,7 @@ from tests.support.acceptance.mission_control.overnight_stagegraph import (
     ROOT,
     production_lifecycle,
 )
+from tests.support.manifests.lifecycle import AUTHOR
 from tests.support.stack import ProductionStack
 
 from mission_control.application.authoring.manifest_submit import SubmitRequest
@@ -70,8 +70,8 @@ def test_goal_manifest_preserves_independent_review_and_repair_bounds() -> None:
 
 def test_goal_model_factory_accepts_actual_lane_binding() -> None:
     from langchain_core.messages import HumanMessage
-    from tests.fixtures.rrm009_production_stack import technical_binding
     from tests.support.cognition.goal_directed import GoalScript
+    from tests.support.production_stack import technical_binding
 
     candidates: list[dict[str, Any]] = [
         {
@@ -403,13 +403,13 @@ async def _run_goal_case(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, scenar
     """Real PostgreSQL/Temporal/KS HTTP; only producer/evaluator cognition is scripted."""
     from datetime import UTC, datetime
 
-    from tests.fixtures.overnight_trusted import install_scripted_trusted
-    from tests.fixtures.rrm009_production_stack import technical_binding
     from tests.support.cognition.goal_directed import GoalScript
     from tests.support.ids import canonical_scope
     from tests.support.integration.deep_agents.report_source_real_service import response
     from tests.support.knowledge.content import model_content
     from tests.support.manifest_runtime import host_pins
+    from tests.support.production_stack import technical_binding
+    from tests.support.scenarios.scripted_trusted_evaluator import install_scripted_trusted
     from tests.support.stack import open_stack
 
     from mission_control.adapters.postgres.human_tasks.repository import PostgresHumanTaskRepository
@@ -515,7 +515,7 @@ async def _run_goal_case(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, scenar
         holder: dict[str, Any] = {}
         recovery: Any = None
         if scenario in {"unavailable", "restart"}:
-            from tests.fixtures.overnight_goal_recovery import GoalSettlementRecovery
+            from tests.support.scenarios.goal_recovery import GoalSettlementRecovery
 
             recovery = GoalSettlementRecovery(
                 mode="unavailable" if scenario == "unavailable" else "restart"
@@ -573,7 +573,7 @@ async def _run_goal_case(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, scenar
             }
 
             async def collect(run_id: str, destination: Path) -> None:
-                from tests.fixtures.overnight_stagegraph_evidence import export_stagegraph
+                from tests.support.scenarios.stage_graph_evidence import export_stagegraph
 
                 gaps = await export_stagegraph(
                     stack,

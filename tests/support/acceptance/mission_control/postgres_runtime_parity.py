@@ -18,12 +18,12 @@ from mission_control.adapters.postgres.orchestration.goal_directed_repository im
 )
 from mission_control.contracts.identities import parse_request_scope
 from mission_control.domain.policies.contracts import RunOutcome
-from tests.fixtures.rrm009_production_stack import (
+from tests.support.ids import SCOPE
+from tests.support.production_stack import (
     goal_input,
     goal_templates,
     publish_technical_catalog,
 )
-from tests.support.ids import SCOPE
 from tests.support.stack import (
     ProductionStack,
     _admit,

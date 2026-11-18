@@ -74,11 +74,12 @@ from mission_control.interfaces.mcp.coordinator_server import (
     create_coordinator_server,
 )
 from mission_control.interfaces.mcp.run_control_tools import RUN_FORK_TOOL, ScopedRunControl
-from tests.fixtures.checkpoint_recovery import recovery_harness, stage_recovery_unit
-from tests.fixtures.goal_directed_journaled import (
+from tests.support.checkpoint_recovery import recovery_harness, stage_recovery_unit
+from tests.support.journal import MemoryOperationJournal
+from tests.support.journaled_goal_loop import (
     SCOPE as GOAL_SCOPE,
 )
-from tests.fixtures.goal_directed_journaled import (
+from tests.support.journaled_goal_loop import (
     admit_goal_run,
     compose_goal_directed,
     goal_blueprint,
@@ -86,18 +87,17 @@ from tests.fixtures.goal_directed_journaled import (
     goal_run_control,
     goal_start_action,
 )
-from tests.fixtures.run_forks import (
+from tests.support.knowledge.stores import InMemoryStaging
+from tests.support.run_control import WORKFLOW_DIGEST, actor
+from tests.support.run_control import command as lifecycle
+from tests.support.run_control import request as run_request
+from tests.support.run_forks import (
     FakeForkSourceReader,
     compose_in_memory_forks,
     inspection_reads,
     stage_policy,
     stagegraph_head,
 )
-from tests.support.journal import MemoryOperationJournal
-from tests.support.knowledge.stores import InMemoryStaging
-from tests.support.run_control import WORKFLOW_DIGEST, actor
-from tests.support.run_control import command as lifecycle
-from tests.support.run_control import request as run_request
 from tests.support.unit.coordinator.coordinator_mcp_read_surface import FakeFacade
 from tests.support.unit.operations.ft_b2_stage_handoff import FakeArtifacts, FakeSelections
 from tests.support.unit.orchestration.rrm_016_goal_directed_settlement import _run_iteration_one
@@ -120,8 +120,8 @@ async def test_cloud_capture_flows_through_lease_snapshot_fork_seed_and_mandator
     from mission_control.application.context.fork_context import ForkContextReader
     from mission_control.domain.context.packet import ContextPacket, pack
     from mission_control.domain.context.snapshot_evidence import CONVERSATION_MEDIA_TYPE
-    from tests.fixtures.lane_turns import cursor_operation
     from tests.support.ids import SCOPE as LANE_SCOPE
+    from tests.support.lanes import cursor_operation
     from tests.support.providers.cursor import cloud_stack
     from tests.unit.context.packets import target, worked_example_request
     from tests.unit.cursor.support import lanes_for, signals, turn

@@ -27,7 +27,7 @@ from mission_control.domain.policies.contracts import (
     ResumeAction,
     ResumeDecision,
 )
-from tests.fixtures.lane_turns import DIGEST
+from tests.support.lanes import DIGEST
 from tests.support.providers.managed_agents import managed_binding, managed_operation
 
 NOW = datetime(2026, 10, 14, tzinfo=UTC)

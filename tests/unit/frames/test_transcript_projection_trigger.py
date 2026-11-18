@@ -56,7 +56,6 @@ from mission_control.application.frames.search import (
 )
 from mission_control.domain.frames.transcript import TranscriptEntry
 from mission_control.domain.policies.contracts import ActorContext
-from tests.fixtures.transcripts import RUN_KEY
 from tests.support.ids import SCOPE
 from tests.support.integration.postgres.operation_journal_stage1 import (
     _SCOPE,
@@ -67,6 +66,7 @@ from tests.support.integration.postgres.operation_journal_stage1 import (
     claim,
     settlement,
 )
+from tests.support.transcripts import RUN_KEY
 from tests.support.unit.frames.transcript_interfaces import transcript_service
 
 NOW = datetime(2026, 10, 21, 12, 0, tzinfo=UTC)

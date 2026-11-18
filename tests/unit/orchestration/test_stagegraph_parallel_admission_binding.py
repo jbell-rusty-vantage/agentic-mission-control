@@ -46,7 +46,7 @@ from mission_control.domain.programs.contracts import (
     StageGraphAdmissionActivityRequest,
 )
 from mission_control.domain.programs.interpreter import StageGraphInterpreter
-from tests.fixtures.lane_bindings import LANE_REBINDERS
+from tests.support.lane_bindings import LANE_REBINDERS
 from tests.support.operations import operation_request
 from tests.support.run_control import ConfigurationVerifier, command, request
 from tests.support.unit.run_control.atomic_family_admission import admission_policies

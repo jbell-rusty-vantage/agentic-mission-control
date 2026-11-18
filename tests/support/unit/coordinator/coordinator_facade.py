@@ -36,7 +36,7 @@ from mission_control.domain.authoring.contracts import (
     SourceProvenance,
 )
 from mission_control.domain.coordinator.launch import BlueprintFamily
-from tests.fixtures.capability_search_catalog import DeterministicEmbeddings
+from tests.support.capability_search import DeterministicEmbeddings
 
 NOW = datetime(2026, 7, 25, 20, 0, tzinfo=UTC)
 DIGEST = f"sha256:{'a' * 64}"

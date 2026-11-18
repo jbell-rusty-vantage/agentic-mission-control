@@ -58,7 +58,7 @@ async def test_agents_inline_projection_reuses_all_resources():
 
 
 def test_selected_catalog_skill_changes_the_api_projection():
-    from tests.fixtures.projections.rows import skill_row
+    from tests.support.projection_rows import skill_row
 
     original = load_agents(SHIPPED_PACK)
     projected = project(
@@ -84,7 +84,7 @@ def test_inline_bundle_tampering_is_refused():
 def test_unsupported_catalog_callbacks_are_refused_before_provider_io():
     import pytest
 
-    from tests.fixtures.projections.rows import hook_row
+    from tests.support.projection_rows import hook_row
 
     original = load_agents(SHIPPED_PACK)
     with pytest.raises(ValueError, match="omitted selected behavior"):

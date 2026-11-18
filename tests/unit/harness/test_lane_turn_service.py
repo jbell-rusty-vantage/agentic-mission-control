@@ -25,7 +25,7 @@ from mission_control.domain.execution.lane_turns import (
     LaneStatusRequest,
     LaneTurnRequest,
 )
-from tests.fixtures.lane_turns import (
+from tests.support.lanes import (
     RecordingSignals,
     ScriptedSessionLane,
     SimulatedWorkerLoss,

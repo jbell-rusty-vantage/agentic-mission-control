@@ -28,7 +28,7 @@ from mission_control.domain.execution.lane_turns import (
 )
 from mission_control.domain.execution.lanes import LaneFrame, SessionHandle, TurnHandle, UsageReport
 from mission_control.domain.frames.contracts import FrameKind, FrameObservation, LaneProfile
-from tests.fixtures.lane_turns import RecordingSignals, ScriptedSessionLane, lane_stack
+from tests.support.lanes import RecordingSignals, ScriptedSessionLane, lane_stack
 from tests.support.providers.codex import codex_operation
 
 

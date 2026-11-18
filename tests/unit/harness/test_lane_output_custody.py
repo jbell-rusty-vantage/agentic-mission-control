@@ -15,7 +15,7 @@ import pytest
 
 from mission_control.adapters.claude.harness import _output_files
 from mission_control.domain.execution.contracts import OperationExecutionRequest
-from tests.fixtures.lane_turns import RecordingSignals
+from tests.support.lanes import RecordingSignals
 from tests.support.providers.cursor import local_stack
 from tests.support.unit.harness.cursor_local import _identity, _service, _turn
 

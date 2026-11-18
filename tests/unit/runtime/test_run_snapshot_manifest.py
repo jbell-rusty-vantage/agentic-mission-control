@@ -50,13 +50,16 @@ from mission_control.domain.policies.forks import (
     run_snapshot_digest,
 )
 from mission_control.domain.policies.inspection import AsyncChildInspection
-from tests.fixtures.checkpoint_lineage import goal_unit, in_doubt_incident
-from tests.fixtures.checkpoint_recovery import (
+from tests.support.checkpoint_lineage import goal_unit, in_doubt_incident
+from tests.support.checkpoint_recovery import (
     RecoveryHarness,
     recovery_harness,
     stage_recovery_unit,
 )
-from tests.fixtures.run_forks import (
+from tests.support.run_control import WORKFLOW_DIGEST, command
+from tests.support.run_control import request as run_request
+from tests.support.run_control import service as run_control_service
+from tests.support.run_forks import (
     FakeForkSourceReader,
     InMemoryForks,
     StaticPendingCommands,
@@ -69,9 +72,6 @@ from tests.fixtures.run_forks import (
     stage_policy,
     stagegraph_head,
 )
-from tests.support.run_control import WORKFLOW_DIGEST, command
-from tests.support.run_control import request as run_request
-from tests.support.run_control import service as run_control_service
 
 SCOPE = "tenant-1"
 
@@ -1006,7 +1006,7 @@ def test_fork_root_parent_run_is_carried_on_the_root_only() -> None:
 
 def test_legacy_snapshot_canonical_bytes_and_digest_remain_exact() -> None:
     from mission_control.domain.authoring.canonical import stable_json_dump
-    from tests.fixtures.run_forks import technical_snapshot
+    from tests.support.run_forks import technical_snapshot
 
     snapshot = technical_snapshot("cm07-legacy-source")
     raw = snapshot.model_dump(mode="json")

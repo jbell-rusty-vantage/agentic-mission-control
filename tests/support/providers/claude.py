@@ -68,9 +68,9 @@ from mission_control.domain.authoring.canonical import sha256_digest
 from mission_control.domain.execution.bindings import ProviderExecutionBinding, WorkspaceSnapshot
 from mission_control.domain.execution.contracts import OperationExecutionRequest
 from mission_control.domain.execution.lane_turns import CleanupOutcome
-from tests.fixtures.lane_bindings import lane_fields
-from tests.fixtures.lane_turns import DIGEST, LANE_QUEUE, LaneStack, lane_stack
 from tests.support.ids import SCOPE
+from tests.support.lane_bindings import lane_fields
+from tests.support.lanes import DIGEST, LANE_QUEUE, LaneStack, lane_stack
 from tests.support.providers.claude_cli import zero_bootstrap_usage
 
 FIXTURES = Path(__file__).resolve().parents[2] / "fixtures" / "provider_frames" / "claude"
@@ -533,7 +533,7 @@ class FixtureWorkspace:
 
 
 def projection_rows() -> tuple[ResolvedCapability, ...]:
-    from tests.fixtures.projections.rows import hook_row, skill_row, tavily_row, verifier_row
+    from tests.support.projection_rows import hook_row, skill_row, tavily_row, verifier_row
 
     return (skill_row(), tavily_row(), hook_row(), verifier_row())
 

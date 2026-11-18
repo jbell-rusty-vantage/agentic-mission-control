@@ -25,7 +25,7 @@ from mission_control.domain.policies.contracts import (
     CommandStatus,
     DecisionStatus,
 )
-from tests.fixtures.mission_control_common_db import (
+from tests.support.db import (
     CommonDatabase,
     create_common_database,
     drop_common_database,

@@ -7,7 +7,7 @@
 - A send the provider accepted before the local receipt was lost is reconciled from the
   persisted journal and never sent twice; an unreconcilable one parks `in_doubt`.
 
-The provider is a labelled fixture (`tests/fixtures/lane_turns.py`), not a live provider.
+The provider is a labelled fixture (`tests/support/lanes.py`), not a live provider.
 """
 
 from __future__ import annotations
@@ -28,15 +28,15 @@ from mission_control.application.execution.harness.lane_turns import execution_s
 from mission_control.application.frames.kinds import cursor_local_key
 from mission_control.application.frames.writer import FrameWriter
 from mission_control.domain.frames.contracts import FrameKind, FrameObservation
-from tests.fixtures.lane_turns import (
+from tests.support.db import CommonDatabase
+from tests.support.db_builders import pg_lane_unit
+from tests.support.lanes import (
     LossyReceiptLane,
     ReconcilingLossyLane,
     RecordingSignals,
     ScriptedSessionLane,
     scripted_frames,
 )
-from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.support.db_builders import pg_lane_unit
 from tests.support.unit.harness.mp06_dispatch_recovery import turn_request
 
 pytestmark = pytest.mark.common_db

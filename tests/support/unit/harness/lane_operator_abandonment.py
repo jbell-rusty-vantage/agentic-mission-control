@@ -15,7 +15,7 @@ from mission_control.application.execution.harness.lane_turns import (
 from mission_control.application.execution.harness.protocol import AgentHarness
 from mission_control.application.execution.harness.sessions import WorkerSessionManager
 from mission_control.application.resolution.registries import LaneRegistry
-from tests.fixtures.lane_turns import lane_stack
+from tests.support.lanes import lane_stack
 from tests.support.unit.harness.lane_cleanup import CleaningLane
 from tests.support.unit.operations.lane_reconciliation import native_recovery
 

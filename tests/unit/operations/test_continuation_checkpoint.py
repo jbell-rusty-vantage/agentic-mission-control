@@ -41,7 +41,7 @@ from mission_control.domain.context.checkpoint import (
     verify_restore,
 )
 from mission_control.domain.context.packet import ContextPacket, ContextPurpose, ExpansionTier
-from tests.fixtures.continuation import NOW, RUN_KEY, build_service, facts, seal_target, trigger
+from tests.support.continuation import NOW, RUN_KEY, build_service, facts, seal_target, trigger
 from tests.support.ids import SCOPE
 
 # workflow-types/08 section 6, field by field, as SPEC-02 names them.

@@ -9,7 +9,7 @@ from typing import Any
 
 from mission_control.application.execution.harness.lane_turns import LaneExecutionIdentity
 from mission_control.domain.execution.lane_turns import LaneTurnRequest
-from tests.fixtures.lane_turns import lane_stack
+from tests.support.lanes import lane_stack
 from tests.support.providers.cursor import LocalStack
 
 

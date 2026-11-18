@@ -31,7 +31,7 @@ from mission_control.domain.coordinator.launch import (
     WorkflowResultRecord,
 )
 from mission_control.domain.policies.contracts import CancelAction, RunOutcome, RunPhase
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import owner_rows, scoped_command, scoped_request
 from tests.support.ids import catalog_scope
 from tests.support.run_control import service

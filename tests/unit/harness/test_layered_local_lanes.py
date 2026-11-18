@@ -65,9 +65,9 @@ from mission_control.domain.execution.lanes import (
     SessionHandle,
     StartRequest,
 )
-from tests.fixtures.lane_turns import lane_stack
-from tests.fixtures.layering_repo import REPO_FILES, repository_bytes, write_repository_files
-from tests.fixtures.projections.rows import hook_row, skill_row, tavily_row, verifier_row
+from tests.support.lanes import lane_stack
+from tests.support.layering_repo import REPO_FILES, repository_bytes, write_repository_files
+from tests.support.projection_rows import hook_row, skill_row, tavily_row, verifier_row
 from tests.support.providers.claude import (
     ClaudeStack,
     base_operation,

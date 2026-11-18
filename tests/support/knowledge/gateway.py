@@ -33,7 +33,6 @@ from mission_control.application.outputs.submission_service import SubmissionSer
 from mission_control.application.ports.knowledge import RecordedUseDecision
 from mission_control.contracts.knowledge_protocol import Governors, digest_bytes
 from mission_control.domain.knowledge.origin import InvocationOrigin
-from tests.fixtures.lane_bindings import lane_fields
 from tests.support.clock import Clock
 from tests.support.knowledge.binding import FakeKnowledgeBinding, http_client_over
 from tests.support.knowledge.credentials import (
@@ -44,6 +43,7 @@ from tests.support.knowledge.credentials import (
     RecordingMinter,
     knowledge_port,
 )
+from tests.support.lane_bindings import lane_fields
 
 INSTALLATION = "00000000-0000-7000-8000-000000000001"
 TENANT = "00000000-0000-7000-8000-0000000000aa"

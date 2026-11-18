@@ -58,7 +58,9 @@ from mission_control.domain.execution.contracts import (
 )
 from mission_control.domain.execution.lanes import LaneSegmentBounds
 from mission_control.domain.frames.contracts import FrameKind
-from tests.fixtures.environment_kits import (
+from tests.support.db import CommonDatabase
+from tests.support.db_builders import admit_unit_attempt
+from tests.support.environment_kits import (
     BASH,
     StaticDefinitions,
     kit_document,
@@ -66,9 +68,7 @@ from tests.fixtures.environment_kits import (
     published_kit,
     setup_environ,
 )
-from tests.fixtures.lane_turns import lane_stack
-from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.support.db_builders import admit_unit_attempt
+from tests.support.lanes import lane_stack
 from tests.support.providers.codex import (
     CodexStack,
     FixtureLauncher,

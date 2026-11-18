@@ -47,7 +47,7 @@ from mission_control.domain.policies.contracts import (
 from mission_control.domain.programs.family_failure import (
     FamilyFailureTerminalizationResult,
 )
-from tests.fixtures.goal_directed_journaled import SCOPE, goal_start_action
+from tests.support.journaled_goal_loop import SCOPE, goal_start_action
 from tests.support.run_control import command
 from tests.support.unit.coordinator.w1_family_failure_terminalization import _request
 from tests.support.unit.orchestration.rrm_016_goal_directed_settlement import (

@@ -97,8 +97,8 @@ async def test_missing_decision_does_not_mint_a_key():
 
 
 async def test_explicit_pending_candidate_fulfills_after_same_id_approval_double():
-    from tests.fixtures.native_receipt_selection import PIN as CUSTOM_PIN
-    from tests.fixtures.native_receipt_selection import pending_receipt_case
+    from tests.support.native_receipt_selection import PIN as CUSTOM_PIN
+    from tests.support.native_receipt_selection import pending_receipt_case
 
     case = await pending_receipt_case()
     await case.select()
@@ -129,7 +129,7 @@ async def test_explicit_pending_candidate_fulfills_after_same_id_approval_double
 
 @pytest.mark.parametrize("outcome", ["noop", "partial", "pending"])
 async def test_non_applied_receipt_never_fulfills_selected_native_promise(outcome):
-    from tests.fixtures.native_receipt_selection import pending_receipt_case
+    from tests.support.native_receipt_selection import pending_receipt_case
 
     case = await pending_receipt_case()
     await case.select()
@@ -140,7 +140,7 @@ async def test_non_applied_receipt_never_fulfills_selected_native_promise(outcom
 
 
 async def test_foreign_run_receipt_cannot_fulfill_explicit_selection():
-    from tests.fixtures.native_receipt_selection import pending_receipt_case
+    from tests.support.native_receipt_selection import pending_receipt_case
 
     case = await pending_receipt_case()
     await case.select()
@@ -165,8 +165,8 @@ async def test_composed_recovery_callback_uses_the_configured_nondefault_pin():
     from types import SimpleNamespace
 
     from mission_control.bootstrap.trusted_judgment import compose_native_write
-    from tests.fixtures.native_receipt_selection import PIN as CUSTOM_PIN
-    from tests.fixtures.native_receipt_selection import pending_receipt_case
+    from tests.support.native_receipt_selection import PIN as CUSTOM_PIN
+    from tests.support.native_receipt_selection import pending_receipt_case
     from tests.support.unit.knowledge.native_write import DIGEST, PLAN, Plans
     from tests.support.unit.outputs.w1_d28_d29 import HANDLE
 
@@ -197,7 +197,7 @@ async def test_composed_recovery_callback_uses_the_configured_nondefault_pin():
 
 
 async def test_stale_successor_never_retargets_the_producers_selected_candidate():
-    from tests.fixtures.native_receipt_selection import pending_receipt_case
+    from tests.support.native_receipt_selection import pending_receipt_case
     from tests.support.unit.knowledge.native_write_recovery import IntentPreview
 
     case = await pending_receipt_case()
@@ -218,7 +218,7 @@ async def test_stale_successor_never_retargets_the_producers_selected_candidate(
 
 
 async def successor_case():
-    from tests.fixtures.native_receipt_selection import pending_receipt_case
+    from tests.support.native_receipt_selection import pending_receipt_case
     from tests.support.unit.knowledge.native_write import RUN_DECISION
 
     case = await pending_receipt_case()

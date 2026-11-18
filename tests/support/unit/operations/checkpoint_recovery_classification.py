@@ -14,7 +14,7 @@ from mission_control.domain.execution.contracts import (
     DeepAgentExecutionBinding,
     OperationExecutionRequest,
 )
-from tests.fixtures.checkpoint_recovery import RecoveryHarness
+from tests.support.checkpoint_recovery import RecoveryHarness
 
 
 def _root(namespace: str, checkpoint_id: str | None = None) -> RunnableConfig:

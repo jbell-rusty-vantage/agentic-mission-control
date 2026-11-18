@@ -50,7 +50,7 @@ from mission_control.domain.context.contributions import (
     StageGrant,
     content_digest,
 )
-from tests.fixtures.hook_contributions import InMemoryInstallStore, RecordingOperationRequests
+from tests.support.hook_contributions import InMemoryInstallStore, RecordingOperationRequests
 from tests.support.knowledge.stores import InMemoryStaging
 from tests.support.models import ScriptedChatModel
 

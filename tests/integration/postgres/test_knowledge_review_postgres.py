@@ -39,8 +39,8 @@ from mission_control.application.knowledge.review import (
 )
 from mission_control.contracts.knowledge_protocol import Ref
 from mission_control.domain.policies.contracts import ActorContext
-from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.support.clock import Clock
+from tests.support.db import CommonDatabase
 from tests.support.knowledge.credentials import KNOWLEDGE_NOW
 from tests.support.knowledge.gateway import origin
 from tests.support.run_control import request, service

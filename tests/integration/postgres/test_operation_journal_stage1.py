@@ -45,7 +45,7 @@ from mission_control.domain.policies.contracts import (
     SettlePendingUsageAction,
 )
 from mission_control.domain.policies.errors import IdempotencyConflict, RunVersionConflict
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import owner_rows
 from tests.support.integration.postgres.operation_journal_stage1 import (
     _SCOPE,
@@ -1059,8 +1059,8 @@ async def test_postgres_lane_admission_rejection_recovers_its_exclusive_authorit
     from mission_control.domain.execution.contracts import OperationExecutionResult
     from mission_control.domain.execution.lane_turns import LaneTurnRequest
     from mission_control.domain.policies.contracts import StartAction
-    from tests.fixtures.checkpoint_recovery import FixtureControlPlane, governed_workspace
-    from tests.fixtures.lane_turns import RecordingSignals, cursor_operation, lane_stack
+    from tests.support.checkpoint_recovery import FixtureControlPlane, governed_workspace
+    from tests.support.lanes import RecordingSignals, cursor_operation, lane_stack
 
     scope = common_db.scope("tenant-1")
     pool = await common_db.pool("mission_control_runtime", max_size=4)

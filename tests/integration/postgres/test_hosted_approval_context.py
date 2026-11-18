@@ -26,7 +26,7 @@ from mission_control.domain.execution.contracts import (
     OperationExecutionRequest,
 )
 from mission_control.domain.policies.contracts import ActorContext
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import admit_unit_attempt
 from tests.support.providers.managed_agents import managed_stack
 from tests.support.providers.openai_agents import agents_stack

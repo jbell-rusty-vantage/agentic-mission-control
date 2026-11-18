@@ -15,7 +15,7 @@ from pydantic import ValidationError
 
 import mission_control.bootstrap.settings as settings_module
 from mission_control.bootstrap.settings import Settings
-from tests.fixtures.isolated_settings import isolated_settings
+from tests.support.settings import isolated_settings
 
 DEPLOYMENTS = Path(__file__).resolve().parents[3] / "deployments"
 

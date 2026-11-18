@@ -62,9 +62,8 @@ from mission_control.domain.programs.watchers import (
     compile_watcher,
     wait_condition_id,
 )
-from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.fixtures.provider_frames import observation
 from tests.support.boundary_commands import declared_wait, states
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import admit_unit_attempt, scoped_command
 from tests.support.integration.postgres.manifest_submit import (
     OWNER,
@@ -85,6 +84,7 @@ from tests.support.integration.postgres.mp15_coordinator_inbox_postgres import (
     owner_fetch,
     subscribe,
 )
+from tests.support.provider_frames import observation
 from tests.support.unit.watchers.watcher_manifest import definition, event_wait_document
 from tests.unit.watchers.fakes import T0
 

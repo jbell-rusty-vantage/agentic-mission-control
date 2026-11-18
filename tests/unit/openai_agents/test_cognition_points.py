@@ -115,7 +115,7 @@ async def test_collect_points_re_derives_the_settlement_fold(tmp_path: Path) -> 
 
 
 def test_step_refs_read_the_item_the_event_or_the_kernel_default() -> None:
-    from tests.fixtures.provider_frames import provider_frame
+    from tests.support.provider_frames import provider_frame
 
     def keyed(ordinal: int, kind: FrameKind, key: str):  # type: ignore[no-untyped-def]
         return provider_frame(ordinal, kind).model_copy(update={"provider_key": key})

@@ -11,7 +11,7 @@ from hashlib import sha256
 import pytest
 from temporalio import activity
 from temporalio.worker import Replayer
-from tests.fixtures import rrm009_production_stack as technical
+from tests.support import production_stack as technical
 from tests.support.acceptance.mission_control.authenticated_scoped_runtime import (
     assert_persisted_run_evidence,
     command,

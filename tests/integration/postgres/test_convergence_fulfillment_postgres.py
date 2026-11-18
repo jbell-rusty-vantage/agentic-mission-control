@@ -35,7 +35,7 @@ from mission_control.domain.outputs.contracts import (
     SubmitOutput,
 )
 from mission_control.domain.programs.goal_directed_runtime import GoalVerifierObservation
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.db import CommonDatabase
 from tests.support.integration.postgres.mp15_coordinator_inbox_postgres import (
     owner_fetch,
     started_run,

@@ -25,7 +25,7 @@ from mission_control.adapters.postgres.ingress import PostgresMintedCredentialSt
 from mission_control.application.secrets.minting import CredentialMinter, LaunchBinding
 from mission_control.application.signals.drainer import DrainItem, DrainRejected
 from mission_control.bootstrap.ingress_drainer import ProductionLaunchResolver
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.db import CommonDatabase
 from tests.support.integration.postgres.manifest_submit import Stack
 from tests.support.integration.postgres.mission_socket_postgres import ISSUER, binding
 from tests.support.unit.signals.drainer import item

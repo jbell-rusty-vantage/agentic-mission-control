@@ -20,11 +20,11 @@ from mission_control.domain.authoring.manifest import Behavior
 from mission_control.domain.authoring.manifest import ExpansionTier as AuthoredTier
 from mission_control.domain.context.packet import ExpansionTier
 from mission_control.domain.programs.contracts import StageAuthoredInput
-from tests.fixtures.lane_bindings import LANE_REBINDERS
 from tests.support.integration.temporal.wp_bp_010_temporal import (
     RecordingOperationBindings,
     _blueprint,
 )
+from tests.support.lane_bindings import LANE_REBINDERS
 from tests.support.unit.operations.ft_b2_stage_handoff import (
     FAST_REF,
     _compiled_template,

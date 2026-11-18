@@ -19,7 +19,7 @@ from mission_control.application.prerequisites.preflight import (
 from mission_control.application.prerequisites.service import InMemoryOwnerPrerequisiteRepository
 from mission_control.domain.execution.contracts import OperationAttemptIdentity
 from mission_control.domain.programs.contracts import StageGraphRunInput
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import admit_unit_attempt
 from tests.support.providers.managed_agents import managed_binding, managed_operation
 from tests.support.unit.run_control.run_launch import _input

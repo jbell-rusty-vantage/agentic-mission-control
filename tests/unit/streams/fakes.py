@@ -19,8 +19,8 @@ from mission_control.application.streams.ports import (
 from mission_control.domain.frames.contracts import FrameKind, ProviderFrame
 from mission_control.domain.subscriptions.contracts import MissionEventEnvelope
 from mission_control.domain.subscriptions.streams import StreamTarget
-from tests.fixtures.provider_frames import FIXTURE_HARNESS, FIXTURE_RUN, provider_frame
 from tests.support.ids import SCOPE
+from tests.support.provider_frames import FIXTURE_HARNESS, FIXTURE_RUN, provider_frame
 
 MISSION = UUID("5a1b2c3d-0000-4000-8000-0000000000a1")
 RUN_KEY = "run-fixture"

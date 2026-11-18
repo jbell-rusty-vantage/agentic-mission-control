@@ -38,7 +38,7 @@ def test_overnight_manifest_keeps_required_transfer_and_optional_omission() -> N
     manifest = parse_manifest(document)
     (definition,) = manifest_to_definitions(manifest, document)
     assert completion_support_issues(definition) == ()
-    from tests.fixtures.rrm009_production_stack import AGENT_COGNITIVE_QUEUE, technical_binding
+    from tests.support.production_stack import AGENT_COGNITIVE_QUEUE, technical_binding
 
     bindings = overnight_launch_bindings(technical_binding())
     assert bindings.deep_agents.placement.task_queue == AGENT_COGNITIVE_QUEUE
@@ -64,8 +64,8 @@ def test_overnight_manifest_keeps_required_transfer_and_optional_omission() -> N
 
 def test_scripted_model_factory_accepts_the_actual_lane_binding_type() -> None:
     from langchain_core.messages import HumanMessage
-    from tests.fixtures.rrm009_production_stack import technical_binding
     from tests.support.cognition.stagegraph import StageGraphScript, stagegraph_components
+    from tests.support.production_stack import technical_binding
 
     technical = technical_binding()
     binding = technical.binding.model_copy(
@@ -115,8 +115,8 @@ def test_negative_script_preserves_index_digest_after_typed_refusal() -> None:
 
 def test_isolation_registration_uses_exact_returned_predecessor_receipt() -> None:
     from langchain_core.messages import HumanMessage, ToolMessage
-    from tests.fixtures.rrm009_production_stack import technical_binding
     from tests.support.cognition.stagegraph import StageGraphScript, stagegraph_components
+    from tests.support.production_stack import technical_binding
 
     technical = technical_binding()
     binding = technical.binding.model_copy(
@@ -168,14 +168,14 @@ async def _run_stagegraph_case(
     """Real PostgreSQL/Temporal/KS HTTP; only producer/evaluator cognition is scripted."""
     from datetime import UTC, datetime
 
-    from tests.fixtures.overnight_stagegraph_recovery import SavedConsumerRestart
-    from tests.fixtures.overnight_trusted import install_scripted_trusted
-    from tests.fixtures.rrm009_production_stack import technical_binding
     from tests.support.cognition.stagegraph import StageGraphScript, stagegraph_components
     from tests.support.ids import canonical_scope
     from tests.support.integration.deep_agents.report_source_real_service import response
     from tests.support.knowledge.content import model_content
     from tests.support.manifest_runtime import host_pins
+    from tests.support.production_stack import technical_binding
+    from tests.support.scenarios.scripted_trusted_evaluator import install_scripted_trusted
+    from tests.support.scenarios.stage_graph_recovery import SavedConsumerRestart
     from tests.support.stack import open_stack
 
     from mission_control.adapters.postgres.human_tasks.repository import PostgresHumanTaskRepository
@@ -365,7 +365,7 @@ async def _run_stagegraph_case(
                 authored_manifest = canonical_manifest_bytes(isolated_document).decode("utf-8")
 
             async def collect(run_id: str, destination: Path) -> None:
-                from tests.fixtures.overnight_stagegraph_evidence import export_stagegraph
+                from tests.support.scenarios.stage_graph_evidence import export_stagegraph
 
                 gaps = await export_stagegraph(
                     stack,
@@ -415,7 +415,7 @@ async def _run_stagegraph_case(
                 )
 
             async def verify(run_id: str) -> None:
-                from tests.fixtures.overnight_stagegraph_evidence import verify_exact_stagegraph
+                from tests.support.scenarios.stage_graph_evidence import verify_exact_stagegraph
 
                 if scenario == "held":
                     store = PostgresOutputContractStore(stack.worker_pool)

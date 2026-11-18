@@ -39,12 +39,12 @@ from mission_control.domain.context.contributions import (
     StageGrant,
     content_digest,
 )
-from tests.fixtures.hook_contributions import Crash, MemoryWorkspace
-from tests.fixtures.mission_control_common_db import (
+from tests.support.db import (
     CommonDatabase,
     common_database,
     migration_paths,
 )
+from tests.support.hook_contributions import Crash, MemoryWorkspace
 from tests.support.knowledge.stores import InMemoryStaging
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.common_db]

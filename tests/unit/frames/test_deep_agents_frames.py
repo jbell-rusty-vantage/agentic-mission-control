@@ -31,10 +31,10 @@ from mission_control.application.frames.kinds import UnknownKindCounter
 from mission_control.application.frames.streams import frame_envelope
 from mission_control.domain.frames.contracts import FrameKind
 from mission_control.domain.subscriptions.streams import StreamScope
-from tests.fixtures.provider_frames import in_memory_store, opened_writer
 from tests.support.deep_agents import registry, skill_reading_model
 from tests.support.ids import INSTALLATION, SCOPE
 from tests.support.models import ScriptedChatModel
+from tests.support.provider_frames import in_memory_store, opened_writer
 from tests.support.unit.frames.deep_agents_frames import _planned, _store_for, _unit_binding
 
 

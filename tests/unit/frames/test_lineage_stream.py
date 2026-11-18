@@ -19,7 +19,7 @@ from mission_control.application.frames.projections import (
     usage_attribution,
 )
 from mission_control.domain.frames.contracts import FrameKind, LaneProfile, ProviderFrame
-from tests.fixtures.provider_frames import provider_frame
+from tests.support.provider_frames import provider_frame
 from tests.support.unit.frames.lineage_stream import claude_frames, codex_frames
 
 K = FrameKind

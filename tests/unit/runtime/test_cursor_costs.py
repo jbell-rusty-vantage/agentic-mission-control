@@ -22,7 +22,7 @@ from mission_control.domain.execution.cursor_costs import (
     CostRequest,
     NativeBillingRun,
 )
-from tests.fixtures.lane_bindings import lane_fields
+from tests.support.lane_bindings import lane_fields
 
 
 class Repository:

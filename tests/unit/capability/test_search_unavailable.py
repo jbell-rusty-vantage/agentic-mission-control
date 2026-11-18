@@ -30,8 +30,8 @@ from mission_control.application.capabilities.capability_search_repository impor
 )
 from mission_control.domain.authoring.extensions import ExtensionRegistry
 from mission_control.domain.authoring.manifest import ManifestErrorCode
-from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog
 from tests.support.ids import canonical_scope, catalog_scope
+from tests.support.manifests.seeded_catalog import fast_track_catalog
 
 ROOT = Path(__file__).resolve().parents[3]
 MINIMAL = ROOT / "tests/fixtures/manifests/minimal-stage-graph.yml"

@@ -36,14 +36,14 @@ from mission_control.domain.programs.goal_directed_runtime import (
     GoalOperationPreparationRequest,
     GoalOperationReconciliationRequest,
 )
-from tests.fixtures.goal_directed_journaled import goal_template_workspace
-from tests.fixtures.lane_bindings import LANE_REBINDERS
 from tests.support.integration.temporal.wp_bp_020_temporal import (
     NOW,
     FakeGoalDirectedActivities,
     _operation,
     _run_input,
 )
+from tests.support.journaled_goal_loop import goal_template_workspace
+from tests.support.lane_bindings import LANE_REBINDERS
 from tests.support.temporal import start_workflow_env
 
 

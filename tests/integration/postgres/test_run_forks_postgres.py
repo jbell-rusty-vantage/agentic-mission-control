@@ -47,17 +47,17 @@ from mission_control.domain.policies.forks import (
     ReuseCandidate,
     derived_unit_identity,
 )
-from tests.fixtures.checkpoint_recovery import stage_recovery_unit
-from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.fixtures.run_forks import (
+from tests.support.checkpoint_recovery import stage_recovery_unit
+from tests.support.db import CommonDatabase
+from tests.support.db_builders import owner_rows, scoped_command, scoped_request
+from tests.support.run_control import NOW, WORKFLOW_DIGEST
+from tests.support.run_control import service as run_control_service
+from tests.support.run_forks import (
     fork_command,
     review_objective_patch,
     stage_policy,
     technical_snapshot,
 )
-from tests.support.db_builders import owner_rows, scoped_command, scoped_request
-from tests.support.run_control import NOW, WORKFLOW_DIGEST
-from tests.support.run_control import service as run_control_service
 
 pytestmark = pytest.mark.common_db
 
@@ -631,8 +631,8 @@ async def test_active_async_child_in_rrm013_authority_blocks_the_snapshot(
         RunSnapshotService,
     )
     from mission_control.domain.policies.contracts import StartAction
-    from tests.fixtures.run_forks import stagegraph_head
     from tests.support.deep_agents import request as spawn_request
+    from tests.support.run_forks import stagegraph_head
 
     owner = await common_db.pool(max_size=4)
     try:

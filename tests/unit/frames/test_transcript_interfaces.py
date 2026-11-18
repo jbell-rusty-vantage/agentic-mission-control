@@ -17,11 +17,11 @@ from mission_control.interfaces.mcp.transcript_tools import (
     ScopedTranscripts,
     register_transcript_tools,
 )
-from tests.fixtures.transcripts import (
+from tests.support.ids import SCOPE
+from tests.support.transcripts import (
     RUN_KEY,
     SECRET_VALUE,
 )
-from tests.support.ids import SCOPE
 from tests.support.unit.frames.transcript_interfaces import (
     _cli_transport,
     http_app,

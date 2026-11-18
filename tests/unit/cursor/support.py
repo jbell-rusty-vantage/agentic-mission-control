@@ -20,8 +20,8 @@ from mission_control.domain.execution.lanes import (
     SendTurnRequest,
     SessionHandle,
 )
-from tests.fixtures.cursor_controls import harness_fields
-from tests.fixtures.lane_turns import LaneStack, RecordingSignals, lane_stack
+from tests.support.cursor_lane_controls import harness_fields
+from tests.support.lanes import LaneStack, RecordingSignals, lane_stack
 from tests.support.providers.cursor import CloudStack
 
 

@@ -5,7 +5,7 @@
   no login, no model turn): over a repository that owns an `AGENTS.md`, a skill and an MCP
   server, the real app-server lists the mission's skill, trusted `SessionStart` hook and MCP
   server beside the repository's own, so the report proves the expectation the prepare records.
-  Re-record with ``uv run --frozen python -m tests.fixtures.projections.discovery.codex_cli``
+  Re-record with ``uv run --frozen python -m tests.support.discovery_recorders.codex_cli``
   (no provider call); the recording is bound to the projection digest.
 - FIXTURE app-server: the harness reads back after `thread/start`, and `lane.turn` persists the
   report as a frame and raises the environment to `discovered`.
@@ -38,8 +38,8 @@ from mission_control.domain.execution.environment_preparation import (
 )
 from mission_control.domain.execution.lanes import PrepareRequest, StartRequest
 from mission_control.domain.frames.contracts import FrameKind
-from tests.fixtures.lane_turns import RecordingSignals, lane_stack
-from tests.fixtures.projections.discovery import codex_cli
+from tests.support.discovery_recorders import codex_cli
+from tests.support.lanes import RecordingSignals, lane_stack
 from tests.support.providers.codex import codex_operation, codex_stack
 
 RECORDING = json.loads(codex_cli.RECORDING.read_text(encoding="utf-8"))
@@ -82,7 +82,7 @@ def test_recording_matches_the_current_projection() -> None:
     projection = codex_cli.project()
     assert RECORDING["projection_digest"] == projection_digest(projection), (
         "codex projection changed: re-record "
-        "`uv run --frozen python -m tests.fixtures.projections.discovery.codex_cli`"
+        "`uv run --frozen python -m tests.support.discovery_recorders.codex_cli`"
     )
     assert RECORDING["projected_paths"] == list(projection.paths())
 

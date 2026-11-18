@@ -2,7 +2,7 @@
 
 FIXTURES: `tests/support/providers/cursor.py` and `tests/support/providers/cursor.py` run the real
 `CursorLocalHarness` / `CursorCloudHarness` over recorded-shape provider fakes inside a real
-Run (`tests/fixtures/cursor_controls.py`). No Cursor agent is created.
+Run (`tests/support/cursor_lane_controls.py`). No Cursor agent is created.
 """
 
 from __future__ import annotations
@@ -30,7 +30,7 @@ from tests.conformance.lanes.contract import (
     LaneFake,
     Script,
 )
-from tests.fixtures.cursor_controls import (
+from tests.support.cursor_lane_controls import (
     cloud_control_stack,
     control_stack,
     fork_packet,

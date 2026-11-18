@@ -38,15 +38,15 @@ from mission_control.domain.execution.invocation_settlement import (
     WaitReason,
 )
 from mission_control.domain.knowledge.judgment import cited_decisions
-from tests.fixtures.checkpoint_recovery import recovery_harness, stage_recovery_unit
-from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.fixtures.saved_settlement import DurableEffectDouble
+from tests.support.checkpoint_recovery import recovery_harness, stage_recovery_unit
+from tests.support.db import CommonDatabase
 from tests.support.integration.postgres.trusted_judgment_postgres import access_for
 from tests.support.integration.temporal.wi04_saved_settlement_restart import (
     _replays,
     _scheduled,
     _Stack,
 )
+from tests.support.saved_settlement import DurableEffectDouble
 from tests.support.temporal import start_workflow_env
 from tests.support.trusted_knowledge import ScriptedRunner, World, evaluators, head_of, world
 

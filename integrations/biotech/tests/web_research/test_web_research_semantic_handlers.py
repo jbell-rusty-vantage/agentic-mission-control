@@ -7,7 +7,7 @@ from typing import Any, cast
 
 import pytest
 from pydantic import ValidationError
-from tests.fixtures.lane_bindings import LANE_REBINDERS
+from tests.support.lane_bindings import LANE_REBINDERS
 from tests.support.unit.web_research.web_research_semantic_handlers import (
     BLUEPRINT_DIGEST,
     BROWSER_RUNTIME,

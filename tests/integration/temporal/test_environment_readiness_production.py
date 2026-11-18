@@ -18,8 +18,8 @@ from mission_control.application.environments import EnvironmentPreparationServi
 from mission_control.application.execution.harness.lane_turns import LaneExecutionIdentity
 from mission_control.domain.execution.environment_preparation import ReadinessLevel
 from mission_control.domain.execution.lanes import CursorExecutionBinding, PreparedSession
-from tests.fixtures.lane_turns import DIGEST, cursor_operation
 from tests.support.ids import SCOPE
+from tests.support.lanes import DIGEST, cursor_operation
 from tests.support.stack import open_stack
 
 pytestmark = pytest.mark.common_db

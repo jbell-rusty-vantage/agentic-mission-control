@@ -30,7 +30,7 @@ from mission_control.application.execution.stop_fence import KernelHookFenceGate
 from mission_control.domain.capabilities.hooks import HookDecision, HookEvent
 from mission_control.domain.frames.contracts import FrameKind, LaneProfile
 from mission_control.domain.policies.stop_fence import StopFence
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import admit_unit_attempt
 
 pytestmark = pytest.mark.common_db

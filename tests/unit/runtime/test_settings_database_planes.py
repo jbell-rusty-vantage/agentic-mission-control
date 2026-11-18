@@ -12,7 +12,7 @@ from mission_control.bootstrap.settings import (
     IntegrationConfigurationError,
     plane_for_application,
 )
-from tests.fixtures.isolated_settings import isolated_settings
+from tests.support.settings import isolated_settings
 
 REF = "abcdefghijklmnopqrst"
 OTHER_REF = "zyxwvutsrqponmlkjihg"

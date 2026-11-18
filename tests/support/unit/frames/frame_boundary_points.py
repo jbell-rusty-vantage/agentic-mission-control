@@ -15,8 +15,8 @@ from mission_control.domain.frames.contracts import (
     ProviderFrame,
     is_closing,
 )
-from tests.fixtures.provider_frames import FRAME_NOW
 from tests.support.ids import SCOPE
+from tests.support.provider_frames import FRAME_NOW
 
 EXECUTION = uuid4()
 RUN = uuid4()

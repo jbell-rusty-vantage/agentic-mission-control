@@ -49,7 +49,7 @@ from mission_control.domain.graph_runtime.identities import (
     RuntimeUnitIdentity,
     StageGraphUnitLocation,
 )
-from tests.fixtures.checkpoint_lineage import BINDING, SCHEMA, namespace_claim
+from tests.support.checkpoint_lineage import BINDING, SCHEMA, namespace_claim
 
 SCOPE = "mc/0192a4f0-0000-7000-8000-00000000b10e/biotech/9287e246-224b-5814-bc00-44bb5396e0c5"
 DIGEST = "sha256:" + "ab" * 32

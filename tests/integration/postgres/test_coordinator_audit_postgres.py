@@ -20,7 +20,7 @@ from mission_control.adapters.postgres.coordinator.coordinator_audit_repository 
     PostgresCoordinatorAuditSink,
 )
 from mission_control.application.coordinator.coordinator_facade import CoordinatorAuditEvent
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import owner_rows
 
 pytestmark = pytest.mark.common_db

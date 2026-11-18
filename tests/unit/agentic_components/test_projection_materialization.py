@@ -38,8 +38,8 @@ from mission_control.domain.capabilities.host_support import (
     LaneProfile,
     all_profiles,
 )
-from tests.fixtures.projections import regen
-from tests.fixtures.projections.rows import (
+from tests.support import projection_regen as regen
+from tests.support.projection_rows import (
     INSTRUCTION,
     PACKET_INDEX,
     _entry,

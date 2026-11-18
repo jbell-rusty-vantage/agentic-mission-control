@@ -34,7 +34,7 @@ from mission_control.domain.execution.lane_turns import (
 )
 from mission_control.domain.execution.lanes import CursorCloudOptions, CursorExecutionBinding
 from mission_control.domain.frames.contracts import FrameKind
-from tests.fixtures.lane_turns import RecordingSignals
+from tests.support.lanes import RecordingSignals
 from tests.support.providers.cursor import CloudStack, cloud_stack
 from tests.support.unit.harness.cursor_cloud import _identity, _lanes, _turn
 
@@ -398,8 +398,8 @@ def test_the_worker_registry_carries_both_real_cursor_lanes(tmp_path: Path) -> N
         DeepAgentsHarness,
     )
     from mission_control.adapters.temporal.deployment_composition import compose_lane_registry
-    from tests.fixtures.isolated_settings import isolated_settings
     from tests.support.deep_agents_runtime import ConformanceRuntime
+    from tests.support.settings import isolated_settings
 
     stack = cloud_stack(tmp_path)
     registry = compose_lane_registry(

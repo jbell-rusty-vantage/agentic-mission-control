@@ -20,9 +20,9 @@ from mission_control.domain.execution.contracts import (
     OperationAttemptIdentity,
     OperationExecutionRequest,
 )
-from tests.fixtures.checkpoint_recovery import stage_recovery_unit
-from tests.fixtures.lane_turns import ScriptedSessionLane, cursor_operation
+from tests.support.checkpoint_recovery import stage_recovery_unit
 from tests.support.ids import SCOPE
+from tests.support.lanes import ScriptedSessionLane, cursor_operation
 
 
 @dataclass

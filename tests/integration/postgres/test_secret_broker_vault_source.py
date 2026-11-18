@@ -20,7 +20,6 @@ from mission_control.adapters.temporal.deployment_composition import compose_sec
 from mission_control.application.secrets.broker import SecretUnavailable
 from mission_control.application.secrets.references import declarations
 from mission_control.domain.authoring.contracts import SecretRef
-from tests.fixtures.isolated_settings import isolated_settings
 from tests.qualification.two_project.disposable import (
     create_database,
     database_dsn,
@@ -28,6 +27,7 @@ from tests.qualification.two_project.disposable import (
     new_suffix,
     require_admin_dsn,
 )
+from tests.support.settings import isolated_settings
 
 pytestmark = pytest.mark.common_db
 

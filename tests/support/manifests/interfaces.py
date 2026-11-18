@@ -29,8 +29,8 @@ from mission_control.domain.authoring.extensions import ExtensionRegistry
 from mission_control.domain.authoring.manifest import ManifestErrorCode, ManifestIssue
 from mission_control.domain.policies.contracts import ActorContext
 from mission_control.interfaces.mcp.coordinator_server import CoordinatorPrincipal
-from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog
 from tests.support.ids import SCOPE
+from tests.support.manifests.seeded_catalog import fast_track_catalog
 
 MISSION_ID = UUID("01920000-0000-7000-8000-00000000a001")
 REVISION_ID = UUID("01920000-0000-7000-8000-00000000a002")

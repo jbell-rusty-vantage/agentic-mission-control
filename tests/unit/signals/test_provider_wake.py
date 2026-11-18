@@ -1,6 +1,6 @@
 """HL-17: Managed Agents and Agents API webhooks enter Signal Ingress as wake signals.
 
-Signed fixture deliveries (tests/fixtures/provider_webhooks.py) are verified with Standard
+Signed fixture deliveries (tests/support/provider_webhooks.py) are verified with Standard
 Webhooks, reduced to a `ProviderWake` and recorded once per `webhook-id`; forged, stale and
 replayed deliveries record nothing. The same deliveries pass the OpenAI SDK's own Standard
 Webhooks verifier, so the fixtures are signed the way providers sign. The PostgreSQL proof is
@@ -23,7 +23,7 @@ from mission_control.application.signals.ports import InboxItem
 from mission_control.application.signals.service import IngressKeys, SignalIngressService
 from mission_control.application.signals.wake import provider_wake
 from mission_control.interfaces.http.ingress import create_ingress_app
-from tests.fixtures.provider_webhooks import (
+from tests.support.provider_webhooks import (
     ANTHROPIC_SESSION_IDLED,
     ANTHROPIC_TEST_SECRET,
     OPENAI_ACTION_REQUIRED,

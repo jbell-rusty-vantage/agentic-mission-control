@@ -22,10 +22,10 @@ from mission_control.application.capabilities.bundle_custody import bundle_defin
 from mission_control.domain.capabilities.bundles import build_bundle_manifest
 from mission_control_db_contract.seeds import _apply_record, load_bundles
 from mission_control_db_contract.storage import storage_available, verify_capability_bundles
-from tests.fixtures.capability_search_catalog import SEEDS
-from tests.fixtures.environment_kits import kit_document, kit_files
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.capability_search import SEEDS
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import BIOTECH_CATALOG
+from tests.support.environment_kits import kit_document, kit_files
 from tests.support.integration.postgres.capability_bundles_publish import SYNTHETIC_STORAGE
 
 pytestmark = pytest.mark.common_db

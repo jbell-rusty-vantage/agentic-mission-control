@@ -38,7 +38,6 @@ from mission_control.domain.policies.contracts import (
     WaitCondition,
 )
 from mission_control.domain.policies.errors import CommandRejected, IdempotencyConflict
-from tests.fixtures.set_order import equal_sets_with_different_iteration_order
 from tests.support.run_control import (
     ALL_PERMISSIONS,
     DIGEST,
@@ -54,6 +53,7 @@ from tests.support.run_control import (
     request,
     service,
 )
+from tests.support.set_order import equal_sets_with_different_iteration_order
 
 
 @pytest.mark.asyncio

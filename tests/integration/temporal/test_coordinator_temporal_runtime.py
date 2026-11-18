@@ -34,7 +34,7 @@ from mission_control.domain.programs.contracts import (
     WorkflowEvaluationRequest,
     WorkflowEvaluationResult,
 )
-from tests.fixtures.lane_bindings import LANE_REBINDERS
+from tests.support.lane_bindings import LANE_REBINDERS
 from tests.support.temporal import start_workflow_env
 
 DIGEST = "sha256:" + "a" * 64

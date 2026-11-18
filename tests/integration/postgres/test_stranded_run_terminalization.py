@@ -39,8 +39,8 @@ from mission_control.domain.programs.family_failure import (
     LIABILITY_TERMINALIZATION_ATTEMPT,
     FamilyFailureTerminalizationRequest,
 )
-from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.support.boundary_commands import TARGET
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import scoped_command, scoped_request
 from tests.support.run_control import service
 

@@ -37,7 +37,7 @@ from mission_control.domain.execution.session_retention import (
     SessionDeletion,
     SessionRetentionPolicy,
 )
-from tests.fixtures.session_retention import FakeSessionDeleter
+from tests.support.session_retention import FakeSessionDeleter
 from tests.support.temporal import workflow_environment
 
 ADDRESS = os.environ.get("MC_TEMPORAL_TEST_ADDRESS", "127.0.0.1:7233")

@@ -67,7 +67,7 @@ controls on the lane, not the fake alone.
    - a `LaneAdapter` subclass with `profile`, `harness(tmp_path)` (the harness exactly as a
      worker registers it) and `open(tmp_path, script, ...)`, which plays each `Script` inside a
      fresh admitted Run: `admitted_unit` plus `compose_control_stack` from
-     `tests/fixtures/cursor_controls.py`, as the existing adapters do;
+     `tests/support/cursor_lane_controls.py`, as the existing adapters do;
    - `continuation_ports` when the describe claims continuation, and `write_workspace` plus
      `fork` when it claims fork emulation.
 3. Add one entry to `CONFORMANCE_LANES` in `registry.py`.

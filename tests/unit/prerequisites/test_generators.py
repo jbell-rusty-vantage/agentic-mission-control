@@ -38,8 +38,8 @@ from mission_control.domain.prerequisites import (
     PasteStep,
     VerificationMethod,
 )
-from tests.fixtures.environment_kits import BASH, kit_pin, published_kit
-from tests.fixtures.owner_prerequisites import (
+from tests.support.environment_kits import BASH, kit_pin, published_kit
+from tests.support.owner_prerequisites import (
     INGRESS,
     INSTALL,
     environment_binding,

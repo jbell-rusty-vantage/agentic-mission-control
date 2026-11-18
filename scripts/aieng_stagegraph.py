@@ -19,7 +19,7 @@ from urllib.parse import quote
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from tests.fixtures.aieng_stagegraph import (  # noqa: E402
+from experiments.knowledge_loop.aieng_stagegraph import (  # noqa: E402
     EVIDENCE,
     MODEL_LIMIT_USD,
     SESSION_CEILING_USD,

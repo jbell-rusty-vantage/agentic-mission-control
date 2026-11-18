@@ -19,11 +19,11 @@ from mission_control.application.frames.reducer import (
 )
 from mission_control.application.frames.writer import FrameWriter
 from mission_control.domain.frames.contracts import frame_id_from_native_event_ref
-from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.fixtures.provider_frames import FRAME_NOW, turn_observations
 from tests.support.clock import SECOND, Clock
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import admit_unit_attempt, owner_rows
 from tests.support.integration.postgres.frame_facts_postgres import projector_actor
+from tests.support.provider_frames import FRAME_NOW, turn_observations
 
 pytestmark = pytest.mark.common_db
 

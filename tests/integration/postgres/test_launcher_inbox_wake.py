@@ -22,7 +22,7 @@ import pytest
 from mission_control.application.subscriptions.coordinator import NotificationKind
 from mission_control.application.subscriptions.coordinator_service import CoordinatorRejected
 from mission_control.application.subscriptions.launcher import subscribe_launcher
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.db import CommonDatabase
 from tests.support.integration.postgres.mp15_coordinator_inbox_postgres import (
     COORDINATOR,
     append_fixture_events,

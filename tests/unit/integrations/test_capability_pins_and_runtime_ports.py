@@ -32,9 +32,9 @@ from mission_control.bootstrap.settings import (
 )
 from mission_control.domain.authoring.contracts import SecretRef
 from mission_control.domain.execution.errors import WorkspaceDigestMismatch
-from tests.fixtures.isolated_settings import isolated_settings
-from tests.fixtures.lane_bindings import lane_fields
+from tests.support.lane_bindings import lane_fields
 from tests.support.operations import MCP_DIGEST, SKILL_DIGEST, operation_request, service_fixture
+from tests.support.settings import isolated_settings
 
 PINS = PROJECT_ROOT / "infra" / "capability-pins" / "research-capabilities.json"
 

@@ -41,7 +41,7 @@ from mission_control.domain.execution.lane_turns import (
 )
 from mission_control.domain.execution.lanes import ReattachRequest
 from mission_control.domain.frames.contracts import FrameKind
-from tests.fixtures.lane_turns import RecordingSignals, SimulatedWorkerLoss
+from tests.support.lanes import RecordingSignals, SimulatedWorkerLoss
 from tests.support.providers.claude import PROFILE, SESSION_ID, claude_stack, fixture_admission
 from tests.support.unit.claude.claude_harness import _fields, _frames, _identity, _turn
 

@@ -41,13 +41,13 @@ from mission_control.domain.programs.contracts import (
     StageInputBinding,
 )
 from mission_control.domain.programs.interpreter import StageGraphInterpreter
-from tests.fixtures.lane_bindings import LANE_REBINDERS
 from tests.support.integration.temporal.wp_bp_010_temporal import (
     DIGEST,
     RecordingOperationBindings,
     _blueprint,
     _operation,
 )
+from tests.support.lane_bindings import LANE_REBINDERS
 from tests.support.unit.operations.ft_b2_stage_handoff import (
     FAST_REF,
     RUN_ID,

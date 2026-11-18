@@ -87,7 +87,6 @@ from mission_control.domain.execution.lanes import (
 )
 from mission_control.domain.frames.contracts import FrameKind
 from mission_control.domain.policies.contracts import ActorContext
-from tests.fixtures.lane_turns import RecordingSignals, lane_stack
 from tests.integration.claude.live_drill import (
     DrillOutcome,
     RecordingClientFactory,
@@ -101,6 +100,7 @@ from tests.integration.claude.live_drill import (
     write_recording,
 )
 from tests.support.integration.claude.claude_live_qualification import _operation, _rows
+from tests.support.lanes import RecordingSignals, lane_stack
 from tests.support.providers.claude import PROFILE, FixtureWorkspace
 from tests.unit.approvals.fixtures import answer
 

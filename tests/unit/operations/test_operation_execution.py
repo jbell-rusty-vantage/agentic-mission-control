@@ -78,7 +78,6 @@ from mission_control.domain.policies.contracts import (
     TerminalizeAction,
 )
 from mission_control.domain.policies.errors import IdempotencyConflict
-from tests.fixtures.lane_bindings import lane_fields
 from tests.support.deep_agents_runtime import (
     ConformanceAssetVerifier,
     ConformanceAuthority,
@@ -88,6 +87,7 @@ from tests.support.deep_agents_runtime import (
     ConformanceSandbox,
     ConformanceSecretResolver,
 )
+from tests.support.lane_bindings import lane_fields
 from tests.support.operations import (
     DIGEST,
     MCP_DIGEST,

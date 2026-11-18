@@ -20,8 +20,8 @@ from mission_control.application.missions.service import MissionControlService
 from mission_control.contracts.contracts import CancelPayload, CommandTarget, MissionCommandRequest
 from mission_control.domain.policies.contracts import RunPhase, StartAction
 from mission_control.domain.policies.stop_fence import STOP_FENCED, EffectAdmission, StopFence
-from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.support.boundary_commands import TARGET
+from tests.support.db import CommonDatabase
 from tests.support.run_control import actor, command, request, service
 
 pytestmark = pytest.mark.common_db

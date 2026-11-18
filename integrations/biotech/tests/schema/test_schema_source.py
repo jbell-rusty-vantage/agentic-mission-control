@@ -6,7 +6,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-from tests.fixtures.sibling_checkouts import authoritative_schema_path
+from tests.support.sibling_checkouts import authoritative_schema_path
 
 from biotech_mission_adapters.bootstrap.schema_source import (
     SCHEMA_SOURCE_ENV,

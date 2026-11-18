@@ -60,7 +60,7 @@ leaser, an in-memory artifact sink, a static auth admission (secret-free) and an
 rig: MP-11's in-memory approval store (FIXTURE semantics of `adapters/postgres/approvals`)
 behind a real `ApprovalBroker`, with a scripted reviewer that resolves each task through the
 real `HumanTaskService` as soon as it is persisted. `codex_stack` composes the harness over
-the fixture app-server launcher and `tests.fixtures.lane_turns.lane_stack`'s governed
+the fixture app-server launcher and `tests.support.lanes.lane_stack`'s governed
 in-memory boundary.
 """
 
@@ -119,10 +119,10 @@ from mission_control.domain.execution.contracts import OperationExecutionRequest
 from mission_control.domain.execution.lane_turns import CleanupOutcome, LaneTurnRequest
 from mission_control.domain.frames.contracts import LaneProfile
 from mission_control.domain.policies.contracts import ActorContext
-from tests.fixtures.lane_bindings import lane_fields
-from tests.fixtures.lane_turns import LANE_QUEUE, LaneStack, lane_stack
 from tests.support.artifacts import MemoryArtifacts
 from tests.support.ids import SCOPE
+from tests.support.lane_bindings import lane_fields
+from tests.support.lanes import LANE_QUEUE, LaneStack, lane_stack
 
 FIXTURE_ROOT = Path(__file__).resolve().parents[2] / "fixtures" / "provider_frames" / "codex"
 SCRIPTS = FIXTURE_ROOT / "scripts"

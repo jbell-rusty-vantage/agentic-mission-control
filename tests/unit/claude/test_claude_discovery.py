@@ -25,7 +25,7 @@ from mission_control.domain.execution.environment_preparation import (
     preparation_id,
 )
 from mission_control.domain.execution.lane_turns import LaneTurnRequest
-from tests.fixtures.lane_turns import RecordingSignals, lane_stack
+from tests.support.lanes import RecordingSignals, lane_stack
 from tests.support.providers.claude import PROFILE, ClaudeStack, claude_stack
 
 SEGMENT = {"heartbeat_timeout_s": 60, "max_frames": 200}

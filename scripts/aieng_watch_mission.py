@@ -7,7 +7,7 @@ fresh common database on the disposable cluster named by MISSION_CONTROL_TEST_AD
 Temporal dev server, the production workers and the configured API. Every GoalDirected role is the
 deterministic technical agent (no provider call); with MISSION_CONTROL_SCRIPTED_MODEL=aieng-watch
 its executor of iteration 1 calls the five AI Engineer watch tools
-(`tests/fixtures/aieng_watch_tools.py`): releases, due, rerun, admit; its verifier reads the tick
+(`scripts/aieng_watch/tools.py`): releases, due, rerun, admit; its verifier reads the tick
 back. Runs are serial ticks; each run's Mission Control mission id is read from its inspection and
 registered for the tools before launch. The AI Engineer missions' budgets bound the work across
 runs.
@@ -38,7 +38,11 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from tests.fixtures import aieng_watch_tools as W  # noqa: E402, N812
+from aieng_watch import tools as W  # noqa: E402, N812
+from tests.support.production_stack import (  # noqa: E402
+    TECHNICAL_SCRIPTS,
+    technical_turn,
+)
 from tests.support.stack import inspect, open_stack, prepare_run, until  # noqa: E402
 
 from mission_control.adapters.postgres.knowledge.invocation_locator import (  # noqa: E402
@@ -118,6 +122,10 @@ async def run_tick(stack: Any, name: str, missions: dict[str, str], out: Path) -
 
 async def serve(out: Path, ticks: list[str]) -> None:
     components, tools = W.build_watch_tools()
+    # The watch tick is this script's own scripted step of the technical parent model.
+    TECHNICAL_SCRIPTS["aieng-watch"] = lambda invocation, messages, call: technical_turn(
+        invocation, messages, extra=W.watch_step
+    )
     os.environ["MISSION_CONTROL_SCRIPTED_MODEL"] = "aieng-watch"
     with tempfile.TemporaryDirectory() as root, pytest.MonkeyPatch.context() as environment:
         # The stack is local (loopback disposable cluster): the remote AI Engineer project fields

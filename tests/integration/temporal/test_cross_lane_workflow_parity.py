@@ -5,7 +5,7 @@ the production launch author, runs it on a real Temporal dev server against a di
 PostgreSQL 17 common component, and compares receipts and records (settlements, accepted
 evidence, workspace candidates, lane turns), never only final text. Provider behaviour comes
 from deterministic FIXTURE clients injected at the client/launcher seam
-(`tests/fixtures/mp20_parity.py` lists exactly what is production and what is fixture). No
+(`tests/support/lane_parity_stack.py` lists exactly what is production and what is fixture). No
 live provider call is made and nothing here qualifies a profile.
 
 Cursor (`cursor_local`, `cursor_cloud`) runs through the same production path: the launch
@@ -49,8 +49,9 @@ from mission_control.domain.execution.lane_requirements import RequirementSet, a
 from mission_control.domain.policies.contracts import ActorContext, CancelAction
 from mission_control.domain.policies.mailbox import MailboxState
 from mission_control.domain.programs.human_gate import HumanResolutionRequest
-from tests.fixtures.manifest_runtime import GoalScript
-from tests.fixtures.mp20_parity import (
+from tests.support.ids import SCOPE
+from tests.support.integration.temporal.rrm_007_boundary_interventions import replay
+from tests.support.lane_parity_stack import (
     CURSOR_PROFILES,
     LOCAL_PROFILES,
     SECRET_MARKERS,
@@ -64,8 +65,6 @@ from tests.fixtures.mp20_parity import (
     manifest_text,
     open_parity_stack,
 )
-from tests.support.ids import SCOPE
-from tests.support.integration.temporal.rrm_007_boundary_interventions import replay
 from tests.support.manifest_runtime import (
     OWNER_KEY,
     SCOPED,
@@ -78,6 +77,7 @@ from tests.support.manifest_runtime import (
     root_executions,
     submit,
 )
+from tests.support.manifests.lifecycle import GoalScript
 from tests.support.providers.cursor import make_remote
 from tests.support.stack import _command, _diagnose, _run, _send, _until
 from tests.support.temporal import patch_ids

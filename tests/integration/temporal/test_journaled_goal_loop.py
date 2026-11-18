@@ -65,18 +65,6 @@ from mission_control.domain.programs.goal_directed_runtime import (
     GoalOperationReconciliationRequest,
     GoalOperationReconciliationResult,
 )
-from tests.fixtures.goal_directed_journaled import (
-    SCOPE,
-    TOKENS_PER_OPERATION,
-    GoalComposition,
-    admit_goal_run,
-    compose_goal_directed,
-    goal_blueprint,
-    goal_model,
-    goal_run_control,
-    goal_run_input,
-    turns_by_operation,
-)
 from tests.support.integration.temporal.rrm_007_boundary_interventions import (
     Authority,
     _phase_is,
@@ -89,6 +77,18 @@ from tests.support.integration.temporal.rrm_007_boundary_interventions import (
 from tests.support.integration.temporal.wp_bp_020_temporal import FakeGoalDirectedActivities
 from tests.support.integration.temporal.wp_bp_020_temporal import _run_input as fake_goal_input
 from tests.support.journal import MemoryOperationJournal
+from tests.support.journaled_goal_loop import (
+    SCOPE,
+    TOKENS_PER_OPERATION,
+    GoalComposition,
+    admit_goal_run,
+    compose_goal_directed,
+    goal_blueprint,
+    goal_model,
+    goal_run_control,
+    goal_run_input,
+    turns_by_operation,
+)
 from tests.support.run_control import command
 from tests.support.temporal import patch_ids, scheduled_activity_inputs, start_workflow_env
 

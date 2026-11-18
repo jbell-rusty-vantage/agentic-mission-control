@@ -53,7 +53,7 @@ from mission_control.domain.programs.search_attributes import (
     search_attribute_scope_hash,
     visibility_run_query,
 )
-from tests.fixtures.checkpoint_lineage import BINDING
+from tests.support.checkpoint_lineage import BINDING
 from tests.support.integration.temporal.rrm_005_search_attributes import (
     UnitBoundStageGraphActivities,
     _start_local,

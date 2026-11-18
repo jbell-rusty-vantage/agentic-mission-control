@@ -23,7 +23,7 @@ from mission_control.adapters.codex import frames as framing
 from mission_control.domain.execution.contracts import OperationExecutionResult
 from mission_control.domain.execution.lanes import LaneSegmentBounds
 from mission_control.domain.frames.contracts import FrameKind
-from tests.fixtures.lane_turns import RecordingSignals
+from tests.support.lanes import RecordingSignals
 from tests.support.providers.codex import codex_stack
 from tests.unit.codex.drive import drive_segments, observed, sent, started
 

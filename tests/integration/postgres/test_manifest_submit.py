@@ -23,7 +23,7 @@ from mission_control.application.authoring.manifest_submit import (
     TenantNotProvisioned,
 )
 from mission_control.domain.authoring.manifest import canonical_manifest_bytes, load_manifest_yaml
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.db import CommonDatabase
 from tests.support.integration.postgres.manifest_submit import (
     MINIMAL,
     OWNER,

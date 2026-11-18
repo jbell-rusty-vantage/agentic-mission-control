@@ -43,7 +43,6 @@ from mission_control.interfaces.mcp.mission_tools import (
     ScopedManifests,
     register_manifest_tools,
 )
-from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog
 from tests.support.ids import SCOPE
 from tests.support.manifests.compile import (
     AT,
@@ -57,6 +56,7 @@ from tests.support.manifests.compile import (
     service,
     text,
 )
+from tests.support.manifests.seeded_catalog import fast_track_catalog
 
 MISSIONS = ROOT / "tests/fixtures/manifests/fast-track"
 GOLDEN = ROOT / "tests/golden/manifests"

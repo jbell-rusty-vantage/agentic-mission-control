@@ -16,8 +16,8 @@ from datetime import timedelta
 from typing import Any
 
 import pytest
-from tests.fixtures.rrm009_production_stack import tracing_stage_blueprint
-from tests.fixtures.run_forks import (
+from tests.support.production_stack import tracing_stage_blueprint
+from tests.support.run_forks import (
     NOW,
     fork_actor,
     fork_command,

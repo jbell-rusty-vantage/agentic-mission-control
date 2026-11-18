@@ -18,7 +18,7 @@ from mission_control.domain.execution.lanes import (
     SnapshotRequest,
     StartRequest,
 )
-from tests.fixtures.cursor_controls import harness_fields, started_session
+from tests.support.cursor_lane_controls import harness_fields, started_session
 from tests.support.providers.cursor import LocalStack, local_stack
 from tests.support.unit.cursor.local_reconcile_and_rehydration import _fresh
 from tests.unit.cursor.support import send_request

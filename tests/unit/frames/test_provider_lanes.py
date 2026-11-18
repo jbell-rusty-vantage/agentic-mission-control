@@ -65,7 +65,7 @@ from mission_control.domain.subscriptions.streams import (
     StreamFilters,
     StreamScope,
 )
-from tests.fixtures.provider_frames import (
+from tests.support.provider_frames import (
     provider_frame,
 )
 from tests.support.unit.frames.provider_lanes import (

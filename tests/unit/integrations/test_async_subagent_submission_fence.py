@@ -37,7 +37,7 @@ from mission_control.domain.execution.contracts import (
     AsyncSubagentLifecycle,
     AsyncSubagentUsage,
 )
-from tests.fixtures.rrm013_live_stack import reconciler
+from tests.support.async_subagent_reconciliation import reconciler
 from tests.support.clock import Clock
 from tests.support.deep_agents import GRAPH_BINDING_DIGEST, NOW, SERVED, contract, request
 from tests.support.providers.agent_protocol import FakeAgentProtocolClient, install
@@ -398,7 +398,7 @@ async def test_parent_deep_agent_start_async_task_reserves_and_links_before_the_
         InMemoryCheckpointLineageRepository,
     )
     from mission_control.domain.execution.contracts import DeepAgentExecutionBinding
-    from tests.fixtures.rrm013_live_stack import PARENT_OBJECTIVE, parent_spawn_model
+    from tests.support.async_subagent_reconciliation import PARENT_OBJECTIVE, parent_spawn_model
     from tests.support.deep_agents import exact_fixture, planned_invocation, unit_bound
 
     client = FakeAgentProtocolClient(served=SERVED)

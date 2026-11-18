@@ -31,9 +31,9 @@ from mission_control.domain.execution.cognition_points import (
     WorkspaceSnapshotPoint,
 )
 from mission_control.domain.execution.lanes import LaneSeedHead, PrepareRequest, StartRequest
-from tests.fixtures.cursor_controls import harness_fields
-from tests.fixtures.lane_turns import cursor_operation
+from tests.support.cursor_lane_controls import harness_fields
 from tests.support.ids import SCOPE
+from tests.support.lanes import cursor_operation
 from tests.support.providers.cursor import local_stack
 from tests.support.unit.cursor.cognition_points import settled_points, unit_changes
 

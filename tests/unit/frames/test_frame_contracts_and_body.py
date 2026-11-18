@@ -26,8 +26,8 @@ from mission_control.domain.frames.contracts import (
     is_closing,
     native_event_ref,
 )
-from tests.fixtures.provider_frames import FRAME_NOW
 from tests.support.ids import SCOPE
+from tests.support.provider_frames import FRAME_NOW
 
 EXPECTED_CLOSING = {
     "tool_call_completed",

@@ -21,8 +21,8 @@ from mission_control.domain.prerequisites import (
     PrerequisiteState,
     VerificationMethod,
 )
-from tests.fixtures.owner_prerequisites import inputs
 from tests.support.clock import Clock
+from tests.support.owner_prerequisites import inputs
 
 SCOPE = "installation:fixture"
 AT = datetime(2026, 10, 13, 12, 0, tzinfo=UTC)

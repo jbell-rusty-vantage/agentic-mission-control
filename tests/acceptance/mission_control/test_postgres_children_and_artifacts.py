@@ -9,13 +9,13 @@ from pathlib import Path
 
 import pytest
 from temporalio.api.enums.v1 import EventType
-from tests.fixtures import rrm009_cancellation
-from tests.fixtures.mission_control_local_agent_server import (
+from tests.support import running_cancellation
+from tests.support.ids import SCOPE
+from tests.support.local_agent_server import (
     deterministic_child_definition,
     local_agent_server,
 )
-from tests.fixtures.rrm009_production_stack import ANSWER_MARKER, technical_binding
-from tests.support.ids import SCOPE
+from tests.support.production_stack import ANSWER_MARKER, technical_binding
 from tests.support.stack import (
     ProductionStack,
     _calls,
@@ -122,8 +122,8 @@ def local_async_binding(endpoint: str):
     technical = technical_binding()
     contract = deterministic_child_definition().contract(
         agent_protocol_url=endpoint,
-        name=rrm009_cancellation.ASYNC_CHILD_NAME,
-        budget_limits=dict(rrm009_cancellation.ASYNC_CHILD_LIMITS),
+        name=running_cancellation.ASYNC_CHILD_NAME,
+        budget_limits=dict(running_cancellation.ASYNC_CHILD_LIMITS),
         timeout_seconds=300,
         dependency_classes=frozenset({AsyncSubagentDependencyClass.REQUIRED_BLOCKING}),
     )
@@ -146,22 +146,24 @@ async def test_real_hosted_async_child_cancellation_uses_postgres_detail(
 ) -> None:
     async with local_agent_server(tmp_path / "agent-server", monkeypatch) as endpoint:
         technical = local_async_binding(endpoint)
-        gate = rrm009_cancellation.CancellationGate(window)  # type: ignore[arg-type]
+        gate = running_cancellation.CancellationGate(window)  # type: ignore[arg-type]
         model_log = []
         async with open_stack(
             root=tmp_path,
             monkeypatch=monkeypatch,
             technical_override=technical,
-            components=rrm009_cancellation.cancellation_components(technical, gate, model_log),
+            components=running_cancellation.cancellation_components(technical, gate, model_log),
             model_log=model_log,
             extra_environment={
-                **rrm009_cancellation.CANCELLATION_ENVIRONMENT,
+                **running_cancellation.CANCELLATION_ENVIRONMENT,
                 "ASYNC_SUBAGENT_SPAWNING_ENABLED": "true",
                 "AGENT_SERVER_ENDPOINT": endpoint,
                 "ASYNC_SUBAGENT_COMPLETION_WAIT_SECONDS": "240",
             },
         ) as production:
-            evidence = await rrm009_cancellation.run_cancellation_drill(production, technical, gate)
+            evidence = await running_cancellation.run_cancellation_drill(
+                production, technical, gate
+            )
             assert evidence["child"]["cancellation_receipt"] == "provider_acknowledged"
             rows = await canonical_evidence(production, evidence["run_id"], children=True)
             assert rows["terminal_outcome"] == "cancelled", rows
@@ -173,25 +175,25 @@ async def test_real_hosted_async_children_complete_and_settle_in_postgres(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    monkeypatch.setattr(rrm009_cancellation, "ASYNC_CHILD_OBJECTIVE", "Reply with exactly PONG.")
+    monkeypatch.setattr(running_cancellation, "ASYNC_CHILD_OBJECTIVE", "Reply with exactly PONG.")
     async with local_agent_server(tmp_path / "agent-server", monkeypatch) as endpoint:
         technical = local_async_binding(endpoint)
-        gate = rrm009_cancellation.CancellationGate("completion_wait")
+        gate = running_cancellation.CancellationGate("completion_wait")
         model_log = []
         async with open_stack(
             root=tmp_path,
             monkeypatch=monkeypatch,
             technical_override=technical,
-            components=rrm009_cancellation.cancellation_components(technical, gate, model_log),
+            components=running_cancellation.cancellation_components(technical, gate, model_log),
             model_log=model_log,
             extra_environment={
-                **rrm009_cancellation.CANCELLATION_ENVIRONMENT,
+                **running_cancellation.CANCELLATION_ENVIRONMENT,
                 "ASYNC_SUBAGENT_SPAWNING_ENABLED": "true",
                 "AGENT_SERVER_ENDPOINT": endpoint,
                 "ASYNC_SUBAGENT_COMPLETION_WAIT_SECONDS": "120",
             },
         ) as production:
-            run_id = await rrm009_cancellation.launch_stagegraph(
+            run_id = await running_cancellation.launch_stagegraph(
                 production, technical, async_children=True
             )
             await _wait_for(production, run_id, lambda: _holds_wait(production, run_id), 180)
@@ -210,7 +212,7 @@ async def test_real_hosted_async_children_complete_and_settle_in_postgres(
                 assert execution.lifecycle == AsyncSubagentLifecycle.COMPLETED
                 assert link.result_decision == "admit" and link.settled
                 assert link.usage_disposition == "settled"
-                assert len(await rrm009_cancellation.provider_runs(child.child_execution_id)) == 1
+                assert len(await running_cancellation.provider_runs(child.child_execution_id)) == 1
             rows = await canonical_evidence(production, run_id, children=True)
             assert rows["terminal_outcome"] == "succeeded", rows
             assert rows["counts"]["subordinate_execution"] >= 2, rows

@@ -17,7 +17,7 @@ from mission_control.adapters.postgres.run_control.run_control_repository import
 )
 from mission_control.application.programs.completion_validation import ArtifactPublicationPending
 from mission_control.domain.authoring.canonical import sha256_digest
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.db import CommonDatabase
 from tests.support.integration.postgres.completion_validation_postgres import recompose
 from tests.support.unit.orchestration.artifact_schema_validation import Custody, captured
 from tests.support.unit.orchestration.completion_validation_service import OUTPUT, prepared

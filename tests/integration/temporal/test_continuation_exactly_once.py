@@ -3,7 +3,7 @@
 The real `OperationWorkflow` drives the real `lane.*` and `continuation.*` activities; the
 continuation ledger (transfer rows, sealed checkpoints, the continuation packet) and, in
 the crash drill, the lane state and frames live in PostgreSQL under the runtime role.
-Providers are labelled fixtures (`tests/fixtures/lane_turns.py`); nothing here proves live
+Providers are labelled fixtures (`tests/support/lanes.py`); nothing here proves live
 provider behaviour.
 
 - V13: a worker is lost after *every* persisted continuation phase (two drills covering the
@@ -96,8 +96,16 @@ from mission_control.domain.programs.goal_directed_runtime import (
     GoalOperationDispatch,
     GoalOperationPreparationRequest,
 )
-from tests.fixtures.continuation import NOW, MemorySnapshots, NoArtifacts, trigger
-from tests.fixtures.lane_turns import (
+from tests.support.clock import SECOND, Clock
+from tests.support.continuation import NOW, MemorySnapshots, NoArtifacts, trigger
+from tests.support.db import CommonDatabase
+from tests.support.db_builders import admit_unit_attempt
+from tests.support.deep_agents_runtime import ConformanceAuthority
+from tests.support.integration.postgres.continuation_postgres import continuation_actor
+from tests.support.integration.temporal.wp_bp_020_temporal import FakeGoalDirectedActivities
+from tests.support.integration.temporal.wp_bp_020_temporal import _run_input as goal_input
+from tests.support.knowledge.stores import InMemoryStaging
+from tests.support.lanes import (
     SOURCE_SESSION,
     ContinuingLane,
     Crashes,
@@ -108,14 +116,6 @@ from tests.fixtures.lane_turns import (
     lane_stack,
     scripted_frames,
 )
-from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.support.clock import SECOND, Clock
-from tests.support.db_builders import admit_unit_attempt
-from tests.support.deep_agents_runtime import ConformanceAuthority
-from tests.support.integration.postgres.continuation_postgres import continuation_actor
-from tests.support.integration.temporal.wp_bp_020_temporal import FakeGoalDirectedActivities
-from tests.support.integration.temporal.wp_bp_020_temporal import _run_input as goal_input
-from tests.support.knowledge.stores import InMemoryStaging
 from tests.support.temporal import patch_ids
 
 pytestmark = pytest.mark.common_db
@@ -501,7 +501,7 @@ async def test_a_continued_executor_and_a_rollover_leave_the_goal_counters_intac
 ) -> None:
     from mission_control.application.execution.harness.state import InMemoryLaneExecutionStateStore
     from mission_control.application.frames.sink import InMemoryFrameStore
-    from tests.fixtures.lane_turns import ACTIVATION_UUID, RUN_UUID
+    from tests.support.lanes import ACTIVATION_UUID, RUN_UUID
 
     client = await _client()
     lane_queue, family_queue = f"mp12-lane-{uuid4().hex[:8]}", f"mp12-goal-{uuid4().hex[:8]}"

@@ -28,7 +28,7 @@ from mission_control.adapters.capabilities.capability_pins import (
 )
 from mission_control.adapters.operations.runtime_ports import PinnedCapabilityAssetVerifier
 from mission_control.bootstrap.settings import PROJECT_ROOT
-from tests.fixtures.lane_bindings import lane_fields
+from tests.support.lane_bindings import lane_fields
 
 PINS = PROJECT_ROOT / "infra" / "capability-pins" / "research-capabilities.json"
 FIXTURES = PROJECT_ROOT / "tests" / "fixtures" / "mcp"

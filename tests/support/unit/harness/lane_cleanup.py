@@ -9,7 +9,7 @@ from dataclasses import dataclass, field
 
 from mission_control.application.workspaces.errors import WorkspaceError
 from mission_control.domain.execution.lane_turns import CleanupOutcome
-from tests.fixtures.lane_turns import ScriptedSessionLane
+from tests.support.lanes import ScriptedSessionLane
 
 
 @dataclass

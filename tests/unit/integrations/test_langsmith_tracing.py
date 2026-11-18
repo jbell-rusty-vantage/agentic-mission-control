@@ -15,7 +15,7 @@ from mission_control.adapters.langsmith.tracing import (
     runtime_execute_metadata,
 )
 from mission_control.bootstrap.settings import Settings
-from tests.fixtures.isolated_settings import isolated_settings
+from tests.support.settings import isolated_settings
 
 _LANGSMITH_ENV = (
     "LANGSMITH_TRACING",

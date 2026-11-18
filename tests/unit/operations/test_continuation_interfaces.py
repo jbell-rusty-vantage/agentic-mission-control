@@ -44,8 +44,8 @@ from mission_control.domain.policies.reducer import required_action_permissions
 from mission_control.interfaces.cli import main as cli
 from mission_control.interfaces.http.continuation import router
 from mission_control.interfaces.http.mission_control import MissionPrincipal, get_mission_principal
-from tests.fixtures.continuation import RUN_KEY, build_service, facts, seal_target, trigger
 from tests.support.boundary_commands import TARGET, started
+from tests.support.continuation import RUN_KEY, build_service, facts, seal_target, trigger
 from tests.support.ids import INSTALLATION, SCOPE, TENANT
 from tests.support.run_control import actor as control_actor
 from tests.support.run_control import service

@@ -20,8 +20,8 @@ from mission_control.domain.subscriptions.streams import (
     StreamCursor,
     StreamFilters,
 )
-from tests.fixtures.provider_frames import FIXTURE_HARNESS
 from tests.support.ids import OTHER_SCOPE, SCOPE
+from tests.support.provider_frames import FIXTURE_HARNESS
 from tests.support.unit.streams.stream_service import (
     READER,
     execution_subscription,

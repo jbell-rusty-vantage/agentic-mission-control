@@ -24,7 +24,7 @@ from mission_control.adapters.deep_agents.model_retry import (
     GovernedModelRetryMiddleware,
     unsent_transport_failure,
 )
-from tests.fixtures.checkpoint_recovery import recovery_harness, stage_recovery_unit
+from tests.support.checkpoint_recovery import recovery_harness, stage_recovery_unit
 
 REQUEST = httpx.Request("POST", "https://api.anthropic.com/v1/messages")
 

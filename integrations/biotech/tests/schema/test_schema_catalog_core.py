@@ -5,7 +5,7 @@ from hashlib import sha256
 from typing import Any
 
 import pytest
-from tests.fixtures.sibling_checkouts import authoritative_schema_path
+from tests.support.sibling_checkouts import authoritative_schema_path
 
 from biotech_mission_adapters.application.schema.schema_catalog import (
     DEFAULT_SEMANTIC_OVERLAY,

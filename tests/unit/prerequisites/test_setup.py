@@ -169,7 +169,7 @@ def test_cli_generates_reviewable_script_without_launching_browser(monkeypatch, 
 def test_wizard_captures_public_environment_id_with_current_definition_digest():
     from mission_control.application.prerequisites.generators import generate_owner_prerequisites
     from mission_control.domain.capabilities.host_support import LaneProfile
-    from tests.fixtures.owner_prerequisites import inputs
+    from tests.support.owner_prerequisites import inputs
 
     _, plan = asyncio.run(setup_service())
     prerequisite = next(

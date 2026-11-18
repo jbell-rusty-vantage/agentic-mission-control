@@ -50,8 +50,8 @@ from mission_control.bootstrap.installation_config import (
 from mission_control.bootstrap.settings import Settings
 from mission_control.domain.authoring.extensions import ExtensionRegistry
 from mission_control.domain.authoring.mission_environment import is_secret_like_config_key
-from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog
-from tests.fixtures.environment_kits import StaticDefinitions
+from tests.support.environment_kits import StaticDefinitions
+from tests.support.manifests.seeded_catalog import fast_track_catalog
 from tests.support.manifests.v2_environment import AT, ENV, NODE, _set, blockers, manifest
 from tests.support.manifests.v2_launch import SCOPE
 

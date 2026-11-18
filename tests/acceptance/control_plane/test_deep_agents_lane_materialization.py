@@ -9,10 +9,9 @@ import pytest
 from langchain_core.messages import AIMessage, BaseMessage, ToolMessage
 from langgraph.checkpoint.memory import InMemorySaver
 from pydantic import ValidationError
-from tests.fixtures.checkpoint_lineage import (
+from tests.support.checkpoint_lineage import (
     activity_attempt,
 )
-from tests.fixtures.lane_bindings import lane_fields
 from tests.support.deep_agents import (
     cognitive_schemas,
     exact,
@@ -25,6 +24,7 @@ from tests.support.deep_agents import (
     skill_reading_model,
     unit_bound,
 )
+from tests.support.lane_bindings import lane_fields
 from tests.support.models import ScriptedChatModel
 from tests.support.operations import operation_request
 

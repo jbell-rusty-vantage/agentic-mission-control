@@ -36,7 +36,7 @@ from mission_control.interfaces.mcp.catalog_tools import (
     register_catalog_tools,
 )
 from mission_control.interfaces.mcp.coordinator_server import CoordinatorPrincipal, _principal_call
-from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog
+from tests.support.manifests.seeded_catalog import fast_track_catalog
 
 SCOPE = "mc/00000000-0000-4000-8000-000000000001/biotech/00000000-0000-4000-8000-000000000002"
 AT = datetime(2026, 11, 16, 12, tzinfo=UTC)

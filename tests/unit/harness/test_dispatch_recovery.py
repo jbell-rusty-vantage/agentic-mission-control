@@ -1,7 +1,7 @@
 """MP-06 (OVE-69): fenced session ownership, the native dispatch journal and interventions.
 
 In-memory stores with the production transition rules (`dispatch.py`) and scripted fake
-lanes (`tests/fixtures/lane_turns.py`, labelled fixtures). The PostgreSQL store and the
+lanes (`tests/support/lanes.py`, labelled fixtures). The PostgreSQL store and the
 real-Temporal crash/race scenarios are in `tests/integration/{postgres,temporal}`.
 """
 
@@ -47,7 +47,8 @@ from mission_control.domain.execution.lane_turns import (
 from mission_control.domain.execution.lanes import TurnHandle
 from mission_control.domain.policies.mailbox import MailboxState
 from mission_control.domain.policies.stop_fence import EffectAdmission, StopFence
-from tests.fixtures.lane_turns import (
+from tests.support.clock import Clock
+from tests.support.lanes import (
     LaneStack,
     LossyReceiptLane,
     NeverAcceptedLane,
@@ -58,7 +59,6 @@ from tests.fixtures.lane_turns import (
     lane_stack,
     scripted_frames,
 )
-from tests.support.clock import Clock
 from tests.support.unit.harness.mp06_dispatch_recovery import BOUNDS, turn_request
 
 T0 = datetime(2026, 10, 8, 12, 0, tzinfo=UTC)
@@ -467,7 +467,7 @@ class _SteeringLane(ScriptedSessionLane):
 async def test_a_steer_lands_on_the_exact_turn_or_is_requeued_as_stale_target(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Any, stale: bool
 ) -> None:
-    from tests.fixtures.cursor_controls import FAST, admitted_unit, compose_control_stack
+    from tests.support.cursor_lane_controls import FAST, admitted_unit, compose_control_stack
 
     monkeypatch.setitem(
         LANE_COMMAND_SEMANTICS["interrupt_and_inject"], "cursor_local", "cooperative_inject"

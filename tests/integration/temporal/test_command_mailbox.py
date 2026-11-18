@@ -48,7 +48,8 @@ from mission_control.contracts.contracts import MissionCommandRequest
 from mission_control.domain.context.packet import ContextSourceKind
 from mission_control.domain.policies.contracts import ActorContext, RunOutcome
 from mission_control.domain.policies.mailbox import MailboxState
-from tests.fixtures.goal_directed_journaled import (
+from tests.support.journal import MemoryOperationJournal
+from tests.support.journaled_goal_loop import (
     SCOPE,
     admit_goal_run,
     compose_goal_directed,
@@ -57,7 +58,6 @@ from tests.fixtures.goal_directed_journaled import (
     goal_run_control,
     goal_run_input,
 )
-from tests.support.journal import MemoryOperationJournal
 from tests.support.knowledge.stores import InMemoryStaging
 from tests.support.run_control import actor as control_actor
 from tests.support.unit.operations.ft_b2_stage_handoff import FakeArtifacts, FakeSelections

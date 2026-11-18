@@ -47,8 +47,8 @@ from mission_control.domain.execution.contracts import (
 from mission_control.domain.policies.contracts import ActorContext
 from mission_control.interfaces.http.artifacts import DIGEST_HEADER, router
 from mission_control.interfaces.http.mission_control import MissionPrincipal, get_mission_principal
-from tests.fixtures.provider_frames import FIXTURE_RUN
 from tests.support.ids import INSTALLATION, SCOPE, TENANT
+from tests.support.provider_frames import FIXTURE_RUN
 
 RUN = str(FIXTURE_RUN)
 READ = frozenset({"workflow_run.read"})

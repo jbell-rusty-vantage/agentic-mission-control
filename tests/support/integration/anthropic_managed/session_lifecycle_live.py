@@ -34,8 +34,8 @@ from mission_control.domain.execution.contracts import (
     OperationWorkflowRequest,
 )
 from mission_control.domain.execution.lanes import LaneSegmentBounds
-from tests.fixtures.lane_turns import lane_stack
 from tests.support.deep_agents_runtime import ConformanceRuntime
+from tests.support.lanes import lane_stack
 from tests.support.providers.managed_agents import LANE_QUEUE, PROFILE
 
 BOUNDS: Final = LaneSegmentBounds(

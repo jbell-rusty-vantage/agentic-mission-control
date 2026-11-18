@@ -32,7 +32,7 @@ from mission_control.domain.authoring.environment_kits import (
 )
 from mission_control.domain.capabilities.host_support import LaneProfile
 from mission_control.domain.execution.bindings import EnvironmentBinding
-from tests.fixtures.environment_kits import (
+from tests.support.environment_kits import (
     BASH,
     StaticDefinitions,
     kit_document,

@@ -31,8 +31,8 @@ from mission_control.interfaces.socketio.commands import (
     receipt_stage,
 )
 from mission_control.interfaces.socketio.server import MissionNamespace
-from tests.fixtures.provider_frames import FIXTURE_HARNESS
 from tests.support.boundary_commands import TARGET, delivered, pause, started
+from tests.support.provider_frames import FIXTURE_HARNESS
 from tests.support.run_control import command, service
 from tests.support.unit.frames.lineage_stream import claude_frames
 from tests.support.unit.socketio.mission_socket import FixtureResolver, Lifecycle, auth, build

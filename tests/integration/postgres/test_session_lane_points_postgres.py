@@ -36,8 +36,8 @@ from mission_control.domain.execution.cognition_points import (
     WorkspaceSnapshotPoint,
 )
 from mission_control.domain.frames.contracts import FrameObservation, LaneProfile
-from tests.fixtures.checkpoint_lineage import LINEAGE_NOW, activity_attempt, namespace_claim
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.checkpoint_lineage import LINEAGE_NOW, activity_attempt, namespace_claim
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import admit_unit_attempt
 
 pytestmark = pytest.mark.common_db

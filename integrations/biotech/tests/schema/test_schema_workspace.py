@@ -4,8 +4,8 @@ import json
 from pathlib import Path
 
 import pytest
-from tests.fixtures.sibling_checkouts import authoritative_schema_path
 from tests.schema_context_helpers import SDL
+from tests.support.sibling_checkouts import authoritative_schema_path
 
 from biotech_mission_adapters.application.schema.schema_catalog import parse_schema_catalog
 from biotech_mission_adapters.application.schema.schema_workspace import (

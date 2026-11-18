@@ -1,7 +1,7 @@
 """The one set of test ids: installations, tenants and canonical scopes.
 
 A canonical scope is ``mc/{installation}/{application}/{tenant}``. The disposable common
-database (``tests.fixtures.mission_control_common_db``) seeds exactly these installations
+database (``tests.support.db``) seeds exactly these installations
 and tenants, so fixtures built from these ids join the database rows they meet.
 
 ``SCOPE``/``INSTALLATION``/``TENANT`` are the default ids for tests that need one scope

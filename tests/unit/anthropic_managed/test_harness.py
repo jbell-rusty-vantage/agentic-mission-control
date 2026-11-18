@@ -39,7 +39,7 @@ from mission_control.domain.execution.lanes import (
     TurnHandle,
     UsageRequest,
 )
-from tests.fixtures.lane_turns import LaneStack, RecordingSignals, lane_stack
+from tests.support.lanes import LaneStack, RecordingSignals, lane_stack
 from tests.support.providers.managed_agents import (
     MAX_LIST_COST,
     MODEL_USAGE,

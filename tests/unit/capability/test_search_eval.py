@@ -9,7 +9,7 @@ import pytest
 from mission_control.application.capabilities.capability_search import CapabilitySearchService
 from mission_control.domain.authoring.contracts import DefinitionKind
 from mission_control.domain.coordinator.contracts import CapabilitySearchRequest
-from tests.fixtures.capability_search_catalog import (
+from tests.support.capability_search import (
     DIMENSIONS,
     MODEL_ID,
     DeterministicEmbeddings,

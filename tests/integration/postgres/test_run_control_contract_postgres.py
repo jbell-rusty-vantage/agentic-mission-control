@@ -12,8 +12,8 @@ import pytest
 from mission_control.adapters.postgres.run_control.run_control_repository import (
     PostgresRunControlRepository,
 )
-from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.support.contracts.run_control import SCENARIOS, RunControlSubject, Scenario
+from tests.support.db import CommonDatabase
 
 pytestmark = pytest.mark.common_db
 

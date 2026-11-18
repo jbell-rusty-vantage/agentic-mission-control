@@ -46,7 +46,7 @@ from mission_control.domain.context.contributions import (
 )
 from mission_control.domain.context.transfer import INDEX_PATH
 from mission_control.domain.outputs.contracts import OutputForm
-from tests.fixtures.hook_contributions import (
+from tests.support.hook_contributions import (
     Crash,
     InMemoryInstallStore,
     MemoryWorkspace,

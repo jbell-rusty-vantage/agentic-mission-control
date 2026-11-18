@@ -37,7 +37,7 @@ from mission_control.domain.coordinator.search_document import (
     render_search_document,
     search_document_source,
 )
-from tests.fixtures.environment_kits import (
+from tests.support.environment_kits import (
     StaticDefinitions,
     kit_document,
     kit_files,

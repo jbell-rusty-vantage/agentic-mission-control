@@ -51,7 +51,7 @@ from mission_control.domain.policies.contracts import (
     ReceiptState,
 )
 from mission_control.domain.policies.mailbox import MailboxState
-from tests.fixtures.checkpoint_recovery import (
+from tests.support.checkpoint_recovery import (
     RecoveryHarness,
     recovery_harness,
     recovery_model,

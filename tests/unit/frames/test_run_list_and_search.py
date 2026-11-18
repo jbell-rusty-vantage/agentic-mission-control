@@ -43,10 +43,10 @@ from mission_control.interfaces.mcp.transcript_tools import (
     ScopedTranscripts,
     register_transcript_tools,
 )
-from tests.fixtures.transcripts import RUN_KEY
 from tests.support.boundary_commands import TARGET, started
 from tests.support.ids import INSTALLATION, SCOPE, TENANT
 from tests.support.run_control import service as run_control_service
+from tests.support.transcripts import RUN_KEY
 from tests.support.unit.frames.run_list_and_search import MemoryDocuments
 from tests.support.unit.frames.transcript_interfaces import transcript_service
 

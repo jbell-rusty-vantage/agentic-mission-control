@@ -19,8 +19,8 @@ from mission_control.domain.programs.goal_directed_runtime import (
     GoalNamedExecutorObservation,
     GoalVerifierObservation,
 )
-from tests.fixtures.rrm009_production_stack import Cognition, call_usage
 from tests.support.cognition.stagegraph import tool_document
+from tests.support.production_stack import Cognition, call_usage
 
 
 def goal_context(content: str) -> tuple[str, int] | None:

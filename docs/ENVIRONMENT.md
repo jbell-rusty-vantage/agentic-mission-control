@@ -50,7 +50,7 @@ For `P` in `AIENG`, `BIOTECH` (`LOCAL` has only the five DSNs and the port):
 - `.env` / `.env.example`: development values; the example holds the names with empty values (and the fake local Docker defaults).
 - `agent_server/runtime.env`: `${VAR}` placeholders for the three planes' `MC_*_DB_RUNTIME_DSN`; values come from the Agent Server's process environment. The Agent Server does not receive a plane URL in the generated environment, so its Supabase JWT auth stays off.
 - `deployments/cloud_runtime` and `deployments/worker-aws`: the secret names are `MC_<PLANE>_DB_RUNTIME_DSN`, `_FAMILY_WRITER_DSN`, `_CHECKPOINT_DSN` (the plan validator derives the checkpoint name from the runtime name).
-- Tests build `Settings` from explicit values (`tests/fixtures/isolated_settings.py`); `tests/fixtures/db_env.py` gives a fixture the plane-qualified name for an application.
+- Tests build `Settings` from explicit values (`tests/support/settings.py`); `tests/support/db_env.py` gives a fixture the plane-qualified name for an application.
 
 ## GitHub
 

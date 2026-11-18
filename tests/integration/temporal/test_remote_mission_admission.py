@@ -52,11 +52,8 @@ from mission_control.contracts.identities import parse_request_scope
 from mission_control.domain.authoring.extensions import ExtensionRegistry
 from mission_control.domain.authoring.manifest import canonical_manifest_bytes, load_manifest_yaml
 from mission_control.interfaces.http.ingress import create_ingress_app
-from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog, publish_output_schemas
-from tests.fixtures.db_env import db_env_name
-from tests.fixtures.manifest_runtime import AUTHOR, ChainScript, chain_components
-from tests.fixtures.mission_control_common_db import ingress_login
-from tests.fixtures.rrm009_production_stack import technical_binding
+from tests.support.db import ingress_login
+from tests.support.db_env import db_env_name
 from tests.support.ids import SCOPE, catalog_scope
 from tests.support.integration.postgres.signal_ingress_postgres import FakeOidc, FakeUploads
 from tests.support.manifest_runtime import (
@@ -67,6 +64,9 @@ from tests.support.manifest_runtime import (
     root_executions,
     write_bindings,
 )
+from tests.support.manifests.lifecycle import AUTHOR, ChainScript, chain_components
+from tests.support.manifests.seeded_catalog import fast_track_catalog, publish_output_schemas
+from tests.support.production_stack import technical_binding
 from tests.support.stack import open_stack
 from tests.unit.authoring.manifest_launch_fixture import deep_agents_chain
 

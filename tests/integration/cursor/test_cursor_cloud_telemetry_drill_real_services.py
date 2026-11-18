@@ -37,7 +37,7 @@ from mission_control.application.agentic_components.telemetry import SIGNAL_SCRI
 from mission_control.application.secrets.minting import CredentialBinding, CredentialMinter
 from mission_control.application.signals.service import IngressKeys, SignalIngressService
 from mission_control.interfaces.http.ingress import create_ingress_app
-from tests.fixtures.mission_control_common_db import CommonDatabase, ingress_login
+from tests.support.db import CommonDatabase, ingress_login
 from tests.support.integration.cursor.mp09_cloud_segment_loop_real_services import (
     _client,
     _run,

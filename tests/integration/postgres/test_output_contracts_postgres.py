@@ -40,7 +40,7 @@ from mission_control.domain.outputs.successors import (
     ContractRevisionProposal,
     RegisteredCandidate,
 )
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import owner_rows
 from tests.support.integration.postgres.output_contracts_postgres import access_for
 from tests.unit.outputs.scenario import (

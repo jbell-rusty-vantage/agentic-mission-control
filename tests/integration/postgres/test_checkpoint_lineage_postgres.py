@@ -18,7 +18,7 @@ from mission_control.adapters.postgres.operations.checkpoint_lineage import (
 )
 from mission_control.adapters.postgres.scope import apply_scope
 from mission_control.domain.execution.checkpoint_lineage import CheckpointNamespaceBusy
-from tests.fixtures.checkpoint_lineage import (
+from tests.support.checkpoint_lineage import (
     LINEAGE_NOW,
     activity_attempt,
     assert_checkpoint_lineage_repository_contract,
@@ -26,7 +26,7 @@ from tests.fixtures.checkpoint_lineage import (
     goal_unit,
     namespace_claim,
 )
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import owner_rows
 from tests.support.integration.postgres.checkpoint_lineage_postgres import RUNTIME_ROLE, admit_run
 

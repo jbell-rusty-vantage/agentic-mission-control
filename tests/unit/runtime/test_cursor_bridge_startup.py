@@ -7,7 +7,7 @@ import pytest
 from pydantic import ValidationError
 
 from mission_control.bootstrap import cursor_bridges
-from tests.fixtures.isolated_settings import isolated_settings
+from tests.support.settings import isolated_settings
 
 PREFIX = "mc/00000000-0000-0000-0000-000000000001/ai-engineer"
 SCOPE = PREFIX + "/00000000-0000-0000-0000-000000000002"

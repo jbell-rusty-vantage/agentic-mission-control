@@ -35,7 +35,7 @@ from mission_control.application.agentic_components.telemetry import (
 )
 from mission_control.bootstrap.host_projection import HOST_PROJECTORS
 from mission_control.domain.capabilities.host_support import LaneProfile
-from tests.fixtures.projections.rows import INSTRUCTION, fixture_rows
+from tests.support.projection_rows import INSTRUCTION, fixture_rows
 
 TOKEN = "mct_" + "s" * 43
 STATE = Path(".mission/state/signals")

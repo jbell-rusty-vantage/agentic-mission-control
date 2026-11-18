@@ -1,6 +1,6 @@
 """Disposable common-database fixtures, registered as a pytest plugin in tests/conftest.py.
 
-Each test gets a fresh disposable database from ``tests.fixtures.mission_control_common_db``
+Each test gets a fresh disposable database from ``tests.support.db``
 with restricted LOGIN roles (real grants, forced RLS) and canonical scopes. ``catalog_db``
 also holds a *disabled* ``ai-engineer`` installation row, so cross-application denial is
 proven by row-level security; its runtime pool is ``catalog_runtime_pool``.
@@ -13,7 +13,7 @@ from collections.abc import AsyncIterator
 import asyncpg
 import pytest_asyncio
 
-from tests.fixtures.mission_control_common_db import (
+from tests.support.db import (
     CommonDatabase,
     create_common_database,
     drop_common_database,

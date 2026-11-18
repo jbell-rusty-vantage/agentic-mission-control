@@ -49,11 +49,11 @@ from mission_control.domain.context.snapshot_evidence import CONVERSATION_MEDIA_
 from mission_control.domain.policies.contracts import StartAction
 from mission_control.domain.policies.forks import RunSnapshotManifest
 from mission_control.domain.policies.mailbox import MailboxState
-from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.fixtures.run_forks import stage_policy, technical_snapshot
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import owner_rows, scoped_command, scoped_request
 from tests.support.run_control import WORKFLOW_DIGEST, actor
 from tests.support.run_control import service as run_control_service
+from tests.support.run_forks import stage_policy, technical_snapshot
 from tests.support.unit.context.fork_conversation_custody import custody
 
 pytestmark = pytest.mark.common_db

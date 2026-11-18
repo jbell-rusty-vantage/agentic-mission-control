@@ -17,7 +17,7 @@ from mission_control.domain.execution.lanes import (
     StartRequest,
     TurnHandle,
 )
-from tests.fixtures.lane_turns import RecordingSignals
+from tests.support.lanes import RecordingSignals
 from tests.support.providers.codex import CodexStack
 
 

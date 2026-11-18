@@ -40,9 +40,9 @@ from mission_control.domain.execution.invocation_settlement import (
     WaitReason,
 )
 from mission_control.domain.policies.errors import IdempotencyConflict
-from tests.fixtures.checkpoint_recovery import recovery_harness, stage_recovery_unit
-from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.fixtures.saved_settlement import DurableEffectDouble
+from tests.support.checkpoint_recovery import recovery_harness, stage_recovery_unit
+from tests.support.db import CommonDatabase
+from tests.support.saved_settlement import DurableEffectDouble
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.common_db]
 

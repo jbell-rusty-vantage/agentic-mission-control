@@ -1,7 +1,7 @@
 """RRM-015: every contract digest is independent of set iteration order.
 
 Each test builds two equal contracts whose sets iterate in different orders (shared helper
-`tests/fixtures/set_order.py`) and asserts that the digest computed by the production site is
+`tests/support/set_order.py`) and asserts that the digest computed by the production site is
 equal. `assert_json_dumps_differ` proves the probe is effective: the JSON-mode dumps differ,
 which is exactly what made the old `sha256_digest(x.model_dump(mode="json"))` seed-dependent.
 """
@@ -24,7 +24,7 @@ from mission_control.domain.graph_runtime.definitions import (
     MCPServerDefinition,
     StageCapabilityRequirement,
 )
-from tests.fixtures.set_order import (
+from tests.support.set_order import (
     assert_json_dumps_differ,
     equal_sets_with_different_iteration_order,
     with_different_set_orders,
@@ -644,7 +644,7 @@ async def test_journal_replay_proofs_accept_reordered_sets_and_reject_changed_fi
         PostgresAtomicOperationJournalRepository,
     )
     from mission_control.domain.policies.errors import IdempotencyConflict
-    from tests.fixtures.set_order import json_with_reversed_sets
+    from tests.support.set_order import json_with_reversed_sets
 
     run, budget, transition, result, event = await _run_control_replay_material()
     reordered_transition = json_with_reversed_sets(transition)

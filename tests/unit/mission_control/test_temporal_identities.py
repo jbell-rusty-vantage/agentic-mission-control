@@ -8,7 +8,7 @@ from temporalio.api.common.v1 import Payloads, WorkflowType
 from temporalio.api.history.v1 import HistoryEvent, WorkflowExecutionStartedEventAttributes
 from temporalio.converter import DataConverter
 from temporalio.exceptions import ApplicationError
-from tests.fixtures.rrm009_production_stack import goal_blueprint, goal_revision
+from tests.support.production_stack import goal_blueprint, goal_revision
 from tests.support.run_control import actor, request, service
 
 from mission_control.adapters.temporal.linked_run_workflow import linked_root_input

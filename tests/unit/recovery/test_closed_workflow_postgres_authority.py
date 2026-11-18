@@ -8,7 +8,7 @@ from unittest.mock import AsyncMock
 from uuid import uuid4
 
 import pytest
-from tests.fixtures.checkpoint_recovery import stage_recovery_unit
+from tests.support.checkpoint_recovery import stage_recovery_unit
 from tests.support.providers.claude import claude_operation
 from tests.support.run_control import NOW
 from tests.support.unit.recovery.closed_workflow import setup_recovery

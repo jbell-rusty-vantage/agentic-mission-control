@@ -6,8 +6,8 @@ Moved from tests/integration/postgres/test_trusted_judgment_postgres.py.
 from __future__ import annotations
 
 from mission_control.application.knowledge.access import InvocationAccess
-from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.support.clock import Clock
+from tests.support.db import CommonDatabase
 from tests.support.knowledge.credentials import KNOWLEDGE_NOW
 from tests.support.knowledge.gateway import origin
 

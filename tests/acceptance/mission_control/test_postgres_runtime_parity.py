@@ -17,18 +17,18 @@ from typing import cast
 import asyncpg
 import pytest
 from temporalio.worker import Replayer
-from tests.fixtures.mission_control_common_db import legacy_poison_intact
-from tests.fixtures.rrm009_production_stack import (
+from tests.support.acceptance.mission_control.postgres_runtime_parity import (
+    goal_directed_two_iterations_scenario,
+    run_authority_digest,
+)
+from tests.support.db import legacy_poison_intact
+from tests.support.ids import SCOPE
+from tests.support.production_stack import (
     AGENT_COGNITIVE_QUEUE,
     publish_technical_catalog,
     stage_input,
     stage_templates,
 )
-from tests.support.acceptance.mission_control.postgres_runtime_parity import (
-    goal_directed_two_iterations_scenario,
-    run_authority_digest,
-)
-from tests.support.ids import SCOPE
 from tests.support.stack import (
     STAGE_OBJECTIVE,
     ProductionStack,

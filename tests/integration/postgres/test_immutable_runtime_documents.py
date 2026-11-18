@@ -32,12 +32,12 @@ from mission_control.application.execution.operations.operation_execution import
 from mission_control.contracts.identities import parse_request_scope
 from mission_control.domain.execution.contracts import OperationSettlement
 from mission_control.domain.policies.errors import IdempotencyConflict
-from tests.fixtures.goal_directed_journaled import goal_revision
-from tests.fixtures.mission_control_common_db import (
+from tests.support.db import (
     CommonDatabase,
     create_common_database,
     drop_common_database,
 )
+from tests.support.journaled_goal_loop import goal_revision
 from tests.support.operations import operation_request
 
 pytestmark = pytest.mark.common_db

@@ -5,7 +5,7 @@ Moved from tests/unit/prerequisites/test_hosted_readonly.py.
 
 from mission_control.application.prerequisites.probes import OwnerProbeBinding
 from mission_control.domain.execution.bindings import ProviderExecutionBinding
-from tests.fixtures.lane_bindings import lane_fields
+from tests.support.lane_bindings import lane_fields
 from tests.support.unit.prerequisites.owner_bootstrap import probe_template
 
 

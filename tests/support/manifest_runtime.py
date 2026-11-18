@@ -41,11 +41,11 @@ from mission_control.domain.authoring.extensions import ExtensionRegistry
 from mission_control.domain.authoring.manifest import canonical_manifest_bytes, load_manifest_yaml
 from mission_control.interfaces.http.mission_control import MissionPrincipal, get_mission_principal
 from mission_control.interfaces.http.missions import router as missions_router
-from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog
-from tests.fixtures.manifest_runtime import AUTHOR, ChainScript
-from tests.fixtures.rrm009_production_stack import AGENT_COGNITIVE_QUEUE, TechnicalBinding
 from tests.support.ids import INSTALLATIONS, SCOPE
+from tests.support.manifests.lifecycle import AUTHOR, ChainScript
+from tests.support.manifests.seeded_catalog import fast_track_catalog
 from tests.support.model_catalog import model_binding
+from tests.support.production_stack import AGENT_COGNITIVE_QUEUE, TechnicalBinding
 from tests.support.stack import ProductionStack, hermetic_pins
 from tests.unit.authoring.manifest_launch_fixture import (
     deep_agents_chain,

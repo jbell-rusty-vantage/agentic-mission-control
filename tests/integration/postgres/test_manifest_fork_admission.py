@@ -17,18 +17,16 @@ from mission_control.application.authoring.manifest_fork_admission import (
 from mission_control.application.recovery.run_forks import ForkCommand, compile_fork_admission
 from mission_control.domain.policies.contracts import DecisionStatus
 from mission_control.domain.policies.forks import RunSnapshotManifest, snapshot_id_for
-from tests.fixtures.run_forks import technical_snapshot
 from tests.support.integration.postgres.manifest_submit import MINIMAL, OWNER, Stack
 from tests.support.integration.postgres.manifest_submit import request as submit_request
 from tests.support.integration.postgres.manifest_submit import stack as stack
+from tests.support.run_forks import technical_snapshot
 
 pytestmark = pytest.mark.common_db
 
 
-@pytest.mark.parametrize("variant", ["minimal", "qualia_shared"])
-async def test_submitted_configuration_forks_through_real_admission_contract(
-    stack: Stack, tmp_path, variant
-):
+@pytest.mark.parametrize("variant", ["minimal", "two_variant_shared_type"])
+async def test_submitted_configuration_forks_through_real_admission_contract(stack: Stack, variant):
     manifest = MINIMAL.read_text(encoding="utf-8")
     source_manifest = manifest
     if variant == "minimal":
@@ -43,6 +41,7 @@ async def test_submitted_configuration_forks_through_real_admission_contract(
         from mission_control.adapters.postgres.run_control.run_control_repository import (
             PostgresRunControlRepository,
         )
+        from mission_control.adapters.storage.control_plane_payloads import InMemoryPayloadStore
         from mission_control.application.authoring.manifest_service import ManifestCompileService
         from mission_control.application.authoring.manifest_submit import (
             ManifestSubmitService,
@@ -54,14 +53,20 @@ async def test_submitted_configuration_forks_through_real_admission_contract(
             F1RunConfigurationVerifier,
             RunControlService,
         )
-        from tests.fixtures.qualia_fork_contract import QualiaForkPrograms
+        from mission_control.domain.authoring.extensions import ExtensionRegistry
         from tests.support.ids import catalog_scope
-        from tests.support.unit.qualia_fork_contract import fixture
+        from tests.support.manifests.seeded_catalog import fast_track_catalog
+        from tests.support.manifests.two_variant_fork import (
+            TwoVariantForkPrograms,
+            two_variant_manifests,
+        )
 
-        definitions, payloads, extensions, _, _, texts = await fixture(tmp_path)
+        definitions, search = await fast_track_catalog()
+        payloads, extensions = InMemoryPayloadStore(), ExtensionRegistry()
+        texts = two_variant_manifests()
         catalog = PostgresDefinitionRepository(stack.pool, catalog_scope=catalog_scope("biotech"))
-        programs = QualiaForkPrograms(catalog, extensions, payloads)
-        compiler = ManifestCompileService(definitions=definitions, search=None, programs=programs)
+        programs = TwoVariantForkPrograms(catalog, extensions, payloads)
+        compiler = ManifestCompileService(definitions=definitions, search=search, programs=programs)
         await programs.prepare(
             compiler,
             texts,

@@ -46,7 +46,7 @@ from mission_control.domain.execution.data_class import (
     DEFAULT_DATA_CLASS_POLICY,
     application_policy,
 )
-from tests.fixtures.isolated_settings import isolated_settings
+from tests.support.settings import isolated_settings
 
 ROOT = Path(__file__).resolve().parents[3]
 DEPLOYMENTS = ROOT / "deployments"

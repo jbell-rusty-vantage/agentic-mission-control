@@ -1,6 +1,6 @@
 """FT-A3 on a disposable common database: migration 0026, lexical fallback and hybrid recall.
 
-Vectors come from tests.fixtures.capability_search_catalog.DeterministicEmbeddings, an
+Vectors come from tests.support.capability_search.DeterministicEmbeddings, an
 offline hashed bag-of-words embedder (no provider is called). They prove storage, nullable
 embedding handling, fusion and recall mechanics, not the quality of a production model.
 """
@@ -35,14 +35,14 @@ from mission_control.application.capabilities.catalog_projection_generation impo
 from mission_control.domain.authoring.contracts import DefinitionKind
 from mission_control.domain.coordinator.contracts import CapabilitySearchRequest
 from mission_control_db_contract.seeds import _apply_record, load_bundles, order_bundles
-from tests.fixtures.capability_search_catalog import (
+from tests.support.capability_search import (
     DIMENSIONS,
     MODEL_ID,
     SEEDS,
     DeterministicEmbeddings,
     evaluation_cases,
 )
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import BIOTECH_CATALOG
 
 pytestmark = pytest.mark.common_db

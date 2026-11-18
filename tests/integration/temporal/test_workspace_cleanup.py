@@ -36,8 +36,8 @@ from mission_control.domain.execution.contracts import (
     OperationWorkflowRequest,
 )
 from mission_control.domain.execution.lanes import LaneSegmentBounds
-from tests.fixtures.lane_turns import lane_stack
-from tests.fixtures.local_lane_workspaces import WITHIN_RUN, LaneDriver
+from tests.support.lanes import lane_stack
+from tests.support.local_lane_workspaces import WITHIN_RUN, LaneDriver
 from tests.support.providers.cursor import LocalStack, local_stack
 from tests.support.temporal import completed_activity_results, patch_ids
 

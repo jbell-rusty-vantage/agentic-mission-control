@@ -23,7 +23,7 @@ the common database with the tenant context set as `_insert_tenants` sets it),
 `transcript_entries(stack, run_id, full=)` and `harness_executions(stack, run_id)`.
 
 WP-TR-2 (FX-TR-STEP, FX-TR-SUB, FX-TR-HOOK) fixture pieces: the exact MCP server is the
-fixture-owned `tests/fixtures/rrm009_mcp_server.py` (a >12 KiB `lookup_binding_marker`
+fixture-owned `tests/support/large_result_mcp_server.py` (a >12 KiB `lookup_binding_marker`
 result), the tracing family's stage operations carry the catalog hook `rrm009.annotate`
 once `DeploymentCapabilityComponents` can register its bundle, and
 `tests.support.stack.close_saver` closes the API's pinned saver for the "saver closed" reads.
@@ -52,7 +52,7 @@ from urllib.parse import quote
 from uuid import uuid4
 
 import pytest
-from tests.fixtures import rrm009_production_stack as technical
+from tests.support import production_stack as technical
 from tests.support.acceptance.mission_control.cognition_points import (
     BASE,
     all_points,

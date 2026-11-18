@@ -10,10 +10,10 @@ import pytest
 from mission_control.adapters.postgres.frames.repository import PostgresFrameRepository
 from mission_control.application.frames.writer import FrameWriter
 from mission_control.domain.frames.contracts import FrameKind, LaneProfile
-from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.fixtures.provider_frames import FRAME_NOW, observation
 from tests.support.clock import SECOND, Clock
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import admit_unit_attempt, owner_rows
+from tests.support.provider_frames import FRAME_NOW, observation
 
 pytestmark = pytest.mark.common_db
 

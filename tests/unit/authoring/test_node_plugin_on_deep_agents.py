@@ -55,9 +55,9 @@ from mission_control.domain.execution.contracts import (
     DeepAgentMCPToolComponent,
     DeepAgentSkillComponent,
 )
-from tests.fixtures.catalog.fast_track_catalog import NOW, fast_track_catalog
 from tests.support.ids import canonical_scope
 from tests.support.manifests.launch_inputs import resolver
+from tests.support.manifests.seeded_catalog import NOW, fast_track_catalog
 from tests.unit.authoring.manifest_launch_fixture import fixture_bindings, fixture_served
 
 ROOT = Path(__file__).resolve().parents[3]

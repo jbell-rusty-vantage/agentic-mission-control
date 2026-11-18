@@ -51,7 +51,6 @@ from mission_control.application.frames.sink import InMemoryFrameStore
 from mission_control.bootstrap.host_projection import HOST_PROJECTORS
 from mission_control.domain.execution.contracts import OperationExecutionResult
 from mission_control.domain.execution.lane_turns import LaneTurnRequest
-from tests.fixtures.lane_turns import RecordingSignals, cursor_operation, lane_stack
 from tests.integration.cursor.live_drill import (
     DrillOutcome,
     RecordingLauncher,
@@ -63,6 +62,7 @@ from tests.integration.cursor.live_drill import (
     write_record,
 )
 from tests.support.artifacts import MemoryArtifacts
+from tests.support.lanes import RecordingSignals, cursor_operation, lane_stack
 from tests.support.providers.cursor import make_repository, pinned_binding, projection_rows
 
 PROFILE = os.environ.get("MC_LANE_QUALIFY_PROFILE", "cursor_local")

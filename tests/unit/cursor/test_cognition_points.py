@@ -22,7 +22,7 @@ from mission_control.domain.execution.cognition_points import (
     SessionCursorPoint,
     WorkspaceSnapshotPoint,
 )
-from tests.fixtures.lane_turns import (
+from tests.support.lanes import (
     cursor_operation,
 )
 from tests.support.providers.cursor import cloud_stack, local_stack

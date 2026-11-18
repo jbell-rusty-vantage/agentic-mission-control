@@ -9,7 +9,7 @@ import json
 from typing import Any
 from uuid import UUID, uuid4
 
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import owner_rows
 from tests.unit.socketio.harness import MissionClient
 

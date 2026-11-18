@@ -10,7 +10,7 @@ from typing import Any
 from mission_control.domain.execution.contracts import OperationExecutionRequest
 from mission_control.domain.execution.lane_turns import LaneTurnRequest
 from mission_control.domain.execution.lanes import LaneSegmentBounds
-from tests.fixtures.lane_turns import cursor_operation
+from tests.support.lanes import cursor_operation
 
 BOUNDS = LaneSegmentBounds(max_frames=50, heartbeat_timeout_s=3)
 

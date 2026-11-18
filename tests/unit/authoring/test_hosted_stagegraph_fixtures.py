@@ -50,7 +50,7 @@ from mission_control.bootstrap.resolution import compose_manifest_launch_resolve
 from mission_control.bootstrap.settings import Settings
 from mission_control.domain.authoring.manifest import load_manifest_yaml
 from mission_control.domain.execution.bindings import ProviderExecutionBinding
-from tests.fixtures.applications import installed_applications
+from tests.support.applications import installed_applications
 from tests.support.manifests.v2_launch import SCOPE, compile_yaml, edited, served
 from tests.support.model_catalog import bindings_catalog
 

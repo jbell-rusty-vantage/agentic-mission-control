@@ -38,7 +38,7 @@ from mission_control.application.execution.operations.operation_execution import
 )
 from mission_control.domain.execution.checkpoint_lineage import CheckpointClassification
 from mission_control.domain.policies.contracts import CommandStatus, ReconcileUnitAction
-from tests.fixtures.checkpoint_recovery import (
+from tests.support.checkpoint_recovery import (
     RecoveryHarness,
     recovery_harness,
     stage_recovery_unit,

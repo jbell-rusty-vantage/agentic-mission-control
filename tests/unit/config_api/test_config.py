@@ -2,7 +2,7 @@ import pytest
 from pydantic import SecretStr, ValidationError
 
 from mission_control.bootstrap.settings import Settings
-from tests.fixtures.isolated_settings import isolated_settings
+from tests.support.settings import isolated_settings
 
 
 def test_preemptive_settings_contract() -> None:

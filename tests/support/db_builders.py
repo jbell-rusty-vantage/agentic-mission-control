@@ -47,16 +47,16 @@ from mission_control.domain.policies.contracts import (
     StartAction,
 )
 from mission_control_db_contract.seeds import _apply_record
-from tests.fixtures.checkpoint_lineage import (
+from tests.support.checkpoint_lineage import (
     LINEAGE_NOW,
     activity_attempt,
     namespace_claim,
     stage_unit,
 )
-from tests.fixtures.lane_turns import LaneStack, cursor_binding, cursor_operation, lane_stack
-from tests.fixtures.mission_control_common_db import COMPONENT_VERSION, CommonDatabase
-from tests.fixtures.provider_frames import BINDING_DIGEST
+from tests.support.db import COMPONENT_VERSION, CommonDatabase
 from tests.support.ids import AI_ENGINEER_INSTALLATION_ID, catalog_scope
+from tests.support.lanes import LaneStack, cursor_binding, cursor_operation, lane_stack
+from tests.support.provider_frames import BINDING_DIGEST
 from tests.support.run_control import command as unit_command
 from tests.support.run_control import request as unit_request
 from tests.support.run_control import service as run_control_service

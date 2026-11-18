@@ -42,7 +42,7 @@ from mission_control.domain.programs.search_attributes import (
     lane_for_runtime,
     phase_for_disposition,
 )
-from tests.fixtures.isolated_settings import isolated_settings
+from tests.support.settings import isolated_settings
 
 KEY = "tmprl-cloud-key-never-printed"
 

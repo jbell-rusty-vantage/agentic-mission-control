@@ -3,7 +3,7 @@
 One client subscribes to the tracing run's `mission_events` and `provider_frames` right after
 launch (deltas included) and acknowledges as it reads; after the run completes and the pumps
 drain, `stream_proof` compares what it received with the projected transcript
-(`tests/fixtures/stream_capture.py::compare`): unit frames carry `unit_key` and their
+(`tests/support/stream_capture.py::compare`): unit frames carry `unit_key` and their
 `after_point_ref`, unit mission events carry `unit_key` and `point_ref`, each point's frames
 arrive in transcript order, and nothing is in one and not the other except listed deltas.
 
@@ -23,9 +23,6 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-from tests.fixtures.live_models import write_json
-from tests.fixtures.stage2_outputs import run_directory
-from tests.fixtures.stream_capture import StreamCapture, compare, mission_socket, problems
 from tests.support.acceptance.mission_control.cognition_points import (
     BASE,
     all_points,
@@ -33,7 +30,10 @@ from tests.support.acceptance.mission_control.cognition_points import (
     launch,
 )
 from tests.support.acceptance.mission_control.tracing import TRACING, transcript_entries
+from tests.support.live_models import write_json
 from tests.support.stack import ScopedStack, open_stack, until
+from tests.support.stream_capture import StreamCapture, compare, mission_socket, problems
+from tests.support.tracing_outputs import run_directory
 
 pytestmark = [pytest.mark.psycopg_selector, pytest.mark.common_db]
 

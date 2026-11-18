@@ -30,12 +30,12 @@ from mission_control.application.frames.writer import FrameWriter
 from mission_control.domain.frames.render import to_jsonl, to_markdown
 from mission_control.domain.frames.transcript import TranscriptQuery
 from mission_control.domain.policies.contracts import ActorContext
-from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.fixtures.provider_frames import FRAME_NOW, turn_observations
-from tests.fixtures.transcripts import normalize
 from tests.support.clock import SECOND, Clock
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import admit_unit_attempt
+from tests.support.provider_frames import FRAME_NOW, turn_observations
 from tests.support.run_control import ALL_PERMISSIONS, actor
+from tests.support.transcripts import normalize
 
 pytestmark = pytest.mark.common_db
 

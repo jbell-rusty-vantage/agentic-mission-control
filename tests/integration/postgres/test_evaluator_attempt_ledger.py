@@ -28,7 +28,7 @@ from mission_control.application.knowledge.judgment import (
     standing_wait,
 )
 from mission_control.application.ports.outputs import AssessmentSupersessionConflict
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.db import CommonDatabase
 from tests.support.integration.postgres.trusted_judgment_postgres import access_for
 from tests.support.trusted_knowledge import ScriptedRunner, world
 

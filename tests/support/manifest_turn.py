@@ -86,12 +86,12 @@ from mission_control.domain.programs.contracts import (
     StageGraphAdmissionActivityRequest,
 )
 from mission_control.domain.programs.interpreter import StageGraphInterpreter
-from tests.fixtures.applications import installed_applications
-from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog, publish_output_schemas
-from tests.fixtures.checkpoint_lineage import activity_attempt
-from tests.fixtures.lane_bindings import LANE_REBINDERS
+from tests.support.applications import installed_applications
+from tests.support.checkpoint_lineage import activity_attempt
 from tests.support.deep_agents import exact_fixture
+from tests.support.lane_bindings import LANE_REBINDERS
 from tests.support.manifests.launch_inputs import SCOPE, SECRETS, admitted
+from tests.support.manifests.seeded_catalog import fast_track_catalog, publish_output_schemas
 from tests.support.model_catalog import fixture_model_profile
 from tests.unit.authoring.manifest_launch_fixture import (
     fixture_bindings,

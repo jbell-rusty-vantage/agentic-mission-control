@@ -52,7 +52,7 @@ from mission_control.domain.graph_runtime.identities import (
     StageGraphUnitLocation,
 )
 from mission_control.domain.policies.contracts import ActorContext
-from tests.fixtures.checkpoint_lineage import (
+from tests.support.checkpoint_lineage import (
     BINDING,
     activity_attempt,
     namespace_claim,

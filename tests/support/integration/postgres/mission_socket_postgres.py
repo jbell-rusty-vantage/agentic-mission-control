@@ -30,7 +30,7 @@ from mission_control.bootstrap.api import ApplicationDeployment, MissionDeployme
 from mission_control.domain.policies.contracts import CommandStatus, RecordUsageAction
 from mission_control.interfaces.socketio.app import MissionSocketConfig, mount_mission_socketio
 from mission_control.interfaces.socketio.server import STREAM_SERVICES, MissionSocketLimits
-from tests.fixtures.mission_control_common_db import COMPONENT_VERSION, CommonDatabase
+from tests.support.db import COMPONENT_VERSION, CommonDatabase
 from tests.support.db_builders import AdmittedUnit, admit_unit_attempt, owner_rows, scoped_command
 from tests.support.run_control import ALL_PERMISSIONS
 from tests.unit.socketio.harness import serve

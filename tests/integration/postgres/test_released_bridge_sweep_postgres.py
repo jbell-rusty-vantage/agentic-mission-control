@@ -10,7 +10,7 @@ from mission_control.adapters.cursor.bridge_recovery import (
 )
 from mission_control.adapters.postgres.lanes.workspace_leases import PostgresWorkspaceLeaseStore
 from mission_control.application.workspaces.policy import slot_path
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.db import CommonDatabase
 from tests.unit.workspaces.lease_scenarios import NOW, claim
 
 pytestmark = pytest.mark.common_db

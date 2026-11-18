@@ -16,15 +16,15 @@ from mission_control.interfaces.http.control_plane import (
     get_control_plane_principal,
 )
 from mission_control.interfaces.http.run_forks import RunForkServices, get_run_fork_services
-from tests.fixtures.checkpoint_recovery import recovery_harness, stage_recovery_unit
-from tests.fixtures.run_forks import (
+from tests.support.checkpoint_recovery import recovery_harness, stage_recovery_unit
+from tests.support.run_control import WORKFLOW_DIGEST, command
+from tests.support.run_forks import (
     FakeForkSourceReader,
     compose_in_memory_forks,
     inspection_reads,
     stage_policy,
     stagegraph_head,
 )
-from tests.support.run_control import WORKFLOW_DIGEST, command
 
 SCOPE = "tenant-1"
 

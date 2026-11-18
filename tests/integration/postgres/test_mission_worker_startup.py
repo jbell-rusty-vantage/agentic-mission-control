@@ -36,12 +36,12 @@ from mission_control.bootstrap.api import (
 from mission_control.bootstrap.settings import get_settings
 from mission_control.bootstrap.worker import prepare_worker, run_worker, select_application
 from mission_control.domain.authoring.extensions import ExtensionRegistry
-from tests.fixtures.isolated_settings import isolated_settings
-from tests.fixtures.mission_control_common_db import (
+from tests.support.db import (
     COMPONENT_VERSION,
     common_database,
     provision_runtime,
 )
+from tests.support.settings import isolated_settings
 from tests.support.stack import start_local
 
 pytestmark = [pytest.mark.psycopg_selector, pytest.mark.common_db]

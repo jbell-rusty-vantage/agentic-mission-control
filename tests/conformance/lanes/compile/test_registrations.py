@@ -17,7 +17,7 @@ from mission_control.application.execution.harness.describe import DECLARED_LANE
 from mission_control.application.resolution.registries import DescribeOnlyLane, LaneRegistry
 from mission_control.bootstrap.resolution import compose_launch_resolution
 from tests.conformance.lanes.compile.registry import COMPILE_LANES
-from tests.fixtures.applications import installed_applications
+from tests.support.applications import installed_applications
 from tests.support.model_catalog import bindings_catalog
 from tests.unit.authoring.manifest_launch_fixture import fixture_bindings, fixture_served
 

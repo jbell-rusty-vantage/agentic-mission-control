@@ -6,7 +6,7 @@ import pytest
 
 from mission_control.application.agentic_components.placement import LaneProjectionError
 from mission_control.domain.capabilities.gates import SignalGatePolicy
-from tests.fixtures.cursor_controls import started_session
+from tests.support.cursor_lane_controls import started_session
 from tests.support.providers.cursor import cloud_stack
 
 

@@ -49,15 +49,15 @@ from mission_control.domain.policies.contracts import (
     BudgetEnvelope,
     StartAction,
 )
-from tests.fixtures.checkpoint_lineage import activity_attempt, namespace_claim, stage_unit
-from tests.fixtures.lane_turns import cursor_operation
-from tests.fixtures.mission_control_common_db import (
+from tests.support.checkpoint_lineage import activity_attempt, namespace_claim, stage_unit
+from tests.support.db import (
     CommonDatabase,
     create_common_database,
     drop_common_database,
 )
-from tests.fixtures.provider_frames import harness_start
 from tests.support.db_builders import scoped_command, scoped_request
+from tests.support.lanes import cursor_operation
+from tests.support.provider_frames import harness_start
 from tests.support.run_control import actor, service
 
 NOW = datetime(2026, 10, 14, tzinfo=UTC)

@@ -127,8 +127,8 @@ async def _service() -> tuple[ContextPackService, FakeChainSupplies]:
 
 
 def _template() -> Any:
-    from tests.fixtures.goal_directed_journaled import goal_templates
     from tests.support.deep_agents import exact_fixture
+    from tests.support.journaled_goal_loop import goal_templates
 
     binding, _profile, _bundle = exact_fixture()
     return goal_templates(binding)["verifier"]

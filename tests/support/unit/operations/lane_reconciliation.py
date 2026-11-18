@@ -21,14 +21,14 @@ from mission_control.domain.policies.contracts import (
     CommandStatus,
     ReconcileUnitAction,
 )
-from tests.fixtures.checkpoint_recovery import (
+from tests.support.checkpoint_recovery import (
     FixtureControlPlane,
     RecoveryHarness,
     recovery_harness,
     stage_recovery_unit,
 )
-from tests.fixtures.lane_bindings import lane_fields
-from tests.fixtures.lane_turns import ScriptedSessionLane
+from tests.support.lane_bindings import lane_fields
+from tests.support.lanes import ScriptedSessionLane
 from tests.support.providers.claude import claude_operation
 from tests.support.run_control import command, reconciler_command
 

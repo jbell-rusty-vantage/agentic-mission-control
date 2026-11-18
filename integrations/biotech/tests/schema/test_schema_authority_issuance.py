@@ -5,7 +5,7 @@ from typing import Self, cast
 
 import pytest
 from neo4j import READ_ACCESS, WRITE_ACCESS
-from tests.fixtures.sibling_checkouts import authoritative_schema_path
+from tests.support.sibling_checkouts import authoritative_schema_path
 
 from biotech_mission_adapters.adapters.infrastructure.neo4j_schema_deployment import (
     Neo4jLiveSchemaDeploymentReader,

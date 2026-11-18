@@ -69,7 +69,7 @@ from mission_control.interfaces.http.control_plane import (
     get_control_plane_principal,
 )
 from mission_control.interfaces.http.runtime_inspection import get_runtime_inspection_service
-from tests.fixtures.checkpoint_lineage import (
+from tests.support.checkpoint_lineage import (
     BINDING,
     CHECKPOINTER,
     LINEAGE_NOW,
@@ -81,7 +81,9 @@ from tests.fixtures.checkpoint_lineage import (
     transition,
     unit_result,
 )
-from tests.fixtures.runtime_inspection import (
+from tests.support.clock import Clock
+from tests.support.run_control import request, service
+from tests.support.runtime_inspection import (
     PROMPT_TEXT,
     READ_AT,
     SECRET_TEXT,
@@ -91,8 +93,6 @@ from tests.fixtures.runtime_inspection import (
     sensitive_state,
     stamps_for,
 )
-from tests.support.clock import Clock
-from tests.support.run_control import request, service
 
 # --- Fixture world -----------------------------------------------------------------------
 

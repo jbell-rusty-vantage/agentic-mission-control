@@ -62,12 +62,12 @@ from mission_control.domain.subscriptions.contracts import (
     SubscriptionRequest,
     SubscriptionState,
 )
-from tests.fixtures.mission_control_common_db import (
+from tests.support.clock import Clock
+from tests.support.db import (
     CommonDatabase,
     common_database,
     migration_paths_with,
 )
-from tests.support.clock import Clock
 from tests.support.integration.postgres.mp15_coordinator_inbox_postgres import (
     COORDINATOR,
     append_fixture_events,

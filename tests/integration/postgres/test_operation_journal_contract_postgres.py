@@ -15,12 +15,12 @@ from mission_control.adapters.postgres.operations.operation_journal import (
 from mission_control.adapters.postgres.run_control.run_control_repository import (
     PostgresRunControlRepository,
 )
-from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.support.contracts.operation_journal import (
     SCENARIOS,
     OperationJournalSubject,
     Scenario,
 )
+from tests.support.db import CommonDatabase
 
 pytestmark = pytest.mark.common_db
 

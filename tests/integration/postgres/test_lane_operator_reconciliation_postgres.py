@@ -56,13 +56,13 @@ from mission_control.domain.policies.contracts import (
     CommandStatus,
     ReconcileUnitAction,
 )
-from tests.fixtures.checkpoint_recovery import (
+from tests.support.checkpoint_recovery import (
     FixtureControlPlane,
     recovery_harness,
     stage_recovery_unit,
 )
-from tests.fixtures.lane_bindings import lane_fields
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.db import CommonDatabase
+from tests.support.lane_bindings import lane_fields
 from tests.support.providers.claude import claude_operation
 from tests.support.run_control import actor, command, reconciler_command
 from tests.support.run_control import service as run_control_service

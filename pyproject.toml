@@ -230,7 +230,7 @@ known-first-party = ["mission_control", "mission_control_db_contract", "biotech_
 "src/mission_control/adapters/deep_agents/materializer.py" = ["S107"]
 "integrations/biotech/src/biotech_mission_adapters/adapters/infrastructure/neo4j_schema_deployment.py" = ["S105"]
 # Long literal fixtures.
-"tests/fixtures/agent_server_block_c.py" = ["E501"]
+"tests/support/agent_server_drills.py" = ["E501"]
 "tests/unit/control_plane/test_digest_set_order_guard.py" = ["E501"]
 
 # ---------------------------------------------------------------------------

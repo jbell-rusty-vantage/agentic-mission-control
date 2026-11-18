@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from tests.fixtures.isolated_settings import isolated_settings
+from tests.support.settings import isolated_settings
 
 ROOT = Path(__file__).resolve().parents[3]
 PLAN = runpy.run_path(str(ROOT / "deployments/worker-aws/plan.py"))

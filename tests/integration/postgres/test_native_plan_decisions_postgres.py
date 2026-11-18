@@ -20,7 +20,7 @@ import pytest_asyncio
 
 from mission_control.adapters.postgres.knowledge.use_decisions import PostgresUseDecisionStore
 from mission_control.application.ports.knowledge import RecordedUseDecision
-from tests.fixtures.mission_control_common_db import (
+from tests.support.db import (
     CommonDatabase,
     common_database,
     migration_paths_with,

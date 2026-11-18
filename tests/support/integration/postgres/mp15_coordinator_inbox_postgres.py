@@ -29,8 +29,8 @@ from mission_control.application.subscriptions.coordinator_service import (
     CoordinatorSubscribeRequest,
 )
 from mission_control.domain.policies.contracts import ActorContext, DomainEventEnvelope, StartAction
-from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.support.boundary_commands import TARGET
+from tests.support.db import CommonDatabase
 from tests.support.run_control import actor, command, request, service
 
 

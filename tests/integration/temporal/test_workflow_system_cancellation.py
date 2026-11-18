@@ -83,17 +83,6 @@ from mission_control.domain.programs.goal_directed_runtime import (
     GoalOperationReconciliationRequest,
     GoalOperationReconciliationResult,
 )
-from tests.fixtures.goal_directed_journaled import (
-    SCOPE,
-    ExactLifecycleBinding,
-    GoalComposition,
-    admit_goal_run,
-    compose_goal_directed,
-    goal_blueprint,
-    goal_model,
-    goal_run_control,
-    goal_run_input,
-)
 from tests.support.integration.temporal.rrm_007_boundary_interventions import (
     GOAL_QUEUE,
     ROOT_WORKFLOWS,
@@ -120,6 +109,17 @@ from tests.support.integration.temporal.wp_bp_010_temporal import _run_input as 
 from tests.support.integration.temporal.wp_bp_020_temporal import _run_input as goal_input
 from tests.support.integration.temporal.wp_bp_020_temporal import fake_settlement
 from tests.support.journal import MemoryOperationJournal
+from tests.support.journaled_goal_loop import (
+    SCOPE,
+    ExactLifecycleBinding,
+    GoalComposition,
+    admit_goal_run,
+    compose_goal_directed,
+    goal_blueprint,
+    goal_model,
+    goal_run_control,
+    goal_run_input,
+)
 from tests.support.temporal import (
     patch_ids,
     scheduled_activity_inputs,

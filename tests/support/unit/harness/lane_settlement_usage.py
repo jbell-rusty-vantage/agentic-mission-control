@@ -6,7 +6,7 @@ Moved from tests/unit/harness/test_lane_settlement_usage.py.
 from __future__ import annotations
 
 from mission_control.domain.execution.contracts import OperationExecutionRequest
-from tests.fixtures.lane_turns import cursor_operation
+from tests.support.lanes import cursor_operation
 
 STAGE_RESERVATION = {"operation.attempts": 1, "concurrency.slots": 1}
 

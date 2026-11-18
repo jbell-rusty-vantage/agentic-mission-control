@@ -20,7 +20,7 @@ from mission_control.application.execution.harness.points import (
 from mission_control.domain.execution.cognition_points import ThreadItemPoint
 from mission_control.domain.execution.lane_turns import NativeRefs
 from mission_control.domain.frames.contracts import FrameKind, ProviderFrame
-from tests.fixtures.lane_turns import RecordingSignals
+from tests.support.lanes import RecordingSignals
 from tests.support.providers.codex import CodexStack, codex_stack
 from tests.support.unit.codex.harness import BOUNDS
 

@@ -72,14 +72,14 @@ from mission_control.domain.programs.contracts import (
     StageGraphDecisionMutation,
     StageInstanceProjection,
 )
-from tests.fixtures.checkpoint_recovery import (
+from tests.support.checkpoint_recovery import (
     FixtureControlPlane,
     recovery_harness,
     stage_recovery_unit,
 )
-from tests.fixtures.lane_bindings import lane_fields
-from tests.fixtures.lane_turns import ScriptedSessionLane, cursor_operation, scripted_frames
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.db import CommonDatabase
+from tests.support.lane_bindings import lane_fields
+from tests.support.lanes import ScriptedSessionLane, cursor_operation, scripted_frames
 from tests.support.run_control import actor, command, service
 
 pytestmark = pytest.mark.common_db

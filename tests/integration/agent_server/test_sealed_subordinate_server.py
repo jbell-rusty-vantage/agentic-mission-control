@@ -8,7 +8,7 @@ contract from PostgreSQL custody under that scope, re-verifies the digests, comp
 binding with the worker's adapter and materializer and stamps the sealed digest. The parent
 then admits the child's result at check time. Another scope cannot run that assistant.
 
-Only the model is substituted (``tests/fixtures/wi23_sealed_child_hosting.py``): a
+Only the model is substituted (``tests/support/sealed_child_hosting.py``): a
 deterministic local child that echoes whether it saw the sealed prompt.
 """
 
@@ -59,10 +59,10 @@ from mission_control.domain.policies.contracts import (
     ReserveBudgetAction,
     StartAction,
 )
-from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.fixtures.mission_control_local_agent_server import local_agent_server
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import scoped_command, scoped_request
 from tests.support.deep_agents import exact_fixture
+from tests.support.local_agent_server import local_agent_server
 from tests.support.run_control import service as run_control_service
 from tests.support.unit.operations.async_child_check_time_admission import _sealed_contract
 from tests.support.unit.operations.async_child_parent_budget import spawn
@@ -107,7 +107,7 @@ async def test_a_sealed_child_is_fetched_verified_compiled_and_admitted_on_the_r
             monkeypatch,
             extra_environment={
                 "MISSION_CONTROL_SEALED_CHILD_FACTORY": (
-                    "tests.fixtures.wi23_sealed_child_hosting:factory"
+                    "tests.support.sealed_child_hosting:factory"
                 ),
                 "WI23_TEST_CUSTODY_DSN": common_db.dsn(),
             },

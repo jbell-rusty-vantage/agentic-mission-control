@@ -53,9 +53,9 @@ from mission_control.bootstrap.host_projection import HOST_PROJECTORS
 from mission_control.domain.execution.bindings import ProviderExecutionBinding
 from mission_control.domain.execution.contracts import OperationExecutionRequest
 from mission_control.domain.execution.lanes import PrepareRequest, StartRequest
-from tests.fixtures.cursor_controls import started_session
-from tests.fixtures.lane_turns import lane_stack
-from tests.fixtures.projections.rows import firecrawl_row, tavily_row
+from tests.support.cursor_lane_controls import started_session
+from tests.support.lanes import lane_stack
+from tests.support.projection_rows import firecrawl_row, tavily_row
 from tests.support.providers.claude import (
     claude_binding,
     claude_operation,

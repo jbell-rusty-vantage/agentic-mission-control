@@ -18,7 +18,7 @@ from mission_control.application.streams.ports import LinkedMission
 from mission_control.application.streams.pump import SubscriptionPump
 from mission_control.domain.frames.contracts import ProviderFrame
 from mission_control.domain.subscriptions.streams import StreamFilters
-from tests.fixtures.provider_frames import FIXTURE_HARNESS
+from tests.support.provider_frames import FIXTURE_HARNESS
 from tests.support.unit.frames.lineage_stream import claude_frames, codex_frames
 from tests.support.unit.streams.stream_lineage import rekeyed, run_pump, stop
 from tests.support.unit.streams.stream_pump import FAST, Recorder, until

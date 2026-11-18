@@ -26,7 +26,7 @@ from mission_control.domain.execution.invocation_settlement import (
     InvocationSettlement,
     SettlementState,
 )
-from tests.fixtures.checkpoint_recovery import RecoveryHarness
+from tests.support.checkpoint_recovery import RecoveryHarness
 
 WORKFLOW_QUEUE = "wi04-operation-workflows"
 HEARTBEAT_SECONDS = 2

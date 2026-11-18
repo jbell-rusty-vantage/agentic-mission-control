@@ -52,11 +52,10 @@ from mission_control.domain.policies.contracts import (
     StartAction,
 )
 from mission_control.interfaces.socketio.server import MissionSocketLimits
-from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.fixtures.provider_frames import FRAME_NOW
 from tests.integration.postgres.realtime_process_app import SPEC_ENV, build
 from tests.support.boundary_commands import TARGET, delivered
 from tests.support.clock import SECOND, Clock
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import admit_unit_attempt, scoped_command, scoped_request
 from tests.support.integration.postgres.mission_socket_postgres import (
     DSN_ENV,
@@ -77,6 +76,7 @@ from tests.support.integration.postgres.realtime_acceptance_postgres import (
     mission_of,
     release_link,
 )
+from tests.support.provider_frames import FRAME_NOW
 from tests.support.unit.frames.provider_lanes import claude_observations, codex_app_observations
 from tests.unit.socketio.harness import MissionClient, serve
 

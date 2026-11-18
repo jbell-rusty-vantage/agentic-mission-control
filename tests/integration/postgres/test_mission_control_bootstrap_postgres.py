@@ -25,7 +25,7 @@ from mission_control.bootstrap.api import (
     create_application,
 )
 from mission_control.bootstrap.common_installation import inspect_common_installation
-from tests.fixtures.mission_control_common_db import (
+from tests.support.db import (
     COMPONENT_VERSION,
     CommonDatabase,
     common_database,

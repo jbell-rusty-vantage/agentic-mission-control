@@ -11,8 +11,8 @@ from mission_control.application.execution.harness.lane_turns import LaneExecuti
 from mission_control.application.execution.harness.retention import SessionRetentionService
 from mission_control.domain.execution.lanes import LaneProfileName
 from mission_control.domain.execution.session_retention import SessionRetentionPolicy
-from tests.fixtures.lane_turns import cursor_operation
-from tests.fixtures.session_retention import RecordingDeletionScheduler
+from tests.support.lanes import cursor_operation
+from tests.support.session_retention import RecordingDeletionScheduler
 
 CUSTODY = datetime(2026, 10, 13, 12, 0, tzinfo=UTC)
 

@@ -49,8 +49,10 @@ from mission_control.domain.execution.environment_preparation import (
 )
 from mission_control.domain.execution.lane_turns import LaneTurnRequest
 from mission_control.domain.execution.lanes import CursorExecutionBinding, PreparedSession
-from tests.fixtures.discovery_lanes import DISCOVERING_LANES, Attempt, scenario
-from tests.fixtures.lane_turns import (
+from tests.support.db import CommonDatabase
+from tests.support.db_builders import owner_rows, scoped_count
+from tests.support.discovery_proofs import DISCOVERING_LANES, Attempt, scenario
+from tests.support.lanes import (
     ACTIVATION_UUID,
     RUN_UUID,
     PreparingLane,
@@ -60,8 +62,6 @@ from tests.fixtures.lane_turns import (
     lane_stack,
     scripted_frames,
 )
-from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.support.db_builders import owner_rows, scoped_count
 
 pytestmark = pytest.mark.common_db
 

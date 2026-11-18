@@ -29,7 +29,7 @@ from mission_control.application.workspaces.snapshots import (
     manifest_ref_of,
     verified_bytes,
 )
-from tests.fixtures.local_lane_workspaces import LANES, SHARED, WITHIN_RUN, LaneDriver
+from tests.support.local_lane_workspaces import LANES, SHARED, WITHIN_RUN, LaneDriver
 from tests.support.providers.cursor import local_stack
 
 

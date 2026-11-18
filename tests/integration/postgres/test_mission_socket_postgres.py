@@ -39,9 +39,8 @@ from mission_control.application.frames.writer import FrameWriter
 from mission_control.application.streams.ports import StreamHint
 from mission_control.application.streams.pump import PumpSettings
 from mission_control.interfaces.socketio.server import MissionSocketLimits
-from tests.fixtures.mission_control_common_db import CommonDatabase
-from tests.fixtures.provider_frames import FRAME_NOW, turn_observations
 from tests.support.clock import SECOND, Clock
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import owner_rows
 from tests.support.integration.postgres.mission_socket_postgres import (
     FAST,
@@ -52,6 +51,7 @@ from tests.support.integration.postgres.mission_socket_postgres import (
     stack,
     subscribe,
 )
+from tests.support.provider_frames import FRAME_NOW, turn_observations
 from tests.unit.socketio.harness import MissionClient
 
 pytestmark = pytest.mark.common_db

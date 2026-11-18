@@ -63,7 +63,7 @@ from mission_control.domain.policies.contracts import (
     ReconcileUnitAction,
 )
 from mission_control.domain.programs.goal_directed import GoalDirectedInterpreter
-from tests.fixtures.checkpoint_recovery import (
+from tests.support.checkpoint_recovery import (
     CrashingSaver,
     RecoveryHarness,
     SimulatedWorkerCrash,
@@ -71,7 +71,8 @@ from tests.fixtures.checkpoint_recovery import (
     recovery_harness,
     stage_recovery_unit,
 )
-from tests.fixtures.goal_directed_journaled import (
+from tests.support.deep_agents import DeterministicProvider
+from tests.support.journaled_goal_loop import (
     SCOPE,
     RecordingGoalDocuments,
     admit_goal_run,
@@ -83,7 +84,6 @@ from tests.fixtures.goal_directed_journaled import (
     goal_templates,
     preparer,
 )
-from tests.support.deep_agents import DeterministicProvider
 from tests.support.run_control import actor, command
 from tests.support.unit.operations.checkpoint_recovery_classification import (
     AFTER_TOOL_CHECKPOINT,

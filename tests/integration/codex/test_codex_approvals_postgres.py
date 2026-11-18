@@ -2,7 +2,7 @@
 approval Human Tasks through the production repositories.
 
 SCHEMA: the scratch database is the released common migration chain (0001..0033, component
-1.2.0) built by `tests.fixtures.mission_control_common_db` (the same chain the
+1.2.0) built by `tests.support.db` (the same chain the
 `tests/integration/postgres/test_mp11_*` fixtures use); `approval_correlation` comes from
 migration 0033.
 
@@ -56,9 +56,9 @@ from mission_control.domain.execution.contracts import (
 )
 from mission_control.domain.execution.lanes import LaneSegmentBounds, ReattachRequest
 from mission_control.domain.policies.contracts import ActorContext
-from tests.fixtures.lane_turns import RecordingSignals, lane_stack
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import admit_unit_attempt, owner_rows
+from tests.support.lanes import RecordingSignals, lane_stack
 from tests.support.providers.codex import (
     REVIEWER,
     CodexStack,

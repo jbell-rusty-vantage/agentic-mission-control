@@ -422,7 +422,7 @@
         "tracked": false,
         "replacement": [
           {
-            "path": "tests/fixtures/run_forks.py",
+            "path": "tests/support/run_forks.py",
             "exists": true,
             "tracked": true
           }
@@ -436,7 +436,7 @@
         "tracked": false,
         "replacement": [
           {
-            "path": "tests/fixtures/rrm013_live_stack.py",
+            "path": "tests/support/async_subagent_reconciliation.py",
             "exists": true,
             "tracked": true
           }

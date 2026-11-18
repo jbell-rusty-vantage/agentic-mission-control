@@ -99,7 +99,7 @@ from mission_control.domain.programs.human_gate import (
     open_activation,
     packet_item,
 )
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import owner_rows
 from tests.support.integration.temporal.wp_bp_010_temporal import FakeStageGraphActivities
 from tests.support.integration.temporal.wp_bp_010_temporal import _operation as stage_operation

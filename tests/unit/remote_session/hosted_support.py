@@ -34,8 +34,8 @@ from mission_control.domain.execution.lane_turns import (
     LaneTurnResult,
 )
 from mission_control.domain.frames.contracts import ProviderFrame
-from tests.fixtures.lane_turns import LaneStack, RecordingSignals, lane_stack
 from tests.support.ids import SCOPE
+from tests.support.lanes import LaneStack, RecordingSignals, lane_stack
 
 UNIT_KEY = "bl-unit-v1:" + "ab" * 32
 BOUNDS = LaneSegmentBounds(

@@ -29,7 +29,7 @@ from tests.conformance.lanes.contract import (
     Scenario,
     Script,
 )
-from tests.fixtures.cursor_controls import FAST, admitted_unit, compose_control_stack
+from tests.support.cursor_lane_controls import FAST, admitted_unit, compose_control_stack
 from tests.support.knowledge.stores import InMemoryStaging
 from tests.support.providers.codex import (
     PROFILE,

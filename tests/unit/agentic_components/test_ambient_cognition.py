@@ -12,7 +12,7 @@ from mission_control.application.agentic_components.materialization import (
 from mission_control.bootstrap.host_projection import HOST_PROJECTORS
 from mission_control.domain.agentic_components.layering import MaterializationPolicy
 from mission_control.domain.capabilities.host_support import LaneProfile
-from tests.fixtures.projections.rows import INSTRUCTION, skill_row
+from tests.support.projection_rows import INSTRUCTION, skill_row
 
 
 def put(root: Path, path: str, content: str) -> None:

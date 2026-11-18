@@ -8,9 +8,9 @@ from __future__ import annotations
 
 import pytest
 
-from tests.fixtures.provider_frames import harness_start, in_memory_store
 from tests.support.contracts.frames import SCENARIOS, FrameStoreSubject, Scenario
 from tests.support.ids import OTHER_SCOPE, SCOPE
+from tests.support.provider_frames import harness_start, in_memory_store
 
 
 @pytest.mark.parametrize("scenario", SCENARIOS, ids=lambda item: item.__name__)

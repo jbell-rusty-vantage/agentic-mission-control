@@ -39,7 +39,7 @@ from mission_control.domain.authoring.contracts import SkillDefinition
 from mission_control.domain.capabilities.bundles import CapabilityDrift
 from mission_control.domain.capabilities.catalog_entry import capability_pin
 from mission_control_db_contract.seeds import load_bundles, order_bundles
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import (
     BIOTECH_CATALOG,
     SEEDS,

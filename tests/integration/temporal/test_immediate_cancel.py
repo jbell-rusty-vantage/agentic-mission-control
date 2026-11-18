@@ -22,7 +22,7 @@ from mission_control.application.execution.stop_fence import (
     KernelHookFenceGate,
 )
 from mission_control.domain.policies.stop_fence import EffectAdmission, StopFence
-from tests.fixtures.checkpoint_recovery import recovery_harness, stage_recovery_unit
+from tests.support.checkpoint_recovery import recovery_harness, stage_recovery_unit
 from tests.support.integration.temporal.rrm_008_operation_workflow_cancellation import (
     _replays,
     _scheduled,

@@ -47,14 +47,14 @@ from mission_control.domain.programs.goal_directed_runtime import (
     GoalOperationReconciliationResult,
 )
 from mission_control.domain.programs.runtime_units import goal_runtime_unit
-from tests.fixtures.checkpoint_lineage import activity_attempt, bind_unit, stage_unit
-from tests.fixtures.goal_directed_journaled import (
+from tests.support.checkpoint_lineage import activity_attempt, bind_unit, stage_unit
+from tests.support.journaled_goal_loop import (
     SCOPE,
     TOKENS_PER_OPERATION,
     admit_goal_run,
     goal_authority,
 )
-from tests.fixtures.lane_bindings import lane_fields
+from tests.support.lane_bindings import lane_fields
 from tests.support.run_control import actor, command
 from tests.support.unit.orchestration.rrm_016_goal_directed_settlement import (
     _claim,

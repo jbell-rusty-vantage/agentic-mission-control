@@ -12,7 +12,7 @@ from mission_control.domain.programs.contracts import (
     StageGraphCompletionActivityRequest,
     StageGraphDecisionMutation,
 )
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import scoped_command, scoped_request
 from tests.support.unit.orchestration.budget_admission_failure import prepared
 

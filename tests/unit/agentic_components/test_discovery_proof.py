@@ -62,9 +62,9 @@ from mission_control.domain.execution.environment_preparation import (
 )
 from mission_control.domain.execution.lanes import PreparedSession
 from mission_control.domain.frames.contracts import FrameKind
-from tests.fixtures.discovery_lanes import DISCOVERING_LANES, scenario
-from tests.fixtures.discovery_lanes import Attempt as LaneAttempt
-from tests.fixtures.lane_turns import cursor_binding, cursor_operation
+from tests.support.discovery_proofs import DISCOVERING_LANES, scenario
+from tests.support.discovery_proofs import Attempt as LaneAttempt
+from tests.support.lanes import cursor_binding, cursor_operation
 
 AT = datetime(2026, 10, 14, 9, 0, tzinfo=UTC)
 D = ReadinessLevel

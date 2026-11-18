@@ -24,7 +24,7 @@ from pathlib import Path
 import pytest
 from pydantic import BaseModel
 
-from tests.fixtures.set_order import model_holds_set
+from tests.support.set_order import model_holds_set
 
 CD = "mission_control.domain.authoring.contracts"
 GR = "mission_control.domain.graph_runtime"
@@ -694,6 +694,9 @@ EXCLUDED_PARTS = (
     "src/mission_control/adapters/agent_server/",
     "src/mission_control/application/subordinates/",
 )
+# The Qualia/AI Engineer paid drivers (AS-A1) moved here from tests/fixtures, which this scan
+# never covered; they build fixture evidence, not runtime identities.
+NOT_SCANNED = ("experiments/knowledge_loop/",)
 EXCLUDED_FILES = ("src/mission_control/adapters/deep_agents/async_subagents.py",)
 
 
@@ -848,6 +851,8 @@ def _scan(root: Path, *, repo: Path | None = None) -> list[tuple[str, _Visitor]]
     assert files, f"Digest guard source scan is empty: {root}"
     for file in files:
         relative = file.relative_to(repo).as_posix()
+        if relative.startswith(NOT_SCANNED):
+            continue
         visitor = _Visitor(relative)
         visitor.visit(ast.parse(file.read_text(encoding="utf-8"), filename=str(file)))
         results.append((relative, visitor))

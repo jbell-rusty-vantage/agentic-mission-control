@@ -108,9 +108,6 @@ from mission_control.domain.authoring.extensions import ExtensionRegistry
 from mission_control.domain.authoring.manifest import canonical_manifest_bytes, load_manifest_yaml
 from mission_control.domain.execution.bindings import ProviderExecutionBinding
 from mission_control.domain.resolution.sealed import SealedLaneBinding
-from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog, publish_output_schemas
-from tests.fixtures.manifest_runtime import ChainScript, chain_components
-from tests.fixtures.rrm009_production_stack import AGENT_COGNITIVE_QUEUE, technical_binding
 from tests.support.artifacts import MemoryArtifacts
 from tests.support.ids import SCOPE
 from tests.support.integration.temporal.manifest_v2_provider_launch import (
@@ -120,7 +117,10 @@ from tests.support.integration.temporal.manifest_v2_provider_launch import (
     provider_lane,
 )
 from tests.support.manifest_runtime import host_pins, missions_app, post, submit
+from tests.support.manifests.lifecycle import ChainScript, chain_components
+from tests.support.manifests.seeded_catalog import fast_track_catalog, publish_output_schemas
 from tests.support.model_catalog import catalog_for, model_binding
+from tests.support.production_stack import AGENT_COGNITIVE_QUEUE, technical_binding
 from tests.support.providers.claude import (
     FIXTURE_ENVIRON,
     FixtureClientFactory,

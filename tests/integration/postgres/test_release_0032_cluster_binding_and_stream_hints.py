@@ -28,7 +28,7 @@ from mission_control.adapters.postgres.run_control.run_control_repository import
 from mission_control.adapters.realtime.stream_hints_postgres import PostgresStreamHints
 from mission_control.application.execution.run_launch import TemporalClusterIdentity
 from mission_control.application.streams.ports import StreamHint
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.db import CommonDatabase
 from tests.support.run_control import request, service
 
 pytestmark = pytest.mark.common_db

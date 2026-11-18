@@ -52,7 +52,7 @@ from mission_control.interfaces.mcp.human_task_tools import domain_error as huma
 from mission_control.interfaces.mcp.operator_server import operator_principal
 from mission_control.interfaces.mcp.run_control_tools import domain_error as run_control_error
 from tests.conformance.resolution.fixtures import MODELS
-from tests.fixtures.catalog_http import INSTALLATION, TENANT, CatalogHarness, catalog_harness
+from tests.support.catalog_http import INSTALLATION, TENANT, CatalogHarness, catalog_harness
 from tests.unit.guide.support import _workspace, full_guide, stub_guide
 
 PERMISSIONS = frozenset(

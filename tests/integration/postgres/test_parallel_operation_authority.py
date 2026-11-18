@@ -33,7 +33,7 @@ from mission_control.domain.policies.contracts import (
     ReserveBudgetAction,
     StartAction,
 )
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import scoped_command, scoped_request
 from tests.support.operations import operation_request
 from tests.support.run_control import NOW, actor, service

@@ -26,8 +26,8 @@ from mission_control.domain.policies.contracts import (
     ResumeAction,
     ResumeDecision,
 )
-from tests.fixtures.checkpoint_lineage import bind_unit
-from tests.fixtures.checkpoint_recovery import (
+from tests.support.checkpoint_lineage import bind_unit
+from tests.support.checkpoint_recovery import (
     SimulatedWorkerCrash,
     recovery_harness,
     recovery_model,
@@ -35,7 +35,7 @@ from tests.fixtures.checkpoint_recovery import (
     recovery_script,
     stage_recovery_unit,
 )
-from tests.fixtures.lane_bindings import lane_fields
+from tests.support.lane_bindings import lane_fields
 from tests.support.run_control import command
 from tests.support.unit.operations.ft_f2_interrupt_and_inject import (
     FAST,

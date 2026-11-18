@@ -30,14 +30,14 @@ from mission_control.domain.execution.contracts import (
 )
 from mission_control.domain.policies.contracts import ExecutionTarget, RunProjection
 from mission_control.domain.policies.stop_fence import StopFence
-from tests.fixtures.checkpoint_recovery import (
+from tests.support.checkpoint_recovery import (
     TOKENS_PER_CALL,
     AcceptingAuthority,
     RecoveryHarness,
     recovery_harness,
     stage_recovery_unit,
 )
-from tests.fixtures.lane_bindings import lane_fields
+from tests.support.lane_bindings import lane_fields
 from tests.support.unit.operations.rrm_008_cancellation import _liability, _settlements
 
 SCOPE = "tenant-1"

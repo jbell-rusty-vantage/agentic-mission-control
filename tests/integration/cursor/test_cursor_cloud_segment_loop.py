@@ -31,7 +31,7 @@ from mission_control.adapters.temporal.workflows.operation import (
     CAPACITY_WAIT_PATCH,
 )
 from mission_control.domain.frames.contracts import FrameKind
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.db import CommonDatabase
 from tests.support.integration.cursor.mp09_cloud_segment_loop_real_services import (
     _client,
     _run,

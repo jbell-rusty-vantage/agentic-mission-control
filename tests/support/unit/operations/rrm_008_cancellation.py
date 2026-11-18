@@ -14,7 +14,7 @@ from mission_control.application.execution.operations.operation_execution import
     bind_operation_execution_request,
 )
 from mission_control.domain.execution.contracts import OperationExecutionRequest
-from tests.fixtures.checkpoint_recovery import RecoveryHarness
+from tests.support.checkpoint_recovery import RecoveryHarness
 
 
 def _settlements(harness: RecoveryHarness, request: OperationExecutionRequest) -> list[Any]:

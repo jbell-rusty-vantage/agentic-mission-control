@@ -47,7 +47,7 @@ from mission_control.domain.execution.lanes import (
 )
 from mission_control.domain.frames.contracts import FrameKind
 from mission_control.domain.policies.stop_fence import StopFence
-from tests.fixtures.lane_turns import RecordingSignals
+from tests.support.lanes import RecordingSignals
 from tests.support.providers.claude import (
     PROFILE,
     SESSION_ID,
@@ -265,7 +265,7 @@ async def test_an_applied_inject_projects_the_interrupted_turn_as_replaced_not_f
     from mission_control.domain.execution.contracts import OperationExecutionRequest
     from mission_control.domain.frames.contracts import LaneProfile
     from mission_control.domain.frames.facts import ExecutionOutcomeFact, fact_events
-    from tests.fixtures.cursor_controls import FAST, admitted_unit, compose_control_stack
+    from tests.support.cursor_lane_controls import FAST, admitted_unit, compose_control_stack
 
     run_control, repository, run_id, unit, changes = await admitted_unit((), None)
     operation = OperationExecutionRequest.model_validate(

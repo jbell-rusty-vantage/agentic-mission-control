@@ -17,7 +17,7 @@ from tests.support.providers.claude import PROFILE, base_operation, claude_bindi
 
 
 def _rows() -> tuple[Any, ...]:
-    from tests.fixtures.projections.rows import skill_row
+    from tests.support.projection_rows import skill_row
 
     # One skill only: no hook script, no MCP server and no executable is projected.
     return (skill_row(),)

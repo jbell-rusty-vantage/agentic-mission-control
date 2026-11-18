@@ -17,8 +17,8 @@ from mission_control.domain.context.snapshot_evidence import (
     digest_bytes,
 )
 from mission_control.domain.policies.forks import RunSnapshotManifest
-from tests.fixtures.run_forks import technical_snapshot
 from tests.support.knowledge.stores import InMemoryStaging
+from tests.support.run_forks import technical_snapshot
 
 
 async def custody(

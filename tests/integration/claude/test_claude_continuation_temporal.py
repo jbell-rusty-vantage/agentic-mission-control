@@ -76,13 +76,13 @@ from mission_control.domain.execution.contracts import (
     OperationWorkflowRequest,
 )
 from mission_control.domain.execution.lanes import LaneSegmentBounds
-from tests.fixtures.continuation import NOW, NoArtifacts, trigger
-from tests.fixtures.lane_turns import Crashes
-from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.support.clock import SECOND, Clock
+from tests.support.continuation import NOW, NoArtifacts, trigger
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import admit_unit_attempt
 from tests.support.integration.postgres.continuation_postgres import continuation_actor
 from tests.support.knowledge.stores import InMemoryStaging
+from tests.support.lanes import Crashes
 from tests.support.providers.claude import SESSION_ID, FixtureScript, claude_operation, claude_stack
 from tests.support.temporal import patch_ids
 

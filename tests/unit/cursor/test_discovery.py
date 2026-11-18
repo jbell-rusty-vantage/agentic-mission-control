@@ -40,9 +40,9 @@ from mission_control.domain.execution.environment_preparation import (
 from mission_control.domain.execution.lane_turns import LaneTurnRequest
 from mission_control.domain.execution.lanes import CursorExecutionBinding, PrepareRequest
 from mission_control.domain.frames.contracts import FrameKind
-from tests.fixtures.cursor_controls import harness_fields
-from tests.fixtures.lane_turns import RecordingSignals, lane_stack
-from tests.fixtures.projections.rows import skill_row
+from tests.support.cursor_lane_controls import harness_fields
+from tests.support.lanes import RecordingSignals, lane_stack
+from tests.support.projection_rows import skill_row
 from tests.support.providers.cursor import cloud_rows, cloud_stack, local_stack
 
 OVERLAY = ".cursor/rules/mc-mission.mdc"

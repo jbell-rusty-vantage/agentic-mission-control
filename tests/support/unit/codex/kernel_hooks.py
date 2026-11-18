@@ -30,7 +30,7 @@ from mission_control.domain.agentic_components.projection import HostProjection
 from mission_control.domain.execution.contracts import OperationExecutionRequest
 from mission_control.domain.execution.lanes import SessionHandle
 from mission_control.interfaces.http.hook_callback import create_hook_callback_app
-from tests.fixtures.lane_turns import lane_stack
+from tests.support.lanes import lane_stack
 from tests.support.providers.codex import (
     CodexStack,
     FixtureLauncher,

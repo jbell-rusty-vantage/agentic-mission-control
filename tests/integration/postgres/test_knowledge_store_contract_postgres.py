@@ -15,8 +15,8 @@ from mission_control.adapters.postgres.knowledge.lineage import PostgresContentL
 from mission_control.adapters.postgres.knowledge.operations import PostgresKnowledgeJournal
 from mission_control.adapters.postgres.knowledge.retained_reads import PostgresRetainedReadStore
 from mission_control.adapters.postgres.knowledge.submissions import PostgresOutputSubmissionStore
-from tests.fixtures.mission_control_common_db import CommonDatabase
 from tests.support.contracts.knowledge import SCENARIOS, KnowledgeSubject, Scenario
+from tests.support.db import CommonDatabase
 
 pytestmark = pytest.mark.common_db
 

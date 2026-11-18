@@ -34,8 +34,8 @@ from mission_control.domain.execution.lanes import (
     SessionHandle,
     TurnHandle,
 )
-from tests.fixtures.cursor_controls import harness_fields
-from tests.fixtures.lane_turns import cursor_operation
+from tests.support.cursor_lane_controls import harness_fields
+from tests.support.lanes import cursor_operation
 
 # A hosted profile no remote lane implements yet stands in for "some provider".
 PROFILE: Final = "claude_cloud"

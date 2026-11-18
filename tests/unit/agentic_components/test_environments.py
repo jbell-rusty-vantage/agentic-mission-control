@@ -29,7 +29,7 @@ from mission_control.application.environments import (
 from mission_control.application.environments.resolver import PROVIDER_OF_HOSTED_PROFILE
 from mission_control.domain.capabilities.host_support import HOSTED_PROFILES, LaneProfile
 from mission_control.domain.execution.bindings import EnvironmentBinding
-from tests.fixtures.projections import regen
+from tests.support import projection_regen as regen
 
 NOW = datetime(2026, 10, 8, 12, 0, tzinfo=UTC)
 DIGEST = "sha256:" + "a" * 64

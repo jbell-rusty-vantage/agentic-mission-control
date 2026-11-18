@@ -41,8 +41,8 @@ from mission_control.domain.frames.facts import (
     ToolEffectFact,
     TurnCompletedFact,
 )
-from tests.fixtures.cursor_controls import harness_fields
-from tests.fixtures.lane_turns import RecordingSignals, lane_stack
+from tests.support.cursor_lane_controls import harness_fields
+from tests.support.lanes import RecordingSignals, lane_stack
 from tests.support.providers.cursor import cloud_stack, local_stack
 
 FIXTURES = Path(__file__).resolve().parents[2] / "integration" / "cursor" / "fixtures"
@@ -306,7 +306,7 @@ async def test_cursor_cloud_busy_is_wait_then_send_and_capacity_after_the_bound(
     stack2 = cloud_stack(tmp_path / "two", api_changes={"busy": True})
     harness = stack2.harness
     heid = str(LaneExecutionIdentity.of(stack2.operation, "cursor_cloud", 1).harness_execution_id)
-    from tests.fixtures.cursor_controls import started_session
+    from tests.support.cursor_lane_controls import started_session
 
     _heid, session = await started_session(stack2)
     assert _heid == heid
@@ -330,7 +330,7 @@ async def test_cursor_cloud_busy_is_wait_then_send_and_capacity_after_the_bound(
 
 
 async def test_cursor_cloud_conflicts_reattach_and_never_double_cancel(tmp_path: Path) -> None:
-    from tests.fixtures.cursor_controls import started_session
+    from tests.support.cursor_lane_controls import started_session
 
     stack = cloud_stack(tmp_path)
     heid, session = await started_session(stack)

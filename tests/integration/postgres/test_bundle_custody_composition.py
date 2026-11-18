@@ -17,7 +17,7 @@ pins. Without custody the launch author refuses with ``bundle_custody_unavailabl
 selecting manifest pointer, before any template is frozen for a worker.
 
 MO-02: the same production path over a workspace that already owns its ``AGENTS.md``, a
-``.claude/skills`` skill and a ``.cursor/hooks.json`` (``tests/fixtures/layering_repo.py``),
+``.claude/skills`` skill and a ``.cursor/hooks.json`` (``tests/support/layering_repo.py``),
 with the manifest's ``materialization.conflicts`` sealed on every binding and applied by the
 lane's ``materialize_projection``: the repository's files stay, its config files are merged, and
 the restore leaves them byte-identical.
@@ -86,16 +86,16 @@ from mission_control.domain.execution.bindings import ProviderExecutionBinding
 from mission_control.domain.execution.contracts import OperationExecutionRequest
 from mission_control.domain.execution.lanes import CursorExecutionBinding
 from mission_control_db_contract.seeds import load_bundles, order_bundles
-from tests.fixtures.catalog.fast_track_catalog import fast_track_catalog
-from tests.fixtures.layering_repo import REPO_FILES, repository_bytes, write_repository_files
-from tests.fixtures.mission_control_common_db import CommonDatabase
+from tests.support.db import CommonDatabase
 from tests.support.db_builders import (
     BIOTECH_CATALOG,
     SEEDS,
     apply_seed_bundle,
     seeds_publish_module,
 )
+from tests.support.layering_repo import REPO_FILES, repository_bytes, write_repository_files
 from tests.support.manifests.cursor_launch import LOCAL
+from tests.support.manifests.seeded_catalog import fast_track_catalog
 from tests.support.manifests.v2_launch import (
     AT,
     SCOPE,

@@ -25,8 +25,8 @@ from mission_control.application.context.lane_support import (
 from mission_control.application.execution.harness.lane_turns import LaneTurnService
 from mission_control.application.execution.harness.sessions import WorkerSessionManager
 from mission_control.domain.execution.lanes import LaneSegmentBounds
-from tests.fixtures.continuation import build_service
-from tests.fixtures.lane_turns import RecordingSignals
+from tests.support.continuation import build_service
+from tests.support.lanes import RecordingSignals
 from tests.support.providers.codex import (
     FixtureLauncher,
     build_harness,

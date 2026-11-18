@@ -29,7 +29,7 @@ from mission_control.application.programs.nested_bodies import (
     NestedActivationRecord,
 )
 from mission_control.domain.authoring.canonical import sha256_digest
-from tests.fixtures.mission_control_common_db import (
+from tests.support.db import (
     CommonDatabase,
     common_database,
     migration_paths_with,

@@ -34,8 +34,8 @@ from mission_control.domain.policies.contracts import RunProjection
 from mission_control.interfaces.cli.main import inspection_wait_state, main
 from mission_control.interfaces.mcp.coordinator_server import create_coordinator_server
 from mission_control.interfaces.mcp.run_control_tools import RUN_INSPECT_TOOL, ScopedRunControl
-from tests.fixtures.provider_frames import FIXTURE_RUN
-from tests.fixtures.transcripts import (
+from tests.support.provider_frames import FIXTURE_RUN
+from tests.support.transcripts import (
     StaticFrames,
     transcript_events,
     transcript_frames,
