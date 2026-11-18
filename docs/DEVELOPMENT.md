@@ -10,7 +10,7 @@ drive it. Operational semantics (installation identity, roles, `mission-db`) sta
 make install          # uv sync (runtime + dev + dbcontract + biotech groups)
 make hooks            # install the git pre-commit hook (prek)
 make infra-up         # docker compose up -d, then wait until healthy
-make check            # lint + format check + ty + deptry + architecture + unit + lane conformance + skills manifests
+make check            # lint + format check + ty + deptry + architecture + unit + Biotech + lane conformance + skills manifests
 ```
 
 `make help` lists every target with a one-line description. Variables are overridable
@@ -26,7 +26,7 @@ per call (`make server PORT=8100 RELOAD=1`, `make infra-logs SERVICE=temporal`).
 | [mypy](https://mypy.readthedocs.io/) | Authoritative type gate (pydantic plugin) | `make typecheck`, `make typecheck-daemon` | ~80 s cold |
 | [deptry](https://deptry.com/) | Declared-vs-imported dependency drift | `make deps-check` | ~1 s |
 | [prek](https://github.com/j178/prek) | Git hooks (Rust reimplementation of pre-commit) | `make hooks`, `make precommit` | — |
-| pytest + asyncio, xdist, timeout, cov; hypothesis | Tests | `make test-unit`, `make test-conformance`, `make coverage` | — |
+| pytest + asyncio, xdist, timeout, cov; hypothesis | Tests | `make test-unit`, `make test-biotech` (integrations/biotech/tests), `make test-conformance`, `make coverage` | — |
 | [uv-secure](https://pypi.org/project/uv-secure/) | Vulnerability scan of `uv.lock` | `make audit` | network |
 
 ### Why two type checkers

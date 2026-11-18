@@ -1,22 +1,25 @@
 # Verification navigation
 
-unit proves pure contracts, reducers and isolated errors. integration proves
-concrete persistence and runtime boundaries. acceptance/mission_control proves
-authenticated scoped execution with real local PostgreSQL and Temporal.
-qualification/two_project is the reviewer-owned independent proof of the common
-release; its common_db tests fail, never skip, without MISSION_CONTROL_TEST_ADMIN_DSN.
+- `unit/` pure contracts, reducers, isolated errors; `architecture/` package rules;
+  `conformance/` every lane against its fake (all in `make check`).
+- `integration/` real PostgreSQL 17 and Temporal; `acceptance/mission_control/` authenticated
+  scoped execution on both; `qualification/two_project/` the common release (common_db
+  tests fail, never skip, without MISSION_CONTROL_TEST_ADMIN_DSN).
+- `support/` holds every helper: builders, the disposable-database plugin (`db.py`,
+  `db_plugin.py`), `temporal.py` (`workflow_env`), `stack.py`, scripted models, `providers/`
+  (one fake per provider API), `contracts/` (in-memory vs PostgreSQL scenarios), `scenarios/`.
+  Mirror modules under `support/{unit,integration,acceptance}/` serve one test file each.
+- `fixtures/` holds data only: histories, manifests, goldens, recorded frames, custody sources.
+- Biotech-domain tests live in `integrations/biotech/tests`: `uv run --group biotech pytest
+  integrations/biotech/tests` (`make test-biotech`); the seven BIOTECH_SCHEMA_SDL_PATH tests skip.
 
-Do not hide a missing service behind a new default skip. Report environment gates
-and exact selections. Disable external tracing in deterministic tests and never
-spend provider budget without authorization. Never point destructive fixture setup
-at live or unknown databases; generate isolated local database names.
+Fake only what we do not control (models, provider APIs, Knowledge Services, clock), with one
+double per boundary; use real PostgreSQL and Temporal, and an in-memory port only beside a
+shared contract test ([RECOMMENDATION section 1](../docs/specs/agentic-sdlc-2026-11/test-suite-review-2026-11-17/RECOMMENDATION.md#1-how-to-decide-what-a-test-may-fake)).
+Never patch privates or assert internal calls. Name test files by behaviour, uniquely.
 
-Biotech-domain tests (biotech_mission_adapters) live in integrations/biotech/tests and run
-with `uv run --group biotech pytest integrations/biotech/tests` (`make test-biotech`, part of
-`make check`); the seven that read BIOTECH_SCHEMA_SDL_PATH stay opt-in and skip without it.
-
-A source reorganization requires import, packaging and renewed runtime checks.
-Do not sum overlapping suite counts or claim deployment from local execution.
+Do not hide a missing service behind a new default skip; report gates and exact selections.
+No provider spend without authorization; destructive setup only on generated `mct_*` names.
 
 <!-- BEGIN:sdlc-module id=tests -->
 ## Verification navigation
@@ -26,8 +29,8 @@ Entrypoints:
 - integration/
 - acceptance/
 - conformance/
-- fixtures/
 - qualification/
+- fixtures/
 - architecture/
 - support/
 - schema_context_helpers.py
