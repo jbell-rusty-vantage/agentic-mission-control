@@ -53,7 +53,7 @@ it in `./dev check` instead of replacing it.
 - The AI Engineer schema program's answers and ledger live in `platform/ai-engineer-research-2026-11-02/10-review-workspace/`,
   which is **not a git repository**. Its session ids (`B08-S<n>`) are valid in `Refs:`, but no trace can read them until the
   folder is versioned. Moving it into `aiengineer/ai-engineer-db-contract/docs/review/` (7.9 MB) is the owner's decision
-  ([schema brief §3](../../../../ai-engineer-research-2026-11-02/10-review-workspace/process/OFFICIAL-SCHEMA-SEQUENCE.md#s3)).
+  ([schema brief §3](../../../../ai-engineer-research-2026-11-02/schema-units/process/OFFICIAL-SCHEMA-SEQUENCE.md#s3)).
 - Each repository's trace reads its own git history and the shared Linear `OVE` snapshot.
 
 <a id="out"></a>
