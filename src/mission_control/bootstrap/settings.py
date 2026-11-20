@@ -8,13 +8,14 @@ from pathlib import Path
 from typing import Any, Literal, get_args
 from urllib.parse import urlsplit
 
-from pydantic import BaseModel, ConfigDict, Field, SecretStr, model_validator
+from pydantic import BaseModel, ConfigDict, Field, SecretStr, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from mission_control.bootstrap.application_profiles import (
     deployments_root,
     installation_defaults,
 )
+from mission_control.contracts.database_release import CHECK_VARIABLE, CheckMode, check_mode
 from mission_control.domain.execution.lanes import LaneProfileName
 from mission_control.domain.execution.placement import PlacementLimit
 
@@ -627,6 +628,11 @@ class Settings(BaseSettings):
     mission_control_application: str | None = Field(default=None, pattern=r"^[a-z][a-z0-9-]{0,63}$")
     # Unset: `<MISSION_CONTROL_HOME>/deployments`.
     mission_control_deployments_root: Path | None = None
+    # VER-S1: how startup treats the release of the bound database when the application declares
+    # the one it works with (`[database_release]` in its profile file). `enforce` refuses a
+    # database on another release, `warn` starts and logs the verdict, `off` does not ask. The
+    # name is the one every consumer of that database reads; a blank value is unset.
+    aieng_db_release_check: CheckMode = "enforce"
     sandbox_image: str = "python:3.12-slim"
 
     api_host: str = "127.0.0.1"
@@ -730,6 +736,15 @@ class Settings(BaseSettings):
                 "when no Supabase signing fallback is configured"
             )
         return secret.get_secret_value().encode()
+
+    @field_validator("aieng_db_release_check", mode="before")
+    @classmethod
+    def _database_release_check_mode(cls, value: object) -> object:
+        """The shared mode rule (`contracts/database_release.check_mode`); blank is unset."""
+
+        if value is None or not str(value).strip():
+            return "enforce"
+        return check_mode({CHECK_VARIABLE: str(value)})
 
     @model_validator(mode="after")
     def _checkpoint_runtime_binding(self) -> Settings:

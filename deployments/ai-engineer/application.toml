@@ -3,7 +3,7 @@
 # application id is `ai-engineer` (`bootstrap/application_profiles.py`). Nothing in the kernel names
 # this application or its binding. `target.toml` beside it stays the installation identity.
 application_id = "ai-engineer"
-revision = 2
+revision = 3
 # Engineering default (R4): no repository source admits more than `internal` for this application's
 # missions today (ADR-0050 section 7 names no Application ceiling; the hosted packs under
 # deployments/hosted-packs/ai-engineer declare `internal`; no widening is configured). A mission that
@@ -70,6 +70,18 @@ closure_enabled = true
 closure_max_files = 512
 closure_max_bytes = 67108864
 closure_retention = "mission"
+
+[database_release]
+# VER-S1 (D-117): the release of the AI Engineer database this Mission Control works with. The
+# database states its release through `api.database_release()` (schema authority:
+# ai-engineer-db-contract, `features/version-and-release.md`); startup checks the bound database
+# beside the component check (`bootstrap/common_installation.py`) and refuses another release.
+# `range` is an exact version or `>=A.B.C <D.E.F`; until the contract's 1.0.0 it is the exact
+# version. `format` is the answer format that contract states; another format is `unknown`.
+# A bound database without the contract's `api` schema (the local stack) is `not_applicable`.
+# The mode is the environment variable `AIENG_DB_RELEASE_CHECK`: `enforce` (default), `warn`, `off`.
+format = "ai-engineer-database-release/1"
+range = "0.12.0"
 
 [installation]
 # Operator defaults this application's installation uses when the environment does not set them

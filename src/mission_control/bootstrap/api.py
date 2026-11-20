@@ -152,10 +152,12 @@ from mission_control.bootstrap.catalog import (
     compose_external_discovery,
     configured_catalog_embeddings,
 )
+from mission_control.bootstrap.common_installation import database_release_report
 from mission_control.bootstrap.composition import (
     MissionApplicationServices,
     compose_application_services,
     compose_knowledge_review,
+    database_release_check,
     temporal_cluster_identity,
 )
 from mission_control.bootstrap.guide import compose_guide
@@ -658,6 +660,9 @@ def create_application(
                     usage_prices = CatalogUsagePrices(
                         application.state.mission_control_model_catalogs[binding.application_id]
                     )
+                    # VER-S1: the release of its database this application declares, checked
+                    # with the component before any tenant is composed.
+                    release_check = database_release_check(get_settings(), binding.application_id)
                     pool = await application_pool(binding.database_secret_ref)
                     stack.push_async_callback(pool.close)
                     if item.signal_ingress_secret_ref is not None:
@@ -791,6 +796,7 @@ def create_application(
                                 task_queue=maintenance_task_queue(item.temporal.queue_base),
                             ),
                             usage_prices=usage_prices,
+                            database_release=release_check,
                         )
                         key = (binding.installation_id, binding.application_id, tenant)
                         application.state.mission_control_services[key] = services.lifecycle
@@ -1225,6 +1231,8 @@ def create_application(
             "storage_mode": "production_common",
             "production_ready": all(item.readiness.production_ready for item in services),
             "component_versions": sorted({item.readiness.component_version for item in services}),
+            # VER-S1: declared range, release, state, verdict and mode per bound database.
+            "database_releases": database_release_report(item.readiness for item in services),
             "launch_configured": all(item.launch is not None for item in services),
         }
 

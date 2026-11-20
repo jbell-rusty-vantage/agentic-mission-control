@@ -77,6 +77,7 @@ from mission_control.application.execution.auth_admission import (
 )
 from mission_control.application.resolution.registries import ModelCatalog
 from mission_control.bootstrap.api import MissionDeployment, create_app, load_deployment
+from mission_control.bootstrap.common_installation import database_release_report
 from mission_control.bootstrap.manifests import served_components
 from mission_control.bootstrap.model_profiles import (
     MODELS_FILE,
@@ -1376,6 +1377,11 @@ async def configured_preflight() -> dict[str, object]:
                     "storage_mode": "production_common",
                     "production_ready": all(
                         item.readiness.production_ready
+                        for item in application.state.mission_control_compositions.values()
+                    ),
+                    # VER-S1: the release of each bound database and the verdict on it.
+                    "database_releases": database_release_report(
+                        item.readiness
                         for item in application.state.mission_control_compositions.values()
                     ),
                     "application_tenants": len(application.state.mission_control_compositions),

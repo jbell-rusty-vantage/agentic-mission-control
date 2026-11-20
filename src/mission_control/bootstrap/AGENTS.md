@@ -4,7 +4,8 @@ cli.py is the `mission-control` console script, one subcommand per process role 
 `worker`, `preflight`); it imports a role only when that role starts. api.py is the configured
 FastAPI factory; worker.py selects the app-bound Temporal
 worker; preflight.py performs read-only readiness; common_installation.py verifies
-the installed common release; composition.py wires actual repositories and
+the installed common release and, when the application declares one, the release of
+the bound database (VER-S1); composition.py wires actual repositories and
 application services. technical_api.py retains optional lower-level
 authoring/control/realtime proof surfaces; api.py remains the configured public
 entrypoint. Both use the same handlers and engine. application_profiles.py loads the
@@ -23,7 +24,7 @@ pools and signed identity. Operator guide: docs/MISSION_CONTROL_LOCAL_API.md.
 
 <!-- BEGIN:sdlc-module id=bootstrap -->
 ## Trusted composition and startup
-Trusted startup and composition. Covers the API and worker factories, read-only preflight, the common-release check and the wiring of repositories and services; bootstrap passes the application id explicitly and never discovers profiles.
+Trusted startup and composition. Covers the API and worker factories, read-only preflight, the common-release check, the release check of the bound database and the wiring of repositories and services; bootstrap passes the application id explicitly and never discovers profiles.
 Entrypoints:
 - api.py — Configured scoped API: uvicorn mission_control.bootstrap.api:create_app --factory…
 - realtime.py — Public API plus the /missions Socket.IO namespace

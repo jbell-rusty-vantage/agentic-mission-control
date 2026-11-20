@@ -7,10 +7,13 @@ Nothing is discovered: a caller names the application ids it composes, and a mis
 file fails closed. The file carries the profile (`mc.application_profile.v1`, validated by
 :class:`ApplicationProfile` and by `ApplicationRegistry.register`) plus one `[installation]` table
 of operator defaults the settings fall back to when the environment sets none (the task queue, the
-LangSmith projects and the capability resource owner, which left `bootstrap/settings.py`).
+LangSmith projects and the capability resource owner, which left `bootstrap/settings.py`), and an
+optional `[database_release]` table: the release of its database the application's Mission Control
+works with, which startup checks against the bound database (VER-S1,
+`contracts/database_release.py`).
 
-Stdlib and domain types only: `bootstrap/settings.py` reads the `[installation]` table at import,
-so this module must not import the settings.
+Stdlib, contract and domain types only: `bootstrap/settings.py` reads the `[installation]` table at
+import, so this module must not import the settings.
 """
 
 from __future__ import annotations
@@ -24,6 +27,7 @@ from typing import TYPE_CHECKING, Any, Final
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
+from mission_control.contracts.database_release import DatabaseReleaseDeclaration
 from mission_control.domain.execution.data_class import DATA_CLASSES, DataClassPolicy
 from mission_control.domain.resolution.profiles import ApplicationProfile
 
@@ -37,6 +41,7 @@ _LOG = logging.getLogger(__name__)
 # settings use (`Settings.mission_control_application`).
 APPLICATION_ENV: Final = "MISSION_CONTROL_APPLICATION"
 INSTALLATION_TABLE: Final = "installation"
+DATABASE_RELEASE_TABLE: Final = "database_release"
 
 
 class ApplicationProfileError(ValueError):
@@ -72,13 +77,16 @@ class InstallationDefaults(BaseModel):
 
 
 class ApplicationFile(BaseModel):
-    """One parsed `application.toml`: the profile and its installation defaults."""
+    """One parsed `application.toml`: the profile, its installation defaults and the database
+    release it declares."""
 
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     path: Path
     profile: ApplicationProfile
     installation: InstallationDefaults
+    # `[database_release]`; None: the application declares none and its database is not checked.
+    database_release: DatabaseReleaseDeclaration | None = None
 
 
 def deployments_root(project_root: Path, configured: Path | str | None = None) -> Path:
@@ -123,9 +131,11 @@ def load_application_file(path: Path) -> ApplicationFile:
             f"unreadable Application Profile {path.as_posix()}: {error}"
         ) from None
     installation = document.pop(INSTALLATION_TABLE, {})
+    release = document.pop(DATABASE_RELEASE_TABLE, None)
     try:
         profile = ApplicationProfile.model_validate(document)
         defaults = InstallationDefaults.model_validate(installation)
+        declared = None if release is None else DatabaseReleaseDeclaration.model_validate(release)
     except ValidationError as error:
         raise ApplicationProfileError(
             f"invalid Application Profile {path.as_posix()}: {error}"
@@ -151,7 +161,9 @@ def load_application_file(path: Path) -> ApplicationFile:
             f"{path.as_posix()} names charter skill {charter}; application "
             f"{profile.application_id} admits only {charter_skill_id(profile.application_id)}"
         )
-    return ApplicationFile(path=path, profile=profile, installation=defaults)
+    return ApplicationFile(
+        path=path, profile=profile, installation=defaults, database_release=declared
+    )
 
 
 def charter_skill_id(application_id: str) -> str:

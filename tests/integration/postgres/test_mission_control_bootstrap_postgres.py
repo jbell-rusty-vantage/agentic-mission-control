@@ -172,6 +172,10 @@ async def test_configured_api_authenticates_and_reads_actual_restricted_database
                 assert ready.status_code == 200, ready.text
                 assert ready.json()["storage_mode"] == "production_common"
                 assert ready.json()["component_versions"] == [COMPONENT_VERSION]
+                # VER-S1: this application declares no database release, so none is checked.
+                assert [item["verdict"] for item in ready.json()["database_releases"]] == [
+                    "not_declared"
+                ]
                 assert ready.json()["production_ready"] is False
                 assert ready.json()["launch_configured"] is False
                 missing = await client.get("/v1/applications/biotech/runs/absent/inspection")

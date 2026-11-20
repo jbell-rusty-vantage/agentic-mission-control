@@ -152,6 +152,7 @@ from mission_control.bootstrap.common_installation import (
     inspect_common_installation,
 )
 from mission_control.bootstrap.composition import (
+    database_release_check,
     inspect_family_writer_installation,
     temporal_cluster_identity,
 )
@@ -432,10 +433,12 @@ async def prepare_worker(
     )
     configured = _settings_for_application(settings, item)
     binding = item.authentication.binding
+    # VER-S1: the release of its database this application declares, checked with the component.
+    release_check = database_release_check(configured, binding.application_id)
     async with AsyncExitStack() as stack:
         pool = await application_pool(binding.database_secret_ref)
         stack.push_async_callback(pool.close)
-        readiness = await inspect_common_installation(pool, binding)
+        readiness = await inspect_common_installation(pool, binding, database_release=release_check)
         family = None
         if configured.mission_control_worker_role == "base":
             assert item.family_writer_secret_ref is not None

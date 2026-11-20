@@ -2,14 +2,15 @@
 type: Concept
 category: boundaries
 title: The Application Profile
-description: "How what may differ per application (knowledge port, Data Class ceiling, output minimums, transfer defaults, hosted session retention, installation defaults) is declared as data in deployments/<app>/application.toml, selected by the installation's application id, validated by the Application Registry and read by the gateway, the manifest compile and the launch author, so the kernel names no application."
+description: "How what may differ per application (knowledge port, Data Class ceiling, output minimums, transfer defaults, hosted session retention, installation defaults, the database release it works with) is declared as data in deployments/<app>/application.toml, selected by the installation's application id, validated by the Application Registry and read by the gateway, the manifest compile, the launch author and startup, so the kernel names no application."
 tags: [mission-control, applications, resolution, knowledge-services, data-class, implementation]
-aliases: [application.toml, Application Registry, per-app profile]
+aliases: [application.toml, Application Registry, per-app profile, database release declaration]
 questions:
   - What may differ per application and where is it declared?
   - Which Data Class ceiling and knowledge binding does an application use?
   - Why was my mission refused as application_unknown?
-updated: 2026-11-01
+  - Which release of its database does an application's Mission Control work with?
+updated: 2026-11-20
 ---
 
 # The Application Profile
@@ -34,7 +35,12 @@ application, `deployments/<app>/application.toml`, beside the installation ident
   application (`deployments/ai-engineer/application.toml:41`, seed `mc.app.ai-engineer.agent-skills` 1.0.4;
   tested, local bundle publish only; not mounted in the provenance proof run);
 - `[installation]`: operator defaults the settings fall back to (task queue, LangSmith projects,
-  capability resource owner). This table is the loader's, not part of the profile type.
+  capability resource owner). This table is the loader's, not part of the profile type;
+- `[database_release]` (optional, VER-S1): the release of its database the application's Mission
+  Control works with, as `range` (an exact version, or `>=A.B.C <D.E.F`) and the `format` of the
+  answer that database states. AI Engineer declares `0.12.0`; Biotech declares none and is not
+  checked. Also the loader's table (`DatabaseReleaseDeclaration`); startup reads it, see
+  [persistence](persistence.md#database-release).
 
 The kernel names no application, binding or apply contract as a value; an architecture test
 pins it. The values and the source of each non-obvious one are commented in the files.
@@ -75,6 +81,9 @@ Application Binding's id; `MISSION_CONTROL_APPLICATION` selects whose `[installa
   `Settings.task_queue_base` / `workspace_root` raise `InstallationDefaultUnavailable`. The API
   derives its queues from the installation (`TemporalDeployment.queue_base`), as the worker does,
   and both refuse a `MISSION_CONTROL_APPLICATION` other than the binding's.
+- **Startup.** The API and the worker pass the declared `[database_release]` to the common
+  installation check, which refuses a bound database on another release; a profile that does not
+  load refuses startup ([persistence](persistence.md#database-release)).
 
 ## Drift
 
@@ -86,7 +95,9 @@ readback is declared only where served. W0 repeated the check against each live 
 
 Built / specified / goal: profile loading, registry validation, the readers above and drift conformance are
 implemented and tested; the hosted session retention number and the file/binary transfer flags are declared
-but unread (S2b, W2); per-application ceilings on lanes other than Deep Agents wait on R3.
+but unread (S2b, W2); per-application ceilings on lanes other than Deep Agents wait on R3. The
+`[database_release]` declaration and its startup reader are implemented and unit-tested (2026-11-20); no
+installation has run them.
 
 ## Citations
 
@@ -100,7 +111,8 @@ but unread (S2b, W2); per-application ceilings on lanes other than Deep Agents w
   [payload layouts](../../src/mission_control/application/knowledge/apply_payload.py),
   [gateway](../../src/mission_control/application/knowledge/gateway.py),
   [Data Class](../../src/mission_control/domain/execution/data_class.py),
-  [settings](../../src/mission_control/bootstrap/settings.py).
+  [settings](../../src/mission_control/bootstrap/settings.py),
+  [database release declaration and rule](../../src/mission_control/contracts/database_release.py).
 - Proof: [W0 release bundle](../specs/provider-consolidation-2026-10/sprint-oc/release/RELEASE-BUNDLE.md).
 - Tests: [profile conformance](../../tests/conformance/applications/test_application_profiles.py),
   [settings defaults](../../tests/unit/config_api/test_application_defaults.py),

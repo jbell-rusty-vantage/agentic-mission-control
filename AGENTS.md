@@ -32,7 +32,7 @@ Data planes, credentials, MCP servers: [workspace registry](../../docs/navigatio
 - Use `GLOSSARY.md` terms and honour its Avoid lists → review.
 - Commit when an issue's work is complete and verified; push at gate release and session end (owner rule 2026-10-27) → review.
 
-<!-- BEGIN:sdlc v=0.3.0 src=dd5dce572a63 -->
+<!-- BEGIN:sdlc v=0.3.0 src=2b9c48482494 -->
 ## Repository guide
 General Mission Control runtime and the common database component. Provider consolidation, one provider at a time; Deep Agents is the primary lane and the reference adapter shape (ADR-0005). Not here: application knowledge (`integrations/biotech`, never imported by the kernel), AI Engineer or Biotech schema authority, Knowledge Services internals.
 Knowledge: [index](docs/knowledge/index.md) (one question per concept, 9 categories) · code map: [CODE-MAP](docs/CODE-MAP.md) · search: `python docs/tools/okf_search.py "<terms>"` (`--programs` adds program documents) · retrieval fixtures: `.sdlc/fixtures/retrieval/`

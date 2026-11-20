@@ -36,3 +36,5 @@ integrations/biotech/src/biotech_mission_adapters/resources/schema-catalog/seman
 integrations/biotech/src/biotech_mission_adapters/resources/schema-catalog/source-reference.v1.json -text
 # ./dev runs under sh on every host
 /dev text eol=lf
+# Mirrored from ai-engineer-db-contract (LF there) and compared byte for byte with it.
+tests/fixtures/database_release/** text eol=lf

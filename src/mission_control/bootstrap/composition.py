@@ -154,7 +154,9 @@ from mission_control.bootstrap.application_profiles import (
     load_application_profile,
 )
 from mission_control.bootstrap.common_installation import (
+    NO_DATABASE_RELEASE_CHECK,
     CommonReadiness,
+    DatabaseReleaseCheck,
     inspect_common_installation,
     verify_pool_role,
 )
@@ -207,6 +209,24 @@ def knowledge_component_supported(pinned_schema_name: str) -> bool:
     return (major, minor, patch) >= MIN_KNOWLEDGE_COMPONENT
 
 
+def database_release_check(settings: Settings, application_id: str) -> DatabaseReleaseCheck:
+    """What startup checks the bound database's release against (VER-S1): the release the
+    application's profile declares (none: no check) and this process's mode.
+
+    A profile that does not load refuses startup: the declared release is never guessed.
+    """
+
+    try:
+        declared = load_application_profile(
+            settings.deployments_root, application_id
+        ).database_release
+    except ApplicationProfileError as error:
+        raise InstallationUnavailable(
+            f"the database release application {application_id} declares is unreadable: {error}"
+        ) from None
+    return DatabaseReleaseCheck(declared=declared, mode=settings.aieng_db_release_check)
+
+
 def temporal_cluster_identity(
     *, target: str, address: str, namespace: str, task_queue: str
 ) -> TemporalClusterIdentity:
@@ -246,6 +266,7 @@ async def compose_application_services(
     time_travel: Callable[[], TimeTravelRegistry | None] | None = None,
     fork_seed_runner: ForkSeedRunner | None = None,
     usage_prices: UsagePrices | None = None,
+    database_release: DatabaseReleaseCheck = NO_DATABASE_RELEASE_CHECK,
 ) -> MissionApplicationServices:
     if registry is not None:
         registry.disable(binding.application_id)
@@ -262,7 +283,9 @@ async def compose_application_services(
         or not identity.audiences & binding.accepted_audiences
     ):
         raise InstallationUnavailable("identity is not bound to this installation")
-    readiness = await inspect_common_installation(runtime_pool, binding)
+    readiness = await inspect_common_installation(
+        runtime_pool, binding, database_release=database_release
+    )
     if family_writer_pool is not None:
         await inspect_family_writer_installation(
             family_writer_pool, readiness.database_name, binding

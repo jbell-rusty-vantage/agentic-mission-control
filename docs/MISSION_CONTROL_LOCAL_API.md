@@ -335,6 +335,14 @@ uvicorn's `auto` loop. Without it the API logs that time travel is unavailable.
 `/health/live` checks process availability. `/health/ready` reports checked local
 readiness and whether launch is configured. OpenAPI is at `/docs`.
 
+`/health/ready` also reports the release of each bound database under `database_releases`
+(`declared_range`, `release`, `state`, `verdict`, `mode`). When the application's profile file
+declares the release it works with (`[database_release]`), the API and the worker refuse to start
+on a bound database that states another one. `AIENG_DB_RELEASE_CHECK` sets the mode: `enforce`
+(default), `warn` (start and log the verdict) or `off` (do not ask the database). A database
+that holds only the Mission Control component, as the local stack's does, is `not_applicable` and
+starts. The rule and the verdicts: [persistence](knowledge/persistence.md#database-release).
+
 Set `MISSION_CONTROL_APPLICATION_ID`, `MISSION_CONTROL_URL`, and an issuer-signed
 `MISSION_CONTROL_TOKEN` in the CLI process. Then use `missionctl run inspect RUN_ID`.
 No placeholder token or development authentication bypass is provided.

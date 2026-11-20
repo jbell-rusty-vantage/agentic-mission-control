@@ -1,5 +1,14 @@
 # Knowledge update log
 
+## 2026-11-20 (the release of the bound database, VER-S1, D-117)
+
+- [Persistence](persistence.md#database-release) gains "The release of the bound database": startup applies the
+  database contract's shared rule to what `api.database_release()` answers, in the same inspection as the component
+  check, and refuses a database on another release (`AIENG_DB_RELEASE_CHECK`: `enforce`, `warn`, `off`);
+  `/health/ready` and the configured preflight report `database_releases`. [Application Profile](application-profile.md)
+  gains the optional `[database_release]` table (AI Engineer declares `0.12.0`, revision 3; Biotech declares none).
+  Implemented and unit-tested; the PostgreSQL read test is written and not run, and no installation has started with it.
+
 ## 2026-11-01 (documentation truth pass, Phase B, OVE-206)
 
 - Refactor of the whole documentation surface. `mission-control-general/` (the origin spec pack) was deleted after every harvest row got a

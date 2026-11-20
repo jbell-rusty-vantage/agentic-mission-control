@@ -189,11 +189,12 @@
       "id": "contracts",
       "title": "Public contracts",
       "path": "src/mission_control/contracts",
-      "purpose": "Public envelopes: commands, inspection, admission, canonical digests. Also scoped identities and the hook, realtime, Context Packet and Knowledge Operation Protocol wire contracts.",
+      "purpose": "Public envelopes: commands, inspection, admission, canonical digests. Also scoped identities, the hook, realtime, Context Packet and Knowledge Operation Protocol wire contracts, and the database release rule.",
       "tests": [
         "tests/unit/run_control/test_mission_control_canonical.py",
         "tests/unit/run_control/test_mission_control_facade.py",
         "tests/unit/mission_control/test_temporal_identities.py",
+        "tests/unit/mission_control/test_database_release_rule.py",
         "tests/conformance"
       ],
       "verify": [
@@ -503,7 +504,7 @@
       "id": "bootstrap",
       "title": "Trusted composition and startup",
       "path": "src/mission_control/bootstrap",
-      "purpose": "Trusted startup and composition. Covers the API and worker factories, read-only preflight, the common-release check and the wiring of repositories and services; bootstrap passes the application id explicitly and never discovers profiles.",
+      "purpose": "Trusted startup and composition. Covers the API and worker factories, read-only preflight, the common-release check, the release check of the bound database and the wiring of repositories and services; bootstrap passes the application id explicitly and never discovers profiles.",
       "tests": [
         "tests/unit/mission_control",
         "tests/unit/prerequisites",
